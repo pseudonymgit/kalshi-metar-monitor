@@ -1,6 +1,6 @@
 import os
 import json
-from metar_monitor import get_latest_metar, set_watchlist, get_watchlist, get_metrics
+from api.core.metar_monitor import get_latest_metar, set_watchlist, get_watchlist, get_metrics
 from flask import Flask, request, jsonify
 from api.core.metar_monitor import (
     get_default_config,
