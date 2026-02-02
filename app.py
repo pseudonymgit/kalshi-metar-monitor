@@ -1,4 +1,5 @@
-import os
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 import json
 from core.metar_monitor import get_latest_metar, set_watchlist, get_watchlist, get_metrics
 from flask import Flask, request, jsonify
