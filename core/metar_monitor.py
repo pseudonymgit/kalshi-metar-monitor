@@ -19,9 +19,6 @@ _STATE = {
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
 
-# ─────────────────────────────────────────
-# Config / helpers
-# ─────────────────────────────────────────
 def get_default_config() -> Dict[str, Any]:
     return {
         "stations": json.loads(os.getenv("METAR_STATIONS_JSON", '["KDEN","KLAX","KNYC","KPHL","KMDW","KMIA","KAUS"]')),
@@ -31,12 +28,12 @@ def get_default_config() -> Dict[str, Any]:
         "ingest_secret": os.getenv("ALERT_INGEST_SECRET", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
         "autostart": os.getenv("METAR_AUTOSTART", "true").lower() in ("1","true","yes","y"),
+        "debug_awc": os.getenv("AWC_DEBUG", "false").lower() in ("1","true","yes","y"),
     }
 
 def _awc_headers() -> Dict[str, str]:
-    # AWC expects a real UA + contact; adding From is recommended.
-    ua = os.getenv("AWC_USER_AGENT") or "KalshiMetarMonitor/1.0 (+contact: daniel.gabriel@gmail.com)"
-    from_email = os.getenv("AWC_FROM_EMAIL", "daniel.gabriel@gmail.com")
+    ua = os.getenv("AWC_USER_AGENT") or "KalshiMetarMonitor/1.0 (+contact: you@example.com)"
+    from_email = os.getenv("AWC_FROM_EMAIL", "you@example.com")
     return {
         "User-Agent": ua,
         "From": from_email,
@@ -44,13 +41,13 @@ def _awc_headers() -> Dict[str, str]:
         "Connection": "close",
     }
 
-def _awc_station_url(icao: str, hours: int = 2) -> str:
-    # One-station (friendlier), JSON format:
-    # https://aviationweather.gov/adds/dataserver_current/httpparam
+def _awc_station_url(icao: str, hours: int = 1) -> str:
+    # Force integer hoursBeforeNow=1 (safest + returns latest)
+    hours = int(hours) if hours and int(hours) > 0 else 1
     return (
         "https://aviationweather.gov/adds/dataserver_current/httpparam"
         f"?dataSource=metars&requestType=retrieve&format=JSON"
-        f"&stationString={icao}&hoursBeforeNow={float(hours)}&mostRecent=true"
+        f"&stationString={icao}&hoursBeforeNow={hours}&mostRecent=true"
     )
 
 def _c_to_f(c: float) -> float:
@@ -93,11 +90,7 @@ def get_state() -> Dict[str, Any]:
             "metrics": _STATE["metrics"],
         }
 
-# ─────────────────────────────────────────
-# AWC (aviationweather.gov) fetch
-# ─────────────────────────────────────────
 def _parse_awc_response(j: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    # AWC JSON shape: { data: { METAR: [ { station_id, temp_c, observation_time, ... } ] } }
     try:
         arr = (j or {}).get("data", {}).get("METAR", [])
         if not arr:
@@ -115,10 +108,17 @@ def _parse_awc_response(j: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     except Exception:
         return None
 
-def _fetch_latest_awc(icao: str, hours_back: int = 2) -> Dict[str, Any]:
+def _fetch_latest_awc(icao: str, hours_back: int = 1) -> Dict[str, Any]:
+    cfg = get_default_config()
     url = _awc_station_url(icao, hours_back)
+    headers = _awc_headers()
     try:
-        r = requests.get(url, headers=_awc_headers(), timeout=15)
+        r = requests.get(url, headers=headers, timeout=(5, 15), allow_redirects=True)
+        if cfg["debug_awc"] and r.status_code >= 400:
+            # Log a helpful message to server logs for troubleshooting
+            print(f"[AWC DEBUG] {icao} status={r.status_code} url={url}")
+            print(f"[AWC DEBUG] Sent headers: {headers}")
+            print(f"[AWC DEBUG] Body snippet: {r.text[:300]}")
         r.raise_for_status()
         obs = _parse_awc_response(r.json())
         if not obs:
@@ -128,18 +128,16 @@ def _fetch_latest_awc(icao: str, hours_back: int = 2) -> Dict[str, Any]:
         return {"status": "error", "icao": icao, "error": str(e)}
 
 def fetch_now(icaos: List[str]) -> Dict[str, Any]:
-    """Batch fetch by iterating one-station calls (AWC-friendly)."""
     ensure_state_loaded()
     observations = {}
-    for i, icao in enumerate(icaos):
-        res = _fetch_latest_awc(icao)
+    for icao in icaos:
+        res = _fetch_latest_awc(icao, hours_back=1)
         if res.get("status") == "ok" and res.get("observation"):
             observations[icao] = res["observation"]
             with _STATE_LOCK:
                 _STATE["last_obs"][icao] = res["observation"]
         else:
             observations[icao] = None
-        # small polite delay between stations
         time.sleep(0.25)
     with _STATE_LOCK:
         _STATE["metrics"]["poll_count"] += 1
@@ -148,9 +146,8 @@ def fetch_now(icaos: List[str]) -> Dict[str, Any]:
     return {"status": "ok", "stations": icaos, "observations": observations}
 
 def get_latest_metar(icao: str) -> Dict[str, Any]:
-    """Single-station latest via AWC. Always fetch fresh (effectively live)."""
     ensure_state_loaded()
-    res = _fetch_latest_awc(icao)
+    res = _fetch_latest_awc(icao, hours_back=1)
     if res.get("status") == "ok" and res.get("observation"):
         with _STATE_LOCK:
             _STATE["last_obs"][icao] = res["observation"]
@@ -160,19 +157,11 @@ def get_latest_metar(icao: str) -> Dict[str, Any]:
         return res["observation"]
     return {"error": res.get("error", "no data"), "icao": icao}
 
-# ─────────────────────────────────────────
-# Alerts & watchlist
-# ─────────────────────────────────────────
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
     if not webhook:
         return
     try:
-        requests.post(
-            webhook,
-            json=payload,
-            timeout=10,
-            headers={"User-Agent": os.getenv("AWC_USER_AGENT", "KalshiMetarMonitor/1.0 (+contact: daniel.gabriel@gmail.com)")}
-        )
+        requests.post(webhook, json=payload, timeout=10, headers=_awc_headers())
     except Exception:
         pass
 
@@ -199,9 +188,6 @@ def get_metrics() -> Dict[str, Any]:
         m["watchlist_size"] = len(_STATE["stations"])
     return m
 
-# ─────────────────────────────────────────
-# Scheduler
-# ─────────────────────────────────────────
 def _poll_once(logger=None):
     ensure_state_loaded()
     cfg = get_default_config()
@@ -209,7 +195,7 @@ def _poll_once(logger=None):
 
     alerts = []
     for icao in stations:
-        res = _fetch_latest_awc(icao)
+        res = _fetch_latest_awc(icao, hours_back=1)
         if res.get("status") != "ok" or not res.get("observation"):
             continue
         obs = res["observation"]
@@ -230,7 +216,7 @@ def _poll_once(logger=None):
                     }
                     alerts.append(alert)
                     _STATE["last_alert"][icao] = {"temp_f": obs["temp_f"], "at": alert["at_utc"]}
-        time.sleep(0.25)  # be nice
+        time.sleep(0.25)
 
     with _STATE_LOCK:
         _STATE["metrics"]["poll_count"] += 1
