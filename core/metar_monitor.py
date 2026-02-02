@@ -34,7 +34,6 @@ def get_default_config() -> Dict[str, Any]:
         "webhook": os.getenv("ALERT_WEBHOOK_URL", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
         # Source control
-        # Default source if caller doesn’t specify ?source=...
         "default_source": os.getenv("METAR_DEFAULT_SOURCE", "nws").lower(),
         # If strict is true, DO NOT fall back to other sources automatically.
         "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
@@ -246,18 +245,17 @@ def get_metrics() -> Dict[str, Any]:
         }
 
 # =========================
-# Scheduler
+# Alerts
 # =========================
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
     """
     Send alert. If webhook is a Discord URL, wrap payload as a 'content' message
-    (and an embed) so it renders cleanly in-channel.
+    (and an embed) so it renders cleanly. Otherwise, POST the raw JSON.
     """
     if not webhook:
         return
     try:
         if "discord.com/api/webhooks" in webhook:
-            # Build a readable line plus an embed
             station = payload.get("station", "UNK")
             tf = payload.get("temp_f")
             pf = payload.get("prev_temp_f")
@@ -281,34 +279,71 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             }
             requests.post(webhook, json=body, timeout=10)
         else:
-            # Generic destination: just send the raw payload
             requests.post(webhook, json=payload, timeout=10)
     except Exception:
+        # keep alerting best-effort; don't crash the poller
         pass
 
+# =========================
+# Scheduler
+# =========================
 def _poll_once(logger=None):
     ensure_state_loaded()
     cfg = get_default_config()
     stations = _STATE["stations"] or cfg["stations"]
     chosen = cfg["default_source"] or "nws"
 
+    alerts: List[Dict[str, Any]] = []
+
     for icao in stations:
         try:
             obs = _fetch_one(icao, chosen, cfg)
-            if obs:
-                with _STATE_LOCK:
-                    _STATE["last_obs"][icao] = obs
+            if not obs:
+                continue
+
+            with _STATE_LOCK:
+                prev = _STATE["last_obs"].get(icao)
+                _STATE["last_obs"][icao] = obs
+
+            # Compare for alert after releasing lock to keep lock short
+            if prev is not None:
+                try:
+                    prev_f = float(prev.get("temp_f"))
+                    now_f = float(obs.get("temp_f"))
+                    delta = round(now_f - prev_f, 1)
+                    if abs(delta) >= cfg["delta_f"]:
+                        alerts.append({
+                            "type": "temp_change",
+                            "station": icao,
+                            "prev_temp_f": prev_f,
+                            "temp_f": now_f,
+                            "delta_f": delta,
+                            "obs_time": obs.get("obs_time"),
+                            "at_utc": datetime.utcnow().replace(tzinfo=timezone.utc).isoformat(),
+                            "source": obs.get("source", chosen),
+                        })
+                        with _STATE_LOCK:
+                            _STATE["last_alert"][icao] = {"temp_f": now_f, "at": datetime.utcnow().isoformat()}
+                except Exception:
+                    # ignore per-station diff errors
+                    pass
+
         except Exception as e:
             if logger:
                 logger.error(f"poll failed for {icao} ({chosen}): {e}")
 
+    # persist cache and counters
     with _STATE_LOCK:
         _STATE["poll_count"] += 1
         _STATE["last_poll_utc"] = datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
         _save_cache(cfg["cache_file"], {"last_obs": _STATE["last_obs"]})
 
+    # send alerts (no lock)
+    for a in alerts:
+        _send_alert(cfg["webhook"], a)
+
     if logger:
-        logger.info(f"METAR poll ({chosen}): stations={len(stations)}")
+        logger.info(f"METAR poll ({chosen}): stations={len(stations)}, alerts={len(alerts)}")
 
 def _scheduler_loop(logger, interval_sec: int):
     while not _SCHEDULER_STOP.is_set():
