@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+from datetime import datetime
 from flask import Flask, request, jsonify
 
 # Make sure local 'core' package is importable on Render
@@ -17,6 +18,9 @@ from core.metar_monitor import (
     stop_scheduler,
     fetch_now,
     get_state,
+    _send_alert,
+    get_default_config,
+    _poll_once,
 )
 
 # --- create app BEFORE any decorators ---
@@ -29,6 +33,42 @@ log.setLevel(logging.INFO)
 def root():
     return jsonify({"status": "ok"}), 200
 
+@app.route("/metar/test-alert", methods=["POST"])
+def metar_test_alert():
+    """
+    Immediately sends a synthetic alert to the configured ALERT_WEBHOOK_URL.
+    Useful to verify Discord wiring without waiting for a real temp change.
+    """
+    cfg = get_default_config()
+    payload = {
+        "type": "temp_change",
+        "station": "KDEN",
+        "prev_temp_f": 50.0,
+        "temp_f": 51.0,
+        "delta_f": 1.0,
+        "obs_time": datetime.utcnow().isoformat(),
+        "at_utc": datetime.utcnow().isoformat(),
+        "source": "synthetic",
+    }
+    _send_alert(cfg.get("webhook", ""), payload)
+    return jsonify({"ok": True, "sent": True}), 200
+
+
+@app.route("/metar/force-poll", methods=["POST"])
+def metar_force_poll():
+    """
+    Runs one poll loop immediately (uses current default source) and returns counters.
+    """
+    before = get_state()
+    _poll_once(app.logger)
+    after = get_state()
+    return jsonify({
+        "ok": True,
+        "before_poll_count": before.get("poll_count"),
+        "after_poll_count": after.get("poll_count"),
+        "last_poll_utc": after.get("last_poll_utc"),
+    }), 200
+    
 @app.route("/metar/test-alert", methods=["POST"])
 def metar_test_alert():
     """Sends a synthetic alert to your configured webhook immediately."""
