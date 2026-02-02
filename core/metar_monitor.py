@@ -248,6 +248,44 @@ def get_metrics() -> Dict[str, Any]:
 # =========================
 # Scheduler
 # =========================
+def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
+    """
+    Send alert. If webhook is a Discord URL, wrap payload as a 'content' message
+    (and an embed) so it renders cleanly in-channel.
+    """
+    if not webhook:
+        return
+    try:
+        if "discord.com/api/webhooks" in webhook:
+            # Build a readable line plus an embed
+            station = payload.get("station", "UNK")
+            tf = payload.get("temp_f")
+            pf = payload.get("prev_temp_f")
+            df = payload.get("delta_f")
+            ts = payload.get("obs_time")
+
+            content = f"**METAR Temp Change** — {station}: {pf}→{tf} °F (Δ {df:+}) @ {ts}"
+
+            body = {
+                "content": content,
+                "embeds": [{
+                    "title": f"{station} Temperature Update",
+                    "fields": [
+                        {"name": "Prev °F", "value": str(pf), "inline": True},
+                        {"name": "Now °F",  "value": str(tf), "inline": True},
+                        {"name": "Δ °F",    "value": f"{df:+}", "inline": True},
+                    ],
+                    "timestamp": payload.get("at_utc"),
+                    "footer": {"text": "METAR monitor"},
+                }]
+            }
+            requests.post(webhook, json=body, timeout=10)
+        else:
+            # Generic destination: just send the raw payload
+            requests.post(webhook, json=payload, timeout=10)
+    except Exception:
+        pass
+
 def _poll_once(logger=None):
     ensure_state_loaded()
     cfg = get_default_config()
