@@ -4,8 +4,8 @@ import os
 import json
 import threading
 import requests
-from datetime import datetime, timezone
-from typing import Dict, List, Any, Optional
+from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Any, Optional, Tuple
 
 # =========================
 # In-memory state
@@ -13,8 +13,9 @@ from typing import Dict, List, Any, Optional
 _STATE_LOCK = threading.Lock()
 _STATE = {
     "stations": [],
-    "last_obs": {},      # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": dict|str, "source": str} }
-    "last_alert": {},    # { ICAO: {"temp_f": float, "at": ISO} }
+    "last_obs": {},        # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
+    "last_alert": {},      # { ICAO: {"temp_f": float, "at": ISO} }
+    "last_seen_iso": {},   # { ICAO: ISO string of latest obs we've processed }
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
@@ -22,6 +23,8 @@ _STATE = {
 
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
+
+OVERLAP_SECONDS = 120  # 2 minutes overlap to survive small API lag/skew
 
 # =========================
 # Config
@@ -33,19 +36,35 @@ def get_default_config() -> Dict[str, Any]:
         "delta_f": float(os.getenv("TEMP_ALERT_DELTA_F", "1.0")),
         "webhook": os.getenv("ALERT_WEBHOOK_URL", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
+
         # Source control
-        "default_source": os.getenv("METAR_DEFAULT_SOURCE", "nws").lower(),
-        # If strict is true, DO NOT fall back to other sources automatically.
+        "default_source": os.getenv("METAR_DEFAULT_SOURCE", "nws").lower(),  # "nws" | "iem" | "tgftp"
         "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
-        # Friendly headers for NWS
+        "sources": [s.strip().lower() for s in os.getenv("METAR_SOURCES", "nws").split(",") if s.strip()],
+
+        # NWS etiquette headers (strongly recommended)
         "http_from": os.getenv("HTTP_FROM_EMAIL", "you@example.com"),
-        "http_agent": os.getenv("HTTP_USER_AGENT", "KalshiMetarMonitor/1.0 (+you@example.com)"),
-        # IEM lookback (hours) for last obs
-        "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "3")),
+        "http_agent": os.getenv("HTTP_USER_AGENT", "KalshiMetarMonitor/1.1 (+you@example.com)"),
+
+        # range window minutes for each poll
+        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
+
+        # IEM range window fallback (we still filter to start..end)
+        "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),
     }
 
 def _c_to_f(c: float) -> float:
     return c * 9.0/5.0 + 32.0
+
+def _parse_iso(s: str) -> datetime:
+    # tolerate both with and without timezone
+    try:
+        return datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except Exception:
+        return datetime.utcnow().replace(tzinfo=timezone.utc)
+
+def _now_utc_iso() -> str:
+    return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
 
 def _load_cache(path: str) -> Dict[str, Any]:
     try:
@@ -77,6 +96,8 @@ def ensure_state_loaded():
         cache = _load_cache(cfg["cache_file"])
         if "last_obs" in cache:
             _STATE["last_obs"].update(cache["last_obs"])
+        if "last_seen_iso" in cache:
+            _STATE["last_seen_iso"].update(cache["last_seen_iso"])
 
 def get_state() -> Dict[str, Any]:
     with _STATE_LOCK:
@@ -84,103 +105,245 @@ def get_state() -> Dict[str, Any]:
             "stations": list(_STATE["stations"]),
             "last_obs": dict(_STATE["last_obs"]),
             "last_alert": dict(_STATE["last_alert"]),
+            "last_seen_iso": dict(_STATE["last_seen_iso"]),
             "cfg": dict(_STATE["cfg"]),
             "poll_count": _STATE["poll_count"],
             "last_poll_utc": _STATE["last_poll_utc"],
         }
 
 # =========================
-# Sources: NWS, tgftp, IEM
+# Source helpers
 # =========================
 def _headers_for_nws(cfg) -> Dict[str, str]:
     return {
         "User-Agent": cfg["http_agent"],
         "From": cfg["http_from"],
-        "Accept": "application/geo+json",
+        "Accept": "application/ld+json, application/geo+json, application/json",
     }
 
-def _fetch_nws_latest(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    # api.weather.gov requires a real UA + From
-    url = f"https://api.weather.gov/stations/{icao}/observations/latest"
-    r = requests.get(url, headers=_headers_for_nws(cfg), timeout=15)
-    r.raise_for_status()
-    j = r.json()
-    props = j.get("properties", {}) if isinstance(j, dict) else {}
-    val = props.get("temperature", {}).get("value")
-    if val is None:
-        return None
-    temp_f = round(_c_to_f(float(val)), 1)
-    ts = props.get("timestamp") or datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
-    return {"temp_f": temp_f, "obs_time": ts, "raw": props, "source": "nws"}
+def _nws_range_url(icao: str, start_iso: str, end_iso: str, limit: int = 200) -> str:
+    # https://api.weather.gov/stations/KDEN/observations?start=...&end=...&limit=200
+    return (
+        f"https://api.weather.gov/stations/{icao}/observations"
+        f"?start={start_iso}&end={end_iso}&limit={limit}"
+    )
 
-def _parse_temp_from_metar_line(line: str) -> Optional[float]:
-    # Try group like 12/01 or M02/M05
-    for token in line.split():
-        if "/" in token and len(token) <= 6:
-            left, _, _right = token.partition("/")
-            try:
-                c = -float(left[1:]) if left.startswith("M") else float(left)
-                return round(_c_to_f(c), 1)
-            except Exception:
-                continue
-    return None
+def _iem_range_url(icao: str, hours: int) -> str:
+    # We’ll still filter client-side to start..end
+    return (
+        "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
+        f"?station={icao}&data=tmpf&tz=UTC&format=json&hours={hours}"
+    )
 
-def _fetch_tgftp_latest(icao: str) -> Optional[Dict[str, Any]]:
-    url = f"https://tgftp.nws.noaa.gov/data/observations/metar/stations/{icao}.TXT"
-    r = requests.get(url, timeout=15)
-    r.raise_for_status()
-    lines = r.text.strip().splitlines()
+def _tgftp_latest_url(icao: str) -> str:
+    return f"https://tgftp.nws.noaa.gov/data/observations/metar/stations/{icao}.TXT"
+
+# =========================
+# Parse → canonical obs tuple
+# =========================
+def _obs_tuple(temp_f: float, ts_iso: str, raw: Any, source: str) -> Dict[str, Any]:
+    return {"temp_f": round(float(temp_f), 1), "obs_time": ts_iso, "raw": raw, "source": source}
+
+def _parse_nws_collection(j: Dict[str, Any]) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    feats = j.get("features", [])
+    for f in feats:
+        props = f.get("properties", {})
+        val_c = props.get("temperature", {}).get("value")
+        ts = props.get("timestamp")
+        if val_c is None or not ts:
+            continue
+        out.append(_obs_tuple(_c_to_f(float(val_c)), ts, props, "nws"))
+    # sort by time asc
+    out.sort(key=lambda x: _parse_iso(x["obs_time"]))
+    return out
+
+def _parse_iem_json(j: Dict[str, Any], start_dt: datetime, end_dt: datetime) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for row in j.get("data", []):
+        tmpf = row.get("tmpf")
+        valid = row.get("valid")  # 'YYYY-mm-dd HH:MM' UTC
+        if tmpf is None or not valid:
+            continue
+        try:
+            ts = datetime.strptime(valid, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        except Exception:
+            continue
+        if ts < start_dt or ts > end_dt:
+            continue
+        out.append(_obs_tuple(float(tmpf), ts.isoformat(), row, "iem"))
+    out.sort(key=lambda x: _parse_iso(x["obs_time"]))
+    return out
+
+def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
+    lines = text.strip().splitlines()
     if not lines:
         return None
     ts_line = lines[0].strip()
     metar_line = lines[-1].strip()
-    temp_f = _parse_temp_from_metar_line(metar_line)
+    # Try find temp from token "12/01" or "M02/M05"
+    temp_f: Optional[float] = None
+    for token in metar_line.split():
+        if "/" in token and len(token) <= 6:
+            left, _, _right = token.partition("/")
+            try:
+                c = -float(left[1:]) if left.startswith("M") else float(left)
+                temp_f = _c_to_f(c)
+                break
+            except Exception:
+                continue
     if temp_f is None:
         return None
     try:
-        obs_time = datetime.strptime(ts_line, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc).isoformat()
+        ts = datetime.strptime(ts_line, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc).isoformat()
     except Exception:
-        obs_time = datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
-    return {"temp_f": temp_f, "obs_time": obs_time, "raw": metar_line, "source": "tgftp"}
+        ts = _now_utc_iso()
+    return _obs_tuple(temp_f, ts, metar_line, "tgftp")
 
-def _fetch_iem_latest(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    hrs = int(cfg.get("iem_hours", 3))
-    url = (
-        "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
-        f"?station={icao}&data=tmpf&tz=UTC&format=json&hours={hrs}"
-    )
-    r = requests.get(url, timeout=20)
+# =========================
+# Range fetchers (strict by source)
+# =========================
+def _fetch_range_nws(icao: str, start_iso: str, end_iso: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    url = _nws_range_url(icao, start_iso, end_iso)
+    r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
     r.raise_for_status()
     j = r.json()
-    data = j.get("data", [])
-    for row in reversed(data):
-        tmpf = row.get("tmpf")
-        if tmpf is not None:
-            valid = row.get("valid")
-            try:
-                dt = datetime.strptime(valid, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc).isoformat()
-            except Exception:
-                dt = datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
-            return {"temp_f": round(float(tmpf), 1), "obs_time": dt, "raw": row, "source": "iem"}
-    return None
+    return _parse_nws_collection(j)
+
+def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    url = _iem_range_url(icao, int(cfg.get("iem_hours", 1)))
+    r = requests.get(url, timeout=25)
+    r.raise_for_status()
+    j = r.json()
+    return _parse_iem_json(j, start_dt, end_dt)
+
+def _fetch_latest_tgftp(icao: str) -> List[Dict[str, Any]]:
+    r = requests.get(_tgftp_latest_url(icao), timeout=15)
+    r.raise_for_status()
+    parsed = _parse_tgftp_text(r.text)
+    return [parsed] if parsed else []
 
 # =========================
-# Fetch entry points
+# Ingestion (dedupe & alerts)
 # =========================
-def _fetch_one(icao: str, source: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    s = (source or cfg["default_source"] or "nws").lower()
-    if s == "nws":
-        return _fetch_nws_latest(icao, cfg)
-    if s == "tgftp":
-        return _fetch_tgftp_latest(icao)
-    if s == "iem":
-        return _fetch_iem_latest(icao, cfg)
-    # Unknown source => None (strict, no fallback)
-    return None
+def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -> Tuple[int, int]:
+    """
+    Ingests observations in chronological order.
+    Returns (ingested_count, alerts_count).
+    """
+    if not new_obs:
+        return (0, 0)
+
+    with _STATE_LOCK:
+        last_seen_iso = _STATE["last_seen_iso"].get(icao)
+        last_temp = _STATE["last_obs"].get(icao, {}).get("temp_f")
+
+    ingested = 0
+    alerts = 0
+    delta_thr = float(cfg["delta_f"])
+
+    # Process in ascending time; skip obs_time <= last_seen_iso
+    for obs in new_obs:
+        ts = obs["obs_time"]
+        if last_seen_iso and _parse_iso(ts) <= _parse_iso(last_seen_iso):
+            continue
+
+        # Store obs
+        with _STATE_LOCK:
+            _STATE["last_obs"][icao] = obs
+            _STATE["last_seen_iso"][icao] = ts
+
+        ingested += 1
+
+        # Alert logic: compare to previous temperature
+        if last_temp is not None:
+            d = round(float(obs["temp_f"]) - float(last_temp), 1)
+            if abs(d) >= delta_thr:
+                _emit_alert(icao, prev_f=last_temp, now_f=obs["temp_f"], delta_f=d, obs_time=ts, cfg=cfg)
+                alerts += 1
+
+        last_temp = obs["temp_f"]
+
+    # Persist cache (best effort)
+    with _STATE_LOCK:
+        _save_cache(cfg["cache_file"], {
+            "last_obs": _STATE["last_obs"],
+            "last_seen_iso": _STATE["last_seen_iso"],
+        })
+
+    return (ingested, alerts)
+
+def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any]) -> None:
+    payload = {
+        "type": "temp_change",
+        "station": icao,
+        "prev_temp_f": prev_f,
+        "temp_f": now_f,
+        "delta_f": delta_f,
+        "obs_time": obs_time,
+        "at_utc": _now_utc_iso(),
+    }
+    _send_alert(cfg.get("webhook", ""), payload)
+
+def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
+    if not webhook:
+        return
+    try:
+        if "discord.com/api/webhooks" in webhook:
+            station = payload.get("station", "UNK")
+            tf = payload.get("temp_f")
+            pf = payload.get("prev_temp_f")
+            df = payload.get("delta_f")
+            ts = payload.get("obs_time")
+            content = f"**METAR Temp Change** — {station}: {pf}→{tf} °F (Δ {df:+}) @ {ts}"
+            body = {
+                "content": content,
+                "embeds": [{
+                    "title": f"{station} Temperature Update",
+                    "fields": [
+                        {"name": "Prev °F", "value": str(pf), "inline": True},
+                        {"name": "Now °F",  "value": str(tf), "inline": True},
+                        {"name": "Δ °F",    "value": f"{df:+}", "inline": True},
+                    ],
+                    "timestamp": payload.get("at_utc"),
+                    "footer": {"text": "METAR monitor"},
+                }]
+            }
+            requests.post(webhook, json=body, timeout=10)
+        else:
+            requests.post(webhook, json=payload, timeout=10)
+    except Exception:
+        pass
+
+# =========================
+# Public fetch helpers (strict by chosen/default source)
+# =========================
+def _compute_window(icao: str, cfg: Dict[str, Any]) -> Tuple[str, str, datetime, datetime]:
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    lookback = int(cfg["lookback_min"])
+    with _STATE_LOCK:
+        last_seen = _STATE["last_seen_iso"].get(icao)
+    if last_seen:
+        start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
+    else:
+        start_dt = now - timedelta(minutes=lookback)
+    end_dt = now
+    return (start_dt.isoformat(), end_dt.isoformat(), start_dt, end_dt)
+
+def _fetch_range_strict(icao: str, chosen: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
+    if chosen == "nws":
+        return _fetch_range_nws(icao, start_iso, end_iso, cfg)
+    if chosen == "iem":
+        return _fetch_range_iem(icao, start_dt, end_dt, cfg)
+    if chosen == "tgftp":
+        # TGFTP only gives latest; still return in list form
+        return _fetch_latest_tgftp(icao)
+    return []
 
 def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, Any]:
     """
-    Strict: if a source is given (or defaulted), we only use that source—no fallback.
+    Strict range fetch. No fallback unless you turn strict off.
     """
     ensure_state_loaded()
     cfg = get_default_config()
@@ -188,27 +351,32 @@ def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, An
 
     observations: Dict[str, Any] = {}
     errors: Dict[str, str] = {}
+    total_ing = 0
+    total_alerts = 0
 
     for icao in stations:
         try:
-            obs = _fetch_one(icao, chosen, cfg)
-            observations[icao] = obs
-            # Save to cache if we got a value
-            if obs:
-                with _STATE_LOCK:
-                    _STATE["last_obs"][icao] = obs
+            obs_list = _fetch_range_strict(icao, chosen, cfg)
+            ing, al = _ingest_obs(icao, obs_list, cfg)
+            total_ing += ing
+            total_alerts += al
+            # Return the latest we know (may still be None if nothing arrived)
+            with _STATE_LOCK:
+                observations[icao] = _STATE["last_obs"].get(icao)
         except Exception as e:
             observations[icao] = None
             errors[icao] = str(e)
 
-    # Persist last_obs (best effort)
-    with _STATE_LOCK:
-        _save_cache(cfg["cache_file"], {"last_obs": _STATE["last_obs"]})
-
-    out = {"status": "ok", "stations": stations, "observations": observations, "source": chosen}
+    out = {
+        "status": "ok",
+        "stations": stations,
+        "observations": observations,
+        "source": chosen,
+        "ingested": total_ing,
+        "alerts": total_alerts,
+    }
     if errors:
         out["errors"] = errors
-        # still ok; caller decides what to do per-station
     return out
 
 def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
@@ -216,7 +384,6 @@ def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
     obs = res.get("observations", {}).get(icao)
     if obs:
         return {"icao": icao, "source": res.get("source"), **obs}
-    # Return error + carry source choice
     err = res.get("errors", {}).get(icao)
     return {"icao": icao, "source": res.get("source"), "error": err or "no observation"}
 
@@ -245,46 +412,6 @@ def get_metrics() -> Dict[str, Any]:
         }
 
 # =========================
-# Alerts
-# =========================
-def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
-    """
-    Send alert. If webhook is a Discord URL, wrap payload as a 'content' message
-    (and an embed) so it renders cleanly. Otherwise, POST the raw JSON.
-    """
-    if not webhook:
-        return
-    try:
-        if "discord.com/api/webhooks" in webhook:
-            station = payload.get("station", "UNK")
-            tf = payload.get("temp_f")
-            pf = payload.get("prev_temp_f")
-            df = payload.get("delta_f")
-            ts = payload.get("obs_time")
-
-            content = f"**METAR Temp Change** — {station}: {pf}→{tf} °F (Δ {df:+}) @ {ts}"
-
-            body = {
-                "content": content,
-                "embeds": [{
-                    "title": f"{station} Temperature Update",
-                    "fields": [
-                        {"name": "Prev °F", "value": str(pf), "inline": True},
-                        {"name": "Now °F",  "value": str(tf), "inline": True},
-                        {"name": "Δ °F",    "value": f"{df:+}", "inline": True},
-                    ],
-                    "timestamp": payload.get("at_utc"),
-                    "footer": {"text": "METAR monitor"},
-                }]
-            }
-            requests.post(webhook, json=body, timeout=10)
-        else:
-            requests.post(webhook, json=payload, timeout=10)
-    except Exception:
-        # keep alerting best-effort; don't crash the poller
-        pass
-
-# =========================
 # Scheduler
 # =========================
 def _poll_once(logger=None):
@@ -293,57 +420,28 @@ def _poll_once(logger=None):
     stations = _STATE["stations"] or cfg["stations"]
     chosen = cfg["default_source"] or "nws"
 
-    alerts: List[Dict[str, Any]] = []
-
+    total_ing = 0
+    total_alerts = 0
     for icao in stations:
         try:
-            obs = _fetch_one(icao, chosen, cfg)
-            if not obs:
-                continue
-
-            with _STATE_LOCK:
-                prev = _STATE["last_obs"].get(icao)
-                _STATE["last_obs"][icao] = obs
-
-            # Compare for alert after releasing lock to keep lock short
-            if prev is not None:
-                try:
-                    prev_f = float(prev.get("temp_f"))
-                    now_f = float(obs.get("temp_f"))
-                    delta = round(now_f - prev_f, 1)
-                    if abs(delta) >= cfg["delta_f"]:
-                        alerts.append({
-                            "type": "temp_change",
-                            "station": icao,
-                            "prev_temp_f": prev_f,
-                            "temp_f": now_f,
-                            "delta_f": delta,
-                            "obs_time": obs.get("obs_time"),
-                            "at_utc": datetime.utcnow().replace(tzinfo=timezone.utc).isoformat(),
-                            "source": obs.get("source", chosen),
-                        })
-                        with _STATE_LOCK:
-                            _STATE["last_alert"][icao] = {"temp_f": now_f, "at": datetime.utcnow().isoformat()}
-                except Exception:
-                    # ignore per-station diff errors
-                    pass
-
+            obs_list = _fetch_range_strict(icao, chosen, cfg)
+            ing, al = _ingest_obs(icao, obs_list, cfg)
+            total_ing += ing
+            total_alerts += al
         except Exception as e:
             if logger:
                 logger.error(f"poll failed for {icao} ({chosen}): {e}")
 
-    # persist cache and counters
     with _STATE_LOCK:
         _STATE["poll_count"] += 1
-        _STATE["last_poll_utc"] = datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
-        _save_cache(cfg["cache_file"], {"last_obs": _STATE["last_obs"]})
-
-    # send alerts (no lock)
-    for a in alerts:
-        _send_alert(cfg["webhook"], a)
+        _STATE["last_poll_utc"] = _now_utc_iso()
+        _save_cache(cfg["cache_file"], {
+            "last_obs": _STATE["last_obs"],
+            "last_seen_iso": _STATE["last_seen_iso"],
+        })
 
     if logger:
-        logger.info(f"METAR poll ({chosen}): stations={len(stations)}, alerts={len(alerts)}")
+        logger.info(f"METAR poll ({chosen}): stations={len(stations)} ingested={total_ing} alerts={total_alerts}")
 
 def _scheduler_loop(logger, interval_sec: int):
     while not _SCHEDULER_STOP.is_set():
