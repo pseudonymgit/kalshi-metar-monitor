@@ -154,15 +154,14 @@ def _tz_name_from_env() -> str:
     # Prefer explicit timezone; defaults to US/Eastern for convenience
     return os.getenv("ALERT_TIMEZONE", "America/New_York")
 
-def _iso_to_tz(iso_str: Optional[str], tz_name: Optional[str] = None) -> Optional[str]:
+def _iso_to_tz(iso_str: str, tz: str = "America/New_York") -> str:
     if not iso_str:
         return None
-    tz = ZoneInfo(tz_name or _tz_name_from_env())
+    dt = _parse_iso(iso_str)
     try:
-        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
-        return dt.astimezone(tz).isoformat()
+        return dt.astimezone(ZoneInfo(tz)).isoformat()
     except Exception:
-        return None
+        return dt.isoformat()
 
 def _headers_for_nws(cfg) -> Dict[str, str]:
     # api.weather.gov requires a legit UA + From
@@ -504,28 +503,49 @@ def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
     err = res.get("errors", {}).get(icao)
     return {"icao": icao, "source": res.get("source"), "error": err or "no observation"}
 
-def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[str, Any]:
+from datetime import datetime, timezone, timedelta
+
+def fetch_window(icao: str, minutes: int, source: str | None = None) -> dict:
+    """
+    Fetch observations for a single ICAO over the last `minutes` (strict by `source`),
+    ingest them (dedupe + alerts), and return the latest known obs plus UTC/ET window.
+    """
     ensure_state_loaded()
-    base_cfg = get_default_config()
-    chosen = (source or base_cfg["default_source"] or "nws").lower()
+    cfg = get_default_config()
+    chosen = (source or cfg.get("default_source") or "nws").lower()
 
-    # temporarily override lookback used by our window helper
-    minutes = max(1, int(minutes))
-    cfg = {**base_cfg, "lookback_min": minutes}
+    # Build time window (UTC). Use a small overlap if we've seen data before.
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    lookback = max(1, int(minutes))
+    base_start = now - timedelta(minutes=lookback)
 
+    with _STATE_LOCK:
+        last_seen_iso = _STATE["last_seen_iso"].get(icao)
+
+    if last_seen_iso:
+        # overlap to avoid missing late-arriving obs
+        overlap_start = _parse_iso(last_seen_iso) - timedelta(seconds=OVERLAP_SECONDS)
+        start_dt = max(base_start, overlap_start)
+    else:
+        start_dt = base_start
+
+    end_dt = now
+    start_iso = start_dt.isoformat()
+    end_iso = end_dt.isoformat()
+
+    # Strict-range fetch by source
     try:
-        start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
-
         if chosen == "nws":
             obs_list = _fetch_range_nws(icao, start_iso, end_iso, cfg)
         elif chosen == "iem":
             obs_list = _fetch_range_iem(icao, start_dt, end_dt, cfg)
         elif chosen == "tgftp":
-            obs_list = _fetch_latest_tgftp(icao)
+            obs_list = _fetch_latest_tgftp(icao)  # latest only
         else:
-            obs_list = []
+            return {"status": "error", "icao": icao, "source": chosen, "error": "unsupported source"}
 
         ing, al = _ingest_obs(icao, obs_list, cfg)
+
         with _STATE_LOCK:
             latest = _STATE["last_obs"].get(icao)
 
@@ -533,16 +553,18 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
             "status": "ok",
             "icao": icao,
             "source": chosen,
+            "window_utc": {"start": start_iso, "end": end_iso},
+            "window_et": {
+                "start": _iso_to_tz(start_iso, "America/New_York"),
+                "end": _iso_to_tz(end_iso,   "America/New_York"),
+            },
             "ingested": ing,
             "alerts": al,
             "latest": latest,
-            "window_start_utc": start_iso,
-            "window_end_utc": end_iso,
-            "window_start_et": _iso_to_tz(start_iso),
-            "window_end_et": _iso_to_tz(end_iso),
         }
     except Exception as e:
         return {"status": "error", "icao": icao, "source": chosen, "error": str(e)}
+
 
 # =========================
 # Watchlist + metrics
@@ -570,7 +592,7 @@ def _iso_to_tz(iso_str: str, tz: str = "America/New_York") -> str:
         # As a last resort, just return the UTC timestamp
         return dt.isoformat()
 
-def get_metrics() -> Dict[str, Any]:
+def get_metrics() -> dict:
     with _STATE_LOCK:
         last_utc = _STATE["last_poll_utc"]
         last_et = _iso_to_tz(last_utc, "America/New_York") if last_utc else None
