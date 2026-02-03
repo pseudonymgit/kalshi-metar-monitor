@@ -66,6 +66,12 @@ def get_default_config() -> Dict[str, Any]:
         "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
     }
 
+def _iso_z(dt: datetime) -> str:
+    """UTC ISO8601 with 'Z' and no microseconds, e.g. 2026-02-03T17:26:27Z"""
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    dt = dt.astimezone(timezone.utc).replace(microsecond=0)
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def _c_to_f(c: float) -> float:
     return c * 9.0/5.0 + 32.0
@@ -334,16 +340,20 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 # Public fetch helpers (strict by chosen/default source)
 # =========================
 def _compute_window(icao: str, cfg: Dict[str, Any]) -> Tuple[str, str, datetime, datetime]:
-    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    now = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(seconds=30)
     lookback = int(cfg["lookback_min"])
     with _STATE_LOCK:
         last_seen = _STATE["last_seen_iso"].get(icao)
+
     if last_seen:
         start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
     else:
         start_dt = now - timedelta(minutes=lookback)
+
     end_dt = now
-    return (start_dt.isoformat(), end_dt.isoformat(), start_dt, end_dt)
+    # Return Z-formatted strings for NWS
+    return (_iso_z(start_dt), _iso_z(end_dt), start_dt, end_dt)
+
 
 def _fetch_range_strict(icao: str, chosen: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
