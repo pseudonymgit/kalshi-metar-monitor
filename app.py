@@ -33,14 +33,27 @@ def root():
 
 @app.route("/metar/window", methods=["GET"])
 def metar_window():
-    from core.metar_monitor import fetch_now
-    icao = request.args.get("icao", "").strip().upper()
-    source = request.args.get("source", "nws")
+    """
+    Example:
+      /metar/window?icao=KDEN&minutes=3&source=nws
+    Strict source (no fallback). Ingests any obs in the window,
+    then returns latest-known obs + counts.
+    """
+    icao = (request.args.get("icao") or "").strip().upper()
+    minutes = int(request.args.get("minutes", "3"))
+    source = (request.args.get("source") or "").strip().lower() or None
+
     if not icao:
         return jsonify({"error": "Missing query param: icao"}), 400
-    # reuse fetch_now (it already uses your sliding window)
-    res = fetch_now([icao], source=source)
-    return jsonify(res), 200 if "errors" not in res else 502
+    if minutes <= 0:
+        return jsonify({"error": "minutes must be > 0"}), 400
+
+    from core.metar_monitor import fetch_window
+    res = fetch_window(icao, minutes, source=source)
+    return jsonify(res), 200
+
+
+
 
 
 @app.route("/metar/latest", methods=["GET"])
