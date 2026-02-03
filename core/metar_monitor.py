@@ -423,31 +423,39 @@ def _send_alert(webhook: str, payload: Dict[str, Any], cfg: Dict[str, Any]) -> N
 # Public fetch helpers (strict by chosen/default source)
 # =========================
 def _compute_window(icao: str, cfg: Dict[str, Any]) -> Tuple[str, str, datetime, datetime]:
-    now = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(seconds=30)
+    # Build a short window ending "now", with overlap and second precision (no microseconds)
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    # NWS can be picky about microseconds; strip them
+    now = now.replace(microsecond=0)
+
     lookback = int(cfg["lookback_min"])
     with _STATE_LOCK:
         last_seen = _STATE["last_seen_iso"].get(icao)
 
     if last_seen:
-        start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
+        start_dt = _parse_iso(last_seen).replace(microsecond=0) - timedelta(seconds=OVERLAP_SECONDS)
     else:
         start_dt = now - timedelta(minutes=lookback)
 
-    end_dt = now
-    # Return Z-formatted strings for NWS
-    return (_iso_z(start_dt), _iso_z(end_dt), start_dt, end_dt)
+    # ensure start < end by at least 2s
+    end_dt = max(start_dt + timedelta(seconds=2), now)
+
+    start_iso = start_dt.isoformat().replace("+00:00", "Z")
+    end_iso   = end_dt.isoformat().replace("+00:00", "Z")
+    return (start_iso, end_iso, start_dt, end_dt)
 
 
-def _fetch_range_strict(icao: str, chosen: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
-    if chosen == "nws":
-        return _fetch_range_nws(icao, start_iso, end_iso, cfg)
-    if chosen == "iem":
-        return _fetch_range_iem(icao, start_dt, end_dt, cfg)
-    if chosen == "tgftp":
-        # TGFTP only gives latest; still return in list form
-        return _fetch_latest_tgftp(icao)
-    return []
+def _fetch_range_nws(icao: str, start_iso: str, end_iso: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    url = f"https://api.weather.gov/stations/{icao}/observations"
+    params = {
+        "start": start_iso,  # RFC3339 (we send Z-terminated, seconds precision)
+        "end": end_iso,
+        "limit": 200
+    }
+    r = requests.get(url, headers=_headers_for_nws(cfg), params=params, timeout=20)
+    r.raise_for_status()
+    j = r.json()
+    return _parse_nws_collection(j)
 
 def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -496,27 +504,17 @@ def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
     return {"icao": icao, "source": res.get("source"), "error": err or "no observation"}
 
 def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[str, Any]:
-    """
-    Fetch a station over a caller-specified window (minutes), strict by source,
-    ingest obs, and return latest-known. Uses the same overlap logic as the scheduler.
-    """
     ensure_state_loaded()
     cfg = get_default_config()
     chosen = (source or cfg["default_source"] or "nws").lower()
 
-    # temporarily compute a window using minutes (instead of METAR_LOOKBACK_MIN)
-    now = datetime.utcnow().replace(tzinfo=timezone.utc)
-    with _STATE_LOCK:
-        last_seen = _STATE["last_seen_iso"].get(icao)
-
-    if last_seen:
-        start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
-    else:
-        start_dt = now - timedelta(minutes=max(1, int(minutes)))
-    end_dt = now
-    start_iso, end_iso = start_dt.isoformat(), end_dt.isoformat()
+    # temporarily override the lookback used by _compute_window
+    minutes = max(1, int(minutes))
+    cfg = {**cfg, "lookback_min": minutes}
 
     try:
+        start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
+
         if chosen == "nws":
             obs_list = _fetch_range_nws(icao, start_iso, end_iso, cfg)
         elif chosen == "iem":
@@ -525,9 +523,11 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
             obs_list = _fetch_latest_tgftp(icao)
         else:
             obs_list = []
+
         ing, al = _ingest_obs(icao, obs_list, cfg)
         with _STATE_LOCK:
             latest = _STATE["last_obs"].get(icao)
+
         return {
             "status": "ok",
             "icao": icao,
