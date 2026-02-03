@@ -30,6 +30,22 @@ OVERLAP_SECONDS = 120  # 2 minutes overlap to survive small API lag/skew
 # Config
 # =========================
 def get_default_config() -> Dict[str, Any]:
+    """
+    Build runtime config from env. Prefer AWC_* (your existing names) but
+    still support HTTP_* for backward compatibility.
+    """
+    # Friendly headers for NWS
+    http_from = (
+        os.getenv("AWC_FROM_EMAIL")
+        or os.getenv("HTTP_FROM_EMAIL")
+        or "you@example.com"
+    )
+    http_agent = (
+        os.getenv("AWC_USER_AGENT")
+        or os.getenv("HTTP_USER_AGENT")
+        or "KalshiMetarMonitor/1.1 (+you@example.com)"
+    )
+
     return {
         "stations": json.loads(os.getenv("METAR_STATIONS_JSON", '["KDEN","KLAX","KNYC","KPHL","KMDW","KMIA","KAUS"]')),
         "poll_seconds": int(os.getenv("METAR_POLL_SECONDS", "60")),
@@ -38,20 +54,18 @@ def get_default_config() -> Dict[str, Any]:
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
 
         # Source control
-        "default_source": os.getenv("METAR_DEFAULT_SOURCE", "nws").lower(),  # "nws" | "iem" | "tgftp"
-        "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
-        "sources": [s.strip().lower() for s in os.getenv("METAR_SOURCES", "nws").split(",") if s.strip()],
+        "default_source": (os.getenv("METAR_DEFAULT_SOURCE") or "nws").lower(),
+        "strict": os.getenv("METAR_STRICT", "true").lower() in ("1","true","yes","y"),
 
-        # NWS etiquette headers (strongly recommended)
-        "http_from": os.getenv("HTTP_FROM_EMAIL", "you@example.com"),
-        "http_agent": os.getenv("HTTP_USER_AGENT", "KalshiMetarMonitor/1.1 (+you@example.com)"),
+        # NWS etiquette headers (prefer your AWC_* names)
+        "http_from": http_from,
+        "http_agent": http_agent,
 
-        # range window minutes for each poll
-        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
-
-        # IEM range window fallback (we still filter to start..end)
+        # Lookback windows
         "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),
+        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
     }
+
 
 def _c_to_f(c: float) -> float:
     return c * 9.0/5.0 + 32.0
@@ -115,10 +129,11 @@ def get_state() -> Dict[str, Any]:
 # Source helpers
 # =========================
 def _headers_for_nws(cfg) -> Dict[str, str]:
+    # api.weather.gov requires a legit UA + From
     return {
         "User-Agent": cfg["http_agent"],
         "From": cfg["http_from"],
-        "Accept": "application/ld+json, application/geo+json, application/json",
+        "Accept": "application/geo+json",
     }
 
 def _nws_range_url(icao: str, start_iso: str, end_iso: str, limit: int = 200) -> str:
