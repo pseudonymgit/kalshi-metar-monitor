@@ -6,6 +6,7 @@ import threading
 import requests
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
+from zoneinfo import ZoneInfo
 
 # =========================
 # In-memory state
@@ -67,6 +68,10 @@ def get_default_config() -> Dict[str, Any]:
 
         # Which timezone to show in alerts/metrics: "UTC" or "ET"
         "alert_tz": (os.getenv("ALERT_TIMEZONE") or "UTC").upper(),  # UTC|ET
+
+        "alert_min_interval_sec": int(os.getenv("ALERT_MIN_INTERVAL_SEC", "300")),  # 5 min default
+        "alert_min_bump_f": float(os.getenv("ALERT_MIN_BUMP_F", "0.1")),            # ignore tiny jitter
+
     }
 
 def _iso_z(dt: datetime) -> str:
@@ -145,6 +150,20 @@ def get_state() -> Dict[str, Any]:
 # =========================
 # Source helpers
 # =========================
+def _tz_name_from_env() -> str:
+    # Prefer explicit timezone; defaults to US/Eastern for convenience
+    return os.getenv("ALERT_TIMEZONE", "America/New_York")
+
+def _iso_to_tz(iso_str: Optional[str], tz_name: Optional[str] = None) -> Optional[str]:
+    if not iso_str:
+        return None
+    tz = ZoneInfo(tz_name or _tz_name_from_env())
+    try:
+        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        return dt.astimezone(tz).isoformat()
+    except Exception:
+        return None
+
 def _headers_for_nws(cfg) -> Dict[str, str]:
     # api.weather.gov requires a legit UA + From
     return {
@@ -305,7 +324,47 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
     return (ingested, alerts)
 
+def _should_alert(icao: str, prev_f: float, now_f: float, when_iso: str, cfg: Dict[str, Any]) -> bool:
+    """
+    Decide if we should alert given the last alert for this ICAO.
+    Rules:
+      - If no previous alert, allow.
+      - Alert if abs(now - last_alert_temp) >= delta_f  (big enough move since last alert), OR
+      - If time since last alert >= min_interval AND abs(now - prev) >= min_bump (not noise).
+    """
+    delta_f = float(cfg.get("delta_f", 1.0))
+    min_interval = int(cfg.get("alert_min_interval_sec", 300))
+    min_bump = float(cfg.get("alert_min_bump_f", 0.1))
+
+    with _STATE_LOCK:
+        last = _STATE["last_alert"].get(icao)
+
+    if not last:
+        return True
+
+    try:
+        last_at = datetime.fromisoformat(last["at"].replace("Z", "+00:00"))
+        now_dt = datetime.fromisoformat(when_iso.replace("Z", "+00:00"))
+    except Exception:
+        return True  # if time parse fails, be permissive
+
+    since_last_sec = (now_dt - last_at).total_seconds()
+    last_temp = float(last.get("temp_f", prev_f))
+
+    # Big enough move since the last alert?
+    if abs(now_f - last_temp) >= delta_f:
+        return True
+
+    # Otherwise, allow periodic update if the interval passed AND it's not just pure jitter
+    if since_last_sec >= min_interval and abs(now_f - prev_f) >= min_bump:
+        return True
+
+    return False
+
 def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any]) -> None:
+    if not _should_alert(icao, prev_f, now_f, obs_time, cfg):
+        return
+
     payload = {
         "type": "temp_change",
         "station": icao,
@@ -316,6 +375,11 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
         "at_utc": _now_utc_iso(),
     }
     _send_alert(cfg.get("webhook", ""), payload)
+
+    # Record last alert for damping
+    with _STATE_LOCK:
+        _STATE["last_alert"][icao] = {"temp_f": now_f, "at": payload["at_utc"]}
+
 
 def _send_alert(webhook: str, payload: Dict[str, Any], cfg: Dict[str, Any]) -> None:
     if not webhook:
@@ -431,6 +495,54 @@ def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
     err = res.get("errors", {}).get(icao)
     return {"icao": icao, "source": res.get("source"), "error": err or "no observation"}
 
+def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Fetch a station over a caller-specified window (minutes), strict by source,
+    ingest obs, and return latest-known. Uses the same overlap logic as the scheduler.
+    """
+    ensure_state_loaded()
+    cfg = get_default_config()
+    chosen = (source or cfg["default_source"] or "nws").lower()
+
+    # temporarily compute a window using minutes (instead of METAR_LOOKBACK_MIN)
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    with _STATE_LOCK:
+        last_seen = _STATE["last_seen_iso"].get(icao)
+
+    if last_seen:
+        start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
+    else:
+        start_dt = now - timedelta(minutes=max(1, int(minutes)))
+    end_dt = now
+    start_iso, end_iso = start_dt.isoformat(), end_dt.isoformat()
+
+    try:
+        if chosen == "nws":
+            obs_list = _fetch_range_nws(icao, start_iso, end_iso, cfg)
+        elif chosen == "iem":
+            obs_list = _fetch_range_iem(icao, start_dt, end_dt, cfg)
+        elif chosen == "tgftp":
+            obs_list = _fetch_latest_tgftp(icao)
+        else:
+            obs_list = []
+        ing, al = _ingest_obs(icao, obs_list, cfg)
+        with _STATE_LOCK:
+            latest = _STATE["last_obs"].get(icao)
+        return {
+            "status": "ok",
+            "icao": icao,
+            "source": chosen,
+            "ingested": ing,
+            "alerts": al,
+            "latest": latest,
+            "window_start_utc": start_iso,
+            "window_end_utc": end_iso,
+            "window_start_et": _iso_to_tz(start_iso),
+            "window_end_et": _iso_to_tz(end_iso),
+        }
+    except Exception as e:
+        return {"status": "error", "icao": icao, "source": chosen, "error": str(e)}
+
 # =========================
 # Watchlist + metrics
 # =========================
@@ -449,15 +561,14 @@ def get_watchlist() -> Dict[str, Any]:
 
 def get_metrics() -> Dict[str, Any]:
     with _STATE_LOCK:
-        last_utc = _STATE["last_poll_utc"]
-        last_et = _to_et_iso(last_utc) if last_utc else None
+        last_poll_utc = _STATE["last_poll_utc"]
+        last_poll_et = _iso_to_tz(last_poll_utc)
         return {
-            "last_poll_utc": last_utc,
-            "last_poll_et": last_et,
+            "last_poll_utc": last_poll_utc,
+            "last_poll_et": last_poll_et,
             "poll_count": _STATE["poll_count"],
             "watchlist_size": len(_STATE["stations"] or get_default_config()["stations"]),
         }
-
 
 # =========================
 # Scheduler
