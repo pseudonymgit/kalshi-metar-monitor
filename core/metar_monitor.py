@@ -255,8 +255,9 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
 # Range fetchers (strict by source)
 # =========================
 def _fetch_range_nws(icao: str, start_iso: str, end_iso: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    url = _nws_range_url(icao, start_iso, end_iso)
-    r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
+    url = f"https://api.weather.gov/stations/{icao}/observations"
+    params = {"start": start_iso, "end": end_iso, "limit": 200}
+    r = requests.get(url, headers=_headers_for_nws(cfg), params=params, timeout=20)
     r.raise_for_status()
     j = r.json()
     return _parse_nws_collection(j)
@@ -505,12 +506,12 @@ def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
 
 def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[str, Any]:
     ensure_state_loaded()
-    cfg = get_default_config()
-    chosen = (source or cfg["default_source"] or "nws").lower()
+    base_cfg = get_default_config()
+    chosen = (source or base_cfg["default_source"] or "nws").lower()
 
-    # temporarily override the lookback used by _compute_window
+    # temporarily override lookback used by our window helper
     minutes = max(1, int(minutes))
-    cfg = {**cfg, "lookback_min": minutes}
+    cfg = {**base_cfg, "lookback_min": minutes}
 
     try:
         start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
@@ -559,13 +560,23 @@ def get_watchlist() -> Dict[str, Any]:
         wl = list(_STATE["stations"]) or get_default_config()["stations"]
     return {"watchlist": wl, "count": len(wl)}
 
+def _iso_to_tz(iso_str: str, tz: str = "America/New_York") -> str:
+    if not iso_str:
+        return None
+    dt = _parse_iso(iso_str)
+    try:
+        return dt.astimezone(ZoneInfo(tz)).isoformat()
+    except Exception:
+        # As a last resort, just return the UTC timestamp
+        return dt.isoformat()
+
 def get_metrics() -> Dict[str, Any]:
     with _STATE_LOCK:
-        last_poll_utc = _STATE["last_poll_utc"]
-        last_poll_et = _iso_to_tz(last_poll_utc)
+        last_utc = _STATE["last_poll_utc"]
+        last_et = _iso_to_tz(last_utc, "America/New_York") if last_utc else None
         return {
-            "last_poll_utc": last_poll_utc,
-            "last_poll_et": last_poll_et,
+            "last_poll_utc": last_utc,
+            "last_poll_et": last_et,
             "poll_count": _STATE["poll_count"],
             "watchlist_size": len(_STATE["stations"] or get_default_config()["stations"]),
         }
