@@ -64,14 +64,25 @@ def get_default_config() -> Dict[str, Any]:
         # Lookback windows
         "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),
         "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
+
+        # Which timezone to show in alerts/metrics: "UTC" or "ET"
+        "alert_tz": (os.getenv("ALERT_TIMEZONE") or "UTC").upper(),  # UTC|ET
     }
 
 def _iso_z(dt: datetime) -> str:
-    """UTC ISO8601 with 'Z' and no microseconds, e.g. 2026-02-03T17:26:27Z"""
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     dt = dt.astimezone(timezone.utc).replace(microsecond=0)
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+def _to_et_iso(dt_or_iso: str | datetime) -> str:
+    if isinstance(dt_or_iso, str):
+        dt = _parse_iso(dt_or_iso)
+    else:
+        dt = dt_or_iso
+    et = dt.astimezone(ZoneInfo("America/New_York")).replace(microsecond=0)
+    # Example: 2026-02-03T12:34:56-05:00
+    return et.isoformat()
 
 def _c_to_f(c: float) -> float:
     return c * 9.0/5.0 + 32.0
@@ -306,17 +317,22 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
     }
     _send_alert(cfg.get("webhook", ""), payload)
 
-def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
+def _send_alert(webhook: str, payload: Dict[str, Any], cfg: Dict[str, Any]) -> None:
     if not webhook:
         return
     try:
+        tz_pref = cfg.get("alert_tz", "UTC").upper()
+        ts_disp = payload["obs_time_et"] if tz_pref == "ET" else payload["obs_time"]
+        at_disp = payload["at_et"] if tz_pref == "ET" else payload["at_utc"]
+
         if "discord.com/api/webhooks" in webhook:
             station = payload.get("station", "UNK")
             tf = payload.get("temp_f")
             pf = payload.get("prev_temp_f")
             df = payload.get("delta_f")
-            ts = payload.get("obs_time")
-            content = f"**METAR Temp Change** — {station}: {pf}→{tf} °F (Δ {df:+}) @ {ts}"
+
+            content = f"**METAR Temp Change** — {station}: {pf}→{tf} °F (Δ {df:+}) @ {ts_disp}"
+
             body = {
                 "content": content,
                 "embeds": [{
@@ -325,13 +341,16 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         {"name": "Prev °F", "value": str(pf), "inline": True},
                         {"name": "Now °F",  "value": str(tf), "inline": True},
                         {"name": "Δ °F",    "value": f"{df:+}", "inline": True},
+                        {"name": "Obs Time", "value": ts_disp, "inline": False},
+                        {"name": "Alert Sent", "value": at_disp, "inline": False},
                     ],
-                    "timestamp": payload.get("at_utc"),
+                    "timestamp": payload.get("at_utc"),  # Discord expects ISO in UTC for embed timestamp
                     "footer": {"text": "METAR monitor"},
                 }]
             }
             requests.post(webhook, json=body, timeout=10)
         else:
+            # For generic webhooks, keep both UTC + ET in the JSON
             requests.post(webhook, json=payload, timeout=10)
     except Exception:
         pass
@@ -430,11 +449,15 @@ def get_watchlist() -> Dict[str, Any]:
 
 def get_metrics() -> Dict[str, Any]:
     with _STATE_LOCK:
+        last_utc = _STATE["last_poll_utc"]
+        last_et = _to_et_iso(last_utc) if last_utc else None
         return {
-            "last_poll_utc": _STATE["last_poll_utc"],
+            "last_poll_utc": last_utc,
+            "last_poll_et": last_et,
             "poll_count": _STATE["poll_count"],
             "watchlist_size": len(_STATE["stations"] or get_default_config()["stations"]),
         }
+
 
 # =========================
 # Scheduler
