@@ -31,6 +31,18 @@ def root():
 
 # -------- METAR endpoints --------
 
+@app.route("/metar/window", methods=["GET"])
+def metar_window():
+    from core.metar_monitor import fetch_now
+    icao = request.args.get("icao", "").strip().upper()
+    source = request.args.get("source", "nws")
+    if not icao:
+        return jsonify({"error": "Missing query param: icao"}), 400
+    # reuse fetch_now (it already uses your sliding window)
+    res = fetch_now([icao], source=source)
+    return jsonify(res), 200 if "errors" not in res else 502
+
+
 @app.route("/metar/latest", methods=["GET"])
 def metar_latest():
     icao = request.args.get("icao", "").strip().upper()
