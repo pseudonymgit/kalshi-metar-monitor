@@ -56,6 +56,7 @@ def metar_window():
 
 
 
+
 @app.route("/metar/latest", methods=["GET"])
 def metar_latest():
     icao = request.args.get("icao", "").strip().upper()
