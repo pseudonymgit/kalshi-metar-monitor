@@ -4,14 +4,29 @@ import os
 import json
 import threading
 import requests
+import csv
+from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 
 try:
-    # Python 3.9+: stdlib time zones
     from zoneinfo import ZoneInfo
 except Exception:
-    ZoneInfo = None  # ET conversion will gracefully degrade to UTC strings
+    ZoneInfo = None
+
+ET_TZ = "America/New_York"
+
+def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
+    if not iso_str:
+        return None
+    try:
+        dt = _parse_iso(iso_str)
+        if ZoneInfo is None:
+            return dt.isoformat()
+        return dt.astimezone(ZoneInfo(tz_name)).isoformat()
+    except Exception:
+        return iso_str
+
 
 # =========================
 # In-memory state
@@ -162,11 +177,15 @@ def _headers_for_nws(cfg) -> Dict[str, str]:
         "Accept": "application/geo+json",
     }
 
+def _iso_seconds_z(dt: datetime) -> str:
+    # 2026-02-06T02:11:03Z (no microseconds, always Z)
+    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
 def _nws_range_url(icao: str, start_iso: str, end_iso: str, limit: int = 200) -> str:
-    # https://api.weather.gov/stations/KDEN/observations?start=...&end=...&limit=200
+    # start_iso / end_iso are expected already normalized to seconds + Z
     return (
         f"https://api.weather.gov/stations/{icao}/observations"
-        f"?start={start_iso}&end={end_iso}&limit={limit}"
+        f"?start={start_iso}&end={end_iso}&limit={min(limit, 200)}"
     )
 
 def _iem_range_url(icao: str, hours: int) -> str:
@@ -175,6 +194,51 @@ def _iem_range_url(icao: str, hours: int) -> str:
         "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
         f"?station={icao}&data=tmpf&tz=UTC&format=json&hours={hours}"
     )
+
+import csv
+from io import StringIO
+
+def _iem_range_url(icao: str, hours: int) -> str:
+    # CSV is the most reliable. We'll filter client-side by start_dt/end_dt.
+    # tz=UTC ensures 'valid' times are UTC.
+    return (
+        "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
+        f"?station={icao}&data=tmpf&tz=UTC&format=comma&hours={hours}"
+    )
+
+def _parse_iem_csv(text: str, start_dt: datetime, end_dt: datetime) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    f = StringIO(text)
+    rdr = csv.DictReader(f)
+    # Columns often include: station,valid,tmpf,relh,drct,sknt,...
+    for row in rdr:
+        valid = row.get("valid")
+        tmpf = row.get("tmpf")
+        if not valid or tmpf in (None, "", "M"):
+            continue
+        try:
+            ts = datetime.strptime(valid, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        except Exception:
+            continue
+        if ts < start_dt or ts > end_dt:
+            continue
+        try:
+            tf = float(tmpf)
+        except Exception:
+            continue
+        out.append(_obs_tuple(tf, ts.isoformat(), row, "iem"))
+    out.sort(key=lambda x: _parse_iso(x["obs_time"]))
+    return out
+
+def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    # Ask for just a small window worth of rows. Add a little cushion.
+    minutes = max(1, (end_dt - start_dt).seconds // 60)
+    hours = max(1, min(3, (minutes // 60) + 1, int(cfg.get("iem_hours", 1))))
+    url = _iem_range_url(icao, hours)
+    r = requests.get(url, timeout=25)
+    r.raise_for_status()
+    return _parse_iem_csv(r.text, start_dt, end_dt)
+
 
 def _tgftp_latest_url(icao: str) -> str:
     return f"https://tgftp.nws.noaa.gov/data/observations/metar/stations/{icao}.TXT"
@@ -246,12 +310,12 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
 # =========================
 # Range fetchers (strict by source)
 # =========================
-def _fetch_range_nws(icao: str, start_iso: str, end_iso: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    url = _nws_range_url(icao, start_iso, end_iso)
+def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    url = _nws_range_url(icao, start_iso_z, end_iso_z)
     r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
     r.raise_for_status()
-    j = r.json()
-    return _parse_nws_collection(j)
+    return _parse_nws_collection(r.json())
+
 
 def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     url = _iem_range_url(icao, int(cfg.get("iem_hours", 1)))
@@ -376,7 +440,9 @@ def _compute_window(icao: str, minutes: int) -> Tuple[str, str, datetime, dateti
 def _fetch_range_strict(icao: str, chosen: str, start_iso: str, end_iso: str,
                         start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     if chosen == "nws":
-        return _fetch_range_nws(icao, start_iso, end_iso, cfg)
+        s = _iso_seconds_z(start_dt)
+        e = _iso_seconds_z(end_dt)
+        return _fetch_range_nws(icao, s, e, cfg)
     if chosen == "iem":
         return _fetch_range_iem(icao, start_dt, end_dt, cfg)
     if chosen == "tgftp":
