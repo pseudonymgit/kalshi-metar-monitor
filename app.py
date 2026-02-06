@@ -52,6 +52,14 @@ def metar_window():
     res = fetch_window(icao, minutes, source=source)
     return jsonify(res), 200
 
+@app.route("/metar/latest", methods=["GET"])
+def metar_latest():
+    icao = (request.args.get("icao") or "").strip().upper()
+    source = (request.args.get("source") or "").strip().lower() or None
+    if not icao:
+        return jsonify({"error": "Missing query param: icao"}), 400
+    return jsonify(get_latest_metar(icao, source=source)), 200
+
 @app.route("/metar/multi", methods=["GET"])
 def metar_multi():
     raw = request.args.get("icaos", "")
@@ -125,6 +133,11 @@ def metar_force_poll():
         "after_poll_count": after.get("poll_count"),
         "last_poll_utc": after.get("last_poll_utc"),
     }), 200
+
+@app.route("/debug/state", methods=["GET"])
+def debug_state():
+    from core.metar_monitor import get_state
+    return jsonify(get_state()), 200
 
 # Render entry
 if __name__ == "__main__":
