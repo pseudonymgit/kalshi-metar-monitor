@@ -52,29 +52,18 @@ def metar_window():
     res = fetch_window(icao, minutes, source=source)
     return jsonify(res), 200
 
-
-
-
-
-
-@app.route("/metar/latest", methods=["GET"])
-def metar_latest():
-    icao = request.args.get("icao", "").strip().upper()
-    if not icao:
-        return jsonify({"error": "Missing query param: icao"}), 400
-    return jsonify(get_latest_metar(icao)), 200
-
 @app.route("/metar/multi", methods=["GET"])
 def metar_multi():
-    # Example: /metar/multi?icaos=KDEN,KLAX,KMDW
     raw = request.args.get("icaos", "")
+    source = (request.args.get("source") or "").strip().lower() or None
     if not raw:
         return jsonify({"error": "Missing query param: icaos"}), 400
     icaos = [x.strip().upper() for x in raw.split(",") if x.strip()]
     if not icaos:
         return jsonify({"error": "No valid ICAOs supplied"}), 400
-    res = fetch_now(icaos)
+    res = fetch_now(icaos, source=source)   # <-- forward the source
     return jsonify(res), 200
+
 
 @app.route("/metar/watchlist", methods=["GET", "POST"])
 def metar_watchlist():
