@@ -382,6 +382,36 @@ FIRST_RUN_CUSHION_SEC = 300  # 5 minutes extra on first run
 def _compute_window(icao: str, minutes: int | None = None, cfg: Dict[str, Any] | None = None):
     """
     Compute a rolling start/end window in UTC.
+
+    - If we've seen this ICAO, start from (last_seen - OVERLAP_SECONDS).
+    - If first run, use now - lookback_min - FIRST_RUN_CUSHION_SEC.
+
+    Returns: (start_iso_z, end_iso_z, start_dt, end_dt)
+    """
+    if cfg is None:
+        cfg = get_default_config()
+    lookback = int(minutes if minutes is not None else cfg.get("lookback_min", 3))
+
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+
+    with _STATE_LOCK:
+        last_seen = _STATE["last_seen_iso"].get(icao)
+
+    if last_seen:
+        start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
+    else:
+        start_dt = now - timedelta(minutes=lookback) - timedelta(seconds=FIRST_RUN_CUSHION_SEC)
+
+    end_dt = now
+
+    # NWS range endpoint expects Z-suffixed seconds (e.g., 2026-02-08T19:50:00Z)
+    start_iso_z = _iso_seconds_z(start_dt)
+    end_iso_z = _iso_seconds_z(end_dt)
+    return (start_iso_z, end_iso_z, start_dt, end_dt)
+
+def _compute_window(icao: str, minutes: int | None = None, cfg: Dict[str, Any] | None = None):
+    """
+    Compute a rolling start/end window in UTC.
     - If we've seen this ICAO, start from (last_seen - OVERLAP_SECONDS).
     - If first run, use now - lookback_min - FIRST_RUN_CUSHION_SEC.
     Returns: (start_iso_z, end_iso_z, start_dt, end_dt)
