@@ -376,26 +376,35 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 # =========================
 # Window + fetch routers (STRICT: no auto-fallback)
 # =========================
-def _compute_window(icao: str, minutes: int) -> Tuple[str, str, datetime, datetime]:
+d# Put near the other constants
+FIRST_RUN_CUSHION_SEC = 300  # 5 minutes extra on first run
+
+def _compute_window(icao: str, minutes: int | None = None, cfg: Dict[str, Any] | None = None):
     """
-    Compute [start,end] in UTC for a tight polling window.
-    If we’ve already seen data, back up by OVERLAP_SECONDS to avoid gaps.
+    Compute a rolling start/end window in UTC.
+    - If we've seen this ICAO, start from (last_seen - OVERLAP_SECONDS).
+    - If first run, use now - lookback_min - FIRST_RUN_CUSHION_SEC.
+    Returns: (start_iso_z, end_iso_z, start_dt, end_dt)
     """
+    if cfg is None:
+        cfg = get_default_config()
+    lookback = int(minutes if minutes is not None else cfg.get("lookback_min", 3))
+
     now = datetime.utcnow().replace(tzinfo=timezone.utc)
-    lookback = max(1, int(minutes))
 
     with _STATE_LOCK:
         last_seen = _STATE["last_seen_iso"].get(icao)
 
     if last_seen:
         start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
-        if start_dt > now:
-            start_dt = now - timedelta(minutes=lookback)
     else:
-        start_dt = now - timedelta(minutes=lookback)
+        # first contact: give ourselves a cushion to catch slightly older obs
+        start_dt = now - timedelta(minutes=lookback) - timedelta(seconds=FIRST_RUN_CUSHION_SEC)
 
     end_dt = now
-    return (start_dt.isoformat(), end_dt.isoformat(), start_dt, end_dt)
+
+    # NWS range endpoint wants Z-suffixed seconds; reuse helper you already have
+    return (_iso_seconds_z(start_dt), _iso_seconds_z(end_dt), start_dt, end_dt)
 
 def _fetch_range_strict(icao: str, chosen: str,
                         start_iso: str, end_iso: str,
