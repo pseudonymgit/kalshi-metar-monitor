@@ -2,31 +2,21 @@
 
 import os
 import json
+import csv
 import threading
 import requests
-import csv
 from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 
+# Optional zoneinfo (Python 3.9+). If unavailable, we’ll no-op ET conversion.
 try:
-    from zoneinfo import ZoneInfo
+    from zoneinfo import ZoneInfo  # type: ignore
 except Exception:
     ZoneInfo = None
 
-ET_TZ = "America/New_York"
-
-def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
-    if not iso_str:
-        return None
-    try:
-        dt = _parse_iso(iso_str)
-        if ZoneInfo is None:
-            return dt.isoformat()
-        return dt.astimezone(ZoneInfo(tz_name)).isoformat()
-    except Exception:
-        return iso_str
-
+ET_TZ_NAME = "America/New_York"
+OVERLAP_SECONDS = 120  # to avoid missing late-arriving obs in tight windows
 
 # =========================
 # In-memory state
@@ -36,7 +26,7 @@ _STATE = {
     "stations": [],
     "last_obs": {},        # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
     "last_alert": {},      # { ICAO: {"temp_f": float, "at": ISO} }
-    "last_seen_iso": {},   # { ICAO: ISO string of latest obs we've processed }
+    "last_seen_iso": {},   # { ICAO: ISO of latest obs we ingested }
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
@@ -45,16 +35,12 @@ _STATE = {
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
 
-OVERLAP_SECONDS = 120  # 2 minutes overlap to survive small API lag/skew
-ET_TZ = "America/New_York"
-
 # =========================
 # Config
 # =========================
 def get_default_config() -> Dict[str, Any]:
     """
-    Build runtime config from env. Prefer AWC_* (your existing names) but
-    still support HTTP_* for backward compatibility.
+    Builds runtime config from env (keeps your AWC_* names; HTTP_* works too).
     """
     http_from = (
         os.getenv("AWC_FROM_EMAIL")
@@ -74,25 +60,24 @@ def get_default_config() -> Dict[str, Any]:
         "webhook": os.getenv("ALERT_WEBHOOK_URL", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
 
-        # Source control
+        # Source control (strict = no fallback across sources)
         "default_source": (os.getenv("METAR_DEFAULT_SOURCE") or "nws").lower(),
-        "strict": os.getenv("METAR_STRICT", "true").lower() in ("1","true","yes","y"),
+        "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
 
-        # NWS etiquette headers
+        # Etiquette for api.weather.gov
         "http_from": http_from,
         "http_agent": http_agent,
 
-        # Lookback windows
+        # Windows
         "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),
         "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
     }
-
 
 # =========================
 # Small time helpers
 # =========================
 def _c_to_f(c: float) -> float:
-    return c * 9.0/5.0 + 32.0
+    return c * 9.0 / 5.0 + 32.0
 
 def _parse_iso(s: str) -> datetime:
     try:
@@ -109,11 +94,10 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
     try:
         dt = _parse_iso(iso_str)
         if ZoneInfo is None:
-            return dt.isoformat()
+            return dt.isoformat()  # fallback: keep UTC but return something sane
         return dt.astimezone(ZoneInfo(tz_name)).isoformat()
     except Exception:
         return iso_str
-
 
 # =========================
 # Cache helpers
@@ -136,7 +120,6 @@ def _save_cache(path: str, data: Dict[str, Any]) -> None:
         os.replace(tmp, path)
     except Exception:
         pass  # best-effort caching
-
 
 # =========================
 # State boot
@@ -166,7 +149,6 @@ def get_state() -> Dict[str, Any]:
             "last_poll_utc": _STATE["last_poll_utc"],
         }
 
-
 # =========================
 # Source helpers
 # =========================
@@ -178,58 +160,24 @@ def _headers_for_nws(cfg) -> Dict[str, str]:
     }
 
 def _iso_seconds_z(dt: datetime) -> str:
+    # api.weather.gov prefers 'Z' (UTC) with seconds precision
     return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-def _nws_range_url(icao: str, start_iso: str, end_iso: str, limit: int = 200) -> str:
+def _nws_range_url(icao: str, start_iso_z: str, end_iso_z: str, limit: int = 200) -> str:
     return (
         f"https://api.weather.gov/stations/{icao}/observations"
-        f"?start={start_iso}&end={end_iso}&limit={min(limit, 200)}"
+        f"?start={start_iso_z}&end={end_iso_z}&limit={min(limit, 200)}"
     )
 
 def _iem_range_url(icao: str, hours: int) -> str:
-    # CSV is the most reliable. We'll filter client-side by start_dt/end_dt.
-    # tz=UTC ensures 'valid' times are UTC.
+    # Use CSV (more resilient than JSON); we’ll filter client-side to [start,end].
     return (
         "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
         f"?station={icao}&data=tmpf&tz=UTC&format=comma&hours={hours}"
     )
 
-def _parse_iem_csv(text: str, start_dt: datetime, end_dt: datetime) -> List[Dict[str, Any]]:
-    out: List[Dict[str, Any]] = []
-    f = StringIO(text)
-    rdr = csv.DictReader(f)
-    # Columns often include: station,valid,tmpf,relh,drct,sknt,...
-    for row in rdr:
-        valid = row.get("valid")
-        tmpf = row.get("tmpf")
-        if not valid or tmpf in (None, "", "M"):
-            continue
-        try:
-            ts = datetime.strptime(valid, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-        except Exception:
-            continue
-        if ts < start_dt or ts > end_dt:
-            continue
-        try:
-            tf = float(tmpf)
-        except Exception:
-            continue
-        out.append(_obs_tuple(tf, ts.isoformat(), row, "iem"))
-    out.sort(key=lambda x: _parse_iso(x["obs_time"]))
-    return out
-
-def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    # Ask for just a small window worth of rows. Add a cushion and cap at 3h.
-    minutes = max(1, int((end_dt - start_dt).total_seconds() // 60))
-    hours = max(1, min(3, (minutes // 60) + 1, int(cfg.get("iem_hours", 1))))
-    url = _iem_range_url(icao, hours)
-    r = requests.get(url, timeout=25)
-    r.raise_for_status()
-    return _parse_iem_csv(r.text, start_dt, end_dt)
-
 def _tgftp_latest_url(icao: str) -> str:
     return f"https://tgftp.nws.noaa.gov/data/observations/metar/stations/{icao}.TXT"
-
 
 # =========================
 # Parse helpers
@@ -249,32 +197,12 @@ def _parse_nws_collection(j: Dict[str, Any]) -> List[Dict[str, Any]]:
     out.sort(key=lambda x: _parse_iso(x["obs_time"]))
     return out
 
-def _parse_iem_json(j: Dict[str, Any], start_dt: datetime, end_dt: datetime) -> List[Dict[str, Any]]:
-    out: List[Dict[str, Any]] = []
-    for row in j.get("data", []):
-        tmpf = row.get("tmpf")
-        valid = row.get("valid")  # 'YYYY-mm-dd HH:MM' UTC
-        if tmpf is None or not valid:
-            continue
-        try:
-            ts = datetime.strptime(valid, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-        except Exception:
-            continue
-        if ts < start_dt or ts > end_dt:
-            continue
-        out.append(_obs_tuple(float(tmpf), ts.isoformat(), row, "iem"))
-    out.sort(key=lambda x: _parse_iso(x["obs_time"]))
-    return out
-
 def _parse_iem_csv(text: str, start_dt: datetime, end_dt: datetime) -> List[Dict[str, Any]]:
-    # If IEM sends HTML (maintenance / error), avoid crashing
-    if text.lstrip().startswith("<") or text.strip().startswith("ERROR"):
+    # If IEM returns HTML (maintenance) or ERROR, avoid exceptions.
+    if text.lstrip().startswith("<") or text.strip().upper().startswith("ERROR"):
         return []
-
     out: List[Dict[str, Any]] = []
-    f = StringIO(text)
-    rdr = csv.DictReader(f)
-    # Typical columns include: station, valid, tmpf, ...
+    rdr = csv.DictReader(StringIO(text))
     for row in rdr:
         valid = row.get("valid")
         tmpf = row.get("tmpf")
@@ -301,7 +229,7 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
     ts_line = lines[0].strip()
     metar_line = lines[-1].strip()
 
-    # Try find temp from token "12/01" or "M02/M05"
+    # Find temp from token like 12/01 or M02/M05
     temp_f: Optional[float] = None
     for token in metar_line.split():
         if "/" in token and len(token) <= 6:
@@ -321,7 +249,6 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
         ts = _now_utc_iso()
     return _obs_tuple(temp_f, ts, metar_line, "tgftp")
 
-
 # =========================
 # Range fetchers (strict by source)
 # =========================
@@ -332,18 +259,19 @@ def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str,
     return _parse_nws_collection(r.json())
 
 def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    url = _iem_range_url(icao, int(cfg.get("iem_hours", 1)))
+    # Ask only for a small horizon (capped) and filter client-side to [start,end].
+    minutes = max(1, int((end_dt - start_dt).total_seconds() // 60))
+    hours = max(1, min(3, (minutes // 60) + 1, int(cfg.get("iem_hours", 1))))
+    url = _iem_range_url(icao, hours)
     r = requests.get(url, timeout=25)
     r.raise_for_status()
-    j = r.json()
-    return _parse_iem_json(j, start_dt, end_dt)
+    return _parse_iem_csv(r.text, start_dt, end_dt)
 
 def _fetch_latest_tgftp(icao: str) -> List[Dict[str, Any]]:
     r = requests.get(_tgftp_latest_url(icao), timeout=15)
     r.raise_for_status()
     parsed = _parse_tgftp_text(r.text)
     return [parsed] if parsed else []
-
 
 # =========================
 # Ingestion (dedupe & alerts)
@@ -369,14 +297,12 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
         if last_seen_iso and _parse_iso(ts) <= _parse_iso(last_seen_iso):
             continue
 
-        # store
         with _STATE_LOCK:
             _STATE["last_obs"][icao] = obs
             _STATE["last_seen_iso"][icao] = ts
 
         ingested += 1
 
-        # alert check
         if last_temp is not None:
             d = round(float(obs["temp_f"]) - float(last_temp), 1)
             if abs(d) >= delta_thr:
@@ -385,7 +311,6 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
         last_temp = obs["temp_f"]
 
-    # cache
     with _STATE_LOCK:
         _save_cache(cfg["cache_file"], {
             "last_obs": _STATE["last_obs"],
@@ -436,48 +361,40 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
     except Exception:
         pass
 
-
 # =========================
-# Public fetch helpers (strict by chosen/default source)
+# Window + fetch routers (STRICT: no auto-fallback)
 # =========================
-def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[str, Any]:
-    ensure_state_loaded()
-    cfg = get_default_config()
-    chosen = (source or cfg["default_source"] or "nws").lower()
+def _compute_window(icao: str, minutes: int) -> Tuple[str, str, datetime, datetime]:
+    """
+    Compute [start,end] in UTC for a tight polling window.
+    If we’ve already seen data, back up by OVERLAP_SECONDS to avoid gaps.
+    """
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    lookback = max(1, int(minutes))
 
-    # build start/end (dt + iso)
-    start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg)
-    obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
-    ing, al = _ingest_obs(icao, obs_list, cfg)
-
-    latest = None
     with _STATE_LOCK:
-        latest = _STATE["last_obs"].get(icao)
+        last_seen = _STATE["last_seen_iso"].get(icao)
 
-    return {
-        "status": "ok",
-        "icao": icao,
-        "source": chosen,
-        "ingested": ing,
-        "alerts": al,
-        "latest": latest,
-        "window_utc": {"start": start_dt.isoformat(), "end": end_dt.isoformat()},
-        "window_et": {
-            "start": _iso_to_tz(start_dt.isoformat(), ET_TZ),
-            "end": _iso_to_tz(end_dt.isoformat(), ET_TZ)
-        }
-    }
+    if last_seen:
+        start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
+        if start_dt > now:
+            start_dt = now - timedelta(minutes=lookback)
+    else:
+        start_dt = now - timedelta(minutes=lookback)
 
+    end_dt = now
+    return (start_dt.isoformat(), end_dt.isoformat(), start_dt, end_dt)
 
-def _fetch_range_strict(icao: str, chosen: str, start_iso: str, end_iso: str,
-                        start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if chosen == "nws":
-        s = _iso_seconds_z(start_dt)
-        e = _iso_seconds_z(end_dt)
-        return _fetch_range_nws(icao, s, e, cfg)
-    if chosen == "iem":
+def _fetch_range_strict(icao: str, chosen: str,
+                        start_iso: str, end_iso: str,
+                        start_dt: datetime, end_dt: datetime,
+                        cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    s = (chosen or cfg["default_source"] or "nws").lower()
+    if s == "nws":
+        return _fetch_range_nws(icao, _iso_seconds_z(start_dt), _iso_seconds_z(end_dt), cfg)
+    if s == "iem":
         return _fetch_range_iem(icao, start_dt, end_dt, cfg)
-    if chosen == "tgftp":
+    if s == "tgftp":
         return _fetch_latest_tgftp(icao)
     return []
 
@@ -506,8 +423,8 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
             "latest": latest,
             "window_utc": {"start": start_dt.isoformat(), "end": end_dt.isoformat()},
             "window_et": {
-                "start": _iso_to_tz(start_dt.isoformat(), ET_TZ),
-                "end": _iso_to_tz(end_dt.isoformat(), ET_TZ),
+                "start": _iso_to_tz(start_dt.isoformat(), ET_TZ_NAME),
+                "end": _iso_to_tz(end_dt.isoformat(), ET_TZ_NAME),
             },
         }
     except Exception as e:
@@ -518,10 +435,9 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
             "error": str(e),
         }
 
-def fetch_latest(icao: str, source: Optional[str] = None) -> dict:
+def fetch_latest(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
     """
-    Return the most recent obs for a single ICAO using the same strict-source
-    logic as fetch_window. Uses METAR_LOOKBACK_MIN for the window size.
+    Latest convenience using METAR_LOOKBACK_MIN as the window size.
     """
     cfg = get_default_config()
     minutes = int(cfg.get("lookback_min", 3))
@@ -543,12 +459,12 @@ def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, An
     """
     cfg = get_default_config()
     minutes = int(cfg.get("lookback_min", 3))
+    chosen = (source or cfg["default_source"] or "nws").lower()
 
-    observations: Dict[str, Dict[str, Any] | None] = {}
+    observations: Dict[str, Optional[Dict[str, Any]]] = {}
     errors: Dict[str, str] = {}
     total_ing = 0
     total_alerts = 0
-    chosen = (source or cfg["default_source"] or "nws").lower()
 
     for icao in stations:
         res = fetch_window(icao, minutes, source=chosen)
@@ -572,10 +488,9 @@ def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, An
         out["errors"] = errors
     return out
 
-def get_latest_metar(icao: str, source: Optional[str] = None) -> dict:
-    """Back-compat alias used by app.py. Returns the same shape as fetch_latest."""
+def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
+    """Back-compat alias used by app.py."""
     return fetch_latest(icao, source=source)
-
 
 # =========================
 # Watchlist + metrics
@@ -596,13 +511,14 @@ def get_watchlist() -> Dict[str, Any]:
 def get_metrics() -> Dict[str, Any]:
     with _STATE_LOCK:
         last_poll_utc = _STATE["last_poll_utc"]
+        poll_count = _STATE["poll_count"]
+        watch_ct = len(_STATE["stations"] or get_default_config()["stations"])
     return {
         "last_poll_utc": last_poll_utc,
-        "last_poll_et": _iso_to_tz(last_poll_utc, ET_TZ),
-        "poll_count": _STATE["poll_count"],
-        "watchlist_size": len(_STATE["stations"] or get_default_config()["stations"]),
+        "last_poll_et": _iso_to_tz(last_poll_utc, ET_TZ_NAME),
+        "poll_count": poll_count,
+        "watchlist_size": watch_ct,
     }
-
 
 # =========================
 # Scheduler
@@ -617,7 +533,6 @@ def _poll_once(logger=None):
     total_alerts = 0
     for icao in stations:
         try:
-            # small rolling window each tick
             start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3))
             obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
             ing, al = _ingest_obs(icao, obs_list, cfg)
