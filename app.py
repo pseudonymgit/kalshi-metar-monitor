@@ -29,6 +29,23 @@ log.setLevel(logging.INFO)
 def root():
     return jsonify({"status": "ok"}), 200
 
+# --- Debug helpers ---
+
+@app.route("/debug/version", methods=["GET"])
+def debug_version():
+    import core.metar_monitor as mm
+    return jsonify({
+        "metar_monitor_attrs": sorted([a for a in dir(mm) if not a.startswith("_")]),
+        "default_cfg": mm.get_default_config(),
+        "has_fetch_window": hasattr(mm, "fetch_window"),
+        "has__fetch_range_strict": hasattr(mm, "_fetch_range_strict"),
+    }), 200
+
+@app.errorhandler(500)
+def err_500(e):
+    import traceback
+    return jsonify({"error": "internal", "trace": traceback.format_exc()}), 500
+
 # -------- METAR endpoints --------
 
 @app.route("/metar/window", methods=["GET"])
