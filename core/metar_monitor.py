@@ -5,6 +5,7 @@ import json
 import csv
 import threading
 import requests
+import math
 from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
@@ -27,6 +28,7 @@ _STATE: Dict[str, Any] = {
     "stations": [],
     "last_obs": {},        # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
     "last_alert": {},      # { ICAO: {"temp_f": float, "at": ISO} }
+    "last_alert_floor": {},  # { ICAO: int of last integer we alerted on }
     "last_seen_iso": {},   # { ICAO: ISO of latest obs we ingested }
     "cfg": {},
     "poll_count": 0,
@@ -70,8 +72,10 @@ def get_default_config() -> Dict[str, Any]:
         "http_agent": http_agent,
 
         # Windows
-        "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),
-        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
+        "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),"lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
+        
+        # NEW: integer-up alert mode (default true)
+        "alert_on_integer_up": os.getenv("ALERT_ON_INTEGER_UP", "true").lower() in ("1","true","yes","y"),
     }
 
 # =========================
@@ -316,11 +320,31 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
         ingested += 1
 
+                # alert check
         if last_temp is not None:
-            d = round(float(obs["temp_f"]) - float(last_temp), 1)
-            if abs(d) >= delta_thr:
-                _emit_alert(icao, prev_f=last_temp, now_f=obs["temp_f"], delta_f=d, obs_time=ts, cfg=cfg)
-                alerts += 1
+            now_f = float(obs["temp_f"])
+            prev_f = float(last_temp)
+
+            if cfg.get("alert_on_integer_up", True):
+                # Only alert when we cross an integer UP (e.g., 70.x -> 71.0+)
+                prev_floor = int(math.floor(prev_f))
+                curr_floor = int(math.floor(now_f))
+                if curr_floor > prev_floor:
+                    # prevent duplicate alert spam if multiple obs at 71.x
+                    with _STATE_LOCK:
+                        last_alert_floor = _STATE["last_alert_floor"].get(icao)
+                        if last_alert_floor != curr_floor:
+                            _STATE["last_alert_floor"][icao] = curr_floor
+                            d = round(now_f - prev_f, 1)
+                            _emit_alert(icao, prev_f=prev_f, now_f=now_f, delta_f=d, obs_time=ts, cfg=cfg)
+                            alerts += 1
+            else:
+                # Original delta mode (TEMP_ALERT_DELTA_F)
+                d = round(now_f - prev_f, 1)
+                if abs(d) >= delta_thr:
+                    _emit_alert(icao, prev_f=prev_f, now_f=now_f, delta_f=d, obs_time=ts, cfg=cfg)
+                    alerts += 1
+
 
         last_temp = obs["temp_f"]
 
