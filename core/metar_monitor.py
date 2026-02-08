@@ -258,6 +258,18 @@ def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str,
     r.raise_for_status()
     return _parse_nws_collection(r.json())
 
+def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    url = f"https://api.weather.gov/stations/{icao}/observations/latest"
+    r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
+    r.raise_for_status()
+    j = r.json()
+    props = j.get("properties", {}) if isinstance(j, dict) else {}
+    val_c = props.get("temperature", {}).get("value")
+    ts = props.get("timestamp")
+    if val_c is None or not ts:
+        return None
+    return _obs_tuple(_c_to_f(float(val_c)), ts, props, "nws")
+
 def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     # Ask only for a small horizon (capped) and filter client-side to [start,end].
     minutes = max(1, int((end_dt - start_dt).total_seconds() // 60))
@@ -435,16 +447,34 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
             "error": str(e),
         }
 
-def fetch_latest(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
-    """
-    Latest convenience using METAR_LOOKBACK_MIN as the window size.
-    """
+def fetch_latest(icao: str, source: Optional[str] = None) -> dict:
     cfg = get_default_config()
     minutes = int(cfg.get("lookback_min", 3))
-    res = fetch_window(icao, minutes, source=source)
+    chosen = (source or cfg["default_source"] or "nws").lower()
+
+    # First try the windowed read
+    res = fetch_window(icao, minutes, source=chosen)
     latest = res.get("latest")
     if latest:
         return {"icao": icao, "source": res.get("source"), **latest}
+
+    # If window was empty and we're staying strict-NWS, hit the NWS 'latest' doc
+    if chosen == "nws":
+        try:
+            single = _fetch_nws_latest_single(icao, cfg)
+            if single:
+                # Optionally ingest so state/cache stays coherent
+                _ingest_obs(icao, [single], cfg)
+                return {"icao": icao, "source": "nws", **single}
+        except Exception as e:
+            return {
+                "icao": icao,
+                "source": "nws",
+                "error": str(e),
+                "status": "error",
+            }
+
+    # Nothing available
     return {
         "icao": icao,
         "source": res.get("source"),
