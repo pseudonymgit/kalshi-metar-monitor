@@ -20,6 +20,20 @@ ET_TZ_NAME = "America/New_York"
 OVERLAP_SECONDS = 120            # avoid gaps around last-seen obs
 FIRST_RUN_CUSHION_SEC = 300      # sweep a bit wider on first contact (5 min)
 
+# --- Station timezone lookup (expand as you add stations) ---
+_ICAO_TZ = {
+    "KDEN": "America/Denver",
+    "KLAX": "America/Los_Angeles",
+    "KMDW": "America/Chicago",
+    "KAUS": "America/Chicago",
+    "KMIA": "America/New_York",
+    "KPHL": "America/New_York",
+    "KNYC": "America/New_York",  # replace with actual airport ICAO if you change source
+}
+
+def _icao_tz_name(icao: str) -> str:
+    return _ICAO_TZ.get(icao.upper(), "America/New_York")  # sensible fallback
+
 # =========================
 # In-memory state
 # =========================
@@ -34,7 +48,9 @@ _STATE: Dict[str, Any] = {
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
-    "last_alert_floor": {},  # { ICAO: int of last integer we alerted on }
+    "last_reset_date_local": {},  # { ICAO: "YYYY-MM-DD" }  per-station local reset marker
+    "last_alert_floor": {},       # { ICAO: int } last integer we alerted o
+
 }
 
 _SCHEDULER_THREAD: Optional[threading.Thread] = None
@@ -112,6 +128,28 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
     except Exception:
         return iso_str
 
+def _to_local(icao: str, dt_utc: datetime) -> datetime:
+    """Convert a UTC datetime to the station's local timezone."""
+    if ZoneInfo is None:
+        return dt_utc  # fallback if zoneinfo missing
+    return dt_utc.astimezone(ZoneInfo(_icao_tz_name(icao)))
+
+def _within_alert_window_local(icao: str, dt_iso: str) -> bool:
+    """True only if station local hour is in [11, 19)."""
+    dt_utc = _parse_iso(dt_iso)
+    dt_local = _to_local(icao, dt_utc)
+    return 11 <= dt_local.hour < 19
+
+def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
+    """Reset integer-cross alert memory once per *local* day for this station."""
+    dt_utc = _parse_iso(dt_iso)
+    dt_local = _to_local(icao, dt_utc)
+    local_day = dt_local.date().isoformat()
+    with _STATE_LOCK:
+        last = _STATE["last_reset_date_local"].get(icao)
+        if last != local_day:
+            _STATE["last_alert_floor"].pop(icao, None)
+            _STATE["last_reset_date_local"][icao] = local_day
 
 def _to_et(dt: datetime) -> datetime:
     if ZoneInfo is None:
@@ -361,30 +399,34 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
         ingested += 1
 
         
-        # Alert check (integer boundary crossing, both directions, only during ET window)
-        if last_temp is not None and cfg.get("alert_on_integer_cross", True):
-            now_f  = float(obs["temp_f"])
-            prev_f = float(last_temp)
+       # Alert check (integer boundary both directions, only during station LOCAL window 11–19)
+if last_temp is not None:
+    now_f  = float(obs["temp_f"])
+    prev_f = float(last_temp)
 
-            # Reset once per ET day
-            et_dt = _et_from_iso(ts)
-            _maybe_daily_reset(et_dt)
+    # per-station daily reset (uses station local date)
+    _maybe_daily_reset_local(icao, ts)
 
-            # Only alert within allowed ET hours
-            if _within_alert_window_et(et_dt, cfg):
-                prev_floor = int(math.floor(prev_f))
-                curr_floor = int(math.floor(now_f))
+    # only alert within the station's local 11:00–19:00 window
+    if _within_alert_window_local(icao, ts):
+        prev_floor = int(math.floor(prev_f))
+        curr_floor = int(math.floor(now_f))
 
-                if curr_floor != prev_floor:
-                    with _STATE_LOCK:
-                        last_floored_alert = _STATE["last_alert_floor"].get(icao)
-                        # Avoid duplicate alerts if multiple obs in same new integer
-                        if last_floored_alert != curr_floor:
-                            _STATE["last_alert_floor"][icao] = curr_floor
-                            d = round(now_f - prev_f, 1)
-                            _emit_alert(icao, prev_f=prev_f, now_f=now_f, delta_f=d, obs_time=ts, cfg=cfg)
-                            alerts += 1
-
+        if curr_floor != prev_floor:
+            with _STATE_LOCK:
+                last_floored_alert = _STATE["last_alert_floor"].get(icao)
+                if last_floored_alert != curr_floor:
+                    _STATE["last_alert_floor"][icao] = curr_floor
+                    d = round(now_f - prev_f, 1)
+                    _emit_alert(
+                        icao,
+                        prev_f=prev_f,
+                        now_f=now_f,
+                        delta_f=d,
+                        obs_time=ts,
+                        cfg=cfg,
+                    )
+                    alerts += 1
         else:
             # fallback: the original delta-based mode
             if last_temp is not None:
