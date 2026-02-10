@@ -3,24 +3,25 @@
 import os
 import json
 import csv
+import math
 import threading
 import requests
-import math
 from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 
-# Optional zoneinfo (Python 3.9+). If unavailable, ET conversion falls back to UTC string.
+# zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
     from zoneinfo import ZoneInfo  # type: ignore
 except Exception:
     ZoneInfo = None
 
+# -------- Constants --------
 ET_TZ_NAME = "America/New_York"
-OVERLAP_SECONDS = 120            # avoid gaps around last-seen obs
-FIRST_RUN_CUSHION_SEC = 300      # sweep a bit wider on first contact (5 min)
+OVERLAP_SECONDS = 120               # small overlap to avoid missing late arrivals
+FIRST_RUN_CUSHION_SEC = 300         # first contact: add 5 min cushion
 
-# --- Station timezone lookup (expand as you add stations) ---
+# Station → local timezone name (expand as you add stations)
 _ICAO_TZ = {
     "KDEN": "America/Denver",
     "KLAX": "America/Los_Angeles",
@@ -28,32 +29,29 @@ _ICAO_TZ = {
     "KAUS": "America/Chicago",
     "KMIA": "America/New_York",
     "KPHL": "America/New_York",
-    "KNYC": "America/New_York",  # replace with actual airport ICAO if you change source
+    "KNYC": "America/New_York",  # replace with actual ICAO if you change source
 }
 
 def _icao_tz_name(icao: str) -> str:
-    return _ICAO_TZ.get(icao.upper(), "America/New_York")  # sensible fallback
+    return _ICAO_TZ.get(icao.upper(), "America/New_York")
 
 # =========================
 # In-memory state
 # =========================
 _STATE_LOCK = threading.Lock()
-_STATE: Dict[str, Any] = {
+_STATE = {
     "stations": [],
-    "last_obs": {},        # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
-    "last_alert": {},      # { ICAO: {"temp_f": float, "at": ISO} }
-    "last_seen_iso": {},   # { ICAO: ISO of latest obs we ingested }
-    "last_alert_floor": {},     # NEW: { ICAO: int } last integer floor we alerted on
-    "last_reset_date_et": None, # NEW: "YYYY-MM-DD" (ET) so we reset once per ET day
+    "last_obs": {},              # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
+    "last_alert": {},            # (kept for compatibility; not used by int-cross logic)
+    "last_seen_iso": {},         # { ICAO: ISO of latest obs we ingested }
+    "last_reset_date_local": {}, # { ICAO: "YYYY-MM-DD" } daily local reset marker
+    "last_alert_floor": {},      # { ICAO: int } last integer (floor) we alerted on
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
-    "last_reset_date_local": {},  # { ICAO: "YYYY-MM-DD" }  per-station local reset marker
-    "last_alert_floor": {},       # { ICAO: int } last integer we alerted o
-
 }
 
-_SCHEDULER_THREAD: Optional[threading.Thread] = None
+_SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
 
 # =========================
@@ -77,17 +75,10 @@ def get_default_config() -> Dict[str, Any]:
     return {
         "stations": json.loads(os.getenv("METAR_STATIONS_JSON", '["KDEN","KLAX","KNYC","KPHL","KMDW","KMIA","KAUS"]')),
         "poll_seconds": int(os.getenv("METAR_POLL_SECONDS", "60")),
+        # delta_f retained for compatibility but no longer used for integer-cross alerts
         "delta_f": float(os.getenv("TEMP_ALERT_DELTA_F", "1.0")),
         "webhook": os.getenv("ALERT_WEBHOOK_URL", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
-
-        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
-        # NEW: integer-up alert mode (default true)
-        "alert_on_integer_up": os.getenv("ALERT_ON_INTEGER_UP", "true").lower() in ("1","true","yes","y"),
-       
-        # NEW (defaults match your request):
-        "alert_on_integer_cross": os.getenv("ALERT_ON_INTEGER_CROSS", "true").lower() in ("1","true","yes","y"),
-        "alert_hours_et": os.getenv("ALERT_HOURS_ET", "9-21"),  # "startHour-endHour" → [start, end)
 
         # Source control (strict = no fallback across sources)
         "default_source": (os.getenv("METAR_DEFAULT_SOURCE") or "nws").lower(),
@@ -103,7 +94,7 @@ def get_default_config() -> Dict[str, Any]:
     }
 
 # =========================
-# Small time helpers
+# Time helpers
 # =========================
 def _c_to_f(c: float) -> float:
     return c * 9.0 / 5.0 + 32.0
@@ -131,7 +122,7 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
 def _to_local(icao: str, dt_utc: datetime) -> datetime:
     """Convert a UTC datetime to the station's local timezone."""
     if ZoneInfo is None:
-        return dt_utc  # fallback if zoneinfo missing
+        return dt_utc
     return dt_utc.astimezone(ZoneInfo(_icao_tz_name(icao)))
 
 def _within_alert_window_local(icao: str, dt_iso: str) -> bool:
@@ -150,37 +141,6 @@ def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
         if last != local_day:
             _STATE["last_alert_floor"].pop(icao, None)
             _STATE["last_reset_date_local"][icao] = local_day
-
-def _to_et(dt: datetime) -> datetime:
-    if ZoneInfo is None:
-        return dt  # fallback: behave as UTC if zoneinfo missing
-    return dt.astimezone(ZoneInfo(ET_TZ_NAME))
-
-def _et_from_iso(iso_str: str) -> datetime:
-    return _to_et(_parse_iso(iso_str))
-
-def _parse_alert_hours(alert_hours: str) -> tuple[int, int]:
-    # "9-21" → (9, 21); clamp to [0, 24]
-    try:
-        a, b = alert_hours.split("-", 1)
-        start = max(0, min(24, int(a.strip())))
-        end   = max(0, min(24, int(b.strip())))
-        return (start, end)
-    except Exception:
-        return (9, 21)
-
-def _within_alert_window_et(dt_et: datetime, cfg: Dict[str, Any]) -> bool:
-    start_h, end_h = _parse_alert_hours(cfg.get("alert_hours_et", "9-21"))
-    # treat as [start, end), e.g., 9:00 <= hour < 21:00
-    return start_h <= dt_et.hour < end_h
-
-def _maybe_daily_reset(current_et: datetime) -> None:
-    """Reset integer-alert memory once per ET date (midnight rollover in ET)."""
-    today = current_et.date().isoformat()  # "YYYY-MM-DD"
-    with _STATE_LOCK:
-        if _STATE.get("last_reset_date_et") != today:
-            _STATE["last_alert_floor"] = {}   # clear which integers we’ve alerted on
-            _STATE["last_reset_date_et"] = today
 
 # =========================
 # Cache helpers
@@ -253,7 +213,7 @@ def _nws_range_url(icao: str, start_iso_z: str, end_iso_z: str, limit: int = 200
     )
 
 def _iem_range_url(icao: str, hours: int) -> str:
-    # Use CSV (more resilient than JSON); we’ll filter client-side to [start,end].
+    # Use CSV; we'll filter client-side to [start,end] UTC.
     return (
         "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
         f"?station={icao}&data=tmpf&tz=UTC&format=comma&hours={hours}"
@@ -354,7 +314,6 @@ def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[st
     return _obs_tuple(_c_to_f(float(val_c)), ts, props, "nws")
 
 def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    # Ask only for a small horizon (capped) and filter client-side to [start,end].
     minutes = max(1, int((end_dt - start_dt).total_seconds() // 60))
     hours = max(1, min(3, (minutes // 60) + 1, int(cfg.get("iem_hours", 1))))
     url = _iem_range_url(icao, hours)
@@ -385,57 +344,46 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
     ingested = 0
     alerts = 0
-    delta_thr = float(cfg["delta_f"])
 
     for obs in new_obs:
         ts = obs["obs_time"]
         if last_seen_iso and _parse_iso(ts) <= _parse_iso(last_seen_iso):
             continue
 
+        # store
         with _STATE_LOCK:
             _STATE["last_obs"][icao] = obs
             _STATE["last_seen_iso"][icao] = ts
 
         ingested += 1
 
-        
-       # Alert check (integer boundary both directions, only during station LOCAL window 11–19)
-if last_temp is not None:
-    now_f  = float(obs["temp_f"])
-    prev_f = float(last_temp)
+        # integer-boundary alerting (both directions), only during local 11–19
+        if last_temp is not None:
+            now_f  = float(obs["temp_f"])
+            prev_f = float(last_temp)
 
-    # per-station daily reset (uses station local date)
-    _maybe_daily_reset_local(icao, ts)
+            # daily reset keyed to local date
+            _maybe_daily_reset_local(icao, ts)
 
-    # only alert within the station's local 11:00–19:00 window
-    if _within_alert_window_local(icao, ts):
-        prev_floor = int(math.floor(prev_f))
-        curr_floor = int(math.floor(now_f))
+            if _within_alert_window_local(icao, ts):
+                prev_floor = int(math.floor(prev_f))
+                curr_floor = int(math.floor(now_f))
 
-        if curr_floor != prev_floor:
-            with _STATE_LOCK:
-                last_floored_alert = _STATE["last_alert_floor"].get(icao)
-                if last_floored_alert != curr_floor:
-                    _STATE["last_alert_floor"][icao] = curr_floor
-                    d = round(now_f - prev_f, 1)
-                    _emit_alert(
-                        icao,
-                        prev_f=prev_f,
-                        now_f=now_f,
-                        delta_f=d,
-                        obs_time=ts,
-                        cfg=cfg,
-                    )
-                    alerts += 1
-        else:
-            # fallback: the original delta-based mode
-            if last_temp is not None:
-                d = round(float(obs["temp_f"]) - float(last_temp), 1)
-                if abs(d) >= delta_thr:
-                    _emit_alert(icao, prev_f=float(last_temp), now_f=float(obs["temp_f"]),
-                                delta_f=d, obs_time=ts, cfg=cfg)
-                    alerts += 1
-
+                if curr_floor != prev_floor:
+                    with _STATE_LOCK:
+                        last_floored_alert = _STATE["last_alert_floor"].get(icao)
+                        if last_floored_alert != curr_floor:
+                            _STATE["last_alert_floor"][icao] = curr_floor
+                            d = round(now_f - prev_f, 1)
+                            _emit_alert(
+                                icao,
+                                prev_f=prev_f,
+                                now_f=now_f,
+                                delta_f=d,
+                                obs_time=ts,
+                                cfg=cfg,
+                            )
+                            alerts += 1
 
         last_temp = obs["temp_f"]
 
@@ -492,13 +440,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 # =========================
 # Window + fetch routers (STRICT: no auto-fallback)
 # =========================
-def _compute_window(icao: str, minutes: int | None = None, cfg: Dict[str, Any] | None = None):
+def _compute_window(icao: str, minutes: Optional[int] = None, cfg: Optional[Dict[str, Any]] = None):
     """
     Compute a rolling start/end window in UTC.
-
     - If we've seen this ICAO, start from (last_seen - OVERLAP_SECONDS).
     - If first run, use now - lookback_min - FIRST_RUN_CUSHION_SEC.
-
     Returns: (start_iso_z, end_iso_z, start_dt, end_dt)
     """
     if cfg is None:
@@ -513,12 +459,9 @@ def _compute_window(icao: str, minutes: int | None = None, cfg: Dict[str, Any] |
     if last_seen:
         start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
     else:
-        # first contact: give ourselves a cushion to catch slightly older obs
         start_dt = now - timedelta(minutes=lookback) - timedelta(seconds=FIRST_RUN_CUSHION_SEC)
 
     end_dt = now
-
-    # NWS range endpoint prefers Z-suffixed seconds
     return (_iso_seconds_z(start_dt), _iso_seconds_z(end_dt), start_dt, end_dt)
 
 def _fetch_range_strict(icao: str, chosen: str,
@@ -527,7 +470,7 @@ def _fetch_range_strict(icao: str, chosen: str,
                         cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     s = (chosen or cfg["default_source"] or "nws").lower()
     if s == "nws":
-        return _fetch_range_nws(icao, start_iso, end_iso, cfg)
+        return _fetch_range_nws(icao, _iso_seconds_z(start_dt), _iso_seconds_z(end_dt), cfg)
     if s == "iem":
         return _fetch_range_iem(icao, start_dt, end_dt, cfg)
     if s == "tgftp":
@@ -543,7 +486,7 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
     cfg = get_default_config()
     chosen = (source or cfg["default_source"] or "nws").lower()
 
-    start_iso, end_iso, start_dt, end_dt = _compute_window(icao, minutes, cfg=cfg)
+    start_iso, end_iso, start_dt, end_dt = _compute_window(icao, minutes, cfg)
 
     try:
         obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
@@ -572,30 +515,32 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
         }
 
 def fetch_latest(icao: str, source: Optional[str] = None) -> dict:
-    """
-    Latest for a single ICAO using strict-source logic.
-    If a window returns empty for NWS, we also try the single 'latest' document.
-    """
     cfg = get_default_config()
     minutes = int(cfg.get("lookback_min", 3))
     chosen = (source or cfg["default_source"] or "nws").lower()
 
-    # Try the windowed read first
+    # First try the windowed read
     res = fetch_window(icao, minutes, source=chosen)
     latest = res.get("latest")
     if latest:
         return {"icao": icao, "source": res.get("source"), **latest}
 
-    # If window empty and strict NWS, try /observations/latest as a backstop
+    # If window was empty and we're staying strict-NWS, hit the NWS 'latest' doc
     if chosen == "nws":
         try:
             single = _fetch_nws_latest_single(icao, cfg)
             if single:
-                _ingest_obs(icao, [single], cfg)  # keep state/cache coherent
+                _ingest_obs(icao, [single], cfg)
                 return {"icao": icao, "source": "nws", **single}
         except Exception as e:
-            return {"icao": icao, "source": "nws", "error": str(e), "status": "error"}
+            return {
+                "icao": icao,
+                "source": "nws",
+                "error": str(e),
+                "status": "error",
+            }
 
+    # Nothing available
     return {
         "icao": icao,
         "source": res.get("source"),
@@ -664,15 +609,11 @@ def get_metrics() -> Dict[str, Any]:
         last_poll_utc = _STATE["last_poll_utc"]
         poll_count = _STATE["poll_count"]
         watch_ct = len(_STATE["stations"] or get_default_config()["stations"])
-        last_reset = _STATE.get("last_reset_date_et")
-    cfg = get_default_config()
     return {
         "last_poll_utc": last_poll_utc,
         "last_poll_et": _iso_to_tz(last_poll_utc, ET_TZ_NAME),
         "poll_count": poll_count,
         "watchlist_size": watch_ct,
-        "alert_hours_et": cfg.get("alert_hours_et", "9-21"),
-        "last_reset_date_et": last_reset,
     }
 
 # =========================
@@ -688,7 +629,7 @@ def _poll_once(logger=None):
     total_alerts = 0
     for icao in stations:
         try:
-            start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg=cfg)
+            start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg)
             obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
             ing, al = _ingest_obs(icao, obs_list, cfg)
             total_ing += ing
