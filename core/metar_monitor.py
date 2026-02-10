@@ -29,6 +29,8 @@ _STATE: Dict[str, Any] = {
     "last_obs": {},        # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
     "last_alert": {},      # { ICAO: {"temp_f": float, "at": ISO} }
     "last_seen_iso": {},   # { ICAO: ISO of latest obs we ingested }
+    "last_alert_floor": {},     # NEW: { ICAO: int } last integer floor we alerted on
+    "last_reset_date_et": None, # NEW: "YYYY-MM-DD" (ET) so we reset once per ET day
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
@@ -66,7 +68,11 @@ def get_default_config() -> Dict[str, Any]:
         "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
         # NEW: integer-up alert mode (default true)
         "alert_on_integer_up": os.getenv("ALERT_ON_INTEGER_UP", "true").lower() in ("1","true","yes","y"),
-    
+       
+        # NEW (defaults match your request):
+        "alert_on_integer_cross": os.getenv("ALERT_ON_INTEGER_CROSS", "true").lower() in ("1","true","yes","y"),
+        "alert_hours_et": os.getenv("ALERT_HOURS_ET", "9-21"),  # "startHour-endHour" → [start, end)
+
         # Source control (strict = no fallback across sources)
         "default_source": (os.getenv("METAR_DEFAULT_SOURCE") or "nws").lower(),
         "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
@@ -105,6 +111,38 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
         return dt.astimezone(ZoneInfo(tz_name)).isoformat()
     except Exception:
         return iso_str
+
+
+def _to_et(dt: datetime) -> datetime:
+    if ZoneInfo is None:
+        return dt  # fallback: behave as UTC if zoneinfo missing
+    return dt.astimezone(ZoneInfo(ET_TZ_NAME))
+
+def _et_from_iso(iso_str: str) -> datetime:
+    return _to_et(_parse_iso(iso_str))
+
+def _parse_alert_hours(alert_hours: str) -> tuple[int, int]:
+    # "9-21" → (9, 21); clamp to [0, 24]
+    try:
+        a, b = alert_hours.split("-", 1)
+        start = max(0, min(24, int(a.strip())))
+        end   = max(0, min(24, int(b.strip())))
+        return (start, end)
+    except Exception:
+        return (9, 21)
+
+def _within_alert_window_et(dt_et: datetime, cfg: Dict[str, Any]) -> bool:
+    start_h, end_h = _parse_alert_hours(cfg.get("alert_hours_et", "9-21"))
+    # treat as [start, end), e.g., 9:00 <= hour < 21:00
+    return start_h <= dt_et.hour < end_h
+
+def _maybe_daily_reset(current_et: datetime) -> None:
+    """Reset integer-alert memory once per ET date (midnight rollover in ET)."""
+    today = current_et.date().isoformat()  # "YYYY-MM-DD"
+    with _STATE_LOCK:
+        if _STATE.get("last_reset_date_et") != today:
+            _STATE["last_alert_floor"] = {}   # clear which integers we’ve alerted on
+            _STATE["last_reset_date_et"] = today
 
 # =========================
 # Cache helpers
@@ -322,29 +360,38 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
         ingested += 1
 
-        # alert check
-        if last_temp is not None:
-            now_f = float(obs["temp_f"])
+        
+        # Alert check (integer boundary crossing, both directions, only during ET window)
+        if last_temp is not None and cfg.get("alert_on_integer_cross", True):
+            now_f  = float(obs["temp_f"])
             prev_f = float(last_temp)
 
-            if cfg.get("alert_on_integer_up", True):
-                # Only alert when we cross an integer UP (e.g., 70.x -> 71.0+)
+            # Reset once per ET day
+            et_dt = _et_from_iso(ts)
+            _maybe_daily_reset(et_dt)
+
+            # Only alert within allowed ET hours
+            if _within_alert_window_et(et_dt, cfg):
                 prev_floor = int(math.floor(prev_f))
                 curr_floor = int(math.floor(now_f))
-                if curr_floor > prev_floor:
-                    # prevent duplicate alert spam if multiple obs at 71.x
+
+                if curr_floor != prev_floor:
                     with _STATE_LOCK:
-                        last_alert_floor = _STATE["last_alert_floor"].get(icao)
-                        if last_alert_floor != curr_floor:
+                        last_floored_alert = _STATE["last_alert_floor"].get(icao)
+                        # Avoid duplicate alerts if multiple obs in same new integer
+                        if last_floored_alert != curr_floor:
                             _STATE["last_alert_floor"][icao] = curr_floor
                             d = round(now_f - prev_f, 1)
                             _emit_alert(icao, prev_f=prev_f, now_f=now_f, delta_f=d, obs_time=ts, cfg=cfg)
                             alerts += 1
-            else:
-                # Original delta mode (TEMP_ALERT_DELTA_F)
-                d = round(now_f - prev_f, 1)
+
+        else:
+            # fallback: the original delta-based mode
+            if last_temp is not None:
+                d = round(float(obs["temp_f"]) - float(last_temp), 1)
                 if abs(d) >= delta_thr:
-                    _emit_alert(icao, prev_f=prev_f, now_f=now_f, delta_f=d, obs_time=ts, cfg=cfg)
+                    _emit_alert(icao, prev_f=float(last_temp), now_f=float(obs["temp_f"]),
+                                delta_f=d, obs_time=ts, cfg=cfg)
                     alerts += 1
 
 
@@ -575,11 +622,15 @@ def get_metrics() -> Dict[str, Any]:
         last_poll_utc = _STATE["last_poll_utc"]
         poll_count = _STATE["poll_count"]
         watch_ct = len(_STATE["stations"] or get_default_config()["stations"])
+        last_reset = _STATE.get("last_reset_date_et")
+    cfg = get_default_config()
     return {
         "last_poll_utc": last_poll_utc,
         "last_poll_et": _iso_to_tz(last_poll_utc, ET_TZ_NAME),
         "poll_count": poll_count,
         "watchlist_size": watch_ct,
+        "alert_hours_et": cfg.get("alert_hours_et", "9-21"),
+        "last_reset_date_et": last_reset,
     }
 
 # =========================
