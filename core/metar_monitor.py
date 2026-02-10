@@ -28,11 +28,11 @@ _STATE: Dict[str, Any] = {
     "stations": [],
     "last_obs": {},        # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
     "last_alert": {},      # { ICAO: {"temp_f": float, "at": ISO} }
-    "last_alert_floor": {},  # { ICAO: int of last integer we alerted on }
     "last_seen_iso": {},   # { ICAO: ISO of latest obs we ingested }
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
+    "last_alert_floor": {},  # { ICAO: int of last integer we alerted on }
 }
 
 _SCHEDULER_THREAD: Optional[threading.Thread] = None
@@ -63,6 +63,10 @@ def get_default_config() -> Dict[str, Any]:
         "webhook": os.getenv("ALERT_WEBHOOK_URL", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
 
+        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
+        # NEW: integer-up alert mode (default true)
+        "alert_on_integer_up": os.getenv("ALERT_ON_INTEGER_UP", "true").lower() in ("1","true","yes","y"),
+    
         # Source control (strict = no fallback across sources)
         "default_source": (os.getenv("METAR_DEFAULT_SOURCE") or "nws").lower(),
         "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
@@ -72,10 +76,8 @@ def get_default_config() -> Dict[str, Any]:
         "http_agent": http_agent,
 
         # Windows
-        "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),"lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
-        
-        # NEW: integer-up alert mode (default true)
-        "alert_on_integer_up": os.getenv("ALERT_ON_INTEGER_UP", "true").lower() in ("1","true","yes","y"),
+        "iem_hours": int(os.getenv("IEM_LOOKBACK_HOURS", "1")),
+        "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
     }
 
 # =========================
@@ -320,7 +322,7 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
         ingested += 1
 
-                # alert check
+        # alert check
         if last_temp is not None:
             now_f = float(obs["temp_f"])
             prev_f = float(last_temp)
