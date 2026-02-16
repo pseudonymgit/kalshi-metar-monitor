@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask, request, jsonify
 
 # Make local 'core' importable on Render
@@ -35,7 +35,7 @@ def root():
 def debug_version():
     import core.metar_monitor as mm
     return jsonify({
-        "metar_monitor_attrs": sorted([a for a in dir(mm) if not a.startswith("_")]),
+        "metar_monitor_attrs": sorted(dir(mm)),
         "default_cfg": mm.get_default_config(),
         "has_fetch_window": hasattr(mm, "fetch_window"),
         "has__fetch_range_strict": hasattr(mm, "_fetch_range_strict"),
@@ -126,11 +126,11 @@ def metar_test_alert():
     payload = {
         "type": "temp_change",
         "station": "KDEN",
-        "prev_temp_f": 50.0,
-        "temp_f": 51.0,
-        "delta_f": 1.0,
-        "obs_time": datetime.utcnow().isoformat(),
-        "at_utc": datetime.utcnow().isoformat(),
+        "prev_temp_f": 70.2,
+        "temp_f": 71.0,
+        "delta_f": 0.8,
+        "obs_time": datetime.now(timezone.utc).isoformat(),
+        "at_utc": datetime.now(timezone.utc).isoformat(),
         "source": "synthetic",
     }
     _send_alert(cfg.get("webhook", ""), payload)
