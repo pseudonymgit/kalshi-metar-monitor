@@ -32,14 +32,16 @@ _ICAO_TZ = {
     "KNYC": "America/New_York",  # replace with actual ICAO if you change source
 }
 
+
 def _icao_tz_name(icao: str) -> str:
     return _ICAO_TZ.get(icao.upper(), "America/New_York")
+
 
 # =========================
 # In-memory state
 # =========================
 _STATE_LOCK = threading.Lock()
-_STATE = {
+_STATE: Dict[str, Any] = {
     "stations": [],
     "last_obs": {},              # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
     "last_alert": {},            # (kept for compatibility; not used by int-cross logic)
@@ -53,6 +55,7 @@ _STATE = {
 
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
+
 
 # =========================
 # Config
@@ -80,7 +83,7 @@ def get_default_config() -> Dict[str, Any]:
         "webhook": os.getenv("ALERT_WEBHOOK_URL", ""),
         "cache_file": os.getenv("METAR_CACHE_FILE", "/opt/render/project/src/data/metar_state.json"),
 
-        # Source control (strict = no fallback across sources)
+        # Source control
         "default_source": (os.getenv("METAR_DEFAULT_SOURCE") or "nws").lower(),
         "strict": os.getenv("METAR_STRICT", "true").lower() in ("1", "true", "yes", "y"),
 
@@ -93,11 +96,13 @@ def get_default_config() -> Dict[str, Any]:
         "lookback_min": int(os.getenv("METAR_LOOKBACK_MIN", "3")),
     }
 
+
 # =========================
 # Time helpers
 # =========================
 def _c_to_f(c: float) -> float:
     return c * 9.0 / 5.0 + 32.0
+
 
 def _parse_iso(s: str) -> datetime:
     try:
@@ -105,8 +110,10 @@ def _parse_iso(s: str) -> datetime:
     except Exception:
         return datetime.utcnow().replace(tzinfo=timezone.utc)
 
+
 def _now_utc_iso() -> str:
     return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
+
 
 def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
     if not iso_str:
@@ -119,17 +126,20 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
     except Exception:
         return iso_str
 
+
 def _to_local(icao: str, dt_utc: datetime) -> datetime:
     """Convert a UTC datetime to the station's local timezone."""
     if ZoneInfo is None:
         return dt_utc
     return dt_utc.astimezone(ZoneInfo(_icao_tz_name(icao)))
 
+
 def _within_alert_window_local(icao: str, dt_iso: str) -> bool:
     """True only if station local hour is in [11, 19)."""
     dt_utc = _parse_iso(dt_iso)
     dt_local = _to_local(icao, dt_utc)
     return 11 <= dt_local.hour < 19
+
 
 def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
     """Reset integer-cross alert memory once per *local* day for this station."""
@@ -141,6 +151,7 @@ def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
         if last != local_day:
             _STATE["last_alert_floor"].pop(icao, None)
             _STATE["last_reset_date_local"][icao] = local_day
+
 
 # =========================
 # Cache helpers
@@ -154,6 +165,7 @@ def _load_cache(path: str) -> Dict[str, Any]:
         pass
     return {}
 
+
 def _save_cache(path: str, data: Dict[str, Any]) -> None:
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -163,6 +175,7 @@ def _save_cache(path: str, data: Dict[str, Any]) -> None:
         os.replace(tmp, path)
     except Exception:
         pass  # best-effort caching
+
 
 # =========================
 # State boot
@@ -174,11 +187,19 @@ def ensure_state_loaded():
             _STATE["cfg"] = cfg
         if not _STATE["stations"]:
             _STATE["stations"] = cfg["stations"]
+
         cache = _load_cache(cfg["cache_file"])
         if "last_obs" in cache:
             _STATE["last_obs"].update(cache["last_obs"])
         if "last_seen_iso" in cache:
             _STATE["last_seen_iso"].update(cache["last_seen_iso"])
+
+        # NEW: persist daily-reset + last-alerted integer across restarts
+        if "last_reset_date_local" in cache:
+            _STATE["last_reset_date_local"].update(cache["last_reset_date_local"])
+        if "last_alert_floor" in cache:
+            _STATE["last_alert_floor"].update(cache["last_alert_floor"])
+
 
 def get_state() -> Dict[str, Any]:
     with _STATE_LOCK:
@@ -187,10 +208,13 @@ def get_state() -> Dict[str, Any]:
             "last_obs": dict(_STATE["last_obs"]),
             "last_alert": dict(_STATE["last_alert"]),
             "last_seen_iso": dict(_STATE["last_seen_iso"]),
+            "last_reset_date_local": dict(_STATE["last_reset_date_local"]),
+            "last_alert_floor": dict(_STATE["last_alert_floor"]),
             "cfg": dict(_STATE["cfg"]),
             "poll_count": _STATE["poll_count"],
             "last_poll_utc": _STATE["last_poll_utc"],
         }
+
 
 # =========================
 # Source helpers
@@ -202,15 +226,18 @@ def _headers_for_nws(cfg) -> Dict[str, str]:
         "Accept": "application/geo+json",
     }
 
+
 def _iso_seconds_z(dt: datetime) -> str:
     # api.weather.gov prefers 'Z' (UTC) with seconds precision
     return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
 
 def _nws_range_url(icao: str, start_iso_z: str, end_iso_z: str, limit: int = 200) -> str:
     return (
         f"https://api.weather.gov/stations/{icao}/observations"
         f"?start={start_iso_z}&end={end_iso_z}&limit={min(limit, 200)}"
     )
+
 
 def _iem_range_url(icao: str, hours: int) -> str:
     # Use CSV; we'll filter client-side to [start,end] UTC.
@@ -219,14 +246,17 @@ def _iem_range_url(icao: str, hours: int) -> str:
         f"?station={icao}&data=tmpf&tz=UTC&format=comma&hours={hours}"
     )
 
+
 def _tgftp_latest_url(icao: str) -> str:
     return f"https://tgftp.nws.noaa.gov/data/observations/metar/stations/{icao}.TXT"
+
 
 # =========================
 # Parse helpers
 # =========================
 def _obs_tuple(temp_f: float, ts_iso: str, raw: Any, source: str) -> Dict[str, Any]:
     return {"temp_f": round(float(temp_f), 1), "obs_time": ts_iso, "raw": raw, "source": source}
+
 
 def _parse_nws_collection(j: Dict[str, Any]) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
@@ -239,6 +269,7 @@ def _parse_nws_collection(j: Dict[str, Any]) -> List[Dict[str, Any]]:
         out.append(_obs_tuple(_c_to_f(float(val_c)), ts, props, "nws"))
     out.sort(key=lambda x: _parse_iso(x["obs_time"]))
     return out
+
 
 def _parse_iem_csv(text: str, start_dt: datetime, end_dt: datetime) -> List[Dict[str, Any]]:
     # If IEM returns HTML (maintenance) or ERROR, avoid exceptions.
@@ -264,6 +295,7 @@ def _parse_iem_csv(text: str, start_dt: datetime, end_dt: datetime) -> List[Dict
         out.append(_obs_tuple(tf, ts.isoformat(), row, "iem"))
     out.sort(key=lambda x: _parse_iso(x["obs_time"]))
     return out
+
 
 def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
     lines = text.strip().splitlines()
@@ -292,6 +324,7 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
         ts = _now_utc_iso()
     return _obs_tuple(temp_f, ts, metar_line, "tgftp")
 
+
 # =========================
 # Range fetchers (strict by source)
 # =========================
@@ -300,6 +333,7 @@ def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str,
     r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
     r.raise_for_status()
     return _parse_nws_collection(r.json())
+
 
 def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     url = f"https://api.weather.gov/stations/{icao}/observations/latest"
@@ -313,6 +347,7 @@ def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[st
         return None
     return _obs_tuple(_c_to_f(float(val_c)), ts, props, "nws")
 
+
 def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     minutes = max(1, int((end_dt - start_dt).total_seconds() // 60))
     hours = max(1, min(3, (minutes // 60) + 1, int(cfg.get("iem_hours", 1))))
@@ -321,11 +356,13 @@ def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[
     r.raise_for_status()
     return _parse_iem_csv(r.text, start_dt, end_dt)
 
+
 def _fetch_latest_tgftp(icao: str) -> List[Dict[str, Any]]:
     r = requests.get(_tgftp_latest_url(icao), timeout=15)
     r.raise_for_status()
     parsed = _parse_tgftp_text(r.text)
     return [parsed] if parsed else []
+
 
 # =========================
 # Ingestion (dedupe & alerts)
@@ -359,7 +396,7 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
         # integer-boundary alerting (both directions), only during local 11–19
         if last_temp is not None:
-            now_f  = float(obs["temp_f"])
+            now_f = float(obs["temp_f"])
             prev_f = float(last_temp)
 
             # daily reset keyed to local date
@@ -391,9 +428,12 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
         _save_cache(cfg["cache_file"], {
             "last_obs": _STATE["last_obs"],
             "last_seen_iso": _STATE["last_seen_iso"],
+            "last_reset_date_local": _STATE["last_reset_date_local"],
+            "last_alert_floor": _STATE["last_alert_floor"],
         })
 
     return (ingested, alerts)
+
 
 def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any]) -> None:
     payload = {
@@ -407,25 +447,36 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
     }
     _send_alert(cfg.get("webhook", ""), payload)
 
+
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
     if not webhook:
         return
     try:
+        station = (payload.get("station") or "UNK").upper()
+        tf = payload.get("temp_f")
+        pf = payload.get("prev_temp_f")
+        df = payload.get("delta_f")
+        ts_utc = payload.get("obs_time")
+
+        # Station-local timestamp for display
+        ts_local = _iso_to_tz(ts_utc, _icao_tz_name(station))
+
         if "discord.com/api/webhooks" in webhook:
-            station = payload.get("station", "UNK")
-            tf = payload.get("temp_f")
-            pf = payload.get("prev_temp_f")
-            df = payload.get("delta_f")
-            ts = payload.get("obs_time")
-            content = f"**METAR Temp Change** — {station}: {pf}→{tf} °F (Δ {df:+}) @ {ts}"
+            content = (
+                f"**Temp Integer Cross** — {station}: "
+                f"{int(math.floor(float(pf)))} → {int(math.floor(float(tf)))} "
+                f"(now {tf}°F, Δ {df:+}) @ {ts_local}"
+            )
             body = {
                 "content": content,
                 "embeds": [{
-                    "title": f"{station} Temperature Update",
+                    "title": f"{station} Temperature Integer Crossing",
                     "fields": [
                         {"name": "Prev °F", "value": str(pf), "inline": True},
                         {"name": "Now °F",  "value": str(tf), "inline": True},
                         {"name": "Δ °F",    "value": f"{df:+}", "inline": True},
+                        {"name": "Obs (local)", "value": str(ts_local), "inline": False},
+                        {"name": "Obs (UTC)",   "value": str(ts_utc),   "inline": False},
                     ],
                     "timestamp": payload.get("at_utc"),
                     "footer": {"text": "METAR monitor"},
@@ -436,6 +487,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             requests.post(webhook, json=payload, timeout=10)
     except Exception:
         pass
+
 
 # =========================
 # Window + fetch routers (STRICT: no auto-fallback)
@@ -464,6 +516,7 @@ def _compute_window(icao: str, minutes: Optional[int] = None, cfg: Optional[Dict
     end_dt = now
     return (_iso_seconds_z(start_dt), _iso_seconds_z(end_dt), start_dt, end_dt)
 
+
 def _fetch_range_strict(icao: str, chosen: str,
                         start_iso: str, end_iso: str,
                         start_dt: datetime, end_dt: datetime,
@@ -476,6 +529,7 @@ def _fetch_range_strict(icao: str, chosen: str,
     if s == "tgftp":
         return _fetch_latest_tgftp(icao)
     return []
+
 
 def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -514,6 +568,7 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
             "error": str(e),
         }
 
+
 def fetch_latest(icao: str, source: Optional[str] = None) -> dict:
     cfg = get_default_config()
     minutes = int(cfg.get("lookback_min", 3))
@@ -547,6 +602,7 @@ def fetch_latest(icao: str, source: Optional[str] = None) -> dict:
         "error": res.get("error") or "no observation",
         "status": res.get("status", "error"),
     }
+
 
 def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -584,9 +640,11 @@ def fetch_now(stations: List[str], source: Optional[str] = None) -> Dict[str, An
         out["errors"] = errors
     return out
 
+
 def get_latest_metar(icao: str, source: Optional[str] = None) -> Dict[str, Any]:
     """Back-compat alias used by app.py."""
     return fetch_latest(icao, source=source)
+
 
 # =========================
 # Watchlist + metrics
@@ -599,10 +657,12 @@ def set_watchlist(icaos: Optional[List[str]]) -> Dict[str, Any]:
         _STATE["stations"] = cleaned
     return {"ok": True, "watchlist": cleaned, "count": len(cleaned)}
 
+
 def get_watchlist() -> Dict[str, Any]:
     with _STATE_LOCK:
         wl = list(_STATE["stations"]) or get_default_config()["stations"]
     return {"watchlist": wl, "count": len(wl)}
+
 
 def get_metrics() -> Dict[str, Any]:
     with _STATE_LOCK:
@@ -615,6 +675,7 @@ def get_metrics() -> Dict[str, Any]:
         "poll_count": poll_count,
         "watchlist_size": watch_ct,
     }
+
 
 # =========================
 # Scheduler
@@ -644,15 +705,19 @@ def _poll_once(logger=None):
         _save_cache(cfg["cache_file"], {
             "last_obs": _STATE["last_obs"],
             "last_seen_iso": _STATE["last_seen_iso"],
+            "last_reset_date_local": _STATE["last_reset_date_local"],
+            "last_alert_floor": _STATE["last_alert_floor"],
         })
 
     if logger:
         logger.info(f"METAR poll ({chosen}): stations={len(stations)} ingested={total_ing} alerts={total_alerts}")
 
+
 def _scheduler_loop(logger, interval_sec: int):
     while not _SCHEDULER_STOP.is_set():
         _poll_once(logger)
         _SCHEDULER_STOP.wait(interval_sec)
+
 
 def start_scheduler(logger, cfg=None) -> bool:
     global _SCHEDULER_THREAD
@@ -668,11 +733,13 @@ def start_scheduler(logger, cfg=None) -> bool:
     _SCHEDULER_THREAD.start()
     return True
 
+
 def stop_scheduler() -> bool:
     if not _SCHEDULER_THREAD:
         return True
     _SCHEDULER_STOP.set()
     return True
+
 
 def is_scheduler_running() -> bool:
     return _SCHEDULER_THREAD is not None and _SCHEDULER_THREAD.is_alive()
