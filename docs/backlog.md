@@ -1,24 +1,17 @@
-# Backlog (Not in Current Phase)
 
-## Rules
-- Items in this file are explicitly OUT OF SCOPE for the current phase.
-- Only pull an item into scope when we start a new phase doc (phase_02_*.md, phase_03_*.md).
-- Exceptions allowed mid-phase: deploy-blockers, security issues, or correctness bugs that break Phase 1 acceptance criteria.
+## Phase 1 (METAR monitor) — remaining / polish
+- [ ] Integer bucket crossing alerts (up + down) instead of delta-based float threshold
+- [ ] Station-local time gating (11:00–19:00 local) for alerts
+- [ ] Overnight reset per station (local midnight)
+- [ ] Add explicit station timezone map (config file or env JSON)
+- [ ] Reduce noise: only alert on bucket transitions, not repeated
+- [ ] Add an endpoint to show station-local time + current bucket for debugging
 
----
+## Phase 2 (Kalshi read-only monitoring)
+- [ ] Kalshi auth (read-only)
+- [ ] Market watchlist config
+- [ ] Poll market data + post snapshots to Discord
+- [ ] No trading / no orders
 
-## P0 — Must do next (Phase 2 candidates)
-- Persist full observation stream (minute-level when available) to storage (DB or Sheets)
-- High-of-day tracking + “spike detection” reporting (capture brief 1-minute highs)
-- Rate limiting + backoff strategy for NWS requests (avoid bans / handle outages)
-- Per-station local time zones (explicit mapping or derived from station metadata)
-
-## P1 — Valuable
-- Admin UI endpoint to show last N observations per station
-- Alert “cooldown” controls to avoid spam during oscillations
-- Structured logging (JSON logs) and log retention strategy
-
-## P2 — Later (Phase 3 candidates)
-- Forecast sources, bias calculations, time-of-day bias profiles
-- Backfill pipelines for history windows
-- Kalshi market mapping, automation, trading strategy layer
+## Phase 3 (TBD)
+- kept intentionally undefined
