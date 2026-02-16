@@ -1,11 +1,23 @@
-# Historical (Old Scope)
+# Phase 2 — Observation History + Reporting (Proposed)
 
-This project originally included:
-- Forecast pulls from multiple weather APIs (OpenWeather, Tomorrow, VisualCrossing, Weatherbit, etc.)
-- Backfills + bias calculations across forecast horizons and times of day
-- Google Sheets tracking + normalization
-- Kalshi market forecasting + verification
+## Goal
+Capture and retain the full observation stream so we can reconstruct “every tick” events and daily highs/lows reliably.
 
-That scope is explicitly paused. The current repo is a clean restart focused only on METAR monitoring (Phase 1).
+## In Scope
+- Store observations to durable storage:
+  - Minimal schema: station, obs_time_utc, temp_f (raw + integer), source, payload hash
+- Endpoints:
+  - GET /history/recent?icao=KDEN&minutes=60
+  - GET /history/day?icao=KDEN&date=YYYY-MM-DD (local date)
+  - GET /history/highs?date=YYYY-MM-DD (local date per station)
+- High-of-day tracking derived from stored observations
+- Operational controls:
+  - retry/backoff and basic circuit breaker when NWS errors
+  - logging improvements (structured logs)
 
-If/when needed, bring back old ideas into separate reference files so Phase 1 stays small and stable.
+## Out of Scope
+- Forecasting, bias, backfills, Kalshi trading
+
+## Definition of Done
+- We can prove we captured short-lived spikes (e.g., 70→71 for 1 minute)
+- Daily high/low computed from stored obs matches what we observed in alerts/logs
