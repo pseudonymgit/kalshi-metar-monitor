@@ -405,11 +405,11 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
         with _STATE_LOCK:
             last_observed_integer = _STATE["last_observed_integer"].get(icao)
 
-        if (
-            _within_alert_window_local(icao, ts)
-            and last_observed_integer is not None
+        integer_changed = (
+            last_observed_integer is not None
             and curr_floor != last_observed_integer
-        ):
+        )
+        if _within_alert_window_local(icao, ts) and integer_changed:
             d = round(now_f - prev_f, 1)
             _emit_alert(
                 icao,
