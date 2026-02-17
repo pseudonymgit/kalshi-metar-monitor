@@ -2,18 +2,17 @@
 
 Phase 1 is frozen.
 
-The following files must not have behavior changes:
-- core/metar_monitor.py (alert logic)
-- Station-local alert window logic
-- Daily reset logic
-- Integer-cross semantics
+The following behavior must NOT change unless explicitly versioned:
 
-Permitted changes:
-- Bug fixes only
-- Logging improvements
-- Performance optimizations that do not change behavior
+- Integer floor transition alert semantics
+- Station-local 11:00–19:00 alert window
+- Station-local daily reset logic
+- last_observed_floor persistence behavior
 
-Any change to Phase 1 behavior requires:
-1. New git tag
-2. Update to PHASE1.md
-3. Explicit documentation of behavioral delta
+If Phase 1 behavior is modified:
+
+1. A new git tag must be created.
+2. docs/PHASE1.md must be updated.
+3. The behavioral change must be explicitly documented.
+
+All future development (Phase 2+) must not alter Phase 1 behavior.
