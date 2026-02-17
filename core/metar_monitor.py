@@ -47,7 +47,7 @@ _STATE: Dict[str, Any] = {
     "last_alert": {},            # (kept for compatibility; not used by int-cross logic)
     "last_seen_iso": {},         # { ICAO: ISO of latest obs we ingested }
     "last_reset_date_local": {}, # { ICAO: "YYYY-MM-DD" } daily local reset marker
-    "last_alert_floor": {},      # { ICAO: int } last integer (floor) we alerted on
+    "last_observed_integer": {}, # { ICAO: int } last observed floored integer temperature
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
@@ -142,14 +142,14 @@ def _within_alert_window_local(icao: str, dt_iso: str) -> bool:
 
 
 def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
-    """Reset integer-cross alert memory once per *local* day for this station."""
+    """Reset integer-cross memory once per *local* day for this station."""
     dt_utc = _parse_iso(dt_iso)
     dt_local = _to_local(icao, dt_utc)
     local_day = dt_local.date().isoformat()
     with _STATE_LOCK:
         last = _STATE["last_reset_date_local"].get(icao)
         if last != local_day:
-            _STATE["last_alert_floor"].pop(icao, None)
+            _STATE["last_observed_integer"].pop(icao, None)
             _STATE["last_reset_date_local"][icao] = local_day
 
 
@@ -194,11 +194,11 @@ def ensure_state_loaded():
         if "last_seen_iso" in cache:
             _STATE["last_seen_iso"].update(cache["last_seen_iso"])
 
-        # NEW: persist daily-reset + last-alerted integer across restarts
+        # Persist daily-reset + last observed integer across restarts
         if "last_reset_date_local" in cache:
             _STATE["last_reset_date_local"].update(cache["last_reset_date_local"])
-        if "last_alert_floor" in cache:
-            _STATE["last_alert_floor"].update(cache["last_alert_floor"])
+        if "last_observed_integer" in cache:
+            _STATE["last_observed_integer"].update(cache["last_observed_integer"])
 
 
 def get_state() -> Dict[str, Any]:
@@ -209,7 +209,7 @@ def get_state() -> Dict[str, Any]:
             "last_alert": dict(_STATE["last_alert"]),
             "last_seen_iso": dict(_STATE["last_seen_iso"]),
             "last_reset_date_local": dict(_STATE["last_reset_date_local"]),
-            "last_alert_floor": dict(_STATE["last_alert_floor"]),
+            "last_observed_integer": dict(_STATE["last_observed_integer"]),
             "cfg": dict(_STATE["cfg"]),
             "poll_count": _STATE["poll_count"],
             "last_poll_utc": _STATE["last_poll_utc"],
@@ -395,32 +395,34 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
         ingested += 1
 
         # integer-boundary alerting (both directions), only during local 11–19
-        if last_temp is not None:
-            now_f = float(obs["temp_f"])
-            prev_f = float(last_temp)
+        now_f = float(obs["temp_f"])
+        prev_f = float(last_temp) if last_temp is not None else now_f
 
-            # daily reset keyed to local date
-            _maybe_daily_reset_local(icao, ts)
+        # daily reset keyed to local date
+        _maybe_daily_reset_local(icao, ts)
 
-            if _within_alert_window_local(icao, ts):
-                prev_floor = int(math.floor(prev_f))
-                curr_floor = int(math.floor(now_f))
+        curr_floor = int(math.floor(now_f))
+        with _STATE_LOCK:
+            last_observed_integer = _STATE["last_observed_integer"].get(icao)
 
-                if curr_floor != prev_floor:
-                    with _STATE_LOCK:
-                        last_floored_alert = _STATE["last_alert_floor"].get(icao)
-                        if last_floored_alert != curr_floor:
-                            _STATE["last_alert_floor"][icao] = curr_floor
-                            d = round(now_f - prev_f, 1)
-                            _emit_alert(
-                                icao,
-                                prev_f=prev_f,
-                                now_f=now_f,
-                                delta_f=d,
-                                obs_time=ts,
-                                cfg=cfg,
-                            )
-                            alerts += 1
+        if (
+            _within_alert_window_local(icao, ts)
+            and last_observed_integer is not None
+            and curr_floor != last_observed_integer
+        ):
+            d = round(now_f - prev_f, 1)
+            _emit_alert(
+                icao,
+                prev_f=prev_f,
+                now_f=now_f,
+                delta_f=d,
+                obs_time=ts,
+                cfg=cfg,
+            )
+            alerts += 1
+
+        with _STATE_LOCK:
+            _STATE["last_observed_integer"][icao] = curr_floor
 
         last_temp = obs["temp_f"]
 
@@ -429,7 +431,7 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
             "last_obs": _STATE["last_obs"],
             "last_seen_iso": _STATE["last_seen_iso"],
             "last_reset_date_local": _STATE["last_reset_date_local"],
-            "last_alert_floor": _STATE["last_alert_floor"],
+            "last_observed_integer": _STATE["last_observed_integer"],
         })
 
     return (ingested, alerts)
@@ -706,7 +708,7 @@ def _poll_once(logger=None):
             "last_obs": _STATE["last_obs"],
             "last_seen_iso": _STATE["last_seen_iso"],
             "last_reset_date_local": _STATE["last_reset_date_local"],
-            "last_alert_floor": _STATE["last_alert_floor"],
+            "last_observed_integer": _STATE["last_observed_integer"],
         })
 
     if logger:
