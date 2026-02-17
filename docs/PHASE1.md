@@ -1,3 +1,21 @@
+# ⚠️ PHASE 1 IS FROZEN
+
+Frozen as of: 2026-02-17
+Git tag: phase1-final
+
+Behavior is locked:
+- NWS source
+- Integer floor transition alerts (up/down)
+- Station-local 11:00–19:00 window
+- Station-local daily reset
+- last_observed_floor persistence
+
+No behavior changes allowed.
+Only critical bug fixes permitted.
+
+
+
+
 # Phase 1 (Hardened) — Current Production Behavior
 
 This document is the source of truth for **current Phase 1 behavior**.
