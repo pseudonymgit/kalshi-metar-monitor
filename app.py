@@ -25,6 +25,9 @@ app = Flask(__name__)
 log = app.logger
 log.setLevel(logging.INFO)
 
+if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
+    start_scheduler(log)
+
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "ok"}), 200
@@ -104,6 +107,25 @@ def metar_watchlist():
 @app.route("/metar/metrics", methods=["GET"])
 def metar_metrics():
     return jsonify(get_metrics()), 200
+
+
+@app.route("/metar/status", methods=["GET"])
+def metar_status():
+    from core.metar_monitor import _SCHEDULER_THREAD
+
+    running = (
+        _SCHEDULER_THREAD is not None and
+        _SCHEDULER_THREAD.is_alive()
+    )
+    state = get_metrics()
+    return jsonify({
+        "scheduler_running": running,
+        "poll_count": state.get("poll_count"),
+        "last_poll_utc": state.get("last_poll_utc"),
+        "timeout_count": state.get("timeout_count"),
+        "last_timeout_station": state.get("last_timeout_station"),
+        "last_timeout_utc": state.get("last_timeout_utc"),
+    }), 200
 
 @app.route("/metar/start", methods=["POST"])
 def metar_start():
