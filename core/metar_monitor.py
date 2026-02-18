@@ -51,6 +51,9 @@ _STATE: Dict[str, Any] = {
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
+    "timeout_count": 0,
+    "last_timeout_station": None,
+    "last_timeout_utc": None,
 }
 
 _SCHEDULER_THREAD = None
@@ -258,6 +261,15 @@ def _obs_tuple(temp_f: float, ts_iso: str, raw: Any, source: str) -> Dict[str, A
     return {"temp_f": round(float(temp_f), 1), "obs_time": ts_iso, "raw": raw, "source": source}
 
 
+def _record_timeout(icao: str):
+    from datetime import datetime, timezone
+
+    with _STATE_LOCK:
+        _STATE["timeout_count"] += 1
+        _STATE["last_timeout_station"] = icao
+        _STATE["last_timeout_utc"] = datetime.now(timezone.utc).isoformat()
+
+
 def _parse_nws_collection(j: Dict[str, Any]) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for f in j.get("features", []):
@@ -330,14 +342,22 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
 # =========================
 def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     url = _nws_range_url(icao, start_iso_z, end_iso_z)
-    r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
+    try:
+        r = requests.get(url, headers=_headers_for_nws(cfg), timeout=10)
+    except requests.exceptions.Timeout:
+        _record_timeout(icao)
+        r = requests.get(url, headers=_headers_for_nws(cfg), timeout=10)
     r.raise_for_status()
     return _parse_nws_collection(r.json())
 
 
 def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     url = f"https://api.weather.gov/stations/{icao}/observations/latest"
-    r = requests.get(url, headers=_headers_for_nws(cfg), timeout=20)
+    try:
+        r = requests.get(url, headers=_headers_for_nws(cfg), timeout=10)
+    except requests.exceptions.Timeout:
+        _record_timeout(icao)
+        r = requests.get(url, headers=_headers_for_nws(cfg), timeout=10)
     r.raise_for_status()
     j = r.json()
     props = j.get("properties", {}) if isinstance(j, dict) else {}
@@ -671,11 +691,17 @@ def get_metrics() -> Dict[str, Any]:
         last_poll_utc = _STATE["last_poll_utc"]
         poll_count = _STATE["poll_count"]
         watch_ct = len(_STATE["stations"] or get_default_config()["stations"])
+        timeout_count = _STATE["timeout_count"]
+        last_timeout_station = _STATE["last_timeout_station"]
+        last_timeout_utc = _STATE["last_timeout_utc"]
     return {
         "last_poll_utc": last_poll_utc,
         "last_poll_et": _iso_to_tz(last_poll_utc, ET_TZ_NAME),
         "poll_count": poll_count,
         "watchlist_size": watch_ct,
+        "timeout_count": timeout_count,
+        "last_timeout_station": last_timeout_station,
+        "last_timeout_utc": last_timeout_utc,
     }
 
 
