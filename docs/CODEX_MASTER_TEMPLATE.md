@@ -1,44 +1,32 @@
-IMPORTANT — AUTHENTICATED PR MODE ONLY
+IMPORTANT — NATIVE PR MODE ONLY
 
-You must create a new branch and open a Pull Request using authenticated GitHub access.
-
-A fine-grained GITHUB_TOKEN secret is available in the runtime.
+All changes must be made on a new branch and opened as a Pull Request
+using Codex’s native GitHub integration (make_pr or equivalent).
 
 DO NOT:
-- Modify or create the main branch
-- Commit without pushing
-- Use unauthenticated git
-- Print or expose GITHUB_TOKEN
-- Echo environment variables
-- Write the token to any file
-- Include the token in logs, diffs, or PR descriptions
+- Modify or commit directly to main
+- Use unauthenticated shell git push
+- Attempt manual gh auth
 - Rewrite the git remote URL
-- Persist credentials to disk
+- Persist credentials
+- Expose any secrets
 
-If authentication fails at any step, abort and report the exact error.
-
-All changes must go through a Pull Request.
+If branch creation or PR creation fails,
+abort and report the exact error.
 
 ----------------------------------------------------------------
-MANDATORY AUTHENTICATION SEQUENCE (RUN BEFORE PUSH)
+GITHUB WORKFLOW REQUIREMENTS
 ----------------------------------------------------------------
 
-1) Authenticate GitHub CLI using the token:
+- Create a new branch.
+- Commit changes to that branch.
+- Push via native Codex GitHub integration.
+- Create a real GitHub Pull Request.
+- Return the PR URL.
+- Confirm the branch exists remotely.
 
-   gh auth login --with-token <<< "$GITHUB_TOKEN"
-
-2) Verify authentication:
-
-   gh auth status
-
-3) Verify remote connectivity:
-
-   git ls-remote origin HEAD
-
-If any of the above fails:
-- Abort immediately
-- Report exact error
-- Do NOT attempt git push
+If PR metadata is recorded locally but no PR appears in GitHub UI,
+treat this as a failure and report it.
 
 ----------------------------------------------------------------
 PROJECT GUARDRAILS
@@ -107,4 +95,3 @@ Return:
 4) PR URL
 5) Required environment variables (if applicable)
 6) Local curl test command (if applicable)
-   
