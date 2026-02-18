@@ -91,3 +91,59 @@ Expected result: `{"ok":true,"sent":true}` and a Discord/webhook message.
 - Alerts fire only on integer floor crosses (up or down) during station-local `11:00–19:00`.
 - Daily reset is station-local date based.
 - Cache persistence preserves `last_alert_floor` and `last_reset_date_local` across restart.
+
+## GitHub remote connectivity (Codex / local automation)
+
+If you run changes from a container or ephemeral workspace, verify the checkout is attached to
+the actual GitHub repo before opening PRs.
+
+```bash
+git remote -v
+```
+
+If no `origin` exists, add one:
+
+```bash
+git remote add origin https://github.com/<owner>/kalshi-metar-monitor.git
+```
+
+If `origin` exists but is wrong, fix it:
+
+```bash
+git remote set-url origin https://github.com/<owner>/kalshi-metar-monitor.git
+```
+
+Then verify connectivity and auth:
+
+```bash
+git ls-remote origin HEAD
+```
+
+
+If this fails with authentication errors, provide a valid GitHub token/credential helper in the
+runtime before attempting `git push` or PR creation.
+
+### Important: local PR tooling vs real GitHub PRs
+
+- Local automation helpers (including Codex `make_pr`) can record PR metadata, but they do **not**
+  guarantee a PR exists on GitHub.
+- A PR appears on GitHub only after a successful push to a remote branch and PR creation via the
+  GitHub API/UI (for example `gh pr create` or the web UI).
+
+Recommended verification sequence:
+
+```bash
+git remote -v
+git ls-remote origin HEAD
+git push -u origin <your-branch>
+```
+
+Then create/verify the PR with one of:
+
+```bash
+gh pr create --fill
+gh pr view --web
+```
+
+or open `https://github.com/<owner>/kalshi-metar-monitor/pulls` in a browser to confirm the PR is
+actually present.
