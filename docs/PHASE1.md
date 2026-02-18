@@ -1,3 +1,20 @@
+# Phase 1 — Alert Engine Specification
+Version: 1.0
+Status: Frozen (Controlled Evolution Only)
+
+This document defines the authoritative alert semantics for Phase 1.
+
+Any change to alert behavior requires:
+- Version increment
+- Explicit documentation of semantic change
+- PR description clearly stating the change
+- ChatGPT merge gate approval
+
+If behavior changes without version increment, it is considered a defect.
+
+
+
+
 # ⚠️ PHASE 1 IS FROZEN
 
 Frozen as of: 2026-02-17
