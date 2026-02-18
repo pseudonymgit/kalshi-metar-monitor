@@ -32,6 +32,25 @@ GITHUB AUTHENTICATION RULES
 If git ls-remote origin HEAD fails due to auth,
 abort and report immediately.
 
+MANDATORY AUTHENTICATION SEQUENCE (MUST RUN BEFORE PUSH)
+
+1) Authenticate GitHub CLI:
+
+   gh auth login --with-token <<< "$GITHUB_TOKEN"
+
+2) Verify authentication:
+
+   gh auth status
+
+3) Verify remote connectivity:
+
+   git ls-remote origin HEAD
+
+If any step fails:
+- Abort immediately
+- Report exact error
+- Do not attempt git push
+  
 ----------------------------------------------------------------
 PROJECT GUARDRAILS
 ----------------------------------------------------------------
