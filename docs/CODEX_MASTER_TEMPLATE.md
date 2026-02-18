@@ -5,36 +5,25 @@ You must create a new branch and open a Pull Request using authenticated GitHub 
 A fine-grained GITHUB_TOKEN secret is available in the runtime.
 
 DO NOT:
-- Commit locally without pushing
+- Modify or create the main branch
+- Commit without pushing
 - Use unauthenticated git
-- Modify the main branch
-- Create or modify main directly
 - Print or expose GITHUB_TOKEN
 - Echo environment variables
 - Write the token to any file
 - Include the token in logs, diffs, or PR descriptions
+- Rewrite the git remote URL
+- Persist credentials to disk
 
-If authentication fails, abort and report the exact error.
+If authentication fails at any step, abort and report the exact error.
 
 All changes must go through a Pull Request.
 
 ----------------------------------------------------------------
-GITHUB AUTHENTICATION RULES
+MANDATORY AUTHENTICATION SEQUENCE (RUN BEFORE PUSH)
 ----------------------------------------------------------------
 
-- Use GITHUB_TOKEN for authenticated GitHub operations.
-- Do not reveal token value.
-- Do not print environment variables.
-- If git push is used, it must be authenticated.
-- If GitHub CLI (gh) is used, it must authenticate via token.
-- Prefer API-based PR creation if available.
-
-If git ls-remote origin HEAD fails due to auth,
-abort and report immediately.
-
-MANDATORY AUTHENTICATION SEQUENCE (MUST RUN BEFORE PUSH)
-
-1) Authenticate GitHub CLI:
+1) Authenticate GitHub CLI using the token:
 
    gh auth login --with-token <<< "$GITHUB_TOKEN"
 
@@ -46,11 +35,11 @@ MANDATORY AUTHENTICATION SEQUENCE (MUST RUN BEFORE PUSH)
 
    git ls-remote origin HEAD
 
-If any step fails:
+If any of the above fails:
 - Abort immediately
 - Report exact error
-- Do not attempt git push
-  
+- Do NOT attempt git push
+
 ----------------------------------------------------------------
 PROJECT GUARDRAILS
 ----------------------------------------------------------------
@@ -70,17 +59,10 @@ PROJECT GUARDRAILS
 - Do not change Render boot behavior unless explicitly requested.
 
 ----------------------------------------------------------------
-CHANGE SCOPE
-----------------------------------------------------------------
-
-(Describe the exact implementation request here.)
-
-----------------------------------------------------------------
-KALSHI RULES (When Applicable)
+KALSHI RULES (WHEN APPLICABLE)
 ----------------------------------------------------------------
 
 Environment variables:
-
 - KALSHI_BASE_URL
 - KALSHI_KEY_ID
 - KALSHI_KEY_PEM
@@ -93,7 +75,7 @@ Paths passed to helpers MUST NOT include `/trade-api/v2` again.
 Correct:
     /markets?limit=1
 
-Signature message format MUST be:
+Signature message format:
     timestamp + METHOD + path + body
 
 Timestamp:
@@ -108,6 +90,12 @@ Signing:
 Never expose key_id or key_pem.
 
 ----------------------------------------------------------------
+CHANGE SCOPE
+----------------------------------------------------------------
+
+(Describe requested implementation here.)
+
+----------------------------------------------------------------
 DELIVERABLE REQUIREMENTS
 ----------------------------------------------------------------
 
@@ -117,5 +105,5 @@ Return:
 2) Confirmation Phase 1 files were not modified
 3) Confirmation no alert semantics changed
 4) PR URL
-5) Required environment variables
-6) Local curl test command
+5) Required environment variables (if applicable)
+6) Local curl test command (if applicable)
