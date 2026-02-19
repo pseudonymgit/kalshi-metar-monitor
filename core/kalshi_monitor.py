@@ -83,3 +83,15 @@ def get_metrics():
         "base_url_configured": bool(cfg["base_url"]),
         "auth_configured": bool(cfg["base_url"] and cfg["key_id"] and cfg["key_pem"]),
     }
+
+
+def _kalshi_public_get(path):
+    base_url = (
+        os.getenv("KALSHI_PUBLIC_BASE_URL")
+        or "https://api.elections.kalshi.com/trade-api/v2"
+    ).rstrip("/")
+    normalized_path = path if path.startswith("/") else f"/{path}"
+    response = requests.get(f"{base_url}{normalized_path}", timeout=10)
+    response.raise_for_status()
+    return response.json()
+=======
