@@ -45,6 +45,18 @@ def kalshi_ping():
         return jsonify({"ok": False}), 200
 
 
+@app.route("/kalshi/markets", methods=["GET"])
+def kalshi_markets():
+    try:
+        limit = int(request.args.get("limit", "5"))
+        from core.kalshi_monitor import get_public_markets
+
+        data = get_public_markets(limit=limit)
+        return jsonify({"ok": True, **data}), 200
+    except Exception:
+        return jsonify({"ok": False}), 200
+
+
 # --- Debug helpers ---
 
 @app.route("/debug/version", methods=["GET"])
