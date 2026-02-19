@@ -38,8 +38,7 @@ def root():
 @app.route("/kalshi/ping", methods=["GET"])
 def kalshi_ping():
     try:
-
-              _kalshi_public_get("/markets?limit=1")
+        _kalshi_public_get("/markets?limit=1")
         return jsonify({"ok": True}), 200
     except Exception:
         return jsonify({"ok": False}), 200
@@ -55,6 +54,7 @@ def kalshi_markets():
         return jsonify({"ok": True, **data}), 200
     except Exception:
         return jsonify({"ok": False}), 200
+
         
 # --- Debug helpers ---
 
