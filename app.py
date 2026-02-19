@@ -55,8 +55,7 @@ def kalshi_markets():
         return jsonify({"ok": True, **data}), 200
     except Exception:
         return jsonify({"ok": False}), 200
-
-
+        
 # --- Debug helpers ---
 
 @app.route("/debug/version", methods=["GET"])
