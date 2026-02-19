@@ -94,4 +94,16 @@ def _kalshi_public_get(path):
     response = requests.get(f"{base_url}{normalized_path}", timeout=10)
     response.raise_for_status()
     return response.json()
+
+
+def get_public_markets(limit=5):
+    """
+    Fetch public Kalshi markets (no authentication).
+    """
+    data = _kalshi_public_get(f"/markets?limit={int(limit)}")
+    return {
+        "cursor": data.get("cursor"),
+        "count": len(data.get("markets", [])),
+        "markets": data.get("markets", []),
+    }
 =======
