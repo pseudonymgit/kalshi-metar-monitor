@@ -20,6 +20,7 @@ from core.metar_monitor import (
     get_default_config,
     _poll_once,
 )
+from core.kalshi_monitor import _kalshi_public_get
 
 app = Flask(__name__)
 log = app.logger
@@ -31,6 +32,15 @@ if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "ok"}), 200
+
+
+@app.route("/kalshi/ping", methods=["GET"])
+def kalshi_ping():
+    try:
+        _kalshi_public_get("/markets?limit=1")
+        return jsonify({"ok": True}), 200
+    except Exception:
+        return jsonify({"ok": False}), 200
 
 # --- Debug helpers ---
 
