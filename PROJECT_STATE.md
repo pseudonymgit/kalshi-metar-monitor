@@ -1,3 +1,4 @@
+
 Kalshi METAR Monitor — Project State Snapshot
 
 1️⃣ Current Phase
