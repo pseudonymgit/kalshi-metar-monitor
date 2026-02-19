@@ -1,86 +1,143 @@
-IMPORTANT — PR MODE ONLY
+CODEX MASTER TEMPLATE (EPHEMERAL-SAFE VERSION)
 
-All changes must be made on a new branch.
-A Pull Request must be opened.
-Never modify main directly.
+AUTHENTICATED PR MODE ONLY
 
-DO NOT:
-- Commit to main
-- Modify main directly
-- Print secrets
-- Echo environment variables
-- Log private keys
-- Expose tokens in output
-- Refactor unrelated code
+All changes must go through a Pull Request.
 
-If PR creation fails, report the exact error.
+A GITHUB_TOKEN secret is available in the runtime.
 
-----------------------------------------------------------------
-PROJECT GUARDRAILS
-----------------------------------------------------------------
+⸻
 
-You must read and respect:
+GIT REMOTE HANDLING (EPHEMERAL CONTAINER SAFE)
 
-- docs/PHASE1.md
-- docs/ARCHITECTURE_GUARDRAILS.md
-- PR_REVIEW_CHECKLIST.md
+This environment may not have a configured git remote.
 
-Phase 1 alert semantics are frozen unless explicitly instructed.
+Before making changes:
+	1.	Run:
+git remote -v
+	2.	If no origin exists:
+git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
+	3.	Verify:
+git remote -v
+	4.	Run:
+git ls-remote origin HEAD
 
-Preserve exactly:
+If git ls-remote origin HEAD fails due to authentication error:
+Abort immediately and report exact error.
 
-- Integer floor-cross detection
-- Station-local 11:00–19:00 window
-- Station-local daily reset
-- Scheduler idempotency
-- Poll cadence
-- No duplicate alerts
-- No unchanged-repeat alerts
+If it succeeds:
+Continue.
 
-If any alert logic is modified intentionally:
+Do NOT abort simply because origin was missing.
+Automatically add it as described above.
 
-- Increment PHASE1.md version
-- Document semantic change clearly
-- State change explicitly in PR description
+⸻
 
-----------------------------------------------------------------
-KALSHI RULES (When Applicable)
-----------------------------------------------------------------
+GITHUB AUTHENTICATION RULES
+	•	Use GITHUB_TOKEN for authenticated operations.
+	•	Do NOT print or expose the token.
+	•	Do NOT echo environment variables.
+	•	Do NOT write the token to disk.
+	•	Do NOT include token in logs or PR descriptions.
+	•	If push fails due to auth → abort and report exact error.
+
+Preferred flow:
+	•	Create new branch
+	•	Commit changes
+	•	git push -u origin 
+	•	gh pr create –fill
+	•	gh pr view –web
+	•	Provide PR URL
+
+Never commit directly to main.
+
+⸻
+
+PHASE 1 PROTECTION RULES (NON-NEGOTIABLE)
+
+Do NOT modify:
+	•	core/metar_monitor.py
+	•	Alert semantics
+	•	Integer floor-cross logic
+	•	Station-local 11:00–19:00 window
+	•	Daily reset logic
+	•	Scheduler idempotency behavior
+	•	Thread lifecycle logic
+	•	requirements.txt (unless explicitly instructed)
+
+If Phase 1 logic must change:
+	•	Explicitly state that this is a Phase 1.x update
+	•	Wait for confirmation before implementing
+
+⸻
+
+KALSHI RULES (WHEN APPLICABLE)
 
 Environment variables:
-- KALSHI_BASE_URL
-- KALSHI_KEY_ID
-- KALSHI_KEY_PEM
+	•	KALSHI_BASE_URL (RSA mode)
+	•	KALSHI_KEY_ID
+	•	KALSHI_KEY_PEM
+	•	KALSHI_PUBLIC_BASE_URL (optional override)
 
-KALSHI_BASE_URL already includes:
-    /trade-api/v2
+Important:
 
-Paths passed to helpers must NOT include it again.
+If using RSA mode:
+	•	Do NOT include /trade-api/v2 in helper path
+	•	Signature format:
+timestamp + METHOD + path + body
+	•	Timestamp must be milliseconds
+	•	Signing:
+RSA
+PKCS1v15
+SHA256
+Base64 encoded
 
-Signature format:
-    timestamp + METHOD + path + body
+Never expose key material.
 
-Timestamp:
-    int(time.time() * 1000)
+Public mode default base:
+https://api.elections.kalshi.com/trade-api/v2
 
-Signing:
-    RSA
-    PKCS1v15
-    SHA256
-    Base64 encoded
+⸻
 
-Never expose key_id or key_pem.
+CHANGE DISCIPLINE
+	•	Minimal diff only
+	•	No unrelated refactoring
+	•	No formatting-only commits
+	•	No renaming unless explicitly requested
+	•	No dependency additions unless explicitly requested
+	•	No boot behavior changes unless explicitly requested
 
-----------------------------------------------------------------
-DELIVERABLE REQUIREMENTS
-----------------------------------------------------------------
+⸻
+
+PR RETURN FORMAT (MANDATORY)
 
 Return:
+	1.	Unified diff
+	2.	Confirmation Phase 1 files untouched
+	3.	Confirmation no alert semantics changed
+	4.	Branch name
+	5.	PR URL
+	6.	Render curl test command
 
-1) Unified diff only
-2) Confirmation Phase 1 files were not modified (unless requested)
-3) Confirmation no alert semantics changed
-4) Branch name
-5) PR URL
-6) Required environment variables
-7) Local curl test command
+⸻
+
+MERGE RULE
+
+No PR gets merged unless ChatGPT signs off with:
+
+“Phase 1 semantics preserved.”
+
+⸻
+
+OPERATING MODE
+
+SOLO-DEV CONTROLLED RELEASE
+
+All changes:
+	•	Branch → PR → AI review → Merge
+
+No direct main commits.
+
+⸻
+
+END OF TEMPLATE
