@@ -94,4 +94,3 @@ def _kalshi_public_get(path):
     response = requests.get(f"{base_url}{normalized_path}", timeout=10)
     response.raise_for_status()
     return response.json()
-=======
