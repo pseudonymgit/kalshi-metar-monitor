@@ -106,4 +106,3 @@ def get_public_markets(limit=5):
         "count": len(data.get("markets", [])),
         "markets": data.get("markets", []),
     }
-=======
