@@ -150,11 +150,3 @@ No direct commits to main.
 END OF TEMPLATE
 
 ---
-
-You now have:
-
-• Setup-script-based authentication
-• Persistent git auth
-• Clean agent behavior
-• Locked Phase 1
-• Controlled PR workflow
