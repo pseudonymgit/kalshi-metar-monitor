@@ -163,6 +163,28 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
 def check_public_market_changes(limit=5):
     markets_data = get_public_markets(limit=limit)
     markets = markets_data.get("markets", [])
+
+    if not _last_market_state:
+        for market in markets:
+            ticker = market.get("ticker")
+            if not ticker:
+                continue
+
+            _last_market_state[ticker] = {
+                "last_price": market.get("last_price"),
+                "yes_bid": market.get("yes_bid"),
+                "yes_ask": market.get("yes_ask"),
+                "no_bid": market.get("no_bid"),
+                "no_ask": market.get("no_ask"),
+                "status": market.get("status"),
+            }
+
+        return {
+            "markets_checked": len(markets),
+            "changes_detected": 0,
+            "alerts_sent": 0,
+        }
+
     changes_detected = 0
     alerts_sent = 0
 
