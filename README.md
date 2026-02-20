@@ -35,3 +35,5 @@ and sends an alert when temperature changes by `TEMP_ALERT_DELTA_F` or more.
   - Example: https://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=JSON&stationString=KDEN&hoursBeforeNow=2&mostRecent=true
 - We only use latest observation per station.
 - All temperatures converted to °F.
+
+Auth pipeline verification test.
