@@ -7,7 +7,14 @@ import requests
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
+from cryptography.hazmat.primitives.asymmetric import padding
 
+# Optional reuse of Phase 1 timezone helper
+try:
+    from core.metar_monitor import _to_local
+except Exception:
+    _to_local = None
+    
 _last_market_state = {}
 
 _STATION_CITY_TOKEN_MAP = {
@@ -139,12 +146,15 @@ def _parse_target_market_types(raw_types):
 
 def _station_local_kalshi_date_token(station):
     now_utc = datetime.now(timezone.utc)
-    try:
-        from core.metar_monitor import _to_local
 
-        now_local = _to_local(station, now_utc)
-    except Exception:
+    if _to_local:
+        try:
+            now_local = _to_local(station, now_utc)
+        except Exception:
+            now_local = now_utc
+    else:
         now_local = now_utc
+
     return now_local.strftime("%y%b%d").upper()
 
 
