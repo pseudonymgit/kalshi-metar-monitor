@@ -1,38 +1,48 @@
 Kalshi METAR Monitor — Project State Snapshot
-
 1️⃣ Current Phase
+
 Phase: Phase 2
 Status: Public Kalshi connectivity active
-Last merged PR:
-Current active branch:
+Last merged PR: Public markets endpoint live
+Current active branch: main
 
 2️⃣ Phase 1 (Alert Engine)
 
 Status: FROZEN
 Version: 1.0
-Last semantics update:
+Tag: phase1-final
 
 Guarantees:
 
-- Integer floor-cross alerts only
-- No unchanged repeat alerts
-- Station-local 11:00–19:00 window
-- Station-local daily reset
-- Scheduler idempotent
-- No duplicate threads
-- No alert emission outside window
+Integer floor-cross alerts only
+
+No unchanged repeat alerts
+
+Station-local 11:00–19:00 window
+
+Station-local daily reset
+
+Scheduler idempotent
+
+No duplicate threads
+
+No alert emission outside window
 
 3️⃣ Phase 2 (Kalshi Integration)
 
 Status: In Progress
+
 Auth mode:
 
-- Public-only (ACTIVE)
-- RSA authenticated (DORMANT)
+Public-only (ACTIVE)
+
+RSA authenticated (DORMANT)
 
 Endpoints implemented:
 
-- /kalshi/ping
+/kalshi/ping
+
+/kalshi/markets
 
 Scheduler integration:
 
@@ -50,22 +60,64 @@ https://kalshi-metar-monitor.onrender.com
 Autostart:
 METAR_AUTOSTART = true
 
-Required Environment Variables:
+5️⃣ Environment Variables (Production)
+Phase 1 Alert Controls
 
-Phase 1:
+ALERT_HOURS_ET
 
-- ALERT_WEBHOOK_URL
-- METAR_STATIONS_JSON
-- METAR_POLL_SECONDS
+ALERT_INGEST_SECRET
 
-Phase 2:
+ALERT_MIN_BUMP_F
 
-- KALSHI_BASE_URL (for RSA mode)
-- KALSHI_KEY_ID (for RSA mode)
-- KALSHI_KEY_PEM (for RSA mode)
-- KALSHI_PUBLIC_BASE_URL (optional override)
+ALERT_MIN_INTERVAL_SEC
 
-5️⃣ Governance Stack
+ALERT_ON_INTEGER_CROSS
+
+ALERT_TIMEZONE
+
+ALERT_WEBHOOK_URL
+
+TEMP_ALERT_DELTA_F
+
+METAR / Source Controls
+
+ASOS_RECENT_MINUTES
+
+IEM_LOOKBACK_HOURS
+
+METAR_LOOKBACK_MIN
+
+METAR_DEFAULT_SOURCE
+
+METAR_STRICT
+
+METAR_CACHE_FILE
+
+METAR_POLL_SECONDS
+
+METAR_STATIONS_JSON
+
+HTTP Etiquette
+
+AWC_FROM_EMAIL
+
+AWC_USER_AGENT
+
+HTTP_FROM_EMAIL
+
+HTTP_USER_AGENT
+
+Kalshi (Phase 2)
+
+KALSHI_PUBLIC_BASE_URL (ACTIVE)
+
+KALSHI_BASE_URL (RSA mode only)
+
+KALSHI_KEY_ID (RSA mode only)
+
+KALSHI_PRIVATE_KEY_PEM (RSA mode only)
+
+6️⃣ Governance Stack
 
 PR Checklist enforced: Yes
 Master Prompt Template enforced: Yes
@@ -73,41 +125,50 @@ Setup Script active: Yes
 Operating Mode declared: Yes
 
 Merge Rule:
+
 No PR merges unless ChatGPT signs off with:
+
 “Phase 1 semantics preserved.”
 
-6️⃣ Known Constraints
-
-- Free GitHub plan (branch protection not enforced)
-- Solo-dev controlled release
-- Codex container is ephemeral
-- Setup script ensures origin + git identity
-- All changes go through PR
-
 7️⃣ Next Planned Work
+Immediate (Phase 2.1)
 
-Short-term:
+Detect Kalshi market state changes
 
-- Get Kalshi API-based info
-- Send basic Kalshi market state changes to Discord
-- Report on relevant open trades
+Send Kalshi state changes to Discord
 
-Mid-term:
+Short-term
 
-- Logic for selective Kalshi alerts
-- Actionable recommendations on what to trade or watch
+Report relevant open trades
 
-Long-term:
+Add selective alert logic
 
-- Automated trading
-- Multi-city expansion
-- Low temperature markets
-- API hardening / rate-limit handling
+Mid-term
+
+Trade recommendation layer
+
+Long-term
+
+Automated trading
+
+Multi-city expansion
+
+Low temperature markets
+
+API hardening / rate-limit handling
 
 8️⃣ Risk Notes
 
-- Kalshi API auth not fully validated
-- No trading safeguards implemented
-- No order throttling logic
+Kalshi public API not rate-limited yet
+
+No market state persistence
+
+No change-diff tracking yet
+
+No trading safeguards implemented
+
+No order throttling logic
+
+RSA auth unvalidated in production
 
 END OF SNAPSHOT
