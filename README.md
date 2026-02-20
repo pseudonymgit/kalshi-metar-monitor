@@ -79,6 +79,12 @@ Current constraints:
 ### Kalshi public
 - `KALSHI_PUBLIC_BASE_URL` (default: `https://api.elections.kalshi.com/trade-api/v2`)
 - `KALSHI_ALERT_TICKERS` — Optional comma-separated ticker allowlist. If unset, all markets are eligible for alerts. Filtering affects alert emission only, not internal state tracking.
+- `KALSHI_TARGET_STATION` — ICAO station code (e.g., `KNYC`).  
+  When set, monitoring is restricted to that station’s city for the current station-local date.
+- `KALSHI_TARGET_MARKET_TYPE` — Comma-separated list of market types (`HIGH`, `LOW`).  
+  When set with `KALSHI_TARGET_STATION`, restricts monitoring to selected types.
+
+If `KALSHI_TARGET_STATION` is unset, structured filtering is disabled and all markets are monitored.
 
 ### Kalshi RSA (dormant)
 - `KALSHI_BASE_URL`
