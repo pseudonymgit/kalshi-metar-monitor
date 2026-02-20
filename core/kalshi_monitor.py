@@ -166,25 +166,65 @@ def check_public_market_changes(limit=5):
     changes_detected = 0
     alerts_sent = 0
 
-    if not _last_market_state:
-        for market in markets:
-            ticker = market.get("ticker")
-            if not ticker:
-                continue
-            _last_market_state[ticker] = {
-                "last_price": market.get("last_price"),
-                "yes_bid": market.get("yes_bid"),
-                "yes_ask": market.get("yes_ask"),
-                "no_bid": market.get("no_bid"),
-                "no_ask": market.get("no_ask"),
-                "status": market.get("status"),
-            }
-        return {
-            "markets_checked": len(markets),
-            "changes_detected": 0,
-            "alerts_sent": 0,
-        }
+markets_data = get_public_markets(limit=limit)
+markets = markets_data.get("markets", [])
+changes_detected = 0
+alerts_sent = 0
 
+# --- Phase 2.1.1: first-run suppression ---
+if not _last_market_state:
+    for market in markets:
+        ticker = market.get("ticker")
+        if not ticker:
+            continue
+        _last_market_state[ticker] = {
+            "last_price": market.get("last_price"),
+            "yes_bid": market.get("yes_bid"),
+            "yes_ask": market.get("yes_ask"),
+            "no_bid": market.get("no_bid"),
+            "no_ask": market.get("no_ask"),
+            "status": market.get("status"),
+        }
+    return {
+        "markets_checked": len(markets),
+        "changes_detected": 0,
+        "alerts_sent": 0,
+    }
+
+# --- Normal diff logic (Phase 2.1 behavior) ---
+for market in markets:
+    ticker = market.get("ticker")
+    if not ticker:
+        continue
+
+    curr_state = {
+        "last_price": market.get("last_price"),
+        "yes_bid": market.get("yes_bid"),
+        "yes_ask": market.get("yes_ask"),
+        "no_bid": market.get("no_bid"),
+        "no_ask": market.get("no_ask"),
+        "status": market.get("status"),
+    }
+
+    prev_state = _last_market_state.get(ticker)
+    should_alert = (
+        prev_state is None
+        or prev_state.get("last_price") != curr_state.get("last_price")
+        or prev_state.get("status") != curr_state.get("status")
+    )
+
+    if should_alert:
+        changes_detected += 1
+        if _send_kalshi_market_alert(ticker, prev_state, curr_state):
+            alerts_sent += 1
+
+    _last_market_state[ticker] = curr_state
+
+return {
+    "markets_checked": len(markets),
+    "changes_detected": changes_detected,
+    "alerts_sent": alerts_sent,
+}
     for market in markets:
         ticker = market.get("ticker")
         if not ticker:
