@@ -8,30 +8,53 @@ Do NOT attempt to read or use GITHUB_TOKEN during agent execution.
 
 ---
 
-GIT PRECHECK (FINAL VERSION)
+GIT PRECHECK (IDEMPOTENT + AUTH SAFE)
 
-Check if origin exists:
+Before making any edits, run:
 
-git remote | grep -q origin || git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
+# Ensure origin exists (safe to run every task)
+if ! git remote | grep -q origin; then
+  git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
+fi
 
-Verify access:
+# Show remotes for visibility
+git remote -v
 
-git ls-remote origin HEAD
+# Verify authenticated access
+if ! git ls-remote origin HEAD > /dev/null 2>&1; then
+  echo "ERROR: git authentication failed or origin misconfigured."
+  exit 1
+fi
 
-If ls-remote fails → abort and report exact error.
+Rules:
 
-Do NOT touch credential helper.
-Do NOT touch ~/.git-credentials.
-Do NOT reference GITHUB_TOKEN.---
+If origin is missing, add it automatically.
+
+If git ls-remote origin HEAD fails, abort and report exact error.
+
+Do NOT modify credential helper.
+
+Do NOT modify ~/.git-credentials.
+
+Do NOT reference or use GITHUB_TOKEN during agent execution.
+
+Authentication is handled by setup script and must not be reconfigured here.
 
 BRANCH RULES
 
-* Never commit directly to main.
-* Always create a new branch.
-* Branch naming format:
-  feature/<short-description>
-  fix/<short-description>
-  phase2/<short-description>
+Never commit directly to main.
+
+Always create a new branch.
+
+Branch naming format:
+
+feature/<short-description>
+
+fix/<short-description>
+
+phase2/<short-description>
+
+test/<short-description> (allowed for pipeline validation only)
 
 ---
 
