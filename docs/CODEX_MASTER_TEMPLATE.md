@@ -150,3 +150,14 @@ No direct commits to main.
 END OF TEMPLATE
 
 ---
+
+BRANCH BASE SAFETY (MANDATORY)
+
+Before creating a feature branch:
+
+1. git checkout main
+2. git pull origin main
+
+Then create the feature branch from updated main.
+One feature → one branch → one merge.
+Do NOT stack branches.

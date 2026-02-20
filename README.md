@@ -78,6 +78,7 @@ Current constraints:
 
 ### Kalshi public
 - `KALSHI_PUBLIC_BASE_URL` (default: `https://api.elections.kalshi.com/trade-api/v2`)
+- `KALSHI_ALERT_TICKERS` — Optional comma-separated ticker allowlist. If unset, all markets are eligible for alerts. Filtering affects alert emission only, not internal state tracking.
 
 ### Kalshi RSA (dormant)
 - `KALSHI_BASE_URL`

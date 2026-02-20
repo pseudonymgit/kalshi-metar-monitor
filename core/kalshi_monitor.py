@@ -163,6 +163,14 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
 def check_public_market_changes(limit=5):
     markets_data = get_public_markets(limit=limit)
     markets = markets_data.get("markets", [])
+    raw_allowlist = (os.getenv("KALSHI_ALERT_TICKERS") or "").strip()
+    alert_allowlist = None
+    if raw_allowlist:
+        alert_allowlist = {
+            ticker.strip()
+            for ticker in raw_allowlist.split(",")
+            if ticker.strip()
+        }
 
     if not _last_market_state:
         for market in markets:
@@ -211,7 +219,9 @@ def check_public_market_changes(limit=5):
 
         if should_alert:
             changes_detected += 1
-            if _send_kalshi_market_alert(ticker, prev_state, curr_state):
+            if (
+                alert_allowlist is None or ticker in alert_allowlist
+            ) and _send_kalshi_market_alert(ticker, prev_state, curr_state):
                 alerts_sent += 1
 
         _last_market_state[ticker] = curr_state
