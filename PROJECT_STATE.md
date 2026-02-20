@@ -60,7 +60,54 @@ https://kalshi-metar-monitor.onrender.com
 Autostart:
 METAR_AUTOSTART = true
 
-5️⃣ Environment Variables (Production)
+5️⃣ Live API Surface (Production)
+Core Health
+
+/
+Health check endpoint.
+
+/debug/version
+Diagnostic info for metar_monitor module.
+
+/debug/state
+Returns current in-memory Phase 1 state.
+
+Phase 1 — METAR Engine
+
+/metar/window
+
+/metar/latest
+
+/metar/multi
+
+/metar/watchlist
+
+/metar/metrics
+
+/metar/status
+
+/metar/start
+
+/metar/stop
+
+/metar/test-alert
+
+/metar/force-poll
+
+All above endpoints are considered part of Phase 1 and must not change semantics without version bump.
+
+Phase 2 — Kalshi
+
+/kalshi/ping
+
+/kalshi/markets
+
+Public mode only. No trading.
+
+
+
+
+6️⃣ Environment Variables (Production)
 Phase 1 Alert Controls
 
 ALERT_HOURS_ET
@@ -117,7 +164,7 @@ KALSHI_KEY_ID (RSA mode only)
 
 KALSHI_PRIVATE_KEY_PEM (RSA mode only)
 
-6️⃣ Governance Stack
+7️⃣  Governance Stack
 
 PR Checklist enforced: Yes
 Master Prompt Template enforced: Yes
@@ -130,7 +177,7 @@ No PR merges unless ChatGPT signs off with:
 
 “Phase 1 semantics preserved.”
 
-7️⃣ Next Planned Work
+8️⃣ Next Planned Work
 Immediate (Phase 2.1)
 
 Detect Kalshi market state changes
@@ -157,7 +204,7 @@ Low temperature markets
 
 API hardening / rate-limit handling
 
-8️⃣ Risk Notes
+9️⃣ Risk Notes
 
 Kalshi public API not rate-limited yet
 
