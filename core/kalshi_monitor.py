@@ -1,6 +1,7 @@
 import base64
 import os
 import time
+from datetime import datetime, timezone
 
 import requests
 from cryptography.hazmat.primitives import hashes, serialization
@@ -8,6 +9,16 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 
 _last_market_state = {}
+
+_STATION_CITY_TOKEN_MAP = {
+    "KDEN": "DEN",
+    "KLAX": "LAX",
+    "KNYC": "NY",
+    "KPHL": "PHIL",
+    "KMDW": "CHI",
+    "KMIA": "MIA",
+    "KAUS": "AUS",
+}
 
 
 def get_default_config():
@@ -115,6 +126,28 @@ def _format_change(prev, curr):
     return f"{prev} → {curr}"
 
 
+def _parse_target_market_types(raw_types):
+    if not raw_types:
+        return set()
+    valid_tokens = {"HIGH", "LOW"}
+    return {
+        token
+        for token in (part.strip().upper() for part in raw_types.split(","))
+        if token in valid_tokens
+    }
+
+
+def _station_local_kalshi_date_token(station):
+    now_utc = datetime.now(timezone.utc)
+    try:
+        from core.metar_monitor import _to_local
+
+        now_local = _to_local(station, now_utc)
+    except Exception:
+        now_local = now_utc
+    return now_local.strftime("%y%b%d").upper()
+
+
 def _send_kalshi_market_alert(ticker, prev_state, curr_state):
     webhook_url = (os.getenv("ALERT_WEBHOOK_URL") or "").strip()
     if not webhook_url:
@@ -163,6 +196,42 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
 def check_public_market_changes(limit=5):
     markets_data = get_public_markets(limit=limit)
     markets = markets_data.get("markets", [])
+    target_station = (os.getenv("KALSHI_TARGET_STATION") or "").strip().upper()
+    target_market_types = _parse_target_market_types(
+        os.getenv("KALSHI_TARGET_MARKET_TYPE")
+    )
+
+    if target_station:
+        city_token = _STATION_CITY_TOKEN_MAP.get(target_station)
+
+        # If station not recognized, monitoring universe is empty
+        if not city_token:
+            markets = []
+        else:
+            date_token = _station_local_kalshi_date_token(target_station)
+
+            filtered = []
+            for market in markets:
+                ticker = market.get("ticker") or ""
+
+                if market.get("status") != "open":
+                    continue
+
+                if city_token not in ticker:
+                    continue
+
+                if date_token not in ticker:
+                    continue
+
+                # Apply market-type filter only if types specified
+                if target_market_types:
+                    if not any(mt in ticker for mt in target_market_types):
+                        continue
+
+                filtered.append(market)
+
+            markets = filtered
+
     raw_allowlist = (os.getenv("KALSHI_ALERT_TICKERS") or "").strip()
     alert_allowlist = None
     if raw_allowlist:
