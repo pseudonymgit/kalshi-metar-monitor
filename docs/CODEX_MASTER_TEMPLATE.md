@@ -8,28 +8,30 @@ A GITHUB_TOKEN secret is available in the runtime.
 
 ⸻
 
-GIT REMOTE HANDLING (EPHEMERAL CONTAINER SAFE)
+GIT REMOTE & AUTH HANDLING (EPHEMERAL SAFE)
 
-This environment may not have a configured git remote.
+Check remote:
 
-Before making changes:
-	1.	Run:
 git remote -v
-	2.	If no origin exists:
+
+If no origin exists:
+
 git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
-	3.	Verify:
-git remote -v
-	4.	Run:
+
+Configure authenticated HTTPS remote:
+
+git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/pseudonymgit/kalshi-metar-monitor.git
+
+Verify authentication:
+
 git ls-remote origin HEAD
 
-If git ls-remote origin HEAD fails due to authentication error:
-Abort immediately and report exact error.
+If git ls-remote fails:
+Abort and report exact error.
 
-If it succeeds:
-Continue.
-
-Do NOT abort simply because origin was missing.
-Automatically add it as described above.
+Do NOT echo or print GITHUB_TOKEN.
+Do NOT write token to disk.
+Do NOT expose token in logs.
 
 ⸻
 
