@@ -8,32 +8,21 @@ Do NOT attempt to read or use GITHUB_TOKEN during agent execution.
 
 ---
 
-GIT PRECHECK (DO NOT RECONFIGURE AUTH)
+GIT PRECHECK (FINAL VERSION)
 
-Before making changes:
+Check if origin exists:
 
-1. Verify remote exists:
+git remote | grep -q origin || git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
 
-   git remote -v
+Verify access:
 
-2. Verify authenticated access:
+git ls-remote origin HEAD
 
-   git ls-remote origin HEAD
+If ls-remote fails → abort and report exact error.
 
-If git ls-remote origin HEAD fails:
-Abort and report exact error.
-
-Do NOT:
-
-* Add origin (setup script already handles this)
-* Modify credential helper
-* Modify ~/.git-credentials
-* Use or print GITHUB_TOKEN
-* Reconfigure remote URL
-
-Authentication is already persisted to disk by setup script.
-
----
+Do NOT touch credential helper.
+Do NOT touch ~/.git-credentials.
+Do NOT reference GITHUB_TOKEN.---
 
 BRANCH RULES
 
