@@ -1,37 +1,97 @@
-# METAR Monitor (Phase 1)
+# Kalshi METAR Monitor
 
-Small, standalone Flask service that polls NOAA AWC (ADDS) for METARs, tracks last observed temperature per station, 
-and sends an alert when temperature changes by `TEMP_ALERT_DELTA_F` or more.
+Operational Flask service with two tracks:
+- **Phase 1 (frozen):** METAR monitoring and temperature alerting.
+- **Phase 2 (manual mode):** Kalshi public market monitoring via on-demand HTTP trigger.
 
-## Endpoints
+## Project Scope
 
-- `GET /health` – liveness check
-- `GET /state` – current in-memory + file-backed state (last temps, last timestamps)
-- `GET /metar/now?stations=KDEN,KLAX` – on-demand fetch without mutating state
-- `POST /monitor/start` – starts the background poller (if not autostarted)
-- `POST /monitor/stop` – stops the background poller
+### Phase 1 — METAR Monitoring (Frozen v1.0)
+Phase 1 is immutable at version **1.0** unless explicitly version-bumped.
+
+Current enforced semantics:
+- Integer floor-cross alerts.
+- Station-local alert window enforcement (11:00–19:00 local time).
+- Station-local daily reset of alert memory.
+- Scheduler isolation (METAR scheduler behavior is independent from Kalshi checks).
+- No drift policy for polling semantics.
+
+### Phase 2 — Kalshi Monitoring (Manual)
+Phase 2 currently runs in **public API mode only**.
+
+Current constraints:
+- Uses unauthenticated public Kalshi endpoint data.
+- Manual trigger endpoint: `POST /kalshi/check`.
+- First-run suppression: initial snapshot seeds memory and emits zero change alerts.
+- No scheduler integration.
+- No trading actions.
+- No rate limiting yet.
+
+## Deployment
+
+- Production Render URL: `https://kalshi-metar-monitor.onrender.com`
+- Start command: `gunicorn app:app -t 180`
+- `METAR_AUTOSTART` behavior:
+  - `true` (default): METAR scheduler starts at process boot.
+  - `false`: scheduler stays stopped until `POST /metar/start`.
+
+## API Surface
+
+### Phase 1 (`/metar/*`)
+- `GET /metar/window` — ingest a strict-source window for one station and return latest-known observation.
+- `GET /metar/latest` — latest observation for one station.
+- `GET /metar/multi` — on-demand fetch for multiple stations.
+- `GET /metar/watchlist` — read active watchlist.
+- `POST /metar/watchlist` — replace active watchlist.
+- `GET /metar/metrics` — poll/timeout counters and monitoring metrics.
+- `GET /metar/status` — scheduler running status and key counters.
+- `POST /metar/start` — start METAR scheduler.
+- `POST /metar/stop` — stop METAR scheduler.
+- `POST /metar/test-alert` — emit a synthetic webhook alert payload.
+- `POST /metar/force-poll` — execute one immediate poll cycle.
+
+### Phase 2 (`/kalshi/*`)
+- `GET /kalshi/ping` — checks public Kalshi reachability.
+- `GET /kalshi/markets` — fetches public markets (supports `limit` query param).
+- `POST /kalshi/check` — manual change-detection pass against current in-memory baseline.
 
 ## Environment Variables
 
-| Var | Default | Notes |
-|-----|---------|-------|
-| `METAR_STATIONS_JSON` | `["KDEN","KLAX","KNYC","KPHL","KMDW","KMIA","KAUS"]` | JSON list of ICAO codes |
-| `METAR_POLL_SECONDS` | `60` | Polling cadence |
-| `TEMP_ALERT_DELTA_F` | `1.0` | Alert on changes >= this |
-| `ALERT_WEBHOOK_URL` | _empty_ | Slack/Discord webhook URL (optional) |
-| `ALERT_INGEST_SECRET` | _empty_ | Optional secret to send along |
-| `METAR_CACHE_FILE` | `/opt/render/project/src/data/metar_state.json` | Where state is persisted |
-| `METAR_AUTOSTART` | `true` | Start poller at boot |
+### Phase 1
+- `METAR_STATIONS_JSON`
+- `METAR_POLL_SECONDS`
+- `TEMP_ALERT_DELTA_F` (retained for compatibility)
+- `METAR_CACHE_FILE`
+- `METAR_AUTOSTART`
+- `METAR_DEFAULT_SOURCE`
+- `METAR_STRICT`
+- `METAR_LOOKBACK_MIN`
+- `IEM_LOOKBACK_HOURS`
+- `ALERT_WEBHOOK_URL`
+- `ALERT_INGEST_SECRET`
 
-## Deploy (Render)
+### HTTP etiquette
+- `AWC_FROM_EMAIL`
+- `AWC_USER_AGENT`
+- `HTTP_FROM_EMAIL`
+- `HTTP_USER_AGENT`
 
-- Start Command: `gunicorn app:app -t 180`
-- Add the env vars above (as “Secret”).
-- Ensure outbound network is allowed.
+### Kalshi public
+- `KALSHI_PUBLIC_BASE_URL` (default: `https://api.elections.kalshi.com/trade-api/v2`)
 
-## Notes
+### Kalshi RSA (dormant)
+- `KALSHI_BASE_URL`
+- `KALSHI_KEY_ID`
+- `KALSHI_PRIVATE_KEY_PEM`
 
-- Source: NOAA AWC ADDS Data Server (no API key)
-  - Example: https://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=JSON&stationString=KDEN&hoursBeforeNow=2&mostRecent=true
-- We only use latest observation per station.
-- All temperatures converted to °F.
+## Governance
+
+- **PR workflow:** all changes are branch-based and merged through Pull Request; no direct commits to `main`.
+- **Master template enforcement:** `docs/CODEX_MASTER_TEMPLATE.md` rules are mandatory and remain in force.
+- **Merge requirement:** PR review must include the explicit sign-off phrase: **“Phase 1 semantics preserved.”**
+- **Branch discipline:** create feature/fix/phase branches from updated `main`; keep diffs minimal and scoped.
+
+## Operational Notes
+
+- This repository is intentionally conservative: stability and deterministic behavior are prioritized over feature expansion.
+- README scope is operational-only; no roadmap commitments are made here.
