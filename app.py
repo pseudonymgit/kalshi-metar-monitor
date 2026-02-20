@@ -55,6 +55,18 @@ def kalshi_markets():
     except Exception:
         return jsonify({"ok": False}), 200
 
+
+@app.route("/kalshi/check", methods=["POST"])
+def kalshi_check():
+    try:
+        limit = int(request.args.get("limit", "5"))
+        from core.kalshi_monitor import check_public_market_changes
+
+        summary = check_public_market_changes(limit=limit)
+        return jsonify(summary), 200
+    except Exception:
+        return jsonify({"ok": False}), 200
+
         
 # --- Debug helpers ---
 
