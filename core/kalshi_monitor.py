@@ -311,7 +311,7 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
                 "title": "Kalshi Market Update",
                 "fields": fields,
                 "footer": {
-                    "text": "Kalshi Public Monitor (Phase 2.1)",
+                    "text": "Kalshi Monitor (Public Mode)",
                 },
             }
         ],
@@ -319,6 +319,63 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
 
     response = requests.post(webhook_url, json=payload, timeout=10)
     return 200 <= response.status_code < 300
+
+
+def send_composed_weather_market_alert(station: str, market_types: set):
+    normalized_station = (station or "").strip().upper()
+    snapshot = build_structured_snapshot(normalized_station, market_types)
+    markets = snapshot.get("markets", [])
+    current_temp_f = (snapshot.get("observed") or {}).get("current_temp_f")
+
+    if not markets:
+        return {"ok": False, "reason": "no_markets"}
+
+    webhook_url = (os.getenv("ALERT_WEBHOOK_URL") or "").strip()
+    if not webhook_url:
+        return {"ok": False, "reason": "missing_webhook"}
+
+    ladder_lines = []
+    for market in markets:
+        strike = market.get("strike")
+        yes_bid = market.get("yes_bid")
+        yes_ask = market.get("yes_ask")
+        ladder_lines.append(f"{strike}°F → YES {yes_bid} / {yes_ask}")
+
+    ladder_text = "\n".join(ladder_lines)
+    if len(ladder_text) > 1000:
+        ladder_text = ladder_text[:1000] + "\n… (truncated)"
+
+    payload = {
+        "content": None,
+        "embeds": [
+            {
+                "title": f"{normalized_station} Weather Market Snapshot",
+                "fields": [
+                    {
+                        "name": "Observed Temp",
+                        "value": str(current_temp_f) if current_temp_f is not None else "N/A",
+                    },
+                    {
+                        "name": "Ladder",
+                        "value": ladder_text,
+                    },
+                ],
+                "footer": {
+                    "text": "Kalshi Monitor (Public Mode)",
+                },
+            }
+        ],
+    }
+
+    response = requests.post(webhook_url, json=payload, timeout=10)
+    if not (200 <= response.status_code < 300):
+        return {"ok": False, "reason": "webhook_failed"}
+
+    return {
+        "ok": True,
+        "markets_included": len(markets),
+        "observed": current_temp_f,
+    }
 
 
 def check_public_market_changes(limit=5):
