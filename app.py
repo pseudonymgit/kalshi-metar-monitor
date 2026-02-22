@@ -67,6 +67,24 @@ def kalshi_check():
     except Exception:
         return jsonify({"ok": False}), 200
 
+
+@app.route("/kalshi/snapshot", methods=["GET"])
+def kalshi_snapshot():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"error": "Missing query param: station"}), 400
+
+    raw_types = request.args.get("type", "")
+    market_types = {
+        token
+        for token in (part.strip().upper() for part in raw_types.split(","))
+        if token in {"HIGH", "LOW"}
+    }
+
+    from core.kalshi_monitor import build_structured_snapshot
+
+    return jsonify(build_structured_snapshot(station=station, market_types=market_types)), 200
+
         
 # --- Debug helpers ---
 
