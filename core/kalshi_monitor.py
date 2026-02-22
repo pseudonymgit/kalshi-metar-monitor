@@ -1,5 +1,6 @@
 import base64
 import os
+import re
 import time
 from datetime import datetime, timezone
 
@@ -7,13 +8,16 @@ import requests
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from cryptography.hazmat.primitives.asymmetric import padding
-
 # Optional reuse of Phase 1 timezone helper
 try:
     from core.metar_monitor import _to_local
 except Exception:
     _to_local = None
+
+try:
+    from core.metar_monitor import get_state as get_metar_state
+except Exception:
+    get_metar_state = None
     
 _last_market_state = {}
 
@@ -129,6 +133,25 @@ def get_public_markets(limit=5):
     }
 
 
+def _get_all_public_markets(max_pages=5, page_limit=200):
+    markets = []
+    cursor = None
+
+    for _ in range(max_pages):
+        path = f"/markets?limit={int(page_limit)}"
+        if cursor:
+            path = f"{path}&cursor={cursor}"
+
+        data = _kalshi_public_get(path)
+        markets.extend(data.get("markets", []))
+
+        cursor = data.get("cursor")
+        if not cursor:
+            break
+
+    return markets
+
+
 def _format_change(prev, curr):
     return f"{prev} → {curr}"
 
@@ -156,6 +179,101 @@ def _station_local_kalshi_date_token(station):
         now_local = now_utc
 
     return now_local.strftime("%y%b%d").upper()
+
+
+def _filter_structured_markets(markets, station, market_types):
+    normalized_station = (station or "").strip().upper()
+    city_token = _STATION_CITY_TOKEN_MAP.get(normalized_station)
+
+    if not city_token:
+        return []
+
+    date_token = _station_local_kalshi_date_token(normalized_station)
+
+    filtered = []
+    for market in markets:
+        ticker = market.get("ticker") or ""
+
+        if market.get("status") != "open":
+            continue
+        if city_token not in ticker:
+            continue
+        if date_token not in ticker:
+            continue
+        if market_types and not any(mt in ticker for mt in market_types):
+            continue
+
+        filtered.append(market)
+
+    return filtered
+
+
+def _extract_strike_from_ticker(ticker):
+    if not ticker:
+        return None
+    match = re.search(r"B(\d+)$", ticker)
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except (TypeError, ValueError):
+        return None
+
+
+def build_structured_snapshot(station: str, market_types: set):
+    normalized_station = (station or "").strip().upper()
+    selected_types = {
+        token.strip().upper()
+        for token in (market_types or set())
+        if token and token.strip().upper() in {"HIGH", "LOW"}
+    }
+
+    filtered_markets = _filter_structured_markets(
+        _get_all_public_markets(),
+        normalized_station,
+        selected_types,
+    )
+
+    markets = []
+    for market in filtered_markets:
+        ticker = market.get("ticker") or ""
+        strike = _extract_strike_from_ticker(ticker)
+        if strike is None:
+            continue
+
+        markets.append(
+            {
+                "ticker": ticker,
+                "strike": strike,
+                "last_price": market.get("last_price"),
+                "yes_bid": market.get("yes_bid"),
+                "yes_ask": market.get("yes_ask"),
+                "no_bid": market.get("no_bid"),
+                "no_ask": market.get("no_ask"),
+            }
+        )
+
+    markets.sort(key=lambda x: x["strike"])
+
+    observed_value = None
+    if get_metar_state:
+        try:
+            observed_value = (
+                (get_metar_state().get("last_obs") or {})
+                .get(normalized_station, {})
+                .get("temp_f")
+            )
+        except Exception:
+            observed_value = None
+
+    return {
+        "station": normalized_station,
+        "market_types": sorted(selected_types) if selected_types else ["HIGH", "LOW"],
+        "observed": {
+            "current_temp_f": observed_value,
+        },
+        "markets": markets,
+    }
 
 
 def _send_kalshi_market_alert(ticker, prev_state, curr_state):
@@ -212,35 +330,11 @@ def check_public_market_changes(limit=5):
     )
 
     if target_station:
-        city_token = _STATION_CITY_TOKEN_MAP.get(target_station)
-
-        # If station not recognized, monitoring universe is empty
-        if not city_token:
-            markets = []
-        else:
-            date_token = _station_local_kalshi_date_token(target_station)
-
-            filtered = []
-            for market in markets:
-                ticker = market.get("ticker") or ""
-
-                if market.get("status") != "open":
-                    continue
-
-                if city_token not in ticker:
-                    continue
-
-                if date_token not in ticker:
-                    continue
-
-                # Apply market-type filter only if types specified
-                if target_market_types:
-                    if not any(mt in ticker for mt in target_market_types):
-                        continue
-
-                filtered.append(market)
-
-            markets = filtered
+        markets = _filter_structured_markets(
+            markets,
+            target_station,
+            target_market_types,
+        )
 
     raw_allowlist = (os.getenv("KALSHI_ALERT_TICKERS") or "").strip()
     alert_allowlist = None
