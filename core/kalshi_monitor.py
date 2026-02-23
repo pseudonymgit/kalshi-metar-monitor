@@ -1,6 +1,7 @@
 import base64
 import os
 import re
+import threading
 import time
 from datetime import datetime, timezone
 
@@ -24,6 +25,7 @@ _last_composed_sent = {}
 _last_market_check_summary = {}
 _ladder_state = {}
 _ladder_event_keys = {}
+_LADDER_LOCK = threading.Lock()
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -271,7 +273,19 @@ def build_structured_snapshot(station: str, market_types: set):
     markets = []
     for market in filtered_markets:
         ticker = market.get("ticker") or ""
-        strike = _extract_strike_from_ticker(ticker)
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        cap = market.get("cap_strike")
+
+        if strike_type == "between" and floor is not None:
+            strike = int(floor)
+        elif strike_type == "less" and cap is not None:
+            strike = int(cap)
+        elif strike_type == "greater" and floor is not None:
+            strike = int(floor)
+        else:
+            strike = _extract_strike_from_ticker(ticker)
+
         if strike is None:
             continue
 
@@ -403,45 +417,45 @@ def process_ladder_transition(station, market_type, snapshot, current_temp):
 
     normalized_station = (station or "").strip().upper()
     normalized_market_type = (market_type or "").strip().upper()
+    with _LADDER_LOCK:
+        prev_event_state_key = _ladder_event_keys.get((normalized_station, normalized_market_type))
+        state_key = f"{normalized_station}_{normalized_market_type}_{event_ticker}"
 
-    prev_event_state_key = _ladder_event_keys.get((normalized_station, normalized_market_type))
-    state_key = f"{normalized_station}_{normalized_market_type}_{event_ticker}"
+        if prev_event_state_key and prev_event_state_key != state_key:
+            _ladder_state.pop(prev_event_state_key, None)
 
-    if prev_event_state_key and prev_event_state_key != state_key:
-        _ladder_state.pop(prev_event_state_key, None)
+        _ladder_event_keys[(normalized_station, normalized_market_type)] = state_key
 
-    _ladder_event_keys[(normalized_station, normalized_market_type)] = state_key
+        state = _ladder_state.get(
+            state_key,
+            {"inside": False, "bucket_index": None, "final_hit": False},
+        )
 
-    state = _ladder_state.get(
-        state_key,
-        {"inside": False, "bucket_index": None, "final_hit": False},
-    )
+        should_alert = False
+        reason = None
 
-    should_alert = False
-    reason = None
+        if not state["inside"] and bucket_index is not None:
+            should_alert = True
+            reason = "entry"
+        elif state["inside"] and bucket_index is not None and bucket_index != state.get("bucket_index"):
+            should_alert = True
+            reason = "bucket"
 
-    if not state["inside"] and bucket_index is not None:
-        should_alert = True
-        reason = "entry"
-    elif state["inside"] and bucket_index is not None and bucket_index != state.get("bucket_index"):
-        should_alert = True
-        reason = "bucket"
+        if final_now and not state.get("final_hit"):
+            should_alert = True
+            reason = "final"
 
-    if final_now and not state.get("final_hit"):
-        should_alert = True
-        reason = "final"
+        if bucket_index is None:
+            state["inside"] = False
+            state["bucket_index"] = None
+            state["final_hit"] = False
+        else:
+            state["inside"] = True
+            state["bucket_index"] = bucket_index
+            if final_now:
+                state["final_hit"] = True
 
-    if bucket_index is None:
-        state["inside"] = False
-        state["bucket_index"] = None
-        state["final_hit"] = False
-    else:
-        state["inside"] = True
-        state["bucket_index"] = bucket_index
-        if final_now:
-            state["final_hit"] = True
-
-    _ladder_state[state_key] = state
+        _ladder_state[state_key] = state
 
     return {
         "should_alert": should_alert,
