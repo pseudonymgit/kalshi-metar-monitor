@@ -205,7 +205,7 @@ def _filter_structured_markets(markets, station, market_types):
 
     filtered = []
     for market in markets:
-        ticker = market.get("ticker") or ""
+        ticker = (market.get("ticker") or "").upper()
 
         if market.get("status") != "open":
             continue
