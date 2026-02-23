@@ -194,6 +194,15 @@ def _station_local_kalshi_date_token(station):
     return now_local.strftime("%y%b%d").upper()
 
 
+def _build_weather_event_ticker(station: str, market_type: str):
+    city_token = _STATION_CITY_TOKEN_MAP.get(station)
+    if not city_token:
+        return None
+
+    date_token = _station_local_kalshi_date_token(station)
+    return f"KX{market_type}{city_token}-{date_token}"
+
+
 def _filter_structured_markets(markets, station, market_types):
     normalized_station = (station or "").strip().upper()
     city_token = _STATION_CITY_TOKEN_MAP.get(normalized_station)
@@ -241,8 +250,19 @@ def build_structured_snapshot(station: str, market_types: set):
         if token and token.strip().upper() in {"HIGH", "LOW"}
     }
 
+    fetched_markets = []
+    market_types_to_fetch = sorted(selected_types) if selected_types else ["HIGH", "LOW"]
+
+    for market_type in market_types_to_fetch:
+        event_ticker = _build_weather_event_ticker(normalized_station, market_type)
+        if not event_ticker:
+            continue
+
+        data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
+        fetched_markets.extend(data.get("markets", []))
+
     filtered_markets = _filter_structured_markets(
-        _get_all_public_markets(),
+        fetched_markets,
         normalized_station,
         selected_types,
     )
