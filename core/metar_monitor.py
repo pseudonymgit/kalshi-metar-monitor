@@ -504,9 +504,22 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                     "footer": {"text": "METAR monitor"},
                 }]
             }
-            requests.post(webhook, json=body, timeout=10)
+            response = requests.post(webhook, json=body, timeout=10)
         else:
-            requests.post(webhook, json=payload, timeout=10)
+            response = requests.post(webhook, json=payload, timeout=10)
+
+        if response is not None and 200 <= response.status_code < 300:
+            try:
+                from core.kalshi_monitor import send_composed_weather_market_alert
+
+                market_type = {"HIGH"} if float(df) > 0 else {"LOW"}
+
+                send_composed_weather_market_alert(
+                    station=station,
+                    market_types=market_type,
+                )
+            except Exception:
+                pass
     except Exception:
         pass
 
