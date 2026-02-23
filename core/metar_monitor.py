@@ -164,8 +164,8 @@ def _load_cache(path: str) -> Dict[str, Any]:
         if os.path.exists(path):
             with open(path, "r") as f:
                 return json.load(f)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[ERROR] station=UNK function=_load_cache: {e}")
     return {}
 
 
@@ -497,6 +497,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                     active is None or station in active
                 )
                 ladder_present = False
+                composed_sent = False
 
                 if station_is_active:
                     for market_type_token in ["HIGH", "LOW"]:
@@ -516,17 +517,19 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         )
 
                         if transition.get("should_alert"):
-                            send_composed_weather_market_alert(
+                            result = send_composed_weather_market_alert(
                                 station=station,
                                 market_types={market_type_token},
                                 transition_reason=transition.get("reason"),
                             )
+                            if result and result.get("ok"):
+                                composed_sent = True
 
-                if ladder_present:
+                if ladder_present and composed_sent:
                     # Suppress raw integer METAR alert if ladder markets exist
                     return
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[ERROR] station={station} function=_send_alert: {e}")
 
         if "discord.com/api/webhooks" in webhook:
             content = (
@@ -552,8 +555,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             response = requests.post(webhook, json=body, timeout=10)
         else:
             response = requests.post(webhook, json=payload, timeout=10)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[ERROR] station={payload.get('station') or 'UNK'} function=_send_alert: {e}")
 
 
 # =========================
