@@ -458,6 +458,7 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
 
 def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any]) -> None:
+    print(f"[DEBUG] _emit_alert called for {icao}")
     payload = {
         "type": "temp_change",
         "station": icao,
@@ -471,7 +472,6 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
 
 
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
-    print(f"[DEBUG] Alert triggered station={station} tf={tf}")
     if not webhook:
         return
     try:
