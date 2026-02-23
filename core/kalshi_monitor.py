@@ -169,6 +169,17 @@ def _parse_target_market_types(raw_types):
     }
 
 
+def _get_active_stations():
+    raw = (os.getenv("KALSHI_ACTIVE_STATIONS") or "").strip()
+    if not raw:
+        return None
+    return {
+        token.strip().upper()
+        for token in raw.split(",")
+        if token.strip()
+    }
+
+
 def _station_local_kalshi_date_token(station):
     now_utc = datetime.now(timezone.utc)
 
@@ -325,6 +336,10 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
 
 def send_composed_weather_market_alert(station: str, market_types: set):
     normalized_station = (station or "").strip().upper()
+    active = _get_active_stations()
+    if active is not None and normalized_station not in active:
+        return {"ok": False, "reason": "inactive_station"}
+
     snapshot = build_structured_snapshot(normalized_station, market_types)
     markets = snapshot.get("markets", [])
     current_temp_f = (snapshot.get("observed") or {}).get("current_temp_f")
