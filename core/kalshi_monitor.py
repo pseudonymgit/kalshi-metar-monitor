@@ -254,6 +254,7 @@ def build_structured_snapshot(station: str, market_types: set):
 
     for market_type in market_types_to_fetch:
         event_ticker = _build_weather_event_ticker(normalized_station, market_type)
+        print("DEBUG EVENT TICKER:", event_ticker)
         if not event_ticker:
             continue
 
