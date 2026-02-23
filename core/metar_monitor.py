@@ -493,34 +493,34 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 )
 
                 active = _get_active_stations()
+                station_is_active = (
+                    active is None or station in active
+                )
                 ladder_present = False
 
-                for market_type_token in ["HIGH", "LOW"]:
-                    # Only run ladder logic for active stations (if active list exists)
-                    if active is not None and station not in active:
-                        break
+                if station_is_active:
+                    for market_type_token in ["HIGH", "LOW"]:
+                        snapshot = build_structured_snapshot(station, {market_type_token})
+                        markets = snapshot.get("markets") or []
 
-                    snapshot = build_structured_snapshot(station, {market_type_token})
-                    markets = snapshot.get("markets") or []
+                        if not markets:
+                            continue
 
-                    if not markets:
-                        continue
+                        ladder_present = True
 
-                    ladder_present = True
-
-                    transition = process_ladder_transition(
-                        station=station,
-                        market_type=market_type_token,
-                        snapshot=snapshot,
-                        current_temp=tf,
-                    )
-
-                    if transition.get("should_alert"):
-                        send_composed_weather_market_alert(
+                        transition = process_ladder_transition(
                             station=station,
-                            market_types={market_type_token},
-                            transition_reason=transition.get("reason"),
+                            market_type=market_type_token,
+                            snapshot=snapshot,
+                            current_temp=tf,
                         )
+
+                        if transition.get("should_alert"):
+                            send_composed_weather_market_alert(
+                                station=station,
+                                market_types={market_type_token},
+                                transition_reason=transition.get("reason"),
+                            )
 
                 if ladder_present:
                     # Suppress raw integer METAR alert if ladder markets exist
