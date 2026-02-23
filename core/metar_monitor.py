@@ -510,14 +510,16 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
         if response is not None and 200 <= response.status_code < 300:
             try:
-                from core.kalshi_monitor import send_composed_weather_market_alert
+                from core.kalshi_monitor import _get_active_stations, send_composed_weather_market_alert
 
                 market_type = {"HIGH"} if float(df) > 0 else {"LOW"}
+                active = _get_active_stations()
 
-                send_composed_weather_market_alert(
-                    station=station,
-                    market_types=market_type,
-                )
+                if active is None or station in active:
+                    send_composed_weather_market_alert(
+                        station=station,
+                        market_types=market_type,
+                    )
             except Exception:
                 pass
     except Exception:
