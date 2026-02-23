@@ -20,6 +20,8 @@ except Exception:
     get_metar_state = None
     
 _last_market_state = {}
+_last_composed_sent = {}
+_last_market_check_summary = {}
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -400,6 +402,9 @@ def send_composed_weather_market_alert(station: str, market_types: set):
     if not (200 <= response.status_code < 300):
         return {"ok": False, "reason": "webhook_failed"}
 
+    key = f"{normalized_station}_{','.join(sorted(snapshot.get('market_types', [])))}"
+    _last_composed_sent[key] = datetime.utcnow().isoformat() + "Z"
+
     return {
         "ok": True,
         "markets_included": len(markets),
@@ -408,6 +413,8 @@ def send_composed_weather_market_alert(station: str, market_types: set):
 
 
 def check_public_market_changes(limit=5):
+    global _last_market_check_summary
+
     markets_data = get_public_markets(limit=limit)
     markets = markets_data.get("markets", [])
     target_station = (os.getenv("KALSHI_TARGET_STATION") or "").strip().upper()
@@ -446,11 +453,13 @@ def check_public_market_changes(limit=5):
                 "status": market.get("status"),
             }
 
-        return {
+        summary = {
             "markets_checked": len(markets),
             "changes_detected": 0,
             "alerts_sent": 0,
         }
+        _last_market_check_summary = summary
+        return summary
 
     changes_detected = 0
     alerts_sent = 0
@@ -485,8 +494,10 @@ def check_public_market_changes(limit=5):
 
         _last_market_state[ticker] = curr_state
 
-    return {
+    summary = {
         "markets_checked": len(markets),
         "changes_detected": changes_detected,
         "alerts_sent": alerts_sent,
     }
+    _last_market_check_summary = summary
+    return summary
