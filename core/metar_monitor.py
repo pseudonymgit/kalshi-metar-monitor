@@ -471,6 +471,7 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
 
 
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
+    print(f"[DEBUG] Alert triggered station={station} tf={tf}")
     if not webhook:
         return
     try:
