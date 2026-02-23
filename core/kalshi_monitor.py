@@ -191,8 +191,7 @@ def _station_local_kalshi_date_token(station):
     else:
         now_local = now_utc
 
-    return now_local.strftime("%y%b%d").upper()
-
+    return now_local.strftime("%d%b%y").upper()
 
 def _build_weather_event_ticker(station: str, market_type: str):
     city_token = _STATION_CITY_TOKEN_MAP.get(station)
