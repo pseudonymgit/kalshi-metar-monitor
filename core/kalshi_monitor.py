@@ -326,9 +326,38 @@ def send_composed_weather_market_alert(station: str, market_types: set):
     snapshot = build_structured_snapshot(normalized_station, market_types)
     markets = snapshot.get("markets", [])
     current_temp_f = (snapshot.get("observed") or {}).get("current_temp_f")
+    market_types_list = snapshot.get("market_types", [])
 
     if not markets:
         return {"ok": False, "reason": "no_markets"}
+
+    if current_temp_f is not None:
+        import math
+
+        threshold = int(math.floor(float(current_temp_f)))
+        filtered_markets = []
+
+        for market in markets:
+            strike = market.get("strike")
+            ticker = market.get("ticker") or ""
+
+            if strike is None:
+                continue
+
+            if "HIGH" in market_types_list and "HIGH" in ticker:
+                if strike < threshold:
+                    continue
+
+            if "LOW" in market_types_list and "LOW" in ticker:
+                if strike > threshold:
+                    continue
+
+            filtered_markets.append(market)
+
+        markets = filtered_markets
+
+        if not markets:
+            return {"ok": False, "reason": "no_markets_after_filter"}
 
     webhook_url = (os.getenv("ALERT_WEBHOOK_URL") or "").strip()
     if not webhook_url:
