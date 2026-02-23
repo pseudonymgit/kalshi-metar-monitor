@@ -22,6 +22,8 @@ except Exception:
 _last_market_state = {}
 _last_composed_sent = {}
 _last_market_check_summary = {}
+_ladder_state = {}
+_ladder_event_keys = {}
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -254,7 +256,6 @@ def build_structured_snapshot(station: str, market_types: set):
 
     for market_type in market_types_to_fetch:
         event_ticker = _build_weather_event_ticker(normalized_station, market_type)
-        print("DEBUG EVENT TICKER:", event_ticker)
         if not event_ticker:
             continue
 
@@ -278,6 +279,10 @@ def build_structured_snapshot(station: str, market_types: set):
             {
                 "ticker": ticker,
                 "strike": strike,
+                "strike_type": market.get("strike_type"),
+                "floor_strike": market.get("floor_strike"),
+                "cap_strike": market.get("cap_strike"),
+                "event_ticker": market.get("event_ticker"),
                 "last_price": market.get("last_price"),
                 "yes_bid": market.get("yes_bid"),
                 "yes_ask": market.get("yes_ask"),
@@ -306,6 +311,141 @@ def build_structured_snapshot(station: str, market_types: set):
             "current_temp_f": observed_value,
         },
         "markets": markets,
+    }
+
+
+def _build_ladder_structure(markets):
+    ladder = []
+
+    for market in markets or []:
+        strike_type = market.get("strike_type")
+        floor_strike = market.get("floor_strike")
+        cap_strike = market.get("cap_strike")
+
+        if strike_type == "between" and floor_strike is not None and cap_strike is not None:
+            ladder.append(
+                {
+                    "kind": "between",
+                    "low": int(floor_strike),
+                    "high": int(cap_strike),
+                }
+            )
+        elif strike_type == "less" and cap_strike is not None:
+            ladder.append(
+                {
+                    "kind": "less",
+                    "threshold": int(cap_strike),
+                }
+            )
+        elif strike_type == "greater" and floor_strike is not None:
+            ladder.append(
+                {
+                    "kind": "greater",
+                    "threshold": int(floor_strike),
+                }
+            )
+
+    def _sort_key(item):
+        if item["kind"] == "between":
+            return item["low"]
+        return item["threshold"]
+
+    ladder.sort(key=_sort_key)
+    return ladder
+
+
+def _determine_bucket(temp_f, ladder, market_type):
+    if temp_f is None or not ladder:
+        return (None, False)
+
+    market_type = (market_type or "").upper()
+    between_buckets = [item for item in ladder if item.get("kind") == "between"]
+
+    if not between_buckets:
+        return (None, False)
+
+    if market_type == "HIGH":
+        first_between = between_buckets[0]
+        if temp_f < first_between["low"]:
+            return (None, False)
+
+        greater_rungs = [item for item in ladder if item.get("kind") == "greater"]
+        if greater_rungs and temp_f > greater_rungs[-1]["threshold"]:
+            return (len(between_buckets), True)
+
+    elif market_type == "LOW":
+        last_between = between_buckets[-1]
+        if temp_f > last_between["high"]:
+            return (None, False)
+
+        less_rungs = [item for item in ladder if item.get("kind") == "less"]
+        if less_rungs and temp_f < less_rungs[0]["threshold"]:
+            return (-1, True)
+
+    for idx, bucket in enumerate(between_buckets):
+        if bucket["low"] <= temp_f <= bucket["high"]:
+            return (idx, False)
+
+    return (None, False)
+
+
+def process_ladder_transition(station, market_type, snapshot, current_temp):
+    markets = (snapshot or {}).get("markets") or []
+    if not markets:
+        return {"should_alert": False, "reason": None}
+
+    event_ticker = markets[0].get("event_ticker")
+    if not event_ticker:
+        return {"should_alert": False, "reason": None}
+
+    ladder = _build_ladder_structure(markets)
+    bucket_index, final_now = _determine_bucket(current_temp, ladder, market_type)
+
+    normalized_station = (station or "").strip().upper()
+    normalized_market_type = (market_type or "").strip().upper()
+
+    prev_event_state_key = _ladder_event_keys.get((normalized_station, normalized_market_type))
+    state_key = f"{normalized_station}_{normalized_market_type}_{event_ticker}"
+
+    if prev_event_state_key and prev_event_state_key != state_key:
+        _ladder_state.pop(prev_event_state_key, None)
+
+    _ladder_event_keys[(normalized_station, normalized_market_type)] = state_key
+
+    state = _ladder_state.get(
+        state_key,
+        {"inside": False, "bucket_index": None, "final_hit": False},
+    )
+
+    should_alert = False
+    reason = None
+
+    if not state["inside"] and bucket_index is not None:
+        should_alert = True
+        reason = "entry"
+    elif state["inside"] and bucket_index is not None and bucket_index != state.get("bucket_index"):
+        should_alert = True
+        reason = "bucket"
+
+    if final_now and not state.get("final_hit"):
+        should_alert = True
+        reason = "final"
+
+    if bucket_index is None:
+        state["inside"] = False
+        state["bucket_index"] = None
+        state["final_hit"] = False
+    else:
+        state["inside"] = True
+        state["bucket_index"] = bucket_index
+        if final_now:
+            state["final_hit"] = True
+
+    _ladder_state[state_key] = state
+
+    return {
+        "should_alert": should_alert,
+        "reason": reason,
     }
 
 
@@ -354,12 +494,12 @@ def _send_kalshi_market_alert(ticker, prev_state, curr_state):
     return 200 <= response.status_code < 300
 
 
-def send_composed_weather_market_alert(station: str, market_types: set):
+def send_composed_weather_market_alert(
+    station: str,
+    market_types: set,
+    transition_reason: str = None,
+):
     normalized_station = (station or "").strip().upper()
-    active = _get_active_stations()
-    if active is not None and normalized_station not in active:
-        return {"ok": False, "reason": "inactive_station"}
-
     snapshot = build_structured_snapshot(normalized_station, market_types)
     markets = snapshot.get("markets", [])
     current_temp_f = (snapshot.get("observed") or {}).get("current_temp_f")
@@ -411,11 +551,13 @@ def send_composed_weather_market_alert(station: str, market_types: set):
     if len(ladder_text) > 1000:
         ladder_text = ladder_text[:1000] + "\n… (truncated)"
 
+    title_suffix = f" ({transition_reason.upper()})" if transition_reason else ""
+
     payload = {
         "content": None,
         "embeds": [
             {
-                "title": f"{normalized_station} Weather Market Snapshot",
+                "title": f"{normalized_station} Weather Market Snapshot{title_suffix}",
                 "fields": [
                     {
                         "name": "Observed Temp",

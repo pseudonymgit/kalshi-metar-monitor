@@ -483,6 +483,51 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
         # Station-local timestamp for display
         ts_local = _iso_to_tz(ts_utc, _icao_tz_name(station))
 
+        if tf is not None:
+            try:
+                from core.kalshi_monitor import (
+                    _get_active_stations,
+                    build_structured_snapshot,
+                    process_ladder_transition,
+                    send_composed_weather_market_alert,
+                )
+
+                active = _get_active_stations()
+                ladder_present = False
+
+                for market_type_token in ["HIGH", "LOW"]:
+                    # Only run ladder logic for active stations (if active list exists)
+                    if active is not None and station not in active:
+                        break
+
+                    snapshot = build_structured_snapshot(station, {market_type_token})
+                    markets = snapshot.get("markets") or []
+
+                    if not markets:
+                        continue
+
+                    ladder_present = True
+
+                    transition = process_ladder_transition(
+                        station=station,
+                        market_type=market_type_token,
+                        snapshot=snapshot,
+                        current_temp=tf,
+                    )
+
+                    if transition.get("should_alert"):
+                        send_composed_weather_market_alert(
+                            station=station,
+                            market_types={market_type_token},
+                            transition_reason=transition.get("reason"),
+                        )
+
+                if ladder_present:
+                    # Suppress raw integer METAR alert if ladder markets exist
+                    return
+            except Exception:
+                pass
+
         if "discord.com/api/webhooks" in webhook:
             content = (
                 f"**Temp Integer Cross** — {station}: "
@@ -507,21 +552,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             response = requests.post(webhook, json=body, timeout=10)
         else:
             response = requests.post(webhook, json=payload, timeout=10)
-
-        if response is not None and 200 <= response.status_code < 300:
-            try:
-                from core.kalshi_monitor import _get_active_stations, send_composed_weather_market_alert
-
-                market_type = {"HIGH"} if float(df) > 0 else {"LOW"}
-                active = _get_active_stations()
-
-                if active is None or station in active:
-                    send_composed_weather_market_alert(
-                        station=station,
-                        market_types=market_type,
-                    )
-            except Exception:
-                pass
     except Exception:
         pass
 
