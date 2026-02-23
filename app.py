@@ -103,6 +103,22 @@ def kalshi_composed():
 
     return jsonify(send_composed_weather_market_alert(station=station, market_types=market_types)), 200
 
+
+@app.route("/kalshi/health", methods=["GET"])
+def kalshi_health():
+    from core.kalshi_monitor import (
+        _last_composed_sent,
+        _last_market_check_summary,
+    )
+
+    active = (os.getenv("KALSHI_ACTIVE_STATIONS") or "").split(",")
+
+    return jsonify({
+        "active_stations": [s.strip() for s in active if s.strip()],
+        "last_composed_sent": _last_composed_sent,
+        "last_market_check_summary": _last_market_check_summary,
+    }), 200
+
         
 # --- Debug helpers ---
 
