@@ -178,7 +178,7 @@ def _station_local_kalshi_date_token(station):
     else:
         now_local = now_utc
 
-    return now_local.strftime("%y%b%d").upper()
+    return now_local.strftime("%d%b%y").upper()
 
 
 def _filter_structured_markets(markets, station, market_types):
