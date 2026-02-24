@@ -258,12 +258,12 @@ def build_structured_snapshot(station: str, market_types: set):
 
     fetched_markets = []
     market_types_to_fetch = sorted(selected_types) if selected_types else ["HIGH", "LOW"]
-
-    for market_type in market_types_to_fetch:
+    
+for market_type in market_types_to_fetch:
     event_ticker = _build_weather_event_ticker(normalized_station, market_type)
-    
+
     print(f"[DEBUG] station={normalized_station} type={market_type} event_ticker={event_ticker}")
-    
+
     if not event_ticker:
         continue
 
