@@ -320,7 +320,7 @@ def build_structured_snapshot(station: str, market_types: set):
         )
 
     markets.sort(key=lambda x: x["strike"])
-
+    print("[DEBUG] metar_state_keys=", list(get_metar_state().keys()))
     observed_value = None
     if get_metar_state:
         try:
