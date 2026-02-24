@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import requests
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetrFstrfic import padding
+from cryptography.hazmat.primitives.asymmetric import padding
 
 # Optional reuse of Phase 1 timezone helper
 try:
