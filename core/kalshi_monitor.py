@@ -246,6 +246,7 @@ def _extract_strike_from_ticker(ticker):
 
 
 def build_structured_snapshot(station: str, market_types: set):
+    print(f"[DEBUG] Built event ticker: {event_ticker}")
     normalized_station = (station or "").strip().upper()
     selected_types = {
         token.strip().upper()
