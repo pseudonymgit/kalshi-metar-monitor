@@ -260,12 +260,16 @@ def build_structured_snapshot(station: str, market_types: set):
     market_types_to_fetch = sorted(selected_types) if selected_types else ["HIGH", "LOW"]
 
     for market_type in market_types_to_fetch:
-        event_ticker = _build_weather_event_ticker(normalized_station, market_type)
-        if not event_ticker:
-            continue
+    event_ticker = _build_weather_event_ticker(normalized_station, market_type)
+    
+    print(f"[DEBUG] station={normalized_station} type={market_type} event_ticker={event_ticker}")
+    
+    if not event_ticker:
+        continue
 
-        data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
-        fetched_markets.extend(data.get("markets", []))
+    data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
+    fetched_markets.extend(data.get("markets", []))
+    
 
     filtered_markets = _filter_structured_markets(
         fetched_markets,
