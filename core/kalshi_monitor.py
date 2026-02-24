@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import requests
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetrFstrfic import padding
 
 # Optional reuse of Phase 1 timezone helper
 try:
@@ -207,6 +207,7 @@ def _build_weather_event_ticker(station: str, market_type: str):
 
 
 def _filter_structured_markets(markets, station, market_types):
+    print(f"[DEBUG] status={market.get('status')}")
     normalized_station = (station or "").strip().upper()
     city_token = _STATION_CITY_TOKEN_MAP.get(normalized_station)
 
@@ -219,7 +220,8 @@ def _filter_structured_markets(markets, station, market_types):
     for market in markets:
         ticker = (market.get("ticker") or "").upper()
 
-        if market.get("status") != "open":
+        status = market.get("status")
+        if status and status != "open":
             continue
         if city_token not in ticker:
             continue
