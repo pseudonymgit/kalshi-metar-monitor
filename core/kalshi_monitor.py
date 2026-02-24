@@ -221,7 +221,7 @@ def _filter_structured_markets(markets, station, market_types):
         ticker = (market.get("ticker") or "").upper()
 
         status = market.get("status")
-        if status and status != "open":
+        if status == "finalized":
             continue
         if city_token not in ticker:
             continue
