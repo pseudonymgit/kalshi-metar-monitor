@@ -222,7 +222,6 @@ def _filter_structured_markets(markets, station, market_types):
         status = market.get("status")
 
         print(
-            f"[DEBUG] ticker={ticker} status={status} "
             f"city_token={city_token} date_token={date_token}"
         )
 
@@ -269,8 +268,6 @@ def build_structured_snapshot(station: str, market_types: set):
 
     for market_type in market_types_to_fetch:
         event_ticker = _build_weather_event_ticker(normalized_station, market_type)
-
-        print(f"[DEBUG] station={normalized_station} type={market_type} event_ticker={event_ticker}")
 
         if not event_ticker:
             continue
