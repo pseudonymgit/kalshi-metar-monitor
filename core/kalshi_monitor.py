@@ -207,7 +207,6 @@ def _build_weather_event_ticker(station: str, market_type: str):
 
 
 def _filter_structured_markets(markets, station, market_types):
-    print(f"[DEBUG] status={market.get('status')}")
     normalized_station = (station or "").strip().upper()
     city_token = _STATION_CITY_TOKEN_MAP.get(normalized_station)
 
@@ -217,16 +216,25 @@ def _filter_structured_markets(markets, station, market_types):
     date_token = _station_local_kalshi_date_token(normalized_station)
 
     filtered = []
+
     for market in markets:
         ticker = (market.get("ticker") or "").upper()
-
         status = market.get("status")
-        if status == "finalized":
+
+        print(
+            f"[DEBUG] ticker={ticker} status={status} "
+            f"city_token={city_token} date_token={date_token}"
+        )
+
+        if status and status != "active":
             continue
+
         if city_token not in ticker:
             continue
+
         if date_token not in ticker:
             continue
+
         if market_types and not any(mt in ticker for mt in market_types):
             continue
 
