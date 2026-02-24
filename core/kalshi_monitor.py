@@ -248,8 +248,8 @@ def _extract_strike_from_ticker(ticker):
 
 
 def build_structured_snapshot(station: str, market_types: set):
-    print(f"[DEBUG] Built event ticker: {event_ticker}")
     normalized_station = (station or "").strip().upper()
+
     selected_types = {
         token.strip().upper()
         for token in (market_types or set())
@@ -258,18 +258,17 @@ def build_structured_snapshot(station: str, market_types: set):
 
     fetched_markets = []
     market_types_to_fetch = sorted(selected_types) if selected_types else ["HIGH", "LOW"]
-    
-for market_type in market_types_to_fetch:
-    event_ticker = _build_weather_event_ticker(normalized_station, market_type)
 
-    print(f"[DEBUG] station={normalized_station} type={market_type} event_ticker={event_ticker}")
+    for market_type in market_types_to_fetch:
+        event_ticker = _build_weather_event_ticker(normalized_station, market_type)
 
-    if not event_ticker:
-        continue
+        print(f"[DEBUG] station={normalized_station} type={market_type} event_ticker={event_ticker}")
 
-    data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
-    fetched_markets.extend(data.get("markets", []))
-    
+        if not event_ticker:
+            continue
+
+        data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
+        fetched_markets.extend(data.get("markets", []))
 
     filtered_markets = _filter_structured_markets(
         fetched_markets,
@@ -278,8 +277,10 @@ for market_type in market_types_to_fetch:
     )
 
     markets = []
+
     for market in filtered_markets:
         ticker = market.get("ticker") or ""
+
         strike_type = market.get("strike_type")
         floor = market.get("floor_strike")
         cap = market.get("cap_strike")
@@ -300,15 +301,16 @@ for market_type in market_types_to_fetch:
             {
                 "ticker": ticker,
                 "strike": strike,
-                "strike_type": market.get("strike_type"),
-                "floor_strike": market.get("floor_strike"),
-                "cap_strike": market.get("cap_strike"),
+                "strike_type": strike_type,
+                "floor_strike": floor,
+                "cap_strike": cap,
                 "event_ticker": market.get("event_ticker"),
                 "last_price": market.get("last_price"),
                 "yes_bid": market.get("yes_bid"),
                 "yes_ask": market.get("yes_ask"),
                 "no_bid": market.get("no_bid"),
                 "no_ask": market.get("no_ask"),
+                "status": market.get("status"),
             }
         )
 
@@ -318,20 +320,18 @@ for market_type in market_types_to_fetch:
     if get_metar_state:
         try:
             observed_value = (
-                (get_metar_state().get("last_obs") or {})
+                get_metar_state().get("latest", {})
                 .get(normalized_station, {})
                 .get("temp_f")
             )
         except Exception:
-            observed_value = None
+            pass
 
     return {
         "station": normalized_station,
-        "market_types": sorted(selected_types) if selected_types else ["HIGH", "LOW"],
-        "observed": {
-            "current_temp_f": observed_value,
-        },
+        "market_types": sorted(selected_types),
         "markets": markets,
+        "observed": {"current_temp_f": observed_value},
     }
 
 
