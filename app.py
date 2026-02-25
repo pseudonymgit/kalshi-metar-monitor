@@ -3,7 +3,7 @@ import sys
 import logging
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify
-
+from core.metar_monitor import ensure_scheduler_started
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -26,6 +26,8 @@ from core.kalshi_monitor import _kalshi_public_get
 app = Flask(__name__)
 log = app.logger
 log.setLevel(logging.INFO)
+
+from core.metar_monitor import ensure_scheduler_started
 
 if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
     start_scheduler(log)
