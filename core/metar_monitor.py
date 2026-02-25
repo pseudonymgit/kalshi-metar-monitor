@@ -494,7 +494,12 @@ def _process_temperature_event(
     return alerts
 
 
-def _simulate_temperature_for_testing(icao: str, temp_f: float, logger=None) -> Dict[str, Any]:
+def _simulate_temperature_for_testing(
+    icao: str,
+    temp_f: float,
+    logger=None,
+    allow_alert_delivery: bool = False,
+) -> Dict[str, Any]:
     ensure_state_loaded()
     cfg = get_default_config()
     ts = _now_utc_iso()
@@ -502,6 +507,7 @@ def _simulate_temperature_for_testing(icao: str, temp_f: float, logger=None) -> 
 
     with _STATE_LOCK:
         last_temp = _STATE["last_obs"].get(icao, {}).get("temp_f")
+        previous_integer = _STATE["last_observed_integer"].get(icao)
         _STATE["last_obs"][icao] = _obs_tuple(float(temp_f), ts, {"simulated": True}, "simulated")
         _STATE["last_seen_iso"][icao] = ts
 
@@ -511,9 +517,13 @@ def _simulate_temperature_for_testing(icao: str, temp_f: float, logger=None) -> 
         obs_time=ts,
         cfg=cfg,
         last_temp_f=last_temp,
-        allow_alert_delivery=False,
+        allow_alert_delivery=allow_alert_delivery,
         ignore_window=True,
     )
+
+    current_integer = int(math.floor(float(temp_f)))
+    crossed_integer = previous_integer is not None and previous_integer != current_integer
+    delivery_attempted = allow_alert_delivery and crossed_integer
 
     if logger:
         logger.info(f"Simulated ladder event for {icao} at {temp_f}F (alerts={alerts})")
@@ -523,6 +533,12 @@ def _simulate_temperature_for_testing(icao: str, temp_f: float, logger=None) -> 
         "icao": icao,
         "temp_f": float(temp_f),
         "alerts_generated": alerts,
+        "delivery_requested": allow_alert_delivery,
+        "delivery_attempted": delivery_attempted,
+        "window_bypassed": True,
+        "previous_integer": previous_integer,
+        "current_integer": current_integer,
+        "crossed_integer": crossed_integer,
     }
 
 
