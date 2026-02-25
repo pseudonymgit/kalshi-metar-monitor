@@ -459,6 +459,7 @@ def _process_temperature_event(
     cfg: Dict[str, Any],
     last_temp_f: Optional[float] = None,
     allow_alert_delivery: bool = True,
+    ignore_window: bool = False,
 ) -> int:
     prev_f = float(last_temp_f) if last_temp_f is not None else float(temp_f)
     now_f = float(temp_f)
@@ -471,7 +472,7 @@ def _process_temperature_event(
 
     alerts = 0
     if (
-        _within_alert_window_local(icao, obs_time)
+        (ignore_window or _within_alert_window_local(icao, obs_time))
         and last_observed_integer is not None
         and curr_floor != last_observed_integer
     ):
@@ -511,6 +512,7 @@ def _simulate_temperature_for_testing(icao: str, temp_f: float, logger=None) -> 
         cfg=cfg,
         last_temp_f=last_temp,
         allow_alert_delivery=False,
+        ignore_window=True,
     )
 
     if logger:
