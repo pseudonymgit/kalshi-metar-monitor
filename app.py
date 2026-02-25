@@ -239,6 +239,12 @@ def metar_simulate_ladder():
     data = request.get_json(force=True, silent=True) or {}
     icao = (data.get("icao") or "").strip().upper()
     temp_f = data.get("temp_f")
+    deliver_raw = data.get("deliver", False)
+    deliver = (
+        deliver_raw is True
+        or deliver_raw == 1
+        or (isinstance(deliver_raw, str) and deliver_raw.strip().lower() in {"true", "1"})
+    )
 
     if not icao:
         return jsonify({"error": "Missing JSON field: icao"}), 400
@@ -250,7 +256,14 @@ def metar_simulate_ladder():
     except Exception:
         return jsonify({"error": "temp_f must be numeric"}), 400
 
-    return jsonify(_simulate_temperature_for_testing(icao, temp_f, logger=app.logger)), 200
+    return jsonify(
+        _simulate_temperature_for_testing(
+            icao,
+            temp_f,
+            logger=app.logger,
+            allow_alert_delivery=deliver,
+        )
+    ), 200
 
 @app.route("/metar/start", methods=["POST"])
 def metar_start():
