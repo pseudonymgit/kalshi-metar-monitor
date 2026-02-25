@@ -440,7 +440,6 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
 
 def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any]) -> None:
-    print(f"[DEBUG] _emit_alert called for {icao}")
     payload = {
         "type": "temp_change",
         "station": icao,
