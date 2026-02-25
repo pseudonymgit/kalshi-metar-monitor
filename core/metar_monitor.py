@@ -51,6 +51,7 @@ _STATE: Dict[str, Any] = {
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
+    "last_loop_utc": None,
     "timeout_count": 0,
     "last_timeout_station": None,
     "last_timeout_utc": None,
@@ -58,6 +59,7 @@ _STATE: Dict[str, Any] = {
 
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
+_SCHEDULER_LOCK = threading.Lock()
 
 
 # =========================
@@ -216,6 +218,7 @@ def get_state() -> Dict[str, Any]:
             "cfg": dict(_STATE["cfg"]),
             "poll_count": _STATE["poll_count"],
             "last_poll_utc": _STATE["last_poll_utc"],
+            "last_loop_utc": _STATE["last_loop_utc"],
         }
 
 
@@ -414,35 +417,14 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
 
         ingested += 1
 
-        # integer-boundary alerting (both directions), only during local 11–19
-        now_f = float(obs["temp_f"])
-        prev_f = float(last_temp) if last_temp is not None else now_f
-
-        # daily reset keyed to local date
-        _maybe_daily_reset_local(icao, ts)
-
-        curr_floor = int(math.floor(now_f))
-        with _STATE_LOCK:
-            last_observed_integer = _STATE["last_observed_integer"].get(icao)
-
-        if (
-            _within_alert_window_local(icao, ts)
-            and last_observed_integer is not None
-            and curr_floor != last_observed_integer
-        ):
-            d = round(now_f - prev_f, 1)
-            _emit_alert(
-                icao,
-                prev_f=prev_f,
-                now_f=now_f,
-                delta_f=d,
-                obs_time=ts,
-                cfg=cfg,
-            )
-            alerts += 1
-
-        with _STATE_LOCK:
-            _STATE["last_observed_integer"][icao] = curr_floor
+        alerts += _process_temperature_event(
+            icao=icao,
+            temp_f=float(obs["temp_f"]),
+            obs_time=ts,
+            cfg=cfg,
+            last_temp_f=last_temp,
+            allow_alert_delivery=True,
+        )
 
         last_temp = obs["temp_f"]
 
@@ -469,6 +451,78 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
         "at_utc": _now_utc_iso(),
     }
     _send_alert(cfg.get("webhook", ""), payload)
+
+
+def _process_temperature_event(
+    icao: str,
+    temp_f: float,
+    obs_time: str,
+    cfg: Dict[str, Any],
+    last_temp_f: Optional[float] = None,
+    allow_alert_delivery: bool = True,
+) -> int:
+    prev_f = float(last_temp_f) if last_temp_f is not None else float(temp_f)
+    now_f = float(temp_f)
+
+    _maybe_daily_reset_local(icao, obs_time)
+
+    curr_floor = int(math.floor(now_f))
+    with _STATE_LOCK:
+        last_observed_integer = _STATE["last_observed_integer"].get(icao)
+
+    alerts = 0
+    if (
+        _within_alert_window_local(icao, obs_time)
+        and last_observed_integer is not None
+        and curr_floor != last_observed_integer
+    ):
+        if allow_alert_delivery:
+            d = round(now_f - prev_f, 1)
+            _emit_alert(
+                icao,
+                prev_f=prev_f,
+                now_f=now_f,
+                delta_f=d,
+                obs_time=obs_time,
+                cfg=cfg,
+            )
+        alerts = 1
+
+    with _STATE_LOCK:
+        _STATE["last_observed_integer"][icao] = curr_floor
+
+    return alerts
+
+
+def _simulate_temperature_for_testing(icao: str, temp_f: float, logger=None) -> Dict[str, Any]:
+    ensure_state_loaded()
+    cfg = get_default_config()
+    ts = _now_utc_iso()
+    icao = (icao or "").strip().upper()
+
+    with _STATE_LOCK:
+        last_temp = _STATE["last_obs"].get(icao, {}).get("temp_f")
+        _STATE["last_obs"][icao] = _obs_tuple(float(temp_f), ts, {"simulated": True}, "simulated")
+        _STATE["last_seen_iso"][icao] = ts
+
+    alerts = _process_temperature_event(
+        icao=icao,
+        temp_f=float(temp_f),
+        obs_time=ts,
+        cfg=cfg,
+        last_temp_f=last_temp,
+        allow_alert_delivery=False,
+    )
+
+    if logger:
+        logger.info(f"Simulated ladder event for {icao} at {temp_f}F (alerts={alerts})")
+
+    return {
+        "ok": True,
+        "icao": icao,
+        "temp_f": float(temp_f),
+        "alerts_generated": alerts,
+    }
 
 
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
@@ -738,6 +792,7 @@ def get_watchlist() -> Dict[str, Any]:
 def get_metrics() -> Dict[str, Any]:
     with _STATE_LOCK:
         last_poll_utc = _STATE["last_poll_utc"]
+        last_loop_utc = _STATE["last_loop_utc"]
         poll_count = _STATE["poll_count"]
         watch_ct = len(_STATE["stations"] or get_default_config()["stations"])
         timeout_count = _STATE["timeout_count"]
@@ -745,6 +800,7 @@ def get_metrics() -> Dict[str, Any]:
         last_timeout_utc = _STATE["last_timeout_utc"]
     return {
         "last_poll_utc": last_poll_utc,
+        "last_loop_utc": last_loop_utc,
         "last_poll_et": _iso_to_tz(last_poll_utc, ET_TZ_NAME),
         "poll_count": poll_count,
         "watchlist_size": watch_ct,
@@ -792,29 +848,44 @@ def _poll_once(logger=None):
 
 def _scheduler_loop(logger, interval_sec: int):
     while not _SCHEDULER_STOP.is_set():
-        _poll_once(logger)
+        try:
+            _poll_once(logger)
+            with _STATE_LOCK:
+                _STATE["last_loop_utc"] = _now_utc_iso()
+        except Exception as e:
+            if logger:
+                logger.exception(f"METAR scheduler loop error: {e}")
         _SCHEDULER_STOP.wait(interval_sec)
 
 
 def start_scheduler(logger, cfg=None) -> bool:
     global _SCHEDULER_THREAD
-    if _SCHEDULER_THREAD and _SCHEDULER_THREAD.is_alive():
-        return True
-    if cfg is None:
-        cfg = get_default_config()
-    ensure_state_loaded()
-    _SCHEDULER_STOP.clear()
-    _SCHEDULER_THREAD = threading.Thread(
-        target=_scheduler_loop, args=(logger, int(cfg["poll_seconds"])), daemon=True
-    )
-    _SCHEDULER_THREAD.start()
+    with _SCHEDULER_LOCK:
+        if _SCHEDULER_THREAD and _SCHEDULER_THREAD.is_alive():
+            return True
+        if cfg is None:
+            cfg = get_default_config()
+        ensure_state_loaded()
+        _SCHEDULER_STOP.clear()
+        _SCHEDULER_THREAD = threading.Thread(
+            target=_scheduler_loop, args=(logger, int(cfg["poll_seconds"])), daemon=True
+        )
+        _SCHEDULER_THREAD.start()
     return True
 
 
+def ensure_scheduler_started(logger, cfg=None) -> bool:
+    return start_scheduler(logger, cfg=cfg)
+
+
 def stop_scheduler() -> bool:
-    if not _SCHEDULER_THREAD:
-        return True
-    _SCHEDULER_STOP.set()
+    global _SCHEDULER_THREAD
+    with _SCHEDULER_LOCK:
+        if not _SCHEDULER_THREAD:
+            return True
+        _SCHEDULER_STOP.set()
+        _SCHEDULER_THREAD.join(timeout=5)
+        _SCHEDULER_THREAD = None
     return True
 
 

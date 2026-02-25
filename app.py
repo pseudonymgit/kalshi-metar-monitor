@@ -3,11 +3,11 @@ import sys
 import logging
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify
-from core.metar_monitor import ensure_scheduler_started
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from core.metar_monitor import (
+    ensure_scheduler_started,
     get_latest_metar,
     set_watchlist,
     get_watchlist,
@@ -19,6 +19,7 @@ from core.metar_monitor import (
     _send_alert,
     get_default_config,
     _poll_once,
+    _simulate_temperature_for_testing,
 )
 
 from core.kalshi_monitor import _kalshi_public_get
@@ -27,10 +28,23 @@ app = Flask(__name__)
 log = app.logger
 log.setLevel(logging.INFO)
 
-from core.metar_monitor import ensure_scheduler_started
+_autostart_fallback_done = False
 
-if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
-    start_scheduler(log)
+if hasattr(app, "before_first_request"):
+    @app.before_first_request
+    def _autostart_scheduler_once():
+        if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
+            ensure_scheduler_started(log)
+else:
+    @app.before_request
+    def _autostart_scheduler_fallback_once():
+        global _autostart_fallback_done
+        if _autostart_fallback_done:
+            return None
+        _autostart_fallback_done = True
+        if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
+            ensure_scheduler_started(log)
+        return None
 
 @app.route("/", methods=["GET"])
 def root():
@@ -213,10 +227,30 @@ def metar_status():
         "scheduler_running": running,
         "poll_count": state.get("poll_count"),
         "last_poll_utc": state.get("last_poll_utc"),
+        "last_loop_utc": state.get("last_loop_utc"),
         "timeout_count": state.get("timeout_count"),
         "last_timeout_station": state.get("last_timeout_station"),
         "last_timeout_utc": state.get("last_timeout_utc"),
     }), 200
+
+
+@app.route("/metar/simulate-ladder", methods=["POST"])
+def metar_simulate_ladder():
+    data = request.get_json(force=True, silent=True) or {}
+    icao = (data.get("icao") or "").strip().upper()
+    temp_f = data.get("temp_f")
+
+    if not icao:
+        return jsonify({"error": "Missing JSON field: icao"}), 400
+    if temp_f is None:
+        return jsonify({"error": "Missing JSON field: temp_f"}), 400
+
+    try:
+        temp_f = float(temp_f)
+    except Exception:
+        return jsonify({"error": "temp_f must be numeric"}), 400
+
+    return jsonify(_simulate_temperature_for_testing(icao, temp_f, logger=app.logger)), 200
 
 @app.route("/metar/start", methods=["POST"])
 def metar_start():
