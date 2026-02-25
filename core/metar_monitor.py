@@ -505,24 +505,34 @@ def _simulate_temperature_for_testing(
     ts = _now_utc_iso()
     icao = (icao or "").strip().upper()
 
+    _maybe_daily_reset_local(icao, ts)
+
     with _STATE_LOCK:
         last_temp = _STATE["last_obs"].get(icao, {}).get("temp_f")
         previous_integer = _STATE["last_observed_integer"].get(icao)
         _STATE["last_obs"][icao] = _obs_tuple(float(temp_f), ts, {"simulated": True}, "simulated")
         _STATE["last_seen_iso"][icao] = ts
 
-    alerts = _process_temperature_event(
-        icao=icao,
-        temp_f=float(temp_f),
-        obs_time=ts,
-        cfg=cfg,
-        last_temp_f=last_temp,
-        allow_alert_delivery=allow_alert_delivery,
-        ignore_window=True,
-    )
-
-    current_integer = int(math.floor(float(temp_f)))
+    prev_f = float(last_temp) if last_temp is not None else float(temp_f)
+    now_f = float(temp_f)
+    current_integer = int(math.floor(now_f))
     crossed_integer = previous_integer is not None and previous_integer != current_integer
+
+    alerts = 1 if crossed_integer else 0
+    if crossed_integer and allow_alert_delivery:
+        d = round(now_f - prev_f, 1)
+        _emit_alert(
+            icao,
+            prev_f=prev_f,
+            now_f=now_f,
+            delta_f=d,
+            obs_time=ts,
+            cfg=cfg,
+        )
+
+    with _STATE_LOCK:
+        _STATE["last_observed_integer"][icao] = current_integer
+
     delivery_attempted = allow_alert_delivery and crossed_integer
 
     if logger:
