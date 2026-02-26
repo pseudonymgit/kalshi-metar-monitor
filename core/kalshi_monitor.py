@@ -409,7 +409,7 @@ def _determine_bucket(temp_f, ladder, market_type):
             return (-1, True)
 
     for idx, bucket in enumerate(between_buckets):
-        if bucket["low"] <= temp_f <= bucket["high"]:
+        if bucket["low"] <= temp_f < bucket["high"]:
             return (idx, False)
 
     return (None, False)
