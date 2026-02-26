@@ -658,36 +658,67 @@ def send_composed_weather_market_alert(
         title_emoji = "🌡️"
 
     distance_info = "MAX REACHED"
-    if current_market is not None and current_temp_f is not None and current_index is not None:
+
+    def _ordered_bounds(market):
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        cap = market.get("cap_strike")
+        low = float("-inf") if strike_type == "less" else (
+            float(floor) if floor is not None else float("-inf")
+        )
+        high = float("inf") if strike_type == "greater" else (
+            float(cap) if cap is not None else float("inf")
+        )
+        return (low, high)
+
+    ordered_markets = sorted(
+        sorted_markets,
+        key=lambda m: (_ordered_bounds(m)[0], _ordered_bounds(m)[1]),
+    )
+
+    ordered_index = None
+    if current_market is not None:
+        current_ticker = current_market.get("ticker")
+        for idx, market in enumerate(ordered_markets):
+            if market.get("ticker") == current_ticker:
+                ordered_index = idx
+                break
+
+    if current_market is not None and current_temp_f is not None and ordered_index is not None:
         if direction_up:
-            if current_index < len(sorted_markets) - 1:
-                next_market = sorted_markets[current_index + 1]
+            if ordered_index < len(ordered_markets) - 1:
+                next_market = ordered_markets[ordered_index + 1]
                 boundary = next_market.get("floor_strike")
-                if boundary is None:
-                    boundary = next_market.get("cap_strike")
                 if boundary is not None:
                     distance = round(float(boundary) - float(current_temp_f), 1)
                     distance_info = f"{distance:.1f}°F"
             else:
                 distance_info = "MAX REACHED"
         else:
-            if current_index > 0:
-                next_market = sorted_markets[current_index - 1]
+            if ordered_index > 0:
+                next_market = ordered_markets[ordered_index - 1]
                 boundary = next_market.get("cap_strike")
-                if boundary is None:
-                    boundary = next_market.get("floor_strike")
                 if boundary is not None:
                     distance = round(float(current_temp_f) - float(boundary), 1)
                     distance_info = f"{distance:.1f}°F"
             else:
                 distance_info = "MIN REACHED"
 
+    local_time_display = "N/A"
+    if _to_local:
+        try:
+            local_dt = _to_local(normalized_station, datetime.now(timezone.utc))
+            local_time_display = local_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+        except Exception:
+            local_time_display = "N/A"
+
     temp_display = "N/A" if current_temp_f is None else f"{float(current_temp_f):.1f}"
     header = f"{title_emoji} {normalized_station} {market_type or 'WEATHER'} — Ladder Cross {direction_icon}"
     ladder_block = "\n".join(ladder_rows)
     content = (
         f"{header}\n"
-        f"{temp_display}°F  →  Entered {current_label}\n\n"
+        f"{temp_display}°F  →  Entered {current_label}\n"
+        f"Local time: {local_time_display}\n\n"
         f"Event: {event_ticker}\n"
         f"https://kalshi.com/markets/{event_ticker}\n\n"
         "LADDER\n"
