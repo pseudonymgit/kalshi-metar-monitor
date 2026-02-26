@@ -578,7 +578,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 station_is_active = (
                     active is None or station in active
                 )
-                ladder_present = False
                 composed_sent = False
 
                 if station_is_active:
@@ -588,8 +587,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
                         if not markets:
                             continue
-
-                        ladder_present = True
 
                         transition = process_ladder_transition(
                             station=station,
@@ -607,8 +604,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             if result and result.get("ok"):
                                 composed_sent = True
 
-                if ladder_present and composed_sent:
-                    # Suppress raw integer METAR alert if ladder markets exist
+                if composed_sent:
+                    # Explicitly suppress raw integer METAR alert when composed ladder alert is delivered
                     return
             except Exception as e:
                 print(f"[ERROR] station={station} function=_send_alert: {e}")
