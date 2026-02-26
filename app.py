@@ -216,6 +216,12 @@ def metar_metrics():
 
 @app.route("/metar/status", methods=["GET"])
 def metar_status():
+    """
+    Scheduler lifecycle status.
+
+    Includes poll counters plus `last_loop_utc`, which represents the
+    scheduler thread's most recent completed loop timestamp.
+    """
     from core.metar_monitor import _SCHEDULER_THREAD
 
     running = (
@@ -236,6 +242,18 @@ def metar_status():
 
 @app.route("/metar/simulate-ladder", methods=["POST"])
 def metar_simulate_ladder():
+    """
+    Simulate a station temperature update for ladder transition testing.
+
+    JSON body:
+      - icao (required)
+      - temp_f (required, numeric)
+      - deliver (optional; true/1 enables webhook delivery attempt)
+
+    Notes:
+      - Bypasses live alert window gating.
+      - Returns crossing and delivery-attempt metadata for test sequencing.
+    """
     data = request.get_json(force=True, silent=True) or {}
     icao = (data.get("icao") or "").strip().upper()
     temp_f = data.get("temp_f")

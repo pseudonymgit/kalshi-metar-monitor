@@ -3,33 +3,36 @@
 ## Runtime notes (Render)
 
 - Start command: `gunicorn app:app -t 180`
-- App must boot cleanly with no duplicate routes or import-time polling side effects.
-- Scheduler is controlled explicitly via API (`/metar/start`, `/metar/stop`).
+- No import-time scheduler side effects.
+- Scheduler lifecycle is request-hook safe and idempotent.
 
-## Environment configuration
+## Scheduler lifecycle
 
-### Required
+Autostart:
+- `METAR_AUTOSTART=true` attempts one scheduler startup on first request lifecycle pass.
+- Uses `before_first_request` when available.
+- Falls back to a guarded one-time `before_request` path.
 
-- `ALERT_WEBHOOK_URL`
-- `AWC_FROM_EMAIL`
-- `AWC_USER_AGENT`
+Manual control:
+- `POST /metar/start`
+- `POST /metar/stop`
 
-### Optional (common)
-
-- `METAR_STATIONS_JSON` (JSON list of ICAOs)
-- `METAR_POLL_SECONDS` (default `60`)
-- `METAR_DEFAULT_SOURCE` (default `nws`)
-- `METAR_STRICT` (default `true`)
-- `METAR_LOOKBACK_MIN` (default `3`)
-- `METAR_CACHE_FILE` (default `/opt/render/project/src/data/metar_state.json`)
-- `IEM_LOOKBACK_HOURS` (default `1`)
+Status:
+- `GET /metar/status` returns:
+  - `scheduler_running`
+  - `poll_count`
+  - `last_poll_utc`
+  - `last_loop_utc`
+  - `timeout_count`
+  - `last_timeout_station`
+  - `last_timeout_utc`
 
 ## Endpoint reference
 
 ### Health / Debug
 
-- `GET /` → basic service health (`{"status":"ok"}`)
-- `GET /debug/version` → module attrs + config sanity
+- `GET /` → `{"status":"ok"}`
+- `GET /debug/version` → module/config diagnostics
 - `GET /debug/state` → in-memory state snapshot
 
 ### METAR operations
@@ -40,54 +43,89 @@
 - `GET /metar/watchlist`
 - `POST /metar/watchlist` with `{"icaos":["KDEN","KLAX"]}`
 - `GET /metar/metrics`
+- `GET /metar/status`
 - `POST /metar/start`
 - `POST /metar/stop`
 - `POST /metar/force-poll`
 - `POST /metar/test-alert`
+- `POST /metar/simulate-ladder`
 
-## Basic curl checks
+### Kalshi operations
 
-Set base URL:
+- `GET /kalshi/ping`
+- `GET /kalshi/markets?limit=5`
+- `POST /kalshi/check?limit=5`
+- `GET /kalshi/snapshot?station=KJFK&type=HIGH,LOW`
+- `POST /kalshi/composed?station=KJFK&type=HIGH`
+- `GET /kalshi/health`
 
+## `/metar/simulate-ladder` runbook
+
+Request:
 ```bash
-BASE="https://<your-render-service>.onrender.com"
+curl -s -X POST "$BASE/metar/simulate-ladder" \
+  -H 'Content-Type: application/json' \
+  -d '{"icao":"KJFK","temp_f":72.1,"deliver":false}'
 ```
 
-### Boot and debug
+JSON rules:
+- Required: `icao`, `temp_f`.
+- Optional: `deliver` (`true`/`1` to allow webhook delivery attempt).
 
+Behavior:
+- Window bypass is always true for simulation (`window_bypassed: true`).
+- Crossing is determined from previous integer vs current integer.
+- `delivery_attempted` is true only when crossing occurs and `deliver=true`.
+
+Baseline → crossing test sequence:
+1. Baseline seed (no crossing):
 ```bash
-curl -s "$BASE/"
-curl -s "$BASE/debug/version"
-curl -s "$BASE/debug/state"
+curl -s -X POST "$BASE/metar/simulate-ladder" \
+  -H 'Content-Type: application/json' \
+  -d '{"icao":"KJFK","temp_f":72.2,"deliver":false}'
+```
+2. Crossing trigger:
+```bash
+curl -s -X POST "$BASE/metar/simulate-ladder" \
+  -H 'Content-Type: application/json' \
+  -d '{"icao":"KJFK","temp_f":73.1,"deliver":false}'
+```
+3. Delivery validation (only when webhook target is ready):
+```bash
+curl -s -X POST "$BASE/metar/simulate-ladder" \
+  -H 'Content-Type: application/json' \
+  -d '{"icao":"KJFK","temp_f":74.1,"deliver":true}'
 ```
 
-### Fetch flows
+## Composed ladder alert interpretation
 
-```bash
-curl -s "$BASE/metar/latest?icao=KDEN&source=nws"
-curl -s "$BASE/metar/window?icao=KDEN&minutes=3&source=nws"
-curl -s "$BASE/metar/multi?icaos=KDEN,KLAX&source=nws"
-```
+Message layout:
+- Header: `<emoji> <station> <market_type> — Ladder Cross <arrow>`
+- Body:
+  - Current temp and entered bucket label.
+  - `Event: <event_ticker>`.
+  - Direct market link: `https://kalshi.com/markets/<event_ticker>`.
+  - Ladder table with YES/NO prices.
+- Footer: `Next rung: <distance | MAX REACHED | MIN REACHED>`.
 
-### Scheduler control
+Table conventions:
+- `▶` marks the active rung row.
+- `← CURRENT` labels the active bucket.
+- Arrow `⬆️` means upward transition context.
+- Arrow `⬇️` means downward transition context.
 
-```bash
-curl -s -X POST "$BASE/metar/start"
-curl -s -X POST "$BASE/metar/force-poll"
-curl -s "$BASE/metar/metrics"
-curl -s -X POST "$BASE/metar/stop"
-```
+## Environment configuration checklist
 
-### Alert plumbing
+Required:
+- `ALERT_WEBHOOK_URL`
+- `AWC_FROM_EMAIL`
+- `AWC_USER_AGENT`
 
-```bash
-curl -s -X POST "$BASE/metar/test-alert"
-```
-
-Expected result: `{"ok":true,"sent":true}` and a Discord/webhook message.
-
-## Operational expectations
-
-- Alerts fire only on integer floor crosses (up or down) during station-local `11:00–19:00`.
-- Daily reset is station-local date based.
-- Cache persistence preserves `last_alert_floor` and `last_reset_date_local` across restart.
+Common production:
+- `METAR_AUTOSTART`
+- `METAR_POLL_SECONDS`
+- `METAR_STATIONS_JSON`
+- `METAR_CACHE_FILE`
+- `KALSHI_TARGET_STATION`
+- `KALSHI_TARGET_MARKET_TYPE`
+- `KALSHI_ALERT_TICKERS`
