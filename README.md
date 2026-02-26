@@ -1,104 +1,154 @@
 # Kalshi METAR Monitor
 
-Operational Flask service with two tracks:
-- **Phase 1 (frozen):** METAR monitoring and temperature alerting.
-- **Phase 2 (manual mode):** Kalshi public market monitoring via on-demand HTTP trigger.
+Production Flask service that ingests METAR observations, detects integer temperature crossings, and emits composed Kalshi weather ladder alerts when structured markets are available.
 
 ## Project Scope
 
-### Phase 1 — METAR Monitoring (Frozen v1.0)
-Phase 1 is immutable at version **1.0** unless explicitly version-bumped.
-
-Current enforced semantics:
-- Integer floor-cross alerts.
-- Station-local alert window enforcement (11:00–19:00 local time).
+### Phase 1 — METAR Monitoring (Frozen v1.0 semantics)
+Phase 1 alert semantics remain fixed:
+- Integer floor-cross detection.
+- Station-local alert window enforcement (11:00–19:00 local time) for live polling.
 - Station-local daily reset of alert memory.
-- Scheduler isolation (METAR scheduler behavior is independent from Kalshi checks).
-- No drift policy for polling semantics.
+- Scheduler lifecycle idempotency and thread isolation.
 
-### Phase 2 — Kalshi Monitoring (Manual)
-Phase 2 currently runs in **public API mode only**.
+### Phase 2 — Kalshi Weather Ladder Composition
+Phase 2 enriches temperature-cross events with current Kalshi weather ladder context:
+- Structured snapshot by station + market type (`HIGH`, `LOW`).
+- Ladder transition detection and composed webhook alert formatting.
+- Event-scoped context memory to infer direction and adjacent rung distance.
 
-Current constraints:
-- Uses unauthenticated public Kalshi endpoint data.
-- Manual trigger endpoint: `POST /kalshi/check`.
-- First-run suppression: initial snapshot seeds memory and emits zero change alerts.
-- No scheduler integration.
-- No trading actions.
-- No rate limiting yet.
+## Weather Ladder Alert Architecture
 
-## Deployment
+Flow:
+1. METAR ingest updates station state and detects integer floor crosses.
+2. On crossing, the alert pipeline fetches Kalshi ladder snapshots for active market types.
+3. Ladder transition logic checks bucket entry/transition.
+4. If transition alert criteria are met, a composed ladder alert is sent.
+5. If structured ladder data exists, the composed ladder alert path supersedes the legacy temp-only alert output.
 
-- Production Render URL: `https://kalshi-metar-monitor.onrender.com`
-- Start command: `gunicorn app:app -t 180`
-- `METAR_AUTOSTART` behavior:
-  - `true` (default): METAR scheduler starts at process boot.
-  - `false`: scheduler stays stopped until `POST /metar/start`.
+Bucket detection rules:
+- `less`: match when `temp <= cap`.
+- `between`: match when `floor <= temp < cap`.
+- `greater`: match when `temp >= floor`.
+
+Direction resolution order:
+1. `transition_reason` hint (`up` / `down`) from ladder transition logic.
+2. Previous bucket index from event-scoped memory.
+3. Previous observed temperature fallback.
+4. Default upward arrow if no prior context exists.
+
+Distance calculation:
+- Uses the adjacent bucket in the resolved direction.
+- Upward movement: boundary from next higher rung.
+- Downward movement: boundary from next lower rung.
+- Edge cases emit `MAX REACHED` (top) or `MIN REACHED` (bottom).
+
+Event-scoped memory:
+- Context key is scoped by `station + market_type + event_ticker`.
+- Prevents cross-event contamination when markets roll to a new event ticker.
+
+## Scheduler Lifecycle
+
+Autostart and lifecycle behavior:
+- `METAR_AUTOSTART=true` (default): scheduler start is attempted once via Flask `before_first_request` when available.
+- Fallback path: one-time guarded `before_request` hook for environments lacking `before_first_request`.
+- Start endpoint: `POST /metar/start`.
+- Stop endpoint: `POST /metar/stop`.
+- Status endpoint: `GET /metar/status` returns:
+  - `scheduler_running`
+  - `poll_count`
+  - `last_poll_utc`
+  - `last_loop_utc`
+  - `timeout_count`
+  - `last_timeout_station`
+  - `last_timeout_utc`
 
 ## API Surface
 
-### Phase 1 (`/metar/*`)
-- `GET /metar/window` — ingest a strict-source window for one station and return latest-known observation.
+### METAR (`/metar/*`)
+- `GET /metar/window` — ingest strict-source window for one station and return latest-known observation.
 - `GET /metar/latest` — latest observation for one station.
 - `GET /metar/multi` — on-demand fetch for multiple stations.
 - `GET /metar/watchlist` — read active watchlist.
 - `POST /metar/watchlist` — replace active watchlist.
 - `GET /metar/metrics` — poll/timeout counters and monitoring metrics.
-- `GET /metar/status` — scheduler running status and key counters.
+- `GET /metar/status` — scheduler and loop lifecycle status.
 - `POST /metar/start` — start METAR scheduler.
 - `POST /metar/stop` — stop METAR scheduler.
-- `POST /metar/test-alert` — emit a synthetic webhook alert payload.
-- `POST /metar/force-poll` — execute one immediate poll cycle.
+- `POST /metar/test-alert` — emit synthetic webhook payload.
+- `POST /metar/force-poll` — run one immediate poll cycle.
+- `POST /metar/simulate-ladder` — simulate temp ingestion for ladder transition testing.
 
-### Phase 2 (`/kalshi/*`)
+### Kalshi (`/kalshi/*`)
 - `GET /kalshi/ping` — checks public Kalshi reachability.
-- `GET /kalshi/markets` — fetches public markets (supports `limit` query param).
-- `POST /kalshi/check` — manual change-detection pass against current in-memory baseline.
+- `GET /kalshi/markets` — fetches public markets (`limit` query param).
+- `POST /kalshi/check` — manual change-detection pass against baseline state.
+- `GET /kalshi/snapshot` — structured station snapshot for market ladders.
+- `POST /kalshi/composed` — manual composed weather-ladder alert trigger.
+- `GET /kalshi/health` — active station set and composed send metadata.
+
+## `/metar/simulate-ladder` Workflow
+
+Request JSON:
+```json
+{
+  "icao": "KJFK",
+  "temp_f": 72.1,
+  "deliver": false
+}
+```
+
+Behavior:
+- Required fields: `icao`, `temp_f`.
+- Optional `deliver` flag (`true/1` values accepted):
+  - `false` (default): computes crossing + ladder logic without webhook delivery.
+  - `true`: attempts live alert delivery when a crossing is generated.
+- Simulation bypasses station-local alert window (`window_bypassed: true`).
+
+Recommended baseline → crossing test sequence:
+1. Seed baseline (no crossing expected):
+   - `temp_f` stays in current integer.
+2. Submit crossing value (integer change):
+   - `temp_f` crosses next integer.
+3. Re-run with `deliver=true` only when ready to emit to webhook.
+
+## Ladder Alert Formatting
+
+Composed ladder alert payload includes:
+- Header with station, market type, and directional arrow (`⬆️` or `⬇️`).
+- Current temperature and entered rung label.
+- Event ticker and direct market URL (`https://kalshi.com/markets/<event_ticker>`).
+- Monospaced ladder table rows:
+  - Rung label (`X or below`, `X–Y`, `X or higher`)
+  - `YES` and `NO` prices in cents
+  - `▶` prefix and `← CURRENT` marker for active rung
+- Footer line: `Next rung: <distance | MAX REACHED | MIN REACHED>`.
 
 ## Environment Variables
 
-### Phase 1
-- `METAR_STATIONS_JSON`
-- `METAR_POLL_SECONDS`
-- `TEMP_ALERT_DELTA_F` (retained for compatibility)
-- `METAR_CACHE_FILE`
-- `METAR_AUTOSTART`
-- `METAR_DEFAULT_SOURCE`
-- `METAR_STRICT`
-- `METAR_LOOKBACK_MIN`
-- `IEM_LOOKBACK_HOURS`
-- `ALERT_WEBHOOK_URL`
-- `ALERT_INGEST_SECRET`
+### Core alerting and scheduler
+- `ALERT_WEBHOOK_URL` — Webhook destination for temp and composed ladder alerts.
+- `METAR_AUTOSTART` — `true/false`; one-time scheduler autostart gate.
+- `METAR_POLL_SECONDS` — Poll interval for scheduler loop.
 
-### HTTP etiquette
-- `AWC_FROM_EMAIL`
-- `AWC_USER_AGENT`
-- `HTTP_FROM_EMAIL`
-- `HTTP_USER_AGENT`
+### Kalshi ladder targeting
+- `KALSHI_TARGET_STATION` — Restrict ladder monitoring to one ICAO’s city event set.
+- `KALSHI_TARGET_MARKET_TYPE` — Comma-separated `HIGH` and/or `LOW` filter.
+- `KALSHI_ALERT_TICKERS` — Optional comma-separated alert emission allowlist.
 
-### Kalshi public
-- `KALSHI_PUBLIC_BASE_URL` (default: `https://api.elections.kalshi.com/trade-api/v2`)
-- `KALSHI_ALERT_TICKERS` — Optional comma-separated ticker allowlist. If unset, all markets are eligible for alerts. Filtering affects alert emission only, not internal state tracking.
-- `KALSHI_TARGET_STATION` — ICAO station code (e.g., `KNYC`).  
-  When set, monitoring is restricted to that station’s city for the current station-local date.
-- `KALSHI_TARGET_MARKET_TYPE` — Comma-separated list of market types (`HIGH`, `LOW`).  
-  When set with `KALSHI_TARGET_STATION`, restricts monitoring to selected types.
+### Additional operational vars
+- `METAR_STATIONS_JSON`, `METAR_CACHE_FILE`, `METAR_DEFAULT_SOURCE`, `METAR_STRICT`, `METAR_LOOKBACK_MIN`, `IEM_LOOKBACK_HOURS`, `ALERT_INGEST_SECRET`, `AWC_FROM_EMAIL`, `AWC_USER_AGENT`, `HTTP_FROM_EMAIL`, `HTTP_USER_AGENT`, `KALSHI_PUBLIC_BASE_URL`.
 
-If `KALSHI_TARGET_STATION` is unset, structured filtering is disabled and all markets are monitored.
+## Deployment (Render / Gunicorn)
 
-### Kalshi RSA (dormant)
-- `KALSHI_BASE_URL`
-- `KALSHI_KEY_ID`
-- `KALSHI_PRIVATE_KEY_PEM`
+- Production URL: `https://kalshi-metar-monitor.onrender.com`
+- Start command: `gunicorn app:app -t 180`
+- Scheduler autostart is request-lifecycle safe:
+  - No import-time scheduler startup.
+  - One-time guarded startup in Flask request hooks.
 
 ## Governance
 
-- **PR workflow:** all changes are branch-based and merged through Pull Request; no direct commits to `main`.
-- **Master template enforcement:** `docs/CODEX_MASTER_TEMPLATE.md` rules are mandatory and remain in force.
-- **Merge requirement:** PR review must include the explicit sign-off phrase: **“Phase 1 semantics preserved.”**
-- **Branch discipline:** create feature/fix/phase branches from updated `main`; keep diffs minimal and scoped.
-
-## Operational Notes
-
-- This repository is intentionally conservative: stability and deterministic behavior are prioritized over feature expansion.
-- README scope is operational-only; no roadmap commitments are made here.
+- Branch + PR workflow only; no direct commits to protected branch names.
+- `docs/CODEX_MASTER_TEMPLATE.md` process rules are mandatory.
+- Merge sign-off phrase remains: **“Phase 1 semantics preserved.”**
