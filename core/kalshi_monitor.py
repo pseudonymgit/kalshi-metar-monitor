@@ -591,7 +591,7 @@ def send_composed_weather_market_alert(
     previous_bucket_index = None
     previous_temp_f = None
     previous_context = getattr(send_composed_weather_market_alert, "_prev_context", {})
-    context_key = f"{normalized_station}_{market_type}"
+    context_key = f"{normalized_station}_{market_type}_{event_ticker}"
     if isinstance(previous_context, dict):
         prior = previous_context.get(context_key) or {}
         previous_bucket_index = prior.get("bucket_index")
