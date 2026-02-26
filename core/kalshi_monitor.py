@@ -534,71 +534,172 @@ def send_composed_weather_market_alert(
     if not markets:
         return {"ok": False, "reason": "no_markets"}
 
-    if current_temp_f is not None:
-        import math
-
-        threshold = int(math.floor(float(current_temp_f)))
-        filtered_markets = []
-
-        for market in markets:
-            strike = market.get("strike")
-            ticker = market.get("ticker") or ""
-
-            if strike is None:
-                continue
-
-            if "HIGH" in market_types_list and "HIGH" in ticker:
-                if strike < threshold:
-                    continue
-
-            if "LOW" in market_types_list and "LOW" in ticker:
-                if strike > threshold:
-                    continue
-
-            filtered_markets.append(market)
-
-        markets = filtered_markets
-
-        if not markets:
-            return {"ok": False, "reason": "no_markets_after_filter"}
-
     webhook_url = (os.getenv("ALERT_WEBHOOK_URL") or "").strip()
     if not webhook_url:
         return {"ok": False, "reason": "missing_webhook"}
 
-    ladder_lines = []
-    for market in markets:
+    def _to_price(value, fallback):
+        chosen = value if value is not None else fallback
+        if chosen is None:
+            return "N/A"
+        try:
+            return str(int(round(float(chosen))))
+        except (TypeError, ValueError):
+            return "N/A"
+
+    def _sort_key(market):
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        if strike_type == "less":
+            return float("-inf")
+        if strike_type == "greater":
+            return float("inf")
+        if floor is None:
+            return float("inf")
+        return float(floor)
+
+    sorted_markets = sorted(markets, key=_sort_key)
+
+    current_index = None
+    for idx, market in enumerate(sorted_markets):
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        cap = market.get("cap_strike")
+        if current_temp_f is None:
+            continue
+        if strike_type == "less" and cap is not None and current_temp_f <= float(cap):
+            current_index = idx
+            break
+        if (
+            strike_type == "between"
+            and floor is not None
+            and cap is not None
+            and float(floor) <= current_temp_f < float(cap)
+        ):
+            current_index = idx
+            break
+        if strike_type == "greater" and floor is not None and current_temp_f >= float(floor):
+            current_index = idx
+            break
+
+    if current_index is None and sorted_markets:
+        current_index = 0 if current_temp_f is None else len(sorted_markets) - 1
+
+    market_type = market_types_list[0] if market_types_list else ""
+    event_ticker = (sorted_markets[0] if sorted_markets else {}).get("event_ticker") or "N/A"
+
+    previous_bucket_index = None
+    previous_temp_f = None
+    previous_context = getattr(send_composed_weather_market_alert, "_prev_context", {})
+    context_key = f"{normalized_station}_{market_type}"
+    if isinstance(previous_context, dict):
+        prior = previous_context.get(context_key) or {}
+        previous_bucket_index = prior.get("bucket_index")
+        previous_temp_f = prior.get("temp_f")
+
+    reason_lower = (transition_reason or "").lower()
+    if "up" in reason_lower:
+        direction_up = True
+    elif "down" in reason_lower:
+        direction_up = False
+    elif (
+        previous_bucket_index is not None
+        and current_index is not None
+        and previous_bucket_index != current_index
+    ):
+        direction_up = current_index > previous_bucket_index
+    elif (
+        previous_temp_f is not None
+        and current_temp_f is not None
+        and float(current_temp_f) != float(previous_temp_f)
+    ):
+        direction_up = float(current_temp_f) > float(previous_temp_f)
+    else:
+        direction_up = True
+
+    direction_icon = "⬆️" if direction_up else "⬇️"
+
+    def _label_for_market(market):
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        cap = market.get("cap_strike")
+        if strike_type == "less" and cap is not None:
+            return f"{int(float(cap))} or below"
+        if strike_type == "greater" and floor is not None:
+            return f"{int(float(floor))} or higher"
+        if strike_type == "between" and floor is not None and cap is not None:
+            return f"{int(float(floor))}–{int(float(cap))}"
         strike = market.get("strike")
-        yes_bid = market.get("yes_bid")
-        yes_ask = market.get("yes_ask")
-        ladder_lines.append(f"{strike}°F → YES {yes_bid} / {yes_ask}")
+        return str(int(float(strike))) if strike is not None else "N/A"
 
-    ladder_text = "\n".join(ladder_lines)
-    if len(ladder_text) > 1000:
-        ladder_text = ladder_text[:1000] + "\n… (truncated)"
+    row_labels = [_label_for_market(market) for market in sorted_markets]
+    label_width = max((len(label) for label in row_labels), default=0)
 
-    title_suffix = f" ({transition_reason.upper()})" if transition_reason else ""
+    ladder_rows = []
+    for idx, market in enumerate(sorted_markets):
+        yes_price = _to_price(market.get("yes_bid"), market.get("yes_ask"))
+        no_price = _to_price(market.get("no_bid"), market.get("no_ask"))
+        label = row_labels[idx].ljust(label_width)
+        prefix = "▶   " if idx == current_index else "    "
+        suffix = "  ← CURRENT" if idx == current_index else ""
+        ladder_rows.append(
+            f"{prefix}{label}  YES {yes_price}¢  NO {no_price}¢{suffix}"
+        )
+
+    current_market = sorted_markets[current_index] if sorted_markets and current_index is not None else None
+    current_label = _label_for_market(current_market) if current_market else "N/A"
+
+    strike_type_for_title = (current_market or {}).get("strike_type")
+    if strike_type_for_title == "less":
+        title_emoji = "🧊"
+    elif strike_type_for_title == "greater":
+        title_emoji = "🔥"
+    else:
+        title_emoji = "🌡️"
+
+    distance_info = "MAX REACHED"
+    if current_market is not None and current_temp_f is not None and current_index is not None:
+        if direction_up:
+            if current_index < len(sorted_markets) - 1:
+                next_market = sorted_markets[current_index + 1]
+                boundary = next_market.get("floor_strike")
+                if boundary is None:
+                    boundary = next_market.get("cap_strike")
+                if boundary is not None:
+                    distance = round(float(boundary) - float(current_temp_f), 1)
+                    distance_info = f"{distance:.1f}°F"
+            else:
+                distance_info = "MAX REACHED"
+        else:
+            if current_index > 0:
+                next_market = sorted_markets[current_index - 1]
+                boundary = next_market.get("cap_strike")
+                if boundary is None:
+                    boundary = next_market.get("floor_strike")
+                if boundary is not None:
+                    distance = round(float(current_temp_f) - float(boundary), 1)
+                    distance_info = f"{distance:.1f}°F"
+            else:
+                distance_info = "MIN REACHED"
+
+    temp_display = "N/A" if current_temp_f is None else f"{float(current_temp_f):.1f}"
+    header = f"{title_emoji} {normalized_station} {market_type or 'WEATHER'} — Ladder Cross {direction_icon}"
+    ladder_block = "\n".join(ladder_rows)
+    content = (
+        f"{header}\n"
+        f"{temp_display}°F  →  Entered {current_label}\n\n"
+        f"Event: {event_ticker}\n"
+        f"https://kalshi.com/markets/{event_ticker}\n\n"
+        "LADDER\n"
+        "────────────────────────────────\n"
+        f"{ladder_block}\n"
+        "────────────────────────────────\n\n"
+        f"Next rung: {distance_info}"
+    )
 
     payload = {
-        "content": None,
-        "embeds": [
-            {
-                "title": f"{normalized_station} Weather Market Snapshot{title_suffix}",
-                "fields": [
-                    {
-                        "name": "Observed Temp",
-                        "value": str(current_temp_f) if current_temp_f is not None else "N/A",
-                    },
-                    {
-                        "name": "Ladder",
-                        "value": ladder_text,
-                    },
-                ],
-                "footer": {
-                    "text": "Kalshi Monitor (Public Mode)",
-                },
-            }
-        ],
+        "content": content,
+        "embeds": [],
     }
 
     response = requests.post(webhook_url, json=payload, timeout=10)
@@ -607,6 +708,14 @@ def send_composed_weather_market_alert(
 
     key = f"{normalized_station}_{','.join(sorted(snapshot.get('market_types', [])))}"
     _last_composed_sent[key] = datetime.utcnow().isoformat() + "Z"
+
+    if not isinstance(previous_context, dict):
+        previous_context = {}
+    previous_context[context_key] = {
+        "bucket_index": current_index,
+        "temp_f": current_temp_f,
+    }
+    send_composed_weather_market_alert._prev_context = previous_context
 
     return {
         "ok": True,
