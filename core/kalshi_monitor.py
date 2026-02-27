@@ -445,6 +445,7 @@ def process_ladder_transition(station, market_type, snapshot, current_temp):
 
         should_alert = False
         reason = None
+        prior_bucket_index = state.get("bucket_index")
 
         if not state["inside"] and bucket_index is not None:
             should_alert = True
@@ -469,9 +470,18 @@ def process_ladder_transition(station, market_type, snapshot, current_temp):
 
         _ladder_state[state_key] = state
 
+    direction = None
+    if should_alert:
+        if prior_bucket_index is not None and bucket_index is not None and bucket_index != prior_bucket_index:
+            direction = "UP" if bucket_index > prior_bucket_index else "DOWN"
+        else:
+            direction = "UP"
+
     return {
         "should_alert": should_alert,
         "reason": reason,
+        "bucket_index": bucket_index,
+        "direction": direction,
     }
 
 
@@ -524,6 +534,9 @@ def send_composed_weather_market_alert(
     station: str,
     market_types: set,
     transition_reason: str = None,
+    prev_temp_f=None,
+    now_temp_f=None,
+    delta_f=None,
 ):
     normalized_station = (station or "").strip().upper()
     snapshot = build_structured_snapshot(normalized_station, market_types)
@@ -713,10 +726,16 @@ def send_composed_weather_market_alert(
             local_time_display = "N/A"
 
     temp_display = "N/A" if current_temp_f is None else f"{float(current_temp_f):.1f}"
+    prev_display = "N/A" if prev_temp_f is None else f"{float(prev_temp_f):.1f}"
+    now_display = "N/A" if now_temp_f is None else f"{float(now_temp_f):.1f}"
+    delta_display = "N/A" if delta_f is None else f"{float(delta_f):+.1f}"
     header = f"{title_emoji} {normalized_station} {market_type or 'WEATHER'} — Ladder Cross {direction_icon}"
     ladder_block = "\n".join(ladder_rows)
     content = (
         f"{header}\n"
+        f"Prev: {prev_display}°F\n"
+        f"Now: {now_display}°F\n"
+        f"Δ: {delta_display}°F\n"
         f"{temp_display}°F  →  Entered {current_label}\n"
         f"Local time: {local_time_display}\n\n"
         f"Event: {event_ticker}\n"
@@ -752,6 +771,8 @@ def send_composed_weather_market_alert(
         "ok": True,
         "markets_included": len(markets),
         "observed": current_temp_f,
+        "event_ticker": event_ticker,
+        "bucket_index": current_index,
     }
 
 
