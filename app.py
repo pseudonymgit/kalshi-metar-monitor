@@ -243,6 +243,13 @@ def metar_metrics():
     return jsonify(get_metrics()), 200
 
 
+@app.route("/metrics/retention", methods=["GET"])
+def retention_metrics():
+    from core.metar_monitor import get_retention_metrics
+
+    return jsonify(get_retention_metrics()), 200
+
+
 @app.route("/metar/status", methods=["GET"])
 def metar_status():
     """
