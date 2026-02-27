@@ -4,6 +4,8 @@ import os
 import json
 import csv
 import math
+import logging
+import sqlite3
 import threading
 import requests
 from io import StringIO
@@ -60,6 +62,8 @@ _STATE: Dict[str, Any] = {
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
 _SCHEDULER_LOCK = threading.Lock()
+_AUDIT_LOCK = threading.Lock()
+_ALERT_LOGGER = logging.getLogger(__name__)
 
 
 # =========================
@@ -476,6 +480,12 @@ def _process_temperature_event(
         and last_observed_integer is not None
         and curr_floor != last_observed_integer
     ):
+        _ALERT_LOGGER.info(
+            "EVENT integer_cross station=%s market_type=ALL prev_int=%s curr_int=%s",
+            icao,
+            last_observed_integer,
+            curr_floor,
+        )
         if allow_alert_delivery:
             d = round(now_f - prev_f, 1)
             _emit_alert(
@@ -492,6 +502,75 @@ def _process_temperature_event(
         _STATE["last_observed_integer"][icao] = curr_floor
 
     return alerts
+
+
+def _alert_db_path() -> str:
+    return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+
+
+def _audit_alert(
+    station: str,
+    market_type: str,
+    event_ticker: str,
+    alert_type: str,
+    direction: Optional[str],
+    temp_f: Optional[float],
+    bucket_index: Optional[int],
+    metadata: Optional[Dict[str, Any]] = None,
+) -> None:
+    try:
+        db_path = _alert_db_path()
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS alerts (
+                        id INTEGER PRIMARY KEY,
+                        created_utc TEXT,
+                        station TEXT,
+                        market_type TEXT,
+                        event_ticker TEXT,
+                        alert_type TEXT,
+                        direction TEXT,
+                        temp_f REAL,
+                        bucket_index INTEGER,
+                        metadata_json TEXT
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    INSERT INTO alerts (
+                        created_utc,
+                        station,
+                        market_type,
+                        event_ticker,
+                        alert_type,
+                        direction,
+                        temp_f,
+                        bucket_index,
+                        metadata_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        _now_utc_iso(),
+                        (station or "").upper(),
+                        (market_type or "").upper(),
+                        event_ticker,
+                        alert_type,
+                        direction,
+                        temp_f,
+                        bucket_index,
+                        json.dumps(metadata or {}, sort_keys=True),
+                    ),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("audit_log_write_failed station=%s error=%s", station, e)
 
 
 def _simulate_temperature_for_testing(
@@ -560,80 +639,118 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
         tf = payload.get("temp_f")
         pf = payload.get("prev_temp_f")
         df = payload.get("delta_f")
-        ts_utc = payload.get("obs_time")
 
-        # Station-local timestamp for display
-        ts_local = _iso_to_tz(ts_utc, _icao_tz_name(station))
+        if tf is None:
+            return
 
-        if tf is not None:
-            try:
-                from core.kalshi_monitor import (
-                    _get_active_stations,
-                    build_structured_snapshot,
-                    process_ladder_transition,
-                    send_composed_weather_market_alert,
-                )
+        try:
+            from core.kalshi_monitor import (
+                _get_active_stations,
+                build_structured_snapshot,
+                process_ladder_transition,
+                send_composed_weather_market_alert,
+            )
 
-                active = _get_active_stations()
-                station_is_active = (
-                    active is None or station in active
-                )
-                composed_sent = False
+            active = _get_active_stations()
+            station_is_active = active is None or station in active
+            should_alert_on_missing = os.getenv("ALERT_ON_MISSING_LADDER", "false").lower() in ("1", "true", "yes", "y")
 
-                if station_is_active:
-                    for market_type_token in ["HIGH", "LOW"]:
-                        snapshot = build_structured_snapshot(station, {market_type_token})
-                        markets = snapshot.get("markets") or []
+            if station_is_active:
+                for market_type_token in ["HIGH", "LOW"]:
+                    snapshot = build_structured_snapshot(station, {market_type_token})
+                    markets = snapshot.get("markets") or []
+                    _ALERT_LOGGER.info(
+                        "EVAL ladder_check station=%s type=%s market_type=%s markets_found=%s",
+                        station,
+                        market_type_token,
+                        market_type_token,
+                        len(markets),
+                    )
 
-                        if not markets:
-                            continue
+                    if not markets:
+                        if should_alert_on_missing:
+                            _ALERT_LOGGER.info(
+                                "WARN ladder_missing station=%s type=%s market_type=%s",
+                                station,
+                                market_type_token,
+                                market_type_token,
+                            )
+                            response = requests.post(
+                                webhook,
+                                json={"content": f"⚠️ Ladder missing — station={station} type={market_type_token} temp={tf}°F"},
+                                timeout=10,
+                            )
+                            if 200 <= response.status_code < 300:
+                                _audit_alert(
+                                    station=station,
+                                    market_type=market_type_token,
+                                    event_ticker="",
+                                    alert_type="ladder_missing",
+                                    direction=None,
+                                    temp_f=float(tf),
+                                    bucket_index=None,
+                                    metadata={"status_code": response.status_code},
+                                )
+                        continue
 
-                        transition = process_ladder_transition(
+                    transition = process_ladder_transition(
+                        station=station,
+                        market_type=market_type_token,
+                        snapshot=snapshot,
+                        current_temp=tf,
+                    )
+
+                    if transition.get("should_alert"):
+                        direction = transition.get("direction") or "UP"
+                        bucket_index = transition.get("bucket_index")
+                        event_ticker = (markets[0] or {}).get("event_ticker") or ""
+                        _ALERT_LOGGER.info(
+                            "EVENT ladder_transition station=%s type=%s market_type=%s direction=%s bucket=%s",
+                            station,
+                            market_type_token,
+                            market_type_token,
+                            direction,
+                            bucket_index,
+                        )
+                        _audit_alert(
                             station=station,
                             market_type=market_type_token,
-                            snapshot=snapshot,
-                            current_temp=tf,
+                            event_ticker=event_ticker,
+                            alert_type="ladder_transition",
+                            direction=direction,
+                            temp_f=float(tf),
+                            bucket_index=bucket_index,
+                            metadata={"reason": transition.get("reason")},
                         )
-
-                        if transition.get("should_alert"):
-                            result = send_composed_weather_market_alert(
-                                station=station,
-                                market_types={market_type_token},
-                                transition_reason=transition.get("reason"),
+                        result = send_composed_weather_market_alert(
+                            station=station,
+                            market_types={market_type_token},
+                            transition_reason=transition.get("reason"),
+                            prev_temp_f=pf,
+                            now_temp_f=tf,
+                            delta_f=df,
+                        )
+                        if result and result.get("ok"):
+                            send_event_ticker = result.get("event_ticker") or event_ticker
+                            _ALERT_LOGGER.info(
+                                "SEND composed_alert station=%s type=%s market_type=%s event=%s",
+                                station,
+                                market_type_token,
+                                market_type_token,
+                                send_event_ticker,
                             )
-                            if result and result.get("ok"):
-                                composed_sent = True
-
-                if composed_sent:
-                    # Explicitly suppress raw integer METAR alert when composed ladder alert is delivered
-                    return
-            except Exception as e:
-                print(f"[ERROR] station={station} function=_send_alert: {e}")
-
-        if "discord.com/api/webhooks" in webhook:
-            content = (
-                f"**Temp Integer Cross** — {station}: "
-                f"{int(math.floor(float(pf)))} → {int(math.floor(float(tf)))} "
-                f"(now {tf}°F, Δ {df:+}) @ {ts_local}"
-            )
-            body = {
-                "content": content,
-                "embeds": [{
-                    "title": f"{station} Temperature Integer Crossing",
-                    "fields": [
-                        {"name": "Prev °F", "value": str(pf), "inline": True},
-                        {"name": "Now °F",  "value": str(tf), "inline": True},
-                        {"name": "Δ °F",    "value": f"{df:+}", "inline": True},
-                        {"name": "Obs (local)", "value": str(ts_local), "inline": False},
-                        {"name": "Obs (UTC)",   "value": str(ts_utc),   "inline": False},
-                    ],
-                    "timestamp": payload.get("at_utc"),
-                    "footer": {"text": "METAR monitor"},
-                }]
-            }
-            response = requests.post(webhook, json=body, timeout=10)
-        else:
-            response = requests.post(webhook, json=payload, timeout=10)
+                            _audit_alert(
+                                station=station,
+                                market_type=market_type_token,
+                                event_ticker=send_event_ticker,
+                                alert_type="composed_alert_sent",
+                                direction=direction,
+                                temp_f=float(tf),
+                                bucket_index=result.get("bucket_index"),
+                                metadata={"reason": transition.get("reason")},
+                            )
+        except Exception as e:
+            print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
         print(f"[ERROR] station={payload.get('station') or 'UNK'} function=_send_alert: {e}")
 
