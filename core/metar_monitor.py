@@ -705,6 +705,58 @@ def get_retention_metrics() -> Dict[str, Any]:
     }
 
 
+def prune_old_alerts() -> Dict[str, Any]:
+    db_path = _alert_db_path()
+    env_value = os.getenv("ALERT_RETENTION_DAYS")
+
+    retention_days: Optional[int] = None
+    if env_value is not None:
+        try:
+            retention_days = int(env_value)
+        except (TypeError, ValueError):
+            retention_days = None
+
+    if not os.path.exists(db_path):
+        return {
+            "retention_days": retention_days,
+            "rows_deleted": 0,
+            "remaining_rows": 0,
+        }
+
+    with _AUDIT_LOCK:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            if retention_days is None:
+                remaining_rows = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
+                return {
+                    "retention_days": None,
+                    "rows_deleted": 0,
+                    "remaining_rows": remaining_rows,
+                }
+
+            cutoff = (datetime.utcnow() - timedelta(days=retention_days)).isoformat() + "Z"
+            cursor = conn.execute(
+                "DELETE FROM alerts WHERE created_utc < ?",
+                (cutoff,),
+            )
+            deleted_count = cursor.rowcount if cursor.rowcount != -1 else 0
+            conn.commit()
+            remaining_rows = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
+            return {
+                "retention_days": retention_days,
+                "rows_deleted": deleted_count,
+                "remaining_rows": remaining_rows,
+            }
+        except sqlite3.Error:
+            return {
+                "retention_days": retention_days,
+                "rows_deleted": 0,
+                "remaining_rows": 0,
+            }
+        finally:
+            conn.close()
+
+
 def _simulate_temperature_for_testing(
     icao: str,
     temp_f: float,
