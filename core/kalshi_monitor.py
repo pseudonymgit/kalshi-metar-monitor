@@ -221,10 +221,6 @@ def _filter_structured_markets(markets, station, market_types):
         ticker = (market.get("ticker") or "").upper()
         status = market.get("status")
 
-        print(
-            f"city_token={city_token} date_token={date_token}"
-        )
-
         if status and status != "active":
             continue
 
@@ -320,7 +316,6 @@ def build_structured_snapshot(station: str, market_types: set):
         )
 
     markets.sort(key=lambda x: x["strike"])
-    print("[DEBUG] metar_state_keys=", list(get_metar_state().keys()))
     observed_value = None
     if get_metar_state:
         try:
