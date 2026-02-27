@@ -326,6 +326,15 @@ def build_structured_snapshot(station: str, market_types: set):
             )
         except Exception:
             pass
+    if observed_value is None:
+        try:
+            from core.metar_monitor import _STATE
+
+            last = _STATE["last_obs"].get(normalized_station)
+            if last and "temp_f" in last:
+                observed_value = float(last["temp_f"])
+        except Exception:
+            pass
 
     return {
         "station": normalized_station,
@@ -606,9 +615,9 @@ def send_composed_weather_market_alert(
         previous_temp_f = prior.get("temp_f")
 
     reason_lower = (transition_reason or "").lower()
-    if "up" in reason_lower:
+    if reason_lower == "up":
         direction_up = True
-    elif "down" in reason_lower:
+    elif reason_lower == "down":
         direction_up = False
     elif (
         previous_bucket_index is not None
