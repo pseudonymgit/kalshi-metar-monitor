@@ -646,6 +646,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
         try:
             from core.kalshi_monitor import (
                 _get_active_stations,
+                _parse_target_market_types,
                 build_structured_snapshot,
                 process_ladder_transition,
                 send_composed_weather_market_alert,
@@ -654,9 +655,14 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             active = _get_active_stations()
             station_is_active = active is None or station in active
             should_alert_on_missing = os.getenv("ALERT_ON_MISSING_LADDER", "false").lower() in ("1", "true", "yes", "y")
+            target_market_types = _parse_target_market_types(
+                os.getenv("KALSHI_TARGET_MARKET_TYPE")
+            )
+            if not target_market_types:
+                target_market_types = {"HIGH"}
 
             if station_is_active:
-                for market_type_token in ["HIGH", "LOW"]:
+                for market_type_token in sorted(target_market_types):
                     snapshot = build_structured_snapshot(station, {market_type_token})
                     markets = snapshot.get("markets") or []
                     _ALERT_LOGGER.info(
