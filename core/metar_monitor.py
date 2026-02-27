@@ -508,6 +508,42 @@ def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
 
+def _run_alert_retention() -> None:
+    try:
+        days = int(os.getenv("ALERT_RETENTION_DAYS", "180"))
+        max_rows = int(os.getenv("ALERT_RETENTION_MAX_ROWS", "200000"))
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                conn.execute(
+                    """
+                    DELETE FROM alerts
+                    WHERE created_utc < datetime('now', ?)
+                    """,
+                    (f"-{days} days",),
+                )
+                conn.execute(
+                    """
+                    DELETE FROM alerts
+                    WHERE id NOT IN (
+                        SELECT id FROM alerts
+                        ORDER BY id DESC
+                        LIMIT ?
+                    )
+                    """,
+                    (max_rows,),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("alert_retention_failed error=%s", e)
+
+
 def _audit_alert(
     station: str,
     market_type: str,
@@ -1038,6 +1074,7 @@ def _poll_once(logger=None):
         })
 
 def _scheduler_loop(logger, interval_sec: int):
+    loop_count = 0
     while not _SCHEDULER_STOP.is_set():
         try:
             _poll_once(logger)
@@ -1046,6 +1083,9 @@ def _scheduler_loop(logger, interval_sec: int):
         except Exception as e:
             if logger:
                 logger.exception(f"METAR scheduler loop error: {e}")
+        loop_count += 1
+        if loop_count % 100 == 0:
+            _run_alert_retention()
         _SCHEDULER_STOP.wait(interval_sec)
 
 
