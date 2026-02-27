@@ -167,6 +167,17 @@ def debug_alerts():
         "alerts": alerts,
     }), 200
 
+
+@app.route("/debug/ladder-state", methods=["GET"])
+def debug_ladder_state():
+    from core.kalshi_monitor import get_ladder_state_snapshot
+
+    snapshot = get_ladder_state_snapshot()
+    return jsonify({
+        "ok": True,
+        **snapshot
+    }), 200
+
 @app.errorhandler(500)
 def err_500(e):
     import traceback
