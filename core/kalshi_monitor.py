@@ -860,3 +860,38 @@ def check_public_market_changes(limit=5):
     }
     _last_market_check_summary = summary
     return summary
+
+
+def get_ladder_state_snapshot():
+    """
+    Read-only snapshot of in-memory ladder state.
+
+    Returns:
+        {
+            "ladder_state": {"<normalized_key>": state_dict},
+            "ladder_event_keys": {"<station_market_type>": "<normalized_key>"},
+            "total_state_keys": int
+        }
+    """
+
+    def _normalize_key(raw_key):
+        if isinstance(raw_key, tuple) and len(raw_key) == 2:
+            station, market_type = raw_key
+            return f"{station}_{market_type}"
+        return raw_key
+
+    with _LADDER_LOCK:
+        ladder_state_copy = {
+            _normalize_key(state_key): dict(state_value)
+            for state_key, state_value in _ladder_state.items()
+        }
+        ladder_event_keys_copy = {
+            f"{station}_{market_type}": _normalize_key(state_key)
+            for (station, market_type), state_key in _ladder_event_keys.items()
+        }
+
+    return {
+        "ladder_state": ladder_state_copy,
+        "ladder_event_keys": ladder_event_keys_copy,
+        "total_state_keys": len(ladder_state_copy),
+    }
