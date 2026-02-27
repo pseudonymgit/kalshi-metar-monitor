@@ -315,22 +315,25 @@ def metar_stop():
 
 @app.route("/metar/test-alert", methods=["POST"])
 def metar_test_alert():
-    """
-    Immediately sends a synthetic alert to the configured ALERT_WEBHOOK_URL.
-    """
-    cfg = get_default_config()
-    payload = {
-        "type": "temp_change",
-        "station": "KDEN",
-        "prev_temp_f": 70.2,
-        "temp_f": 71.0,
-        "delta_f": 0.8,
-        "obs_time": datetime.now(timezone.utc).isoformat(),
-        "at_utc": datetime.now(timezone.utc).isoformat(),
-        "source": "synthetic",
-    }
-    _send_alert(cfg.get("webhook", ""), payload)
-    return jsonify({"ok": True, "sent": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    station = (data.get("station") or "").strip().upper()
+    temp_f = data.get("temp_f")
+
+    if not station:
+        return jsonify({"error": "Missing JSON field: station"}), 400
+
+    try:
+        temp_f = float(temp_f)
+    except (TypeError, ValueError):
+        return jsonify({"error": "temp_f must be float"}), 400
+
+    return jsonify(
+        _simulate_temperature_for_testing(
+            icao=station,
+            temp_f=float(temp_f),
+            allow_alert_delivery=True,
+        )
+    ), 200
 
 @app.route("/metar/force-poll", methods=["POST"])
 def metar_force_poll():
