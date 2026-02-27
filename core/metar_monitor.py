@@ -767,7 +767,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             with _MISSING_LADDER_LOCK:
                                 if dedupe_key in _MISSING_LADDER_DEDUPE:
                                     continue
-                                _MISSING_LADDER_DEDUPE[dedupe_key] = True
                             _ALERT_LOGGER.info(
                                 "WARN ladder_missing station=%s type=%s market_type=%s",
                                 station,
@@ -780,6 +779,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 timeout=10,
                             )
                             if 200 <= response.status_code < 300:
+                                with _MISSING_LADDER_LOCK:
+                                    _MISSING_LADDER_DEDUPE[dedupe_key] = True
                                 _audit_alert(
                                     station=station,
                                     market_type=market_type_token,
