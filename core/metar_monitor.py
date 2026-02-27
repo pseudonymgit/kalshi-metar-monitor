@@ -659,6 +659,52 @@ def get_recent_alerts(limit: int = 100) -> List[Dict[str, Any]]:
         return []
 
 
+def get_retention_metrics() -> Dict[str, Any]:
+    db_path = _alert_db_path()
+    file_exists = os.path.exists(db_path)
+    file_size_bytes = os.path.getsize(db_path) if file_exists else 0
+
+    if not file_exists:
+        return {
+            "db_path": db_path,
+            "file_exists": file_exists,
+            "file_size_bytes": file_size_bytes,
+            "total_rows": 0,
+            "oldest_created_utc": None,
+            "newest_created_utc": None,
+            "rows_last_24h": 0,
+        }
+
+    total_rows = 0
+    oldest_created_utc = None
+    newest_created_utc = None
+    rows_last_24h = 0
+
+    conn = sqlite3.connect(db_path, timeout=1)
+    try:
+        total_rows = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
+        oldest_created_utc, newest_created_utc = conn.execute(
+            "SELECT MIN(created_utc), MAX(created_utc) FROM alerts"
+        ).fetchone()
+        cutoff = (datetime.utcnow() - timedelta(days=1)).isoformat() + "Z"
+        rows_last_24h = conn.execute(
+            "SELECT COUNT(*) FROM alerts WHERE created_utc >= ?",
+            (cutoff,)
+        ).fetchone()[0]
+    finally:
+        conn.close()
+
+    return {
+        "db_path": db_path,
+        "file_exists": file_exists,
+        "file_size_bytes": file_size_bytes,
+        "total_rows": total_rows,
+        "oldest_created_utc": oldest_created_utc,
+        "newest_created_utc": newest_created_utc,
+        "rows_last_24h": rows_last_24h,
+    }
+
+
 def _simulate_temperature_for_testing(
     icao: str,
     temp_f: float,
