@@ -983,10 +983,6 @@ def _poll_once(logger=None):
             "last_observed_integer": _STATE["last_observed_integer"],
         })
 
-    if logger:
-        logger.info(f"METAR poll ({chosen}): stations={len(stations)} ingested={total_ing} alerts={total_alerts}")
-
-
 def _scheduler_loop(logger, interval_sec: int):
     while not _SCHEDULER_STOP.is_set():
         try:
