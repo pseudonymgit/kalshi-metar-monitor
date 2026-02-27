@@ -20,6 +20,7 @@ from core.metar_monitor import (
     get_default_config,
     _poll_once,
     _simulate_temperature_for_testing,
+    get_recent_alerts,
 )
 
 from core.kalshi_monitor import _kalshi_public_get
@@ -147,6 +148,23 @@ def debug_version():
         "default_cfg": mm.get_default_config(),
         "has_fetch_window": hasattr(mm, "fetch_window"),
         "has__fetch_range_strict": hasattr(mm, "_fetch_range_strict"),
+    }), 200
+
+
+@app.route("/debug/alerts", methods=["GET"])
+def debug_alerts():
+    raw_limit = request.args.get("limit", "100")
+    try:
+        limit = int(raw_limit)
+    except (TypeError, ValueError):
+        limit = 100
+
+    alerts = get_recent_alerts(limit)
+    return jsonify({
+        "ok": True,
+        "count": len(alerts),
+        "limit": limit,
+        "alerts": alerts,
     }), 200
 
 @app.errorhandler(500)
