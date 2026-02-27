@@ -63,6 +63,8 @@ _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
 _SCHEDULER_LOCK = threading.Lock()
 _AUDIT_LOCK = threading.Lock()
+_MISSING_LADDER_DEDUPE = {}
+_MISSING_LADDER_LOCK = threading.Lock()
 _ALERT_LOGGER = logging.getLogger(__name__)
 
 
@@ -752,6 +754,20 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
                     if not markets:
                         if should_alert_on_missing:
+                            try:
+                                if _to_local:
+                                    local_date = _to_local(station, datetime.now(timezone.utc)).date().isoformat()
+                                else:
+                                    local_date = datetime.now(timezone.utc).date().isoformat()
+                            except Exception:
+                                local_date = datetime.now(timezone.utc).date().isoformat()
+
+                            dedupe_key = f"{station}_{market_type_token}_{local_date}"
+
+                            with _MISSING_LADDER_LOCK:
+                                if dedupe_key in _MISSING_LADDER_DEDUPE:
+                                    continue
+                                _MISSING_LADDER_DEDUPE[dedupe_key] = True
                             _ALERT_LOGGER.info(
                                 "WARN ladder_missing station=%s type=%s market_type=%s",
                                 station,
