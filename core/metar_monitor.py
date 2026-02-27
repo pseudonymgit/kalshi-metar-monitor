@@ -573,6 +573,54 @@ def _audit_alert(
         _ALERT_LOGGER.warning("audit_log_write_failed station=%s error=%s", station, e)
 
 
+def get_recent_alerts(limit: int = 100) -> List[Dict[str, Any]]:
+    try:
+        limit = min(max(int(limit), 1), 500)
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return []
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                rows = conn.execute(
+                    """
+                    SELECT id, created_utc, station, market_type,
+                           event_ticker, alert_type, direction,
+                           temp_f, bucket_index, metadata_json
+                    FROM alerts
+                    ORDER BY id DESC
+                    LIMIT ?
+                    """,
+                    (limit,),
+                ).fetchall()
+            finally:
+                conn.close()
+
+        alerts: List[Dict[str, Any]] = []
+        for row in rows:
+            metadata = {}
+            if row[9]:
+                metadata = json.loads(row[9])
+            alerts.append(
+                {
+                    "id": row[0],
+                    "created_utc": row[1],
+                    "station": row[2],
+                    "market_type": row[3],
+                    "event_ticker": row[4],
+                    "alert_type": row[5],
+                    "direction": row[6],
+                    "temp_f": row[7],
+                    "bucket_index": row[8],
+                    "metadata": metadata,
+                }
+            )
+        return alerts
+    except Exception:
+        return []
+
+
 def _simulate_temperature_for_testing(
     icao: str,
     temp_f: float,
