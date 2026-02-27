@@ -50,6 +50,9 @@ _STATE: Dict[str, Any] = {
     "last_seen_iso": {},         # { ICAO: ISO of latest obs we ingested }
     "last_reset_date_local": {}, # { ICAO: "YYYY-MM-DD" } daily local reset marker
     "last_observed_integer": {}, # { ICAO: int } last observed floored integer temperature
+    "running_daily_max": {},     # { ICAO: float } running daily max temperature
+    "last_settlement_bucket": {},# { ICAO: int } last settlement bucket
+    "last_instant_bucket": {},   # { ICAO: int } last instant bucket
     "cfg": {},
     "poll_count": 0,
     "last_poll_utc": None,
@@ -161,7 +164,11 @@ def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
         last = _STATE["last_reset_date_local"].get(icao)
         if last != local_day:
             _STATE["last_observed_integer"].pop(icao, None)
+            _STATE["running_daily_max"].pop(icao, None)
+            _STATE["last_settlement_bucket"].pop(icao, None)
+            _STATE["last_instant_bucket"].pop(icao, None)
             _STATE["last_reset_date_local"][icao] = local_day
+            _prune_transition_events()
 
 
 # =========================
@@ -210,6 +217,12 @@ def ensure_state_loaded():
             _STATE["last_reset_date_local"].update(cache["last_reset_date_local"])
         if "last_observed_integer" in cache:
             _STATE["last_observed_integer"].update(cache["last_observed_integer"])
+        if "running_daily_max" in cache:
+            _STATE["running_daily_max"].update(cache["running_daily_max"])
+        if "last_settlement_bucket" in cache:
+            _STATE["last_settlement_bucket"].update(cache["last_settlement_bucket"])
+        if "last_instant_bucket" in cache:
+            _STATE["last_instant_bucket"].update(cache["last_instant_bucket"])
 
 
 def get_state() -> Dict[str, Any]:
@@ -221,6 +234,9 @@ def get_state() -> Dict[str, Any]:
             "last_seen_iso": dict(_STATE["last_seen_iso"]),
             "last_reset_date_local": dict(_STATE["last_reset_date_local"]),
             "last_observed_integer": dict(_STATE["last_observed_integer"]),
+            "running_daily_max": dict(_STATE["running_daily_max"]),
+            "last_settlement_bucket": dict(_STATE["last_settlement_bucket"]),
+            "last_instant_bucket": dict(_STATE["last_instant_bucket"]),
             "cfg": dict(_STATE["cfg"]),
             "poll_count": _STATE["poll_count"],
             "last_poll_utc": _STATE["last_poll_utc"],
@@ -440,6 +456,9 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
             "last_seen_iso": _STATE["last_seen_iso"],
             "last_reset_date_local": _STATE["last_reset_date_local"],
             "last_observed_integer": _STATE["last_observed_integer"],
+            "running_daily_max": _STATE["running_daily_max"],
+            "last_settlement_bucket": _STATE["last_settlement_bucket"],
+            "last_instant_bucket": _STATE["last_instant_bucket"],
         })
 
     return (ingested, alerts)
@@ -473,8 +492,51 @@ def _process_temperature_event(
     _maybe_daily_reset_local(icao, obs_time)
 
     curr_floor = int(math.floor(now_f))
+    instant_bucket = curr_floor
     with _STATE_LOCK:
         last_observed_integer = _STATE["last_observed_integer"].get(icao)
+        prev_running_max = _STATE["running_daily_max"].get(icao)
+        previous_settlement_bucket = _STATE["last_settlement_bucket"].get(icao)
+        previous_instant_bucket = _STATE["last_instant_bucket"].get(icao)
+
+    new_running_max = max(prev_running_max, now_f) if prev_running_max is not None else now_f
+    settlement_bucket = int(math.floor(new_running_max))
+
+    instant_changed = previous_instant_bucket is not None and instant_bucket != previous_instant_bucket
+    settlement_changed = (
+        previous_settlement_bucket is not None and settlement_bucket > previous_settlement_bucket
+    )
+    transition_type = None
+    if previous_instant_bucket is not None:
+        if instant_bucket > previous_instant_bucket:
+            transition_type = "instant_up"
+        elif instant_bucket < previous_instant_bucket:
+            transition_type = "instant_down"
+    if previous_settlement_bucket is not None and settlement_bucket > previous_settlement_bucket:
+        transition_type = "settlement_up"
+    if (
+        transition_type == "instant_down"
+        and previous_settlement_bucket is not None
+        and settlement_bucket == previous_settlement_bucket
+    ):
+        transition_type = "reversion_after_settlement"
+
+    if transition_type and (instant_changed or settlement_changed):
+        _log_transition_event(
+            station=icao,
+            transition_type=transition_type,
+            instant_bucket_before=previous_instant_bucket,
+            instant_bucket_after=instant_bucket,
+            settlement_bucket=settlement_bucket,
+            running_max=new_running_max,
+            current_temp=now_f,
+            metadata={
+                "obs_time": obs_time,
+                "prev_temp_f": prev_f,
+                "prev_running_max": prev_running_max,
+                "previous_settlement_bucket": previous_settlement_bucket,
+            },
+        )
 
     alerts = 0
     if (
@@ -502,12 +564,102 @@ def _process_temperature_event(
 
     with _STATE_LOCK:
         _STATE["last_observed_integer"][icao] = curr_floor
+        _STATE["running_daily_max"][icao] = new_running_max
+        _STATE["last_settlement_bucket"][icao] = settlement_bucket
+        _STATE["last_instant_bucket"][icao] = instant_bucket
 
     return alerts
 
 
 def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+
+
+def _log_transition_event(
+    station: str,
+    transition_type: Optional[str],
+    instant_bucket_before: Optional[int],
+    instant_bucket_after: int,
+    settlement_bucket: int,
+    running_max: float,
+    current_temp: float,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> None:
+    try:
+        db_path = _alert_db_path()
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS transition_events (
+                        id INTEGER PRIMARY KEY,
+                        created_utc TEXT,
+                        station TEXT,
+                        transition_type TEXT,
+                        instant_bucket_before INTEGER,
+                        instant_bucket_after INTEGER,
+                        settlement_bucket INTEGER,
+                        running_max REAL,
+                        current_temp REAL,
+                        metadata_json TEXT
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    INSERT INTO transition_events (
+                        created_utc,
+                        station,
+                        transition_type,
+                        instant_bucket_before,
+                        instant_bucket_after,
+                        settlement_bucket,
+                        running_max,
+                        current_temp,
+                        metadata_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        _now_utc_iso(),
+                        (station or "").upper(),
+                        transition_type,
+                        instant_bucket_before,
+                        instant_bucket_after,
+                        settlement_bucket,
+                        running_max,
+                        current_temp,
+                        json.dumps(metadata or {}, sort_keys=True),
+                    ),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("transition_event_log_failed station=%s error=%s", station, e)
+
+
+def _prune_transition_events() -> None:
+    try:
+        retention_days = int(os.getenv("TRANSITION_RETENTION_DAYS", "3"))
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return
+
+        cutoff = (datetime.utcnow() - timedelta(days=retention_days)).isoformat() + "Z"
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                conn.execute(
+                    "DELETE FROM transition_events WHERE created_utc < ?",
+                    (cutoff,),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("transition_event_prune_failed error=%s", e)
 
 
 def _run_alert_retention() -> None:
