@@ -17,6 +17,21 @@ Phase 2 enriches temperature-cross events with current Kalshi weather ladder con
 - Ladder transition detection and composed webhook alert formatting.
 - Event-scoped context memory to infer direction and adjacent rung distance.
 
+## Alert Routing Policy (Production)
+
+Within station-local alert window (11:00–19:00):
+
+| Condition | Result |
+|---|---|
+| Ladder exists + transition fires | Composed ladder alert |
+| Ladder exists + no transition | Nothing |
+| Ladder missing + enabled | Ladder-missing alert |
+| Outside window | Nothing |
+
+Policy notes:
+- Raw integer-cross (temp-only) alerts are permanently removed.
+- Composed alerts are the only alert type.
+
 ## Weather Ladder Alert Architecture
 
 Flow:
@@ -24,7 +39,51 @@ Flow:
 2. On crossing, the alert pipeline fetches Kalshi ladder snapshots for active market types.
 3. Ladder transition logic checks bucket entry/transition.
 4. If transition alert criteria are met, a composed ladder alert is sent.
-5. If structured ladder data exists, the composed ladder alert path supersedes the legacy temp-only alert output.
+
+## Architecture Overview (Alert Flow)
+
+`Integer cross detected -> Window check -> Ladder evaluation ->`
+- `Transition? -> Composed alert -> Audit row`
+- `Missing? -> Missing alert -> Audit row`
+- `Otherwise -> No alert`
+
+## SQLite Durable Audit
+
+- Environment variable: `ALERT_DB_PATH=/var/data/alerts.db`
+- Default fallback path: `/var/data/alerts.db`
+- Deployment requirement: persistent disk is required.
+- Scope: single-instance SQLite only.
+
+Table: `alerts`
+- `id INTEGER PRIMARY KEY`
+- `created_utc TEXT`
+- `station TEXT`
+- `market_type TEXT`
+- `event_ticker TEXT`
+- `alert_type TEXT`
+- `direction TEXT`
+- `temp_f REAL`
+- `bucket_index INTEGER`
+- `metadata_json TEXT`
+
+Audit event writes:
+- `ladder_transition`
+- `ladder_missing`
+- `composed_alert_sent`
+
+## Structured Logging Contract
+
+Allowed high-signal log events:
+- `EVENT integer_cross`
+- `EVAL ladder_check`
+- `WARN ladder_missing`
+- `EVENT ladder_transition`
+- `SEND composed_alert`
+
+Contract:
+- No per-poll logging.
+- No debug prints.
+- High-signal logs only.
 
 Bucket detection rules:
 - `less`: match when `temp <= cap`.
@@ -127,14 +186,24 @@ Composed ladder alert payload includes:
 ## Environment Variables
 
 ### Core alerting and scheduler
-- `ALERT_WEBHOOK_URL` — Webhook destination for temp and composed ladder alerts.
+- `ALERT_WEBHOOK_URL` — Webhook destination for composed ladder alerts.
 - `METAR_AUTOSTART` — `true/false`; one-time scheduler autostart gate.
 - `METAR_POLL_SECONDS` — Poll interval for scheduler loop.
+- `ALERT_DB_PATH` — Durable SQLite audit DB path (default `/var/data/alerts.db`; persistent disk required).
+
+### Alert policy controls
+- `ALERT_ON_MISSING_LADDER` — Enables ladder-missing alert emission when a ladder is unavailable.
+- `SUPPRESS_TEMP_ONLY_ALERTS` — Legacy compatibility only; raw temp-only alerts are removed in production.
 
 ### Kalshi ladder targeting
 - `KALSHI_TARGET_STATION` — Restrict ladder monitoring to one ICAO’s city event set.
-- `KALSHI_TARGET_MARKET_TYPE` — Comma-separated `HIGH` and/or `LOW` filter.
+- `KALSHI_TARGET_MARKET_TYPE` — Comma-separated `HIGH` and/or `LOW` filter (`HIGH,LOW` enables symmetric dual-side monitoring).
 - `KALSHI_ALERT_TICKERS` — Optional comma-separated alert emission allowlist.
+
+## LOW Market Support
+
+- `HIGH` and `LOW` share symmetric ladder-evaluation and transition behavior.
+- Enable both with: `KALSHI_TARGET_MARKET_TYPE=HIGH,LOW`.
 
 ### Additional operational vars
 - `METAR_STATIONS_JSON`, `METAR_CACHE_FILE`, `METAR_DEFAULT_SOURCE`, `METAR_STRICT`, `METAR_LOOKBACK_MIN`, `IEM_LOOKBACK_HOURS`, `ALERT_INGEST_SECRET`, `AWC_FROM_EMAIL`, `AWC_USER_AGENT`, `HTTP_FROM_EMAIL`, `HTTP_USER_AGENT`, `KALSHI_PUBLIC_BASE_URL`.

@@ -2,8 +2,13 @@
 
 ## Required for production alerting
 - `ALERT_WEBHOOK_URL`
-  - Destination webhook for composed ladder alerts and temp alerts.
+  - Destination webhook for composed ladder alerts.
   - If unset, alert send operations return a missing-webhook result and no delivery occurs.
+
+- `ALERT_DB_PATH` (default: `/var/data/alerts.db`)
+  - Durable SQLite alert audit path.
+  - Persistent disk required in production.
+  - Single-instance SQLite deployment model.
 
 - `AWC_FROM_EMAIL`
 - `AWC_USER_AGENT`
@@ -30,6 +35,14 @@
 - `TEMP_ALERT_DELTA_F`
   - Compatibility variable; integer crossing drives live alert semantics.
 
+## Alert policy
+- `ALERT_ON_MISSING_LADDER`
+  - Enables ladder-missing alert emission when ladder data is unavailable.
+
+- `SUPPRESS_TEMP_ONLY_ALERTS`
+  - Legacy compatibility flag.
+  - Raw temp-only alerts are removed in production; composed alert pathways remain.
+
 ## Kalshi weather ladder targeting
 - `KALSHI_PUBLIC_BASE_URL` (default: `https://api.elections.kalshi.com/trade-api/v2`)
 
@@ -38,6 +51,7 @@
 
 - `KALSHI_TARGET_MARKET_TYPE`
   - Comma-separated `HIGH` and/or `LOW` filters when station targeting is enabled.
+  - `HIGH,LOW` enables symmetric dual-side monitoring.
 
 - `KALSHI_ALERT_TICKERS`
   - Optional comma-separated ticker allowlist for alert emission.

@@ -31,13 +31,67 @@ Flask service on Render with two integrated runtime tracks:
 
 ## Weather Ladder Alert Architecture
 
+### Routing matrix (within station-local 11:00–19:00)
+
+| Condition | Result |
+|---|---|
+| Ladder exists + transition fires | Composed ladder alert |
+| Ladder exists + no transition | Nothing |
+| Ladder missing + enabled | Ladder-missing alert |
+| Outside window | Nothing |
+
+Raw integer-cross temp-only alerts are removed. Composed alert pathways are the only production alert type.
+
 ### Flow
 1. METAR observation ingested and station state updated.
 2. Integer crossing detected against station integer memory.
 3. For active station and each market type (`HIGH`, `LOW`), structured snapshot is queried.
 4. Ladder transition evaluator returns `should_alert` + reason.
 5. Composed ladder alert sends formatted ladder message with event link.
-6. If structured ladder data exists, the composed ladder alert path supersedes the legacy temp-only alert output.
+
+Concise flow:
+`Integer cross detected -> Window check -> Ladder evaluation ->`
+- `Transition? -> Composed alert -> Audit row`
+- `Missing? -> Missing alert -> Audit row`
+- `Otherwise -> No alert`
+
+## Durable alert audit (SQLite)
+
+- `ALERT_DB_PATH` controls audit DB location.
+- Default fallback path: `/var/data/alerts.db`.
+- Single-instance SQLite only.
+- Persistent disk required.
+
+Table: `alerts`
+- `id INTEGER PRIMARY KEY`
+- `created_utc TEXT`
+- `station TEXT`
+- `market_type TEXT`
+- `event_ticker TEXT`
+- `alert_type TEXT`
+- `direction TEXT`
+- `temp_f REAL`
+- `bucket_index INTEGER`
+- `metadata_json TEXT`
+
+Written events:
+- `ladder_transition`
+- `ladder_missing`
+- `composed_alert_sent`
+
+## Structured logging contract
+
+Allowed events:
+- `EVENT integer_cross`
+- `EVAL ladder_check`
+- `WARN ladder_missing`
+- `EVENT ladder_transition`
+- `SEND composed_alert`
+
+Logging rules:
+- No per-poll logging.
+- No debug prints.
+- High-signal logs only.
 
 ### Bucket detection
 - `less`: `temp <= cap`
