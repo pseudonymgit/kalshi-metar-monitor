@@ -250,6 +250,13 @@ def retention_metrics():
     return jsonify(get_retention_metrics()), 200
 
 
+@app.route("/metrics/prune", methods=["POST"])
+def retention_prune():
+    from core.metar_monitor import prune_old_alerts
+
+    return jsonify(prune_old_alerts()), 200
+
+
 @app.route("/metar/status", methods=["GET"])
 def metar_status():
     """
