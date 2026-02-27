@@ -8,6 +8,7 @@ import logging
 import sqlite3
 import threading
 import requests
+import time
 from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
@@ -68,6 +69,9 @@ _SCHEDULER_LOCK = threading.Lock()
 _AUDIT_LOCK = threading.Lock()
 _MISSING_LADDER_DEDUPE = {}
 _MISSING_LADDER_LOCK = threading.Lock()
+_KALSHI_RATE_LIMIT_LOCK = threading.Lock()
+_KALSHI_LAST_CALL_TS = {}
+_KALSHI_CALL_THROTTLE_SECONDS = 5
 _ALERT_LOGGER = logging.getLogger(__name__)
 
 
@@ -464,7 +468,7 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
     return (ingested, alerts)
 
 
-def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any]) -> None:
+def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any], instant_bucket_changed: bool = False, settlement_bucket_changed: bool = False) -> None:
     payload = {
         "type": "temp_change",
         "station": icao,
@@ -473,6 +477,8 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
         "delta_f": delta_f,
         "obs_time": obs_time,
         "at_utc": _now_utc_iso(),
+        "instant_bucket_changed": bool(instant_bucket_changed),
+        "settlement_bucket_changed": bool(settlement_bucket_changed),
     }
     _send_alert(cfg.get("webhook", ""), payload)
 
@@ -559,6 +565,8 @@ def _process_temperature_event(
                 delta_f=d,
                 obs_time=obs_time,
                 cfg=cfg,
+                instant_bucket_changed=instant_changed,
+                settlement_bucket_changed=settlement_changed,
             )
         alerts = 1
 
@@ -971,6 +979,18 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
         if tf is None:
             return
+
+        instant_bucket_changed = bool(payload.get("instant_bucket_changed"))
+        settlement_bucket_changed = bool(payload.get("settlement_bucket_changed"))
+        if not instant_bucket_changed and not settlement_bucket_changed:
+            return
+
+        now_ts = time.time()
+        with _KALSHI_RATE_LIMIT_LOCK:
+            last_call_ts = _KALSHI_LAST_CALL_TS.get(station)
+            if last_call_ts is not None and (now_ts - last_call_ts) < _KALSHI_CALL_THROTTLE_SECONDS:
+                return
+            _KALSHI_LAST_CALL_TS[station] = now_ts
 
         try:
             from core.kalshi_monitor import (

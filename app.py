@@ -23,7 +23,7 @@ from core.metar_monitor import (
     get_recent_alerts,
 )
 
-from core.kalshi_monitor import _kalshi_public_get
+from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
 
 app = Flask(__name__)
 log = app.logger
@@ -36,6 +36,7 @@ if hasattr(app, "before_first_request"):
     def _autostart_scheduler_once():
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
+        ensure_series_discovery_loaded()
 else:
     @app.before_request
     def _autostart_scheduler_fallback_once():
@@ -45,6 +46,7 @@ else:
         _autostart_fallback_done = True
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
+        ensure_series_discovery_loaded()
         return None
 
 @app.route("/", methods=["GET"])
