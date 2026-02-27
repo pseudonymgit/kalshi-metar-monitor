@@ -26,6 +26,9 @@ _last_market_check_summary = {}
 _ladder_state = {}
 _ladder_event_keys = {}
 _LADDER_LOCK = threading.Lock()
+_SERIES_LOCK = threading.Lock()
+_SERIES_BY_STATION = {}
+_SERIES_DISCOVERED = False
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -197,6 +200,46 @@ def _station_local_kalshi_date_token(station):
 
     return now_local.strftime("%y%b%d").upper()
 
+
+def _discover_series_for_stations():
+    data = _kalshi_public_get("/series?tags=Daily%20temperature")
+    series_items = data.get("series") or []
+    configured_stations = _get_active_stations() or set(_STATION_CITY_TOKEN_MAP.keys())
+
+    discovered = {}
+
+    for station in sorted(configured_stations):
+        station_code = (station or "").strip().upper()
+        city_token = _STATION_CITY_TOKEN_MAP.get(station_code, "")
+
+        for item in series_items:
+            frequency = (item.get("frequency") or "").strip().lower()
+            title = (item.get("title") or "").strip()
+            ticker = (item.get("ticker") or "").strip().upper()
+
+            if frequency != "daily":
+                continue
+            if "highest" not in title.lower():
+                continue
+            if not ticker:
+                continue
+
+            if station_code in ticker or (city_token and city_token in ticker):
+                discovered[station_code] = ticker
+                break
+
+    return discovered
+
+
+def ensure_series_discovery_loaded():
+    global _SERIES_DISCOVERED, _SERIES_BY_STATION
+    with _SERIES_LOCK:
+        if _SERIES_DISCOVERED:
+            return dict(_SERIES_BY_STATION)
+        _SERIES_BY_STATION = _discover_series_for_stations()
+        _SERIES_DISCOVERED = True
+        return dict(_SERIES_BY_STATION)
+
 def _build_weather_event_ticker(station: str, market_type: str):
     city_token = _STATION_CITY_TOKEN_MAP.get(station)
     if not city_token:
@@ -252,6 +295,8 @@ def _extract_strike_from_ticker(ticker):
 
 def build_structured_snapshot(station: str, market_types: set):
     normalized_station = (station or "").strip().upper()
+    series_by_station = ensure_series_discovery_loaded()
+    series_ticker = series_by_station.get(normalized_station)
 
     selected_types = {
         token.strip().upper()
@@ -260,15 +305,8 @@ def build_structured_snapshot(station: str, market_types: set):
     }
 
     fetched_markets = []
-    market_types_to_fetch = sorted(selected_types) if selected_types else ["HIGH", "LOW"]
-
-    for market_type in market_types_to_fetch:
-        event_ticker = _build_weather_event_ticker(normalized_station, market_type)
-
-        if not event_ticker:
-            continue
-
-        data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
+    if series_ticker:
+        data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
         fetched_markets.extend(data.get("markets", []))
 
     filtered_markets = _filter_structured_markets(
