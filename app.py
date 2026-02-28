@@ -21,6 +21,7 @@ from core.metar_monitor import (
     _poll_once,
     _simulate_temperature_for_testing,
     get_recent_alerts,
+    run_replay_for_station_day,
 )
 
 from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
@@ -376,6 +377,26 @@ def metar_force_poll():
         "after_poll_count": after.get("poll_count"),
         "last_poll_utc": after.get("last_poll_utc"),
     }), 200
+
+@app.route("/debug/replay", methods=["POST"])
+def debug_replay():
+    data = request.get_json(force=True, silent=True) or {}
+    station = (data.get("station") or "").strip().upper()
+    date_local = (data.get("date_local") or "").strip()
+
+    if not station:
+        return jsonify({"error": "Missing JSON field: station"}), 400
+    if not date_local:
+        return jsonify({"error": "Missing JSON field: date_local"}), 400
+
+    try:
+        result = run_replay_for_station_day(station=station, date_local=date_local)
+        return jsonify(result), 200
+    except ValueError:
+        return jsonify({"error": "date_local must be YYYY-MM-DD"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/debug/state", methods=["GET"])
 def debug_state():
