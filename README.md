@@ -2,6 +2,17 @@
 
 Production Flask service that ingests METAR observations, detects integer temperature crossings, and emits composed Kalshi weather ladder alerts when structured markets are available.
 
+## Canonical Documentation
+- Architecture specification: `docs/ARCHITECTURE.md`
+- Execution governance rules: `docs/CODEX_MASTER_TEMPLATE.md`
+
+## Deterministic Runtime Guardrails
+- 60-second polling cadence.
+- Event-gated Kalshi calls (only after integer-cross detection).
+- 5-second station throttle.
+- Deterministic-only behavior.
+- No automated trading.
+
 ## Project Scope
 
 ### Phase 1 — METAR Monitoring (Frozen v1.0 semantics)
@@ -220,4 +231,5 @@ Composed ladder alert payload includes:
 
 - Branch + PR workflow only; no direct commits to protected branch names.
 - `docs/CODEX_MASTER_TEMPLATE.md` process rules are mandatory.
+- `docs/ARCHITECTURE.md` is the canonical deterministic architecture specification.
 - Merge sign-off phrase remains: **“Phase 1 semantics preserved.”**

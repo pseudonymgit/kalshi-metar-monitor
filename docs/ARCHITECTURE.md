@@ -1,4 +1,11 @@
-# Architecture
+## Deterministic execution guarantees
+- Poll cadence is fixed at 60 seconds (`METAR_POLL_SECONDS=60` in production baseline).
+- Kalshi ladder snapshot calls are event-gated and run only after an integer floor-cross is detected.
+- Station fetch cadence is throttled to at most one request every 5 seconds per station.
+- Runtime behavior is deterministic only (no probabilistic/ML decision path).
+- This service is alerting-only and does not execute automated trading actions.
+
+# Deterministic Architecture Specification
 
 ## Overview
 Flask service on Render with two integrated runtime tracks:
