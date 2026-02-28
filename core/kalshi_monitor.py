@@ -6,6 +6,8 @@ import time
 from datetime import datetime, timezone
 
 import requests
+
+from core.authoritative_state import immutable_public_state_snapshot
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -366,9 +368,8 @@ def build_structured_snapshot(station: str, market_types: set):
             pass
     if observed_value is None:
         try:
-            from core.metar_monitor import _STATE
-
-            last = _STATE["last_obs"].get(normalized_station)
+            state_snapshot = immutable_public_state_snapshot()
+            last = state_snapshot["last_obs"].get(normalized_station)
             if last and "temp_f" in last:
                 observed_value = float(last["temp_f"])
         except Exception:

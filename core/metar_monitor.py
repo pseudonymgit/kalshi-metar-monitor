@@ -14,6 +14,17 @@ from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 
+from core.authoritative_state import (
+    commit_temperature_state,
+    immutable_public_state_snapshot,
+    read_temperature_state,
+    reset_station_daily_state,
+    set_latest_observation,
+    state_lock,
+    state_ref,
+)
+from core.transition_emitter import emit_transition_if_changed
+
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
     from zoneinfo import ZoneInfo  # type: ignore
@@ -42,27 +53,10 @@ def _icao_tz_name(icao: str) -> str:
 
 
 # =========================
-# In-memory state
+# In-memory state (authoritative owner lives in core.authoritative_state)
 # =========================
-_STATE_LOCK = threading.Lock()
-_STATE: Dict[str, Any] = {
-    "stations": [],
-    "last_obs": {},              # { ICAO: {"temp_f": float, "obs_time": ISO, "raw": any, "source": str} }
-    "last_alert": {},            # (kept for compatibility; not used by int-cross logic)
-    "last_seen_iso": {},         # { ICAO: ISO of latest obs we ingested }
-    "last_reset_date_local": {}, # { ICAO: "YYYY-MM-DD" } daily local reset marker
-    "last_observed_integer": {}, # { ICAO: int } last observed floored integer temperature
-    "running_daily_max": {},     # { ICAO: float } running daily max temperature
-    "last_settlement_bucket": {},# { ICAO: int } last settlement bucket
-    "last_instant_bucket": {},   # { ICAO: int } last instant bucket
-    "cfg": {},
-    "poll_count": 0,
-    "last_poll_utc": None,
-    "last_loop_utc": None,
-    "timeout_count": 0,
-    "last_timeout_station": None,
-    "last_timeout_utc": None,
-}
+_STATE_LOCK = state_lock()
+_STATE = state_ref()
 
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
@@ -167,13 +161,9 @@ def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
     local_day = dt_local.date().isoformat()
     with _STATE_LOCK:
         last = _STATE["last_reset_date_local"].get(icao)
-        if last != local_day:
-            _STATE["last_observed_integer"].pop(icao, None)
-            _STATE["running_daily_max"].pop(icao, None)
-            _STATE["last_settlement_bucket"].pop(icao, None)
-            _STATE["last_instant_bucket"].pop(icao, None)
-            _STATE["last_reset_date_local"][icao] = local_day
-            _prune_transition_events()
+    if last != local_day:
+        reset_station_daily_state(icao, local_day)
+        _prune_transition_events()
 
 
 # =========================
@@ -231,22 +221,22 @@ def ensure_state_loaded():
 
 
 def get_state() -> Dict[str, Any]:
-    with _STATE_LOCK:
-        return {
-            "stations": list(_STATE["stations"]),
-            "last_obs": dict(_STATE["last_obs"]),
-            "last_alert": dict(_STATE["last_alert"]),
-            "last_seen_iso": dict(_STATE["last_seen_iso"]),
-            "last_reset_date_local": dict(_STATE["last_reset_date_local"]),
-            "last_observed_integer": dict(_STATE["last_observed_integer"]),
-            "running_daily_max": dict(_STATE["running_daily_max"]),
-            "last_settlement_bucket": dict(_STATE["last_settlement_bucket"]),
-            "last_instant_bucket": dict(_STATE["last_instant_bucket"]),
-            "cfg": dict(_STATE["cfg"]),
-            "poll_count": _STATE["poll_count"],
-            "last_poll_utc": _STATE["last_poll_utc"],
-            "last_loop_utc": _STATE["last_loop_utc"],
-        }
+    snapshot = immutable_public_state_snapshot()
+    return {
+        "stations": list(snapshot["stations"]),
+        "last_obs": dict(snapshot["last_obs"]),
+        "last_alert": dict(snapshot["last_alert"]),
+        "last_seen_iso": dict(snapshot["last_seen_iso"]),
+        "last_reset_date_local": dict(snapshot["last_reset_date_local"]),
+        "last_observed_integer": dict(snapshot["last_observed_integer"]),
+        "running_daily_max": dict(snapshot["running_daily_max"]),
+        "last_settlement_bucket": dict(snapshot["last_settlement_bucket"]),
+        "last_instant_bucket": dict(snapshot["last_instant_bucket"]),
+        "cfg": dict(snapshot["cfg"]),
+        "poll_count": snapshot["poll_count"],
+        "last_poll_utc": snapshot["last_poll_utc"],
+        "last_loop_utc": snapshot["last_loop_utc"],
+    }
 
 
 # =========================
@@ -437,10 +427,8 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
         if last_seen_iso and _parse_iso(ts) <= _parse_iso(last_seen_iso):
             continue
 
-        # store
-        with _STATE_LOCK:
-            _STATE["last_obs"][icao] = obs
-            _STATE["last_seen_iso"][icao] = ts
+        # store through authoritative state owner
+        set_latest_observation(icao, obs, ts)
 
         ingested += 1
 
@@ -500,11 +488,11 @@ def _process_temperature_event(
 
     curr_floor = int(math.floor(now_f))
     instant_bucket = curr_floor
-    with _STATE_LOCK:
-        last_observed_integer = _STATE["last_observed_integer"].get(icao)
-        prev_running_max = _STATE["running_daily_max"].get(icao)
-        previous_settlement_bucket = _STATE["last_settlement_bucket"].get(icao)
-        previous_instant_bucket = _STATE["last_instant_bucket"].get(icao)
+    temperature_state = read_temperature_state(icao)
+    last_observed_integer = temperature_state["last_observed_integer"]
+    prev_running_max = temperature_state["running_daily_max"]
+    previous_settlement_bucket = temperature_state["last_settlement_bucket"]
+    previous_instant_bucket = temperature_state["last_instant_bucket"]
 
     new_running_max = max(prev_running_max, now_f) if prev_running_max is not None else now_f
     settlement_bucket = int(math.floor(new_running_max))
@@ -528,22 +516,24 @@ def _process_temperature_event(
     ):
         transition_type = "reversion_after_settlement"
 
-    if transition_type and (instant_changed or settlement_changed):
-        _log_transition_event(
-            station=icao,
-            transition_type=transition_type,
-            instant_bucket_before=previous_instant_bucket,
-            instant_bucket_after=instant_bucket,
-            settlement_bucket=settlement_bucket,
-            running_max=new_running_max,
-            current_temp=now_f,
-            metadata={
-                "obs_time": obs_time,
-                "prev_temp_f": prev_f,
-                "prev_running_max": prev_running_max,
-                "previous_settlement_bucket": previous_settlement_bucket,
-            },
-        )
+    emit_transition_if_changed(
+        transition_type=transition_type,
+        instant_changed=instant_changed,
+        settlement_changed=settlement_changed,
+        station=icao,
+        instant_bucket_before=previous_instant_bucket,
+        instant_bucket_after=instant_bucket,
+        settlement_bucket=settlement_bucket,
+        running_max=new_running_max,
+        current_temp=now_f,
+        metadata={
+            "obs_time": obs_time,
+            "prev_temp_f": prev_f,
+            "prev_running_max": prev_running_max,
+            "previous_settlement_bucket": previous_settlement_bucket,
+        },
+        emit_fn=_log_transition_event,
+    )
 
     alerts = 0
     if (
@@ -571,11 +561,13 @@ def _process_temperature_event(
             )
         alerts = 1
 
-    with _STATE_LOCK:
-        _STATE["last_observed_integer"][icao] = curr_floor
-        _STATE["running_daily_max"][icao] = new_running_max
-        _STATE["last_settlement_bucket"][icao] = settlement_bucket
-        _STATE["last_instant_bucket"][icao] = instant_bucket
+    commit_temperature_state(
+        icao=icao,
+        curr_floor=curr_floor,
+        running_daily_max=new_running_max,
+        settlement_bucket=settlement_bucket,
+        instant_bucket=instant_bucket,
+    )
 
     return alerts
 
