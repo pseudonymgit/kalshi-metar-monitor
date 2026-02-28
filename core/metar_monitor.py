@@ -25,6 +25,7 @@ from core.authoritative_state import (
 )
 from core.transition_emitter import emit_transition_if_changed
 from core.replay_engine import execute_ordered_replay_stream
+from core.security_boundaries import enforce_execution_domain_guard
 
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
@@ -421,6 +422,11 @@ def _ingest_obs(
     """
     if not new_obs:
         return (0, 0)
+
+    enforce_execution_domain_guard(
+        allow_alert_delivery=allow_alert_delivery,
+        persist_cache=persist_cache,
+    )
 
     with _STATE_LOCK:
         last_seen_iso = _STATE["last_seen_iso"].get(icao)

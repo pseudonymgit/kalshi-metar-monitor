@@ -3,11 +3,20 @@ import sqlite3
 from typing import Any, Dict, List, Optional, Tuple
 
 from core.authoritative_state import immutable_public_state_snapshot
-from core.metar_monitor import _alert_db_path
 from core.scoring_engine import score_settlement_epochs, serialize_epoch_scores
+from core.security_boundaries import (
+    detect_illegal_cross_layer_imports,
+    verify_observability_read_only,
+)
 
+
+detect_illegal_cross_layer_imports(module_name=__name__, module_globals=globals())
 
 ReadOnlyRow = Tuple[Any, ...]
+
+
+def _alert_db_path() -> str:
+    return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
 
 def _db_exists() -> bool:
@@ -112,6 +121,7 @@ def get_input_acceptance_visibility(*, station: Optional[str] = None) -> Dict[st
     """
     normalized_station = (station or "").strip().upper()
     snapshot = immutable_public_state_snapshot()
+    verify_observability_read_only(snapshot)
 
     last_seen_iso = snapshot["last_seen_iso"]
     last_obs = snapshot["last_obs"]
@@ -145,6 +155,7 @@ def get_execution_boundary_markers() -> Dict[str, Any]:
     Read-only scheduler boundary markers from immutable authoritative snapshot.
     """
     snapshot = immutable_public_state_snapshot()
+    verify_observability_read_only(snapshot)
     return {
         "source": "authoritative_state_snapshot",
         "poll_count": snapshot["poll_count"],
