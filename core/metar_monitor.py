@@ -24,6 +24,7 @@ from core.authoritative_state import (
     state_ref,
 )
 from core.transition_emitter import emit_transition_if_changed
+from core.replay_engine import execute_ordered_replay_stream
 
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
@@ -407,7 +408,13 @@ def _fetch_latest_tgftp(icao: str) -> List[Dict[str, Any]]:
 # =========================
 # Ingestion (dedupe & alerts)
 # =========================
-def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -> Tuple[int, int]:
+def _ingest_obs(
+    icao: str,
+    new_obs: List[Dict[str, Any]],
+    cfg: Dict[str, Any],
+    allow_alert_delivery: bool = True,
+    persist_cache: bool = True,
+) -> Tuple[int, int]:
     """
     Ingests observations in chronological order.
     Returns (ingested_count, alerts_count).
@@ -438,21 +445,22 @@ def _ingest_obs(icao: str, new_obs: List[Dict[str, Any]], cfg: Dict[str, Any]) -
             obs_time=ts,
             cfg=cfg,
             last_temp_f=last_temp,
-            allow_alert_delivery=True,
+            allow_alert_delivery=allow_alert_delivery,
         )
 
         last_temp = obs["temp_f"]
 
-    with _STATE_LOCK:
-        _save_cache(cfg["cache_file"], {
-            "last_obs": _STATE["last_obs"],
-            "last_seen_iso": _STATE["last_seen_iso"],
-            "last_reset_date_local": _STATE["last_reset_date_local"],
-            "last_observed_integer": _STATE["last_observed_integer"],
-            "running_daily_max": _STATE["running_daily_max"],
-            "last_settlement_bucket": _STATE["last_settlement_bucket"],
-            "last_instant_bucket": _STATE["last_instant_bucket"],
-        })
+    if persist_cache:
+        with _STATE_LOCK:
+            _save_cache(cfg["cache_file"], {
+                "last_obs": _STATE["last_obs"],
+                "last_seen_iso": _STATE["last_seen_iso"],
+                "last_reset_date_local": _STATE["last_reset_date_local"],
+                "last_observed_integer": _STATE["last_observed_integer"],
+                "running_daily_max": _STATE["running_daily_max"],
+                "last_settlement_bucket": _STATE["last_settlement_bucket"],
+                "last_instant_bucket": _STATE["last_instant_bucket"],
+            })
 
     return (ingested, alerts)
 
@@ -675,13 +683,8 @@ def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
 
         _reset_replay_runtime_state_for_station(station)
 
-        # TODO:
-        # Replay currently loads runtime config.
-        # Future phase will load persisted configuration snapshot
-        # to guarantee historical replay determinism.
         cfg = get_default_config()
-        last_temp_f: Optional[float] = None
-        processed = 0
+        replay_observations: List[Dict[str, Any]] = []
         for row in replay_rows:
             obs_time = row[1]
             temp_f = float(row[2])
@@ -693,27 +696,18 @@ def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
                 except Exception:
                     raw = {"raw_json": raw_json}
 
-            with _STATE_LOCK:
-                _STATE["last_obs"][station] = _obs_tuple(temp_f, obs_time, raw, row[3] or "replay")
-                _STATE["last_seen_iso"][station] = obs_time
-
-            _process_temperature_event(
-                icao=station,
-                temp_f=temp_f,
-                obs_time=obs_time,
-                cfg=cfg,
-                last_temp_f=last_temp_f,
-                allow_alert_delivery=False,
+            replay_observations.append(
+                _obs_tuple(temp_f, obs_time, raw, row[3] or "replay")
             )
-            last_temp_f = temp_f
-            processed += 1
 
-        return {
-            "station": station,
-            "date": date_local,
-            "observations_processed": processed,
-            "status": "completed",
-        }
+        result = execute_ordered_replay_stream(
+            station=station,
+            ordered_observations=replay_observations,
+            cfg=cfg,
+            ingest_fn=_ingest_obs,
+        )
+        result["date"] = date_local
+        return result
     finally:
         _restore_station_state(station, snapshot)
         if scheduler_was_running:
