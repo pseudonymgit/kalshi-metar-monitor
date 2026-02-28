@@ -10,6 +10,7 @@ import sqlite3
 import threading
 import requests
 import time
+from collections import deque
 from io import StringIO
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
@@ -70,6 +71,8 @@ _KALSHI_RATE_LIMIT_LOCK = threading.Lock()
 _KALSHI_LAST_CALL_TS = {}
 _KALSHI_CALL_THROTTLE_SECONDS = 5
 _ALERT_LOGGER = logging.getLogger(__name__)
+_TRANSITION_HISTORY = deque(maxlen=500)
+_TRANSITION_LOCK = threading.Lock()
 
 
 # =========================
@@ -730,6 +733,7 @@ def _log_transition_event(
     current_temp: float,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> None:
+    now_iso = _now_utc_iso()
     try:
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -767,7 +771,7 @@ def _log_transition_event(
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
-                        _now_utc_iso(),
+                        now_iso,
                         (station or "").upper(),
                         transition_type,
                         instant_bucket_before,
@@ -781,8 +785,50 @@ def _log_transition_event(
                 conn.commit()
             finally:
                 conn.close()
+
+        with _TRANSITION_LOCK:
+            _TRANSITION_HISTORY.append(
+                {
+                    "station": (station or "").upper(),
+                    "transition_type": transition_type,
+                    "instant_bucket_before": instant_bucket_before,
+                    "instant_bucket_after": instant_bucket_after,
+                    "settlement_bucket": settlement_bucket,
+                    "running_max": running_max,
+                    "current_temp": current_temp,
+                    "timestamp_utc": now_iso,
+                }
+            )
     except Exception as e:
         _ALERT_LOGGER.warning("transition_event_log_failed station=%s error=%s", station, e)
+
+
+def _annotate_transition_history_market_eval(station: str, alerts_sent: int) -> None:
+    normalized_station = (station or "").strip().upper()
+    with _TRANSITION_LOCK:
+        for entry in reversed(_TRANSITION_HISTORY):
+            if entry.get("station") != normalized_station:
+                continue
+            entry["market_evaluated"] = True
+            entry["alerts_sent"] = int(alerts_sent)
+            break
+
+
+def get_transition_history(station=None, limit=50):
+    normalized_station = (station or "").strip().upper()
+    try:
+        bounded_limit = max(1, min(int(limit), 200))
+    except Exception:
+        bounded_limit = 50
+
+    with _TRANSITION_LOCK:
+        history = list(_TRANSITION_HISTORY)
+
+    if normalized_station:
+        history = [entry for entry in history if entry.get("station") == normalized_station]
+
+    history = list(reversed(history))
+    return history[:bounded_limit]
 
 
 def _prune_transition_events() -> None:
@@ -1147,6 +1193,9 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             if not target_market_types:
                 target_market_types = {"HIGH"}
 
+            evaluated_market_types = 0
+            market_alerts_sent = 0
+
             if station_is_active:
                 for market_type_token in sorted(target_market_types):
                     snapshot = build_structured_snapshot(station, {market_type_token})
@@ -1200,6 +1249,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 )
                         continue
 
+                    evaluated_market_types += 1
+
                     transition = process_ladder_transition(
                         station=station,
                         market_type=market_type_token,
@@ -1238,6 +1289,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             delta_f=df,
                         )
                         if result and result.get("ok"):
+                            market_alerts_sent += 1
                             send_event_ticker = result.get("event_ticker") or event_ticker
                             _ALERT_LOGGER.info(
                                 "SEND composed_alert station=%s type=%s market_type=%s event=%s",
@@ -1256,6 +1308,9 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 bucket_index=result.get("bucket_index"),
                                 metadata={"reason": transition.get("reason")},
                             )
+
+            if evaluated_market_types > 0:
+                _annotate_transition_history_market_eval(station, market_alerts_sent)
         except Exception as e:
             print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
