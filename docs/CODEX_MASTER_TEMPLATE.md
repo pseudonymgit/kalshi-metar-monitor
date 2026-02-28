@@ -2,6 +2,7 @@
 
 AUTHENTICATED PR MODE ONLY
 All changes must go through a Pull Request.
+Execution governance rules only.
 
 Git authentication is preconfigured in the setup script via credential helper.
 Do NOT attempt to read or use GITHUB_TOKEN during agent execution.
@@ -81,7 +82,7 @@ If Phase 1 must change:
 KALSHI RULES
 
 Public API default:
-[https://api.elections.kalshi.com/trade-api/v2](https://api.elections.kalshi.com/trade-api/v2)
+https://api.elections.kalshi.com/trade-api/v2
 
 RSA mode (dormant) rules:
 
