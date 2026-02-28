@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from core.authoritative_state import immutable_public_state_snapshot
 from core.metar_monitor import _alert_db_path
+from core.scoring_engine import score_settlement_epochs, serialize_epoch_scores
 
 
 ReadOnlyRow = Tuple[Any, ...]
@@ -84,6 +85,23 @@ def get_emitted_transition_stream(*, station: Optional[str] = None, limit: int =
         "station": normalized_station or None,
         "count": len(events),
         "events": events,
+    }
+
+
+def get_settlement_epoch_scores(*, station: Optional[str] = None, limit: int = 200) -> Dict[str, Any]:
+    """
+    Read-only deterministic scoring derived from emitted transition history.
+    """
+    transition_stream = get_emitted_transition_stream(station=station, limit=limit)
+    ordered_events = list(reversed(transition_stream["events"]))
+    scores = score_settlement_epochs(ordered_events)
+
+    return {
+        "source": "transition_events",
+        "station": transition_stream["station"],
+        "transition_count": transition_stream["count"],
+        "epoch_count": len(scores),
+        "scores": serialize_epoch_scores(scores),
     }
 
 
