@@ -1,5 +1,13 @@
 from typing import Any, Callable, Dict, Optional
 
+from core.security_boundaries import (
+    detect_illegal_cross_layer_imports,
+    enforce_transition_emission_authority,
+)
+
+
+detect_illegal_cross_layer_imports(module_name=__name__, module_globals=globals())
+
 
 def emit_transition_if_changed(
     *,
@@ -19,6 +27,8 @@ def emit_transition_if_changed(
     Single authority for transition emission routing.
     No state mutation is allowed in this layer.
     """
+    enforce_transition_emission_authority()
+
     if not transition_type:
         return
     if not (instant_changed or settlement_changed):

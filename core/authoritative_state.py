@@ -3,6 +3,11 @@ import threading
 from types import MappingProxyType
 from typing import Any, Dict, Optional
 
+from core.security_boundaries import (
+    enforce_authoritative_state_mutation_boundary,
+    verify_observability_read_only,
+)
+
 _STATE_LOCK = threading.Lock()
 
 # Authoritative runtime state owner for METAR monitor domains.
@@ -45,6 +50,7 @@ def read_temperature_state(icao: str) -> Dict[str, Optional[float]]:
 
 
 def set_latest_observation(icao: str, obs: Dict[str, Any], obs_time: str) -> None:
+    enforce_authoritative_state_mutation_boundary("set_latest_observation")
     with _STATE_LOCK:
         _STATE["last_obs"][icao] = obs
         _STATE["last_seen_iso"][icao] = obs_time
@@ -57,6 +63,7 @@ def commit_temperature_state(
     settlement_bucket: int,
     instant_bucket: int,
 ) -> None:
+    enforce_authoritative_state_mutation_boundary("commit_temperature_state")
     with _STATE_LOCK:
         _STATE["last_observed_integer"][icao] = curr_floor
         _STATE["running_daily_max"][icao] = running_daily_max
@@ -65,6 +72,7 @@ def commit_temperature_state(
 
 
 def reset_station_daily_state(icao: str, local_day: str) -> None:
+    enforce_authoritative_state_mutation_boundary("reset_station_daily_state")
     with _STATE_LOCK:
         _STATE["last_observed_integer"].pop(icao, None)
         _STATE["running_daily_max"].pop(icao, None)
@@ -75,7 +83,7 @@ def reset_station_daily_state(icao: str, local_day: str) -> None:
 
 def immutable_public_state_snapshot() -> Dict[str, Any]:
     with _STATE_LOCK:
-        return {
+        snapshot = {
             "stations": tuple(_STATE["stations"]),
             "last_obs": MappingProxyType(copy.deepcopy(_STATE["last_obs"])),
             "last_alert": MappingProxyType(copy.deepcopy(_STATE["last_alert"])),
@@ -90,3 +98,5 @@ def immutable_public_state_snapshot() -> Dict[str, Any]:
             "last_poll_utc": _STATE["last_poll_utc"],
             "last_loop_utc": _STATE["last_loop_utc"],
         }
+    verify_observability_read_only(snapshot)
+    return snapshot
