@@ -21,6 +21,7 @@ from core.metar_monitor import (
     _poll_once,
     _simulate_temperature_for_testing,
     get_recent_alerts,
+    get_transition_history,
     run_replay_for_station_day,
 )
 
@@ -258,6 +259,23 @@ def retention_prune():
     from core.metar_monitor import prune_old_alerts
 
     return jsonify(prune_old_alerts()), 200
+
+
+@app.route("/observability/transitions", methods=["GET"])
+def observability_transitions():
+    station = (request.args.get("station") or "").strip().upper() or None
+    raw_limit = request.args.get("limit", "50")
+    try:
+        limit = int(raw_limit)
+    except (TypeError, ValueError):
+        limit = 50
+
+    transitions = get_transition_history(station=station, limit=limit)
+    return jsonify({
+        "ok": True,
+        "count": len(transitions),
+        "transitions": transitions,
+    }), 200
 
 
 @app.route("/metar/status", methods=["GET"])
