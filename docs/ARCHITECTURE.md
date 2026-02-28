@@ -1,136 +1,102 @@
-## Deterministic execution guarantees
-- Poll cadence is fixed at 60 seconds (`METAR_POLL_SECONDS=60` in production baseline).
-- Kalshi ladder snapshot calls are event-gated and run only after an integer floor-cross is detected.
-- Station fetch cadence is throttled to at most one request every 5 seconds per station.
-- Runtime behavior is deterministic only (no probabilistic/ML decision path).
-- This service is alerting-only and does not execute automated trading actions.
+# Canonical Operational Architecture
 
-# Deterministic Architecture Specification
+## System Purpose
 
-## Overview
-Flask service on Render with two integrated runtime tracks:
-- METAR ingestion and integer-cross detection.
-- Kalshi weather ladder transition composition for alert output.
+Kalshi METAR Monitor is a deterministic observation system.
 
-## Runtime Components
-- `app.py`
-  - HTTP routes.
-  - Scheduler lifecycle hooks (autostart + manual control).
+Its purpose is deterministic execution visibility and deterministic transition emission under immutable Phase 1 behavioral semantics.
 
-- `core/metar_monitor.py`
-  - Polling scheduler, dedupe, station-local window/reset behavior.
-  - Integer floor-cross detection.
-  - Alert emission pipeline entrypoint.
+This architecture document defines structural authority boundaries and deterministic containment only.
 
-- `core/kalshi_monitor.py`
-  - Structured market snapshot building.
-  - Ladder bucket transition detection.
-  - Composed ladder alert rendering and dispatch.
+## Deterministic Authority Flow
 
-## Scheduler Lifecycle
-- Autostart gate: `METAR_AUTOSTART`.
-- Startup path:
-  - Preferred: `before_first_request` one-time start.
-  - Fallback: guarded one-time `before_request` when first hook is unavailable.
-- Idempotent start path via `ensure_scheduler_started()` / `start_scheduler()` under lock.
-- Stop path joins worker thread with timeout.
-- Status visibility includes `last_loop_utc` in addition to poll counters.
+External Reality
+→ Execution Domain
+→ Transition History
+→ Replay Domain
+→ Observability Domain
+→ Scoring Domain
 
-## Weather Ladder Alert Architecture
+## Domain Model
 
-### Routing matrix (within station-local 11:00–19:00)
+### Execution Domain
 
-| Condition | Result |
-|---|---|
-| Ladder exists + transition fires | Composed ladder alert |
-| Ladder exists + no transition | Nothing |
-| Ladder missing + enabled | Ladder-missing alert |
-| Outside window | Nothing |
+- Produces deterministic state progression from canonical observations under Phase 1 semantics.
+- Holds transition authority.
+- Transition authority transfers atomically at the moment of emission creation inside the authoritative evaluation cycle.
+- No intermediate mutable transition state may exist outside that cycle.
 
-Raw integer-cross temp-only alerts are removed. Composed alert pathways are the only production alert type.
+### Historical Domain
 
-### Flow
-1. METAR observation ingested and station state updated.
-2. Integer crossing detected against station integer memory.
-3. For active station and each market type (`HIGH`, `LOW`), structured snapshot is queried.
-4. Ladder transition evaluator returns `should_alert` + reason.
-5. Composed ladder alert sends formatted ladder message with event link.
+- Stores canonical historical observations and committed transition history.
+- Historical observations are replay reconstruction authority.
+- Committed transition history is immutable.
 
-Concise flow:
-`Integer cross detected -> Window check -> Ladder evaluation ->`
-- `Transition? -> Composed alert -> Audit row`
-- `Missing? -> Missing alert -> Audit row`
-- `Otherwise -> No alert`
+### Replay Domain
 
-## Durable alert audit (SQLite)
+- Reconstructs deterministic system state from historically valid deterministic system state produced under Phase 1 semantics.
+- External initialization values are prohibited.
+- Stored transition history may be used for validation comparison.
+- Stored transition history is not required for replay reconstruction authority.
 
-- `ALERT_DB_PATH` controls audit DB location.
-- Default fallback path: `/var/data/alerts.db`.
-- Single-instance SQLite only.
-- Persistent disk required.
+### Observability Domain
 
-Table: `alerts`
-- `id INTEGER PRIMARY KEY`
-- `created_utc TEXT`
-- `station TEXT`
-- `market_type TEXT`
-- `event_ticker TEXT`
-- `alert_type TEXT`
-- `direction TEXT`
-- `temp_f REAL`
-- `bucket_index INTEGER`
-- `metadata_json TEXT`
+- Provides deterministic execution visibility and audit integrity.
+- Is strictly epistemic.
+- Must not participate in execution causality.
+- May expose deterministic artifacts produced by downstream deterministic derivation layers operating within architectural constraints.
+- Shall not assume or define signal-layer authority.
 
-Written events:
-- `ladder_transition`
-- `ladder_missing`
-- `composed_alert_sent`
+### Scoring Domain
 
-## Structured logging contract
+- Defines deterministic scoring classification derived exclusively from emitted transition history.
+- Is strictly post-transitional.
+- Possesses zero execution authority.
+- Time normalization is derived exclusively from deterministic transition ordering or epoch-relative positional metrics.
+- Must not depend on wall-clock timestamps or execution duration.
 
-Allowed events:
-- `EVENT integer_cross`
-- `EVAL ladder_check`
-- `WARN ladder_missing`
-- `EVENT ladder_transition`
-- `SEND composed_alert`
+### Security Domain
 
-Logging rules:
-- No per-poll logging.
-- No debug prints.
-- High-signal logs only.
+- Protects deterministic legitimacy, authority protection, and boundary integrity.
+- Does not participate in execution behavior.
+- Replay may validate against committed transition history.
+- Replay reconstruction authority derives exclusively from canonical historical observations governed under Phase 1 semantics.
 
-### Bucket detection
-- `less`: `temp <= cap`
-- `between`: `floor <= temp < cap`
-- `greater`: `temp >= floor`
+## Replay Guarantees
 
-### Direction resolution order
-1. Transition reason (`up` / `down`).
-2. Prior bucket index from scoped context memory.
-3. Prior observed temperature fallback.
-4. Upward default when no prior context exists.
+- Replay execution remains behaviorally identical to production execution under Phase 1 semantics and deterministic architecture constraints.
+- Replay initialization state is derived exclusively from historically valid deterministic system state.
+- External initialization values are prohibited.
+- Stored transition history may validate replay but is not replay reconstruction authority.
 
-### Next-rung distance
-- Uses adjacent bucket boundary in resolved direction.
-- Upward: compare against next higher rung boundary.
-- Downward: compare against next lower rung boundary.
-- Edge labels: `MAX REACHED` or `MIN REACHED`.
+## Observability Constraints
 
-### Memory scoping
-- Transition and direction context are scoped per:
-  - `station`
-  - `market_type`
-  - `event_ticker`
-- Event rollover resets effective context for new ticker to prevent stale direction memory.
-- Context memory is maintained in-process and resets on application restart. It is not persisted to disk.
+- Observability is strictly epistemic.
+- Observability must not participate in execution causality.
+- Observability may expose deterministic artifacts from downstream deterministic derivation layers within architectural constraints.
+- Observability shall not assume or define signal-layer authority.
 
-## State
-In-memory METAR state tracks watchlist, latest obs, dedupe cursor, poll counters, timeout metrics, and last loop timestamp.
+## Scoring Containment
 
-Kalshi ladder context tracks prior bucket/temperature per scoped event key for direction/distance rendering continuity.
+- Scoring is strictly post-transitional.
+- Scoring possesses zero execution authority.
+- Scoring classification derives exclusively from emitted transition history.
+- Scoring normalization must not depend on wall-clock timestamps or execution duration.
 
-## Deployment behavior
-- Gunicorn process boot does not start polling at import time.
-- Scheduler starts lazily through request lifecycle hooks when autostart is enabled.
-- Manual API start/stop remains available for explicit operator control.
+## Security Boundaries
+
+- Security protects deterministic legitimacy, authority protection, and boundary integrity.
+- Security does not participate in execution behavior.
+- Execution is the sole transition-authoritative domain.
+- Historical observations are replay reconstruction authority.
+- Transition history can validate replay but cannot replace canonical historical observation authority for reconstruction.
+
+## Contributor Guardrails
+
+- Preserve Phase 1 behavioral semantics as immutable baseline.
+- Do not alter transition authority placement; transition authority remains in Execution.
+- Do not introduce execution causality into Replay, Observability, Scoring, or Security domains.
+- Do not use external initialization values for Replay.
+- Do not treat transition history as replay reconstruction authority.
+- Keep scoring normalization independent of wall-clock timestamps and execution duration.
+- Any proposed Phase 1 behavioral modification requires explicit versioning and explicit documentation updates.
