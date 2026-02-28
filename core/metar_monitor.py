@@ -1,6 +1,7 @@
 # core/metar_monitor.py
 
 import os
+import copy
 import json
 import csv
 import math
@@ -581,6 +582,150 @@ def _process_temperature_event(
 
 def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+
+
+def _snapshot_station_state(station: str) -> Dict[str, Any]:
+    station = (station or "").strip().upper()
+    with _STATE_LOCK:
+        last_obs = _STATE["last_obs"].get(station)
+        return {
+            "last_observed_integer": _STATE["last_observed_integer"].get(station),
+            "running_daily_max": _STATE["running_daily_max"].get(station),
+            "last_settlement_bucket": _STATE["last_settlement_bucket"].get(station),
+            "last_instant_bucket": _STATE["last_instant_bucket"].get(station),
+            "last_seen_iso": _STATE["last_seen_iso"].get(station),
+            "last_obs": copy.deepcopy(last_obs),
+            "last_reset_date_local": _STATE["last_reset_date_local"].get(station),
+        }
+
+
+def _restore_station_state(station: str, snapshot: Dict[str, Any]) -> None:
+    station = (station or "").strip().upper()
+    with _STATE_LOCK:
+        for state_key, snapshot_key in (
+            ("last_observed_integer", "last_observed_integer"),
+            ("running_daily_max", "running_daily_max"),
+            ("last_settlement_bucket", "last_settlement_bucket"),
+            ("last_instant_bucket", "last_instant_bucket"),
+            ("last_seen_iso", "last_seen_iso"),
+            ("last_obs", "last_obs"),
+            ("last_reset_date_local", "last_reset_date_local"),
+        ):
+            value = snapshot.get(snapshot_key)
+            if value is None:
+                _STATE[state_key].pop(station, None)
+            else:
+                _STATE[state_key][station] = value
+
+
+def _reset_replay_runtime_state_for_station(station: str) -> None:
+    station = (station or "").strip().upper()
+    with _STATE_LOCK:
+        _STATE["last_observed_integer"].pop(station, None)
+        _STATE["running_daily_max"].pop(station, None)
+        _STATE["last_settlement_bucket"].pop(station, None)
+        _STATE["last_instant_bucket"].pop(station, None)
+        _STATE["last_seen_iso"].pop(station, None)
+        _STATE["last_obs"].pop(station, None)
+        _STATE["last_reset_date_local"].pop(station, None)
+
+
+def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
+    """
+    Deterministic replay executor for one station-local date.
+    Replays persisted observations strictly in ingest_sequence_id order.
+    """
+    station = (station or "").strip().upper()
+    scheduler_was_running = is_scheduler_running()
+    if scheduler_was_running:
+        stop_scheduler()
+    snapshot = _snapshot_station_state(station)
+
+    try:
+        ensure_state_loaded()
+        date_local = (date_local or "").strip()
+        datetime.strptime(date_local, "%Y-%m-%d")
+
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            _reset_replay_runtime_state_for_station(station)
+            return {
+                "station": station,
+                "date": date_local,
+                "observations_processed": 0,
+                "status": "completed",
+            }
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                try:
+                    rows = conn.execute(
+                        """
+                        SELECT ingest_sequence_id, obs_time, temp_f, source, raw_json
+                        FROM metar_observations
+                        WHERE station = ?
+                        ORDER BY ingest_sequence_id ASC
+                        """,
+                        (station,),
+                    ).fetchall()
+                except sqlite3.Error:
+                    rows = []
+            finally:
+                conn.close()
+
+        replay_rows = []
+        for row in rows:
+            obs_time = row[1]
+            obs_local_date = _to_local(station, _parse_iso(obs_time)).date().isoformat()
+            if obs_local_date == date_local:
+                replay_rows.append(row)
+
+        _reset_replay_runtime_state_for_station(station)
+
+        # TODO:
+        # Replay currently loads runtime config.
+        # Future phase will load persisted configuration snapshot
+        # to guarantee historical replay determinism.
+        cfg = get_default_config()
+        last_temp_f: Optional[float] = None
+        processed = 0
+        for row in replay_rows:
+            obs_time = row[1]
+            temp_f = float(row[2])
+            raw_json = row[4]
+            raw = {}
+            if raw_json:
+                try:
+                    raw = json.loads(raw_json)
+                except Exception:
+                    raw = {"raw_json": raw_json}
+
+            with _STATE_LOCK:
+                _STATE["last_obs"][station] = _obs_tuple(temp_f, obs_time, raw, row[3] or "replay")
+                _STATE["last_seen_iso"][station] = obs_time
+
+            _process_temperature_event(
+                icao=station,
+                temp_f=temp_f,
+                obs_time=obs_time,
+                cfg=cfg,
+                last_temp_f=last_temp_f,
+                allow_alert_delivery=False,
+            )
+            last_temp_f = temp_f
+            processed += 1
+
+        return {
+            "station": station,
+            "date": date_local,
+            "observations_processed": processed,
+            "status": "completed",
+        }
+    finally:
+        _restore_station_state(station, snapshot)
+        if scheduler_was_running:
+            start_scheduler(_ALERT_LOGGER)
 
 
 def _log_transition_event(
