@@ -1458,6 +1458,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             prev_temp_f=pf,
                             now_temp_f=tf,
                             delta_f=df,
+                            obs_time_utc=payload.get("obs_time"),
                         )
                         if result and result.get("ok"):
                             market_alerts_sent += 1

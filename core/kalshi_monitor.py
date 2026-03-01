@@ -1,6 +1,7 @@
 import base64
 import os
 import re
+import sqlite3
 import threading
 import time
 from datetime import datetime, timezone
@@ -8,6 +9,7 @@ from datetime import datetime, timezone
 import requests
 
 from core.authoritative_state import immutable_public_state_snapshot
+from core.station_time import parse_iso_utc, station_local_day_key, to_station_local
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -41,6 +43,83 @@ _STATION_CITY_TOKEN_MAP = {
     "KMIA": "MIA",
     "KAUS": "AUS",
 }
+
+
+def _alert_db_path() -> str:
+    return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+
+
+def _load_current_epoch_context(station: str, market_type: str, obs_time_utc: str):
+    normalized_station = (station or "").strip().upper()
+    normalized_market_type = (market_type or "").strip().upper() or None
+    local_trading_date = station_local_day_key(normalized_station, obs_time_utc)
+    if not normalized_station or local_trading_date == "unknown":
+        return {}
+
+    try:
+        conn = sqlite3.connect(f"file:{_alert_db_path()}?mode=ro", uri=True, timeout=1)
+    except Exception:
+        return {}
+
+    try:
+        row = conn.execute(
+            """
+            SELECT settlement_bucket,
+                   prior_settlement_bucket,
+                   settlement_jump_magnitude,
+                   epoch_status,
+                   reversion_occurred,
+                   first_reversion_timestamp_utc,
+                   max_excursion_above_settlement,
+                   terminal_state_reached
+            FROM settlement_epochs
+            WHERE station = ?
+              AND ((market_type IS NULL AND ? IS NULL) OR market_type = ?)
+              AND local_trading_date = ?
+            ORDER BY CASE WHEN epoch_status = 'open' THEN 0 ELSE 1 END,
+                     id DESC
+            LIMIT 1
+            """,
+            (normalized_station, normalized_market_type, normalized_market_type, local_trading_date),
+        ).fetchone()
+        if not row:
+            return {}
+
+        return {
+            "settlement_bucket": row[0],
+            "prior_settlement_bucket": row[1],
+            "settlement_jump_magnitude": row[2],
+            "epoch_status": row[3],
+            "reversion_occurred": bool(row[4]),
+            "first_reversion_timestamp_utc": row[5],
+            "max_excursion_above_settlement": row[6],
+            "terminal_state_reached": bool(row[7]),
+        }
+    except Exception:
+        return {}
+    finally:
+        conn.close()
+
+
+def _derive_attention_phrase(epoch_context):
+    if bool(epoch_context.get("terminal_state_reached")):
+        return "TERMINAL STATE"
+    if bool(epoch_context.get("reversion_occurred")):
+        return "REVERTED AFTER SETTLEMENT"
+
+    settlement_bucket = epoch_context.get("settlement_bucket")
+    prior_settlement_bucket = epoch_context.get("prior_settlement_bucket")
+    if (
+        isinstance(settlement_bucket, int)
+        and isinstance(prior_settlement_bucket, int)
+        and settlement_bucket > prior_settlement_bucket
+    ):
+        return "NEW SETTLEMENT / NO REVERSION YET"
+
+    if str(epoch_context.get("epoch_status") or "").lower() == "open":
+        return "OPEN EPOCH / ALERTABLE"
+
+    return "EPOCH CONTEXT AVAILABLE"
 
 
 def get_default_config():
@@ -591,6 +670,7 @@ def send_composed_weather_market_alert(
     prev_temp_f=None,
     now_temp_f=None,
     delta_f=None,
+    obs_time_utc=None,
 ):
     normalized_station = (station or "").strip().upper()
     snapshot = build_structured_snapshot(normalized_station, market_types)
@@ -783,15 +863,46 @@ def send_composed_weather_market_alert(
     prev_display = "N/A" if prev_temp_f is None else f"{float(prev_temp_f):.1f}"
     now_display = "N/A" if now_temp_f is None else f"{float(now_temp_f):.1f}"
     delta_display = "N/A" if delta_f is None else f"{float(delta_f):+.1f}"
+
+    epoch_context = _load_current_epoch_context(
+        normalized_station,
+        market_type,
+        obs_time_utc,
+    )
+    epoch_context["previous_relevant_bucket"] = previous_bucket_index
+    epoch_context["current_relevant_bucket"] = current_index
+
+    station_local_timestamp = None
+    obs_dt = parse_iso_utc(obs_time_utc)
+    if obs_dt is not None:
+        try:
+            station_local_timestamp = to_station_local(normalized_station, obs_dt).isoformat()
+        except Exception:
+            station_local_timestamp = None
+    epoch_context["station_local_timestamp"] = station_local_timestamp
+
+    attention_phrase = _derive_attention_phrase(epoch_context)
+
     header = f"{title_emoji} {normalized_station} {market_type or 'WEATHER'} — Ladder Cross {direction_icon}"
     ladder_block = "\n".join(ladder_rows)
     content = (
         f"{header}\n"
+        f"Structure: {attention_phrase}\n"
         f"Prev: {prev_display}°F\n"
         f"Now: {now_display}°F\n"
         f"Δ: {delta_display}°F\n"
         f"{temp_display}°F  →  Entered {current_label}\n"
         f"Local time: {local_time_display}\n\n"
+        f"Epoch: S={epoch_context.get('settlement_bucket')}"
+        f" P={epoch_context.get('prior_settlement_bucket')}"
+        f" J={epoch_context.get('settlement_jump_magnitude')}"
+        f" Status={epoch_context.get('epoch_status')}"
+        f" Rev={epoch_context.get('reversion_occurred')}"
+        f" RevAt={epoch_context.get('first_reversion_timestamp_utc')}"
+        f" Exc={epoch_context.get('max_excursion_above_settlement')}"
+        f" Terminal={epoch_context.get('terminal_state_reached')}\n"
+        f"Relevant bucket: prev={epoch_context.get('previous_relevant_bucket')} curr={epoch_context.get('current_relevant_bucket')}\n"
+        f"Station local obs: {epoch_context.get('station_local_timestamp')}\n\n"
         f"Event: {event_ticker}\n"
         f"https://kalshi.com/markets/{event_ticker}\n\n"
         "LADDER\n"
@@ -804,6 +915,10 @@ def send_composed_weather_market_alert(
     payload = {
         "content": content,
         "embeds": [],
+        "alert_context": {
+            "attention_phrase": attention_phrase,
+            **epoch_context,
+        },
     }
 
     response = requests.post(webhook_url, json=payload, timeout=10)
