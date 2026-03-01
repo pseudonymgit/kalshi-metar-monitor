@@ -62,7 +62,7 @@ class ObservabilityAlertPreviewTests(unittest.TestCase):
                         "up",
                         70.2,
                         70,
-                        json.dumps({"reason": "crossed_up", "source": "deterministic"}),
+                        json.dumps({"reason": "crossed_up", "source": "deterministic", "attention_phrase": "OPEN EPOCH / ALERTABLE", "alert_context": {"attention_phrase": "OPEN EPOCH / ALERTABLE", "station_local_timestamp": "2026-01-01T03:00:00-07:00", "previous_relevant_bucket": 69, "current_relevant_bucket": 70, "settlement_bucket": 70, "prior_settlement_bucket": 69, "settlement_jump_magnitude": 1, "epoch_status": "open", "reversion_occurred": False, "first_reversion_timestamp_utc": None, "max_excursion_above_settlement": 0.2, "terminal_state_reached": False}}),
                     ),
                 )
                 conn.execute(
@@ -117,6 +117,19 @@ class ObservabilityAlertPreviewTests(unittest.TestCase):
                 "event_ticker",
                 "bucket_index",
                 "metadata",
+                "alert_context",
+                "attention_phrase",
+                "station_local_timestamp",
+                "previous_relevant_bucket",
+                "current_relevant_bucket",
+                "settlement_bucket",
+                "prior_settlement_bucket",
+                "settlement_jump_magnitude",
+                "epoch_status",
+                "reversion_occurred",
+                "first_reversion_timestamp_utc",
+                "max_excursion_above_settlement",
+                "terminal_state_reached",
             ],
         )
 
@@ -129,8 +142,21 @@ class ObservabilityAlertPreviewTests(unittest.TestCase):
         self.assertEqual(row["event_ticker"], "KXHIGH-TICKER")
         self.assertEqual(row["bucket_index"], 70)
         self.assertEqual(row["reason"], "crossed_up")
+        self.assertEqual(row["attention_phrase"], "OPEN EPOCH / ALERTABLE")
+        self.assertEqual(row["station_local_timestamp"], "2026-01-01T03:00:00-07:00")
+        self.assertEqual(row["previous_relevant_bucket"], 69)
+        self.assertEqual(row["current_relevant_bucket"], 70)
+        self.assertEqual(row["settlement_bucket"], 70)
+        self.assertEqual(row["prior_settlement_bucket"], 69)
+        self.assertEqual(row["settlement_jump_magnitude"], 1)
+        self.assertEqual(row["epoch_status"], "open")
+        self.assertFalse(row["reversion_occurred"])
+        self.assertIsNone(row["first_reversion_timestamp_utc"])
+        self.assertEqual(row["max_excursion_above_settlement"], 0.2)
+        self.assertFalse(row["terminal_state_reached"])
         self.assertTrue(row["is_recent_alert_example"])
         self.assertEqual(row["payload_preview"]["temp_f"], 70.2)
+        self.assertEqual(row["payload_preview"]["attention_phrase"], "OPEN EPOCH / ALERTABLE")
 
 
 
@@ -215,6 +241,8 @@ class ObservabilityAlertPreviewTests(unittest.TestCase):
         self.assertEqual(global_payload["count"], 1)
         self.assertEqual(global_payload["rows"][0]["station"], "KLAX")
         self.assertEqual(global_payload["rows"][0]["event_ticker"], "KLAX-NEWEST")
+        self.assertIsNone(global_payload["rows"][0]["attention_phrase"])
+        self.assertIsNone(global_payload["rows"][0]["alert_context"])
 
     def test_alert_preview_normalizes_invalid_limit(self):
         with tempfile.TemporaryDirectory() as tmp:

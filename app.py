@@ -917,11 +917,35 @@ def observability_alert_preview():
         "event_ticker",
         "bucket_index",
         "metadata",
+        "alert_context",
+        "attention_phrase",
+        "station_local_timestamp",
+        "previous_relevant_bucket",
+        "current_relevant_bucket",
+        "settlement_bucket",
+        "prior_settlement_bucket",
+        "settlement_jump_magnitude",
+        "epoch_status",
+        "reversion_occurred",
+        "first_reversion_timestamp_utc",
+        "max_excursion_above_settlement",
+        "terminal_state_reached",
     ]
 
     preview_rows = []
     for row in recent_alert_rows:
         metadata = row.get("metadata") or {}
+        alert_context = metadata.get("alert_context") if isinstance(metadata.get("alert_context"), dict) else None
+
+        def _context_value(key):
+            if not isinstance(alert_context, dict):
+                return None
+            return alert_context.get(key)
+
+        attention_phrase = metadata.get("attention_phrase")
+        if attention_phrase is None:
+            attention_phrase = _context_value("attention_phrase")
+
         preview_rows.append(
             {
                 "station": row.get("station"),
@@ -933,6 +957,19 @@ def observability_alert_preview():
                 "bucket_index": row.get("bucket_index"),
                 "metadata": metadata,
                 "reason": metadata.get("reason") or metadata.get("suppression_reason"),
+                "alert_context": alert_context,
+                "attention_phrase": attention_phrase,
+                "station_local_timestamp": _context_value("station_local_timestamp"),
+                "previous_relevant_bucket": _context_value("previous_relevant_bucket"),
+                "current_relevant_bucket": _context_value("current_relevant_bucket"),
+                "settlement_bucket": _context_value("settlement_bucket"),
+                "prior_settlement_bucket": _context_value("prior_settlement_bucket"),
+                "settlement_jump_magnitude": _context_value("settlement_jump_magnitude"),
+                "epoch_status": _context_value("epoch_status"),
+                "reversion_occurred": _context_value("reversion_occurred"),
+                "first_reversion_timestamp_utc": _context_value("first_reversion_timestamp_utc"),
+                "max_excursion_above_settlement": _context_value("max_excursion_above_settlement"),
+                "terminal_state_reached": _context_value("terminal_state_reached"),
                 "is_recent_alert_example": True,
                 "payload_preview": {
                     "station": row.get("station"),
@@ -942,6 +979,12 @@ def observability_alert_preview():
                     "direction": row.get("direction"),
                     "bucket_index": row.get("bucket_index"),
                     "temp_f": row.get("temp_f"),
+                    "attention_phrase": attention_phrase,
+                    "epoch_status": _context_value("epoch_status"),
+                    "settlement_bucket": _context_value("settlement_bucket"),
+                    "current_relevant_bucket": _context_value("current_relevant_bucket"),
+                    "reversion_occurred": _context_value("reversion_occurred"),
+                    "terminal_state_reached": _context_value("terminal_state_reached"),
                 },
             }
         )
