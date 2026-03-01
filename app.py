@@ -362,7 +362,34 @@ def observability_ingestion_health():
 def observability_current_epochs():
     station = (request.args.get("station") or "").strip().upper() or None
     payload = get_current_settlement_epoch_summaries(station=station)
-    return jsonify({"ok": True, **payload}), 200
+    response_fields = [
+        "station",
+        "market_type",
+        "local_trading_date",
+        "settlement_bucket",
+        "prior_settlement_bucket",
+        "settlement_timestamp_utc",
+        "settlement_jump_magnitude",
+        "epoch_status",
+        "epoch_close_reason",
+        "epoch_close_timestamp_utc",
+        "reversion_occurred",
+        "first_reversion_timestamp_utc",
+        "max_excursion_above_settlement",
+        "duration_at_or_above_settlement_seconds",
+        "duration_strictly_above_settlement_seconds",
+        "terminal_state_reached",
+        "settlement_transition_event_id",
+        "last_transition_event_id",
+        "last_transition_timestamp_utc",
+        "last_transition_temp_f",
+        "selection_source",
+    ]
+    compact_epochs = [
+        {field: row.get(field) for field in response_fields}
+        for row in payload.get("epochs", [])
+    ]
+    return jsonify({"ok": True, **payload, "epochs": compact_epochs}), 200
 
 
 @app.route("/metar/status", methods=["GET"])
