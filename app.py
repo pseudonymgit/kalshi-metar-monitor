@@ -117,6 +117,161 @@ def _select_station_epoch_row(epoch_rows):
         ),
     )
 
+
+def _market_has_supported_strike(market):
+    strike_type = market.get("strike_type")
+    floor = market.get("floor_strike")
+    cap = market.get("cap_strike")
+
+    if strike_type == "between" and floor is not None:
+        return True
+    if strike_type == "less" and cap is not None:
+        return True
+    if strike_type == "greater" and floor is not None:
+        return True
+
+    from core.kalshi_monitor import _extract_strike_from_ticker
+
+    return _extract_strike_from_ticker((market.get("ticker") or "").upper()) is not None
+
+
+def _build_market_coverage_rows(station_filter=None):
+    from core.kalshi_monitor import (
+        _STATION_CITY_TOKEN_MAP,
+        _filter_structured_markets,
+        _get_active_stations,
+        _parse_target_market_types,
+        _station_local_kalshi_date_token,
+    )
+
+    cfg = get_default_config()
+    state = get_state()
+
+    configured_stations = set((cfg.get("stations") or []))
+    configured_stations.update(state.get("stations") or [])
+    stations = sorted(station.strip().upper() for station in configured_stations if station)
+
+    if station_filter:
+        stations = [station for station in stations if station == station_filter]
+
+    active_stations = _get_active_stations()
+    enabled_market_types = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
+    if not enabled_market_types:
+        enabled_market_types = {"HIGH"}
+
+    webhook_configured = bool((os.getenv("ALERT_WEBHOOK_URL") or "").strip())
+    series_by_station = ensure_series_discovery_loaded()
+
+    rows = []
+    for station in stations:
+        station_active = active_stations is None or station in active_stations
+        series_ticker = series_by_station.get(station)
+
+        discovered_markets = []
+        if series_ticker:
+            data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
+            discovered_markets = data.get("markets") or []
+
+        for market_type in ["HIGH", "LOW"]:
+            market_type_enabled = market_type in enabled_market_types
+            filtered_markets = _filter_structured_markets(discovered_markets, station, {market_type})
+            eligible_markets = [market for market in filtered_markets if _market_has_supported_strike(market)]
+
+            filtered_out_summary = {
+                "inactive_status": 0,
+                "station_mismatch": 0,
+                "date_mismatch": 0,
+                "market_type_mismatch": 0,
+                "unsupported_strike": 0,
+            }
+
+            filtered_market_tickers = []
+            filtered_tickers = {m.get("ticker") for m in filtered_markets}
+            eligible_tickers = [
+                (market.get("ticker") or "").upper()
+                for market in eligible_markets
+                if market.get("ticker")
+            ]
+            city_token = _STATION_CITY_TOKEN_MAP.get(station)
+            date_token = _station_local_kalshi_date_token(station)
+            for market in discovered_markets:
+                ticker = (market.get("ticker") or "").upper()
+                status = market.get("status")
+
+                if status and status != "active":
+                    filtered_out_summary["inactive_status"] += 1
+                    filtered_market_tickers.append(ticker)
+                    continue
+
+                if ticker not in filtered_tickers:
+                    if city_token and city_token not in ticker:
+                        filtered_out_summary["station_mismatch"] += 1
+                    elif date_token and date_token not in ticker:
+                        filtered_out_summary["date_mismatch"] += 1
+                    elif market_type not in ticker:
+                        filtered_out_summary["market_type_mismatch"] += 1
+                    else:
+                        filtered_out_summary["date_mismatch"] += 1
+                    filtered_market_tickers.append(ticker)
+                    continue
+
+                if ticker not in eligible_tickers:
+                    filtered_out_summary["unsupported_strike"] += 1
+                    filtered_market_tickers.append(ticker)
+
+            evaluation_possible = bool(
+                station_active
+                and market_type_enabled
+                and series_ticker
+                and len(eligible_markets) > 0
+            )
+            alerting_possible = bool(evaluation_possible and webhook_configured)
+
+            if not station_active:
+                coverage_status = "not_covered"
+                coverage_reason = "station_not_active"
+            elif not market_type_enabled:
+                coverage_status = "not_covered"
+                coverage_reason = "market_type_disabled_by_config"
+            elif not series_ticker:
+                coverage_status = "not_covered"
+                coverage_reason = "no_discovered_series"
+            elif len(eligible_markets) == 0:
+                coverage_status = "not_covered"
+                coverage_reason = "no_eligible_markets_after_filters"
+            elif not webhook_configured:
+                coverage_status = "evaluation_only"
+                coverage_reason = "webhook_missing"
+            else:
+                coverage_status = "alerting_possible_runtime_gated"
+                coverage_reason = "eligible_but_runtime_transition_terminal_rate_limit_gates_apply"
+
+            rows.append(
+                {
+                    "station": station,
+                    "market_type": market_type,
+                    "station_active_for_processing": station_active,
+                    "market_type_enabled_by_config": market_type_enabled,
+                    "discovered_series_ticker": series_ticker,
+                    "series_discovered": bool(series_ticker),
+                    "discovered_market_count": len(discovered_markets),
+                    "eligible_market_count_after_filters": len(eligible_markets),
+                    "evaluation_possible": evaluation_possible,
+                    "alerting_possible": alerting_possible,
+                    "coverage_status": coverage_status,
+                    "coverage_reason": coverage_reason,
+                    "eligible_market_tickers": eligible_tickers[:10],
+                    "filtered_out_market_count": len(filtered_market_tickers),
+                    "filtered_out_market_counts_by_reason": filtered_out_summary,
+                }
+            )
+
+    return {
+        "station": station_filter,
+        "stations_evaluated": stations,
+        "rows": rows,
+    }
+
 if hasattr(app, "before_first_request"):
     @app.before_first_request
     def _autostart_scheduler_once():
@@ -461,6 +616,13 @@ def observability_current_epochs():
         for row in payload.get("epochs", [])
     ]
     return jsonify({"ok": True, **payload, "epochs": compact_epochs}), 200
+
+
+@app.route("/observability/market-coverage", methods=["GET"])
+def observability_market_coverage():
+    station = (request.args.get("station") or "").strip().upper() or None
+    payload = _build_market_coverage_rows(station_filter=station)
+    return jsonify({"ok": True, "count": len(payload["rows"]), **payload}), 200
 
 
 @app.route("/metar/status", methods=["GET"])
