@@ -298,6 +298,93 @@ def _station_today_day_keys(stations):
         for station in stations
     }
 
+
+def _build_trader_dashboard_rows(station_filter=None):
+    ingestion_payload = _build_ingestion_health_rows(station_filter=station_filter)
+    current_epochs_payload = get_current_settlement_epoch_summaries(station=station_filter)
+
+    stations = [row.get("station") for row in ingestion_payload.get("stations", []) if row.get("station")]
+
+    epoch_rows_by_station = {}
+    for epoch_row in current_epochs_payload.get("epochs", []):
+        station_code = epoch_row.get("station")
+        if not station_code:
+            continue
+        epoch_rows_by_station.setdefault(station_code, []).append(epoch_row)
+
+    station_day_keys = _station_today_day_keys(stations)
+    day_structure_payload = get_current_day_structure_summaries(
+        station_day_keys=station_day_keys,
+        station=station_filter,
+    )
+    day_rows_by_station = {
+        row.get("station"): row
+        for row in day_structure_payload.get("rows", [])
+        if row.get("station")
+    }
+
+    market_coverage_payload = _build_market_coverage_rows(station_filter=station_filter)
+    market_coverage_by_station = {}
+    for coverage_row in market_coverage_payload.get("rows", []):
+        station_code = coverage_row.get("station")
+        market_type = coverage_row.get("market_type")
+        if not station_code or market_type not in {"HIGH", "LOW"}:
+            continue
+        market_coverage_by_station.setdefault(station_code, {})[market_type] = coverage_row
+
+    rows = []
+    for ingestion_row in ingestion_payload.get("stations", []):
+        station_code = ingestion_row.get("station")
+        selected_epoch = _select_station_epoch_row(epoch_rows_by_station.get(station_code, [])) or {}
+        day_row = day_rows_by_station.get(station_code, {})
+        station_coverage = market_coverage_by_station.get(station_code, {})
+        high_coverage = station_coverage.get("HIGH", {})
+        low_coverage = station_coverage.get("LOW", {})
+
+        rows.append(
+            {
+                "station": station_code,
+                "ingestion_status": ingestion_row.get("status"),
+                "ingestion_status_reason": ingestion_row.get("status_reason"),
+                "latest_accepted_observation_utc": ingestion_row.get("latest_accepted_observation_utc"),
+                "freshness_lag_seconds": ingestion_row.get("freshness_lag_seconds"),
+                "latest_poll_utc": ingestion_row.get("latest_poll_utc"),
+                "current_epoch_selection_source": selected_epoch.get("selection_source"),
+                "epoch_status": selected_epoch.get("epoch_status"),
+                "local_trading_date": selected_epoch.get("local_trading_date") or day_row.get("local_trading_date"),
+                "settlement_bucket": selected_epoch.get("settlement_bucket"),
+                "prior_settlement_bucket": selected_epoch.get("prior_settlement_bucket"),
+                "settlement_timestamp_utc": selected_epoch.get("settlement_timestamp_utc"),
+                "reversion_occurred": selected_epoch.get("reversion_occurred"),
+                "first_reversion_timestamp_utc": selected_epoch.get("first_reversion_timestamp_utc"),
+                "max_excursion_above_settlement": selected_epoch.get("max_excursion_above_settlement"),
+                "duration_at_or_above_settlement_seconds": selected_epoch.get("duration_at_or_above_settlement_seconds"),
+                "duration_strictly_above_settlement_seconds": selected_epoch.get("duration_strictly_above_settlement_seconds"),
+                "terminal_state_reached": selected_epoch.get("terminal_state_reached"),
+                "last_transition_timestamp_utc": selected_epoch.get("last_transition_timestamp_utc"),
+                "last_transition_temp_f": selected_epoch.get("last_transition_temp_f"),
+                "epoch_count_today": day_row.get("epoch_count_today"),
+                "open_epoch_present": day_row.get("open_epoch_present"),
+                "closed_epoch_count_today": day_row.get("closed_epoch_count_today"),
+                "reverted_epoch_count_today": day_row.get("reverted_epoch_count_today"),
+                "terminal_epoch_count_today": day_row.get("terminal_epoch_count_today"),
+                "high_alerting_possible": high_coverage.get("alerting_possible"),
+                "low_alerting_possible": low_coverage.get("alerting_possible"),
+                "high_coverage_status": high_coverage.get("coverage_status"),
+                "low_coverage_status": low_coverage.get("coverage_status"),
+                "high_coverage_reason": high_coverage.get("coverage_reason"),
+                "low_coverage_reason": low_coverage.get("coverage_reason"),
+                "high_eligible_market_count": high_coverage.get("eligible_market_count_after_filters"),
+                "low_eligible_market_count": low_coverage.get("eligible_market_count_after_filters"),
+            }
+        )
+
+    return {
+        "station": station_filter,
+        "count": len(rows),
+        "rows": rows,
+    }
+
 if hasattr(app, "before_first_request"):
     @app.before_first_request
     def _autostart_scheduler_once():
@@ -691,6 +778,13 @@ def observability_market_coverage():
     station = (request.args.get("station") or "").strip().upper() or None
     payload = _build_market_coverage_rows(station_filter=station)
     return jsonify({"ok": True, "count": len(payload["rows"]), **payload}), 200
+
+
+@app.route("/observability/trader-dashboard", methods=["GET"])
+def observability_trader_dashboard():
+    station = (request.args.get("station") or "").strip().upper() or None
+    payload = _build_trader_dashboard_rows(station_filter=station)
+    return jsonify({"ok": True, **payload}), 200
 
 
 @app.route("/metar/status", methods=["GET"])
