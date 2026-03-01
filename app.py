@@ -23,6 +23,7 @@ from core.metar_monitor import (
     get_recent_alerts,
     get_transition_history,
     run_replay_for_station_day,
+    is_scheduler_running,
 )
 
 from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
@@ -276,6 +277,84 @@ def observability_transitions():
         "count": len(transitions),
         "transitions": transitions,
     }), 200
+
+
+@app.route("/observability/ingestion-health", methods=["GET"])
+def observability_ingestion_health():
+    """
+    Deterministic per-station ingestion freshness visibility.
+
+    Classification rules:
+      - healthy: station has accepted observation and age <= stale_after_seconds
+      - stale: station has accepted observation and age > stale_after_seconds
+      - stale: station has no accepted observation
+    """
+    state = get_state()
+    cfg = get_default_config()
+    now_utc = datetime.now(timezone.utc)
+    last_poll_utc = state.get("last_poll_utc")
+
+    stale_after_seconds = max(int(cfg.get("poll_seconds", 60)) * 3, 60)
+
+    poll_lag_seconds = None
+    if last_poll_utc:
+        try:
+            poll_lag_seconds = max(
+                0,
+                int((now_utc - datetime.fromisoformat(last_poll_utc.replace("Z", "+00:00"))).total_seconds()),
+            )
+        except Exception:
+            poll_lag_seconds = None
+
+    stations = state.get("stations") or cfg.get("stations") or []
+    per_station = []
+
+    for station in stations:
+        latest_observation_utc = state.get("last_seen_iso", {}).get(station)
+        freshness_lag_seconds = None
+        status = "stale"
+        reason = "no_accepted_observation"
+
+        if latest_observation_utc:
+            try:
+                freshness_lag_seconds = max(
+                    0,
+                    int(
+                        (now_utc - datetime.fromisoformat(latest_observation_utc.replace("Z", "+00:00"))).total_seconds()
+                    ),
+                )
+                if freshness_lag_seconds <= stale_after_seconds:
+                    status = "healthy"
+                    reason = "freshness_lag_within_threshold"
+                else:
+                    status = "stale"
+                    reason = "freshness_lag_exceeds_threshold"
+            except Exception:
+                status = "stale"
+                reason = "invalid_observation_timestamp"
+
+        per_station.append(
+            {
+                "station": station,
+                "latest_accepted_observation_utc": latest_observation_utc,
+                "latest_poll_utc": last_poll_utc,
+                "freshness_lag_seconds": freshness_lag_seconds,
+                "poll_lag_seconds": poll_lag_seconds,
+                "status": status,
+                "status_reason": reason,
+            }
+        )
+
+    return jsonify(
+        {
+            "ok": True,
+            "scheduler_running": is_scheduler_running(),
+            "last_poll_utc": last_poll_utc,
+            "poll_lag_seconds": poll_lag_seconds,
+            "stale_after_seconds": stale_after_seconds,
+            "stations": per_station,
+        }
+    ), 200
 
 
 @app.route("/metar/status", methods=["GET"])
