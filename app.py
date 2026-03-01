@@ -35,6 +35,88 @@ log.setLevel(logging.INFO)
 
 _autostart_fallback_done = False
 
+
+def _safe_lag_seconds(*, now_utc: datetime, iso_timestamp: str):
+    if not iso_timestamp:
+        return None
+    try:
+        return max(0, int((now_utc - datetime.fromisoformat(iso_timestamp.replace("Z", "+00:00"))).total_seconds()))
+    except Exception:
+        return None
+
+
+def _build_ingestion_health_rows(*, station_filter=None):
+    state = get_state()
+    cfg = get_default_config()
+    now_utc = datetime.now(timezone.utc)
+    last_poll_utc = state.get("last_poll_utc")
+
+    stale_after_seconds = max(int(cfg.get("poll_seconds", 60)) * 3, 60)
+    poll_lag_seconds = _safe_lag_seconds(now_utc=now_utc, iso_timestamp=last_poll_utc)
+
+    configured_stations = state.get("stations") or cfg.get("stations") or []
+    if station_filter:
+        stations = [station for station in configured_stations if station == station_filter]
+    else:
+        stations = list(configured_stations)
+
+    per_station = []
+    for station in stations:
+        latest_observation_utc = state.get("last_seen_iso", {}).get(station)
+        freshness_lag_seconds = None
+        status = "stale"
+        reason = "no_accepted_observation"
+
+        if latest_observation_utc:
+            freshness_lag_seconds = _safe_lag_seconds(now_utc=now_utc, iso_timestamp=latest_observation_utc)
+            if freshness_lag_seconds is None:
+                status = "stale"
+                reason = "invalid_observation_timestamp"
+            elif freshness_lag_seconds <= stale_after_seconds:
+                status = "healthy"
+                reason = "freshness_lag_within_threshold"
+            else:
+                status = "stale"
+                reason = "freshness_lag_exceeds_threshold"
+
+        per_station.append(
+            {
+                "station": station,
+                "latest_accepted_observation_utc": latest_observation_utc,
+                "latest_poll_utc": last_poll_utc,
+                "freshness_lag_seconds": freshness_lag_seconds,
+                "poll_lag_seconds": poll_lag_seconds,
+                "status": status,
+                "status_reason": reason,
+            }
+        )
+
+    return {
+        "scheduler_running": is_scheduler_running(),
+        "last_poll_utc": last_poll_utc,
+        "poll_lag_seconds": poll_lag_seconds,
+        "stale_after_seconds": stale_after_seconds,
+        "stations": per_station,
+    }
+
+
+def _select_station_epoch_row(epoch_rows):
+    if not epoch_rows:
+        return None
+
+    open_rows = [row for row in epoch_rows if row.get("epoch_status") == "open"]
+    candidate_rows = open_rows or epoch_rows
+
+    return max(
+        candidate_rows,
+        key=lambda row: (
+            row.get("settlement_timestamp_utc") or "",
+            row.get("last_transition_timestamp_utc") or "",
+            int(row.get("epoch_id") or 0),
+            row.get("market_type") or "",
+        ),
+    )
+
 if hasattr(app, "before_first_request"):
     @app.before_first_request
     def _autostart_scheduler_once():
@@ -290,70 +372,59 @@ def observability_ingestion_health():
       - stale: station has accepted observation and age > stale_after_seconds
       - stale: station has no accepted observation
     """
-    state = get_state()
-    cfg = get_default_config()
-    now_utc = datetime.now(timezone.utc)
-    last_poll_utc = state.get("last_poll_utc")
+    payload = _build_ingestion_health_rows()
+    return jsonify({"ok": True, **payload}), 200
 
-    stale_after_seconds = max(int(cfg.get("poll_seconds", 60)) * 3, 60)
 
-    poll_lag_seconds = None
-    if last_poll_utc:
-        try:
-            poll_lag_seconds = max(
-                0,
-                int((now_utc - datetime.fromisoformat(last_poll_utc.replace("Z", "+00:00"))).total_seconds()),
-            )
-        except Exception:
-            poll_lag_seconds = None
+@app.route("/observability/station-summary", methods=["GET"])
+def observability_station_summary():
+    station = (request.args.get("station") or "").strip().upper() or None
 
-    stations = state.get("stations") or cfg.get("stations") or []
-    per_station = []
+    ingestion_payload = _build_ingestion_health_rows(station_filter=station)
+    current_epochs_payload = get_current_settlement_epoch_summaries(station=station)
 
-    for station in stations:
-        latest_observation_utc = state.get("last_seen_iso", {}).get(station)
-        freshness_lag_seconds = None
-        status = "stale"
-        reason = "no_accepted_observation"
+    epoch_rows_by_station = {}
+    for row in current_epochs_payload.get("epochs", []):
+        row_station = row.get("station")
+        if not row_station:
+            continue
+        epoch_rows_by_station.setdefault(row_station, []).append(row)
 
-        if latest_observation_utc:
-            try:
-                freshness_lag_seconds = max(
-                    0,
-                    int(
-                        (now_utc - datetime.fromisoformat(latest_observation_utc.replace("Z", "+00:00"))).total_seconds()
-                    ),
-                )
-                if freshness_lag_seconds <= stale_after_seconds:
-                    status = "healthy"
-                    reason = "freshness_lag_within_threshold"
-                else:
-                    status = "stale"
-                    reason = "freshness_lag_exceeds_threshold"
-            except Exception:
-                status = "stale"
-                reason = "invalid_observation_timestamp"
-
-        per_station.append(
+    summary_rows = []
+    for ingestion_row in ingestion_payload.get("stations", []):
+        station_code = ingestion_row.get("station")
+        selected_epoch = _select_station_epoch_row(epoch_rows_by_station.get(station_code, [])) or {}
+        summary_rows.append(
             {
-                "station": station,
-                "latest_accepted_observation_utc": latest_observation_utc,
-                "latest_poll_utc": last_poll_utc,
-                "freshness_lag_seconds": freshness_lag_seconds,
-                "poll_lag_seconds": poll_lag_seconds,
-                "status": status,
-                "status_reason": reason,
+                "station": station_code,
+                "ingestion_status": ingestion_row.get("status"),
+                "ingestion_status_reason": ingestion_row.get("status_reason"),
+                "latest_accepted_observation_utc": ingestion_row.get("latest_accepted_observation_utc"),
+                "freshness_lag_seconds": ingestion_row.get("freshness_lag_seconds"),
+                "latest_poll_utc": ingestion_row.get("latest_poll_utc"),
+                "current_epoch_selection_source": selected_epoch.get("selection_source"),
+                "epoch_status": selected_epoch.get("epoch_status"),
+                "local_trading_date": selected_epoch.get("local_trading_date"),
+                "settlement_bucket": selected_epoch.get("settlement_bucket"),
+                "prior_settlement_bucket": selected_epoch.get("prior_settlement_bucket"),
+                "settlement_timestamp_utc": selected_epoch.get("settlement_timestamp_utc"),
+                "reversion_occurred": selected_epoch.get("reversion_occurred"),
+                "first_reversion_timestamp_utc": selected_epoch.get("first_reversion_timestamp_utc"),
+                "max_excursion_above_settlement": selected_epoch.get("max_excursion_above_settlement"),
+                "duration_at_or_above_settlement_seconds": selected_epoch.get("duration_at_or_above_settlement_seconds"),
+                "duration_strictly_above_settlement_seconds": selected_epoch.get("duration_strictly_above_settlement_seconds"),
+                "terminal_state_reached": selected_epoch.get("terminal_state_reached"),
+                "last_transition_timestamp_utc": selected_epoch.get("last_transition_timestamp_utc"),
+                "last_transition_temp_f": selected_epoch.get("last_transition_temp_f"),
             }
         )
 
     return jsonify(
         {
             "ok": True,
-            "scheduler_running": is_scheduler_running(),
-            "last_poll_utc": last_poll_utc,
-            "poll_lag_seconds": poll_lag_seconds,
-            "stale_after_seconds": stale_after_seconds,
-            "stations": per_station,
+            "station": station,
+            "count": len(summary_rows),
+            "rows": summary_rows,
         }
     ), 200
 
