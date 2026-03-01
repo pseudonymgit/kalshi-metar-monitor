@@ -43,6 +43,28 @@ log.setLevel(logging.INFO)
 _autostart_fallback_done = False
 
 
+def _merge_discovered_stations_into_watchlist():
+    try:
+        discovered_stations = {
+            station.strip().upper()
+            for station in (ensure_series_discovery_loaded() or {}).keys()
+            if station and station.strip()
+        }
+        if not discovered_stations:
+            return
+
+        current_watchlist = {
+            station.strip().upper()
+            for station in (get_watchlist().get("watchlist") or [])
+            if station and station.strip()
+        }
+        merged_watchlist = sorted(current_watchlist.union(discovered_stations))
+        if merged_watchlist != sorted(current_watchlist):
+            set_watchlist(merged_watchlist)
+    except Exception:
+        return
+
+
 
 
 def _get_recent_alert_rows_for_preview(*, station=None, limit=25):
@@ -213,9 +235,24 @@ def _build_market_coverage_rows(station_filter=None):
     cfg = get_default_config()
     state = get_state()
 
-    configured_stations = set((cfg.get("stations") or []))
-    configured_stations.update(state.get("stations") or [])
-    stations = sorted(station.strip().upper() for station in configured_stations if station)
+    configured_stations = {
+        station.strip().upper()
+        for station in (cfg.get("stations") or [])
+        if station and station.strip()
+    }
+    configured_stations.update(
+        station.strip().upper()
+        for station in (state.get("stations") or [])
+        if station and station.strip()
+    )
+
+    discovered_stations = {
+        station.strip().upper()
+        for station in (ensure_series_discovery_loaded() or {}).keys()
+        if station and station.strip()
+    }
+
+    stations = sorted(configured_stations.union(discovered_stations))
 
     if station_filter:
         stations = [station for station in stations if station == station_filter]
@@ -227,9 +264,18 @@ def _build_market_coverage_rows(station_filter=None):
 
     webhook_configured = bool((os.getenv("ALERT_WEBHOOK_URL") or "").strip())
     series_by_station = ensure_series_discovery_loaded()
+    live_ingestion_stations = {
+        station.strip().upper()
+        for station in (get_watchlist().get("watchlist") or [])
+        if station and station.strip()
+    }
+    if not live_ingestion_stations:
+        live_ingestion_stations = set(configured_stations)
 
     rows = []
     for station in stations:
+        station_ingestion_configured = station in configured_stations
+        station_in_live_ingestion_universe = station in live_ingestion_stations
         station_active = active_stations is None or station in active_stations
         series_ticker = series_by_station.get(station)
 
@@ -286,6 +332,8 @@ def _build_market_coverage_rows(station_filter=None):
                     filtered_market_tickers.append(ticker)
 
             evaluation_possible = bool(
+                station_in_live_ingestion_universe
+                and
                 station_active
                 and market_type_enabled
                 and series_ticker
@@ -296,6 +344,9 @@ def _build_market_coverage_rows(station_filter=None):
             if not station_active:
                 coverage_status = "not_covered"
                 coverage_reason = "station_not_active"
+            elif not station_in_live_ingestion_universe:
+                coverage_status = "not_covered"
+                coverage_reason = "station_not_in_live_ingestion_universe"
             elif not market_type_enabled:
                 coverage_status = "not_covered"
                 coverage_reason = "market_type_disabled_by_config"
@@ -316,6 +367,8 @@ def _build_market_coverage_rows(station_filter=None):
                 {
                     "station": station,
                     "market_type": market_type,
+                    "station_ingestion_configured": station_ingestion_configured,
+                    "station_in_live_ingestion_universe": station_in_live_ingestion_universe,
                     "station_active_for_processing": station_active,
                     "market_type_enabled_by_config": market_type_enabled,
                     "discovered_series_ticker": series_ticker,
@@ -501,6 +554,7 @@ if hasattr(app, "before_first_request"):
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
         ensure_series_discovery_loaded()
+        _merge_discovered_stations_into_watchlist()
 else:
     @app.before_request
     def _autostart_scheduler_fallback_once():
@@ -511,6 +565,7 @@ else:
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
         ensure_series_discovery_loaded()
+        _merge_discovered_stations_into_watchlist()
         return None
 
 @app.route("/", methods=["GET"])
