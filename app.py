@@ -599,6 +599,135 @@ def _count_alerts_for_station_local_day(*, station, local_trading_date):
     return alerts_sent_today
 
 
+def _count_settlement_up_epochs_for_station_local_day(*, station, local_trading_date):
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station or not local_trading_date:
+        return 0
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    if not os.path.exists(db_path):
+        return 0
+
+    try:
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1)
+        try:
+            rows = conn.execute(
+                """
+                SELECT COUNT(*)
+                FROM settlement_epochs
+                WHERE station = ?
+                  AND local_trading_date = ?
+                  AND settlement_jump_magnitude >= 1
+                """,
+                (normalized_station, local_trading_date),
+            ).fetchall()
+        finally:
+            conn.close()
+    except Exception:
+        return 0
+
+    return int((rows[0][0] or 0) if rows else 0)
+
+
+def _count_composed_alerts_for_station_local_day(*, station, local_trading_date):
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station or not local_trading_date:
+        return 0
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    if not os.path.exists(db_path):
+        return 0
+
+    try:
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1)
+        try:
+            rows = conn.execute(
+                """
+                SELECT created_utc
+                FROM alerts
+                WHERE station = ?
+                  AND alert_type = 'composed_alert_sent'
+                """,
+                (normalized_station,),
+            ).fetchall()
+        finally:
+            conn.close()
+    except Exception:
+        return 0
+
+    alerts_sent_today = 0
+    for row in rows:
+        created_utc = row[0]
+        if station_local_day_key(normalized_station, created_utc) == local_trading_date:
+            alerts_sent_today += 1
+
+    return alerts_sent_today
+
+
+def _build_alert_fire_audit_rows():
+    now_utc = datetime.now(timezone.utc)
+    station_universe = _canonical_live_station_universe()
+    stations = station_universe.get("stations") or []
+    if not stations:
+        stations = sorted(
+            {
+                station
+                for station in (
+                    station_universe.get("configured_stations") or set()
+                ).union(
+                    station_universe.get("discovered_stations") or set()
+                ).union(
+                    station_universe.get("watchlist_stations") or set()
+                )
+                if station
+            }
+        )
+
+    station_day_keys = _station_today_day_keys(stations)
+
+    coverage_payload = _build_market_coverage_rows()
+    eligible_market_counts = {}
+    for coverage_row in coverage_payload.get("rows", []):
+        station_code = coverage_row.get("station")
+        if not station_code:
+            continue
+        eligible_market_counts[station_code] = eligible_market_counts.get(station_code, 0) + int(
+            coverage_row.get("eligible_market_count_after_filters") or 0
+        )
+
+    rows = []
+    for station in stations:
+        local_trading_date = station_day_keys.get(station)
+        settlement_up_count_today = _count_settlement_up_epochs_for_station_local_day(
+            station=station,
+            local_trading_date=local_trading_date,
+        )
+        eligible_market_count_today = int(eligible_market_counts.get(station, 0))
+        alerts_sent_today = _count_composed_alerts_for_station_local_day(
+            station=station,
+            local_trading_date=local_trading_date,
+        )
+
+        fire_integrity = "OK"
+        if settlement_up_count_today > 0 and eligible_market_count_today > 0 and alerts_sent_today == 0:
+            fire_integrity = "TRANSITION_WITHOUT_ALERT"
+
+        rows.append(
+            {
+                "station": station,
+                "settlement_up_count_today": settlement_up_count_today,
+                "eligible_market_count_today": eligible_market_count_today,
+                "alerts_sent_today": alerts_sent_today,
+                "fire_integrity": fire_integrity,
+            }
+        )
+
+    return {
+        "generated_utc": now_utc.isoformat(),
+        "stations": rows,
+    }
+
+
 def _derive_alert_block(alert_block_class):
     block_reason_by_class = {
         "NO_OBSERVATION": "No accepted observation exists for the current station-local trading day.",
@@ -1237,6 +1366,12 @@ def observability_alert_preview():
 def observability_alert_diagnostics():
     station = (request.args.get("station") or "").strip().upper() or None
     payload = _build_alert_diagnostic_rows(station_filter=station)
+    return jsonify({"ok": True, **payload}), 200
+
+
+@app.route("/observability/alert-fire-audit", methods=["GET"])
+def observability_alert_fire_audit():
+    payload = _build_alert_fire_audit_rows()
     return jsonify({"ok": True, **payload}), 200
 
 
