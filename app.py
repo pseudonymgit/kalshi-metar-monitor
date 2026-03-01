@@ -35,7 +35,7 @@ from core.observability import (
     get_current_day_structure_summaries,
     get_current_settlement_epoch_summaries,
 )
-from core.station_time import to_station_local
+from core.station_time import station_local_day_key, to_station_local
 
 app = Flask(__name__)
 log = app.logger
@@ -565,6 +565,166 @@ def _build_trader_dashboard_rows(station_filter=None):
         "rows": rows,
     }
 
+
+def _count_alerts_for_station_local_day(*, station, local_trading_date):
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station or not local_trading_date:
+        return 0
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    if not os.path.exists(db_path):
+        return 0
+
+    try:
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1)
+        try:
+            rows = conn.execute(
+                """
+                SELECT created_utc
+                FROM alerts
+                WHERE station = ?
+                """,
+                (normalized_station,),
+            ).fetchall()
+        finally:
+            conn.close()
+    except Exception:
+        return 0
+
+    alerts_sent_today = 0
+    for row in rows:
+        created_utc = row[0]
+        if station_local_day_key(normalized_station, created_utc) == local_trading_date:
+            alerts_sent_today += 1
+    return alerts_sent_today
+
+
+def _derive_alert_block(alert_block_class):
+    block_reason_by_class = {
+        "NO_OBSERVATION": "No accepted observation exists for the current station-local trading day.",
+        "NO_BUCKET_CHANGE": "Instant bucket matches settlement bucket and no settlement_up transition occurred today.",
+        "NO_MARKET_MATCH": "Settlement changed today but no eligible Kalshi market matched deterministic filters.",
+        "TERMINAL_STATE": "Current settlement epoch is terminal; alert emission is blocked.",
+        "SUPPRESSED": "Latest market evaluation outcome is suppression-gated.",
+        "ALERTABLE": "Latest market evaluation outcome indicates alertable conditions.",
+    }
+
+    block_state_by_class = {
+        "NO_OBSERVATION": "BLOCKED_NO_OBSERVATION",
+        "NO_BUCKET_CHANGE": "BLOCKED_NO_BUCKET_CHANGE",
+        "NO_MARKET_MATCH": "BLOCKED_NO_MARKET_MATCH",
+        "TERMINAL_STATE": "BLOCKED_TERMINAL_STATE",
+        "SUPPRESSED": "BLOCKED_SUPPRESSED",
+        "ALERTABLE": "NOT_BLOCKED_ALERTABLE",
+    }
+
+    return {
+        "alert_block_state": block_state_by_class.get(alert_block_class, "BLOCKED_UNKNOWN"),
+        "alert_block_reason": block_reason_by_class.get(alert_block_class, "Deterministic diagnostic unavailable."),
+    }
+
+
+def _build_alert_diagnostic_rows(station_filter=None):
+    state = get_state()
+    now_utc = datetime.now(timezone.utc)
+
+    station_universe = _canonical_live_station_universe(station_filter=station_filter)
+    stations = station_universe.get("stations") or []
+    station_day_keys = _station_today_day_keys(stations)
+
+    day_structure_payload = get_current_day_structure_summaries(
+        station_day_keys=station_day_keys,
+        station=station_filter,
+    )
+    day_rows_by_station = {
+        row.get("station"): row
+        for row in day_structure_payload.get("rows", [])
+        if row.get("station")
+    }
+
+    latest_evaluation_context_by_station = get_latest_station_market_evaluation_context(station=station_filter)
+    market_coverage_payload = _build_market_coverage_rows(station_filter=station_filter)
+    coverage_rows_by_station = {}
+    for row in market_coverage_payload.get("rows", []):
+        station_code = row.get("station")
+        if not station_code:
+            continue
+        coverage_rows_by_station.setdefault(station_code, []).append(row)
+
+    rows = []
+    for station in stations:
+        local_trading_date = station_day_keys.get(station)
+        latest_observation_utc = state.get("last_seen_iso", {}).get(station)
+        latest_obs = state.get("last_obs", {}).get(station) or {}
+        latest_temp_f = latest_obs.get("temp_f")
+
+        instant_bucket = None
+        if latest_temp_f is not None:
+            try:
+                instant_bucket = int(float(latest_temp_f))
+            except Exception:
+                instant_bucket = None
+
+        day_row = day_rows_by_station.get(station, {})
+        settlement_bucket = day_row.get("current_or_latest_settlement_bucket")
+        epoch_count_today = int(day_row.get("epoch_count_today") or 0)
+        settlement_up_today = epoch_count_today > 0
+
+        coverage_rows = coverage_rows_by_station.get(station, [])
+        has_eligible_market = any((row.get("eligible_market_count_after_filters") or 0) > 0 for row in coverage_rows)
+
+        latest_eval = latest_evaluation_context_by_station.get(station, {})
+        latest_outcome = (latest_eval.get("latest_evaluation_outcome") or "").strip().upper()
+
+        if not latest_observation_utc:
+            diagnostic_class = "NO_OBSERVATION"
+        elif station_local_day_key(station, latest_observation_utc) != local_trading_date:
+            diagnostic_class = "NO_OBSERVATION"
+        elif bool(day_row.get("current_or_latest_terminal_state_reached")):
+            diagnostic_class = "TERMINAL_STATE"
+        elif latest_outcome == "ALERT_SENT":
+            diagnostic_class = "ALERTABLE"
+        elif instant_bucket is not None and settlement_bucket is not None and instant_bucket == settlement_bucket and not settlement_up_today:
+            diagnostic_class = "NO_BUCKET_CHANGE"
+        elif settlement_up_today and not has_eligible_market:
+            diagnostic_class = "NO_MARKET_MATCH"
+        elif latest_outcome.startswith("SUPPRESSED_"):
+            diagnostic_class = "SUPPRESSED"
+        else:
+            diagnostic_class = "NO_BUCKET_CHANGE"
+
+        block = _derive_alert_block(diagnostic_class)
+        last_transition = get_transition_history(station=station, limit=1)
+        last_transition_reason = None
+        if last_transition:
+            transition = last_transition[0]
+            last_transition_reason = transition.get("reason") or transition.get("transition_type")
+
+        rows.append(
+            {
+                "station": station,
+                "polling_active": bool(latest_observation_utc),
+                "latest_observation_utc": latest_observation_utc,
+                "latest_temp_f": latest_temp_f,
+                "instant_bucket": instant_bucket,
+                "settlement_bucket": settlement_bucket,
+                "last_transition_reason": last_transition_reason,
+                "last_market_evaluation_outcome": latest_eval.get("latest_evaluation_outcome"),
+                "alerts_sent_today": _count_alerts_for_station_local_day(
+                    station=station,
+                    local_trading_date=local_trading_date,
+                ),
+                "alert_block_state": block["alert_block_state"],
+                "alert_block_reason": block["alert_block_reason"],
+                "diagnostic_class": diagnostic_class,
+            }
+        )
+
+    return {
+        "generated_utc": now_utc.isoformat(),
+        "stations": rows,
+    }
+
 if hasattr(app, "before_first_request"):
     @app.before_first_request
     def _autostart_scheduler_once():
@@ -1071,6 +1231,13 @@ def observability_alert_preview():
             "rows": preview_rows,
         }
     ), 200
+
+
+@app.route("/observability/alert-diagnostics", methods=["GET"])
+def observability_alert_diagnostics():
+    station = (request.args.get("station") or "").strip().upper() or None
+    payload = _build_alert_diagnostic_rows(station_filter=station)
+    return jsonify({"ok": True, **payload}), 200
 
 
 @app.route("/metar/status", methods=["GET"])
