@@ -44,6 +44,17 @@ _STATION_CITY_TOKEN_MAP = {
     "KAUS": "AUS",
 }
 
+_EXPLICIT_SETTLEMENT_STATION_OVERRIDES = {
+    "NYC": "KNYC",
+    "CHI": "KMDW",
+    "LAX": "KLAX",
+    "DEN": "KDEN",
+    "MIA": "KMIA",
+    "AUS": "KAUS",
+    "PHL": "KPHL",
+    "PHIL": "KPHL",
+}
+
 
 def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
@@ -240,6 +251,72 @@ def _get_all_public_markets(max_pages=5, page_limit=200):
             break
 
     return markets
+
+
+def build_market_derived_station_universe(max_pages=5, page_limit=200):
+    city_tokens = set()
+    cursor = None
+
+    for _ in range(max_pages):
+        path = f"/markets?limit={int(page_limit)}&status=open"
+        if cursor:
+            path = f"{path}&cursor={cursor}"
+
+        data = _kalshi_public_get(path)
+        markets = data.get("markets") or []
+
+        for market in markets:
+            if str(market.get("status") or "").upper() != "OPEN":
+                continue
+
+            ticker = str(market.get("ticker") or "").strip().upper()
+            prefix = None
+            if ticker.startswith("KXHIGH"):
+                prefix = "KXHIGH"
+            elif ticker.startswith("KXLOW"):
+                prefix = "KXLOW"
+
+            if not prefix:
+                continue
+
+            remainder = ticker[len(prefix):]
+            city_token, _, _ = remainder.partition("-")
+            city_token = city_token.strip().upper()
+            if city_token:
+                city_tokens.add(city_token)
+
+        cursor = data.get("cursor")
+        if not cursor:
+            break
+
+    return sorted(city_tokens)
+
+
+def resolve_settlement_station(token: str) -> str | None:
+    normalized_token = (token or "").strip().upper()
+    if not normalized_token:
+        return None
+
+    for station, city_token in _STATION_CITY_TOKEN_MAP.items():
+        if (city_token or "").strip().upper() == normalized_token:
+            return station
+
+    return _EXPLICIT_SETTLEMENT_STATION_OVERRIDES.get(normalized_token)
+
+
+def build_market_polling_station_universe(max_pages=5, page_limit=200):
+    tokens = build_market_derived_station_universe(max_pages=max_pages, page_limit=page_limit)
+    stations = set()
+
+    for token in tokens:
+        try:
+            station = resolve_settlement_station(token)
+        except Exception:
+            continue
+        if station:
+            stations.add(station)
+
+    return sorted(stations)
 
 
 def _format_change(prev, curr):
