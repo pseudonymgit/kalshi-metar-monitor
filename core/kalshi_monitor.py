@@ -285,7 +285,30 @@ def _station_local_kalshi_date_token(station):
 def _discover_series_for_stations():
     data = _kalshi_public_get("/series?tags=Daily%20temperature")
     series_items = data.get("series") or []
-    configured_stations = _get_active_stations() or set(_STATION_CITY_TOKEN_MAP.keys())
+    configured_stations = set((_get_active_stations() or set()))
+    configured_stations.update(_STATION_CITY_TOKEN_MAP.keys())
+
+    reverse_city_token_map = {
+        city_token: station
+        for station, city_token in _STATION_CITY_TOKEN_MAP.items()
+    }
+
+    for item in series_items:
+        frequency = (item.get("frequency") or "").strip().lower()
+        title = (item.get("title") or "").strip().lower()
+        ticker = (item.get("ticker") or "").strip().upper()
+
+        if frequency != "daily":
+            continue
+        if "highest" not in title:
+            continue
+        if not ticker.startswith("KXHIGH"):
+            continue
+
+        discovered_token = ticker[len("KXHIGH"):]
+        discovered_station = reverse_city_token_map.get(discovered_token)
+        if discovered_station:
+            configured_stations.add(discovered_station)
 
     discovered = {}
 
