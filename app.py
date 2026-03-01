@@ -1468,6 +1468,16 @@ def metar_simulate_ladder():
     except Exception:
         return jsonify({"error": "temp_f must be numeric"}), 400
 
+    from core.kalshi_monitor import build_structured_snapshot
+
+    try:
+        build_structured_snapshot(
+            station=icao,
+            market_types={"HIGH", "LOW"}
+        )
+    except Exception as e:
+        log.warning(f"simulation ladder hydration failed station={icao}: {e}")
+
     return jsonify(
         _simulate_temperature_for_testing(
             icao,
