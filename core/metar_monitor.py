@@ -935,6 +935,69 @@ def get_transition_history(station=None, limit=50):
     return history[:bounded_limit]
 
 
+def get_latest_station_market_evaluation_context(station: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    normalized_station = (station or "").strip().upper()
+    latest_by_station: Dict[str, Dict[str, Any]] = {}
+
+    try:
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return latest_by_station
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                query = """
+                    SELECT
+                        te.station,
+                        te.created_utc,
+                        te.transition_type,
+                        te.id,
+                        te.metadata_json
+                    FROM transition_events te
+                    WHERE te.station != ''
+                """
+                params: List[Any] = []
+                if normalized_station:
+                    query += " AND te.station = ?"
+                    params.append(normalized_station)
+
+                query += " ORDER BY te.id DESC"
+                rows = conn.execute(query, tuple(params)).fetchall()
+            finally:
+                conn.close()
+
+        for row in rows:
+            station_code = (row[0] or "").strip().upper()
+            if not station_code or station_code in latest_by_station:
+                continue
+
+            metadata_json = row[4]
+            metadata: Dict[str, Any] = {}
+            if metadata_json:
+                try:
+                    metadata = json.loads(metadata_json)
+                except Exception:
+                    metadata = {}
+
+            if metadata.get("market_evaluated") is not True:
+                continue
+
+            latest_by_station[station_code] = {
+                "latest_evaluation_timestamp_utc": row[1],
+                "latest_market_evaluated": metadata.get("market_evaluated"),
+                "latest_alerts_sent": metadata.get("alerts_sent"),
+                "latest_evaluation_outcome": metadata.get("evaluation_outcome"),
+                "latest_suppression_reason": metadata.get("suppression_reason"),
+                "latest_transition_type": row[2],
+                "latest_transition_event_id": row[3],
+            }
+    except Exception as e:
+        _ALERT_LOGGER.warning("latest_market_eval_context_query_failed station=%s error=%s", normalized_station, e)
+
+    return latest_by_station
+
+
 def _prune_transition_events() -> None:
     try:
         retention_days = int(os.getenv("TRANSITION_RETENTION_DAYS", "3"))
