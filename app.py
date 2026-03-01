@@ -300,6 +300,44 @@ def _station_today_day_keys(stations):
     }
 
 
+def _derive_trader_dashboard_attention(row):
+    if row.get("ingestion_status") != "healthy":
+        return {"attention_status": "action_needed", "attention_reason": "stale_ingestion"}
+
+    coverage_pairs = [
+        (row.get("high_coverage_status"), row.get("high_coverage_reason")),
+        (row.get("low_coverage_status"), row.get("low_coverage_reason")),
+    ]
+    relevant_reasons = [
+        reason
+        for status, reason in coverage_pairs
+        if status is not None and reason not in {"market_type_disabled_by_config", "station_not_active"}
+    ]
+
+    if relevant_reasons and all(reason == "no_discovered_series" for reason in relevant_reasons):
+        return {"attention_status": "action_needed", "attention_reason": "no_discovered_series"}
+
+    if relevant_reasons and all(reason == "no_eligible_markets_after_filters" for reason in relevant_reasons):
+        return {"attention_status": "action_needed", "attention_reason": "no_eligible_markets"}
+
+    if bool(row.get("terminal_state_reached")):
+        return {"attention_status": "watch", "attention_reason": "terminal_state_reached"}
+
+    latest_outcome = row.get("latest_evaluation_outcome") or ""
+    if latest_outcome.startswith("SUPPRESSED_"):
+        return {"attention_status": "watch", "attention_reason": "latest_evaluation_suppressed"}
+
+    if any(status == "evaluation_only" and reason == "webhook_missing" for status, reason in coverage_pairs):
+        return {"attention_status": "action_needed", "attention_reason": "evaluation_only_webhook_missing"}
+
+    if bool(row.get("open_epoch_present")) and any(
+        row.get(flag) is True for flag in ["high_alerting_possible", "low_alerting_possible"]
+    ):
+        return {"attention_status": "ready", "attention_reason": "alerting_possible_open_epoch"}
+
+    return {"attention_status": "normal", "attention_reason": "normal"}
+
+
 def _build_trader_dashboard_rows(station_filter=None):
     ingestion_payload = _build_ingestion_health_rows(station_filter=station_filter)
     current_epochs_payload = get_current_settlement_epoch_summaries(station=station_filter)
@@ -345,50 +383,50 @@ def _build_trader_dashboard_rows(station_filter=None):
         low_coverage = station_coverage.get("LOW", {})
         latest_eval = latest_evaluation_context_by_station.get(station_code, {})
 
-        rows.append(
-            {
-                "station": station_code,
-                "ingestion_status": ingestion_row.get("status"),
-                "ingestion_status_reason": ingestion_row.get("status_reason"),
-                "latest_accepted_observation_utc": ingestion_row.get("latest_accepted_observation_utc"),
-                "freshness_lag_seconds": ingestion_row.get("freshness_lag_seconds"),
-                "latest_poll_utc": ingestion_row.get("latest_poll_utc"),
-                "current_epoch_selection_source": selected_epoch.get("selection_source"),
-                "epoch_status": selected_epoch.get("epoch_status"),
-                "local_trading_date": selected_epoch.get("local_trading_date") or day_row.get("local_trading_date"),
-                "settlement_bucket": selected_epoch.get("settlement_bucket"),
-                "prior_settlement_bucket": selected_epoch.get("prior_settlement_bucket"),
-                "settlement_timestamp_utc": selected_epoch.get("settlement_timestamp_utc"),
-                "reversion_occurred": selected_epoch.get("reversion_occurred"),
-                "first_reversion_timestamp_utc": selected_epoch.get("first_reversion_timestamp_utc"),
-                "max_excursion_above_settlement": selected_epoch.get("max_excursion_above_settlement"),
-                "duration_at_or_above_settlement_seconds": selected_epoch.get("duration_at_or_above_settlement_seconds"),
-                "duration_strictly_above_settlement_seconds": selected_epoch.get("duration_strictly_above_settlement_seconds"),
-                "terminal_state_reached": selected_epoch.get("terminal_state_reached"),
-                "last_transition_timestamp_utc": selected_epoch.get("last_transition_timestamp_utc"),
-                "last_transition_temp_f": selected_epoch.get("last_transition_temp_f"),
-                "epoch_count_today": day_row.get("epoch_count_today"),
-                "open_epoch_present": day_row.get("open_epoch_present"),
-                "closed_epoch_count_today": day_row.get("closed_epoch_count_today"),
-                "reverted_epoch_count_today": day_row.get("reverted_epoch_count_today"),
-                "terminal_epoch_count_today": day_row.get("terminal_epoch_count_today"),
-                "high_alerting_possible": high_coverage.get("alerting_possible"),
-                "low_alerting_possible": low_coverage.get("alerting_possible"),
-                "high_coverage_status": high_coverage.get("coverage_status"),
-                "low_coverage_status": low_coverage.get("coverage_status"),
-                "high_coverage_reason": high_coverage.get("coverage_reason"),
-                "low_coverage_reason": low_coverage.get("coverage_reason"),
-                "high_eligible_market_count": high_coverage.get("eligible_market_count_after_filters"),
-                "low_eligible_market_count": low_coverage.get("eligible_market_count_after_filters"),
-                "latest_evaluation_timestamp_utc": latest_eval.get("latest_evaluation_timestamp_utc"),
-                "latest_market_evaluated": latest_eval.get("latest_market_evaluated"),
-                "latest_alerts_sent": latest_eval.get("latest_alerts_sent"),
-                "latest_evaluation_outcome": latest_eval.get("latest_evaluation_outcome"),
-                "latest_suppression_reason": latest_eval.get("latest_suppression_reason"),
-                "latest_transition_type": latest_eval.get("latest_transition_type"),
-                "latest_transition_event_id": latest_eval.get("latest_transition_event_id"),
-            }
-        )
+        row = {
+            "station": station_code,
+            "ingestion_status": ingestion_row.get("status"),
+            "ingestion_status_reason": ingestion_row.get("status_reason"),
+            "latest_accepted_observation_utc": ingestion_row.get("latest_accepted_observation_utc"),
+            "freshness_lag_seconds": ingestion_row.get("freshness_lag_seconds"),
+            "latest_poll_utc": ingestion_row.get("latest_poll_utc"),
+            "current_epoch_selection_source": selected_epoch.get("selection_source"),
+            "epoch_status": selected_epoch.get("epoch_status"),
+            "local_trading_date": selected_epoch.get("local_trading_date") or day_row.get("local_trading_date"),
+            "settlement_bucket": selected_epoch.get("settlement_bucket"),
+            "prior_settlement_bucket": selected_epoch.get("prior_settlement_bucket"),
+            "settlement_timestamp_utc": selected_epoch.get("settlement_timestamp_utc"),
+            "reversion_occurred": selected_epoch.get("reversion_occurred"),
+            "first_reversion_timestamp_utc": selected_epoch.get("first_reversion_timestamp_utc"),
+            "max_excursion_above_settlement": selected_epoch.get("max_excursion_above_settlement"),
+            "duration_at_or_above_settlement_seconds": selected_epoch.get("duration_at_or_above_settlement_seconds"),
+            "duration_strictly_above_settlement_seconds": selected_epoch.get("duration_strictly_above_settlement_seconds"),
+            "terminal_state_reached": selected_epoch.get("terminal_state_reached"),
+            "last_transition_timestamp_utc": selected_epoch.get("last_transition_timestamp_utc"),
+            "last_transition_temp_f": selected_epoch.get("last_transition_temp_f"),
+            "epoch_count_today": day_row.get("epoch_count_today"),
+            "open_epoch_present": day_row.get("open_epoch_present"),
+            "closed_epoch_count_today": day_row.get("closed_epoch_count_today"),
+            "reverted_epoch_count_today": day_row.get("reverted_epoch_count_today"),
+            "terminal_epoch_count_today": day_row.get("terminal_epoch_count_today"),
+            "high_alerting_possible": high_coverage.get("alerting_possible"),
+            "low_alerting_possible": low_coverage.get("alerting_possible"),
+            "high_coverage_status": high_coverage.get("coverage_status"),
+            "low_coverage_status": low_coverage.get("coverage_status"),
+            "high_coverage_reason": high_coverage.get("coverage_reason"),
+            "low_coverage_reason": low_coverage.get("coverage_reason"),
+            "high_eligible_market_count": high_coverage.get("eligible_market_count_after_filters"),
+            "low_eligible_market_count": low_coverage.get("eligible_market_count_after_filters"),
+            "latest_evaluation_timestamp_utc": latest_eval.get("latest_evaluation_timestamp_utc"),
+            "latest_market_evaluated": latest_eval.get("latest_market_evaluated"),
+            "latest_alerts_sent": latest_eval.get("latest_alerts_sent"),
+            "latest_evaluation_outcome": latest_eval.get("latest_evaluation_outcome"),
+            "latest_suppression_reason": latest_eval.get("latest_suppression_reason"),
+            "latest_transition_type": latest_eval.get("latest_transition_type"),
+            "latest_transition_event_id": latest_eval.get("latest_transition_event_id"),
+        }
+        row.update(_derive_trader_dashboard_attention(row))
+        rows.append(row)
 
     return {
         "station": station_filter,
