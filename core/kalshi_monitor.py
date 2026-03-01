@@ -461,11 +461,19 @@ def _determine_bucket(temp_f, ladder, market_type):
 def process_ladder_transition(station, market_type, snapshot, current_temp):
     markets = (snapshot or {}).get("markets") or []
     if not markets:
-        return {"should_alert": False, "reason": None}
+        return {
+            "should_alert": False,
+            "reason": None,
+            "outcome_hint": "NO_ELIGIBLE_MARKET",
+        }
 
     event_ticker = markets[0].get("event_ticker")
     if not event_ticker:
-        return {"should_alert": False, "reason": None}
+        return {
+            "should_alert": False,
+            "reason": None,
+            "outcome_hint": "NO_ELIGIBLE_MARKET",
+        }
 
     ladder = _build_ladder_structure(markets)
     bucket_index, final_now = _determine_bucket(current_temp, ladder, market_type)
@@ -488,6 +496,7 @@ def process_ladder_transition(station, market_type, snapshot, current_temp):
 
         should_alert = False
         reason = None
+        terminal_state_blocked = bool(final_now and state.get("final_hit"))
         prior_bucket_index = state.get("bucket_index")
 
         if not state["inside"] and bucket_index is not None:
@@ -525,6 +534,8 @@ def process_ladder_transition(station, market_type, snapshot, current_temp):
         "reason": reason,
         "bucket_index": bucket_index,
         "direction": direction,
+        "terminal_state_blocked": terminal_state_blocked,
+        "outcome_hint": "TERMINAL_STATE" if terminal_state_blocked else None,
     }
 
 

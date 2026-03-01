@@ -803,15 +803,76 @@ def _log_transition_event(
         _ALERT_LOGGER.warning("transition_event_log_failed station=%s error=%s", station, e)
 
 
-def _annotate_transition_history_market_eval(station: str, alerts_sent: int) -> None:
+def _annotate_transition_history_market_eval(
+    station: str,
+    alerts_sent: int,
+    evaluation_outcome: str,
+    suppression_reason: Optional[str] = None,
+) -> None:
     normalized_station = (station or "").strip().upper()
+    safe_outcome = (evaluation_outcome or "").strip().upper() or "SUPPRESSED_UNKNOWN"
+    safe_suppression_reason = (suppression_reason or "").strip().upper() or None
+
     with _TRANSITION_LOCK:
         for entry in reversed(_TRANSITION_HISTORY):
             if entry.get("station") != normalized_station:
                 continue
             entry["market_evaluated"] = True
             entry["alerts_sent"] = int(alerts_sent)
+            entry["evaluation_outcome"] = safe_outcome
+            if safe_suppression_reason:
+                entry["suppression_reason"] = safe_suppression_reason
             break
+
+    try:
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                cur = conn.execute(
+                    """
+                    SELECT id, metadata_json
+                    FROM transition_events
+                    WHERE station = ?
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (normalized_station,),
+                )
+                row = cur.fetchone()
+                if not row:
+                    return
+
+                metadata: Dict[str, Any] = {}
+                raw_metadata = row[1]
+                if raw_metadata:
+                    try:
+                        metadata = json.loads(raw_metadata)
+                    except Exception:
+                        metadata = {"raw_metadata_json": raw_metadata}
+
+                metadata["market_evaluated"] = True
+                metadata["alerts_sent"] = int(alerts_sent)
+                metadata["evaluation_outcome"] = safe_outcome
+                if safe_suppression_reason:
+                    metadata["suppression_reason"] = safe_suppression_reason
+
+                conn.execute(
+                    "UPDATE transition_events SET metadata_json = ? WHERE id = ?",
+                    (json.dumps(metadata, sort_keys=True), row[0]),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning(
+            "transition_market_eval_annotation_failed station=%s error=%s",
+            normalized_station,
+            e,
+        )
 
 
 def get_transition_history(station=None, limit=50):
@@ -1193,11 +1254,15 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             if not target_market_types:
                 target_market_types = {"HIGH"}
 
-            evaluated_market_types = 0
+            evaluated_market_attempts = 0
+            no_eligible_market_count = 0
             market_alerts_sent = 0
+            suppression_reason = None
+            saw_terminal_state = False
 
             if station_is_active:
                 for market_type_token in sorted(target_market_types):
+                    evaluated_market_attempts += 1
                     snapshot = build_structured_snapshot(station, {market_type_token})
                     markets = snapshot.get("markets") or []
                     _ALERT_LOGGER.info(
@@ -1209,6 +1274,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                     )
 
                     if not markets:
+                        no_eligible_market_count += 1
                         if should_alert_on_missing:
                             try:
                                 if _to_local:
@@ -1248,8 +1314,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                     metadata={"status_code": response.status_code},
                                 )
                         continue
-
-                    evaluated_market_types += 1
 
                     transition = process_ladder_transition(
                         station=station,
@@ -1308,9 +1372,30 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 bucket_index=result.get("bucket_index"),
                                 metadata={"reason": transition.get("reason")},
                             )
+                    else:
+                        if transition.get("terminal_state_blocked"):
+                            saw_terminal_state = True
+                        raw_reason = (transition.get("reason") or "").strip().upper()
+                        if raw_reason:
+                            suppression_reason = raw_reason
 
-            if evaluated_market_types > 0:
-                _annotate_transition_history_market_eval(station, market_alerts_sent)
+            if evaluated_market_attempts > 0:
+                if market_alerts_sent > 0:
+                    evaluation_outcome = "ALERT_SENT"
+                elif saw_terminal_state:
+                    evaluation_outcome = "TERMINAL_STATE"
+                elif no_eligible_market_count == evaluated_market_attempts:
+                    evaluation_outcome = "NO_ELIGIBLE_MARKET"
+                else:
+                    reason_token = suppression_reason or "NO_TRANSITION"
+                    evaluation_outcome = f"SUPPRESSED_{reason_token}"
+
+                _annotate_transition_history_market_eval(
+                    station=station,
+                    alerts_sent=market_alerts_sent,
+                    evaluation_outcome=evaluation_outcome,
+                    suppression_reason=suppression_reason,
+                )
         except Exception as e:
             print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
