@@ -208,6 +208,8 @@ class ObservabilityTraderDashboardTests(unittest.TestCase):
             "latest_suppression_reason",
             "latest_transition_type",
             "latest_transition_event_id",
+            "attention_status",
+            "attention_reason",
         }
 
         self.assertTrue(expected_contract_fields.issubset(set(rows["KDEN"].keys())))
@@ -230,6 +232,8 @@ class ObservabilityTraderDashboardTests(unittest.TestCase):
         self.assertEqual(rows["KDEN"]["low_coverage_reason"], "market_type_disabled_by_config")
         self.assertEqual(rows["KDEN"]["high_eligible_market_count"], 3)
         self.assertEqual(rows["KDEN"]["low_eligible_market_count"], 0)
+        self.assertEqual(rows["KDEN"]["attention_status"], "ready")
+        self.assertEqual(rows["KDEN"]["attention_reason"], "alerting_possible_open_epoch")
 
         self.assertEqual(rows["KLAX"]["ingestion_status"], "stale")
         self.assertEqual(rows["KLAX"]["ingestion_status_reason"], "freshness_lag_exceeds_threshold")
@@ -258,6 +262,80 @@ class ObservabilityTraderDashboardTests(unittest.TestCase):
         self.assertIsNone(rows["KLAX"]["latest_suppression_reason"])
         self.assertIsNone(rows["KLAX"]["latest_transition_type"])
         self.assertIsNone(rows["KLAX"]["latest_transition_event_id"])
+        self.assertEqual(rows["KLAX"]["attention_status"], "action_needed")
+        self.assertEqual(rows["KLAX"]["attention_reason"], "stale_ingestion")
+
+
+    def test_trader_dashboard_attention_priority_order(self):
+        cases = [
+            ({"ingestion_status": "stale"}, "action_needed", "stale_ingestion"),
+            (
+                {
+                    "ingestion_status": "healthy",
+                    "high_coverage_status": "not_covered",
+                    "low_coverage_status": "not_covered",
+                    "high_coverage_reason": "no_discovered_series",
+                    "low_coverage_reason": "no_discovered_series",
+                },
+                "action_needed",
+                "no_discovered_series",
+            ),
+            (
+                {
+                    "ingestion_status": "healthy",
+                    "high_coverage_status": "not_covered",
+                    "low_coverage_status": "not_covered",
+                    "high_coverage_reason": "no_eligible_markets_after_filters",
+                    "low_coverage_reason": "no_eligible_markets_after_filters",
+                },
+                "action_needed",
+                "no_eligible_markets",
+            ),
+            (
+                {
+                    "ingestion_status": "healthy",
+                    "terminal_state_reached": True,
+                    "latest_evaluation_outcome": "SUPPRESSED_RUNTIME_GATED",
+                },
+                "watch",
+                "terminal_state_reached",
+            ),
+            (
+                {
+                    "ingestion_status": "healthy",
+                    "latest_evaluation_outcome": "SUPPRESSED_RUNTIME_GATED",
+                    "high_coverage_status": "evaluation_only",
+                    "high_coverage_reason": "webhook_missing",
+                },
+                "watch",
+                "latest_evaluation_suppressed",
+            ),
+            (
+                {
+                    "ingestion_status": "healthy",
+                    "high_coverage_status": "evaluation_only",
+                    "high_coverage_reason": "webhook_missing",
+                },
+                "action_needed",
+                "evaluation_only_webhook_missing",
+            ),
+            (
+                {
+                    "ingestion_status": "healthy",
+                    "open_epoch_present": True,
+                    "high_alerting_possible": True,
+                },
+                "ready",
+                "alerting_possible_open_epoch",
+            ),
+            ({"ingestion_status": "healthy"}, "normal", "normal"),
+        ]
+
+        for row, expected_status, expected_reason in cases:
+            with self.subTest(row=row):
+                attention = app_module._derive_trader_dashboard_attention(row)
+                self.assertEqual(attention["attention_status"], expected_status)
+                self.assertEqual(attention["attention_reason"], expected_reason)
 
 
     @patch("app._build_market_coverage_rows", return_value={"station": "KDEN", "stations_evaluated": ["KDEN"], "rows": []})
