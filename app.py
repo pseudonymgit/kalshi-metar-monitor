@@ -27,6 +27,7 @@ from core.metar_monitor import (
     get_latest_station_market_evaluation_context,
     run_replay_for_station_day,
     is_scheduler_running,
+    set_live_station_universe_resolver,
 )
 
 from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
@@ -112,6 +113,13 @@ def _canonical_live_station_universe(station_filter=None):
         "discovered_stations": discovered_stations,
         "watchlist_stations": watchlist_stations,
     }
+
+
+def _canonical_live_polling_stations():
+    return _canonical_live_station_universe().get("stations") or []
+
+
+set_live_station_universe_resolver(_canonical_live_polling_stations)
 
 
 

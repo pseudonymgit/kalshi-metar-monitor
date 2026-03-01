@@ -54,6 +54,7 @@ _STATE = state_ref()
 _SCHEDULER_THREAD = None
 _SCHEDULER_STOP = threading.Event()
 _SCHEDULER_LOCK = threading.Lock()
+_LIVE_STATION_UNIVERSE_RESOLVER = None
 _AUDIT_LOCK = threading.Lock()
 _MISSING_LADDER_DEDUPE = {}
 _MISSING_LADDER_LOCK = threading.Lock()
@@ -1711,13 +1712,48 @@ def get_metrics() -> Dict[str, Any]:
     }
 
 
+def set_live_station_universe_resolver(resolver) -> None:
+    """
+    Register a callable that returns the canonical live station universe.
+    Resolver may return either a list of station codes or a dict containing
+    a "stations" list.
+    """
+    global _LIVE_STATION_UNIVERSE_RESOLVER
+    _LIVE_STATION_UNIVERSE_RESOLVER = resolver
+
+
+def _resolve_live_polling_stations(cfg: Dict[str, Any]) -> List[str]:
+    stations = _STATE["stations"] or cfg["stations"]
+
+    resolver = _LIVE_STATION_UNIVERSE_RESOLVER
+    if callable(resolver):
+        try:
+            resolved = resolver()
+            if isinstance(resolved, dict):
+                resolved = resolved.get("stations")
+            if isinstance(resolved, list):
+                canonical = [
+                    station.strip().upper()
+                    for station in resolved
+                    if isinstance(station, str) and station.strip()
+                ]
+                if canonical:
+                    stations = sorted(set(canonical))
+                    with _STATE_LOCK:
+                        _STATE["stations"] = stations
+        except Exception:
+            pass
+
+    return stations
+
+
 # =========================
 # Scheduler
 # =========================
 def _poll_once(logger=None):
     ensure_state_loaded()
     cfg = get_default_config()
-    stations = _STATE["stations"] or cfg["stations"]
+    stations = _resolve_live_polling_stations(cfg)
     chosen = cfg["default_source"] or "nws"
 
     total_ing = 0
