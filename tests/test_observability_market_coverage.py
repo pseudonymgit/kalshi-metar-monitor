@@ -136,7 +136,7 @@ class ObservabilityMarketCoverageTests(unittest.TestCase):
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26JAN01")
     @patch("app._kalshi_public_get", return_value={"markets": []})
     @patch("core.kalshi_monitor._get_active_stations", return_value=None)
-    def test_market_coverage_marks_discovered_station_not_live_when_missing_from_watchlist(self, *_mocks):
+    def test_market_coverage_keeps_discovered_station_live_even_when_missing_from_watchlist(self, *_mocks):
         response = self.client.get("/observability/market-coverage")
         self.assertEqual(response.status_code, 200)
 
@@ -146,13 +146,10 @@ class ObservabilityMarketCoverageTests(unittest.TestCase):
             for row in payload["rows"]
         }
 
-        self.assertFalse(rows[("KMIA", "HIGH")]["station_in_live_ingestion_universe"])
-        self.assertFalse(rows[("KMIA", "LOW")]["station_in_live_ingestion_universe"])
+        self.assertTrue(rows[("KMIA", "HIGH")]["station_in_live_ingestion_universe"])
+        self.assertTrue(rows[("KMIA", "LOW")]["station_in_live_ingestion_universe"])
         self.assertFalse(rows[("KMIA", "HIGH")]["evaluation_possible"])
-        self.assertEqual(
-            rows[("KMIA", "HIGH")]["coverage_reason"],
-            "station_not_in_live_ingestion_universe",
-        )
+        self.assertEqual(rows[("KMIA", "HIGH")]["coverage_reason"], "no_eligible_markets_after_filters")
 
 
 if __name__ == "__main__":

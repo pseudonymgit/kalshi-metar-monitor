@@ -65,6 +65,55 @@ def _merge_discovered_stations_into_watchlist():
         return
 
 
+def _canonical_live_station_universe(station_filter=None):
+    cfg = get_default_config()
+    state = get_state()
+
+    configured_stations = {
+        station.strip().upper()
+        for station in (cfg.get("stations") or [])
+        if station and station.strip()
+    }
+    configured_stations.update(
+        station.strip().upper()
+        for station in (state.get("stations") or [])
+        if station and station.strip()
+    )
+
+    try:
+        discovered_series = ensure_series_discovery_loaded() or {}
+    except Exception:
+        discovered_series = {}
+
+    discovered_stations = {
+        station.strip().upper()
+        for station in discovered_series.keys()
+        if station and station.strip()
+    }
+
+    try:
+        watchlist_payload = get_watchlist() or {}
+    except Exception:
+        watchlist_payload = {}
+
+    watchlist_stations = {
+        station.strip().upper()
+        for station in (watchlist_payload.get("watchlist") or [])
+        if station and station.strip()
+    }
+
+    live_stations = sorted(configured_stations.union(discovered_stations).union(watchlist_stations))
+    if station_filter:
+        live_stations = [station for station in live_stations if station == station_filter]
+
+    return {
+        "stations": live_stations,
+        "configured_stations": configured_stations,
+        "discovered_stations": discovered_stations,
+        "watchlist_stations": watchlist_stations,
+    }
+
+
 
 
 def _get_recent_alert_rows_for_preview(*, station=None, limit=25):
@@ -142,11 +191,8 @@ def _build_ingestion_health_rows(*, station_filter=None):
     stale_after_seconds = max(int(cfg.get("poll_seconds", 60)) * 3, 60)
     poll_lag_seconds = _safe_lag_seconds(now_utc=now_utc, iso_timestamp=last_poll_utc)
 
-    configured_stations = state.get("stations") or cfg.get("stations") or []
-    if station_filter:
-        stations = [station for station in configured_stations if station == station_filter]
-    else:
-        stations = list(configured_stations)
+    station_universe = _canonical_live_station_universe(station_filter=station_filter)
+    stations = station_universe.get("stations") or []
 
     per_station = []
     for station in stations:
@@ -232,30 +278,9 @@ def _build_market_coverage_rows(station_filter=None):
         _station_local_kalshi_date_token,
     )
 
-    cfg = get_default_config()
-    state = get_state()
-
-    configured_stations = {
-        station.strip().upper()
-        for station in (cfg.get("stations") or [])
-        if station and station.strip()
-    }
-    configured_stations.update(
-        station.strip().upper()
-        for station in (state.get("stations") or [])
-        if station and station.strip()
-    )
-
-    discovered_stations = {
-        station.strip().upper()
-        for station in (ensure_series_discovery_loaded() or {}).keys()
-        if station and station.strip()
-    }
-
-    stations = sorted(configured_stations.union(discovered_stations))
-
-    if station_filter:
-        stations = [station for station in stations if station == station_filter]
+    station_universe = _canonical_live_station_universe(station_filter=station_filter)
+    stations = station_universe.get("stations") or []
+    configured_stations = station_universe.get("configured_stations") or set()
 
     active_stations = _get_active_stations()
     enabled_market_types = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
@@ -264,13 +289,7 @@ def _build_market_coverage_rows(station_filter=None):
 
     webhook_configured = bool((os.getenv("ALERT_WEBHOOK_URL") or "").strip())
     series_by_station = ensure_series_discovery_loaded()
-    live_ingestion_stations = {
-        station.strip().upper()
-        for station in (get_watchlist().get("watchlist") or [])
-        if station and station.strip()
-    }
-    if not live_ingestion_stations:
-        live_ingestion_stations = set(configured_stations)
+    live_ingestion_stations = set(stations)
 
     rows = []
     for station in stations:
@@ -393,17 +412,7 @@ def _build_market_coverage_rows(station_filter=None):
 
 
 def _station_universe(station_filter=None):
-    cfg = get_default_config()
-    state = get_state()
-
-    configured_stations = set((cfg.get("stations") or []))
-    configured_stations.update(state.get("stations") or [])
-    stations = sorted(station.strip().upper() for station in configured_stations if station)
-
-    if station_filter:
-        stations = [station for station in stations if station == station_filter]
-
-    return stations
+    return _canonical_live_station_universe(station_filter=station_filter).get("stations") or []
 
 
 def _station_today_day_keys(stations):
