@@ -428,3 +428,145 @@ def get_current_settlement_epoch_summaries(*, station: Optional[str] = None) -> 
         "count": len(summaries),
         "epochs": summaries,
     }
+
+
+def get_current_day_structure_summaries(
+    *,
+    station_day_keys: Dict[str, str],
+    station: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Deterministic per-station current-day structural settlement epoch summary.
+
+    Selection rule per station for current/latest fields:
+      1) Prefer latest open epoch for station and local_trading_date.
+      2) If none exists, fall back to latest epoch by id for that day.
+    """
+    normalized_station = (station or "").strip().upper()
+
+    if normalized_station:
+        stations = [normalized_station] if normalized_station in station_day_keys else []
+    else:
+        stations = sorted(station_day_keys.keys())
+
+    rows: List[Dict[str, Any]] = []
+    for station_code in stations:
+        local_day_key = station_day_keys.get(station_code)
+        if not local_day_key:
+            continue
+
+        aggregate_row = _query_rows_readonly(
+            """
+            SELECT COUNT(*) AS epoch_count_today,
+                   MAX(CASE WHEN epoch_status = 'open' THEN 1 ELSE 0 END) AS open_epoch_present,
+                   SUM(CASE WHEN epoch_status = 'closed' THEN 1 ELSE 0 END) AS closed_epoch_count_today,
+                   SUM(CASE WHEN reversion_occurred = 1 THEN 1 ELSE 0 END) AS reverted_epoch_count_today,
+                   SUM(CASE WHEN epoch_close_reason = 'terminal_state' THEN 1 ELSE 0 END) AS terminal_epoch_count_today
+            FROM settlement_epochs
+            WHERE station = ?
+              AND local_trading_date = ?
+            """,
+            (station_code, local_day_key),
+        )
+
+        epoch_count_today = int((aggregate_row[0][0] or 0) if aggregate_row else 0)
+        open_epoch_present = bool((aggregate_row[0][1] or 0) if aggregate_row else 0)
+        closed_epoch_count_today = int((aggregate_row[0][2] or 0) if aggregate_row else 0)
+        reverted_epoch_count_today = int((aggregate_row[0][3] or 0) if aggregate_row else 0)
+        terminal_epoch_count_today = int((aggregate_row[0][4] or 0) if aggregate_row else 0)
+
+        selected_rows = _query_rows_readonly(
+            """
+            SELECT se.settlement_bucket,
+                   se.prior_settlement_bucket,
+                   se.settlement_timestamp_utc,
+                   se.settlement_jump_magnitude,
+                   se.epoch_status,
+                   se.reversion_occurred,
+                   se.first_reversion_timestamp_utc,
+                   se.max_excursion_above_settlement,
+                   se.duration_at_or_above_settlement_seconds,
+                   se.duration_strictly_above_settlement_seconds,
+                   se.terminal_state_reached,
+                   se.last_transition_timestamp_utc,
+                   se.last_transition_temp_f,
+                   'open_epoch' AS selection_source
+            FROM settlement_epochs se
+            WHERE se.station = ?
+              AND se.local_trading_date = ?
+              AND se.epoch_status = 'open'
+              AND se.id = (
+                  SELECT MAX(inner_open.id)
+                  FROM settlement_epochs inner_open
+                  WHERE inner_open.station = se.station
+                    AND inner_open.local_trading_date = se.local_trading_date
+                    AND inner_open.epoch_status = 'open'
+              )
+            UNION ALL
+            SELECT se.settlement_bucket,
+                   se.prior_settlement_bucket,
+                   se.settlement_timestamp_utc,
+                   se.settlement_jump_magnitude,
+                   se.epoch_status,
+                   se.reversion_occurred,
+                   se.first_reversion_timestamp_utc,
+                   se.max_excursion_above_settlement,
+                   se.duration_at_or_above_settlement_seconds,
+                   se.duration_strictly_above_settlement_seconds,
+                   se.terminal_state_reached,
+                   se.last_transition_timestamp_utc,
+                   se.last_transition_temp_f,
+                   'latest_epoch_fallback' AS selection_source
+            FROM settlement_epochs se
+            WHERE se.station = ?
+              AND se.local_trading_date = ?
+              AND se.id = (
+                  SELECT MAX(inner_latest.id)
+                  FROM settlement_epochs inner_latest
+                  WHERE inner_latest.station = se.station
+                    AND inner_latest.local_trading_date = se.local_trading_date
+              )
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM settlement_epochs open_exists
+                  WHERE open_exists.station = se.station
+                    AND open_exists.local_trading_date = se.local_trading_date
+                    AND open_exists.epoch_status = 'open'
+              )
+            """,
+            (station_code, local_day_key, station_code, local_day_key),
+        )
+        selected = selected_rows[0] if selected_rows else None
+
+        rows.append(
+            {
+                "station": station_code,
+                "local_trading_date": local_day_key,
+                "epoch_count_today": epoch_count_today,
+                "open_epoch_present": open_epoch_present,
+                "current_or_latest_settlement_bucket": selected[0] if selected else None,
+                "current_or_latest_prior_settlement_bucket": selected[1] if selected else None,
+                "current_or_latest_settlement_timestamp_utc": selected[2] if selected else None,
+                "current_or_latest_settlement_jump_magnitude": selected[3] if selected else None,
+                "current_or_latest_epoch_status": selected[4] if selected else None,
+                "current_or_latest_reversion_occurred": bool(selected[5]) if selected else None,
+                "current_or_latest_first_reversion_timestamp_utc": selected[6] if selected else None,
+                "current_or_latest_max_excursion_above_settlement": selected[7] if selected else None,
+                "current_or_latest_duration_at_or_above_settlement_seconds": selected[8] if selected else None,
+                "current_or_latest_duration_strictly_above_settlement_seconds": selected[9] if selected else None,
+                "current_or_latest_terminal_state_reached": bool(selected[10]) if selected else None,
+                "latest_transition_timestamp_utc": selected[11] if selected else None,
+                "latest_transition_temp_f": selected[12] if selected else None,
+                "closed_epoch_count_today": closed_epoch_count_today,
+                "reverted_epoch_count_today": reverted_epoch_count_today,
+                "terminal_epoch_count_today": terminal_epoch_count_today,
+                "latest_selection_source": selected[13] if selected else None,
+            }
+        )
+
+    return {
+        "database_present": _db_exists(),
+        "station": normalized_station or None,
+        "count": len(rows),
+        "rows": rows,
+    }
