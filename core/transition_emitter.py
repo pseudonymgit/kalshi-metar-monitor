@@ -21,8 +21,8 @@ def emit_transition_if_changed(
     running_max: float,
     current_temp: float,
     metadata: Dict[str, Any],
-    emit_fn: Callable[..., None],
-) -> None:
+    emit_fn: Callable[..., Any],
+) -> Optional[Any]:
     """
     Single authority for transition emission routing.
     No state mutation is allowed in this layer.
@@ -30,11 +30,11 @@ def emit_transition_if_changed(
     enforce_transition_emission_authority()
 
     if not transition_type:
-        return
+        return None
     if not (instant_changed or settlement_changed):
-        return
+        return None
 
-    emit_fn(
+    return emit_fn(
         station=station,
         transition_type=transition_type,
         instant_bucket_before=instant_bucket_before,

@@ -474,7 +474,17 @@ def _ingest_obs(
     return (ingested, alerts)
 
 
-def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time: str, cfg: Dict[str, Any], instant_bucket_changed: bool = False, settlement_bucket_changed: bool = False) -> None:
+def _emit_alert(
+    icao: str,
+    prev_f: float,
+    now_f: float,
+    delta_f: float,
+    obs_time: str,
+    cfg: Dict[str, Any],
+    instant_bucket_changed: bool = False,
+    settlement_bucket_changed: bool = False,
+    transition_correlation: Optional[Dict[str, Any]] = None,
+) -> None:
     payload = {
         "type": "temp_change",
         "station": icao,
@@ -485,6 +495,7 @@ def _emit_alert(icao: str, prev_f: float, now_f: float, delta_f: float, obs_time
         "at_utc": _now_utc_iso(),
         "instant_bucket_changed": bool(instant_bucket_changed),
         "settlement_bucket_changed": bool(settlement_bucket_changed),
+        "transition_correlation": transition_correlation,
     }
     _send_alert(cfg.get("webhook", ""), payload)
 
@@ -533,7 +544,7 @@ def _process_temperature_event(
     ):
         transition_type = "reversion_after_settlement"
 
-    emit_transition_if_changed(
+    transition_correlation = emit_transition_if_changed(
         transition_type=transition_type,
         instant_changed=instant_changed,
         settlement_changed=settlement_changed,
@@ -575,6 +586,7 @@ def _process_temperature_event(
                 cfg=cfg,
                 instant_bucket_changed=instant_changed,
                 settlement_bucket_changed=settlement_changed,
+                transition_correlation=transition_correlation,
             )
         alerts = 1
 
@@ -732,9 +744,10 @@ def _log_transition_event(
     running_max: float,
     current_temp: float,
     metadata: Optional[Dict[str, Any]] = None,
-) -> None:
+) -> Optional[Dict[str, Any]]:
     now_iso = _now_utc_iso()
     try:
+        transition_event_id = None
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         with _AUDIT_LOCK:
@@ -756,7 +769,7 @@ def _log_transition_event(
                     )
                     """
                 )
-                conn.execute(
+                cur = conn.execute(
                     """
                     INSERT INTO transition_events (
                         created_utc,
@@ -782,6 +795,7 @@ def _log_transition_event(
                         json.dumps(metadata or {}, sort_keys=True),
                     ),
                 )
+                transition_event_id = int(cur.lastrowid or 0) or None
                 conn.commit()
             finally:
                 conn.close()
@@ -795,23 +809,125 @@ def _log_transition_event(
                     "instant_bucket_after": instant_bucket_after,
                     "settlement_bucket": settlement_bucket,
                     "running_max": running_max,
-                    "current_temp": current_temp,
-                    "timestamp_utc": now_iso,
-                }
-            )
+                        "current_temp": current_temp,
+                        "timestamp_utc": now_iso,
+                        "transition_event_id": transition_event_id,
+                    }
+                )
+        return {
+            "station": (station or "").upper(),
+            "timestamp_utc": now_iso,
+            "transition_event_id": transition_event_id,
+        }
     except Exception as e:
         _ALERT_LOGGER.warning("transition_event_log_failed station=%s error=%s", station, e)
+    return None
 
 
-def _annotate_transition_history_market_eval(station: str, alerts_sent: int) -> None:
+def _annotate_transition_history_market_eval(
+    station: str,
+    transition_correlation: Optional[Dict[str, Any]],
+    alerts_sent: int,
+    evaluation_outcome: str,
+    suppression_reason: Optional[str] = None,
+) -> None:
     normalized_station = (station or "").strip().upper()
+    transition_id = None
+    transition_timestamp = None
+    if isinstance(transition_correlation, dict):
+        raw_id = transition_correlation.get("transition_event_id")
+        if raw_id is not None:
+            try:
+                transition_id = int(raw_id)
+            except Exception:
+                transition_id = None
+        raw_timestamp = transition_correlation.get("timestamp_utc")
+        if raw_timestamp is not None:
+            transition_timestamp = str(raw_timestamp)
+    if transition_id is None and not transition_timestamp:
+        _ALERT_LOGGER.warning(
+            "transition_market_eval_annotation_skipped station=%s reason=missing_correlation",
+            normalized_station,
+        )
+        return
+    safe_outcome = (evaluation_outcome or "").strip().upper() or "SUPPRESSED_UNKNOWN"
+    safe_suppression_reason = (suppression_reason or "").strip().upper() or None
+
     with _TRANSITION_LOCK:
         for entry in reversed(_TRANSITION_HISTORY):
             if entry.get("station") != normalized_station:
                 continue
+            if transition_id is not None and int(entry.get("transition_event_id") or 0) != transition_id:
+                continue
+            if transition_id is None and transition_timestamp and entry.get("timestamp_utc") != transition_timestamp:
+                continue
             entry["market_evaluated"] = True
             entry["alerts_sent"] = int(alerts_sent)
+            entry["evaluation_outcome"] = safe_outcome
+            if safe_suppression_reason:
+                entry["suppression_reason"] = safe_suppression_reason
             break
+
+    try:
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                cur = conn.execute(
+                    """
+                    SELECT id, metadata_json
+                    FROM transition_events
+                    WHERE station = ?
+                    AND (
+                        (? IS NOT NULL AND id = ?)
+                        OR (? IS NULL AND ? IS NOT NULL AND created_utc = ?)
+                    )
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (
+                        normalized_station,
+                        transition_id,
+                        transition_id,
+                        transition_id,
+                        transition_timestamp,
+                        transition_timestamp,
+                    ),
+                )
+                row = cur.fetchone()
+                if not row:
+                    return
+
+                metadata: Dict[str, Any] = {}
+                raw_metadata = row[1]
+                if raw_metadata:
+                    try:
+                        metadata = json.loads(raw_metadata)
+                    except Exception:
+                        metadata = {"raw_metadata_json": raw_metadata}
+
+                metadata["market_evaluated"] = True
+                metadata["alerts_sent"] = int(alerts_sent)
+                metadata["evaluation_outcome"] = safe_outcome
+                if safe_suppression_reason:
+                    metadata["suppression_reason"] = safe_suppression_reason
+
+                conn.execute(
+                    "UPDATE transition_events SET metadata_json = ? WHERE id = ?",
+                    (json.dumps(metadata, sort_keys=True), row[0]),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning(
+            "transition_market_eval_annotation_failed station=%s error=%s",
+            normalized_station,
+            e,
+        )
 
 
 def get_transition_history(station=None, limit=50):
@@ -1159,6 +1275,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
         tf = payload.get("temp_f")
         pf = payload.get("prev_temp_f")
         df = payload.get("delta_f")
+        transition_correlation = payload.get("transition_correlation")
 
         if tf is None:
             return
@@ -1193,11 +1310,15 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             if not target_market_types:
                 target_market_types = {"HIGH"}
 
-            evaluated_market_types = 0
+            evaluated_market_attempts = 0
+            no_eligible_market_count = 0
             market_alerts_sent = 0
+            suppression_reason = None
+            saw_terminal_state = False
 
             if station_is_active:
                 for market_type_token in sorted(target_market_types):
+                    evaluated_market_attempts += 1
                     snapshot = build_structured_snapshot(station, {market_type_token})
                     markets = snapshot.get("markets") or []
                     _ALERT_LOGGER.info(
@@ -1209,6 +1330,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                     )
 
                     if not markets:
+                        no_eligible_market_count += 1
                         if should_alert_on_missing:
                             try:
                                 if _to_local:
@@ -1248,8 +1370,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                     metadata={"status_code": response.status_code},
                                 )
                         continue
-
-                    evaluated_market_types += 1
 
                     transition = process_ladder_transition(
                         station=station,
@@ -1308,9 +1428,31 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 bucket_index=result.get("bucket_index"),
                                 metadata={"reason": transition.get("reason")},
                             )
+                    else:
+                        if transition.get("terminal_state_blocked"):
+                            saw_terminal_state = True
+                        raw_reason = (transition.get("reason") or "").strip().upper()
+                        if raw_reason:
+                            suppression_reason = raw_reason
 
-            if evaluated_market_types > 0:
-                _annotate_transition_history_market_eval(station, market_alerts_sent)
+            if evaluated_market_attempts > 0:
+                if market_alerts_sent > 0:
+                    evaluation_outcome = "ALERT_SENT"
+                elif saw_terminal_state:
+                    evaluation_outcome = "TERMINAL_STATE"
+                elif no_eligible_market_count == evaluated_market_attempts:
+                    evaluation_outcome = "NO_ELIGIBLE_MARKET"
+                else:
+                    reason_token = suppression_reason or "NO_TRANSITION"
+                    evaluation_outcome = f"SUPPRESSED_{reason_token}"
+
+                _annotate_transition_history_market_eval(
+                    station=station,
+                    transition_correlation=transition_correlation,
+                    alerts_sent=market_alerts_sent,
+                    evaluation_outcome=evaluation_outcome,
+                    suppression_reason=suppression_reason,
+                )
         except Exception as e:
             print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
