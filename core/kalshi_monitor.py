@@ -7,6 +7,7 @@ import time
 from datetime import datetime, timezone
 
 import requests
+from flask import has_request_context, request
 
 from core.authoritative_state import immutable_public_state_snapshot
 from core.station_time import parse_iso_utc, station_local_day_key, to_station_local
@@ -33,6 +34,7 @@ _LADDER_LOCK = threading.Lock()
 _SERIES_LOCK = threading.Lock()
 _SERIES_BY_STATION = {}
 _SERIES_DISCOVERED = False
+_SERIES_MARKETS_CACHE = {}
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -212,6 +214,9 @@ def get_metrics():
 
 
 def _kalshi_public_get(path):
+    if has_request_context() and str(request.path or "").startswith("/observability/"):
+        raise RuntimeError("Live Kalshi call attempted in observability path")
+
     base_url = (
         os.getenv("KALSHI_PUBLIC_BASE_URL")
         or "https://api.elections.kalshi.com/trade-api/v2"
@@ -421,6 +426,18 @@ def ensure_series_discovery_loaded():
         _SERIES_DISCOVERED = True
         return dict(_SERIES_BY_STATION)
 
+
+def get_cached_series_markets(series_ticker: str) -> dict | None:
+    normalized_series_ticker = (series_ticker or "").strip().upper()
+    if not normalized_series_ticker:
+        return None
+
+    with _SERIES_LOCK:
+        cached_markets = _SERIES_MARKETS_CACHE.get(normalized_series_ticker)
+        if cached_markets is None:
+            return None
+        return {"markets": list(cached_markets)}
+
 def _build_weather_event_ticker(station: str, market_type: str):
     city_token = _STATION_CITY_TOKEN_MAP.get(station)
     if not city_token:
@@ -489,6 +506,8 @@ def build_structured_snapshot(station: str, market_types: set):
     if series_ticker:
         data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
         fetched_markets.extend(data.get("markets", []))
+        with _SERIES_LOCK:
+            _SERIES_MARKETS_CACHE[series_ticker] = list(fetched_markets)
 
     filtered_markets = _filter_structured_markets(
         fetched_markets,

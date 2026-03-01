@@ -14,12 +14,14 @@ class AlertFireAuditEndpointTests(unittest.TestCase):
     @patch("app._count_composed_alerts_for_station_local_day", return_value=0)
     @patch("app._count_settlement_up_epochs_for_station_local_day", return_value=2)
     @patch("app._build_market_coverage_rows")
+    @patch("core.kalshi_monitor._kalshi_public_get", side_effect=AssertionError("should not be called"))
     @patch("app._station_today_day_keys", return_value={"KDEN": "2026-01-01"})
     @patch("app._canonical_live_station_universe")
     def test_transition_with_eligible_markets_and_zero_alerts_flags_integrity(
         self,
         mock_station_universe,
         _mock_day_keys,
+        _mock_public_get,
         mock_coverage,
         _mock_settlement_count,
         _mock_alert_count,

@@ -27,7 +27,7 @@ from core.authoritative_state import (
 from core.transition_emitter import emit_transition_if_changed
 from core.replay_engine import execute_ordered_replay_stream
 from core.security_boundaries import enforce_execution_domain_guard
-from core.station_time import station_timezone_name, to_station_local
+from core.station_time import station_local_day_key, station_timezone_name, to_station_local
 
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
@@ -39,6 +39,7 @@ except Exception:
 ET_TZ_NAME = "America/New_York"
 OVERLAP_SECONDS = 120               # small overlap to avoid missing late arrivals
 FIRST_RUN_CUSHION_SEC = 300         # first contact: add 5 min cushion
+METAR_ACCEPTANCE_GRACE_SECONDS = min(900, OVERLAP_SECONDS * 5)  # 15 minutes max, bounded by overlap safety
 
 def _icao_tz_name(icao: str) -> str:
     return station_timezone_name(icao)
@@ -139,13 +140,6 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
 def _to_local(icao: str, dt_utc: datetime) -> datetime:
     """Convert a UTC datetime to the station's local timezone."""
     return to_station_local(icao, dt_utc)
-
-
-def _within_alert_window_local(icao: str, dt_iso: str) -> bool:
-    """True only if station local hour is in [11, 19)."""
-    dt_utc = _parse_iso(dt_iso)
-    dt_local = _to_local(icao, dt_utc)
-    return 11 <= dt_local.hour < 19
 
 
 def _maybe_daily_reset_local(icao: str, dt_iso: str) -> None:
@@ -407,6 +401,8 @@ def _ingest_obs(
     cfg: Dict[str, Any],
     allow_alert_delivery: bool = True,
     persist_cache: bool = True,
+    window_start: Optional[datetime] = None,
+    window_end: Optional[datetime] = None,
 ) -> Tuple[int, int]:
     """
     Ingests observations in chronological order.
@@ -426,10 +422,29 @@ def _ingest_obs(
 
     ingested = 0
     alerts = 0
+    window_end_day_key = station_local_day_key(icao, window_end.isoformat()) if window_end else None
 
     for obs in new_obs:
         ts = obs["obs_time"]
-        if last_seen_iso and _parse_iso(ts) <= _parse_iso(last_seen_iso):
+        obs_dt = _parse_iso(ts)
+
+        if window_end and obs_dt > window_end:
+            continue
+
+        if window_start:
+            grace_start = window_start - timedelta(seconds=METAR_ACCEPTANCE_GRACE_SECONDS)
+            if obs_dt < grace_start:
+                continue
+
+            obs_day_key = station_local_day_key(icao, obs_dt.isoformat())
+            if window_end_day_key and obs_day_key != window_end_day_key:
+                continue
+
+            if obs_dt < window_start:
+                lag_seconds = int((window_start - obs_dt).total_seconds())
+                _ALERT_LOGGER.debug(f"accepted_with_grace station={icao} lag_seconds={lag_seconds}")
+
+        if last_seen_iso and obs_dt <= _parse_iso(last_seen_iso):
             continue
 
         # store through authoritative state owner
@@ -496,7 +511,6 @@ def _process_temperature_event(
     cfg: Dict[str, Any],
     last_temp_f: Optional[float] = None,
     allow_alert_delivery: bool = True,
-    ignore_window: bool = False,
 ) -> int:
     prev_f = float(last_temp_f) if last_temp_f is not None else float(temp_f)
     now_f = float(temp_f)
@@ -554,8 +568,7 @@ def _process_temperature_event(
 
     alerts = 0
     if (
-        (ignore_window or _within_alert_window_local(icao, obs_time))
-        and last_observed_integer is not None
+        last_observed_integer is not None
         and curr_floor != last_observed_integer
     ):
         _ALERT_LOGGER.info(
@@ -1294,7 +1307,6 @@ def _simulate_temperature_for_testing(
         cfg=cfg,
         last_temp_f=last_temp,
         allow_alert_delivery=allow_alert_delivery,
-        ignore_window=True,
     )
 
     with _STATE_LOCK:
@@ -1312,7 +1324,6 @@ def _simulate_temperature_for_testing(
         "alerts_generated": alerts,
         "delivery_requested": allow_alert_delivery,
         "delivery_attempted": delivery_attempted,
-        "window_bypassed": True,
         "previous_integer": previous_integer,
         "current_integer": current_integer,
         "crossed_integer": previous_integer is not None and previous_integer != current_integer,
@@ -1571,7 +1582,7 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
 
     try:
         obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
-        ing, al = _ingest_obs(icao, obs_list, cfg)
+        ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
         with _STATE_LOCK:
             latest = _STATE["last_obs"].get(icao)
         return {
@@ -1754,6 +1765,18 @@ def _poll_once(logger=None):
     ensure_state_loaded()
     cfg = get_default_config()
     stations = _resolve_live_polling_stations(cfg)
+
+    from core.kalshi_monitor import build_structured_snapshot
+
+    for icao in stations:
+        try:
+            build_structured_snapshot(
+                station=icao,
+                market_types={"HIGH", "LOW"}
+            )
+        except Exception:
+            pass
+
     chosen = cfg["default_source"] or "nws"
 
     total_ing = 0
@@ -1762,7 +1785,7 @@ def _poll_once(logger=None):
         try:
             start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg)
             obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
-            ing, al = _ingest_obs(icao, obs_list, cfg)
+            ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
             total_ing += ing
             total_alerts += al
         except Exception as e:

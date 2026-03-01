@@ -34,6 +34,7 @@ from core.kalshi_monitor import (
     _kalshi_public_get,
     build_market_polling_station_universe,
     ensure_series_discovery_loaded,
+    get_cached_series_markets,
 )
 from core.observability import (
     get_current_day_structure_summaries,
@@ -333,9 +334,13 @@ def _build_market_coverage_rows(station_filter=None):
         series_ticker = series_by_station.get(station)
 
         discovered_markets = []
+        market_data_available = True
         if series_ticker:
-            data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
-            discovered_markets = data.get("markets") or []
+            cached_data = get_cached_series_markets(series_ticker)
+            if cached_data is None:
+                market_data_available = False
+            else:
+                discovered_markets = cached_data.get("markets") or []
 
         for market_type in ["HIGH", "LOW"]:
             market_type_enabled = market_type in enabled_market_types
@@ -406,6 +411,9 @@ def _build_market_coverage_rows(station_filter=None):
             elif not series_ticker:
                 coverage_status = "not_covered"
                 coverage_reason = "no_discovered_series"
+            elif not market_data_available:
+                coverage_status = "market_data_unknown"
+                coverage_reason = "cache_not_yet_populated"
             elif len(eligible_markets) == 0:
                 coverage_status = "not_covered"
                 coverage_reason = "no_eligible_markets_after_filters"
@@ -1438,7 +1446,6 @@ def metar_simulate_ladder():
       - deliver (optional; true/1 enables webhook delivery attempt)
 
     Notes:
-      - Bypasses live alert window gating.
       - Returns crossing and delivery-attempt metadata for test sequencing.
     """
     data = request.get_json(force=True, silent=True) or {}
