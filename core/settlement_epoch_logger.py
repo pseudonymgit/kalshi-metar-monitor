@@ -1,7 +1,8 @@
 import os
 import sqlite3
-from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
+
+from core.station_time import parse_iso_utc, station_local_day_key
 
 
 _SETTLEMENT_UP = "settlement_up"
@@ -13,25 +14,9 @@ def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
 
-def _parse_iso_utc(timestamp: Optional[str]) -> Optional[datetime]:
-    if not timestamp:
-        return None
-    normalized = str(timestamp).strip()
-    if not normalized:
-        return None
-    if normalized.endswith("Z"):
-        normalized = normalized[:-1] + "+00:00"
-    try:
-        return datetime.fromisoformat(normalized)
-    except ValueError:
-        return None
-
-
-def _event_day_key(obs_timestamp_utc: Optional[str], event_timestamp_utc: Optional[str]) -> str:
-    source = _parse_iso_utc(obs_timestamp_utc) or _parse_iso_utc(event_timestamp_utc)
-    if source is None:
-        return "unknown"
-    return source.date().isoformat()
+def _event_day_key(station: str, obs_timestamp_utc: Optional[str], event_timestamp_utc: Optional[str]) -> str:
+    source_timestamp = obs_timestamp_utc if parse_iso_utc(obs_timestamp_utc) is not None else event_timestamp_utc
+    return station_local_day_key(station, source_timestamp)
 
 
 def _close_epoch(
@@ -73,8 +58,8 @@ def _maybe_add_duration(
     if previous_temp is None:
         return at_or_above_seconds, strictly_above_seconds
 
-    start_dt = _parse_iso_utc(start_iso)
-    end_dt = _parse_iso_utc(end_iso)
+    start_dt = parse_iso_utc(start_iso)
+    end_dt = parse_iso_utc(end_iso)
     if start_dt is None or end_dt is None:
         return at_or_above_seconds, strictly_above_seconds
 
@@ -109,8 +94,8 @@ def log_transition_for_settlement_epoch(
     obs_timestamp_utc = metadata_dict.get("obs_time")
     terminal_state_reached = bool(metadata_dict.get("terminal_state_reached"))
 
-    day_key = _event_day_key(obs_timestamp_utc, event_timestamp_utc)
     station_normalized = (station or "").strip().upper()
+    day_key = _event_day_key(station_normalized, obs_timestamp_utc, event_timestamp_utc)
 
     db_path = _alert_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
