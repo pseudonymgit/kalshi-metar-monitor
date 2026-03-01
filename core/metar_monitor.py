@@ -1478,7 +1478,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 direction=direction,
                                 temp_f=float(tf),
                                 bucket_index=result.get("bucket_index"),
-                                metadata={"reason": transition.get("reason")},
+                                metadata={
+                                    "reason": transition.get("reason"),
+                                    "attention_phrase": result.get("attention_phrase"),
+                                    "alert_context": result.get("alert_context"),
+                                },
                             )
                     else:
                         if transition.get("terminal_state_blocked"):
