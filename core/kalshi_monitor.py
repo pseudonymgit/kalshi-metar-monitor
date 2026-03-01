@@ -942,6 +942,11 @@ def send_composed_weather_market_alert(
         "observed": current_temp_f,
         "event_ticker": event_ticker,
         "bucket_index": current_index,
+        "attention_phrase": attention_phrase,
+        "alert_context": {
+            "attention_phrase": attention_phrase,
+            **epoch_context,
+        },
     }
 
 
