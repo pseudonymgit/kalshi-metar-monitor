@@ -30,7 +30,11 @@ from core.metar_monitor import (
     set_live_station_universe_resolver,
 )
 
-from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
+from core.kalshi_monitor import (
+    _kalshi_public_get,
+    build_market_polling_station_universe,
+    ensure_series_discovery_loaded,
+)
 from core.observability import (
     get_current_day_structure_summaries,
     get_current_settlement_epoch_summaries,
@@ -67,6 +71,27 @@ def _merge_discovered_stations_into_watchlist():
 
 
 def _canonical_live_station_universe(station_filter=None):
+    try:
+        market_polling_stations = build_market_polling_station_universe()
+    except Exception:
+        market_polling_stations = []
+
+    if market_polling_stations:
+        live_stations = sorted(
+            station.strip().upper()
+            for station in market_polling_stations
+            if station and station.strip()
+        )
+        if station_filter:
+            live_stations = [station for station in live_stations if station == station_filter]
+        return {
+            "stations": live_stations,
+            "configured_stations": set(),
+            "discovered_stations": set(),
+            "watchlist_stations": set(),
+            "market_polling_stations": set(live_stations),
+        }
+
     cfg = get_default_config()
     state = get_state()
 
@@ -112,6 +137,7 @@ def _canonical_live_station_universe(station_filter=None):
         "configured_stations": configured_stations,
         "discovered_stations": discovered_stations,
         "watchlist_stations": watchlist_stations,
+        "market_polling_stations": set(),
     }
 
 
