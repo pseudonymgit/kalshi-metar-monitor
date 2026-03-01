@@ -89,13 +89,46 @@ class SettlementEpochLoggerTests(unittest.TestCase):
             self.assertEqual(second[3], "open")
             self.assertEqual(second[4], None)
 
-    def test_closes_on_day_key_change(self):
+    def test_closes_on_station_local_day_key_change(self):
         with tempfile.TemporaryDirectory() as tmp:
             db_path = os.path.join(tmp, "alerts.db")
             os.environ["ALERT_DB_PATH"] = db_path
 
             log_transition_for_settlement_epoch(
-                station="KSEA",
+                station="KDEN",
+                transition_type="settlement_up",
+                settlement_bucket=60,
+                current_temp=60.0,
+                metadata={"obs_time": "2026-02-01T06:55:00Z", "previous_settlement_bucket": 59},
+                transition_event_id=1,
+                event_timestamp_utc="2026-02-01T06:55:00Z",
+            )
+            log_transition_for_settlement_epoch(
+                station="KDEN",
+                transition_type="instant_up",
+                settlement_bucket=60,
+                current_temp=60.5,
+                metadata={"obs_time": "2026-02-01T07:05:00Z"},
+                transition_event_id=2,
+                event_timestamp_utc="2026-02-01T07:05:00Z",
+            )
+
+            conn = sqlite3.connect(db_path)
+            row = conn.execute(
+                "SELECT epoch_status, epoch_close_reason FROM settlement_epochs ORDER BY id LIMIT 1"
+            ).fetchone()
+            conn.close()
+
+            self.assertEqual(row[0], "closed")
+            self.assertEqual(row[1], "day_reset")
+
+    def test_does_not_close_when_utc_day_changes_but_station_local_day_does_not(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = os.path.join(tmp, "alerts.db")
+            os.environ["ALERT_DB_PATH"] = db_path
+
+            log_transition_for_settlement_epoch(
+                station="KPHL",
                 transition_type="settlement_up",
                 settlement_bucket=60,
                 current_temp=60.0,
@@ -104,7 +137,7 @@ class SettlementEpochLoggerTests(unittest.TestCase):
                 event_timestamp_utc="2026-02-01T23:55:00Z",
             )
             log_transition_for_settlement_epoch(
-                station="KSEA",
+                station="KPHL",
                 transition_type="instant_up",
                 settlement_bucket=60,
                 current_temp=60.5,
@@ -119,8 +152,8 @@ class SettlementEpochLoggerTests(unittest.TestCase):
             ).fetchone()
             conn.close()
 
-            self.assertEqual(row[0], "closed")
-            self.assertEqual(row[1], "day_reset")
+            self.assertEqual(row[0], "open")
+            self.assertEqual(row[1], None)
 
 
 if __name__ == "__main__":

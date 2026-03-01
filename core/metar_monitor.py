@@ -27,6 +27,7 @@ from core.authoritative_state import (
 from core.transition_emitter import emit_transition_if_changed
 from core.replay_engine import execute_ordered_replay_stream
 from core.security_boundaries import enforce_execution_domain_guard
+from core.station_time import station_timezone_name, to_station_local
 
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
@@ -39,20 +40,9 @@ ET_TZ_NAME = "America/New_York"
 OVERLAP_SECONDS = 120               # small overlap to avoid missing late arrivals
 FIRST_RUN_CUSHION_SEC = 300         # first contact: add 5 min cushion
 
-# Station → local timezone name (expand as you add stations)
-_ICAO_TZ = {
-    "KDEN": "America/Denver",
-    "KLAX": "America/Los_Angeles",
-    "KMDW": "America/Chicago",
-    "KAUS": "America/Chicago",
-    "KMIA": "America/New_York",
-    "KPHL": "America/New_York",
-    "KNYC": "America/New_York",  # replace with actual ICAO if you change source
-}
-
-
 def _icao_tz_name(icao: str) -> str:
-    return _ICAO_TZ.get(icao.upper(), "America/New_York")
+    return station_timezone_name(icao)
+
 
 
 # =========================
@@ -147,9 +137,7 @@ def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
 
 def _to_local(icao: str, dt_utc: datetime) -> datetime:
     """Convert a UTC datetime to the station's local timezone."""
-    if ZoneInfo is None:
-        return dt_utc
-    return dt_utc.astimezone(ZoneInfo(_icao_tz_name(icao)))
+    return to_station_local(icao, dt_utc)
 
 
 def _within_alert_window_local(icao: str, dt_iso: str) -> bool:
