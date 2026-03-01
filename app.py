@@ -27,6 +27,7 @@ from core.metar_monitor import (
 )
 
 from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
+from core.observability import get_current_settlement_epoch_summaries
 
 app = Flask(__name__)
 log = app.logger
@@ -355,6 +356,13 @@ def observability_ingestion_health():
             "stations": per_station,
         }
     ), 200
+
+
+@app.route("/observability/current-epochs", methods=["GET"])
+def observability_current_epochs():
+    station = (request.args.get("station") or "").strip().upper() or None
+    payload = get_current_settlement_epoch_summaries(station=station)
+    return jsonify({"ok": True, **payload}), 200
 
 
 @app.route("/metar/status", methods=["GET"])
