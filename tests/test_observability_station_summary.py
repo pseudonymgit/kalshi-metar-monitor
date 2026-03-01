@@ -13,6 +13,12 @@ class ObservabilityStationSummaryTests(unittest.TestCase):
     def setUp(self):
         app_module._autostart_fallback_done = True
         self.client = app.test_client()
+        self._discovery_patcher = patch("app.ensure_series_discovery_loaded", return_value={})
+        self._watchlist_patcher = patch("app.get_watchlist", return_value={"watchlist": [], "count": 0})
+        self._discovery_patcher.start()
+        self._watchlist_patcher.start()
+        self.addCleanup(self._discovery_patcher.stop)
+        self.addCleanup(self._watchlist_patcher.stop)
 
     @patch("app.is_scheduler_running", return_value=True)
     @patch("app.get_default_config", return_value={"stations": ["KDEN", "KLAX"], "poll_seconds": 60})
