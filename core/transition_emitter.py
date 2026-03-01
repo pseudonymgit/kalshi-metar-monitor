@@ -1,5 +1,6 @@
 from typing import Any, Callable, Dict, Optional
 
+from core.settlement_epoch_logger import log_transition_for_settlement_epoch
 from core.security_boundaries import (
     detect_illegal_cross_layer_imports,
     enforce_transition_emission_authority,
@@ -34,7 +35,7 @@ def emit_transition_if_changed(
     if not (instant_changed or settlement_changed):
         return None
 
-    return emit_fn(
+    transition_correlation = emit_fn(
         station=station,
         transition_type=transition_type,
         instant_bucket_before=instant_bucket_before,
@@ -44,3 +45,25 @@ def emit_transition_if_changed(
         current_temp=current_temp,
         metadata=metadata,
     )
+
+    transition_event_id = None
+    event_timestamp_utc = None
+    if isinstance(transition_correlation, dict):
+        raw_id = transition_correlation.get("transition_event_id")
+        if isinstance(raw_id, int):
+            transition_event_id = raw_id
+        raw_timestamp = transition_correlation.get("timestamp_utc")
+        if raw_timestamp is not None:
+            event_timestamp_utc = str(raw_timestamp)
+
+    log_transition_for_settlement_epoch(
+        station=station,
+        transition_type=transition_type,
+        settlement_bucket=settlement_bucket,
+        current_temp=current_temp,
+        metadata=metadata,
+        transition_event_id=transition_event_id,
+        event_timestamp_utc=event_timestamp_utc,
+    )
+
+    return transition_correlation
