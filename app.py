@@ -27,7 +27,11 @@ from core.metar_monitor import (
 )
 
 from core.kalshi_monitor import _kalshi_public_get, ensure_series_discovery_loaded
-from core.observability import get_current_settlement_epoch_summaries
+from core.observability import (
+    get_current_day_structure_summaries,
+    get_current_settlement_epoch_summaries,
+)
+from core.station_time import to_station_local
 
 app = Flask(__name__)
 log = app.logger
@@ -270,6 +274,28 @@ def _build_market_coverage_rows(station_filter=None):
         "station": station_filter,
         "stations_evaluated": stations,
         "rows": rows,
+    }
+
+
+def _station_universe(station_filter=None):
+    cfg = get_default_config()
+    state = get_state()
+
+    configured_stations = set((cfg.get("stations") or []))
+    configured_stations.update(state.get("stations") or [])
+    stations = sorted(station.strip().upper() for station in configured_stations if station)
+
+    if station_filter:
+        stations = [station for station in stations if station == station_filter]
+
+    return stations
+
+
+def _station_today_day_keys(stations):
+    now_utc = datetime.now(timezone.utc)
+    return {
+        station: to_station_local(station, now_utc).date().isoformat()
+        for station in stations
     }
 
 if hasattr(app, "before_first_request"):
@@ -616,6 +642,48 @@ def observability_current_epochs():
         for row in payload.get("epochs", [])
     ]
     return jsonify({"ok": True, **payload, "epochs": compact_epochs}), 200
+
+
+@app.route("/observability/day-structure", methods=["GET"])
+def observability_day_structure():
+    station = (request.args.get("station") or "").strip().upper() or None
+    stations = _station_universe(station_filter=station)
+    station_day_keys = _station_today_day_keys(stations)
+
+    payload = get_current_day_structure_summaries(
+        station_day_keys=station_day_keys,
+        station=station,
+    )
+
+    response_fields = [
+        "station",
+        "local_trading_date",
+        "epoch_count_today",
+        "open_epoch_present",
+        "current_or_latest_settlement_bucket",
+        "current_or_latest_prior_settlement_bucket",
+        "current_or_latest_settlement_timestamp_utc",
+        "current_or_latest_settlement_jump_magnitude",
+        "current_or_latest_epoch_status",
+        "current_or_latest_reversion_occurred",
+        "current_or_latest_first_reversion_timestamp_utc",
+        "current_or_latest_max_excursion_above_settlement",
+        "current_or_latest_duration_at_or_above_settlement_seconds",
+        "current_or_latest_duration_strictly_above_settlement_seconds",
+        "current_or_latest_terminal_state_reached",
+        "latest_transition_timestamp_utc",
+        "latest_transition_temp_f",
+        "closed_epoch_count_today",
+        "reverted_epoch_count_today",
+        "terminal_epoch_count_today",
+        "latest_selection_source",
+    ]
+    compact_rows = [
+        {field: row.get(field) for field in response_fields}
+        for row in payload.get("rows", [])
+    ]
+
+    return jsonify({"ok": True, **payload, "rows": compact_rows}), 200
 
 
 @app.route("/observability/market-coverage", methods=["GET"])
