@@ -1,5 +1,6 @@
 import os
 import tempfile
+import sqlite3
 import unittest
 from unittest.mock import patch
 
@@ -46,6 +47,85 @@ class ObservabilityTraderDashboardTests(unittest.TestCase):
                 transition_event_id=1,
                 event_timestamp_utc="2026-01-01T10:00:00Z",
             )
+
+
+            conn = sqlite3.connect(db_path)
+            try:
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS transition_events (
+                        id INTEGER PRIMARY KEY,
+                        created_utc TEXT,
+                        station TEXT,
+                        transition_type TEXT,
+                        instant_bucket_before INTEGER,
+                        instant_bucket_after INTEGER,
+                        settlement_bucket INTEGER,
+                        running_max REAL,
+                        current_temp REAL,
+                        metadata_json TEXT
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    INSERT INTO transition_events (
+                        id,
+                        created_utc,
+                        station,
+                        transition_type,
+                        instant_bucket_before,
+                        instant_bucket_after,
+                        settlement_bucket,
+                        running_max,
+                        current_temp,
+                        metadata_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        101,
+                        "2026-01-01T10:05:00Z",
+                        "KDEN",
+                        "instant_up",
+                        69,
+                        70,
+                        70,
+                        70.1,
+                        70.1,
+                        '{"market_evaluated": true, "alerts_sent": 1, "evaluation_outcome": "ALERT_SENT"}',
+                    ),
+                )
+                conn.execute(
+                    """
+                    INSERT INTO transition_events (
+                        id,
+                        created_utc,
+                        station,
+                        transition_type,
+                        instant_bucket_before,
+                        instant_bucket_after,
+                        settlement_bucket,
+                        running_max,
+                        current_temp,
+                        metadata_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        102,
+                        "2026-01-01T10:06:00Z",
+                        "KDEN",
+                        "instant_up",
+                        70,
+                        70,
+                        70,
+                        70.2,
+                        70.2,
+                        '{"note": "non_eval_event"}',
+                    ),
+                )
+                conn.commit()
+            finally:
+                conn.close()
 
             app_module._build_market_coverage_rows.return_value = {
                 "station": None,
@@ -121,6 +201,13 @@ class ObservabilityTraderDashboardTests(unittest.TestCase):
             "low_coverage_reason",
             "high_eligible_market_count",
             "low_eligible_market_count",
+            "latest_evaluation_timestamp_utc",
+            "latest_market_evaluated",
+            "latest_alerts_sent",
+            "latest_evaluation_outcome",
+            "latest_suppression_reason",
+            "latest_transition_type",
+            "latest_transition_event_id",
         }
 
         self.assertTrue(expected_contract_fields.issubset(set(rows["KDEN"].keys())))
@@ -156,6 +243,22 @@ class ObservabilityTraderDashboardTests(unittest.TestCase):
         self.assertIsNone(rows["KLAX"]["low_coverage_status"])
         self.assertEqual(rows["KLAX"]["high_eligible_market_count"], 2)
         self.assertIsNone(rows["KLAX"]["low_eligible_market_count"])
+        self.assertEqual(rows["KDEN"]["latest_evaluation_timestamp_utc"], "2026-01-01T10:05:00Z")
+        self.assertEqual(rows["KDEN"]["latest_market_evaluated"], True)
+        self.assertEqual(rows["KDEN"]["latest_alerts_sent"], 1)
+        self.assertEqual(rows["KDEN"]["latest_evaluation_outcome"], "ALERT_SENT")
+        self.assertIsNone(rows["KDEN"]["latest_suppression_reason"])
+        self.assertEqual(rows["KDEN"]["latest_transition_type"], "instant_up")
+        self.assertEqual(rows["KDEN"]["latest_transition_event_id"], 101)
+
+        self.assertIsNone(rows["KLAX"]["latest_evaluation_timestamp_utc"])
+        self.assertIsNone(rows["KLAX"]["latest_market_evaluated"])
+        self.assertIsNone(rows["KLAX"]["latest_alerts_sent"])
+        self.assertIsNone(rows["KLAX"]["latest_evaluation_outcome"])
+        self.assertIsNone(rows["KLAX"]["latest_suppression_reason"])
+        self.assertIsNone(rows["KLAX"]["latest_transition_type"])
+        self.assertIsNone(rows["KLAX"]["latest_transition_event_id"])
+
 
     @patch("app._build_market_coverage_rows", return_value={"station": "KDEN", "stations_evaluated": ["KDEN"], "rows": []})
     @patch("app.is_scheduler_running", return_value=True)

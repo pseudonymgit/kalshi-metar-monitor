@@ -22,6 +22,7 @@ from core.metar_monitor import (
     _simulate_temperature_for_testing,
     get_recent_alerts,
     get_transition_history,
+    get_latest_station_market_evaluation_context,
     run_replay_for_station_day,
     is_scheduler_running,
 )
@@ -325,6 +326,8 @@ def _build_trader_dashboard_rows(station_filter=None):
 
     market_coverage_payload = _build_market_coverage_rows(station_filter=station_filter)
     market_coverage_by_station = {}
+    latest_evaluation_context_by_station = get_latest_station_market_evaluation_context(station=station_filter)
+
     for coverage_row in market_coverage_payload.get("rows", []):
         station_code = coverage_row.get("station")
         market_type = coverage_row.get("market_type")
@@ -340,6 +343,7 @@ def _build_trader_dashboard_rows(station_filter=None):
         station_coverage = market_coverage_by_station.get(station_code, {})
         high_coverage = station_coverage.get("HIGH", {})
         low_coverage = station_coverage.get("LOW", {})
+        latest_eval = latest_evaluation_context_by_station.get(station_code, {})
 
         rows.append(
             {
@@ -376,6 +380,13 @@ def _build_trader_dashboard_rows(station_filter=None):
                 "low_coverage_reason": low_coverage.get("coverage_reason"),
                 "high_eligible_market_count": high_coverage.get("eligible_market_count_after_filters"),
                 "low_eligible_market_count": low_coverage.get("eligible_market_count_after_filters"),
+                "latest_evaluation_timestamp_utc": latest_eval.get("latest_evaluation_timestamp_utc"),
+                "latest_market_evaluated": latest_eval.get("latest_market_evaluated"),
+                "latest_alerts_sent": latest_eval.get("latest_alerts_sent"),
+                "latest_evaluation_outcome": latest_eval.get("latest_evaluation_outcome"),
+                "latest_suppression_reason": latest_eval.get("latest_suppression_reason"),
+                "latest_transition_type": latest_eval.get("latest_transition_type"),
+                "latest_transition_event_id": latest_eval.get("latest_transition_event_id"),
             }
         )
 
