@@ -223,3 +223,203 @@ def get_persistence_confirmation_events(*, station: Optional[str] = None, limit:
         "count": len(confirmations),
         "events": confirmations[:bounded_limit],
     }
+
+
+def get_current_settlement_epoch_summaries(*, station: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Deterministic per-station (and market_type) current epoch visibility.
+
+    Selection rule per station+market_type key:
+      1) Prefer currently open epoch (epoch_status='open').
+      2) If no open epoch exists, fall back to latest epoch by id.
+    """
+    normalized_station = (station or "").strip().upper()
+
+    open_params: Tuple[Any, ...]
+    latest_params: Tuple[Any, ...]
+
+    if normalized_station:
+        open_query = """
+            SELECT se.station,
+                   se.market_type,
+                   se.local_trading_date,
+                   se.settlement_bucket,
+                   se.prior_settlement_bucket,
+                   se.settlement_timestamp_utc,
+                   se.settlement_jump_magnitude,
+                   se.epoch_status,
+                   se.epoch_close_reason,
+                   se.epoch_close_timestamp_utc,
+                   se.reversion_occurred,
+                   se.first_reversion_timestamp_utc,
+                   se.max_excursion_above_settlement,
+                   se.duration_at_or_above_settlement_seconds,
+                   se.duration_strictly_above_settlement_seconds,
+                   se.terminal_state_reached,
+                   se.settlement_transition_event_id,
+                   se.last_transition_event_id,
+                   se.last_transition_timestamp_utc,
+                   se.last_transition_temp_f,
+                   'open_epoch' AS selection_source
+            FROM settlement_epochs se
+            WHERE se.station = ?
+              AND se.epoch_status = 'open'
+              AND se.id = (
+                  SELECT MAX(inner_open.id)
+                  FROM settlement_epochs inner_open
+                  WHERE inner_open.station = se.station
+                    AND ((inner_open.market_type IS NULL AND se.market_type IS NULL) OR inner_open.market_type = se.market_type)
+                    AND inner_open.epoch_status = 'open'
+              )
+        """
+        latest_query = """
+            SELECT se.station,
+                   se.market_type,
+                   se.local_trading_date,
+                   se.settlement_bucket,
+                   se.prior_settlement_bucket,
+                   se.settlement_timestamp_utc,
+                   se.settlement_jump_magnitude,
+                   se.epoch_status,
+                   se.epoch_close_reason,
+                   se.epoch_close_timestamp_utc,
+                   se.reversion_occurred,
+                   se.first_reversion_timestamp_utc,
+                   se.max_excursion_above_settlement,
+                   se.duration_at_or_above_settlement_seconds,
+                   se.duration_strictly_above_settlement_seconds,
+                   se.terminal_state_reached,
+                   se.settlement_transition_event_id,
+                   se.last_transition_event_id,
+                   se.last_transition_timestamp_utc,
+                   se.last_transition_temp_f,
+                   'latest_epoch_fallback' AS selection_source
+            FROM settlement_epochs se
+            WHERE se.station = ?
+              AND se.id = (
+                  SELECT MAX(inner_latest.id)
+                  FROM settlement_epochs inner_latest
+                  WHERE inner_latest.station = se.station
+                    AND ((inner_latest.market_type IS NULL AND se.market_type IS NULL) OR inner_latest.market_type = se.market_type)
+              )
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM settlement_epochs open_exists
+                  WHERE open_exists.station = se.station
+                    AND ((open_exists.market_type IS NULL AND se.market_type IS NULL) OR open_exists.market_type = se.market_type)
+                    AND open_exists.epoch_status = 'open'
+              )
+        """
+        open_params = (normalized_station,)
+        latest_params = (normalized_station,)
+    else:
+        open_query = """
+            SELECT se.station,
+                   se.market_type,
+                   se.local_trading_date,
+                   se.settlement_bucket,
+                   se.prior_settlement_bucket,
+                   se.settlement_timestamp_utc,
+                   se.settlement_jump_magnitude,
+                   se.epoch_status,
+                   se.epoch_close_reason,
+                   se.epoch_close_timestamp_utc,
+                   se.reversion_occurred,
+                   se.first_reversion_timestamp_utc,
+                   se.max_excursion_above_settlement,
+                   se.duration_at_or_above_settlement_seconds,
+                   se.duration_strictly_above_settlement_seconds,
+                   se.terminal_state_reached,
+                   se.settlement_transition_event_id,
+                   se.last_transition_event_id,
+                   se.last_transition_timestamp_utc,
+                   se.last_transition_temp_f,
+                   'open_epoch' AS selection_source
+            FROM settlement_epochs se
+            WHERE se.epoch_status = 'open'
+              AND se.id = (
+                  SELECT MAX(inner_open.id)
+                  FROM settlement_epochs inner_open
+                  WHERE inner_open.station = se.station
+                    AND ((inner_open.market_type IS NULL AND se.market_type IS NULL) OR inner_open.market_type = se.market_type)
+                    AND inner_open.epoch_status = 'open'
+              )
+        """
+        latest_query = """
+            SELECT se.station,
+                   se.market_type,
+                   se.local_trading_date,
+                   se.settlement_bucket,
+                   se.prior_settlement_bucket,
+                   se.settlement_timestamp_utc,
+                   se.settlement_jump_magnitude,
+                   se.epoch_status,
+                   se.epoch_close_reason,
+                   se.epoch_close_timestamp_utc,
+                   se.reversion_occurred,
+                   se.first_reversion_timestamp_utc,
+                   se.max_excursion_above_settlement,
+                   se.duration_at_or_above_settlement_seconds,
+                   se.duration_strictly_above_settlement_seconds,
+                   se.terminal_state_reached,
+                   se.settlement_transition_event_id,
+                   se.last_transition_event_id,
+                   se.last_transition_timestamp_utc,
+                   se.last_transition_temp_f,
+                   'latest_epoch_fallback' AS selection_source
+            FROM settlement_epochs se
+            WHERE se.id = (
+                  SELECT MAX(inner_latest.id)
+                  FROM settlement_epochs inner_latest
+                  WHERE inner_latest.station = se.station
+                    AND ((inner_latest.market_type IS NULL AND se.market_type IS NULL) OR inner_latest.market_type = se.market_type)
+              )
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM settlement_epochs open_exists
+                  WHERE open_exists.station = se.station
+                    AND ((open_exists.market_type IS NULL AND se.market_type IS NULL) OR open_exists.market_type = se.market_type)
+                    AND open_exists.epoch_status = 'open'
+              )
+        """
+        open_params = ()
+        latest_params = ()
+
+    open_rows = _query_rows_readonly(open_query, open_params)
+    fallback_rows = _query_rows_readonly(latest_query, latest_params)
+    rows = sorted(open_rows + fallback_rows, key=lambda row: ((row[0] or ""), (row[1] or "")))
+
+    summaries = [
+        {
+            "station": row[0],
+            "market_type": row[1],
+            "local_trading_date": row[2],
+            "settlement_bucket": row[3],
+            "prior_settlement_bucket": row[4],
+            "settlement_timestamp_utc": row[5],
+            "settlement_jump_magnitude": row[6],
+            "epoch_status": row[7],
+            "epoch_close_reason": row[8],
+            "epoch_close_timestamp_utc": row[9],
+            "reversion_occurred": bool(row[10]),
+            "first_reversion_timestamp_utc": row[11],
+            "max_excursion_above_settlement": row[12],
+            "duration_at_or_above_settlement_seconds": row[13],
+            "duration_strictly_above_settlement_seconds": row[14],
+            "terminal_state_reached": bool(row[15]),
+            "settlement_transition_event_id": row[16],
+            "last_transition_event_id": row[17],
+            "last_transition_timestamp_utc": row[18],
+            "last_transition_temp_f": row[19],
+            "selection_source": row[20],
+            "is_open_epoch": row[20] == "open_epoch",
+        }
+        for row in rows
+    ]
+
+    return {
+        "database_present": _db_exists(),
+        "station": normalized_station or None,
+        "count": len(summaries),
+        "epochs": summaries,
+    }
