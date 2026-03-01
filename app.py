@@ -1,6 +1,8 @@
 import os
+import json
 import sys
 import logging
+import sqlite3
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify
 # Make local 'core' importable on Render
@@ -40,6 +42,65 @@ log.setLevel(logging.INFO)
 
 _autostart_fallback_done = False
 
+
+
+
+def _get_recent_alert_rows_for_preview(*, station=None, limit=25):
+    try:
+        bounded_limit = min(max(int(limit), 1), 500)
+    except (TypeError, ValueError):
+        bounded_limit = 25
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    if not os.path.exists(db_path):
+        return []
+
+    query_base = """
+        SELECT id, created_utc, station, market_type,
+               event_ticker, alert_type, direction,
+               temp_f, bucket_index, metadata_json
+        FROM alerts
+    """
+    params = []
+    if station:
+        query_base += " WHERE station = ?"
+        params.append(station)
+
+    query_base += " ORDER BY id DESC LIMIT ?"
+    params.append(bounded_limit)
+
+    try:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            rows = conn.execute(query_base, tuple(params)).fetchall()
+        finally:
+            conn.close()
+    except Exception:
+        return []
+
+    alerts = []
+    for row in rows:
+        metadata = {}
+        if row[9]:
+            try:
+                metadata = json.loads(row[9])
+            except Exception:
+                metadata = {}
+        alerts.append(
+            {
+                "id": row[0],
+                "created_utc": row[1],
+                "station": row[2],
+                "market_type": row[3],
+                "event_ticker": row[4],
+                "alert_type": row[5],
+                "direction": row[6],
+                "temp_f": row[7],
+                "bucket_index": row[8],
+                "metadata": metadata,
+            }
+        )
+    return alerts
 
 def _safe_lag_seconds(*, now_utc: datetime, iso_timestamp: str):
     if not iso_timestamp:
@@ -834,6 +895,67 @@ def observability_trader_dashboard():
     station = (request.args.get("station") or "").strip().upper() or None
     payload = _build_trader_dashboard_rows(station_filter=station)
     return jsonify({"ok": True, **payload}), 200
+
+
+@app.route("/observability/alert-preview", methods=["GET"])
+def observability_alert_preview():
+    station = (request.args.get("station") or "").strip().upper() or None
+    raw_limit = request.args.get("limit", "25")
+    try:
+        limit = min(max(int(raw_limit), 1), 100)
+    except (TypeError, ValueError):
+        limit = 25
+
+    recent_alert_rows = _get_recent_alert_rows_for_preview(station=station, limit=limit)
+
+    schema_fields = [
+        "station",
+        "created_utc",
+        "alert_type",
+        "market_type",
+        "direction",
+        "event_ticker",
+        "bucket_index",
+        "metadata",
+    ]
+
+    preview_rows = []
+    for row in recent_alert_rows:
+        metadata = row.get("metadata") or {}
+        preview_rows.append(
+            {
+                "station": row.get("station"),
+                "created_utc": row.get("created_utc"),
+                "alert_type": row.get("alert_type"),
+                "market_type": row.get("market_type"),
+                "direction": row.get("direction"),
+                "event_ticker": row.get("event_ticker"),
+                "bucket_index": row.get("bucket_index"),
+                "metadata": metadata,
+                "reason": metadata.get("reason") or metadata.get("suppression_reason"),
+                "is_recent_alert_example": True,
+                "payload_preview": {
+                    "station": row.get("station"),
+                    "market_type": row.get("market_type"),
+                    "event_ticker": row.get("event_ticker"),
+                    "alert_type": row.get("alert_type"),
+                    "direction": row.get("direction"),
+                    "bucket_index": row.get("bucket_index"),
+                    "temp_f": row.get("temp_f"),
+                },
+            }
+        )
+
+    return jsonify(
+        {
+            "ok": True,
+            "station": station,
+            "limit": limit,
+            "count": len(preview_rows),
+            "schema_fields": schema_fields,
+            "rows": preview_rows,
+        }
+    ), 200
 
 
 @app.route("/metar/status", methods=["GET"])
