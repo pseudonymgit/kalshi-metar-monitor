@@ -1613,6 +1613,119 @@ def _build_ingestion_diagnostic_classification(station, runtime, window_runtime)
     return "FETCH_EMPTY", "Fetched observations did not produce accepted data and no deterministic rejection class matched."
 
 
+def _compute_window_delta_seconds(window_start, window_end, latest_timestamp):
+    parsed_window_start = _parse_iso_timestamp(window_start)
+    parsed_window_end = _parse_iso_timestamp(window_end)
+    parsed_latest = _parse_iso_timestamp(latest_timestamp)
+
+    if not parsed_latest or not parsed_window_start or not parsed_window_end:
+        return None
+
+    if parsed_latest < parsed_window_start:
+        return int((parsed_latest - parsed_window_start).total_seconds())
+    if parsed_latest > parsed_window_end:
+        return int((parsed_latest - parsed_window_end).total_seconds())
+    return 0
+
+
+def _dominant_rejection_reason(runtime, window_runtime):
+    reason_counts = _rejection_reason_counts(runtime, window_runtime)
+    if not reason_counts:
+        return None
+    return sorted(reason_counts.items(), key=lambda item: (-item[1], item[0]))[0][0]
+
+
+def _classify_ingestion_root_cause(runtime, window_runtime, state):
+    fetched_count = int(runtime.get("fetched_observation_count") or 0)
+    ingested_count = int(runtime.get("ingested_observation_count") or 0)
+    rejected_count = int(runtime.get("rejected_observation_count") or 0)
+    last_fetch_status = runtime.get("last_fetch_status") or "not_attempted"
+
+    station = (runtime.get("station") or "").strip().upper()
+    admission = ((state.get("ingestion_admission") or {}).get(station) or {}) if station else {}
+    skip_reason = (admission.get("skip_reason") or "").strip().lower()
+
+    if last_fetch_status == "skipped_ladder_not_hydrated" or skip_reason == "ladder_not_hydrated":
+        return "LADDER_BLOCKING_FETCH"
+
+    if fetched_count == 0:
+        return "NO_DATA_RETURNED_FROM_SOURCE"
+
+    dominant_reason = _dominant_rejection_reason(runtime, window_runtime)
+    if rejected_count >= fetched_count and fetched_count > 0:
+        if dominant_reason == "dedup_older_or_equal_timestamp":
+            return "ALL_REJECTED_DEDUP"
+        if dominant_reason == "outside_station_local_trading_day":
+            return "ALL_REJECTED_TRADING_DAY"
+
+    window_start = _parse_iso_timestamp(window_runtime.get("window_start_utc"))
+    window_end = _parse_iso_timestamp(window_runtime.get("window_end_utc"))
+    latest_raw = _parse_iso_timestamp(runtime.get("latest_raw_observation_timestamp"))
+
+    if latest_raw and window_start and latest_raw < window_start:
+        return "WINDOW_AHEAD_OF_AVAILABLE_DATA"
+    if latest_raw and window_end and latest_raw > window_end:
+        return "WINDOW_BEHIND_AVAILABLE_DATA"
+
+    if ingested_count > 0:
+        return "UNKNOWN_INGESTION_FAILURE"
+
+    return "UNKNOWN_INGESTION_FAILURE"
+
+
+@app.route("/observability/ingestion-root-cause", methods=["GET"])
+def observability_ingestion_root_cause():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    runtime = get_station_ingestion_runtime(station)
+    window_runtime = get_station_ingestion_window_runtime(station)
+    state = get_state() or {}
+
+    window_start_utc = window_runtime.get("window_start_utc")
+    window_end_utc = window_runtime.get("window_end_utc")
+    latest_raw_timestamp = runtime.get("latest_raw_observation_timestamp")
+    latest_accepted_timestamp = runtime.get("latest_accepted_observation_timestamp")
+
+    fetched_count = int(runtime.get("fetched_observation_count") or 0)
+    ingested_count = int(runtime.get("ingested_observation_count") or 0)
+    rejected_count = int(runtime.get("rejected_observation_count") or 0)
+
+    payload_runtime = {**runtime, "station": station}
+    deterministic_root_cause = _classify_ingestion_root_cause(payload_runtime, window_runtime, state)
+
+    return jsonify(
+        {
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "last_fetch_status": runtime.get("last_fetch_status"),
+            "window_start_utc": window_start_utc,
+            "window_end_utc": window_end_utc,
+            "nws_query_start_utc": runtime.get("nws_query_start_utc") or window_start_utc,
+            "nws_query_end_utc": runtime.get("nws_query_end_utc") or window_end_utc,
+            "latest_raw_observation_timestamp": latest_raw_timestamp,
+            "latest_accepted_observation_timestamp": latest_accepted_timestamp,
+            "seconds_window_vs_latest_raw": _compute_window_delta_seconds(
+                window_start_utc,
+                window_end_utc,
+                latest_raw_timestamp,
+            ),
+            "seconds_window_vs_latest_accepted": _compute_window_delta_seconds(
+                window_start_utc,
+                window_end_utc,
+                latest_accepted_timestamp,
+            ),
+            "fetched_observation_count": fetched_count,
+            "ingested_observation_count": ingested_count,
+            "rejected_observation_count": rejected_count,
+            "dominant_rejection_reason": _dominant_rejection_reason(runtime, window_runtime),
+            "deterministic_root_cause": deterministic_root_cause,
+        }
+    ), 200
+
+
 @app.route("/observability/ingestion-diagnostic-class", methods=["GET"])
 def observability_ingestion_diagnostic_class():
     station = (request.args.get("station") or "").strip().upper()
