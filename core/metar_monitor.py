@@ -551,15 +551,19 @@ def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str,
         "response_timestamp": r.headers.get("Date") if getattr(r, "headers", None) else None,
     }
     parsed_obs = _parse_nws_collection(payload)
+
+    def _parse_utc(ts: str) -> datetime:
+        return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+
     try:
-        start_dt = _parse_iso(start_iso_z)
-        end_dt = _parse_iso(end_iso_z)
+        start_dt = _parse_utc(start_iso_z)
+        end_dt = _parse_utc(end_iso_z)
     except Exception:
         return parsed_obs
     filtered_obs: List[Dict[str, Any]] = []
     for obs in parsed_obs:
         try:
-            obs_dt = _parse_iso(obs.get("obs_time", ""))
+            obs_dt = _parse_utc(obs.get("obs_time", ""))
         except Exception:
             continue
         if start_dt <= obs_dt <= end_dt:
