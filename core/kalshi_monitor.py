@@ -1,10 +1,11 @@
 import base64
+import contextvars
 import os
 import re
 import sqlite3
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 from flask import has_request_context, request
@@ -45,6 +46,37 @@ _STATION_CITY_TOKEN_MAP = {
     "KMIA": "MIA",
     "KAUS": "AUS",
 }
+
+_KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", default="production")
+_FORBIDDEN_KALSHI_DOMAINS = frozenset({"observability", "diagnostics", "audit", "replay"})
+
+
+class kalshi_execution_domain:
+    def __init__(self, domain: str):
+        self._domain = (domain or "production").strip().lower() or "production"
+        self._token = None
+
+    def __enter__(self):
+        self._token = _KALSHI_EXECUTION_DOMAIN.set(self._domain)
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._token is not None:
+            _KALSHI_EXECUTION_DOMAIN.reset(self._token)
+
+
+def _current_kalshi_execution_domain() -> str:
+    return str(_KALSHI_EXECUTION_DOMAIN.get() or "production").strip().lower() or "production"
+
+
+def set_kalshi_execution_domain(domain: str):
+    normalized = (domain or "production").strip().lower() or "production"
+    return _KALSHI_EXECUTION_DOMAIN.set(normalized)
+
+
+def reset_kalshi_execution_domain(token) -> None:
+    _KALSHI_EXECUTION_DOMAIN.reset(token)
+
 
 _EXPLICIT_SETTLEMENT_STATION_OVERRIDES = {
     "NYC": "KNYC",
@@ -214,6 +246,9 @@ def get_metrics():
 
 
 def _kalshi_public_get(path):
+    execution_domain = _current_kalshi_execution_domain()
+    if execution_domain in _FORBIDDEN_KALSHI_DOMAINS:
+        raise RuntimeError(f"Live Kalshi call attempted in forbidden execution domain '{execution_domain}'")
     if has_request_context() and str(request.path or "").startswith("/observability/"):
         raise RuntimeError("Live Kalshi call attempted in observability path")
 
@@ -433,10 +468,83 @@ def get_cached_series_markets(series_ticker: str) -> dict | None:
         return None
 
     with _SERIES_LOCK:
-        cached_markets = _SERIES_MARKETS_CACHE.get(normalized_series_ticker)
-        if cached_markets is None:
+        cached_entry = _SERIES_MARKETS_CACHE.get(normalized_series_ticker)
+        if cached_entry is None:
             return None
-        return {"markets": list(cached_markets)}
+        return {
+            "markets": list(cached_entry.get("markets") or []),
+            "hydrated_at_utc": cached_entry.get("hydrated_at_utc"),
+            "station_local_day": cached_entry.get("station_local_day"),
+        }
+
+
+def _station_local_previous_day(station: str, now_utc_iso: str) -> str:
+    current_utc = parse_iso_utc(now_utc_iso)
+    current_local = to_station_local(station, current_utc)
+    previous_local = current_local - timedelta(days=1)
+    previous_utc_iso = previous_local.astimezone(timezone.utc).isoformat()
+    return station_local_day_key(station, previous_utc_iso)
+
+
+def ensure_ladder_hydration_prerequisite(station: str) -> dict:
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return {"status": "cache_missing", "reason": "station_missing"}
+
+    now_utc_iso = datetime.now(timezone.utc).isoformat()
+    station_day = station_local_day_key(normalized_station, now_utc_iso)
+    series_ticker = ensure_series_discovery_loaded().get(normalized_station)
+    if not series_ticker:
+        return {"status": "cache_missing", "reason": "series_missing", "station_local_day": station_day}
+
+    cached = get_cached_series_markets(series_ticker)
+    if cached is None:
+        return {"status": "cache_missing", "reason": "cache_missing", "series_ticker": series_ticker, "station_local_day": station_day}
+
+    cached_day = cached.get("station_local_day")
+    rollover_grace = False
+    yesterday_day = _station_local_previous_day(normalized_station, now_utc_iso)
+
+    if cached_day == station_day:
+        rollover_grace = False
+    elif yesterday_day is not None and cached_day == yesterday_day:
+        rollover_grace = True
+    else:
+        return {
+            "status": "cache_stale",
+            "reason": "station_local_day_mismatch",
+            "series_ticker": series_ticker,
+            "station_local_day": station_day,
+            "yesterday_station_local_day": yesterday_day,
+            "cached_station_local_day": cached_day,
+            "hydrated_at_utc": cached.get("hydrated_at_utc"),
+        }
+
+    return {
+        "status": "cache_valid",
+        "series_ticker": series_ticker,
+        "station_local_day": station_day,
+        "hydrated_at_utc": cached.get("hydrated_at_utc"),
+        "rollover_grace": rollover_grace,
+    }
+
+
+def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
+    if _current_kalshi_execution_domain() != "production":
+        raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
+
+    normalized_station = (station or "").strip().upper()
+    snapshot = build_structured_snapshot(normalized_station, market_types)
+    series_ticker = ensure_series_discovery_loaded().get(normalized_station)
+    cached = get_cached_series_markets(series_ticker) if series_ticker else None
+    return {
+        "station": normalized_station,
+        "series_ticker": series_ticker,
+        "status": "hydrated",
+        "hydrated_at_utc": (cached or {}).get("hydrated_at_utc"),
+        "station_local_day": (cached or {}).get("station_local_day"),
+        "market_count": len(snapshot.get("markets") or []),
+    }
 
 def _build_weather_event_ticker(station: str, market_type: str):
     city_token = _STATION_CITY_TOKEN_MAP.get(station)
@@ -507,7 +615,11 @@ def build_structured_snapshot(station: str, market_types: set):
         data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
         fetched_markets.extend(data.get("markets", []))
         with _SERIES_LOCK:
-            _SERIES_MARKETS_CACHE[series_ticker] = list(fetched_markets)
+            _SERIES_MARKETS_CACHE[series_ticker] = {
+                "markets": list(fetched_markets),
+                "hydrated_at_utc": datetime.now(timezone.utc).isoformat(),
+                "station_local_day": station_local_day_key(normalized_station, datetime.now(timezone.utc).isoformat()),
+            }
 
     filtered_markets = _filter_structured_markets(
         fetched_markets,

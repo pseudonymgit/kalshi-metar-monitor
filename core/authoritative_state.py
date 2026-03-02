@@ -14,7 +14,6 @@ _STATE_LOCK = threading.Lock()
 _STATE: Dict[str, Any] = {
     "stations": [],
     "last_obs": {},
-    "last_alert": {},
     "last_seen_iso": {},
     "last_reset_date_local": {},
     "last_observed_integer": {},
@@ -81,12 +80,18 @@ def reset_station_daily_state(icao: str, local_day: str) -> None:
         _STATE["last_reset_date_local"][icao] = local_day
 
 
+def clear_latest_observation(icao: str) -> None:
+    enforce_authoritative_state_mutation_boundary("clear_latest_observation")
+    with _STATE_LOCK:
+        _STATE["last_seen_iso"].pop(icao, None)
+        _STATE["last_obs"].pop(icao, None)
+
+
 def immutable_public_state_snapshot() -> Dict[str, Any]:
     with _STATE_LOCK:
         snapshot = {
             "stations": tuple(_STATE["stations"]),
             "last_obs": MappingProxyType(copy.deepcopy(_STATE["last_obs"])),
-            "last_alert": MappingProxyType(copy.deepcopy(_STATE["last_alert"])),
             "last_seen_iso": MappingProxyType(copy.deepcopy(_STATE["last_seen_iso"])),
             "last_reset_date_local": MappingProxyType(copy.deepcopy(_STATE["last_reset_date_local"])),
             "last_observed_integer": MappingProxyType(copy.deepcopy(_STATE["last_observed_integer"])),

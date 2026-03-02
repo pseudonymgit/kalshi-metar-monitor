@@ -16,6 +16,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 
 from core.authoritative_state import (
+    clear_latest_observation,
     commit_temperature_state,
     immutable_public_state_snapshot,
     read_temperature_state,
@@ -190,22 +191,44 @@ def ensure_state_loaded():
             _STATE["stations"] = cfg["stations"]
 
         cache = _load_cache(cfg["cache_file"])
-        if "last_obs" in cache:
-            _STATE["last_obs"].update(cache["last_obs"])
-        if "last_seen_iso" in cache:
-            _STATE["last_seen_iso"].update(cache["last_seen_iso"])
-
-        # Persist daily-reset + last observed integer across restarts
         if "last_reset_date_local" in cache:
             _STATE["last_reset_date_local"].update(cache["last_reset_date_local"])
-        if "last_observed_integer" in cache:
-            _STATE["last_observed_integer"].update(cache["last_observed_integer"])
-        if "running_daily_max" in cache:
-            _STATE["running_daily_max"].update(cache["running_daily_max"])
-        if "last_settlement_bucket" in cache:
-            _STATE["last_settlement_bucket"].update(cache["last_settlement_bucket"])
-        if "last_instant_bucket" in cache:
-            _STATE["last_instant_bucket"].update(cache["last_instant_bucket"])
+
+    last_obs_cache = cache.get("last_obs") or {}
+    last_seen_cache = cache.get("last_seen_iso") or {}
+    for station in set(last_obs_cache.keys()) | set(last_seen_cache.keys()):
+        obs = last_obs_cache.get(station)
+        obs_time = last_seen_cache.get(station)
+        if obs is not None and obs_time:
+            set_latest_observation(station, obs, obs_time)
+
+    observed_integer_cache = cache.get("last_observed_integer") or {}
+    running_daily_max_cache = cache.get("running_daily_max") or {}
+    last_settlement_cache = cache.get("last_settlement_bucket") or {}
+    last_instant_cache = cache.get("last_instant_bucket") or {}
+    for station in (
+        set(observed_integer_cache.keys())
+        | set(running_daily_max_cache.keys())
+        | set(last_settlement_cache.keys())
+        | set(last_instant_cache.keys())
+    ):
+        curr_floor = observed_integer_cache.get(station)
+        running_daily_max = running_daily_max_cache.get(station)
+        settlement_bucket = last_settlement_cache.get(station)
+        instant_bucket = last_instant_cache.get(station)
+        if (
+            curr_floor is not None
+            and running_daily_max is not None
+            and settlement_bucket is not None
+            and instant_bucket is not None
+        ):
+            commit_temperature_state(
+                icao=station,
+                curr_floor=int(curr_floor),
+                running_daily_max=float(running_daily_max),
+                settlement_bucket=int(settlement_bucket),
+                instant_bucket=int(instant_bucket),
+            )
 
 
 def get_state() -> Dict[str, Any]:
@@ -213,7 +236,6 @@ def get_state() -> Dict[str, Any]:
     return {
         "stations": list(snapshot["stations"]),
         "last_obs": dict(snapshot["last_obs"]),
-        "last_alert": dict(snapshot["last_alert"]),
         "last_seen_iso": dict(snapshot["last_seen_iso"]),
         "last_reset_date_local": dict(snapshot["last_reset_date_local"]),
         "last_observed_integer": dict(snapshot["last_observed_integer"]),
@@ -624,32 +646,26 @@ def _snapshot_station_state(station: str) -> Dict[str, Any]:
 
 def _restore_station_state(station: str, snapshot: Dict[str, Any]) -> None:
     station = (station or "").strip().upper()
-    with _STATE_LOCK:
-        for state_key, snapshot_key in (
-            ("last_observed_integer", "last_observed_integer"),
-            ("running_daily_max", "running_daily_max"),
-            ("last_settlement_bucket", "last_settlement_bucket"),
-            ("last_instant_bucket", "last_instant_bucket"),
-            ("last_seen_iso", "last_seen_iso"),
-            ("last_obs", "last_obs"),
-            ("last_reset_date_local", "last_reset_date_local"),
-        ):
-            value = snapshot.get(snapshot_key)
-            if value is None:
-                _STATE[state_key].pop(station, None)
-            else:
-                _STATE[state_key][station] = value
+    reset_station_daily_state(station, snapshot.get("last_reset_date_local") or "")
+    if snapshot.get("last_observed_integer") is not None:
+        commit_temperature_state(
+            icao=station,
+            curr_floor=int(snapshot["last_observed_integer"]),
+            running_daily_max=float(snapshot["running_daily_max"]),
+            settlement_bucket=int(snapshot["last_settlement_bucket"]),
+            instant_bucket=int(snapshot["last_instant_bucket"]),
+        )
+    if snapshot.get("last_obs") is not None and snapshot.get("last_seen_iso"):
+        set_latest_observation(station, snapshot["last_obs"], snapshot["last_seen_iso"])
+    else:
+        clear_latest_observation(station)
 
 
 def _reset_replay_runtime_state_for_station(station: str) -> None:
     station = (station or "").strip().upper()
+    reset_station_daily_state(station, _now_utc_iso()[:10])
+    clear_latest_observation(station)
     with _STATE_LOCK:
-        _STATE["last_observed_integer"].pop(station, None)
-        _STATE["running_daily_max"].pop(station, None)
-        _STATE["last_settlement_bucket"].pop(station, None)
-        _STATE["last_instant_bucket"].pop(station, None)
-        _STATE["last_seen_iso"].pop(station, None)
-        _STATE["last_obs"].pop(station, None)
         _STATE["last_reset_date_local"].pop(station, None)
 
 
@@ -1292,21 +1308,16 @@ def _simulate_temperature_for_testing(
     ts = _now_utc_iso()
     icao = (icao or "").strip().upper()
 
-    _maybe_daily_reset_local(icao, ts)
-
     with _STATE_LOCK:
-        last_temp = _STATE["last_obs"].get(icao, {}).get("temp_f")
         previous_integer = _STATE["last_observed_integer"].get(icao)
-        _STATE["last_obs"][icao] = _obs_tuple(float(temp_f), ts, {"simulated": True}, "simulated")
-        _STATE["last_seen_iso"][icao] = ts
 
-    alerts = _process_temperature_event(
-        icao=icao,
-        temp_f=float(temp_f),
-        obs_time=ts,
-        cfg=cfg,
-        last_temp_f=last_temp,
+    simulated_obs = _obs_tuple(float(temp_f), ts, {"simulated": True}, "simulated")
+    _, alerts = _ingest_obs(
+        icao,
+        [simulated_obs],
+        cfg,
         allow_alert_delivery=allow_alert_delivery,
+        persist_cache=allow_alert_delivery,
     )
 
     with _STATE_LOCK:
@@ -1580,6 +1591,18 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
 
     start_iso, end_iso, start_dt, end_dt = _compute_window(icao, minutes, cfg)
 
+    from core.kalshi_monitor import ensure_ladder_hydration_prerequisite
+
+    hydration = ensure_ladder_hydration_prerequisite(icao)
+    if hydration.get("status") != "cache_valid":
+        return {
+            "status": "degraded",
+            "icao": icao,
+            "source": chosen,
+            "poll_skipped_reason": "ladder_not_hydrated",
+            "hydration": hydration,
+        }
+
     try:
         obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
         ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
@@ -1766,22 +1789,25 @@ def _poll_once(logger=None):
     cfg = get_default_config()
     stations = _resolve_live_polling_stations(cfg)
 
-    from core.kalshi_monitor import build_structured_snapshot
+    from core.kalshi_monitor import ensure_ladder_hydration_prerequisite
 
+    hydration_by_station = {}
     for icao in stations:
-        try:
-            build_structured_snapshot(
-                station=icao,
-                market_types={"HIGH", "LOW"}
+        hydration = ensure_ladder_hydration_prerequisite(icao)
+        hydration_by_station[icao] = hydration
+        if hydration.get("status") != "cache_valid" and logger:
+            logger.warning(
+                f"poll_skipped_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
             )
-        except Exception:
-            pass
 
     chosen = cfg["default_source"] or "nws"
 
     total_ing = 0
     total_alerts = 0
     for icao in stations:
+        hydration = hydration_by_station.get(icao) or {}
+        if hydration.get("status") != "cache_valid":
+            continue
         try:
             start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg)
             obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
