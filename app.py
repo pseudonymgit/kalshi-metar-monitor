@@ -777,6 +777,33 @@ def _build_alert_fire_audit_rows():
     }
 
 
+def _build_runtime_authority_hydration_snapshot(*, stations):
+    from core.kalshi_monitor import get_ladder_state_snapshot
+
+    ladder_snapshot = get_ladder_state_snapshot() or {}
+    ladder_state = ladder_snapshot.get("ladder_state") or {}
+
+    hydration_by_station = {}
+    for station in stations:
+        normalized_station = (station or "").strip().upper()
+        station_state_keys = sorted(
+            key
+            for key in ladder_state.keys()
+            if isinstance(key, str) and key.startswith(f"{normalized_station}_")
+        )
+        hydration_by_station[normalized_station] = {
+            "cache_present": bool(station_state_keys),
+            "state_key_count": len(station_state_keys),
+            "state_keys": station_state_keys[:10],
+        }
+
+    return {
+        "snapshot_source": "in_memory_ladder_state",
+        "total_ladder_state_keys": ladder_snapshot.get("total_state_keys", 0),
+        "stations": hydration_by_station,
+    }
+
+
 def _derive_alert_block(alert_block_class):
     block_reason_by_class = {
         "NO_OBSERVATION": "No accepted observation exists for the current station-local trading day.",
@@ -1444,6 +1471,47 @@ def observability_alert_diagnostics():
 def observability_alert_fire_audit():
     payload = _build_alert_fire_audit_rows()
     return jsonify({"ok": True, **payload}), 200
+
+
+@app.route("/observability/runtime-authority-snapshot", methods=["GET"])
+def observability_runtime_authority_snapshot():
+    station = (request.args.get("station") or "").strip().upper() or None
+    station_universe = _canonical_live_station_universe(station_filter=station)
+    stations = station_universe.get("stations") or []
+
+    scheduler_snapshot = _build_ingestion_health_rows(station_filter=station)
+    hydration_snapshot = _build_runtime_authority_hydration_snapshot(stations=stations)
+
+    transitions = get_transition_history(station=station, limit=50)
+    alerts = get_recent_alerts(50)
+    if station:
+        alerts = [row for row in alerts if (row.get("station") or "").strip().upper() == station]
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+
+    return jsonify(
+        {
+            "ok": True,
+            "execution_mode": "observability",
+            "station": station,
+            "scheduler_health_snapshot": scheduler_snapshot,
+            "hydration_snapshot": hydration_snapshot,
+            "latest_transitions": {
+                "count": len(transitions),
+                "bounded_limit": 50,
+                "rows": transitions,
+            },
+            "latest_alerts": {
+                "count": len(alerts),
+                "bounded_limit": 50,
+                "rows": alerts,
+            },
+            "db": {
+                "path": db_path,
+                "exists": os.path.exists(db_path),
+            },
+        }
+    ), 200
 
 
 @app.route("/metar/status", methods=["GET"])

@@ -664,6 +664,29 @@ Observability-only; no live Kalshi calls.
 ---
 
 ## Endpoint
+`GET /observability/runtime-authority-snapshot`
+
+### Domain
+Observability
+
+### Purpose
+Returns a bounded, deterministic runtime authority snapshot for production diagnosis.
+
+### Execution Authority
+observability-only
+
+### Data Source
+Runtime state + SQLite audit
+
+### Trading Relevance
+Provides execution-truth evidence (scheduler health, hydration cache state, transitions, alerts, DB path/existence) without granting mutation authority.
+
+### Safety Notes
+Read-only, bounded payload, and no execution mutation.
+
+---
+
+## Endpoint
 `GET /metar/status`
 
 ### Domain
