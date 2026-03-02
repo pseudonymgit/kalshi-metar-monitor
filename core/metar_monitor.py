@@ -68,6 +68,7 @@ _ALERT_LOGGER = logging.getLogger(__name__)
 _TRANSITION_HISTORY = deque(maxlen=500)
 _TRANSITION_LOCK = threading.Lock()
 _LAST_SETTLEMENT_UP_TS = {}
+_LAST_NWS_FETCH_DIAGNOSTIC = {}
 
 
 # =========================
@@ -356,6 +357,24 @@ def get_station_ingestion_window_runtime(station: str) -> Dict[str, Any]:
     }
 
 
+def get_last_nws_fetch_diagnostic(station: str) -> Dict[str, Any]:
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return {}
+
+    diagnostic = _LAST_NWS_FETCH_DIAGNOSTIC.get(normalized_station) or {}
+    return {
+        "station": normalized_station,
+        "timestamp_utc": diagnostic.get("timestamp_utc"),
+        "request_url": diagnostic.get("request_url"),
+        "start_iso": diagnostic.get("start_iso"),
+        "end_iso": diagnostic.get("end_iso"),
+        "http_status": diagnostic.get("http_status"),
+        "feature_count": diagnostic.get("feature_count"),
+        "response_timestamp": diagnostic.get("response_timestamp"),
+    }
+
+
 # =========================
 # Source helpers
 # =========================
@@ -479,6 +498,7 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
 # =========================
 def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     url = _nws_range_url(icao, start_iso_z, end_iso_z)
+    normalized_station = (icao or "").strip().upper()
     execution_domain = "production"
     try:
         from core.kalshi_monitor import _current_kalshi_execution_domain
@@ -524,6 +544,15 @@ def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str,
         len(features) if isinstance(features, list) else 0,
         r.headers.get("Date") if getattr(r, "headers", None) else None,
     )
+    _LAST_NWS_FETCH_DIAGNOSTIC[normalized_station] = {
+        "timestamp_utc": _now_utc_iso(),
+        "request_url": url,
+        "start_iso": start_iso_z,
+        "end_iso": end_iso_z,
+        "http_status": r.status_code,
+        "feature_count": len(features) if isinstance(features, list) else 0,
+        "response_timestamp": r.headers.get("Date") if getattr(r, "headers", None) else None,
+    }
     return _parse_nws_collection(payload)
 
 
