@@ -1,4 +1,5 @@
 import base64
+import copy
 import contextvars
 import os
 import re
@@ -41,6 +42,7 @@ _SERIES_DISCOVERY_ATTEMPT_COUNT = 0
 _LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
 _LAST_SERIES_DISCOVERY_ERROR = None
 _MARKETS_CACHE_POPULATION_COUNT = 0
+_LAST_HYDRATION_EXECUTION = {}
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -622,6 +624,11 @@ def get_kalshi_connectivity_snapshot() -> dict:
         }
 
 
+def get_last_hydration_execution_snapshot() -> dict:
+    with _SERIES_LOCK:
+        return copy.deepcopy(_LAST_HYDRATION_EXECUTION)
+
+
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
     if _current_kalshi_execution_domain() != "production":
         raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
@@ -648,7 +655,14 @@ def _build_weather_event_ticker(station: str, market_type: str):
     return f"KX{market_type}{city_token}-{date_token}"
 
 
-def _filter_structured_markets(markets, station, market_types):
+def _filter_structured_markets(markets, station, market_types, rejection_counts=None):
+    rejection_counts = rejection_counts if isinstance(rejection_counts, dict) else None
+
+    def _record_rejection(reason: str):
+        if rejection_counts is None:
+            return
+        rejection_counts[reason] = int(rejection_counts.get(reason, 0)) + 1
+
     normalized_station = (station or "").strip().upper()
     city_token = _STATION_CITY_TOKEN_MAP.get(normalized_station)
 
@@ -664,15 +678,19 @@ def _filter_structured_markets(markets, station, market_types):
         status = market.get("status")
 
         if status and status != "active":
+            _record_rejection("inactive_market")
             continue
 
         if city_token not in ticker:
+            _record_rejection("city_token_mismatch")
             continue
 
         if date_token not in ticker:
+            _record_rejection("date_mismatch")
             continue
 
         if market_types and not any(mt in ticker for mt in market_types):
+            _record_rejection("market_type_mismatch")
             continue
 
         filtered.append(market)
@@ -695,6 +713,7 @@ def _extract_strike_from_ticker(ticker):
 def build_structured_snapshot(station: str, market_types: set):
     global _MARKETS_CACHE_POPULATION_COUNT
     normalized_station = (station or "").strip().upper()
+    evaluated_at_utc = datetime.now(timezone.utc).isoformat()
     series_by_station = ensure_series_discovery_loaded()
     series_ticker = series_by_station.get(normalized_station)
 
@@ -705,22 +724,37 @@ def build_structured_snapshot(station: str, market_types: set):
     }
 
     fetched_markets = []
+    cache_written = False
     if series_ticker:
         data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
         fetched_markets.extend(data.get("markets", []))
         with _SERIES_LOCK:
             _SERIES_MARKETS_CACHE[series_ticker] = {
                 "markets": list(fetched_markets),
-                "hydrated_at_utc": datetime.now(timezone.utc).isoformat(),
-                "station_local_day": station_local_day_key(normalized_station, datetime.now(timezone.utc).isoformat()),
+                "hydrated_at_utc": evaluated_at_utc,
+                "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
             }
             _MARKETS_CACHE_POPULATION_COUNT += 1
+        cache_written = True
 
+    rejection_counts = {}
     filtered_markets = _filter_structured_markets(
         fetched_markets,
         normalized_station,
         selected_types,
+        rejection_counts,
     )
+
+    with _SERIES_LOCK:
+        _LAST_HYDRATION_EXECUTION[normalized_station] = {
+            "evaluated_at_utc": evaluated_at_utc,
+            "station": normalized_station,
+            "series_ticker": series_ticker,
+            "raw_market_count": len(fetched_markets),
+            "filtered_market_count": len(filtered_markets),
+            "rejection_counts": dict(rejection_counts),
+            "cache_written": cache_written,
+        }
 
     markets = []
 
