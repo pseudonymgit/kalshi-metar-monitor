@@ -37,6 +37,10 @@ _SERIES_BY_STATION = {}
 _SERIES_DISCOVERED = False
 _SERIES_MARKETS_CACHE = {}
 _HYDRATION_PREREQUISITE_STATE = {}
+_SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+_LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+_LAST_SERIES_DISCOVERY_ERROR = None
+_MARKETS_CACHE_POPULATION_COUNT = 0
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -457,12 +461,30 @@ def _discover_series_for_stations():
 
 def ensure_series_discovery_loaded():
     global _SERIES_DISCOVERED, _SERIES_BY_STATION
+    global _SERIES_DISCOVERY_ATTEMPT_COUNT, _LAST_SERIES_DISCOVERY_SUCCESS_UTC, _LAST_SERIES_DISCOVERY_ERROR
     with _SERIES_LOCK:
         if _SERIES_DISCOVERED:
             return dict(_SERIES_BY_STATION)
-        _SERIES_BY_STATION = _discover_series_for_stations()
-        _SERIES_DISCOVERED = True
-        return dict(_SERIES_BY_STATION)
+
+        record_connectivity_state = True
+        if _current_kalshi_execution_domain() != "production":
+            record_connectivity_state = False
+        if has_request_context() and str(request.path or "").startswith("/observability/"):
+            record_connectivity_state = False
+
+        if record_connectivity_state:
+            _SERIES_DISCOVERY_ATTEMPT_COUNT += 1
+        try:
+            _SERIES_BY_STATION = _discover_series_for_stations()
+            _SERIES_DISCOVERED = True
+            if record_connectivity_state:
+                _LAST_SERIES_DISCOVERY_SUCCESS_UTC = datetime.now(timezone.utc).isoformat()
+                _LAST_SERIES_DISCOVERY_ERROR = None
+            return dict(_SERIES_BY_STATION)
+        except Exception as exc:
+            if record_connectivity_state:
+                _LAST_SERIES_DISCOVERY_ERROR = str(exc)
+            raise
 
 
 def get_cached_series_markets(series_ticker: str) -> dict | None:
@@ -590,6 +612,16 @@ def get_hydration_prerequisite_state_snapshot() -> dict:
         }
 
 
+def get_kalshi_connectivity_snapshot() -> dict:
+    with _SERIES_LOCK:
+        return {
+            "series_discovery_attempted": _SERIES_DISCOVERY_ATTEMPT_COUNT > 0,
+            "last_series_discovery_success_utc": _LAST_SERIES_DISCOVERY_SUCCESS_UTC,
+            "last_series_discovery_error": _LAST_SERIES_DISCOVERY_ERROR,
+            "markets_cache_population_count": int(_MARKETS_CACHE_POPULATION_COUNT),
+        }
+
+
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
     if _current_kalshi_execution_domain() != "production":
         raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
@@ -661,6 +693,7 @@ def _extract_strike_from_ticker(ticker):
 
 
 def build_structured_snapshot(station: str, market_types: set):
+    global _MARKETS_CACHE_POPULATION_COUNT
     normalized_station = (station or "").strip().upper()
     series_by_station = ensure_series_discovery_loaded()
     series_ticker = series_by_station.get(normalized_station)
@@ -681,6 +714,7 @@ def build_structured_snapshot(station: str, market_types: set):
                 "hydrated_at_utc": datetime.now(timezone.utc).isoformat(),
                 "station_local_day": station_local_day_key(normalized_station, datetime.now(timezone.utc).isoformat()),
             }
+            _MARKETS_CACHE_POPULATION_COUNT += 1
 
     filtered_markets = _filter_structured_markets(
         fetched_markets,
