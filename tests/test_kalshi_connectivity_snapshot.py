@@ -12,6 +12,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.original_attempt_count = kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT
         self.original_last_success = kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC
         self.original_last_error = kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR
+        self.original_last_hydration_execution = dict(kalshi_monitor._LAST_HYDRATION_EXECUTION)
 
     def tearDown(self):
         kalshi_monitor._SERIES_DISCOVERED = self.original_series_discovered
@@ -19,6 +20,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = self.original_attempt_count
         kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = self.original_last_success
         kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
+        kalshi_monitor._LAST_HYDRATION_EXECUTION = dict(self.original_last_hydration_execution)
 
     def test_connectivity_snapshot_records_series_discovery_success(self):
         kalshi_monitor._SERIES_DISCOVERED = False
@@ -69,6 +71,22 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertIsNone(snapshot["last_series_discovery_success_utc"])
         self.assertIsNone(snapshot["last_series_discovery_error"])
 
+
+    def test_get_last_hydration_execution_snapshot_returns_deep_copy(self):
+        kalshi_monitor._LAST_HYDRATION_EXECUTION = {
+            "KDEN": {
+                "rejection_counts": {"date_mismatch": 2},
+                "cache_written": False,
+            }
+        }
+
+        snapshot = kalshi_monitor.get_last_hydration_execution_snapshot()
+        snapshot["KDEN"]["rejection_counts"]["date_mismatch"] = 999
+
+        self.assertEqual(
+            kalshi_monitor._LAST_HYDRATION_EXECUTION["KDEN"]["rejection_counts"]["date_mismatch"],
+            2,
+        )
 
 if __name__ == "__main__":
     unittest.main()

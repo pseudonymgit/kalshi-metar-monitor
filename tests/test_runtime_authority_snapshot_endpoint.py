@@ -42,6 +42,17 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             }
         },
     })
+    @patch("app.get_last_hydration_execution_snapshot", return_value={
+        "KDEN": {
+            "evaluated_at_utc": "2025-01-01T00:00:00+00:00",
+            "station": "KDEN",
+            "series_ticker": "KXHIGHDEN",
+            "raw_market_count": 24,
+            "filtered_market_count": 8,
+            "rejection_counts": {"date_mismatch": 12, "market_type_mismatch": 4},
+            "cache_written": True,
+        }
+    })
     @patch("app.get_kalshi_connectivity_snapshot", return_value={
         "series_discovery_attempted": True,
         "last_series_discovery_success_utc": "2025-01-01T00:00:00+00:00",
@@ -75,6 +86,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["kalshi_connectivity"]["last_series_discovery_success_utc"], "2025-01-01T00:00:00+00:00")
         self.assertEqual(payload["kalshi_connectivity"]["last_series_discovery_error"], "temporary_error")
         self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 7)
+        self.assertEqual(payload["hydration_execution"]["KDEN"]["raw_market_count"], 24)
         self.assertEqual(payload["latest_transitions"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["count"], 1)
@@ -85,6 +97,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
     @patch("app.os.path.exists", return_value=False)
     @patch("app.get_recent_alerts", return_value=[])
     @patch("app.get_transition_history", return_value=[])
+    @patch("app.get_last_hydration_execution_snapshot", return_value={})
     @patch("app.get_kalshi_connectivity_snapshot", return_value={
         "series_discovery_attempted": False,
         "last_series_discovery_success_utc": None,
@@ -100,6 +113,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(payload["execution_mode"], "observability")
         self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 0)
+        self.assertEqual(payload["hydration_execution"], {})
 
 
 if __name__ == "__main__":
