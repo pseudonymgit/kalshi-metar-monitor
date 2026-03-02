@@ -31,6 +31,7 @@ from core.metar_monitor import (
 )
 
 from core.kalshi_monitor import (
+    _current_kalshi_execution_domain,
     _kalshi_public_get,
     build_market_polling_station_universe,
     ensure_series_discovery_loaded,
@@ -1006,7 +1007,7 @@ def observability_internal_alert_runtime():
     return jsonify(
         {
             "ok": True,
-            "execution_domain": kalshi_execution_domain(),
+            "execution_domain": _current_kalshi_execution_domain(),
             "station": runtime_snapshot["station"],
             "scheduler_running": is_scheduler_running(),
             "hydration_state": runtime_snapshot["hydration"],
