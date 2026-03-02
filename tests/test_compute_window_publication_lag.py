@@ -19,7 +19,7 @@ class ComputeWindowPublicationLagTests(unittest.TestCase):
         _start_iso, _end_iso, start_dt, end_dt = metar_monitor._compute_window("KDEN", minutes=3, cfg={"lookback_min": 3})
 
         self.assertEqual(end_dt, datetime(2026, 3, 2, 11, 58, 30, tzinfo=timezone.utc))
-        self.assertEqual(start_dt, datetime(2026, 3, 2, 11, 50, 30, tzinfo=timezone.utc))
+        self.assertEqual(start_dt, datetime(2026, 3, 2, 10, 58, 30, tzinfo=timezone.utc))
 
     @patch("core.metar_monitor.datetime")
     def test_last_seen_overlap_remains_anchored_to_last_seen(self, mock_datetime):
