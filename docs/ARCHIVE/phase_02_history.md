@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Phase 2 — Observation History + Reporting (Proposed)
 
 ## Goal

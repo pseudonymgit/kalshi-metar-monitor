@@ -1,164 +1,68 @@
-# CODEX MASTER TEMPLATE (AUTH PERSISTED VIA SETUP SCRIPT)
+# CODEX MASTER TEMPLATE (ACTIVE)
 
-AUTHENTICATED PR MODE ONLY
-All changes must go through a Pull Request.
-Execution governance rules only.
+## Purpose
 
-Git authentication is preconfigured in the setup script via credential helper.
-Do NOT attempt to read or use GITHUB_TOKEN during agent execution.
+Defines mandatory engineering and governance rules when Codex
+produces or modifies repository code or documentation.
 
----
+This document governs tooling behavior only.
+Historical templates remain archived.
 
-GIT PRECHECK (IDEMPOTENT + AUTH SAFE)
+------------------------------------------------------------
 
-Before making any edits, run:
+## Core Engineering Rules
 
-# Ensure origin exists (safe to run every task)
-if ! git remote | grep -q origin; then
-  git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
-fi
+- Preserve deterministic execution behavior.
+- Do not modify execution semantics unless explicitly requested.
+- Prefer architectural stability over feature expansion.
+- Do not refactor outside requested scope.
+- Do not rename functions or endpoints unless instructed.
 
-# Show remotes for visibility
-git remote -v
+------------------------------------------------------------
 
-# Verify authenticated access
-if ! git ls-remote origin HEAD > /dev/null 2>&1; then
-  echo "ERROR: git authentication failed or origin misconfigured."
-  exit 1
-fi
+## Documentation Authority Model
 
-Rules:
+Canonical authority hierarchy:
 
-If origin is missing, add it automatically.
+1. docs/API_REFERENCE.md
+2. docs/ARCHITECTURE.md
+3. docs/OPERATING_MODE.md
+4. docs/OPERATIONS.md
+5. docs/ROLLING_TODO.md
 
-If git ls-remote origin HEAD fails, abort and report exact error.
+If conflicts exist, higher authority controls.
 
-Do NOT modify credential helper.
+Archived documents MUST NOT be treated as requirements.
 
-Do NOT modify ~/.git-credentials.
+------------------------------------------------------------
 
-Do NOT reference or use GITHUB_TOKEN during agent execution.
+## PR Output Requirements
 
-Authentication is handled by setup script and must not be reconfigured here.
+All implementation responses MUST:
 
-BRANCH RULES
+- Produce unified diffs.
+- Modify only requested scope.
+- Preserve replay determinism.
+- Preserve transition-driven alert semantics.
+- Avoid introducing probabilistic or ML behavior.
 
-Never commit directly to main.
+------------------------------------------------------------
 
-Always create a new branch.
+## Safety Constraints
 
-Branch naming format:
+DO NOT:
 
-feature/<short-description>
+- introduce automated trading
+- introduce probabilistic execution paths
+- smooth or suppress rapid reversions
+- shift execution authority outside Execution domain
 
-fix/<short-description>
+------------------------------------------------------------
 
-phase2/<short-description>
+## Merge Gate
 
-test/<short-description> (allowed for pipeline validation only)
+A PR may be merged only if review confirms:
 
----
+"Deterministic execution semantics preserved."
 
-PHASE 1 PROTECTION (NON-NEGOTIABLE)
-
-Do NOT modify:
-
-* core/metar_monitor.py
-* Alert semantics
-* Integer floor-cross logic
-* Station-local 11:00–19:00 window
-* Station-local daily reset
-* Scheduler idempotency
-* Thread lifecycle
-* requirements.txt (unless explicitly requested)
-
-If Phase 1 must change:
-
-* Explicitly declare Phase 1.x
-* Stop and request confirmation before proceeding
-
----
-
-KALSHI RULES
-
-Public API default:
-https://api.elections.kalshi.com/trade-api/v2
-
-RSA mode (dormant) rules:
-
-* Do NOT include /trade-api/v2 in helper path
-* Signature format:
-  timestamp + METHOD + path + body
-* Timestamp in milliseconds
-* RSA PKCS1v15 + SHA256
-* Base64 encoded
-* Never expose key material
-
----
-
-CHANGE DISCIPLINE
-
-* Minimal diff only
-* No formatting-only commits
-* No refactoring unrelated code
-* No renaming unless explicitly requested
-* No dependency additions unless explicitly requested
-* No boot behavior changes unless explicitly requested
-
----
-
-PR CREATION FLOW
-
-After implementing changes:
-
-1. git checkout -b <branch-name>
-2. git add relevant files
-3. git commit -m "<clear message>"
-4. git push -u origin <branch-name>
-5. gh pr create --fill
-6. gh pr view --web
-
-Return:
-
-1. Unified diff
-2. Confirmation Phase 1 files untouched
-3. Confirmation no alert semantics changed
-4. Branch name
-5. PR URL
-6. Render curl test command
-
----
-
-MERGE RULE
-
-No PR gets merged unless ChatGPT signs off with:
-
-“Phase 1 semantics preserved.”
-
----
-
-OPERATING MODE
-
-SOLO-DEV CONTROLLED RELEASE
-
-All changes:
-Branch → PR → AI review → Merge
-
-No direct commits to main.
-
----
-
-END OF TEMPLATE
-
----
-
-BRANCH BASE SAFETY (MANDATORY)
-
-Before creating a feature branch:
-
-1. git checkout main
-2. git pull origin main
-
-Then create the feature branch from updated main.
-One feature → one branch → one merge.
-Do NOT stack branches.
+------------------------------------------------------------

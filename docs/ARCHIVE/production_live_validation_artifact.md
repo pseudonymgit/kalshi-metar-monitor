@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Production Validation Artifact — Live Transition → Alert Flow
 
 ## 1. Live Validation Runbook

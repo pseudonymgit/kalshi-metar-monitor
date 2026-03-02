@@ -17,7 +17,7 @@
 ## Scheduler and METAR behavior
 - `METAR_AUTOSTART` (default: `true`)
   - Enables one-time scheduler start through request lifecycle hooks.
-  - `false` keeps scheduler stopped until `POST /metar/start`.
+  - Runtime control APIs are documented only in `docs/API_REFERENCE.md`.
 
 - `METAR_POLL_SECONDS` (default: `60`)
   - Poll loop interval for the scheduler worker.
@@ -33,7 +33,7 @@
 - `METAR_LOOKBACK_MIN` (default: `3`)
 - `IEM_LOOKBACK_HOURS` (default: `1`)
 - `TEMP_ALERT_DELTA_F`
-  - Compatibility variable; integer crossing drives live alert semantics.
+  - Compatibility variable; transition-driven integer crossing remains authoritative.
 
 ## Alert policy
 - `ALERT_ON_MISSING_LADDER`
@@ -41,13 +41,14 @@
 
 - `SUPPRESS_TEMP_ONLY_ALERTS`
   - Legacy compatibility flag.
-  - Raw temp-only alerts are removed in production; composed alert pathways remain.
+  - Raw temp-only alerts are removed in production; transition-driven composed pathways remain.
 
 ## Kalshi weather ladder targeting
 - `KALSHI_PUBLIC_BASE_URL` (default: `https://api.elections.kalshi.com/trade-api/v2`)
 
 - `KALSHI_TARGET_STATION`
   - Restricts structured ladder monitoring to one station’s event set.
+  - Station authority is market-derived in canonical operating mode.
 
 - `KALSHI_TARGET_MARKET_TYPE`
   - Comma-separated `HIGH` and/or `LOW` filters when station targeting is enabled.
@@ -62,6 +63,9 @@
 - `HTTP_FROM_EMAIL`
 - `HTTP_USER_AGENT`
 
-## Notes
-- Simulation endpoint `POST /metar/simulate-ladder` can request delivery with `deliver=true`, but still depends on `ALERT_WEBHOOK_URL`.
-- Simulation flow bypasses live window gating for deterministic baseline/crossing validation.
+## Canonical references
+- API surface and endpoints: `docs/API_REFERENCE.md`
+- Architecture and invariants: `docs/ARCHITECTURE.md`
+- Operating governance and semantics: `docs/OPERATING_MODE.md`
+- Runbooks and deployment notes: `docs/OPERATIONS.md`
+- Active roadmap: `docs/ROLLING_TODO.md`

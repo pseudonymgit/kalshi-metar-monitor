@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Phase 3-B Deterministic Replay Specification
 Status: ACCEPTED
 Authority: Phase 3 Orchestrator

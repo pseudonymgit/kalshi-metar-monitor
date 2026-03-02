@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 
 ## Phase 1 (METAR monitor) — remaining / polish
 - [ ] Integer bucket crossing alerts (up + down) instead of delta-based float threshold
