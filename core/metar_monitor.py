@@ -2142,13 +2142,14 @@ def _poll_once(logger=None):
             hydration_passed = hydration.get("status") == "cache_valid"
             ingestion_admission[icao] = {
                 "hydration_passed": hydration_passed,
-                "admitted_to_fetch": hydration_passed,
-                "skip_reason": None if hydration_passed else "ladder_not_hydrated",
+                "admitted_to_fetch": True,
+                "skip_reason": None,
+                "market_phase_enabled": hydration_passed,
                 "evaluated_at_utc": _now_utc_iso(),
             }
             if hydration.get("status") != "cache_valid" and logger:
                 logger.warning(
-                    f"poll_skipped_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
+                    f"market_phase_blocked_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
                 )
 
         chosen = cfg["default_source"] or "nws"
@@ -2158,22 +2159,7 @@ def _poll_once(logger=None):
         for icao in stations:
             hydration = hydration_by_station.get(icao) or {}
             poll_attempt_utc = _now_utc_iso()
-            if hydration.get("status") != "cache_valid":
-                with _STATE_LOCK:
-                    _STATE["ingestion_runtime"][icao] = {
-                        "last_poll_attempt_utc": poll_attempt_utc,
-                        "last_fetch_status": "skipped_ladder_not_hydrated",
-                        "fetched_observation_count": 0,
-                        "ingested_observation_count": 0,
-                        "rejected_observation_count": 0,
-                        "rejection_reasons": [],
-                        "latest_raw_observation_timestamp": None,
-                        "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
-                        "window_start_utc": None,
-                        "window_end_utc": None,
-                        "sample_rejected_observations": [],
-                    }
-                continue
+            market_phase_enabled = hydration.get("status") == "cache_valid"
             try:
                 start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg)
                 obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
@@ -2187,7 +2173,14 @@ def _poll_once(logger=None):
                     window_end=end_dt,
                 )
                 rejection_reason_counts = rejection_diagnostics["reasons"]
-                ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
+                ing, al = _ingest_obs(
+                    icao,
+                    obs_list,
+                    cfg,
+                    allow_alert_delivery=market_phase_enabled,
+                    window_start=start_dt,
+                    window_end=end_dt,
+                )
                 total_ing += ing
                 total_alerts += al
                 with _STATE_LOCK:
