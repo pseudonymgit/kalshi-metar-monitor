@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Production-Readiness Audit (Weather-Driven Alert System)
 
 ## 1) Silent failure paths

@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Phase 1 — Alert Engine Specification
 Version: 1.0
 Status: Frozen (Controlled Evolution Only)

@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Phase 3-E Deterministic Security & Boundary Specification
 Status: ACCEPTED
 Authority: Phase 3 Orchestrator

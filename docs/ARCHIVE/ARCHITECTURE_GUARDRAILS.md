@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Architecture Guardrails
 
 Phase 1 is frozen.
