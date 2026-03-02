@@ -1568,6 +1568,37 @@ def observability_nws_fetch_runtime():
     ), 200
 
 
+@app.route("/observability/hydration-prerequisite-runtime", methods=["GET"])
+def observability_hydration_prerequisite_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    hydration_snapshot = get_hydration_prerequisite_state_snapshot() or {}
+    return jsonify(
+        {
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "hydration_state": hydration_snapshot.get(station) or {},
+            "ok": True,
+        }
+    ), 200
+
+
+@app.route("/observability/kalshi-connectivity-runtime", methods=["GET"])
+def observability_kalshi_connectivity_runtime():
+    connectivity_snapshot = get_kalshi_connectivity_snapshot() or {}
+    return jsonify(
+        {
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "connectivity_snapshot": connectivity_snapshot,
+            "ok": True,
+        }
+    ), 200
+
+
 def _parse_iso_timestamp(iso_timestamp):
     if not iso_timestamp:
         return None
