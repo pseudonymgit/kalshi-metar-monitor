@@ -661,12 +661,13 @@ def _restore_station_state(station: str, snapshot: Dict[str, Any]) -> None:
         clear_latest_observation(station)
 
 
-def _reset_replay_runtime_state_for_station(station: str) -> None:
+def _reset_replay_runtime_state_for_station(
+    station: str,
+    replay_local_day: str,
+) -> None:
     station = (station or "").strip().upper()
-    reset_station_daily_state(station, _now_utc_iso()[:10])
+    reset_station_daily_state(station, replay_local_day)
     clear_latest_observation(station)
-    with _STATE_LOCK:
-        _STATE["last_reset_date_local"].pop(station, None)
 
 
 def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
@@ -687,7 +688,10 @@ def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
 
         db_path = _alert_db_path()
         if not os.path.exists(db_path):
-            _reset_replay_runtime_state_for_station(station)
+            _reset_replay_runtime_state_for_station(
+                station,
+                date_local,
+            )
             return {
                 "station": station,
                 "date": date_local,
@@ -720,7 +724,10 @@ def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
             if obs_local_date == date_local:
                 replay_rows.append(row)
 
-        _reset_replay_runtime_state_for_station(station)
+        _reset_replay_runtime_state_for_station(
+            station,
+            date_local,
+        )
 
         cfg = get_default_config()
         replay_observations: List[Dict[str, Any]] = []
