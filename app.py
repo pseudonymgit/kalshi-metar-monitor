@@ -847,13 +847,11 @@ def _derive_alert_block(alert_block_class):
     }
 
 
-def _build_alert_decision_trace(station: str):
+def _get_alert_runtime_snapshot(station: str):
     normalized_station = (station or "").strip().upper()
-    now_utc = datetime.now(timezone.utc).isoformat()
-
     state = get_state() or {}
-    admission = (state.get("ingestion_admission") or {}).get(normalized_station) or {}
 
+    admission = (state.get("ingestion_admission") or {}).get(normalized_station) or {}
     hydration_prerequisite_state = get_hydration_prerequisite_state_snapshot() or {}
     hydration_station = hydration_prerequisite_state.get(normalized_station) or {}
     hydration_passed = bool(hydration_station.get("cache_valid"))
@@ -863,6 +861,7 @@ def _build_alert_decision_trace(station: str):
     latest_observation = (state.get("last_obs") or {}).get(normalized_station) or None
 
     transitions = get_transition_history(station=normalized_station, limit=50)
+    latest_transition = transitions[0] if transitions else None
     settlement_transition = next(
         (
             row
@@ -881,6 +880,53 @@ def _build_alert_decision_trace(station: str):
         for row in get_recent_alerts(100)
         if (row.get("station") or "").strip().upper() == normalized_station
     ]
+
+    return {
+        "station": normalized_station,
+        "admission": admission,
+        "hydration": hydration_station,
+        "hydration_passed": hydration_passed,
+        "admitted_to_fetch": admitted_to_fetch,
+        "latest_observation_utc": latest_observation_utc,
+        "latest_observation": latest_observation,
+        "latest_transition": latest_transition,
+        "settlement_transition": settlement_transition,
+        "latest_market_eval": latest_market_eval,
+        "latest_outcome": latest_outcome,
+        "latest_suppression_reason": latest_suppression_reason,
+        "station_alerts": station_alerts,
+    }
+
+
+def _derive_runtime_diagnostic(first_blocking_stage: str, runtime_snapshot: dict):
+    if first_blocking_stage == "INGESTION_ADMISSION":
+        if not runtime_snapshot.get("hydration_passed"):
+            return "HYDRATION"
+        return "INGESTION"
+    if first_blocking_stage == "SETTLEMENT_TRANSITION":
+        return "TRANSITION"
+    if first_blocking_stage == "MARKET_MATCH":
+        return "MARKET"
+    if first_blocking_stage == "SUPPRESSION_GATE":
+        return "SUPPRESSION"
+    if first_blocking_stage == "ALERT_EMISSION":
+        return "EMISSION"
+    return "NONE"
+
+
+def _build_alert_decision_trace(station: str):
+    runtime_snapshot = _get_alert_runtime_snapshot(station)
+    normalized_station = runtime_snapshot["station"]
+    now_utc = datetime.now(timezone.utc).isoformat()
+    admission = runtime_snapshot["admission"]
+    hydration_passed = runtime_snapshot["hydration_passed"]
+    admitted_to_fetch = runtime_snapshot["admitted_to_fetch"]
+    latest_observation_utc = runtime_snapshot["latest_observation_utc"]
+    latest_observation = runtime_snapshot["latest_observation"]
+    settlement_transition = runtime_snapshot["settlement_transition"]
+    latest_outcome = runtime_snapshot["latest_outcome"]
+    latest_suppression_reason = runtime_snapshot["latest_suppression_reason"]
+    station_alerts = runtime_snapshot["station_alerts"]
 
     decision_chain = []
 
@@ -933,6 +979,49 @@ def _build_alert_decision_trace(station: str):
         "decision_chain": decision_chain,
         "terminal_state": "ALERTABLE",
     }
+
+
+@app.route("/observability/internal-alert-runtime", methods=["GET"])
+def observability_internal_alert_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    runtime_snapshot = _get_alert_runtime_snapshot(station)
+    decision_trace = _build_alert_decision_trace(station=station)
+
+    first_blocking_stage = "NONE"
+    for stage in decision_trace.get("decision_chain") or []:
+        if stage.get("status") == "BLOCK":
+            first_blocking_stage = stage.get("stage") or "UNKNOWN"
+            break
+
+    now_date_utc = datetime.now(timezone.utc).date().isoformat()
+    alerts_emitted_today = sum(
+        1
+        for alert in runtime_snapshot.get("station_alerts") or []
+        if str(alert.get("timestamp") or alert.get("sent_utc") or "").startswith(now_date_utc)
+    )
+
+    return jsonify(
+        {
+            "ok": True,
+            "execution_domain": kalshi_execution_domain(),
+            "station": runtime_snapshot["station"],
+            "scheduler_running": is_scheduler_running(),
+            "hydration_state": runtime_snapshot["hydration"],
+            "ingestion_admission": runtime_snapshot["admission"],
+            "latest_observation": {
+                "observed_at_utc": runtime_snapshot["latest_observation_utc"],
+                "observation": runtime_snapshot["latest_observation"],
+            },
+            "latest_transition": runtime_snapshot["latest_transition"],
+            "latest_market_outcome": runtime_snapshot["latest_outcome"] or "UNKNOWN",
+            "alerts_emitted_today": alerts_emitted_today,
+            "first_blocking_stage": first_blocking_stage,
+            "diagnostic_class": _derive_runtime_diagnostic(first_blocking_stage, runtime_snapshot),
+        }
+    ), 200
 
 
 def _build_alert_diagnostic_rows(station_filter=None):
