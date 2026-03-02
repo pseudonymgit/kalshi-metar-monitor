@@ -56,6 +56,7 @@ class StructuralHardeningTests(unittest.TestCase):
     @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
     @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
     @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"attempted": True, "cache_valid": False, "series_discovered": False}})
     @patch("core.metar_monitor._fetch_range_strict")
     @patch("core.metar_monitor._ingest_obs")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
@@ -71,6 +72,7 @@ class StructuralHardeningTests(unittest.TestCase):
     @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
     @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
     @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"attempted": True, "cache_valid": False, "series_discovered": True}})
     @patch("core.metar_monitor._fetch_range_strict")
     @patch("core.metar_monitor._ingest_obs")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
@@ -84,6 +86,21 @@ class StructuralHardeningTests(unittest.TestCase):
         self.assertFalse(admission["admitted_to_fetch"])
         self.assertEqual(admission["skip_reason"], "ladder_not_hydrated")
         self.assertIsNotNone(admission["evaluated_at_utc"])
+
+    @patch("core.metar_monitor.ensure_state_loaded")
+    @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
+    @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
+    @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"attempted": True, "cache_valid": False, "series_discovered": True}})
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.metar_monitor._fetch_range_strict")
+    @patch("core.metar_monitor._ingest_obs")
+    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
+    @patch("core.metar_monitor._save_cache")
+    def test_poll_once_executes_hydrator_when_prereq_snapshot_requires_it(self, _save, mock_hydrate, _ingest, _fetch, *_mocks):
+        metar_monitor._poll_once()
+
+        mock_hydrate.assert_called_once_with(station="KDEN", market_types={"HIGH"})
 
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={})
