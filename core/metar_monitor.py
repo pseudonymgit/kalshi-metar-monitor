@@ -259,8 +259,9 @@ def _compute_rejection_reasons(
     last_seen_iso: Optional[str],
     window_start: Optional[datetime],
     window_end: Optional[datetime],
-) -> Dict[str, int]:
+) -> Dict[str, Any]:
     reasons: Dict[str, int] = {}
+    sample_rejected_observations: List[Dict[str, Any]] = []
     cursor_last_seen_iso = last_seen_iso
     window_end_day_key = station_local_day_key(icao, window_end.isoformat()) if window_end else None
 
@@ -289,11 +290,27 @@ def _compute_rejection_reasons(
 
         if rejection_reason:
             reasons[rejection_reason] = reasons.get(rejection_reason, 0) + 1
+            if len(sample_rejected_observations) < 5:
+                sample_rejected_observations.append(
+                    {
+                        "obs_time": ts,
+                        "rejection_reason": rejection_reason,
+                        "delta_seconds_from_window_start": (
+                            (obs_dt - window_start).total_seconds() if window_start else None
+                        ),
+                        "delta_seconds_from_window_end": (
+                            (obs_dt - window_end).total_seconds() if window_end else None
+                        ),
+                    }
+                )
             continue
 
         cursor_last_seen_iso = ts
 
-    return reasons
+    return {
+        "reasons": reasons,
+        "sample_rejected_observations": sample_rejected_observations,
+    }
 
 
 def get_station_ingestion_runtime(station: str) -> Dict[str, Any]:
@@ -316,6 +333,25 @@ def get_station_ingestion_runtime(station: str) -> Dict[str, Any]:
         "rejection_reasons": runtime.get("rejection_reasons") or [],
         "latest_raw_observation_timestamp": runtime.get("latest_raw_observation_timestamp") or latest_raw.get("obs_time"),
         "latest_accepted_observation_timestamp": latest_accepted,
+    }
+
+
+def get_station_ingestion_window_runtime(station: str) -> Dict[str, Any]:
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return {}
+
+    state = get_state()
+    runtime = (state.get("ingestion_runtime") or {}).get(normalized_station) or {}
+
+    return {
+        "station": normalized_station,
+        "window_start_utc": runtime.get("window_start_utc"),
+        "window_end_utc": runtime.get("window_end_utc"),
+        "last_seen_iso": (state.get("last_seen_iso") or {}).get(normalized_station),
+        "latest_raw_observation_timestamp": runtime.get("latest_raw_observation_timestamp"),
+        "latest_accepted_observation_timestamp": runtime.get("latest_accepted_observation_timestamp"),
+        "sample_rejected_observations": runtime.get("sample_rejected_observations") or [],
     }
 
 
@@ -1764,6 +1800,10 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
                 "rejected_observation_count": 0,
                 "rejection_reasons": [],
                 "latest_raw_observation_timestamp": None,
+                "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
+                "window_start_utc": start_dt.isoformat(),
+                "window_end_utc": end_dt.isoformat(),
+                "sample_rejected_observations": [],
             }
         return {
             "status": "degraded",
@@ -1777,13 +1817,14 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
         obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
         with _STATE_LOCK:
             pre_ingest_last_seen = _STATE["last_seen_iso"].get(icao)
-        rejection_reason_counts = _compute_rejection_reasons(
+        rejection_diagnostics = _compute_rejection_reasons(
             icao,
             obs_list,
             last_seen_iso=pre_ingest_last_seen,
             window_start=start_dt,
             window_end=end_dt,
         )
+        rejection_reason_counts = rejection_diagnostics["reasons"]
         ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
         with _STATE_LOCK:
             latest = _STATE["last_obs"].get(icao)
@@ -1797,7 +1838,11 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
                     {"reason": reason, "count": count}
                     for reason, count in sorted(rejection_reason_counts.items())
                 ],
+                "window_start_utc": start_dt.isoformat(),
+                "window_end_utc": end_dt.isoformat(),
                 "latest_raw_observation_timestamp": (obs_list[-1].get("obs_time") if obs_list else None),
+                "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
+                "sample_rejected_observations": rejection_diagnostics["sample_rejected_observations"],
             }
         return {
             "status": "ok",
@@ -1822,6 +1867,10 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
                 "rejected_observation_count": 0,
                 "rejection_reasons": [{"reason": "fetch_or_ingest_exception", "count": 1}],
                 "latest_raw_observation_timestamp": None,
+                "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
+                "window_start_utc": start_dt.isoformat(),
+                "window_end_utc": end_dt.isoformat(),
+                "sample_rejected_observations": [],
             }
         return {
             "status": "error",
@@ -2049,6 +2098,10 @@ def _poll_once(logger=None):
                         "rejected_observation_count": 0,
                         "rejection_reasons": [],
                         "latest_raw_observation_timestamp": None,
+                        "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
+                        "window_start_utc": None,
+                        "window_end_utc": None,
+                        "sample_rejected_observations": [],
                     }
                 continue
             try:
@@ -2056,13 +2109,14 @@ def _poll_once(logger=None):
                 obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
                 with _STATE_LOCK:
                     pre_ingest_last_seen = _STATE["last_seen_iso"].get(icao)
-                rejection_reason_counts = _compute_rejection_reasons(
+                rejection_diagnostics = _compute_rejection_reasons(
                     icao,
                     obs_list,
                     last_seen_iso=pre_ingest_last_seen,
                     window_start=start_dt,
                     window_end=end_dt,
                 )
+                rejection_reason_counts = rejection_diagnostics["reasons"]
                 ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
                 total_ing += ing
                 total_alerts += al
@@ -2077,7 +2131,11 @@ def _poll_once(logger=None):
                             {"reason": reason, "count": count}
                             for reason, count in sorted(rejection_reason_counts.items())
                         ],
+                        "window_start_utc": start_dt.isoformat(),
+                        "window_end_utc": end_dt.isoformat(),
                         "latest_raw_observation_timestamp": (obs_list[-1].get("obs_time") if obs_list else None),
+                        "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
+                        "sample_rejected_observations": rejection_diagnostics["sample_rejected_observations"],
                     }
             except Exception as e:
                 with _STATE_LOCK:
@@ -2089,6 +2147,10 @@ def _poll_once(logger=None):
                         "rejected_observation_count": 0,
                         "rejection_reasons": [{"reason": "fetch_or_ingest_exception", "count": 1}],
                         "latest_raw_observation_timestamp": None,
+                        "latest_accepted_observation_timestamp": _STATE["last_seen_iso"].get(icao),
+                        "window_start_utc": None,
+                        "window_end_utc": None,
+                        "sample_rejected_observations": [],
                     }
                 if logger:
                     logger.error(f"poll failed for {icao} ({chosen}): {e}")
