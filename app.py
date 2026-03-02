@@ -4,7 +4,7 @@ import sys
 import logging
 import sqlite3
 from datetime import datetime, timezone
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -35,6 +35,9 @@ from core.kalshi_monitor import (
     build_market_polling_station_universe,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
+    kalshi_execution_domain,
+    reset_kalshi_execution_domain,
+    set_kalshi_execution_domain,
 )
 from core.observability import (
     get_current_day_structure_summaries,
@@ -323,7 +326,8 @@ def _build_market_coverage_rows(station_filter=None):
         enabled_market_types = {"HIGH"}
 
     webhook_configured = bool((os.getenv("ALERT_WEBHOOK_URL") or "").strip())
-    series_by_station = ensure_series_discovery_loaded()
+    with kalshi_execution_domain("observability"):
+        series_by_station = ensure_series_discovery_loaded()
     live_ingestion_stations = set(stations)
 
     rows = []
@@ -334,13 +338,19 @@ def _build_market_coverage_rows(station_filter=None):
         series_ticker = series_by_station.get(station)
 
         discovered_markets = []
-        market_data_available = True
+        cache_status = "cache_missing"
+        cache_metadata = {}
         if series_ticker:
             cached_data = get_cached_series_markets(series_ticker)
-            if cached_data is None:
-                market_data_available = False
-            else:
+            if cached_data is not None:
                 discovered_markets = cached_data.get("markets") or []
+                cache_metadata = {
+                    "hydrated_at_utc": cached_data.get("hydrated_at_utc"),
+                    "station_local_day": cached_data.get("station_local_day"),
+                }
+                expected_day = station_local_day_key(station, datetime.utcnow().replace(tzinfo=timezone.utc).isoformat())
+                cached_day = cached_data.get("station_local_day")
+                cache_status = "cache_valid" if (cached_day is None or cached_day == expected_day) else "cache_stale"
 
         for market_type in ["HIGH", "LOW"]:
             market_type_enabled = market_type in enabled_market_types
@@ -411,9 +421,12 @@ def _build_market_coverage_rows(station_filter=None):
             elif not series_ticker:
                 coverage_status = "not_covered"
                 coverage_reason = "no_discovered_series"
-            elif not market_data_available:
+            elif cache_status == "cache_missing":
                 coverage_status = "market_data_unknown"
                 coverage_reason = "cache_not_yet_populated"
+            elif cache_status == "cache_stale":
+                coverage_status = "market_data_unknown"
+                coverage_reason = "cache_stale"
             elif len(eligible_markets) == 0:
                 coverage_status = "not_covered"
                 coverage_reason = "no_eligible_markets_after_filters"
@@ -435,6 +448,8 @@ def _build_market_coverage_rows(station_filter=None):
                     "discovered_series_ticker": series_ticker,
                     "series_discovered": bool(series_ticker),
                     "discovered_market_count": len(discovered_markets),
+                    "series_market_cache_status": cache_status,
+                    "series_market_cache_metadata": cache_metadata,
                     "eligible_market_count_after_filters": len(eligible_markets),
                     "evaluation_possible": evaluation_possible,
                     "alerting_possible": alerting_possible,
@@ -907,6 +922,28 @@ else:
         ensure_series_discovery_loaded()
         _merge_discovered_stations_into_watchlist()
         return None
+
+@app.before_request
+def _set_request_execution_domain():
+    path = str(request.path or "").lower()
+    domain = "production"
+    if path.startswith("/observability/"):
+        domain = "observability"
+    elif path.startswith("/diagnostics/"):
+        domain = "diagnostics"
+    elif path.startswith("/audit/"):
+        domain = "audit"
+    elif path.startswith("/debug/replay"):
+        domain = "replay"
+    g._kalshi_execution_domain_token = set_kalshi_execution_domain(domain)
+
+
+@app.teardown_request
+def _clear_request_execution_domain(_exc):
+    token = getattr(g, "_kalshi_execution_domain_token", None)
+    if token is not None:
+        reset_kalshi_execution_domain(token)
+
 
 @app.route("/", methods=["GET"])
 def root():
@@ -1468,10 +1505,10 @@ def metar_simulate_ladder():
     except Exception:
         return jsonify({"error": "temp_f must be numeric"}), 400
 
-    from core.kalshi_monitor import build_structured_snapshot
+    from core.kalshi_monitor import hydrate_station_ladder_snapshot
 
     try:
-        build_structured_snapshot(
+        hydrate_station_ladder_snapshot(
             station=icao,
             market_types={"HIGH", "LOW"}
         )
