@@ -29,6 +29,16 @@ Purpose: system must reliably inform immediate trading decisions.
 - [ ] Detect silent execution-domain guard rejection
 - [ ] Add transition emission verification logging
 
+### P0 — STRUCTURAL EDGE PRESERVATION
+
+Purpose: preserve deterministic execution edge from structural-event awareness.
+
+- [ ] Goldilocks alert surfacing
+- [ ] Replay verification for Goldilocks transitions
+- [ ] Detection auditability for advance-and-revert sequences
+- [ ] Station-day visibility for structural events
+- [ ] Missed-event detection with deterministic root-cause traceability
+
 ### P0 — EPOCH BACKFILL BOOTSTRAP
 
 Purpose: increase usable historical learning immediately.
@@ -45,9 +55,10 @@ Rule: a partial historical day is preferable to missing epoch history.
 
 ### P1 — MARKET EXPANSION (MERGED WORKSTREAM)
 
-LOW Market Enablement + City Optimization
+LOW + HIGH Symmetric Market Enablement + City Optimization
 
 - [ ] Enable LOW markets across supported cities
+- [ ] Preserve HIGH/LOW symmetric transition monitoring guarantees
 - [ ] Replace static ICAO→Kalshi mapping with formulaic resolver
 - [ ] Auto-detect newly listed Kalshi temperature markets
 - [ ] Emit alert when unknown market detected
@@ -83,8 +94,8 @@ Constraint: no execution authority impact.
 
 ### P3 — DECISION SUPPORT VISIBILITY (HUMAN-IN-THE-LOOP)
 
-- [ ] High-probability / high-payout condition highlighting
-- [ ] Market vs structural probability comparison views
+- [ ] High-signal condition highlighting for manual review
+- [ ] Market vs structural state comparison views
 - [ ] Actionable report generation
 - [ ] Manual trader decision support only
 
@@ -96,6 +107,7 @@ Carry-forward items from prior backlog organization remain represented in the pr
 - Integer bucket crossing alert behavior and reduced-noise transition-only emission intent
 - Station-local gating, per-station reset behavior, and station time visibility/debugging intent
 - Kalshi read-only market monitoring and watchlist expansion intent
+- Goldilocks structural-event handling as live reliability concern (now explicit priority)
 
 No completed historical items were removed.
 
@@ -105,5 +117,8 @@ DO NOT:
 - modify execution logic
 - introduce ML behavior
 - introduce probabilistic execution paths
+- smooth temperature transitions
+- suppress rapid reversions
+- reinterpret Goldilocks events statistically
 - alter Phase-1 semantics
 - grant execution authority outside Execution domain

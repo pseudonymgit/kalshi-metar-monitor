@@ -6,6 +6,18 @@ Production Flask service that ingests METAR observations, detects integer temper
 - Architecture specification: `docs/ARCHITECTURE.md`
 - Execution governance rules: `docs/CODEX_MASTER_TEMPLATE.md`
 
+## Canonical Production Intent
+- Markets are the source of truth for which stations are active.
+- METAR ingestion follows market availability and monitors both `HIGH` and `LOW` markets symmetrically.
+- Settlement buckets are monotonic per station-day; alerts are transition-driven.
+- Replay must reproduce live transitions exactly.
+- Observability is read-only from persisted runtime state + cached market data and must not trigger live Kalshi calls.
+
+## Goldilocks Structural Event Doctrine
+A Goldilocks structural event is a brief settlement advancement followed by rapid reversion that creates informational asymmetry between true settlement state and trader awareness.
+
+Detection and surfacing of these events is a live trading reliability requirement, not optional analytics or experimentation.
+
 ## Deterministic Runtime Guardrails
 - 60-second polling cadence.
 - Event-gated Kalshi calls (only after integer-cross detection).
@@ -47,7 +59,7 @@ Policy notes:
 
 Flow:
 1. METAR ingest updates station state and detects integer floor crosses.
-2. On crossing, the alert pipeline fetches Kalshi ladder snapshots for active market types.
+2. On crossing, the alert pipeline evaluates market-authoritative station context and fetches Kalshi ladder snapshots for active market types.
 3. Ladder transition logic checks bucket entry/transition.
 4. If transition alert criteria are met, a composed ladder alert is sent.
 
@@ -135,27 +147,13 @@ Autostart and lifecycle behavior:
 
 ## API Surface
 
-### METAR (`/metar/*`)
-- `GET /metar/window` — ingest strict-source window for one station and return latest-known observation.
-- `GET /metar/latest` — latest observation for one station.
-- `GET /metar/multi` — on-demand fetch for multiple stations.
-- `GET /metar/watchlist` — read active watchlist.
-- `POST /metar/watchlist` — replace active watchlist.
-- `GET /metar/metrics` — poll/timeout counters and monitoring metrics.
-- `GET /metar/status` — scheduler and loop lifecycle status.
-- `POST /metar/start` — start METAR scheduler.
-- `POST /metar/stop` — stop METAR scheduler.
-- `POST /metar/test-alert` — emit synthetic webhook payload.
-- `POST /metar/force-poll` — run one immediate poll cycle.
-- `POST /metar/simulate-ladder` — simulate temp ingestion for ladder transition testing.
+Canonical endpoint definitions live in `docs/API_REFERENCE.md`.
 
-### Kalshi (`/kalshi/*`)
-- `GET /kalshi/ping` — checks public Kalshi reachability.
-- `GET /kalshi/markets` — fetches public markets (`limit` query param).
-- `POST /kalshi/check` — manual change-detection pass against baseline state.
-- `GET /kalshi/snapshot` — structured station snapshot for market ladders.
-- `POST /kalshi/composed` — manual composed weather-ladder alert trigger.
-- `GET /kalshi/health` — active station set and composed send metadata.
+Use that document as the single source of truth for:
+- method + path inventory,
+- execution authority classification,
+- domain mapping (Execution/Observability/Simulation/Operations/Debug/Kalshi Integration),
+- data-source and safety semantics.
 
 ## `/metar/simulate-ladder` Workflow
 
