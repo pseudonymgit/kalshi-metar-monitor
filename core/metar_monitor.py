@@ -1942,120 +1942,123 @@ def _resolve_live_polling_stations(cfg: Dict[str, Any]) -> List[str]:
 # Scheduler
 # =========================
 def _poll_once(logger=None):
-    ensure_state_loaded()
-    cfg = get_default_config()
-    stations = _resolve_live_polling_stations(cfg)
+    from core.kalshi_monitor import kalshi_execution_domain
 
-    from core.kalshi_monitor import (
-        _current_kalshi_execution_domain,
-        ensure_ladder_hydration_prerequisite,
-        get_hydration_prerequisite_state_snapshot,
-        hydrate_station_ladder_snapshot,
-    )
+    with kalshi_execution_domain("production"):
+        ensure_state_loaded()
+        cfg = get_default_config()
+        stations = _resolve_live_polling_stations(cfg)
 
-    hydration_by_station = {}
-    ingestion_admission = {}
-    for icao in stations:
-        hydration = ensure_ladder_hydration_prerequisite(icao)
-        hydration_by_station[icao] = hydration
-
-        hydration_state = (get_hydration_prerequisite_state_snapshot().get(icao) or {})
-        should_execute_hydration = (
-            _current_kalshi_execution_domain() == "production"
-            and bool(hydration_state.get("attempted"))
-            and not bool(hydration_state.get("cache_valid"))
-            and bool(hydration_state.get("series_discovered"))
+        from core.kalshi_monitor import (
+            _current_kalshi_execution_domain,
+            ensure_ladder_hydration_prerequisite,
+            get_hydration_prerequisite_state_snapshot,
+            hydrate_station_ladder_snapshot,
         )
-        if should_execute_hydration:
+
+        hydration_by_station = {}
+        ingestion_admission = {}
+        for icao in stations:
+            hydration = ensure_ladder_hydration_prerequisite(icao)
+            hydration_by_station[icao] = hydration
+
+            hydration_state = (get_hydration_prerequisite_state_snapshot().get(icao) or {})
+            should_execute_hydration = (
+                _current_kalshi_execution_domain() == "production"
+                and bool(hydration_state.get("attempted"))
+                and not bool(hydration_state.get("cache_valid"))
+                and bool(hydration_state.get("series_discovered"))
+            )
+            if should_execute_hydration:
+                try:
+                    hydrate_station_ladder_snapshot(station=icao, market_types={"HIGH"})
+                except Exception as e:
+                    if logger:
+                        logger.warning(f"poll_hydration_execution_failed station={icao}: {e}")
+
+            hydration_passed = hydration.get("status") == "cache_valid"
+            ingestion_admission[icao] = {
+                "hydration_passed": hydration_passed,
+                "admitted_to_fetch": hydration_passed,
+                "skip_reason": None if hydration_passed else "ladder_not_hydrated",
+                "evaluated_at_utc": _now_utc_iso(),
+            }
+            if hydration.get("status") != "cache_valid" and logger:
+                logger.warning(
+                    f"poll_skipped_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
+                )
+
+        chosen = cfg["default_source"] or "nws"
+
+        total_ing = 0
+        total_alerts = 0
+        for icao in stations:
+            hydration = hydration_by_station.get(icao) or {}
+            poll_attempt_utc = _now_utc_iso()
+            if hydration.get("status") != "cache_valid":
+                with _STATE_LOCK:
+                    _STATE["ingestion_runtime"][icao] = {
+                        "last_poll_attempt_utc": poll_attempt_utc,
+                        "last_fetch_status": "skipped_ladder_not_hydrated",
+                        "fetched_observation_count": 0,
+                        "ingested_observation_count": 0,
+                        "rejected_observation_count": 0,
+                        "rejection_reasons": [],
+                        "latest_raw_observation_timestamp": None,
+                    }
+                continue
             try:
-                hydrate_station_ladder_snapshot(station=icao, market_types={"HIGH"})
+                start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg)
+                obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
+                with _STATE_LOCK:
+                    pre_ingest_last_seen = _STATE["last_seen_iso"].get(icao)
+                rejection_reason_counts = _compute_rejection_reasons(
+                    icao,
+                    obs_list,
+                    last_seen_iso=pre_ingest_last_seen,
+                    window_start=start_dt,
+                    window_end=end_dt,
+                )
+                ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
+                total_ing += ing
+                total_alerts += al
+                with _STATE_LOCK:
+                    _STATE["ingestion_runtime"][icao] = {
+                        "last_poll_attempt_utc": poll_attempt_utc,
+                        "last_fetch_status": "ok",
+                        "fetched_observation_count": len(obs_list),
+                        "ingested_observation_count": ing,
+                        "rejected_observation_count": max(0, len(obs_list) - ing),
+                        "rejection_reasons": [
+                            {"reason": reason, "count": count}
+                            for reason, count in sorted(rejection_reason_counts.items())
+                        ],
+                        "latest_raw_observation_timestamp": (obs_list[-1].get("obs_time") if obs_list else None),
+                    }
             except Exception as e:
+                with _STATE_LOCK:
+                    _STATE["ingestion_runtime"][icao] = {
+                        "last_poll_attempt_utc": poll_attempt_utc,
+                        "last_fetch_status": "error",
+                        "fetched_observation_count": 0,
+                        "ingested_observation_count": 0,
+                        "rejected_observation_count": 0,
+                        "rejection_reasons": [{"reason": "fetch_or_ingest_exception", "count": 1}],
+                        "latest_raw_observation_timestamp": None,
+                    }
                 if logger:
-                    logger.warning(f"poll_hydration_execution_failed station={icao}: {e}")
+                    logger.error(f"poll failed for {icao} ({chosen}): {e}")
 
-        hydration_passed = hydration.get("status") == "cache_valid"
-        ingestion_admission[icao] = {
-            "hydration_passed": hydration_passed,
-            "admitted_to_fetch": hydration_passed,
-            "skip_reason": None if hydration_passed else "ladder_not_hydrated",
-            "evaluated_at_utc": _now_utc_iso(),
-        }
-        if hydration.get("status") != "cache_valid" and logger:
-            logger.warning(
-                f"poll_skipped_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
-            )
-
-    chosen = cfg["default_source"] or "nws"
-
-    total_ing = 0
-    total_alerts = 0
-    for icao in stations:
-        hydration = hydration_by_station.get(icao) or {}
-        poll_attempt_utc = _now_utc_iso()
-        if hydration.get("status") != "cache_valid":
-            with _STATE_LOCK:
-                _STATE["ingestion_runtime"][icao] = {
-                    "last_poll_attempt_utc": poll_attempt_utc,
-                    "last_fetch_status": "skipped_ladder_not_hydrated",
-                    "fetched_observation_count": 0,
-                    "ingested_observation_count": 0,
-                    "rejected_observation_count": 0,
-                    "rejection_reasons": [],
-                    "latest_raw_observation_timestamp": None,
-                }
-            continue
-        try:
-            start_iso, end_iso, start_dt, end_dt = _compute_window(icao, cfg.get("lookback_min", 3), cfg)
-            obs_list = _fetch_range_strict(icao, chosen, start_iso, end_iso, start_dt, end_dt, cfg)
-            with _STATE_LOCK:
-                pre_ingest_last_seen = _STATE["last_seen_iso"].get(icao)
-            rejection_reason_counts = _compute_rejection_reasons(
-                icao,
-                obs_list,
-                last_seen_iso=pre_ingest_last_seen,
-                window_start=start_dt,
-                window_end=end_dt,
-            )
-            ing, al = _ingest_obs(icao, obs_list, cfg, window_start=start_dt, window_end=end_dt)
-            total_ing += ing
-            total_alerts += al
-            with _STATE_LOCK:
-                _STATE["ingestion_runtime"][icao] = {
-                    "last_poll_attempt_utc": poll_attempt_utc,
-                    "last_fetch_status": "ok",
-                    "fetched_observation_count": len(obs_list),
-                    "ingested_observation_count": ing,
-                    "rejected_observation_count": max(0, len(obs_list) - ing),
-                    "rejection_reasons": [
-                        {"reason": reason, "count": count}
-                        for reason, count in sorted(rejection_reason_counts.items())
-                    ],
-                    "latest_raw_observation_timestamp": (obs_list[-1].get("obs_time") if obs_list else None),
-                }
-        except Exception as e:
-            with _STATE_LOCK:
-                _STATE["ingestion_runtime"][icao] = {
-                    "last_poll_attempt_utc": poll_attempt_utc,
-                    "last_fetch_status": "error",
-                    "fetched_observation_count": 0,
-                    "ingested_observation_count": 0,
-                    "rejected_observation_count": 0,
-                    "rejection_reasons": [{"reason": "fetch_or_ingest_exception", "count": 1}],
-                    "latest_raw_observation_timestamp": None,
-                }
-            if logger:
-                logger.error(f"poll failed for {icao} ({chosen}): {e}")
-
-    with _STATE_LOCK:
-        _STATE["ingestion_admission"].update(ingestion_admission)
-        _STATE["poll_count"] += 1
-        _STATE["last_poll_utc"] = _now_utc_iso()
-        _save_cache(cfg["cache_file"], {
-            "last_obs": _STATE["last_obs"],
-            "last_seen_iso": _STATE["last_seen_iso"],
-            "last_reset_date_local": _STATE["last_reset_date_local"],
-            "last_observed_integer": _STATE["last_observed_integer"],
-        })
+        with _STATE_LOCK:
+            _STATE["ingestion_admission"].update(ingestion_admission)
+            _STATE["poll_count"] += 1
+            _STATE["last_poll_utc"] = _now_utc_iso()
+            _save_cache(cfg["cache_file"], {
+                "last_obs": _STATE["last_obs"],
+                "last_seen_iso": _STATE["last_seen_iso"],
+                "last_reset_date_local": _STATE["last_reset_date_local"],
+                "last_observed_integer": _STATE["last_observed_integer"],
+            })
 
 def _scheduler_loop(logger, interval_sec: int):
     loop_count = 0
