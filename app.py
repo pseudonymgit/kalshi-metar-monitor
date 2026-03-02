@@ -1633,6 +1633,87 @@ def observability_ingestion_diagnostic_class():
         }
     ), 200
 
+
+def _classify_alert_causality(
+    *,
+    ingestion_diagnostic_class: str,
+    transition_runtime: dict,
+    market_eligibility_runtime: dict,
+    internal_alert_runtime: dict,
+):
+    latest_market_outcome = str(internal_alert_runtime.get("latest_market_outcome") or "").strip().upper()
+
+    if ingestion_diagnostic_class != "INGESTION_HEALTHY":
+        return "NO_INGESTION", f"ingestion_diagnostic_class={ingestion_diagnostic_class}"
+
+    if int(transition_runtime.get("transitions_seen_today") or 0) <= 0:
+        return "NO_TRANSITIONS", "transition_runtime reports transitions_seen_today=0"
+
+    if latest_market_outcome == "NO_ELIGIBLE_MARKET" or int(market_eligibility_runtime.get("eligible_markets_count") or 0) <= 0:
+        return "NO_ELIGIBLE_MARKET", "market_eligibility_runtime reports no eligible market"
+
+    if latest_market_outcome.startswith("SUPPRESSED_"):
+        suppression_reason = market_eligibility_runtime.get("latest_suppression_reason") or latest_market_outcome
+        return "SUPPRESSED_TRANSITION", f"latest_market_outcome={latest_market_outcome} reason={suppression_reason}"
+
+    if latest_market_outcome == "TERMINAL_STATE":
+        return "TERMINAL_STATE_BLOCK", "latest_market_outcome=TERMINAL_STATE"
+
+    if latest_market_outcome == "ALERT_SENT" or int(internal_alert_runtime.get("alerts_emitted_today") or 0) > 0:
+        return "ALERT_ALREADY_SENT", "internal_alert_runtime indicates an alert was already sent"
+
+    return "ALERT_PATH_HEALTHY", "ingestion, transitions, and market eligibility path are healthy"
+
+
+@app.route("/observability/alert-causality-class", methods=["GET"])
+def observability_alert_causality_class():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    ingestion_runtime = get_station_ingestion_runtime(station)
+    window_runtime = get_station_ingestion_window_runtime(station)
+    ingestion_diagnostic_class, _ = _build_ingestion_diagnostic_classification(station, ingestion_runtime, window_runtime)
+
+    transition_runtime = _get_transition_runtime_summary(station)
+
+    latest_market_eval = get_latest_station_market_evaluation_context(station=station).get(station, {})
+    eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
+    market_eligibility_runtime = {
+        "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
+        "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
+        "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
+    }
+
+    runtime_snapshot = _get_alert_runtime_snapshot(station)
+    now_date_utc = datetime.now(timezone.utc).date().isoformat()
+    alerts_emitted_today = sum(
+        1
+        for alert in runtime_snapshot.get("station_alerts") or []
+        if str(alert.get("timestamp") or alert.get("sent_utc") or "").startswith(now_date_utc)
+    )
+    internal_alert_runtime = {
+        "latest_market_outcome": runtime_snapshot.get("latest_outcome") or "UNKNOWN",
+        "alerts_emitted_today": alerts_emitted_today,
+    }
+
+    alert_causality_class, explanation = _classify_alert_causality(
+        ingestion_diagnostic_class=ingestion_diagnostic_class,
+        transition_runtime=transition_runtime,
+        market_eligibility_runtime=market_eligibility_runtime,
+        internal_alert_runtime=internal_alert_runtime,
+    )
+
+    return jsonify(
+        {
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "alert_causality_class": alert_causality_class,
+            "explanation": explanation,
+        }
+    ), 200
+
 @app.route("/observability/transition-runtime", methods=["GET"])
 def observability_transition_runtime():
     station = (request.args.get("station") or "").strip().upper()
