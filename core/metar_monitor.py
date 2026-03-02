@@ -40,6 +40,7 @@ except Exception:
 ET_TZ_NAME = "America/New_York"
 OVERLAP_SECONDS = 120               # small overlap to avoid missing late arrivals
 FIRST_RUN_CUSHION_SEC = 300         # first contact: add 5 min cushion
+PUBLICATION_LAG_BUFFER_SECONDS = 90
 METAR_ACCEPTANCE_GRACE_SECONDS = min(900, OVERLAP_SECONDS * 5)  # 15 minutes max, bounded by overlap safety
 
 def _icao_tz_name(icao: str) -> str:
@@ -1743,6 +1744,7 @@ def _compute_window(icao: str, minutes: Optional[int] = None, cfg: Optional[Dict
     lookback = int(minutes if minutes is not None else cfg.get("lookback_min", 3))
 
     now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    window_end = now - timedelta(seconds=PUBLICATION_LAG_BUFFER_SECONDS)
 
     with _STATE_LOCK:
         last_seen = _STATE["last_seen_iso"].get(icao)
@@ -1750,9 +1752,9 @@ def _compute_window(icao: str, minutes: Optional[int] = None, cfg: Optional[Dict
     if last_seen:
         start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
     else:
-        start_dt = now - timedelta(minutes=lookback) - timedelta(seconds=FIRST_RUN_CUSHION_SEC)
+        start_dt = window_end - timedelta(minutes=lookback) - timedelta(seconds=FIRST_RUN_CUSHION_SEC)
 
-    end_dt = now
+    end_dt = window_end
     return (_iso_seconds_z(start_dt), _iso_seconds_z(end_dt), start_dt, end_dt)
 
 
