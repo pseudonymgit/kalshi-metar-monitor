@@ -35,6 +35,7 @@ from core.kalshi_monitor import (
     build_market_polling_station_universe,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
+    get_hydration_prerequisite_state_snapshot,
     kalshi_execution_domain,
     reset_kalshi_execution_domain,
     set_kalshi_execution_domain,
@@ -844,6 +845,94 @@ def _derive_alert_block(alert_block_class):
     }
 
 
+def _build_alert_decision_trace(station: str):
+    normalized_station = (station or "").strip().upper()
+    now_utc = datetime.now(timezone.utc).isoformat()
+
+    state = get_state() or {}
+    admission = (state.get("ingestion_admission") or {}).get(normalized_station) or {}
+
+    hydration_prerequisite_state = get_hydration_prerequisite_state_snapshot() or {}
+    hydration_station = hydration_prerequisite_state.get(normalized_station) or {}
+    hydration_passed = bool(hydration_station.get("cache_valid"))
+    admitted_to_fetch = bool(admission.get("admitted_to_fetch"))
+
+    latest_observation_utc = (state.get("last_seen_iso") or {}).get(normalized_station)
+    latest_observation = (state.get("last_obs") or {}).get(normalized_station) or None
+
+    transitions = get_transition_history(station=normalized_station, limit=50)
+    settlement_transition = next(
+        (
+            row
+            for row in transitions
+            if str(row.get("transition_type") or "").strip().lower().startswith("settlement_")
+        ),
+        None,
+    )
+
+    latest_market_eval = get_latest_station_market_evaluation_context(station=normalized_station).get(normalized_station, {})
+    latest_outcome = (latest_market_eval.get("latest_evaluation_outcome") or "").strip().upper()
+    latest_suppression_reason = (latest_market_eval.get("latest_suppression_reason") or "").strip().upper()
+
+    station_alerts = [
+        row
+        for row in get_recent_alerts(100)
+        if (row.get("station") or "").strip().upper() == normalized_station
+    ]
+
+    decision_chain = []
+
+    def _pass(stage: str, reason: str):
+        decision_chain.append({"stage": stage, "status": "PASS", "reason": reason})
+
+    def _block(stage: str, reason: str, terminal_state: str):
+        decision_chain.append({"stage": stage, "status": "BLOCK", "reason": reason})
+        return {
+            "station": normalized_station,
+            "evaluated_at_utc": now_utc,
+            "decision_chain": decision_chain,
+            "terminal_state": terminal_state,
+        }
+
+    if not (hydration_passed and admitted_to_fetch):
+        skip_reason = admission.get("skip_reason") or "ladder_not_hydrated"
+        return _block("INGESTION_ADMISSION", f"station_not_admitted:{skip_reason}", "BLOCKED_INGESTION_ADMISSION")
+    _pass("INGESTION_ADMISSION", "station_admitted_to_fetch")
+
+    if not latest_observation or not latest_observation_utc:
+        return _block("OBSERVATION_PRESENT", "no_accepted_observation", "BLOCKED_NO_OBSERVATION")
+    _pass("OBSERVATION_PRESENT", "accepted_observation_present")
+
+    if not settlement_transition:
+        return _block("SETTLEMENT_TRANSITION", "no_settlement_transition_recorded", "BLOCKED_NO_SETTLEMENT_TRANSITION")
+    _pass("SETTLEMENT_TRANSITION", "settlement_transition_present")
+
+    if latest_outcome == "NO_ELIGIBLE_MARKET":
+        return _block("MARKET_MATCH", "no_eligible_market_after_filters", "BLOCKED_NO_MARKET_MATCH")
+    _pass("MARKET_MATCH", "eligible_market_path_present_or_not_blocked")
+
+    if latest_outcome.startswith("SUPPRESSED_"):
+        suppression_reason = latest_suppression_reason or latest_outcome
+        block = _derive_alert_block("SUPPRESSED")
+        return _block("SUPPRESSION_GATE", f"suppressed:{suppression_reason}", block.get("alert_block_state") or "BLOCKED_SUPPRESSED")
+    _pass("SUPPRESSION_GATE", "not_suppressed")
+
+    if latest_outcome != "ALERT_SENT":
+        return _block(
+            "ALERT_EMISSION",
+            f"alert_not_emitted:latest_outcome={latest_outcome or 'UNKNOWN'} alerts_seen={len(station_alerts)}",
+            "BLOCKED_ALERT_EMISSION",
+        )
+    _pass("ALERT_EMISSION", "alert_emitted")
+
+    return {
+        "station": normalized_station,
+        "evaluated_at_utc": now_utc,
+        "decision_chain": decision_chain,
+        "terminal_state": "ALERTABLE",
+    }
+
+
 def _build_alert_diagnostic_rows(station_filter=None):
     state = get_state()
     now_utc = datetime.now(timezone.utc)
@@ -1486,6 +1575,16 @@ def observability_alert_diagnostics():
 def observability_alert_fire_audit():
     payload = _build_alert_fire_audit_rows()
     return jsonify({"ok": True, **payload}), 200
+
+
+@app.route("/observability/alert-decision-trace", methods=["GET"])
+def observability_alert_decision_trace():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    payload = _build_alert_decision_trace(station=station)
+    return jsonify({"ok": True, "execution_mode": "observability", **payload}), 200
 
 
 @app.route("/observability/runtime-authority-snapshot", methods=["GET"])
