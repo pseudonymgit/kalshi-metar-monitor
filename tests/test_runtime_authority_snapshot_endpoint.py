@@ -42,6 +42,12 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             }
         },
     })
+    @patch("app.get_kalshi_connectivity_snapshot", return_value={
+        "series_discovery_attempted": True,
+        "last_series_discovery_success_utc": "2025-01-01T00:00:00+00:00",
+        "last_series_discovery_error": "temporary_error",
+        "markets_cache_population_count": 7,
+    })
     @patch("app._build_ingestion_health_rows", return_value={
         "generated_utc": "2025-01-01T00:00:00+00:00",
         "stale_after_seconds": 180,
@@ -65,11 +71,35 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["hydration_snapshot"]["stations"]["KDEN"]["hydration_prerequisite"]["attempted"], True)
         self.assertEqual(payload["hydration_snapshot"]["stations"]["KDEN"]["hydration_prerequisite"]["cache_valid"], True)
         self.assertEqual(payload["hydration_snapshot"]["stations"]["KDEN"]["ingestion_admission"]["hydration_passed"], True)
+        self.assertEqual(payload["kalshi_connectivity"]["series_discovery_attempted"], True)
+        self.assertEqual(payload["kalshi_connectivity"]["last_series_discovery_success_utc"], "2025-01-01T00:00:00+00:00")
+        self.assertEqual(payload["kalshi_connectivity"]["last_series_discovery_error"], "temporary_error")
+        self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 7)
         self.assertEqual(payload["latest_transitions"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["count"], 1)
         self.assertEqual(payload["db"]["path"], "/var/data/alerts.db")
         self.assertTrue(payload["db"]["exists"])
+
+    @patch("app._kalshi_public_get", side_effect=AssertionError("observability endpoint must remain read-only"))
+    @patch("app.os.path.exists", return_value=False)
+    @patch("app.get_recent_alerts", return_value=[])
+    @patch("app.get_transition_history", return_value=[])
+    @patch("app.get_kalshi_connectivity_snapshot", return_value={
+        "series_discovery_attempted": False,
+        "last_series_discovery_success_utc": None,
+        "last_series_discovery_error": None,
+        "markets_cache_population_count": 0,
+    })
+    @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {}})
+    @patch("app._build_ingestion_health_rows", return_value={"stations": []})
+    @patch("app._canonical_live_station_universe", return_value={"stations": []})
+    def test_runtime_authority_snapshot_does_not_trigger_live_kalshi_calls(self, *_mocks):
+        response = self.client.get("/observability/runtime-authority-snapshot")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertEqual(payload["execution_mode"], "observability")
+        self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 0)
 
 
 if __name__ == "__main__":

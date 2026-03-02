@@ -35,6 +35,7 @@ from core.kalshi_monitor import (
     build_market_polling_station_universe,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
+    get_kalshi_connectivity_snapshot,
     get_hydration_prerequisite_state_snapshot,
     kalshi_execution_domain,
     reset_kalshi_execution_domain,
@@ -1610,6 +1611,7 @@ def observability_runtime_authority_snapshot():
             "station": station,
             "scheduler_health_snapshot": scheduler_snapshot,
             "hydration_snapshot": hydration_snapshot,
+            "kalshi_connectivity": get_kalshi_connectivity_snapshot(),
             "latest_transitions": {
                 "count": len(transitions),
                 "bounded_limit": 50,
