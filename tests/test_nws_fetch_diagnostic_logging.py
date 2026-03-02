@@ -32,7 +32,7 @@ class NWSFetchDiagnosticLoggingTests(unittest.TestCase):
         self.assertIn("NWS_FETCH_DIAGNOSTIC", emitted)
         self.assertIn("station=KNYC", emitted)
         self.assertIn(
-            "url=https://api.weather.gov/stations/KNYC/observations?start=2026-03-03T00:00:00Z&end=2026-03-03T01:00:00Z",
+            "url=https://api.weather.gov/stations/KNYC/observations?limit=200",
             emitted,
         )
         self.assertIn("NWS_FETCH_RESULT", emitted)
