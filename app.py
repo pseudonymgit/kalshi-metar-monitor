@@ -25,6 +25,7 @@ from core.metar_monitor import (
     get_recent_alerts,
     get_transition_history,
     get_station_ingestion_runtime,
+    get_station_ingestion_window_runtime,
     get_latest_station_market_evaluation_context,
     run_replay_for_station_day,
     is_scheduler_running,
@@ -1520,6 +1521,27 @@ def observability_ingestion_runtime():
         }
     ), 200
 
+
+@app.route("/observability/ingestion-window-runtime", methods=["GET"])
+def observability_ingestion_window_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    runtime = get_station_ingestion_window_runtime(station)
+    return jsonify(
+        {
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "window_start_utc": runtime.get("window_start_utc"),
+            "window_end_utc": runtime.get("window_end_utc"),
+            "last_seen_iso": runtime.get("last_seen_iso"),
+            "latest_raw_observation_timestamp": runtime.get("latest_raw_observation_timestamp"),
+            "latest_accepted_observation_timestamp": runtime.get("latest_accepted_observation_timestamp"),
+            "sample_rejected_observations": runtime.get("sample_rejected_observations") or [],
+        }
+    ), 200
 
 @app.route("/observability/transition-runtime", methods=["GET"])
 def observability_transition_runtime():
