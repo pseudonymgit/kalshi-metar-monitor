@@ -40,6 +40,7 @@ except Exception:
 ET_TZ_NAME = "America/New_York"
 OVERLAP_SECONDS = 120               # small overlap to avoid missing late arrivals
 FIRST_RUN_CUSHION_SEC = 300         # first contact: add 5 min cushion
+BOOTSTRAP_LOOKBACK_MINUTES = 60     # first contact: deterministic widened bootstrap window
 PUBLICATION_LAG_BUFFER_SECONDS = 90
 METAR_ACCEPTANCE_GRACE_SECONDS = min(900, OVERLAP_SECONDS * 5)  # 15 minutes max, bounded by overlap safety
 
@@ -1819,7 +1820,7 @@ def _compute_window(icao: str, minutes: Optional[int] = None, cfg: Optional[Dict
     """
     Compute a rolling start/end window in UTC.
     - If we've seen this ICAO, start from (last_seen - OVERLAP_SECONDS).
-    - If first run, use now - lookback_min - FIRST_RUN_CUSHION_SEC.
+    - If first run, use now - BOOTSTRAP_LOOKBACK_MINUTES.
     Returns: (start_iso_z, end_iso_z, start_dt, end_dt)
     """
     if cfg is None:
@@ -1835,7 +1836,7 @@ def _compute_window(icao: str, minutes: Optional[int] = None, cfg: Optional[Dict
     if last_seen:
         start_dt = _parse_iso(last_seen) - timedelta(seconds=OVERLAP_SECONDS)
     else:
-        start_dt = window_end - timedelta(minutes=lookback) - timedelta(seconds=FIRST_RUN_CUSHION_SEC)
+        start_dt = window_end - timedelta(minutes=BOOTSTRAP_LOOKBACK_MINUTES)
 
     end_dt = window_end
     return (_iso_seconds_z(start_dt), _iso_seconds_z(end_dt), start_dt, end_dt)
