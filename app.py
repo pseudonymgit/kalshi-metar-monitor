@@ -1543,6 +1543,96 @@ def observability_ingestion_window_runtime():
         }
     ), 200
 
+
+def _parse_iso_timestamp(iso_timestamp):
+    if not iso_timestamp:
+        return None
+    try:
+        return datetime.fromisoformat(str(iso_timestamp).replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
+def _rejection_reason_counts(runtime, window_runtime):
+    counts = {}
+    for row in runtime.get("rejection_reasons") or []:
+        reason = row.get("reason")
+        if not reason:
+            continue
+        counts[reason] = counts.get(reason, 0) + int(row.get("count") or 0)
+    for row in window_runtime.get("sample_rejected_observations") or []:
+        reason = row.get("rejection_reason")
+        if not reason:
+            continue
+        counts[reason] = counts.get(reason, 0)
+    return counts
+
+
+def _build_ingestion_diagnostic_classification(station, runtime, window_runtime):
+    last_fetch_status = runtime.get("last_fetch_status") or "not_attempted"
+    fetched_count = int(runtime.get("fetched_observation_count") or 0)
+    ingested_count = int(runtime.get("ingested_observation_count") or 0)
+    rejected_count = int(runtime.get("rejected_observation_count") or 0)
+    latest_accepted = runtime.get("latest_accepted_observation_timestamp")
+    latest_raw = runtime.get("latest_raw_observation_timestamp")
+
+    if (
+        last_fetch_status == "not_attempted"
+        and not runtime.get("last_poll_attempt_utc")
+        and fetched_count == 0
+        and ingested_count == 0
+        and rejected_count == 0
+        and not latest_raw
+        and not latest_accepted
+    ):
+        return "NO_FETCH_ATTEMPT", "No fetch attempt has been recorded for this station."
+
+    if fetched_count == 0:
+        return "FETCH_EMPTY", "Latest fetch attempt returned zero observations."
+
+    if ingested_count > 0 or latest_accepted:
+        return "INGESTION_HEALTHY", "At least one observation has been accepted into ingestion runtime."
+
+    reason_counts = _rejection_reason_counts(runtime, window_runtime)
+    if fetched_count > 0 and rejected_count >= fetched_count:
+        if reason_counts.get("outside_station_local_trading_day", 0) > 0:
+            return "STATION_DAY_MISMATCH", "Observations were rejected for outside_station_local_trading_day."
+        if reason_counts.get("dedup_older_or_equal_timestamp", 0) > 0:
+            return "ALL_REJECTED_DEDUP", "All fetched observations were rejected by dedup_older_or_equal_timestamp."
+        if reason_counts.get("outside_window_before_grace_start", 0) > 0:
+            return "ALL_REJECTED_OUTSIDE_WINDOW", "All fetched observations were rejected as outside the ingestion window."
+
+    window_start = _parse_iso_timestamp(window_runtime.get("window_start_utc"))
+    window_end = _parse_iso_timestamp(window_runtime.get("window_end_utc"))
+    latest_raw_ts = _parse_iso_timestamp(latest_raw)
+    if latest_raw_ts and window_start and latest_raw_ts < window_start:
+        return "WINDOW_AHEAD_OF_DATA", "Latest raw observation timestamp is older than window_start_utc."
+    if latest_raw_ts and window_end and latest_raw_ts > window_end:
+        return "WINDOW_BEHIND_DATA", "Latest raw observation timestamp is newer than window_end_utc."
+
+    return "FETCH_EMPTY", "Fetched observations did not produce accepted data and no deterministic rejection class matched."
+
+
+@app.route("/observability/ingestion-diagnostic-class", methods=["GET"])
+def observability_ingestion_diagnostic_class():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    runtime = get_station_ingestion_runtime(station)
+    window_runtime = get_station_ingestion_window_runtime(station)
+    diagnostic_class, explanation = _build_ingestion_diagnostic_classification(station, runtime, window_runtime)
+
+    return jsonify(
+        {
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "diagnostic_class": diagnostic_class,
+            "explanation": explanation,
+        }
+    ), 200
+
 @app.route("/observability/transition-runtime", methods=["GET"])
 def observability_transition_runtime():
     station = (request.args.get("station") or "").strip().upper()
