@@ -39,7 +39,32 @@ Each event MUST include deterministic identity attributes:
 
 Identity uniqueness requirement:
 
-- Unique key = (`station_id`, `obs_timestamp_utc`, `evaluation_seq`, `source_path`)
+- Unique key = (`station_id`, `obs_timestamp_utc`, `evaluation_context_key`, `source_path`)
+
+### 1.2.1 Deterministic Event Identity Anchoring
+
+Event identity is anchored to the **execution-evaluation instance** and MUST NOT derive from
+runtime process lifecycle state.
+
+Canonical deterministic identity tuple:
+
+- `station_id`
+- `obs_timestamp_utc`
+- `evaluation_context_key`
+- `source_path`
+
+`evaluation_context_key` MUST be derived only from deterministic execution inputs that are
+already replayable for the same station/day evaluation path.
+
+Identity anchoring guarantees:
+
+1. Process restart MUST NOT generate a new logical identity for the same evaluated instance.
+2. Replay MUST reproduce the identical identity tuple for equivalent ordered inputs.
+3. Sequence counters (including `evaluation_seq`) are ordering aids only and MUST NEVER be
+   treated as identity authority.
+
+Uniqueness enforcement MUST rely on the deterministic identity tuple above, not runtime
+sequence counter values.
 
 ### 1.3 Decision Path Fields
 
