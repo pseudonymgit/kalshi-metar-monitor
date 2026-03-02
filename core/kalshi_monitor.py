@@ -49,6 +49,8 @@ _STATION_CITY_TOKEN_MAP = {
 
 _KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", default="production")
 _FORBIDDEN_KALSHI_DOMAINS = frozenset({"observability", "diagnostics", "audit", "replay"})
+_KALSHI_PUBLIC_SESSION = requests.Session()
+_KALSHI_PUBLIC_SESSION.trust_env = False
 
 
 class kalshi_execution_domain:
@@ -257,7 +259,7 @@ def _kalshi_public_get(path):
         or "https://api.elections.kalshi.com/trade-api/v2"
     ).rstrip("/")
     normalized_path = path if path.startswith("/") else f"/{path}"
-    response = requests.get(f"{base_url}{normalized_path}", timeout=10)
+    response = _KALSHI_PUBLIC_SESSION.get(f"{base_url}{normalized_path}", timeout=10)
     response.raise_for_status()
     return response.json()
 
