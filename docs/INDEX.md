@@ -6,6 +6,7 @@
 - `docs/OPERATING_MODE.md` — governance, semantic authority, and production intent.
 - `docs/OPERATIONS.md` — runbooks, deployment, and operational procedures.
 - `docs/ROLLING_TODO.md` — active roadmap and execution queue.
+- `docs/EXECUTION_VISIBILITY_STANDARD.md` — normative execution visibility requirements and enforcement standard.
 - `docs/phase_current.md` — current active phase tracking.
 
 ## Supporting current docs
