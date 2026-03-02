@@ -26,6 +26,7 @@ from core.metar_monitor import (
     get_transition_history,
     get_station_ingestion_runtime,
     get_station_ingestion_window_runtime,
+    get_last_nws_fetch_diagnostic,
     get_latest_station_market_evaluation_context,
     run_replay_for_station_day,
     is_scheduler_running,
@@ -1540,6 +1541,29 @@ def observability_ingestion_window_runtime():
             "latest_raw_observation_timestamp": runtime.get("latest_raw_observation_timestamp"),
             "latest_accepted_observation_timestamp": runtime.get("latest_accepted_observation_timestamp"),
             "sample_rejected_observations": runtime.get("sample_rejected_observations") or [],
+        }
+    ), 200
+
+
+@app.route("/observability/nws-fetch-runtime", methods=["GET"])
+def observability_nws_fetch_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    diagnostic = get_last_nws_fetch_diagnostic(station)
+    return jsonify(
+        {
+            "station": station,
+            "last_fetch_timestamp_utc": diagnostic.get("timestamp_utc"),
+            "request_url": diagnostic.get("request_url"),
+            "start_iso": diagnostic.get("start_iso"),
+            "end_iso": diagnostic.get("end_iso"),
+            "http_status": diagnostic.get("http_status"),
+            "feature_count": diagnostic.get("feature_count"),
+            "response_timestamp": diagnostic.get("response_timestamp"),
+            "scheduler_running": is_scheduler_running(),
+            "execution_domain": _current_kalshi_execution_domain(),
         }
     ), 200
 
