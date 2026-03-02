@@ -225,6 +225,61 @@ def _safe_lag_seconds(*, now_utc: datetime, iso_timestamp: str):
         return None
 
 
+def _get_transition_runtime_summary(station: str):
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return {}
+
+    state = get_state()
+    latest_observation = (state.get("last_obs") or {}).get(normalized_station) or {}
+    latest_timestamp = (state.get("last_seen_iso") or {}).get(normalized_station)
+    today_local_key = station_local_day_key(normalized_station, datetime.now(timezone.utc).isoformat())
+
+    transitions_seen_today = 0
+    last_transition_type = None
+    last_transition_timestamp = None
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    if os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                rows = conn.execute(
+                    """
+                    SELECT created_utc, transition_type
+                    FROM transition_events
+                    WHERE station = ?
+                    ORDER BY id DESC
+                    """,
+                    (normalized_station,),
+                ).fetchall()
+            finally:
+                conn.close()
+
+            for index, row in enumerate(rows):
+                created_utc, transition_type = row
+                if index == 0:
+                    last_transition_type = transition_type
+                    last_transition_timestamp = created_utc
+                if station_local_day_key(normalized_station, created_utc) != today_local_key:
+                    break
+                if transition_type == "settlement_up":
+                    transitions_seen_today += 1
+        except Exception:
+            pass
+
+    return {
+        "scheduler_running": is_scheduler_running(),
+        "latest_observation_temp_f": latest_observation.get("temp_f"),
+        "latest_observation_timestamp": latest_timestamp,
+        "last_observed_integer": (state.get("last_observed_integer") or {}).get(normalized_station),
+        "current_settlement_integer": (state.get("last_settlement_bucket") or {}).get(normalized_station),
+        "transitions_seen_today": transitions_seen_today,
+        "last_transition_type": last_transition_type,
+        "last_transition_timestamp": last_transition_timestamp,
+    }
+
+
 def _build_ingestion_health_rows(*, station_filter=None):
     state = get_state()
     cfg = get_default_config()
@@ -1432,6 +1487,14 @@ def observability_ingestion_runtime():
             "latest_accepted_observation_timestamp": runtime.get("latest_accepted_observation_timestamp"),
         }
     ), 200
+
+
+@app.route("/observability/transition-runtime", methods=["GET"])
+def observability_transition_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+    return jsonify(_get_transition_runtime_summary(station)), 200
 
 
 @app.route("/observability/station-summary", methods=["GET"])
