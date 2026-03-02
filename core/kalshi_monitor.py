@@ -36,6 +36,7 @@ _SERIES_LOCK = threading.Lock()
 _SERIES_BY_STATION = {}
 _SERIES_DISCOVERED = False
 _SERIES_MARKETS_CACHE = {}
+_HYDRATION_PREREQUISITE_STATE = {}
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -490,18 +491,45 @@ def _station_local_previous_day(station: str, now_utc_iso: str) -> str:
 
 def ensure_ladder_hydration_prerequisite(station: str) -> dict:
     normalized_station = (station or "").strip().upper()
+    result = None
+
     if not normalized_station:
         return {"status": "cache_missing", "reason": "station_missing"}
 
     now_utc_iso = datetime.now(timezone.utc).isoformat()
     station_day = station_local_day_key(normalized_station, now_utc_iso)
     series_ticker = ensure_series_discovery_loaded().get(normalized_station)
+    series_discovered = bool(series_ticker)
+    markets_cached = bool(get_cached_series_markets(series_ticker)) if series_ticker else False
+
     if not series_ticker:
-        return {"status": "cache_missing", "reason": "series_missing", "station_local_day": station_day}
+        result = {"status": "cache_missing", "reason": "series_missing", "station_local_day": station_day}
+        with _SERIES_LOCK:
+            _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
+                "attempted": True,
+                "cache_valid": False,
+                "series_discovered": series_discovered,
+                "markets_cached": markets_cached,
+                "status": result.get("status"),
+                "reason": result.get("reason"),
+                "evaluated_at_utc": now_utc_iso,
+            }
+        return result
 
     cached = get_cached_series_markets(series_ticker)
     if cached is None:
-        return {"status": "cache_missing", "reason": "cache_missing", "series_ticker": series_ticker, "station_local_day": station_day}
+        result = {"status": "cache_missing", "reason": "cache_missing", "series_ticker": series_ticker, "station_local_day": station_day}
+        with _SERIES_LOCK:
+            _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
+                "attempted": True,
+                "cache_valid": False,
+                "series_discovered": series_discovered,
+                "markets_cached": markets_cached,
+                "status": result.get("status"),
+                "reason": result.get("reason"),
+                "evaluated_at_utc": now_utc_iso,
+            }
+        return result
 
     cached_day = cached.get("station_local_day")
     rollover_grace = False
@@ -512,7 +540,7 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
     elif yesterday_day is not None and cached_day == yesterday_day:
         rollover_grace = True
     else:
-        return {
+        result = {
             "status": "cache_stale",
             "reason": "station_local_day_mismatch",
             "series_ticker": series_ticker,
@@ -521,14 +549,45 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
             "cached_station_local_day": cached_day,
             "hydrated_at_utc": cached.get("hydrated_at_utc"),
         }
+        with _SERIES_LOCK:
+            _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
+                "attempted": True,
+                "cache_valid": False,
+                "series_discovered": series_discovered,
+                "markets_cached": markets_cached,
+                "status": result.get("status"),
+                "reason": result.get("reason"),
+                "evaluated_at_utc": now_utc_iso,
+            }
+        return result
 
-    return {
+    result = {
         "status": "cache_valid",
         "series_ticker": series_ticker,
         "station_local_day": station_day,
         "hydrated_at_utc": cached.get("hydrated_at_utc"),
         "rollover_grace": rollover_grace,
     }
+    with _SERIES_LOCK:
+        _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
+            "attempted": True,
+            "cache_valid": True,
+            "series_discovered": series_discovered,
+            "markets_cached": markets_cached,
+            "status": result.get("status"),
+            "reason": result.get("reason"),
+            "evaluated_at_utc": now_utc_iso,
+        }
+    return result
+
+
+def get_hydration_prerequisite_state_snapshot() -> dict:
+    with _SERIES_LOCK:
+        return {
+            station: dict(state)
+            for station, state in _HYDRATION_PREREQUISITE_STATE.items()
+            if isinstance(station, str) and isinstance(state, dict)
+        }
 
 
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:

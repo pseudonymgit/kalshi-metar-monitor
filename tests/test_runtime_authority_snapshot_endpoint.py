@@ -27,6 +27,12 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
                 "cache_present": True,
                 "state_key_count": 1,
                 "state_keys": ["KDEN_HIGH"],
+                "hydration_prerequisite": {
+                    "attempted": True,
+                    "cache_valid": True,
+                    "series_discovered": True,
+                    "markets_cached": True,
+                },
             }
         },
     })
@@ -50,6 +56,8 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["station"], "KDEN")
         self.assertEqual(payload["scheduler_health_snapshot"]["stations"][0]["station"], "KDEN")
         self.assertEqual(payload["hydration_snapshot"]["stations"]["KDEN"]["cache_present"], True)
+        self.assertEqual(payload["hydration_snapshot"]["stations"]["KDEN"]["hydration_prerequisite"]["attempted"], True)
+        self.assertEqual(payload["hydration_snapshot"]["stations"]["KDEN"]["hydration_prerequisite"]["cache_valid"], True)
         self.assertEqual(payload["latest_transitions"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["count"], 1)
