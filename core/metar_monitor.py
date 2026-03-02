@@ -1633,7 +1633,12 @@ def fetch_window(icao: str, minutes: int, source: Optional[str] = None) -> Dict[
 
     start_iso, end_iso, start_dt, end_dt = _compute_window(icao, minutes, cfg)
 
-    from core.kalshi_monitor import ensure_ladder_hydration_prerequisite
+    from core.kalshi_monitor import (
+        _current_kalshi_execution_domain,
+        ensure_ladder_hydration_prerequisite,
+        get_hydration_prerequisite_state_snapshot,
+        hydrate_station_ladder_snapshot,
+    )
 
     hydration = ensure_ladder_hydration_prerequisite(icao)
     if hydration.get("status") != "cache_valid":
@@ -1831,13 +1836,33 @@ def _poll_once(logger=None):
     cfg = get_default_config()
     stations = _resolve_live_polling_stations(cfg)
 
-    from core.kalshi_monitor import ensure_ladder_hydration_prerequisite
+    from core.kalshi_monitor import (
+        _current_kalshi_execution_domain,
+        ensure_ladder_hydration_prerequisite,
+        get_hydration_prerequisite_state_snapshot,
+        hydrate_station_ladder_snapshot,
+    )
 
     hydration_by_station = {}
     ingestion_admission = {}
     for icao in stations:
         hydration = ensure_ladder_hydration_prerequisite(icao)
         hydration_by_station[icao] = hydration
+
+        hydration_state = (get_hydration_prerequisite_state_snapshot().get(icao) or {})
+        should_execute_hydration = (
+            _current_kalshi_execution_domain() == "production"
+            and bool(hydration_state.get("attempted"))
+            and not bool(hydration_state.get("cache_valid"))
+            and bool(hydration_state.get("series_discovered"))
+        )
+        if should_execute_hydration:
+            try:
+                hydrate_station_ladder_snapshot(station=icao, market_types={"HIGH"})
+            except Exception as e:
+                if logger:
+                    logger.warning(f"poll_hydration_execution_failed station={icao}: {e}")
+
         hydration_passed = hydration.get("status") == "cache_valid"
         ingestion_admission[icao] = {
             "hydration_passed": hydration_passed,
