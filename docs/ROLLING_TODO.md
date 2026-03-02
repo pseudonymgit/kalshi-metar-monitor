@@ -14,22 +14,33 @@ All expansion must directly improve one or more of:
 
 Avoid scope creep.
 
-## Priority Stack
+## Priority Stack (Reconciled)
 
-### P0 — LIVE TRADING RELIABILITY (ACTIVE)
+### P0 — PRODUCTION RELIABILITY + DISCOVERY INTEGRITY (ACTIVE)
 
-Purpose: system must reliably inform immediate trading decisions.
+Purpose: preserve alert-path determinism while closing station/market visibility gaps.
 
+- [ ] **Market discovery mismatch investigation** (new)
 - [ ] Audit missing alert emissions across stations
 - [ ] Verify ingestion parity across all active cities
 - [ ] Detect stalled station ingestion automatically
-- [ ] Add ingestion health visibility endpoint
+- [x] Add ingestion health visibility endpoint *(completed: `/observability/ingestion-health` present)*
 - [ ] Confirm integer-cross detection consistency
 - [ ] Validate scheduler execution per station
-- [ ] Detect silent execution-domain guard rejection
-- [ ] Add transition emission verification logging
+- [x] Detect silent execution-domain guard rejection *(completed: execution-domain observability + guardrails present)*
+- [~] Add transition emission verification logging *(partially complete via transition/runtime observability; needs explicit acceptance criteria closure)*
+- [ ] **Milestone tagging requirement** (new)
 
-### P0 — STRUCTURAL EDGE PRESERVATION
+### P0 — ALERT GOVERNANCE HARDENING (NEW)
+
+Purpose: freeze deterministic alert contracts before broader expansion.
+
+- [ ] **Alert Schema v1.0 design freeze** (new)
+- [ ] **Event log canonicalization format** (new)
+- [ ] **Schema versioning policy** (new)
+- [ ] **Alert distribution topology decision (Discord per-city vs unified)** (new)
+
+### P1 — STRUCTURAL EDGE PRESERVATION
 
 Purpose: preserve deterministic execution edge from structural-event awareness.
 
@@ -39,7 +50,7 @@ Purpose: preserve deterministic execution edge from structural-event awareness.
 - [ ] Station-day visibility for structural events
 - [ ] Missed-event detection with deterministic root-cause traceability
 
-### P0 — EPOCH BACKFILL BOOTSTRAP
+### P1 — EPOCH BACKFILL BOOTSTRAP
 
 Purpose: increase usable historical learning immediately.
 
@@ -53,21 +64,29 @@ Purpose: increase usable historical learning immediately.
 
 Rule: a partial historical day is preferable to missing epoch history.
 
-### P1 — MARKET EXPANSION (MERGED WORKSTREAM)
+### P2 — EXECUTION/OBSERVABILITY DOMAIN SEPARATION MAINTENANCE
+
+Purpose: ensure read-only observability boundaries remain explicit and testable.
+
+- [x] Confirm observability endpoints do not perform live Kalshi calls *(completed by domain guards and endpoint tests)*
+- [~] Hydration state surfacing consistency across endpoints *(partially complete; continue reconciliation of endpoint-level semantics)*
+- [ ] Runtime authority snapshot adoption as primary operator diagnosis surface
+
+### P2 — MARKET EXPANSION (MERGED WORKSTREAM)
 
 LOW + HIGH Symmetric Market Enablement + City Optimization
 
-- [ ] Enable LOW markets across supported cities
-- [ ] Preserve HIGH/LOW symmetric transition monitoring guarantees
+- [~] Enable LOW markets across supported cities *(stale priority: runtime supports LOW; deployment/config parity remains)*
+- [x] Preserve HIGH/LOW symmetric transition monitoring guarantees *(completed structurally; keep as regression guard)*
 - [ ] Replace static ICAO→Kalshi mapping with formulaic resolver
-- [ ] Auto-detect newly listed Kalshi temperature markets
+- [~] Auto-detect newly listed Kalshi temperature markets *(partially complete via series discovery; validate failure modes)*
 - [ ] Emit alert when unknown market detected
 - [ ] Optimize city selection for diversified weather regimes
 - [ ] Expand ingestion simultaneously with LOW activation
 
 Goal: accelerate epoch density growth without increasing architectural complexity.
 
-### P1 — ENVIRONMENTAL SIGNAL LOGGING
+### P3 — ENVIRONMENTAL SIGNAL LOGGING
 
 Logging only. No prediction logic introduced.
 
@@ -82,24 +101,26 @@ Add deterministic logging for:
 
 Purpose: future structural correlation analysis.
 
-### P2 — SEARCHABLE EPOCH STORE
+### P4 — SEARCHABLE EPOCH STORE + DECISION SUPPORT VISIBILITY
 
 - [ ] Transition hashing
 - [ ] Epoch indexing
 - [ ] Fast deterministic lookup
 - [ ] Replay validation fingerprints
 - [ ] Queryable epoch search interface
-
-Constraint: no execution authority impact.
-
-### P3 — DECISION SUPPORT VISIBILITY (HUMAN-IN-THE-LOOP)
-
 - [ ] High-signal condition highlighting for manual review
 - [ ] Market vs structural state comparison views
 - [ ] Actionable report generation
 - [ ] Manual trader decision support only
 
-Constraint: no automated execution.
+Constraint: no execution authority impact.
+
+## Reconciliation Notes
+
+- Completed items were retained and marked instead of removed.
+- Obsolete framing consolidated: prior standalone "decision support" section moved into P4 to reduce priority ambiguity.
+- Bootstrap scope remains active but deprioritized behind production discovery/alert governance closure.
+- Historical intent is preserved; ordering now reflects current operational risk.
 
 ## Historical Continuity (Preserved Intent)
 
