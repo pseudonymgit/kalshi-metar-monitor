@@ -66,6 +66,7 @@ _KALSHI_CALL_THROTTLE_SECONDS = 5
 _ALERT_LOGGER = logging.getLogger(__name__)
 _TRANSITION_HISTORY = deque(maxlen=500)
 _TRANSITION_LOCK = threading.Lock()
+_LAST_SETTLEMENT_UP_TS = {}
 
 
 # =========================
@@ -588,6 +589,37 @@ def _process_temperature_event(
         emit_fn=_log_transition_event,
     )
 
+    normalized_station = (icao or "").strip().upper()
+    if transition_type == "settlement_up":
+        _LAST_SETTLEMENT_UP_TS[normalized_station] = obs_time
+    elif transition_type == "reversion_after_settlement":
+        settlement_up_obs_time = _LAST_SETTLEMENT_UP_TS.get(normalized_station)
+        if settlement_up_obs_time:
+            delta_seconds = (
+                _parse_iso(obs_time) - _parse_iso(settlement_up_obs_time)
+            ).total_seconds()
+            if delta_seconds <= 300:
+                emit_transition_if_changed(
+                    transition_type="goldilocks_reversion",
+                    instant_changed=instant_changed,
+                    settlement_changed=settlement_changed,
+                    station=icao,
+                    instant_bucket_before=previous_instant_bucket,
+                    instant_bucket_after=instant_bucket,
+                    settlement_bucket=settlement_bucket,
+                    running_max=new_running_max,
+                    current_temp=now_f,
+                    metadata={
+                        "obs_time": obs_time,
+                        "prev_temp_f": prev_f,
+                        "prev_running_max": prev_running_max,
+                        "previous_settlement_bucket": previous_settlement_bucket,
+                        "settlement_up_obs_time": settlement_up_obs_time,
+                        "delta_seconds": delta_seconds,
+                    },
+                    emit_fn=_log_transition_event,
+                )
+
     alerts = 0
     if (
         last_observed_integer is not None
@@ -646,6 +678,7 @@ def _snapshot_station_state(station: str) -> Dict[str, Any]:
 
 def _restore_station_state(station: str, snapshot: Dict[str, Any]) -> None:
     station = (station or "").strip().upper()
+    _LAST_SETTLEMENT_UP_TS.pop(station, None)
     reset_station_daily_state(station, snapshot.get("last_reset_date_local") or "")
     if snapshot.get("last_observed_integer") is not None:
         commit_temperature_state(
@@ -666,6 +699,7 @@ def _reset_replay_runtime_state_for_station(
     replay_local_day: str,
 ) -> None:
     station = (station or "").strip().upper()
+    _LAST_SETTLEMENT_UP_TS.pop(station, None)
     reset_station_daily_state(station, replay_local_day)
     clear_latest_observation(station)
 
