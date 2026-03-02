@@ -783,6 +783,7 @@ def _build_runtime_authority_hydration_snapshot(*, stations):
     ladder_snapshot = get_ladder_state_snapshot() or {}
     ladder_state = ladder_snapshot.get("ladder_state") or {}
     hydration_prerequisite_state = get_hydration_prerequisite_state_snapshot() or {}
+    admission_state = (get_state() or {}).get("ingestion_admission") or {}
 
     hydration_by_station = {}
     for station in stations:
@@ -792,6 +793,7 @@ def _build_runtime_authority_hydration_snapshot(*, stations):
             for key in ladder_state.keys()
             if isinstance(key, str) and key.startswith(f"{normalized_station}_")
         )
+        station_admission = admission_state.get(normalized_station) or {}
         hydration_by_station[normalized_station] = {
             "cache_present": bool(station_state_keys),
             "state_key_count": len(station_state_keys),
@@ -801,6 +803,12 @@ def _build_runtime_authority_hydration_snapshot(*, stations):
                 "cache_valid": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("cache_valid")),
                 "series_discovered": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("series_discovered")),
                 "markets_cached": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("markets_cached")),
+            },
+            "ingestion_admission": {
+                "hydration_passed": bool(station_admission.get("hydration_passed")),
+                "admitted_to_fetch": bool(station_admission.get("admitted_to_fetch")),
+                "skip_reason": station_admission.get("skip_reason") or "not_evaluated",
+                "evaluated_at_utc": station_admission.get("evaluated_at_utc"),
             },
         }
 
