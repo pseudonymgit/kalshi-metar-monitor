@@ -1,0 +1,74 @@
+import unittest
+from unittest.mock import patch
+
+import app as app_module
+from core import kalshi_monitor
+
+
+class KalshiConnectivitySnapshotTests(unittest.TestCase):
+    def setUp(self):
+        self.original_series_discovered = kalshi_monitor._SERIES_DISCOVERED
+        self.original_series_by_station = dict(kalshi_monitor._SERIES_BY_STATION)
+        self.original_attempt_count = kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT
+        self.original_last_success = kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC
+        self.original_last_error = kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR
+
+    def tearDown(self):
+        kalshi_monitor._SERIES_DISCOVERED = self.original_series_discovered
+        kalshi_monitor._SERIES_BY_STATION = dict(self.original_series_by_station)
+        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = self.original_attempt_count
+        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = self.original_last_success
+        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
+
+    def test_connectivity_snapshot_records_series_discovery_success(self):
+        kalshi_monitor._SERIES_DISCOVERED = False
+        kalshi_monitor._SERIES_BY_STATION = {}
+        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = "stale-error"
+
+        with patch("core.kalshi_monitor._discover_series_for_stations", return_value={"KDEN": "KXHIGHDEN"}):
+            discovered = kalshi_monitor.ensure_series_discovery_loaded()
+
+        snapshot = kalshi_monitor.get_kalshi_connectivity_snapshot()
+        self.assertEqual(discovered, {"KDEN": "KXHIGHDEN"})
+        self.assertTrue(snapshot["series_discovery_attempted"])
+        self.assertIsNotNone(snapshot["last_series_discovery_success_utc"])
+        self.assertIsNone(snapshot["last_series_discovery_error"])
+
+    def test_connectivity_snapshot_records_last_discovery_failure(self):
+        kalshi_monitor._SERIES_DISCOVERED = False
+        kalshi_monitor._SERIES_BY_STATION = {}
+        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = None
+
+        with patch("core.kalshi_monitor._discover_series_for_stations", side_effect=RuntimeError("series-api-down")):
+            with self.assertRaises(RuntimeError):
+                kalshi_monitor.ensure_series_discovery_loaded()
+
+        snapshot = kalshi_monitor.get_kalshi_connectivity_snapshot()
+        self.assertTrue(snapshot["series_discovery_attempted"])
+        self.assertEqual(snapshot["last_series_discovery_error"], "series-api-down")
+        self.assertIsNone(snapshot["last_series_discovery_success_utc"])
+
+    def test_observability_context_does_not_mutate_connectivity_counters(self):
+        kalshi_monitor._SERIES_DISCOVERED = False
+        kalshi_monitor._SERIES_BY_STATION = {}
+        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = None
+
+        with app_module.app.test_request_context("/observability/runtime-authority-snapshot"):
+            with patch("core.kalshi_monitor._discover_series_for_stations", side_effect=RuntimeError("blocked")):
+                with self.assertRaises(RuntimeError):
+                    kalshi_monitor.ensure_series_discovery_loaded()
+
+        snapshot = kalshi_monitor.get_kalshi_connectivity_snapshot()
+        self.assertFalse(snapshot["series_discovery_attempted"])
+        self.assertIsNone(snapshot["last_series_discovery_success_utc"])
+        self.assertIsNone(snapshot["last_series_discovery_error"])
+
+
+if __name__ == "__main__":
+    unittest.main()
