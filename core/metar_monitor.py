@@ -247,6 +247,7 @@ def get_state() -> Dict[str, Any]:
         "poll_count": snapshot["poll_count"],
         "last_poll_utc": snapshot["last_poll_utc"],
         "last_loop_utc": snapshot["last_loop_utc"],
+        "ingestion_admission": dict(snapshot["ingestion_admission"]),
     }
 
 
@@ -1833,9 +1834,17 @@ def _poll_once(logger=None):
     from core.kalshi_monitor import ensure_ladder_hydration_prerequisite
 
     hydration_by_station = {}
+    ingestion_admission = {}
     for icao in stations:
         hydration = ensure_ladder_hydration_prerequisite(icao)
         hydration_by_station[icao] = hydration
+        hydration_passed = hydration.get("status") == "cache_valid"
+        ingestion_admission[icao] = {
+            "hydration_passed": hydration_passed,
+            "admitted_to_fetch": hydration_passed,
+            "skip_reason": None if hydration_passed else "ladder_not_hydrated",
+            "evaluated_at_utc": _now_utc_iso(),
+        }
         if hydration.get("status") != "cache_valid" and logger:
             logger.warning(
                 f"poll_skipped_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
@@ -1860,6 +1869,7 @@ def _poll_once(logger=None):
                 logger.error(f"poll failed for {icao} ({chosen}): {e}")
 
     with _STATE_LOCK:
+        _STATE["ingestion_admission"].update(ingestion_admission)
         _STATE["poll_count"] += 1
         _STATE["last_poll_utc"] = _now_utc_iso()
         _save_cache(cfg["cache_file"], {

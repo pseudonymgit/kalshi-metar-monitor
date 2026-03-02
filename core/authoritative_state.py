@@ -27,6 +27,7 @@ _STATE: Dict[str, Any] = {
     "timeout_count": 0,
     "last_timeout_station": None,
     "last_timeout_utc": None,
+    "ingestion_admission": {},
 }
 
 
@@ -102,6 +103,7 @@ def immutable_public_state_snapshot() -> Dict[str, Any]:
             "poll_count": _STATE["poll_count"],
             "last_poll_utc": _STATE["last_poll_utc"],
             "last_loop_utc": _STATE["last_loop_utc"],
+            "ingestion_admission": MappingProxyType(copy.deepcopy(_STATE["ingestion_admission"])),
         }
     verify_observability_read_only(snapshot)
     return snapshot

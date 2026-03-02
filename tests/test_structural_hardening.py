@@ -68,6 +68,24 @@ class StructuralHardeningTests(unittest.TestCase):
         mock_hydrate.assert_not_called()
 
     @patch("core.metar_monitor.ensure_state_loaded")
+    @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
+    @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
+    @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
+    @patch("core.metar_monitor._fetch_range_strict")
+    @patch("core.metar_monitor._ingest_obs")
+    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
+    @patch("core.metar_monitor._save_cache")
+    def test_poll_once_records_ingestion_admission_for_non_hydrated_station(self, _save, _hydrate, _ingest, _fetch, *_mocks):
+        metar_monitor._poll_once()
+
+        state = metar_monitor.get_state()
+        admission = state["ingestion_admission"]["KDEN"]
+        self.assertFalse(admission["hydration_passed"])
+        self.assertFalse(admission["admitted_to_fetch"])
+        self.assertEqual(admission["skip_reason"], "ladder_not_hydrated")
+        self.assertIsNotNone(admission["evaluated_at_utc"])
+
+    @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={})
     @patch("core.metar_monitor._ingest_obs", return_value=(1, 0))
     def test_simulation_uses_ingest_path(self, mock_ingest, *_mocks):
