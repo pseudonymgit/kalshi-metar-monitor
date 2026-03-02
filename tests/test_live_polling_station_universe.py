@@ -26,6 +26,7 @@ class LivePollingStationUniverseTests(unittest.TestCase):
              ), \
              patch("core.metar_monitor._fetch_range_strict", side_effect=lambda icao, *args, **kwargs: (seen.append(icao) or [])), \
              patch("core.metar_monitor._ingest_obs", return_value=(0, 0)), \
+             patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_valid"}), \
              patch("core.metar_monitor._save_cache"):
             with patch("app.get_default_config", return_value={"stations": ["KDEN"]}), \
                  patch("app.get_state", return_value={"stations": ["KDEN"]}), \
