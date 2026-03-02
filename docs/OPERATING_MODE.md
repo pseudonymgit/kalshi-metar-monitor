@@ -33,6 +33,8 @@ Unless version incremented, the following are frozen:
 - Station-local daily reset
 - Scheduler idempotency
 - No polling drift
+- No probabilistic execution paths
+- No suppression of rapid reversions
 
 ------------------------------------------------------------
 SECURITY POLICY
@@ -53,3 +55,4 @@ This system may control real capital.
 Stability > speed.
 Determinism > convenience.
 Explicit versioning > silent drift.
+Goldilocks structural-event preservation > cosmetic smoothing.
