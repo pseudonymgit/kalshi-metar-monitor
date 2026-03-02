@@ -24,6 +24,7 @@ from core.metar_monitor import (
     _simulate_temperature_for_testing,
     get_recent_alerts,
     get_transition_history,
+    get_station_ingestion_runtime,
     get_latest_station_market_evaluation_context,
     run_replay_for_station_day,
     is_scheduler_running,
@@ -1407,6 +1408,30 @@ def observability_ingestion_health():
     """
     payload = _build_ingestion_health_rows()
     return jsonify({"ok": True, **payload}), 200
+
+
+@app.route("/observability/ingestion-runtime", methods=["GET"])
+def observability_ingestion_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    runtime = get_station_ingestion_runtime(station)
+    return jsonify(
+        {
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "last_poll_attempt_utc": runtime.get("last_poll_attempt_utc"),
+            "last_fetch_status": runtime.get("last_fetch_status"),
+            "fetched_observation_count": runtime.get("fetched_observation_count"),
+            "ingested_observation_count": runtime.get("ingested_observation_count"),
+            "rejected_observation_count": runtime.get("rejected_observation_count"),
+            "rejection_reasons": runtime.get("rejection_reasons"),
+            "latest_raw_observation_timestamp": runtime.get("latest_raw_observation_timestamp"),
+            "latest_accepted_observation_timestamp": runtime.get("latest_accepted_observation_timestamp"),
+        }
+    ), 200
 
 
 @app.route("/observability/station-summary", methods=["GET"])
