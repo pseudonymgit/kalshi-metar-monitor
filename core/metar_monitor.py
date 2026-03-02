@@ -391,11 +391,8 @@ def _iso_seconds_z(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _nws_range_url(icao: str, start_iso_z: str, end_iso_z: str, limit: int = 200) -> str:
-    return (
-        f"https://api.weather.gov/stations/{icao}/observations"
-        f"?start={start_iso_z}&end={end_iso_z}&limit={min(limit, 200)}"
-    )
+def _nws_collection_url(icao: str, limit: int = 200) -> str:
+    return f"https://api.weather.gov/stations/{icao}/observations?limit={min(limit, 200)}"
 
 
 def _iem_range_url(icao: str, hours: int) -> str:
@@ -497,7 +494,7 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
 # Range fetchers (strict by source)
 # =========================
 def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
-    url = _nws_range_url(icao, start_iso_z, end_iso_z)
+    url = _nws_collection_url(icao)
     normalized_station = (icao or "").strip().upper()
     execution_domain = "production"
     try:
@@ -553,7 +550,21 @@ def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str,
         "feature_count": len(features) if isinstance(features, list) else 0,
         "response_timestamp": r.headers.get("Date") if getattr(r, "headers", None) else None,
     }
-    return _parse_nws_collection(payload)
+    parsed_obs = _parse_nws_collection(payload)
+    try:
+        start_dt = _parse_iso(start_iso_z)
+        end_dt = _parse_iso(end_iso_z)
+    except Exception:
+        return parsed_obs
+    filtered_obs: List[Dict[str, Any]] = []
+    for obs in parsed_obs:
+        try:
+            obs_dt = _parse_iso(obs.get("obs_time", ""))
+        except Exception:
+            continue
+        if start_dt <= obs_dt <= end_dt:
+            filtered_obs.append(obs)
+    return filtered_obs
 
 
 def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
