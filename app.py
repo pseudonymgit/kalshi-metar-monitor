@@ -1263,6 +1263,11 @@ def root():
     return jsonify({"status": "ok"}), 200
 
 
+@app.route("/execution-domain", methods=["GET"])
+def execution_domain():
+    return jsonify({"execution_domain": _current_kalshi_execution_domain()}), 200
+
+
 @app.route("/kalshi/ping", methods=["GET"])
 def kalshi_ping():
     try:
