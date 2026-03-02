@@ -3,22 +3,21 @@
 No PR may be merged unless all items below are satisfied.
 
 ------------------------------------------------------------
-PHASE 1 SEMANTICS
+SEMANTICS + GOVERNANCE
 ------------------------------------------------------------
 
-[ ] Alert logic unchanged
+[ ] Alert logic unchanged unless explicitly scoped
 [ ] Integer floor-cross detection preserved
-[ ] No alert suppression logic added
-[ ] Station-local 11:00–19:00 window preserved
-[ ] Station-local daily reset preserved
-[ ] Scheduler idempotency preserved
-[ ] No polling frequency drift
+[ ] Symmetric HIGH/LOW monitoring preserved where configured
+[ ] Transition-driven alerting preserved (no temp-only alerts)
+[ ] Station-local alert window + reset semantics unchanged unless intentionally versioned
+[ ] Replay parity expectations preserved
+[ ] Observability remains non-causal and does not call Kalshi
 
-If Phase 1 behavior was intentionally changed:
+If behavior was intentionally changed:
 
-[ ] PHASE1.md version incremented
-[ ] Semantic change clearly documented
-[ ] Merge gate phrase updated accordingly
+[ ] Canonical docs updated (`docs/OPERATING_MODE.md`, `docs/ARCHITECTURE.md`)
+[ ] Semantic change clearly documented in PR
 
 ------------------------------------------------------------
 SECURITY
@@ -31,31 +30,20 @@ SECURITY
 [ ] No token or credential echoed
 
 ------------------------------------------------------------
-ARCHITECTURE
+ENGINEERING DISCIPLINE
 ------------------------------------------------------------
 
 [ ] No refactor outside requested scope
 [ ] No renamed functions unless explicitly requested
 [ ] No new dependencies unless approved
-[ ] No main branch direct commits
+[ ] No direct commits to protected branches
 
 ------------------------------------------------------------
-KALSHI (When Applicable)
+DOCS CONSISTENCY
 ------------------------------------------------------------
 
-[ ] Signature format correct (timestamp + METHOD + path + body)
-[ ] Timestamp in milliseconds
-[ ] RSA PKCS1v15 + SHA256
-[ ] Base64 encoded signature
-[ ] KALSHI_BASE_URL does NOT duplicate /trade-api/v2
-[ ] key_id and key_pem never exposed
-
-------------------------------------------------------------
-MERGE GATE
-------------------------------------------------------------
-
-ChatGPT must explicitly state:
-
-“Phase 1 semantics preserved.”
-
-If not stated, the PR must not be merged.
+[ ] API details live only in `docs/API_REFERENCE.md`
+[ ] Runbooks/deployment notes live in `docs/OPERATIONS.md`
+[ ] Architecture and invariants live in `docs/ARCHITECTURE.md`
+[ ] Governance and semantic authority live in `docs/OPERATING_MODE.md`
+[ ] Roadmap updates tracked in `docs/ROLLING_TODO.md`

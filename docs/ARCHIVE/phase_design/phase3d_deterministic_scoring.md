@@ -1,3 +1,5 @@
+ARCHIVED — superseded; not current requirements.
+
 # Phase 3-D Deterministic Scoring Engine Specification
 Status: ACCEPTED
 Authority: Phase 3 Orchestrator
