@@ -1038,6 +1038,38 @@ def _build_alert_decision_trace(station: str):
     }
 
 
+@app.route("/observability/market-eligibility-runtime", methods=["GET"])
+def observability_market_eligibility_runtime():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    latest_market_eval = get_latest_station_market_evaluation_context(station=station).get(station, {})
+    eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
+    rejection_breakdown = eligibility_runtime.get("rejection_breakdown") or {}
+    latest_transition = (get_transition_history(station=station, limit=1) or [{}])[0]
+
+    return jsonify(
+        {
+            "ok": True,
+            "station": station,
+            "scheduler_running": is_scheduler_running(),
+            "execution_domain": _current_kalshi_execution_domain(),
+            "latest_settlement_integer": latest_transition.get("settlement_bucket"),
+            "markets_considered_count": int(eligibility_runtime.get("markets_considered_count") or 0),
+            "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
+            "rejected_markets_count": int(eligibility_runtime.get("rejected_markets_count") or 0),
+            "rejection_breakdown": {
+                "outside_price_band": int(rejection_breakdown.get("outside_price_band") or 0),
+                "wrong_series": int(rejection_breakdown.get("wrong_series") or 0),
+                "expired_market": int(rejection_breakdown.get("expired_market") or 0),
+                "settlement_mismatch": int(rejection_breakdown.get("settlement_mismatch") or 0),
+                "unknown_reason": int(rejection_breakdown.get("unknown_reason") or 0),
+            },
+            "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
+            "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
+        }
+    ), 200
 @app.route("/observability/internal-alert-runtime", methods=["GET"])
 def observability_internal_alert_runtime():
     station = (request.args.get("station") or "").strip().upper()
