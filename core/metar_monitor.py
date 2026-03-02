@@ -479,13 +479,52 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
 # =========================
 def _fetch_range_nws(icao: str, start_iso_z: str, end_iso_z: str, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     url = _nws_range_url(icao, start_iso_z, end_iso_z)
+    execution_domain = "production"
     try:
-        r = requests.get(url, headers=_headers_for_nws(cfg), timeout=10)
+        from core.kalshi_monitor import _current_kalshi_execution_domain
+
+        execution_domain = _current_kalshi_execution_domain()
+    except Exception:
+        execution_domain = "production"
+
+    headers = _headers_for_nws(cfg)
+    _ALERT_LOGGER.info(
+        "NWS_FETCH_DIAGNOSTIC\n"
+        "station=%s\n"
+        "url=%s\n"
+        "start=%s\n"
+        "end=%s\n"
+        "execution_domain=%s\n"
+        "user_agent=%s\n"
+        "timestamp_utc=%s",
+        icao,
+        url,
+        start_iso_z,
+        end_iso_z,
+        execution_domain,
+        headers.get("User-Agent", ""),
+        _now_utc_iso(),
+    )
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
     except requests.exceptions.Timeout:
         _record_timeout(icao)
-        r = requests.get(url, headers=_headers_for_nws(cfg), timeout=10)
+        r = requests.get(url, headers=headers, timeout=10)
     r.raise_for_status()
-    return _parse_nws_collection(r.json())
+    payload = r.json()
+    features = payload.get("features", []) if isinstance(payload, dict) else []
+    _ALERT_LOGGER.info(
+        "NWS_FETCH_RESULT\n"
+        "station=%s\n"
+        "http_status=%s\n"
+        "feature_count=%s\n"
+        "response_timestamp=%s",
+        icao,
+        r.status_code,
+        len(features) if isinstance(features, list) else 0,
+        r.headers.get("Date") if getattr(r, "headers", None) else None,
+    )
+    return _parse_nws_collection(payload)
 
 
 def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
