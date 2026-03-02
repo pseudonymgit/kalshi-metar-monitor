@@ -958,6 +958,7 @@ def _annotate_transition_history_market_eval(
     alerts_sent: int,
     evaluation_outcome: str,
     suppression_reason: Optional[str] = None,
+    market_eligibility_runtime: Optional[Dict[str, Any]] = None,
 ) -> None:
     normalized_station = (station or "").strip().upper()
     transition_id = None
@@ -980,6 +981,7 @@ def _annotate_transition_history_market_eval(
         return
     safe_outcome = (evaluation_outcome or "").strip().upper() or "SUPPRESSED_UNKNOWN"
     safe_suppression_reason = (suppression_reason or "").strip().upper() or None
+    eligibility_runtime = market_eligibility_runtime if isinstance(market_eligibility_runtime, dict) else None
 
     with _TRANSITION_LOCK:
         for entry in reversed(_TRANSITION_HISTORY):
@@ -994,6 +996,8 @@ def _annotate_transition_history_market_eval(
             entry["evaluation_outcome"] = safe_outcome
             if safe_suppression_reason:
                 entry["suppression_reason"] = safe_suppression_reason
+            if eligibility_runtime is not None:
+                entry["market_eligibility_runtime"] = copy.deepcopy(eligibility_runtime)
             break
 
     try:
@@ -1042,6 +1046,8 @@ def _annotate_transition_history_market_eval(
                 metadata["evaluation_outcome"] = safe_outcome
                 if safe_suppression_reason:
                     metadata["suppression_reason"] = safe_suppression_reason
+                if eligibility_runtime is not None:
+                    metadata["market_eligibility_runtime"] = copy.deepcopy(eligibility_runtime)
 
                 conn.execute(
                     "UPDATE transition_events SET metadata_json = ? WHERE id = ?",
@@ -1131,6 +1137,7 @@ def get_latest_station_market_evaluation_context(station: Optional[str] = None) 
                 "latest_suppression_reason": metadata.get("suppression_reason"),
                 "latest_transition_type": row[2],
                 "latest_transition_event_id": row[3],
+                "market_eligibility_runtime": metadata.get("market_eligibility_runtime") if isinstance(metadata.get("market_eligibility_runtime"), dict) else None,
             }
     except Exception as e:
         _ALERT_LOGGER.warning("latest_market_eval_context_query_failed station=%s error=%s", normalized_station, e)
@@ -1481,6 +1488,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 _get_active_stations,
                 _parse_target_market_types,
                 build_structured_snapshot,
+                get_last_hydration_execution_snapshot,
                 process_ladder_transition,
                 send_composed_weather_market_alert,
             )
@@ -1499,12 +1507,42 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             market_alerts_sent = 0
             suppression_reason = None
             saw_terminal_state = False
+            markets_considered_count = 0
+            eligible_markets_count = 0
+            rejection_breakdown = {
+                "outside_price_band": 0,
+                "wrong_series": 0,
+                "expired_market": 0,
+                "settlement_mismatch": 0,
+                "unknown_reason": 0,
+            }
 
             if station_is_active:
                 for market_type_token in sorted(target_market_types):
                     evaluated_market_attempts += 1
                     snapshot = build_structured_snapshot(station, {market_type_token})
                     markets = snapshot.get("markets") or []
+                    hydration_snapshot = get_last_hydration_execution_snapshot().get(station, {})
+                    raw_market_count = int(hydration_snapshot.get("raw_market_count") or 0)
+                    filtered_market_count = int(hydration_snapshot.get("filtered_market_count") or 0)
+                    rejection_counts = hydration_snapshot.get("rejection_counts") or {}
+
+                    markets_considered_count += raw_market_count
+                    eligible_markets_count += len(markets)
+
+                    wrong_series_rejections = int(rejection_counts.get("city_token_mismatch") or 0) + int(rejection_counts.get("market_type_mismatch") or 0)
+                    settlement_mismatch_rejections = int(rejection_counts.get("date_mismatch") or 0)
+                    expired_rejections = int(rejection_counts.get("inactive_market") or 0)
+                    outside_price_band_rejections = max(filtered_market_count - len(markets), 0)
+                    known_rejections = wrong_series_rejections + settlement_mismatch_rejections + expired_rejections + outside_price_band_rejections
+                    unknown_rejections = max(raw_market_count - len(markets) - known_rejections, 0)
+
+                    rejection_breakdown["wrong_series"] += wrong_series_rejections
+                    rejection_breakdown["settlement_mismatch"] += settlement_mismatch_rejections
+                    rejection_breakdown["expired_market"] += expired_rejections
+                    rejection_breakdown["outside_price_band"] += outside_price_band_rejections
+                    rejection_breakdown["unknown_reason"] += unknown_rejections
+
                     _ALERT_LOGGER.info(
                         "EVAL ladder_check station=%s type=%s market_type=%s markets_found=%s",
                         station,
@@ -1641,6 +1679,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                     alerts_sent=market_alerts_sent,
                     evaluation_outcome=evaluation_outcome,
                     suppression_reason=suppression_reason,
+                    market_eligibility_runtime={
+                        "markets_considered_count": markets_considered_count,
+                        "eligible_markets_count": eligible_markets_count,
+                        "rejected_markets_count": max(markets_considered_count - eligible_markets_count, 0),
+                        "rejection_breakdown": rejection_breakdown,
+                    },
                 )
         except Exception as e:
             print(f"[ERROR] station={station} function=_send_alert: {e}")
