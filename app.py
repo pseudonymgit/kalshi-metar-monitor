@@ -778,10 +778,11 @@ def _build_alert_fire_audit_rows():
 
 
 def _build_runtime_authority_hydration_snapshot(*, stations):
-    from core.kalshi_monitor import get_ladder_state_snapshot
+    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, get_ladder_state_snapshot
 
     ladder_snapshot = get_ladder_state_snapshot() or {}
     ladder_state = ladder_snapshot.get("ladder_state") or {}
+    hydration_prerequisite_state = get_hydration_prerequisite_state_snapshot() or {}
 
     hydration_by_station = {}
     for station in stations:
@@ -795,6 +796,12 @@ def _build_runtime_authority_hydration_snapshot(*, stations):
             "cache_present": bool(station_state_keys),
             "state_key_count": len(station_state_keys),
             "state_keys": station_state_keys[:10],
+            "hydration_prerequisite": {
+                "attempted": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("attempted")),
+                "cache_valid": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("cache_valid")),
+                "series_discovered": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("series_discovered")),
+                "markets_cached": bool((hydration_prerequisite_state.get(normalized_station) or {}).get("markets_cached")),
+            },
         }
 
     return {
