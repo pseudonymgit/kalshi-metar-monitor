@@ -128,6 +128,173 @@ Purpose: future structural correlation analysis.
 
 Constraint: no execution authority impact.
 
+
+## Signal Engine Evolution (Deterministic Backbone Preserved)
+
+This section captures the agreed signal-engine architecture while preserving deterministic core behavior.
+
+Non-negotiable constraints:
+- Phase 1 ladder semantics are immutable.
+- Execution-domain guard remains strict.
+- Replay equivalence must not be violated.
+- The system does **NOT** perform live trading.
+
+### Implemented
+
+#### Phase 1 — Nearest Strike Only (Directional Purity)
+
+Status: Implemented.
+
+- `build_structured_snapshot()` now filters to only the nearest relevant strike:
+  - `HIGH` -> next strike above observed value
+  - `LOW` -> next strike below observed value
+- Deep ladder rungs are no longer evaluated.
+- Eliminates multi-rung spam.
+
+### In progress
+
+#### Phase 2 — Proximity Regime Engine
+
+Status: Regime tracking implemented. Emission logic not yet fully integrated.
+
+- `classify_proximity(distance_f)`:
+  - `<= 0.25` -> `CRITICAL`
+  - `<= 0.5` -> `NEAR`
+  - `<= 0.8` -> `APPROACHING`
+  - else -> `FAR`
+- `_LAST_PROXIMITY_REGIME` tracked per `(station, direction)`.
+- Emit only when regime rank increases:
+  - `{"FAR":0,"APPROACHING":1,"NEAR":2,"CRITICAL":3}`
+
+Goal:
+- Prevent oscillation spam.
+- Escalation-only proximity signals.
+
+### Designed but not implemented
+
+#### Phase 3 — Price Suppression Logic
+
+Status: Designed.
+
+Policy:
+- If regime in `{APPROACHING, NEAR, CRITICAL}`
+- AND `yes_price >= 90`
+- AND `distance > 0.15`
+- -> suppress.
+
+Override:
+- If `distance <= 0.15` -> never suppress.
+
+Structural signals ignore suppression entirely.
+
+#### Phase 4 — Time Weighting (Soft Suppression)
+
+Status: Designed.
+
+- High window: `11-19` local
+- Low window: `3-10` local
+
+Outside window:
+- Suppress Tier 2 (proximity)
+- Allow Tier 1 (structural)
+
+No hard blocking of ladder events.
+
+#### Phase 5 — Forced Rehydration on Critical Events
+
+Status: Designed.
+
+Trigger recache when:
+- `settlement_bucket_changed`
+- OR regime == `CRITICAL`
+
+Even if TTL not expired.
+
+Purpose:
+- Ensure fresh strikes/prices during decisive events.
+
+#### Phase 6 — Signal Classification Layer
+
+Status: Scaffold planned.
+
+`signal_class`:
+- `STRUCTURAL`
+- `PROXIMITY`
+- `PREDICTIVE` (not enabled)
+
+Emission rule:
+- `STRUCTURAL` -> always emit
+- `PROXIMITY` -> emit if not suppressed
+- `PREDICTIVE` -> future
+
+#### Phase 7 — Goldilocks Priority
+
+Status: Design confirmed.
+
+Goldilocks (`reversion_after_settlement`):
+- Tier 1
+- Never suppressed
+- Force recache
+- Payload includes:
+  - `current_temp`
+  - `high_of_day`
+  - `settlement`
+  - `nearest_strike`
+  - `YES price`
+
+#### Phase 8 — Alert Payload Upgrade
+
+Status: Planned.
+
+All alerts will include:
+- `current_temp`
+- `high_of_day`
+- `settlement_bucket`
+- `nearest_strike`
+- `distance_to_strike`
+- `yes_price`
+- `spread`
+- `time_remaining`
+- `signal_class`
+
+Goal:
+- Alerts become structured state reports, not stimuli.
+
+### Future roadmap
+
+#### Expected Behavior Change
+
+Before:
+- Multi-rung spam
+- Oscillation noise
+- Late-day expansion garbage
+
+After:
+- `0-2` proximity alerts per meaningful move
+- Rare Tier 1 structural events
+- No deep ladder nonsense
+- Strike-relevant only
+- Informative, not stimulating
+
+#### Strategic roadmap
+
+- Support all Kalshi cities dynamically (remove static station map).
+- Detect newly listed series automatically.
+- Auto-discover new market structures.
+- AI interpretation layer (non-authoritative, read-only).
+- Unified signal engine (deterministic backbone + signal evaluation layer).
+- Maintain strict execution-domain guard integrity.
+
+#### Important architectural note
+
+Hydration gating is policy-level only.
+Ingest execution-domain flags must never be used for market-phase suppression.
+
+Execution domain symmetry:
+- `(True, True)` = production
+- `(False, False)` = replay
+- Mixed states forbidden.
+
 ## Reconciliation Notes
 
 - Completed items were retained and marked instead of removed.
