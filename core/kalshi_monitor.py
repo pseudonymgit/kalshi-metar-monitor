@@ -833,6 +833,16 @@ def build_structured_snapshot(station: str, market_types: set):
         except Exception:
             pass
 
+    if observed_value is not None and len(selected_types) == 1:
+        direction = next(iter(sorted(selected_types)))
+
+        if direction == "HIGH":
+            higher = [m for m in markets if m["strike"] > observed_value]
+            markets = [min(higher, key=lambda x: x["strike"])] if higher else []
+        elif direction == "LOW":
+            lower = [m for m in markets if m["strike"] < observed_value]
+            markets = [max(lower, key=lambda x: x["strike"])] if lower else []
+
     return {
         "station": normalized_station,
         "market_types": sorted(selected_types),
