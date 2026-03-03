@@ -442,6 +442,7 @@ def _discover_series_for_stations():
         station_code = (station or "").strip().upper()
         city_token = _STATION_CITY_TOKEN_MAP.get(station_code, "")
 
+        candidates = []
         for item in series_items:
             frequency = (item.get("frequency") or "").strip().lower()
             title = (item.get("title") or "").strip()
@@ -455,8 +456,22 @@ def _discover_series_for_stations():
                 continue
 
             if station_code in ticker or (city_token and city_token in ticker):
-                discovered[station_code] = ticker
-                break
+                score = 0
+                if city_token:
+                    if ticker == f"KXHIGH{city_token}":
+                        score = 5
+                    elif ticker == f"KX{city_token}HIGH":
+                        score = 4
+                    elif ticker.startswith("KXHIGH") and city_token in ticker:
+                        score = 3
+                    elif "HIGH" in ticker and city_token in ticker:
+                        score = 2
+                    else:
+                        score = 1
+                candidates.append((score, ticker))
+
+        if candidates:
+            discovered[station_code] = sorted(candidates, key=lambda candidate: (-candidate[0], candidate[1]))[0][1]
 
     return discovered
 
@@ -477,7 +492,11 @@ def ensure_series_discovery_loaded():
         if record_connectivity_state:
             _SERIES_DISCOVERY_ATTEMPT_COUNT += 1
         try:
-            _SERIES_BY_STATION = _discover_series_for_stations()
+            discovered = _discover_series_for_stations()
+            if not discovered:
+                raise RuntimeError("series discovery returned 0 station mappings")
+
+            _SERIES_BY_STATION = discovered
             _SERIES_DISCOVERED = True
             if record_connectivity_state:
                 _LAST_SERIES_DISCOVERY_SUCCESS_UTC = datetime.now(timezone.utc).isoformat()
