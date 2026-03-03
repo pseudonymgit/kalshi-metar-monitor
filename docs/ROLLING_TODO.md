@@ -31,6 +31,19 @@ Purpose: preserve alert-path determinism while closing station/market visibility
 - [~] Add transition emission verification logging *(partially complete via transition/runtime observability; needs explicit acceptance criteria closure)*
 - [ ] **Milestone tagging requirement** (new)
 
+
+### P0 — REGRESSION ALERT GOVERNANCE
+
+Purpose: detect invariant violations and structural drift independent of trading alerts.
+
+Tasks:
+- [ ] Define regression-class taxonomy (hydration, discovery, eligibility, scheduler, execution-domain)
+- [ ] Define invariant violation triggers vs informational telemetry
+- [ ] Separate regression notifications from trading alerts
+- [ ] Add replay-based regression verification hook
+- [ ] Define suppression transparency for regression-class events
+- [ ] Production runtime discovery snapshot validation
+
 ### P0 — ALERT GOVERNANCE HARDENING (NEW)
 
 Purpose: freeze deterministic alert contracts before broader expansion.
