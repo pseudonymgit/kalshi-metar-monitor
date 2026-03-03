@@ -38,6 +38,22 @@ Status: Design proposal only (no implementation changes).
 }
 ```
 
+## Invariant-Conformant Decision Examples
+
+```json
+{
+  "decision_type": "alert_emitted",
+  "suppression_reason": "none"
+}
+```
+
+```json
+{
+  "decision_type": "suppressed",
+  "suppression_reason": "outside_alert_window"
+}
+```
+
 ## Required Fields
 
 - `schema_version` (string; required)
@@ -62,9 +78,12 @@ Status: Design proposal only (no implementation changes).
 4. `suppression_reason` must always be present:
    - `none` for emitted alerts.
    - explicit reason token for suppressed decisions (e.g., `outside_alert_window`, `no_eligible_market`, `terminal_state`, `rate_limited`).
-5. `deterministic_cause_reference` must bind to existing deterministic execution artifacts (no random UUID authority).
-6. `replay_equivalence_hash` must be computed from a canonical field-order serialization excluding non-deterministic metadata.
-7. Any field omitted by producer must fail schema validation.
+5. Hard consistency invariants:
+   - If `decision_type == "alert_emitted"`, `suppression_reason` MUST equal `none`.
+   - If `decision_type == "suppressed"`, `suppression_reason` MUST NOT equal `none`.
+6. `deterministic_cause_reference` must bind to existing deterministic execution artifacts (no random UUID authority).
+7. `replay_equivalence_hash` must be computed from a canonical field-order serialization excluding non-deterministic metadata.
+8. Any field omitted by producer must fail schema validation.
 
 ## Transition Type Enum (proposed)
 
@@ -75,6 +94,11 @@ Status: Design proposal only (no implementation changes).
 
 - `alert_emitted`
 - `suppressed`
+
+## Replay Equivalence Scope
+
+- Replay equivalence is defined over transition + decision outcomes and deterministic observation context.
+- Replay equivalence does NOT require parity of diagnostic breakdown fields (for example, rejection breakdown counts), which are informational.
 
 ## Replay Equivalence Hash Design (proposal)
 
@@ -89,13 +113,13 @@ observation_timestamp,
 observation_temperature,
 deterministic_cause_reference,
 eligibility_evaluation_result.outcome,
-suppression_reason,
-execution_domain_confirmation.domain
+suppression_reason
 }))`
 
 Notes:
 - Canonical JSON requires deterministic key ordering and normalized numeric/string encoding.
 - Excludes transport metadata, write timestamps, database row IDs.
+- Excludes `execution_domain_confirmation.domain`; execution domain confirmation remains required metadata but is not an equivalence input.
 
 ## Compatibility + Versioning
 
