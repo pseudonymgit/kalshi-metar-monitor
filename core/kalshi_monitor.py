@@ -34,6 +34,7 @@ _ladder_state = {}
 _ladder_event_keys = {}
 _LADDER_LOCK = threading.Lock()
 _SERIES_LOCK = threading.Lock()
+_PROXIMITY_LOCK = threading.Lock()
 _SERIES_BY_STATION = {}
 _SERIES_DISCOVERED = False
 _SERIES_MARKETS_CACHE = {}
@@ -43,6 +44,13 @@ _LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
 _LAST_SERIES_DISCOVERY_ERROR = None
 _MARKETS_CACHE_POPULATION_COUNT = 0
 _LAST_HYDRATION_EXECUTION = {}
+_LAST_PROXIMITY_REGIME = {}
+_PROXIMITY_RANK = {
+    "FAR": 0,
+    "APPROACHING": 1,
+    "NEAR": 2,
+    "CRITICAL": 3,
+}
 
 _STATION_CITY_TOKEN_MAP = {
     "KDEN": "DEN",
@@ -727,6 +735,16 @@ def _extract_strike_from_ticker(ticker):
         return int(match.group(1))
     except (TypeError, ValueError):
         return None
+
+
+def classify_proximity(distance_f: float) -> str:
+    if distance_f <= 0.25:
+        return "CRITICAL"
+    if distance_f <= 0.5:
+        return "NEAR"
+    if distance_f <= 0.8:
+        return "APPROACHING"
+    return "FAR"
 
 
 def build_structured_snapshot(station: str, market_types: set):
