@@ -27,6 +27,19 @@
 - Cache hydration is performed by ingestion/execution cycles.
 - Operations runbooks must ensure cache hydration before treating observability snapshots as complete.
 
+
+## Bootstrap Window Constants (Canonical)
+
+Values below are execution constants from `core/metar_monitor.py` and are authoritative for bootstrap/lookback behavior.
+
+| Constant | Value | Purpose |
+|---|---:|---|
+| `BOOTSTRAP_LOOKBACK_MINUTES` | `60` | First-contact bootstrap lookback window when no prior station timestamp exists. |
+| `OVERLAP_SECONDS` | `120` | Deterministic overlap for subsequent windows to avoid late-arrival misses. |
+| `FIRST_RUN_CUSHION_SEC` | `300` | First-contact cushion to absorb initial fetch edge timing. |
+| `PUBLICATION_LAG_BUFFER_SECONDS` | `90` | Excludes most-recent publication edge to avoid premature reads. |
+| `METAR_ACCEPTANCE_GRACE_SECONDS` | `600` (`min(900, OVERLAP_SECONDS * 5)`) | Bounded acceptance grace for delayed observations. |
+
 ## Scheduler lifecycle
 
 Autostart:

@@ -9,6 +9,8 @@ AUTHENTICATED PR MODE ONLY
 All repository mutations MUST occur via Pull Request.
 Execution operates under deterministic governance rules.
 
+- Session handoff template at `docs/CODEX_HANDOFF_TEMPLATE.md` is mandatory for all future Codex sessions in this repository.
+
 Agent behavior is PATCH-ONLY.
 Conversation output is NOT authoritative.
 Git diff output IS authoritative.
