@@ -1221,7 +1221,10 @@ if hasattr(app, "before_first_request"):
     def _autostart_scheduler_once():
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
-        ensure_series_discovery_loaded()
+        try:
+            ensure_series_discovery_loaded()
+        except Exception as exc:
+            log.error("Series discovery failed during startup: %s", exc)
         _merge_discovered_stations_into_watchlist()
 else:
     @app.before_request
@@ -1232,7 +1235,10 @@ else:
         _autostart_fallback_done = True
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
-        ensure_series_discovery_loaded()
+        try:
+            ensure_series_discovery_loaded()
+        except Exception as exc:
+            log.error("Series discovery failed during startup: %s", exc)
         _merge_discovered_stations_into_watchlist()
         return None
 
