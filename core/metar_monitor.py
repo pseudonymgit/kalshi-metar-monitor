@@ -2218,7 +2218,8 @@ def _poll_once(logger=None):
                     icao,
                     obs_list,
                     cfg,
-                    allow_alert_delivery=market_phase_enabled,
+                    allow_alert_delivery=True,
+                    persist_cache=True,
                     window_start=start_dt,
                     window_end=end_dt,
                 )
