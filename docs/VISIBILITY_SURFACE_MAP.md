@@ -38,6 +38,18 @@ alert semantics, scheduler cadence, or replay behavior.
 | Scheduler health | Poll/loop markers | `/metar/status`, execution boundary markers | Loop end updates `last_loop_utc` and poll counter | Bounded by one scheduler interval + query time | Replay temporarily pauses scheduler and then restores; visible via status timestamps |
 | Replay/live divergence risk | Manual comparison only (replay endpoint output vs persisted transition history) | `/debug/replay` + observability endpoints | Operator runs replay then inspects parity manually | Unbounded (operator-driven) | Partial: replay available, parity surface not first-class |
 
+
+## 2A) Coverage Reason Interpretation Matrix
+
+Use `coverage_reason` and cache status together; this matrix is canonical triage guidance.
+
+| coverage_reason | Typical cache status context | Interpretation | Operator action |
+|---|---|---|---|
+| `market_data_unknown` | `cache_missing` / `cache_stale` / upstream hydration attempt failure | Coverage cannot be resolved from current cache snapshot; this does **not** by itself imply scheduler or ingestion failure. | Check runtime-authority + hydration/market-coverage surfaces before escalation. |
+| `not_in_live_station_universe` | `cache_valid` or fallback universe active | Station not currently in canonical live station scope for this evaluation cycle. | Validate station-universe resolution order and discovery snapshot. |
+| `eligible_market_present` | `cache_valid` | At least one currently eligible market exists for station/type/day context. | Normal operations; continue monitoring transition outcomes. |
+| `no_eligible_market` | `cache_valid` | Markets were evaluated but none passed deterministic eligibility filters. | Review eligibility diagnostics and filter breakdown. |
+
 ## 3) Silent Zones
 
 Detection only (no remediation proposals):

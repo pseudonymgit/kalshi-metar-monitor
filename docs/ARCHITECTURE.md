@@ -23,6 +23,20 @@ Market Availability (Kalshi listings)
 → Observability Domain
 → Scoring Domain
 
+
+## Station-Universe Resolution Order
+
+Canonical live station scope resolves in this strict order:
+
+1. Market-derived station universe from live Kalshi discovery when discovery/hydration path is available.
+2. Deterministic fallback union when market-derived resolution is unavailable:
+   - configured station list,
+   - runtime state station keys,
+   - watchlist stations,
+   - discovered series station keys.
+
+This preserves market-authoritative intent while keeping execution deterministic during upstream market-discovery disruption.
+
 ## Canonical Control Surface
 
 HTTP endpoint definitions are canonicalized in `docs/API_REFERENCE.md`.
@@ -103,6 +117,7 @@ That reference is authoritative for endpoint domain assignment, execution author
 - Cache hydration expectations must be explicit in operations docs and runbooks.
 - Observability may expose deterministic artifacts from downstream deterministic derivation layers within architectural constraints.
 - Observability shall not assume or define signal-layer authority.
+- Alert absence alone must never be used to infer hydration failure or discovery failure; operators must corroborate with runtime-authority and market-coverage surfaces.
 
 ## Governance Invariants
 

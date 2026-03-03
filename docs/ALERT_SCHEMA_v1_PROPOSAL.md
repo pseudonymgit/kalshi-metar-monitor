@@ -15,6 +15,7 @@ Status: Design proposal only (no implementation changes).
   "schema_version": "1.0.0",
   "station": "KDEN",
   "transition_type": "LADDER_BUCKET_TRANSITION",
+  "decision_type": "alert_emitted",
   "pre_state_bucket": 71,
   "post_state_bucket": 72,
   "observation_timestamp": "2026-03-02T16:11:00+00:00",
@@ -25,17 +26,7 @@ Status: Design proposal only (no implementation changes).
     "evaluation_trace_id": "deterministic runtime trace token"
   },
   "eligibility_evaluation_result": {
-    "outcome": "ALERTABLE",
-    "markets_considered_count": 18,
-    "eligible_markets_count": 3,
-    "rejected_markets_count": 15,
-    "rejection_breakdown": {
-      "outside_price_band": 5,
-      "wrong_series": 2,
-      "expired_market": 4,
-      "settlement_mismatch": 3,
-      "unknown_reason": 1
-    }
+    "outcome": "ALERTABLE"
   },
   "suppression_reason": "none",
   "execution_domain_confirmation": {
@@ -51,34 +42,39 @@ Status: Design proposal only (no implementation changes).
 
 - `schema_version` (string; required)
 - `station` (ICAO uppercase; required)
-- `transition_type` (enum; required)
+- `transition_type` (enum; required; ladder state transition class only)
+- `decision_type` (enum; required; `alert_emitted` or `suppressed`)
 - `pre_state_bucket` (int or null if initial state; required)
 - `post_state_bucket` (int; required)
 - `observation_timestamp` (ISO-8601 UTC; required)
 - `observation_temperature` (number; required)
 - `deterministic_cause_reference` (object; required)
 - `eligibility_evaluation_result` (object; required)
-- `suppression_reason` (string; required, explicit, never implicit)
+- `suppression_reason` (string; required, explicit, never implicit; `none` when `decision_type=alert_emitted`)
 - `execution_domain_confirmation` (object; required)
 - `replay_equivalence_hash` (string; required)
 
 ## Deterministic Semantics
 
-1. `suppression_reason` must always be present:
+1. `transition_type` must encode only ladder transition class and never encode suppression outcomes.
+2. `decision_type` records execution outcome: `alert_emitted` or `suppressed`.
+3. Suppression is a decision outcome, not a transition type.
+4. `suppression_reason` must always be present:
    - `none` for emitted alerts.
    - explicit reason token for suppressed decisions (e.g., `outside_alert_window`, `no_eligible_market`, `terminal_state`, `rate_limited`).
-2. `deterministic_cause_reference` must bind to existing deterministic execution artifacts (no random UUID authority).
-3. `replay_equivalence_hash` must be computed from a canonical field-order serialization excluding non-deterministic metadata.
-4. Any field omitted by producer must fail schema validation.
+5. `deterministic_cause_reference` must bind to existing deterministic execution artifacts (no random UUID authority).
+6. `replay_equivalence_hash` must be computed from a canonical field-order serialization excluding non-deterministic metadata.
+7. Any field omitted by producer must fail schema validation.
 
 ## Transition Type Enum (proposed)
 
 - `LADDER_BUCKET_TRANSITION`
 - `LADDER_BUCKET_ENTRY_INITIAL`
-- `NO_ELIGIBLE_MARKET_SUPPRESSION`
-- `HYDRATION_UNAVAILABLE_SUPPRESSION`
-- `WINDOW_GATED_SUPPRESSION`
-- `TERMINAL_STATE_SUPPRESSION`
+
+## Decision Type Enum (proposed)
+
+- `alert_emitted`
+- `suppressed`
 
 ## Replay Equivalence Hash Design (proposal)
 
@@ -86,12 +82,13 @@ Status: Design proposal only (no implementation changes).
 schema_version,
 station,
 transition_type,
+decision_type,
 pre_state_bucket,
 post_state_bucket,
 observation_timestamp,
 observation_temperature,
 deterministic_cause_reference,
-eligibility_evaluation_result,
+eligibility_evaluation_result.outcome,
 suppression_reason,
 execution_domain_confirmation.domain
 }))`
