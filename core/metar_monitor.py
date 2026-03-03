@@ -1606,9 +1606,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
         try:
             from core.kalshi_monitor import (
+                _LAST_PROXIMITY_REGIME,
+                _PROXIMITY_LOCK,
+                _PROXIMITY_RANK,
                 _get_active_stations,
                 _parse_target_market_types,
                 build_structured_snapshot,
+                classify_proximity,
                 get_last_hydration_execution_snapshot,
                 process_ladder_transition,
                 send_composed_weather_market_alert,
@@ -1782,6 +1786,27 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         raw_reason = (transition.get("reason") or "").strip().upper()
                         if raw_reason:
                             suppression_reason = raw_reason
+
+                    nearest_market = markets[0] if markets else None
+                    nearest_strike = (nearest_market or {}).get("strike")
+                    proximity_regime_tightened = False
+                    try:
+                        observed_value = float(tf)
+                    except (TypeError, ValueError):
+                        observed_value = None
+
+                    if nearest_strike is not None and observed_value is not None:
+                        distance = abs(float(nearest_strike) - observed_value)
+                        new_regime = classify_proximity(distance)
+                        regime_key = (station, market_type_token)
+                        with _PROXIMITY_LOCK:
+                            old_regime = _LAST_PROXIMITY_REGIME.get(regime_key)
+                            proximity_regime_tightened = (
+                                old_regime is None
+                                or _PROXIMITY_RANK[new_regime] > _PROXIMITY_RANK[old_regime]
+                            )
+                            _LAST_PROXIMITY_REGIME[regime_key] = new_regime
+
 
             if evaluated_market_attempts > 0:
                 if market_alerts_sent > 0:
