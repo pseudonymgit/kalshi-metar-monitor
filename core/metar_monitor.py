@@ -995,6 +995,9 @@ def _log_transition_event(
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
     now_iso = _now_utc_iso()
+    event_metadata = dict(metadata or {})
+    event_metadata.setdefault("alert_schema_version", 2)
+    event_metadata.setdefault("alert_classification", "STRUCTURAL")
     try:
         transition_event_id = None
         db_path = _alert_db_path()
@@ -1041,7 +1044,7 @@ def _log_transition_event(
                         settlement_bucket,
                         running_max,
                         current_temp,
-                        json.dumps(metadata or {}, sort_keys=True),
+                        json.dumps(event_metadata, sort_keys=True),
                     ),
                 )
                 transition_event_id = int(cur.lastrowid or 0) or None
@@ -1103,6 +1106,14 @@ def _annotate_transition_history_market_eval(
     safe_outcome = (evaluation_outcome or "").strip().upper() or "SUPPRESSED_UNKNOWN"
     safe_suppression_reason = (suppression_reason or "").strip().upper() or None
     eligibility_runtime = market_eligibility_runtime if isinstance(market_eligibility_runtime, dict) else None
+    if safe_outcome == "ALERT_SENT":
+        alert_classification = "MARKET_ELIGIBLE"
+    elif safe_outcome.startswith("HYDRATION_BLOCKED"):
+        alert_classification = "HYDRATION_BLOCKED"
+    elif safe_outcome == "NO_ELIGIBLE_MARKET":
+        alert_classification = "MARKET_SUPPRESSED"
+    else:
+        alert_classification = "MARKET_SUPPRESSED"
 
     with _TRANSITION_LOCK:
         for entry in reversed(_TRANSITION_HISTORY):
@@ -1115,6 +1126,8 @@ def _annotate_transition_history_market_eval(
             entry["market_evaluated"] = True
             entry["alerts_sent"] = int(alerts_sent)
             entry["evaluation_outcome"] = safe_outcome
+            entry["alert_schema_version"] = 2
+            entry["alert_classification"] = alert_classification
             if safe_suppression_reason:
                 entry["suppression_reason"] = safe_suppression_reason
             if eligibility_runtime is not None:
@@ -1165,6 +1178,8 @@ def _annotate_transition_history_market_eval(
                 metadata["market_evaluated"] = True
                 metadata["alerts_sent"] = int(alerts_sent)
                 metadata["evaluation_outcome"] = safe_outcome
+                metadata["alert_schema_version"] = 2
+                metadata["alert_classification"] = alert_classification
                 if safe_suppression_reason:
                     metadata["suppression_reason"] = safe_suppression_reason
                 if eligibility_runtime is not None:
