@@ -157,3 +157,37 @@ Keyword extraction (collector):
    - Map: `Emit alert when unknown market detected`; regression taxonomy item (`hydration, discovery, eligibility, scheduler, execution-domain`).
 
 No execution-domain guards were bypassed in this evidence run.
+
+## LIVE Render Evidence Run — 2026-03-03
+
+- Base URL used: `https://kalshi-metar-monitor.onrender.com` (from `README.md` production URL reference).
+- Collector command run: `python tools/collect_evidence.py --base-url https://kalshi-metar-monitor.onrender.com --out-dir evidence_out`
+- Bundle path emitted: `evidence_out/bundle_20260304T010059Z/evidence_bundle.json`
+
+### Endpoint highlights
+
+- All 9 probed endpoints in `tools/collect_evidence.py` failed before application response with transport error:
+  - `<urlopen error Tunnel connection failed: 403 Forbidden>`
+- Direct connectivity check also failed:
+  - `curl -sS -D - https://kalshi-metar-monitor.onrender.com/execution-domain`
+  - output included `curl: (56) CONNECT tunnel failed, response 403` and `HTTP/1.1 403 Forbidden`.
+
+### Certification categories (LIVE)
+
+- **A) Execution-domain symmetry:** **UNKNOWN** (endpoint unreachable through current network path).
+- **B) Hydration / cache stability:** **UNKNOWN** (endpoint unreachable through current network path).
+- **C) Ingestion health:** **UNKNOWN** (endpoint unreachable through current network path).
+- **D) Discovery integrity:** **UNKNOWN** (endpoint unreachable through current network path).
+- **E) Transition → alert integrity:** **UNKNOWN** (endpoint unreachable through current network path).
+
+### Anomaly counts (LIVE run attempt)
+
+- Endpoint transport failures: **9/9**.
+- HTTP status from application endpoints: **0 captured** (blocked at CONNECT tunnel stage).
+
+## LIVE Run Blocked
+
+- Blocking condition: egress path from this execution environment to `https://kalshi-metar-monitor.onrender.com` is denied by an HTTP CONNECT tunnel returning `403 Forbidden` before the Render app responds.
+- Required to complete LIVE certification snapshot:
+  - A network path (or proxy policy) that allows HTTPS CONNECT to `kalshi-metar-monitor.onrender.com`, **or**
+  - Execution from a host/environment without the denying proxy in front of outbound HTTPS.
