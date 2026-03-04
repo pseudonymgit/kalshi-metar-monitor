@@ -38,6 +38,8 @@ class IngestionHealthEndpointTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["stale_after_seconds"], 180)
         self.assertTrue(payload["scheduler_running"])
+        self.assertIn("system_health", payload)
+        self.assertIn("ingestion", payload["system_health"])
 
         stations = {row["station"]: row for row in payload["stations"]}
 
