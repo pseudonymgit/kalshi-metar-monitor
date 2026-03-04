@@ -171,12 +171,14 @@ class SimulationEndpointHydrationTests(unittest.TestCase):
 
     @patch("app.ensure_scheduler_started", return_value=True)
     @patch("app.ensure_series_discovery_loaded", return_value={})
-    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})
+    @patch("core.kalshi_monitor.process_hydration_queue_worker", return_value={"status": "hydrated", "station": "KDEN"})
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
     @patch("app._simulate_temperature_for_testing", return_value={"ok": True})
-    def test_simulate_ladder_hydrates_explicitly(self, _simulate, mock_hydrate, *_mocks):
+    def test_simulate_ladder_hydration_flows_through_queue_worker(self, _simulate, mock_enqueue, mock_worker, *_mocks):
         response = self.client.post("/metar/simulate-ladder", json={"icao": "KDEN", "temp_f": 70.0})
         self.assertEqual(response.status_code, 200)
-        mock_hydrate.assert_called_once_with(station="KDEN", market_types={"HIGH", "LOW"})
+        mock_enqueue.assert_called_once_with("KDEN", reason="simulate_ladder")
+        mock_worker.assert_called_once_with(market_types={"HIGH", "LOW"})
 
 
 if __name__ == "__main__":

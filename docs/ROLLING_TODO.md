@@ -89,12 +89,19 @@ Purpose: ensure read-only observability boundaries remain explicit and testable.
 
 #### Deterministic Hydration Queue
 
-Status: Implemented.
+Status: Hardened in production path (poll + alert queue-only execution).
 
 Purpose:
 - Prevent API rate-limit storms and ensure ladder cache stability.
 - Route all hydration triggers through deterministic queue scheduling.
 - Preserve replay and signal equivalence while decoupling network timing from poll execution.
+
+Completed hardening:
+- Queue worker is the sole live hydration execution path for poll/alert/simulate flows.
+- Poll and alert paths only enqueue hydration work (no inline ladder hydration calls).
+- Alert/send market evaluation now uses cache-only ladder reads; cache misses trigger enqueue-only refresh.
+- 429 response handling is centralized to queue backoff + deterministic retry eligibility.
+- Runtime authority and hydration prerequisite observability now expose queue depth, queued stations, and active backoff stations.
 
 Future improvements:
 - Global hydration metrics

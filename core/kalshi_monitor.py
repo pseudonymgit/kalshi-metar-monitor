@@ -701,9 +701,17 @@ def enqueue_station_hydration(station: str, reason: str = "cache_missing") -> bo
 
 def hydration_queue_snapshot() -> dict:
     with _SERIES_LOCK:
+        now_ts = time.time()
+        backoff_until = dict(_hydration_backoff_until)
+        backoff_stations = sorted(
+            station for station, until_ts in backoff_until.items() if float(until_ts or 0.0) > now_ts
+        )
         return {
             "queue": list(_hydration_queue),
-            "backoff_until": dict(_hydration_backoff_until),
+            "queue_depth": len(_hydration_queue),
+            "queued_stations": list(_hydration_queue),
+            "backoff_until": backoff_until,
+            "backoff_stations": backoff_stations,
             "last_hydration_request_ts": float(_last_hydration_request_ts or 0.0),
         }
 
@@ -941,7 +949,7 @@ def build_structured_snapshot(station: str, market_types: set):
     if get_metar_state:
         try:
             observed_value = (
-                get_metar_state().get("latest", {})
+                get_metar_state().get("last_obs", {})
                 .get(normalized_station, {})
                 .get("temp_f")
             )
@@ -970,6 +978,105 @@ def build_structured_snapshot(station: str, market_types: set):
         "station": normalized_station,
         "market_types": sorted(selected_types),
         "markets": markets,
+        "observed": {"current_temp_f": observed_value},
+    }
+
+
+def build_structured_snapshot_from_cache(station: str, market_types: set):
+    normalized_station = (station or "").strip().upper()
+    selected_types = {
+        token.strip().upper()
+        for token in (market_types or set())
+        if token and token.strip().upper() in {"HIGH", "LOW"}
+    }
+
+    with _SERIES_LOCK:
+        series_ticker = (_SERIES_BY_STATION.get(normalized_station) or "").strip().upper() or None
+        cached_markets = list((_SERIES_MARKETS_CACHE.get(series_ticker) or {}).get("markets") or []) if series_ticker else []
+
+    rejection_counts = {}
+    filtered_markets = _filter_structured_markets(
+        cached_markets,
+        normalized_station,
+        selected_types,
+        rejection_counts,
+    )
+
+    markets = []
+    for market in filtered_markets:
+        ticker = market.get("ticker") or ""
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        cap = market.get("cap_strike")
+
+        if strike_type == "between" and floor is not None:
+            strike = int(floor)
+        elif strike_type == "less" and cap is not None:
+            strike = int(cap)
+        elif strike_type == "greater" and floor is not None:
+            strike = int(floor)
+        else:
+            strike = _extract_strike_from_ticker(ticker)
+
+        if strike is None:
+            continue
+
+        markets.append(
+            {
+                "ticker": ticker,
+                "strike": strike,
+                "strike_type": strike_type,
+                "floor_strike": floor,
+                "cap_strike": cap,
+                "event_ticker": market.get("event_ticker"),
+                "last_price": market.get("last_price"),
+                "yes_bid": market.get("yes_bid"),
+                "yes_ask": market.get("yes_ask"),
+                "no_bid": market.get("no_bid"),
+                "no_ask": market.get("no_ask"),
+                "status": market.get("status"),
+            }
+        )
+
+    markets.sort(key=lambda x: x["strike"])
+    observed_value = None
+    if get_metar_state:
+        try:
+            observed_value = (
+                get_metar_state().get("last_obs", {})
+                .get(normalized_station, {})
+                .get("temp_f")
+            )
+        except Exception:
+            pass
+    if observed_value is None:
+        try:
+            state_snapshot = immutable_public_state_snapshot()
+            last = state_snapshot["last_obs"].get(normalized_station)
+            if last and "temp_f" in last:
+                observed_value = float(last["temp_f"])
+        except Exception:
+            pass
+
+    if observed_value is not None and len(selected_types) == 1:
+        direction = next(iter(sorted(selected_types)))
+        if direction == "HIGH":
+            higher = [m for m in markets if m["strike"] > observed_value]
+            markets = [min(higher, key=lambda x: x["strike"])] if higher else []
+        elif direction == "LOW":
+            lower = [m for m in markets if m["strike"] < observed_value]
+            markets = [max(lower, key=lambda x: x["strike"])] if lower else []
+
+    return {
+        "station": normalized_station,
+        "series_ticker": series_ticker,
+        "market_types": sorted(selected_types),
+        "markets": markets,
+        "raw_market_count": len(cached_markets),
+        "filtered_market_count": len(filtered_markets),
+        "rejection_counts": dict(rejection_counts),
+        "cache_written": bool(cached_markets),
+        "hydration_source": "cache_only",
         "observed": {"current_temp_f": observed_value},
     }
 
@@ -1187,12 +1294,13 @@ def send_composed_weather_market_alert(
     obs_time_utc=None,
 ):
     normalized_station = (station or "").strip().upper()
-    snapshot = build_structured_snapshot(normalized_station, market_types)
+    snapshot = build_structured_snapshot_from_cache(normalized_station, market_types)
     markets = snapshot.get("markets", [])
     current_temp_f = (snapshot.get("observed") or {}).get("current_temp_f")
     market_types_list = snapshot.get("market_types", [])
 
     if not markets:
+        enqueue_station_hydration(normalized_station, reason="alert_send_cache_missing")
         return {"ok": False, "reason": "no_markets"}
 
     webhook_url = (os.getenv("ALERT_WEBHOOK_URL") or "").strip()

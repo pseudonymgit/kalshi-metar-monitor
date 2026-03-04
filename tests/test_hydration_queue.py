@@ -29,6 +29,11 @@ class HydrationQueueTests(unittest.TestCase):
 
         snapshot = kalshi_monitor.hydration_queue_snapshot()
         self.assertEqual(snapshot["queue"], ["KDEN", "KPHL"])
+        self.assertEqual(snapshot["queue_depth"], 2)
+        self.assertEqual(snapshot["queued_stations"], ["KDEN", "KPHL"])
+        self.assertEqual(snapshot["backoff_until"], {})
+        self.assertEqual(snapshot["backoff_stations"], [])
+        self.assertEqual(snapshot["last_hydration_request_ts"], 0.0)
 
     @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})

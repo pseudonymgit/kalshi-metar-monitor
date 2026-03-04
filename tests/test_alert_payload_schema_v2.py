@@ -9,7 +9,7 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
     @patch("core.kalshi_monitor.requests.post")
     @patch("core.kalshi_monitor.get_last_hydration_execution_snapshot")
     @patch("core.kalshi_monitor._load_current_epoch_context")
-    @patch("core.kalshi_monitor.build_structured_snapshot")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache")
     def test_composed_alert_payload_includes_schema_v2_sections(
         self,
         mock_snapshot,
@@ -88,6 +88,43 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
         self.assertIn("alert_decision", sent_payload)
         self.assertIn("execution_context", sent_payload)
         self.assertEqual(sent_payload["alert_decision"]["decision"], "FIRED")
+
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
+    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", side_effect=AssertionError("send path must not hydrate inline"))
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache", return_value={"markets": [], "observed": {"current_temp_f": 80.0}, "market_types": ["HIGH"]})
+    def test_cache_miss_enqueues_without_inline_hydration(self, _cache_snapshot, _hydrate, mock_enqueue):
+        result = kalshi_monitor.send_composed_weather_market_alert(
+            station="KAUS",
+            market_types={"HIGH"},
+            transition_reason="crossed_up",
+        )
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["reason"], "no_markets")
+        mock_enqueue.assert_called_once_with("KAUS", reason="alert_send_cache_missing")
+
+    @patch("core.kalshi_monitor._SERIES_MARKETS_CACHE", {
+        "KXHIGHDEN": {
+            "markets": [
+                {
+                    "ticker": "KXHIGHDEN-26DEC31-B70",
+                    "strike_type": "between",
+                    "floor_strike": 70,
+                    "cap_strike": 71,
+                    "event_ticker": "KXHIGHDEN-26DEC31",
+                    "status": "active",
+                }
+            ],
+            "hydrated_at_utc": "2026-01-01T12:00:00+00:00",
+            "station_local_day": "2026-01-01",
+        }
+    })
+    @patch("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXHIGHDEN"})
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26DEC31")
+    @patch("core.kalshi_monitor.get_metar_state", return_value={"last_obs": {"KDEN": {"temp_f": 69.7}}})
+    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
+    def test_cache_only_snapshot_reads_observed_temp_from_last_obs(self, *_mocks):
+        snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"HIGH"})
+        self.assertEqual(snapshot["observed"]["current_temp_f"], 69.7)
 
 
 if __name__ == "__main__":
