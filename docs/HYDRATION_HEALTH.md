@@ -46,3 +46,20 @@ Per station, classifier emits one `status`:
 
 This allows dashboards and alert pipelines to consume hydration drift signals
 without additional Kalshi API calls.
+
+
+## Queue Observability
+
+Hydration execution is queue-driven for live poll/alert flows.
+Operational queue state is surfaced in existing observability payloads:
+
+- `/observability/runtime-authority-snapshot`
+  - `hydration_queue.queue_depth`
+  - `hydration_queue.queued_stations`
+  - `hydration_queue.backoff_stations`
+- `/observability/hydration-prerequisite-runtime`
+  - `hydration_queue` snapshot for the same process epoch.
+
+These fields allow operators to distinguish cache-policy usability issues from
+queue transport/backoff pressure without introducing new write-capable surfaces.
+Queue observability is read-only telemetry and not a hydration control plane.

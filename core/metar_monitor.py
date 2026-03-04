@@ -1750,10 +1750,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 _PROXIMITY_RANK,
                 _get_active_stations,
                 _parse_target_market_types,
-                build_structured_snapshot,
+                build_structured_snapshot_from_cache,
                 classify_proximity,
                 enqueue_station_hydration,
-                get_last_hydration_execution_snapshot,
+                get_hydration_prerequisite_state_snapshot,
                 process_ladder_transition,
                 send_composed_weather_market_alert,
             )
@@ -1784,16 +1784,18 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 "unknown_reason": 0,
             }
 
+            hydration_prereq_snapshot = get_hydration_prerequisite_state_snapshot() or {}
+            hydration_state = hydration_prereq_snapshot.get(station) or {}
             if station_is_active:
                 for market_type_token in sorted(target_market_types):
                     evaluated_market_attempts += 1
-                    snapshot = build_structured_snapshot(station, {market_type_token})
+                    snapshot = build_structured_snapshot_from_cache(station, {market_type_token})
                     markets = snapshot.get("markets") or []
-                    hydration_snapshot = get_last_hydration_execution_snapshot().get(station, {})
-                    hydrated_any = hydrated_any or bool(hydration_snapshot.get("cache_written"))
-                    raw_market_count = int(hydration_snapshot.get("raw_market_count") or 0)
-                    filtered_market_count = int(hydration_snapshot.get("filtered_market_count") or 0)
-                    rejection_counts = hydration_snapshot.get("rejection_counts") or {}
+                    hydration_usable = bool(hydration_state.get("cache_valid"))
+                    hydrated_any = hydrated_any or hydration_usable or bool(snapshot.get("cache_written"))
+                    raw_market_count = int(snapshot.get("raw_market_count") or 0)
+                    filtered_market_count = int(snapshot.get("filtered_market_count") or 0)
+                    rejection_counts = snapshot.get("rejection_counts") or {}
 
                     markets_considered_count += raw_market_count
                     eligible_markets_count += len(markets)
@@ -1821,6 +1823,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
                     if not markets:
                         no_eligible_market_count += 1
+                        enqueue_station_hydration(
+                            station,
+                            reason=f"alert_market_eval_{hydration_state.get('status') or 'cache_missing'}",
+                        )
                         if should_alert_on_missing:
                             try:
                                 if _to_local:
@@ -1938,7 +1944,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 "event_ticker": (nearest_market or {}).get("event_ticker"),
                                 "market_type": market_type_token,
                                 "strike": (nearest_market or {}).get("strike"),
-                                "hydrated": bool(hydration_snapshot.get("cache_written")),
+                                "hydrated": hydration_usable,
                             }
                         )
                         market_context_seeded = True
