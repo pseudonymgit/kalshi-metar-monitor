@@ -59,6 +59,7 @@ from core.kalshi_monitor import (
     get_kalshi_connectivity_snapshot,
     get_hydration_prerequisite_state_snapshot,
     get_last_hydration_execution_snapshot,
+    hydration_queue_snapshot,
     kalshi_execution_domain,
     reset_kalshi_execution_domain,
     set_kalshi_execution_domain,
@@ -1785,6 +1786,7 @@ def observability_hydration_prerequisite_runtime():
             "execution_domain": _current_kalshi_execution_domain(),
             "scheduler_running": is_scheduler_running(),
             "hydration_state": hydration_snapshot.get(station) or {},
+            "hydration_queue": hydration_queue_snapshot(),
             "ok": True,
         }
     ), 200
@@ -2389,6 +2391,7 @@ def observability_runtime_authority_snapshot():
     if station:
         alerts = [row for row in alerts if (row.get("station") or "").strip().upper() == station]
     hydration_execution = get_last_hydration_execution_snapshot()
+    hydration_queue = hydration_queue_snapshot()
 
     db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
@@ -2401,6 +2404,7 @@ def observability_runtime_authority_snapshot():
             "hydration_snapshot": hydration_snapshot,
             "kalshi_connectivity": get_kalshi_connectivity_snapshot(),
             "hydration_execution": hydration_execution,
+            "hydration_queue": hydration_queue,
             "latest_transitions": {
                 "count": len(transitions),
                 "bounded_limit": 50,
@@ -2508,15 +2512,13 @@ def metar_simulate_ladder():
     except Exception:
         return jsonify({"error": "temp_f must be numeric"}), 400
 
-    from core.kalshi_monitor import hydrate_station_ladder_snapshot
+    from core.kalshi_monitor import enqueue_station_hydration, process_hydration_queue_worker
 
+    enqueue_station_hydration(icao, reason="simulate_ladder")
     try:
-        hydrate_station_ladder_snapshot(
-            station=icao,
-            market_types={"HIGH", "LOW"}
-        )
+        process_hydration_queue_worker(market_types={"HIGH", "LOW"})
     except Exception as e:
-        log.warning(f"simulation ladder hydration failed station={icao}: {e}")
+        log.warning(f"simulation ladder hydration worker failed station={icao}: {e}")
 
     return jsonify(
         _simulate_temperature_for_testing(

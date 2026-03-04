@@ -53,6 +53,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             "cache_written": True,
         }
     })
+    @patch("app.hydration_queue_snapshot", return_value={"queue": ["KDEN"], "queue_depth": 1, "queued_stations": ["KDEN"], "backoff_until": {"KPHL": 123.0}, "backoff_stations": ["KPHL"], "last_hydration_request_ts": 99.0})
     @patch("app.get_kalshi_connectivity_snapshot", return_value={
         "series_discovery_attempted": True,
         "last_series_discovery_success_utc": "2025-01-01T00:00:00+00:00",
@@ -87,6 +88,8 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["kalshi_connectivity"]["last_series_discovery_error"], "temporary_error")
         self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 7)
         self.assertEqual(payload["hydration_execution"]["KDEN"]["raw_market_count"], 24)
+        self.assertEqual(payload["hydration_queue"]["queue_depth"], 1)
+        self.assertEqual(payload["hydration_queue"]["backoff_stations"], ["KPHL"])
         self.assertEqual(payload["latest_transitions"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["count"], 1)
@@ -100,6 +103,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
     @patch("app.get_recent_alerts", return_value=[])
     @patch("app.get_transition_history", return_value=[])
     @patch("app.get_last_hydration_execution_snapshot", return_value={})
+    @patch("app.hydration_queue_snapshot", return_value={"queue": [], "queue_depth": 0, "queued_stations": [], "backoff_until": {}, "backoff_stations": [], "last_hydration_request_ts": 0.0})
     @patch("app.get_kalshi_connectivity_snapshot", return_value={
         "series_discovery_attempted": False,
         "last_series_discovery_success_utc": None,
@@ -116,6 +120,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["execution_mode"], "observability")
         self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 0)
         self.assertEqual(payload["hydration_execution"], {})
+        self.assertEqual(payload["hydration_queue"]["queue_depth"], 0)
         self.assertIn("system_health", payload)
 
 
