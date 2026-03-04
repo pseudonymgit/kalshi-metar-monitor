@@ -14,7 +14,9 @@ This module MUST NOT
 - Mutate authoritative temperature state.
 """
 
-from typing import Any, Callable, Dict, Optional
+from contextlib import contextmanager
+from contextvars import ContextVar
+from typing import Any, Callable, Dict, Iterator, Optional
 
 from core.settlement_epoch_logger import log_transition_for_settlement_epoch
 from core.security_boundaries import (
@@ -24,6 +26,20 @@ from core.security_boundaries import (
 
 
 detect_illegal_cross_layer_imports(module_name=__name__, module_globals=globals())
+
+
+_TRANSITION_CAPTURE_HOOK: ContextVar[Optional[Callable[..., None]]] = ContextVar(
+    "transition_capture_hook", default=None
+)
+
+
+@contextmanager
+def transition_capture_hook(hook: Callable[..., None]) -> Iterator[None]:
+    token = _TRANSITION_CAPTURE_HOOK.set(hook)
+    try:
+        yield
+    finally:
+        _TRANSITION_CAPTURE_HOOK.reset(token)
 
 
 def emit_transition_if_changed(
@@ -64,6 +80,20 @@ def emit_transition_if_changed(
         current_temp=current_temp,
         metadata=metadata,
     )
+
+    capture_hook = _TRANSITION_CAPTURE_HOOK.get()
+    if capture_hook is not None:
+        capture_hook(
+            station=station,
+            transition_type=transition_type,
+            instant_bucket_before=instant_bucket_before,
+            instant_bucket_after=instant_bucket_after,
+            settlement_bucket=settlement_bucket,
+            running_max=running_max,
+            current_temp=current_temp,
+            metadata=metadata,
+            transition_correlation=transition_correlation,
+        )
 
     transition_event_id = None
     event_timestamp_utc = None
