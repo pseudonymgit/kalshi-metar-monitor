@@ -1752,6 +1752,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 _parse_target_market_types,
                 build_structured_snapshot,
                 classify_proximity,
+                enqueue_station_hydration,
                 get_last_hydration_execution_snapshot,
                 process_ladder_transition,
                 send_composed_weather_market_alert,
@@ -1962,6 +1963,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             )
                             _LAST_PROXIMITY_REGIME[regime_key] = new_regime
                             market_context["proximity_regime"] = new_regime
+                        if new_regime == "CRITICAL":
+                            enqueue_station_hydration(station, reason="proximity_critical")
+
+                    if settlement_bucket_changed:
+                        enqueue_station_hydration(station, reason="settlement_bucket_changed")
 
 
             # Alert eligibility summary: transition -> market evaluation -> suppression
@@ -2371,10 +2377,9 @@ def _poll_once(logger=None):
         stations = _resolve_live_polling_stations(cfg)
 
         from core.kalshi_monitor import (
-            _current_kalshi_execution_domain,
+            enqueue_station_hydration,
             ensure_ladder_hydration_prerequisite,
-            get_hydration_prerequisite_state_snapshot,
-            hydrate_station_ladder_snapshot,
+            process_hydration_queue_worker,
         )
 
         hydration_by_station = {}
@@ -2383,19 +2388,8 @@ def _poll_once(logger=None):
             hydration = ensure_ladder_hydration_prerequisite(icao)
             hydration_by_station[icao] = hydration
 
-            hydration_state = (get_hydration_prerequisite_state_snapshot().get(icao) or {})
-            should_execute_hydration = (
-                _current_kalshi_execution_domain() == "production"
-                and bool(hydration_state.get("attempted"))
-                and not bool(hydration_state.get("cache_valid"))
-                and bool(hydration_state.get("series_discovered"))
-            )
-            if should_execute_hydration:
-                try:
-                    hydrate_station_ladder_snapshot(station=icao, market_types={"HIGH"})
-                except Exception as e:
-                    if logger:
-                        logger.warning(f"poll_hydration_execution_failed station={icao}: {e}")
+            if hydration.get("status") in {"cache_missing", "cache_stale"}:
+                enqueue_station_hydration(icao, reason=str(hydration.get("reason") or hydration.get("status")))
 
             hydration_passed = hydration.get("status") == "cache_valid"
             ingestion_admission[icao] = {
@@ -2409,6 +2403,12 @@ def _poll_once(logger=None):
                 logger.warning(
                     f"market_phase_blocked_reason=ladder_not_hydrated station={icao} hydration_status={hydration.get('status')}"
                 )
+
+        try:
+            process_hydration_queue_worker(market_types={"HIGH"})
+        except Exception as e:
+            if logger:
+                logger.warning(f"poll_hydration_worker_failed: {e}")
 
         chosen = cfg["default_source"] or "nws"
 
