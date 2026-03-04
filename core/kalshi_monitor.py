@@ -1396,13 +1396,63 @@ def send_composed_weather_market_alert(
         f"Next rung: {distance_info}"
     )
 
+    market_open = bool((current_market or {}).get("open", True))
+    market_expired = bool((current_market or {}).get("expired", False))
+    market_range = {
+        "strike_type": (current_market or {}).get("strike_type"),
+        "floor_strike": (current_market or {}).get("floor_strike"),
+        "cap_strike": (current_market or {}).get("cap_strike"),
+        "label": current_label,
+    }
+    hydration_state = {
+        "status": hydration_status,
+        "series_discovered": bool(hydration_snapshot.get("series_ticker")),
+    }
     payload = {
         "content": content,
         "embeds": [],
         "schema_version": ALERT_SCHEMA_VERSION,
+        "alert_schema_version": ALERT_SCHEMA_VERSION,
         "timestamp_utc": timestamp_utc,
         "station": normalized_station,
         "classification": "MARKET_ELIGIBLE",
+        "alert_summary": {
+            "station": normalized_station,
+            "transition_type": transition_type,
+            "settlement_bucket": settlement_bucket,
+            "market_symbol": event_ticker_value,
+            "alert_classification": "MARKET_ELIGIBLE",
+        },
+        "transition_correlation": {
+            "transition_event_id": None,
+            "timestamp_utc": obs_time_utc,
+            "instant_bucket_before": instant_bucket_before,
+            "instant_bucket_after": instant_bucket_after,
+            "settlement_bucket": settlement_bucket,
+            "running_max": running_max,
+        },
+        "market_evaluation": {
+            "market_symbol": event_ticker_value,
+            "market_range": market_range,
+            "market_open": market_open,
+            "market_expired": market_expired,
+            "eligibility_result": "ELIGIBLE",
+        },
+        "suppression_context": {
+            "suppression_reason": "",
+            "settlement_mismatch": False,
+            "expired_market": market_expired,
+            "hydration_blocked": not bool(hydration_snapshot.get("cache_written")),
+            "execution_domain_blocked": _current_kalshi_execution_domain() in _FORBIDDEN_KALSHI_DOMAINS,
+        },
+        "diagnostic_metadata": {
+            "alert_schema_version": ALERT_SCHEMA_VERSION,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "hydration_state": hydration_state,
+            "ladder_cache_age_seconds": ladder_cache_age_seconds,
+            "evaluation_timestamp": timestamp_utc,
+        },
+        "alert_classification": "MARKET_ELIGIBLE",
         "summary": {
             "headline": summary,
             "transition": transition_type,
@@ -1440,8 +1490,7 @@ def send_composed_weather_market_alert(
         "execution_context": {
             "execution_domain": _current_kalshi_execution_domain(),
             "hydration_state": {
-                "status": hydration_status,
-                "series_discovered": bool(hydration_snapshot.get("series_ticker")),
+                **hydration_state,
                 "ladder_cache_age_seconds": ladder_cache_age_seconds,
             },
             "scheduler_poll_count": None,

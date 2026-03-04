@@ -76,10 +76,14 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
 
         self.assertTrue(result["ok"])
         sent_payload = mock_post.call_args.kwargs["json"]
-        self.assertEqual(sent_payload["alert_schema_version"], 2)
+        self.assertEqual(int(sent_payload["alert_schema_version"]), 2)
         self.assertEqual(sent_payload["alert_classification"], "MARKET_ELIGIBLE")
+        self.assertIn("alert_summary", sent_payload)
+        self.assertIn("transition_correlation", sent_payload)
+        self.assertIn("suppression_context", sent_payload)
+        self.assertIn("diagnostic_metadata", sent_payload)
         self.assertIn("summary", sent_payload)
-        self.assertIn("structural_event", sent_payload)
+        self.assertIn("transition_context", sent_payload)
         self.assertIn("market_evaluation", sent_payload)
         self.assertIn("alert_decision", sent_payload)
         self.assertIn("execution_context", sent_payload)
