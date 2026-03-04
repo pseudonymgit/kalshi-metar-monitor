@@ -979,6 +979,12 @@ def compute_system_health_snapshot(
         for row in transition_rows
         if str(row.get("alert_classification") or "").strip().upper() == "MARKET_SUPPRESSED"
     )
+    evaluation_suppression_breakdown = {}
+    for row in transition_rows:
+        if str(row.get("alert_classification") or "").strip().upper() != "MARKET_SUPPRESSED":
+            continue
+        suppression_reason = (row.get("suppression_reason") or "").strip().lower() or "unknown_reason"
+        evaluation_suppression_breakdown[suppression_reason] = evaluation_suppression_breakdown.get(suppression_reason, 0) + 1
 
     alert_rows = alerts if isinstance(alerts, list) else get_recent_alerts(50)
     normalized_station = (station or "").strip().upper()
@@ -1019,6 +1025,7 @@ def compute_system_health_snapshot(
         "evaluation": {
             "status": evaluation_status,
             "reason": evaluation_reason,
+            "suppression_breakdown": evaluation_suppression_breakdown,
             "last_updated_utc": (
                 _max_iso_timestamp(row.get("timestamp_utc") for row in transition_rows)
                 or _max_iso_timestamp((row.get("sent_utc") or row.get("timestamp") or row.get("created_utc")) for row in alert_rows)
