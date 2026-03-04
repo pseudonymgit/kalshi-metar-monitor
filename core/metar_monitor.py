@@ -1,3 +1,21 @@
+"""
+METAR Monitor
+
+This module owns ingestion of METAR observations and deterministic generation
+of station temperature transitions used by downstream market evaluation.
+
+Responsibilities
+- Poll METAR providers and normalize accepted observations.
+- Maintain authoritative station-local temperature state.
+- Detect instant/settlement ladder transitions.
+- Route transition emissions through transition_emitter.
+
+This module MUST NOT
+- Bypass transition_emitter for transition persistence.
+- Let observability paths influence runtime execution state.
+- Perform non-deterministic replay behavior.
+"""
+
 # core/metar_monitor.py
 
 import os
@@ -64,6 +82,8 @@ _MISSING_LADDER_DEDUPE = {}
 _MISSING_LADDER_LOCK = threading.Lock()
 _KALSHI_RATE_LIMIT_LOCK = threading.Lock()
 _KALSHI_LAST_CALL_TS = {}
+# Rate-limit invariant: this window throttles repeated market evaluation
+# calls; transition events may still be persisted even when evaluation skips.
 _KALSHI_CALL_THROTTLE_SECONDS = 5
 _ALERT_LOGGER = logging.getLogger(__name__)
 _TRANSITION_HISTORY = deque(maxlen=500)
@@ -760,6 +780,8 @@ def _process_temperature_event(
     ):
         transition_type = "reversion_after_settlement"
 
+    # Causal flow: observation -> bucket transition detection -> authoritative
+    # transition emission (persisted before any alert/evaluation side effects).
     transition_correlation = emit_transition_if_changed(
         transition_type=transition_type,
         instant_changed=instant_changed,
@@ -821,6 +843,8 @@ def _process_temperature_event(
             last_observed_integer,
             curr_floor,
         )
+        # Alert eligibility boundary: delivery is attempted only when deterministic
+        # integer-cross criteria were met and delivery is explicitly enabled.
         if allow_alert_delivery:
             d = round(now_f - prev_f, 1)
             _emit_alert(
@@ -894,6 +918,8 @@ def _reset_replay_runtime_state_for_station(
     clear_latest_observation(station)
 
 
+# Replay mode reconstructs deterministic station state from historical
+# observations and must not perform live alert delivery side effects.
 def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
     """
     Deterministic replay executor for one station-local date.
@@ -970,6 +996,8 @@ def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
                 _obs_tuple(temp_f, obs_time, raw, row[3] or "replay")
             )
 
+        # Replay causal flow: ordered historical observations -> deterministic
+        # transition/state reconstruction through the same ingestion semantics.
         result = execute_ordered_replay_stream(
             station=station,
             ordered_observations=replay_observations,
@@ -1609,12 +1637,16 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
         instant_bucket_changed = bool(payload.get("instant_bucket_changed"))
         settlement_bucket_changed = bool(payload.get("settlement_bucket_changed"))
+        # Alert gating: market evaluation only proceeds when a deterministic
+        # transition is present; non-transition observations produce no alerts.
         if not instant_bucket_changed and not settlement_bucket_changed:
             return
 
         now_ts = time.time()
         with _KALSHI_RATE_LIMIT_LOCK:
             last_call_ts = _KALSHI_LAST_CALL_TS.get(station)
+            # Throttle causal implication: suppress duplicate near-term Kalshi checks
+            # while leaving previously recorded transition history intact.
             if last_call_ts is not None and (now_ts - last_call_ts) < _KALSHI_CALL_THROTTLE_SECONDS:
                 return
             _KALSHI_LAST_CALL_TS[station] = now_ts
@@ -1823,6 +1855,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             _LAST_PROXIMITY_REGIME[regime_key] = new_regime
 
 
+            # Alert eligibility summary: transition -> market evaluation -> suppression
+            # or alert outcome is recorded for deterministic post-run introspection.
             if evaluated_market_attempts > 0:
                 if market_alerts_sent > 0:
                     evaluation_outcome = "ALERT_SENT"
@@ -2160,6 +2194,8 @@ def _resolve_live_polling_stations(cfg: Dict[str, Any]) -> List[str]:
 # =========================
 # Scheduler
 # =========================
+# Scheduler causal flow per loop: hydrate market prerequisites, fetch
+# observations, ingest deterministically, then update immutable metrics.
 def _poll_once(logger=None):
     from core.kalshi_monitor import kalshi_execution_domain
 

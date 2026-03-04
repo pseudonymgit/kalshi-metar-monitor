@@ -1,3 +1,20 @@
+"""
+Kalshi Monitor
+
+This module owns market discovery, ladder hydration, and deterministic market
+transition interpretation for the METAR runtime.
+
+Responsibilities
+- Discover and cache Kalshi market ladders per station/day.
+- Build structured snapshots for market eligibility evaluation.
+- Convert ladder transitions into alert-ready context for the alert layer.
+
+This module MUST NOT
+- Ingest raw METAR observations directly.
+- Emit transition events (owned by transition_emitter).
+- Mutate observability state.
+"""
+
 import base64
 import copy
 import contextvars
@@ -63,6 +80,8 @@ _STATION_CITY_TOKEN_MAP = {
 }
 
 _KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", default="production")
+# Replay/diagnostics safety: these domains are hard-blocked from live
+# Kalshi calls to preserve deterministic replay and read-only tooling.
 _FORBIDDEN_KALSHI_DOMAINS = frozenset({"observability", "diagnostics", "audit", "replay"})
 _KALSHI_PUBLIC_SESSION = requests.Session()
 _KALSHI_PUBLIC_SESSION.trust_env = False
@@ -262,6 +281,8 @@ def get_metrics():
     }
 
 
+# Architectural boundary: this is the only public API call path and it
+# enforces execution-domain guards before any network side effect occurs.
 def _kalshi_public_get(path):
     execution_domain = _current_kalshi_execution_domain()
     if execution_domain in _FORBIDDEN_KALSHI_DOMAINS:
@@ -656,6 +677,8 @@ def get_last_hydration_execution_snapshot() -> dict:
         return copy.deepcopy(_LAST_HYDRATION_EXECUTION)
 
 
+# Replay safety rule: hydration is production-only because it performs
+# live market reads; replay must use persisted deterministic history.
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
     if _current_kalshi_execution_domain() != "production":
         raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
@@ -944,6 +967,8 @@ def _determine_bucket(temp_f, ladder, market_type):
     return (None, False)
 
 
+# Alert eligibility gate: ladder state transition determines whether a
+# market is eligible for alerting (entry/bucket/final) or suppressed.
 def process_ladder_transition(station, market_type, snapshot, current_temp):
     markets = (snapshot or {}).get("markets") or []
     if not markets:

@@ -1,3 +1,19 @@
+"""
+Transition Emitter
+
+This module is the sole routing authority for transition emission events.
+
+Responsibilities
+- Enforce transition emission authority boundaries.
+- Route validated transition changes to the persistence callback.
+- Propagate transition identity into settlement epoch logging.
+
+This module MUST NOT
+- Evaluate market eligibility.
+- Deliver alerts.
+- Mutate authoritative temperature state.
+"""
+
 from typing import Any, Callable, Dict, Optional
 
 from core.settlement_epoch_logger import log_transition_for_settlement_epoch
@@ -28,6 +44,8 @@ def emit_transition_if_changed(
     Single authority for transition emission routing.
     No state mutation is allowed in this layer.
     """
+    # Architectural boundary: every transition event must pass this guard so
+    # emission remains deterministic and centralized in one authority.
     enforce_transition_emission_authority()
 
     if not transition_type:
@@ -35,6 +53,7 @@ def emit_transition_if_changed(
     if not (instant_changed or settlement_changed):
         return None
 
+    # Causal flow: observation-derived transition -> persisted transition event.
     transition_correlation = emit_fn(
         station=station,
         transition_type=transition_type,
@@ -56,6 +75,7 @@ def emit_transition_if_changed(
         if raw_timestamp is not None:
             event_timestamp_utc = str(raw_timestamp)
 
+    # Causal flow continuation: emitted transition -> settlement epoch tracker.
     log_transition_for_settlement_epoch(
         station=station,
         transition_type=transition_type,
