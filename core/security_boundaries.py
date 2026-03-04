@@ -2,6 +2,21 @@ import inspect
 from types import MappingProxyType, ModuleType
 from typing import Any, Dict, Mapping
 
+# Determinism enforcement layer: this module codifies architectural law, not business logic.
+# Responsibilities:
+# - enforce which modules are allowed to mutate authoritative runtime state
+# - enforce which module is allowed to emit transitions into the persisted history
+# - enforce strict execution-vs-replay domain flags so side effects cannot leak into replay
+# - enforce observability as read-only data exposure
+# - enforce forbidden import edges to preserve layered ownership boundaries
+# Enforcement role:
+# - fail closed via SecurityBoundaryViolation whenever execution crosses a forbidden boundary
+# - preserve replay equivalence by preventing mixed execution modes and hidden write paths
+# This module MUST NOT allow:
+# - cross-layer imports that let lower-trust layers reach orchestration or scoring internals
+# - unauthorized transition emission or authoritative state mutation from arbitrary modules
+# - mutable objects crossing into observability snapshots
+
 
 class SecurityBoundaryViolation(RuntimeError):
     """Raised when deterministic authority boundaries are violated."""
@@ -35,6 +50,8 @@ def _caller_module_name(frame_offset: int = 1) -> str:
 
 
 def enforce_authoritative_state_mutation_boundary(operation: str) -> None:
+    # State mutation authority is intentionally centralized so every persisted mutation follows
+    # the same observation -> transition -> persistence doctrine, rather than ad-hoc writes.
     caller_module = _caller_module_name(frame_offset=3)
     if caller_module not in _STATE_MUTATION_AUTHORIZED_CALLERS:
         raise SecurityBoundaryViolation(
@@ -43,6 +60,8 @@ def enforce_authoritative_state_mutation_boundary(operation: str) -> None:
 
 
 def enforce_transition_emission_authority() -> None:
+    # Transition records are the replay source of truth. Only the orchestrator may append them,
+    # otherwise replay integrity is broken by out-of-band event creation.
     caller_module = _caller_module_name(frame_offset=3)
     if caller_module not in _TRANSITION_EMIT_AUTHORIZED_CALLERS:
         raise SecurityBoundaryViolation(
@@ -51,6 +70,8 @@ def enforce_transition_emission_authority() -> None:
 
 
 def enforce_execution_domain_guard(*, allow_alert_delivery: bool, persist_cache: bool) -> str:
+    # Runtime domain is binary: execution (side effects allowed) or replay (side effects denied).
+    # Mixed flags would make a run neither fully replay-safe nor fully production-authoritative.
     if allow_alert_delivery and persist_cache:
         return "execution"
     if not allow_alert_delivery and not persist_cache:
@@ -61,6 +82,8 @@ def enforce_execution_domain_guard(*, allow_alert_delivery: bool, persist_cache:
 
 
 def enforce_replay_domain_isolation(*, allow_alert_delivery: bool, persist_cache: bool) -> None:
+    # Replay must remain observationally pure: it can evaluate historical behavior but cannot
+    # emit alerts or mutate live caches, preserving deterministic re-execution semantics.
     if allow_alert_delivery:
         raise SecurityBoundaryViolation("replay domain cannot enable alert delivery")
     if persist_cache:
@@ -68,6 +91,8 @@ def enforce_replay_domain_isolation(*, allow_alert_delivery: bool, persist_cache
 
 
 def verify_observability_read_only(snapshot: Mapping[str, Any]) -> None:
+    # Observability is a terminal read path in the architecture; this guard ensures snapshots
+    # cannot become backchannels for state mutation across layer boundaries.
     if not isinstance(snapshot, Mapping):
         raise SecurityBoundaryViolation("public state snapshot must be a mapping")
 
@@ -84,6 +109,10 @@ def verify_observability_read_only(snapshot: Mapping[str, Any]) -> None:
 
 
 def detect_illegal_cross_layer_imports(*, module_name: str, module_globals: Dict[str, Any]) -> None:
+    # Import graph enforcement prevents high-authority orchestration/evaluation modules from
+    # becoming ambient dependencies of read-only or transition-only layers.
+    # This preserves ownership boundaries across: observation -> transition -> persistence ->
+    # evaluation -> alert, with each stage only depending on allowed predecessors.
     forbidden = _FORBIDDEN_IMPORTS_BY_MODULE.get(module_name)
     if not forbidden:
         return
