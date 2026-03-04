@@ -1155,10 +1155,11 @@ def _log_transition_event(
                     "instant_bucket_after": instant_bucket_after,
                     "settlement_bucket": settlement_bucket,
                     "running_max": running_max,
-                        "current_temp": current_temp,
-                        "timestamp_utc": now_iso,
-                        "transition_event_id": transition_event_id,
-                    }
+                    "current_temp": current_temp,
+                    "timestamp_utc": now_iso,
+                    "transition_event_id": transition_event_id,
+                    "metadata": copy.deepcopy(event_metadata),
+                }
                 )
         return {
             "station": (station or "").upper(),
@@ -1294,18 +1295,35 @@ def _annotate_transition_history_market_eval(
         )
 
 
-def get_transition_history(station=None, limit=50):
+def get_transition_history(station=None, day: Optional[str] = None, limit=50):
     normalized_station = (station or "").strip().upper()
+    normalized_day = (day or "").strip()
     try:
         bounded_limit = max(1, min(int(limit), 200))
     except Exception:
         bounded_limit = 50
+
+    if normalized_day:
+        datetime.strptime(normalized_day, "%Y-%m-%d")
 
     with _TRANSITION_LOCK:
         history = list(_TRANSITION_HISTORY)
 
     if normalized_station:
         history = [entry for entry in history if entry.get("station") == normalized_station]
+
+    if normalized_day:
+        filtered_history = []
+        for entry in history:
+            obs_time = (entry.get("metadata") or {}).get("obs_time")
+            if not obs_time:
+                continue
+            try:
+                if station_local_day_key(entry.get("station") or normalized_station, obs_time) == normalized_day:
+                    filtered_history.append(entry)
+            except Exception:
+                continue
+        history = filtered_history
 
     history = list(reversed(history))
     return history[:bounded_limit]

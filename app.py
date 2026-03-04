@@ -71,6 +71,7 @@ from core.alert_integrity_monitor import build_alert_integrity_findings
 from core.ladder_cache_observability import build_ladder_cache_snapshot
 from core.hydration_health_classifier import classify_hydration_health
 from core.station_time import station_local_day_key, to_station_local
+from core.replay_parity_validator import validate_replay_parity
 
 app = Flask(__name__)
 log = app.logger
@@ -2603,6 +2604,25 @@ def debug_replay():
 def debug_state():
     from core.metar_monitor import get_state
     return jsonify(get_state()), 200
+
+
+@app.route("/integrity/replay_parity", methods=["GET"])
+def integrity_replay_parity():
+    station = (request.args.get("station") or "").strip().upper()
+    day = (request.args.get("day") or "").strip()
+
+    if not station:
+        return jsonify({"error": "Missing query parameter: station"}), 400
+    if not day:
+        return jsonify({"error": "Missing query parameter: day"}), 400
+
+    try:
+        result = validate_replay_parity(station=station, trading_day=day)
+        return jsonify({"ok": True, "result": result}), 200
+    except ValueError:
+        return jsonify({"error": "day must be YYYY-MM-DD"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Render entry
 if __name__ == "__main__":
