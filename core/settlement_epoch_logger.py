@@ -1,3 +1,20 @@
+"""
+Settlement Epoch Logger
+
+This module translates emitted transition events into per-station settlement
+epoch records for deterministic post-hoc analysis.
+
+Responsibilities
+- Maintain settlement epoch open/close lifecycle in storage.
+- Track reversion and duration metrics from emitted transitions.
+- Preserve deterministic causal history keyed by station-local trading day.
+
+This module MUST NOT
+- Ingest METAR observations directly.
+- Perform Kalshi market evaluation.
+- Trigger alert delivery side effects.
+"""
+
 import os
 import sqlite3
 from typing import Any, Dict, Optional, Tuple
@@ -75,6 +92,8 @@ def _maybe_add_duration(
     return at_or_above_seconds, strictly_above_seconds
 
 
+# Architectural boundary: settlement epochs are derived strictly from
+# emitted transitions, never from raw observation ingestion.
 def log_transition_for_settlement_epoch(
     *,
     station: str,
