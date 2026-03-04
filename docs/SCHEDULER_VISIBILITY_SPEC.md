@@ -3,7 +3,7 @@
 ## Purpose and Scope
 
 This specification defines deterministic **operator visibility design** for scheduler health in production.
-It resolves the scheduler interpretation gap identified in `docs/VISIBILITY_SURFACE_MAP.md` Silent Zone #4.
+It resolves the scheduler interpretation gap identified in `docs/archive/planning/VISIBILITY_SURFACE_MAP.md` Silent Zone #4.
 
 This document is design-only and explicitly non-causal:
 
