@@ -30,6 +30,7 @@ from flask import has_request_context, request
 
 from core.authoritative_state import immutable_public_state_snapshot
 from core.station_time import parse_iso_utc, station_local_day_key, to_station_local
+from core.alert_schema import ALERT_SCHEMA_VERSION
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -85,7 +86,6 @@ _KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", def
 _FORBIDDEN_KALSHI_DOMAINS = frozenset({"observability", "diagnostics", "audit", "replay"})
 _KALSHI_PUBLIC_SESSION = requests.Session()
 _KALSHI_PUBLIC_SESSION.trust_env = False
-
 
 class kalshi_execution_domain:
     def __init__(self, domain: str):
@@ -1399,28 +1399,57 @@ def send_composed_weather_market_alert(
     payload = {
         "content": content,
         "embeds": [],
+        "schema_version": ALERT_SCHEMA_VERSION,
+        "timestamp_utc": timestamp_utc,
+        "station": normalized_station,
+        "classification": "MARKET_ELIGIBLE",
+        "summary": {
+            "headline": summary,
+            "transition": transition_type,
+            "temp_f": temperature_f,
+            "instant_bucket": instant_bucket_after,
+            "settlement_bucket": settlement_bucket,
+        },
+        "transition_context": {
+            "transition_type": transition_type,
+            "instant_before": instant_bucket_before,
+            "instant_after": instant_bucket_after,
+            "settlement_bucket": settlement_bucket,
+            "running_max": running_max,
+            "obs_time": obs_time_utc,
+        },
+        "market_context": {
+            "series_ticker": (sorted_markets[0] if sorted_markets else {}).get("series_ticker"),
+            "event_ticker": event_ticker_value,
+            "market_type": market_type,
+            "strike": (current_market or {}).get("strike"),
+            "proximity_regime": classify_proximity(abs(float((current_market or {}).get("strike") or 0) - float(temperature_f))) if temperature_f is not None and (current_market or {}).get("strike") is not None else None,
+            "hydrated": bool(hydration_snapshot.get("cache_written")),
+        },
+        "eligibility_evaluation": {
+            "markets_considered": markets_considered_count,
+            "eligible_markets": eligible_markets_count,
+            "rejected_markets": rejected_markets_count,
+            "rejection_breakdown": rejection_breakdown,
+        },
+        "suppression": {
+            "suppressed": False,
+            "reason": "",
+            "reason_category": "NO_TRANSITION",
+        },
+        "execution_context": {
+            "execution_domain": _current_kalshi_execution_domain(),
+            "hydration_state": {
+                "status": hydration_status,
+                "series_discovered": bool(hydration_snapshot.get("series_ticker")),
+                "ladder_cache_age_seconds": ladder_cache_age_seconds,
+            },
+            "scheduler_poll_count": None,
+            "station_local_timestamp": station_local_timestamp or (local_dt.isoformat() if local_dt else None),
+        },
         "alert_context": {
             "attention_phrase": attention_phrase,
             **epoch_context,
-        },
-        "alert_schema_version": 2,
-        "alert_classification": "MARKET_ELIGIBLE",
-        "summary": summary,
-        "structural_event": {
-            "station": normalized_station,
-            "transition_type": transition_type,
-            "instant_bucket_before": instant_bucket_before,
-            "instant_bucket_after": instant_bucket_after,
-            "settlement_bucket": settlement_bucket,
-            "running_max": running_max,
-            "timestamp_utc": timestamp_utc,
-            "temperature_f": temperature_f,
-        },
-        "market_evaluation": {
-            "markets_considered_count": markets_considered_count,
-            "eligible_markets_count": eligible_markets_count,
-            "rejected_markets_count": rejected_markets_count,
-            "rejection_breakdown": rejection_breakdown,
         },
         "alert_decision": {
             "decision": decision,
@@ -1429,13 +1458,6 @@ def send_composed_weather_market_alert(
             "bucket_index": current_index,
             "direction": direction,
             "event_ticker": event_ticker_value,
-        },
-        "execution_context": {
-            "hydration_status": hydration_status,
-            "series_discovered": bool(hydration_snapshot.get("series_ticker")),
-            "ladder_cache_age_seconds": ladder_cache_age_seconds,
-            "execution_domain": _current_kalshi_execution_domain(),
-            "station_local_timestamp": station_local_timestamp or (local_dt.isoformat() if local_dt else None),
         },
     }
 
