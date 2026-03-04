@@ -67,6 +67,7 @@ from core.observability import (
     get_current_day_structure_summaries,
     get_current_settlement_epoch_summaries,
 )
+from core.alert_integrity_monitor import build_alert_integrity_findings
 from core.station_time import station_local_day_key, to_station_local
 
 app = Flask(__name__)
@@ -2408,6 +2409,28 @@ def observability_runtime_authority_snapshot():
             ),
         }
     ), 200
+
+
+@app.route("/integrity/alert_pipeline", methods=["GET"])
+def integrity_alert_pipeline():
+    station = (request.args.get("station") or "").strip().upper() or None
+    station_universe = _canonical_live_station_universe(station_filter=station)
+    transitions = get_transition_history(station=station, limit=200)
+    latest_evaluations = get_latest_station_market_evaluation_context(station=station)
+    hydration_snapshot = _build_runtime_authority_hydration_snapshot(stations=station_universe.get("stations") or [])
+    recent_alerts = get_recent_alerts(200)
+    if station:
+        recent_alerts = [row for row in recent_alerts if (row.get("station") or "").strip().upper() == station]
+
+    payload = build_alert_integrity_findings(
+        station_universe=station_universe,
+        transitions=transitions,
+        latest_evaluations=latest_evaluations,
+        hydration_snapshot=hydration_snapshot,
+        recent_alerts=recent_alerts,
+    )
+
+    return jsonify({"ok": True, "station": station, **payload}), 200
 
 
 @app.route("/metar/status", methods=["GET"])
