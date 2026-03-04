@@ -8,6 +8,20 @@ from core.security_boundaries import (
     verify_observability_read_only,
 )
 
+# Determinism enforcement layer: authoritative state owner.
+# Responsibilities:
+# - provide the single writable in-memory state authority for monitor execution
+# - expose controlled mutation entry points guarded by caller-authorization checks
+# - expose immutable snapshots for downstream observability and evaluation consumers
+# Enforcement role:
+# - enforce state ownership boundaries so writes only occur in approved orchestration paths
+# - enforce lock-scoped mutation so state transitions remain atomic and replay-consistent
+# - prevent read interfaces from exposing mutable references that could bypass authority checks
+# This module MUST NOT allow:
+# - direct external mutation of _STATE outside sanctioned mutation functions
+# - mutable snapshot leakage into observability or scoring layers
+# - write operations that bypass lock discipline or mutation-boundary enforcement
+
 _STATE_LOCK = threading.Lock()
 
 # Authoritative runtime state owner for METAR monitor domains.
@@ -33,10 +47,14 @@ _STATE: Dict[str, Any] = {
 
 
 def state_lock() -> threading.Lock:
+    # Exposed for orchestrated critical sections where multiple authoritative updates must be
+    # performed atomically under one lock without granting raw, unguarded write authority.
     return _STATE_LOCK
 
 
 def state_ref() -> Dict[str, Any]:
+    # Internal authority reference for orchestrator-owned flows only; callers still rely on
+    # mutation-boundary guards to preserve ownership and replay integrity.
     return _STATE
 
 
@@ -51,6 +69,8 @@ def read_temperature_state(icao: str) -> Dict[str, Optional[float]]:
 
 
 def set_latest_observation(icao: str, obs: Dict[str, Any], obs_time: str) -> None:
+    # Observation ingestion can update state only via authorized orchestrators so the pipeline
+    # remains observation -> transition -> persistence, never observation -> direct side effects.
     enforce_authoritative_state_mutation_boundary("set_latest_observation")
     with _STATE_LOCK:
         _STATE["last_obs"][icao] = obs
@@ -64,6 +84,8 @@ def commit_temperature_state(
     settlement_bucket: int,
     instant_bucket: int,
 ) -> None:
+    # Temperature projection commit is the persistence boundary for computed state. Guarding this
+    # write prevents downstream evaluation or observability code from self-authoring history.
     enforce_authoritative_state_mutation_boundary("commit_temperature_state")
     with _STATE_LOCK:
         _STATE["last_observed_integer"][icao] = curr_floor
@@ -73,6 +95,8 @@ def commit_temperature_state(
 
 
 def reset_station_daily_state(icao: str, local_day: str) -> None:
+    # Daily reset rewrites multiple ownership fields; lock + authority guard ensure reset happens
+    # as a single authoritative transition rather than piecemeal cross-layer mutations.
     enforce_authoritative_state_mutation_boundary("reset_station_daily_state")
     with _STATE_LOCK:
         _STATE["last_observed_integer"].pop(icao, None)
@@ -83,6 +107,8 @@ def reset_station_daily_state(icao: str, local_day: str) -> None:
 
 
 def clear_latest_observation(icao: str) -> None:
+    # Clearing stale observation pointers is a persistence operation and must respect the same
+    # authority boundary as transition-producing writes.
     enforce_authoritative_state_mutation_boundary("clear_latest_observation")
     with _STATE_LOCK:
         _STATE["last_seen_iso"].pop(icao, None)
@@ -90,6 +116,8 @@ def clear_latest_observation(icao: str) -> None:
 
 
 def immutable_public_state_snapshot() -> Dict[str, Any]:
+    # Snapshot is the sanctioned cross-layer read interface: deep-copied and proxy-wrapped so
+    # evaluators/observers can inspect authoritative state without becoming state owners.
     with _STATE_LOCK:
         snapshot = {
             "stations": tuple(_STATE["stations"]),
@@ -107,5 +135,6 @@ def immutable_public_state_snapshot() -> Dict[str, Any]:
             "ingestion_admission": MappingProxyType(copy.deepcopy(_STATE["ingestion_admission"])),
             "ingestion_runtime": MappingProxyType(copy.deepcopy(_STATE["ingestion_runtime"])),
         }
+    # Defense in depth: validate the exported snapshot still satisfies read-only contract.
     verify_observability_read_only(snapshot)
     return snapshot
