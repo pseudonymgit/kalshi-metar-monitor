@@ -92,6 +92,8 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["latest_alerts"]["count"], 1)
         self.assertEqual(payload["db"]["path"], "/var/data/alerts.db")
         self.assertTrue(payload["db"]["exists"])
+        self.assertIn("system_health", payload)
+        self.assertEqual(payload["system_health"]["ingestion"]["status"], "OK")
 
     @patch("app._kalshi_public_get", side_effect=AssertionError("observability endpoint must remain read-only"))
     @patch("app.os.path.exists", return_value=False)
@@ -114,6 +116,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["execution_mode"], "observability")
         self.assertEqual(payload["kalshi_connectivity"]["markets_cache_population_count"], 0)
         self.assertEqual(payload["hydration_execution"], {})
+        self.assertIn("system_health", payload)
 
 
 if __name__ == "__main__":

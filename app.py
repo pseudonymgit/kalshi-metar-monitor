@@ -881,6 +881,139 @@ def _build_runtime_authority_hydration_snapshot(*, stations):
     }
 
 
+def _max_iso_timestamp(values):
+    candidates = [str(value) for value in values if value]
+    return max(candidates) if candidates else None
+
+
+def compute_system_health_snapshot(
+    *,
+    station=None,
+    ingestion_snapshot=None,
+    hydration_snapshot=None,
+    hydration_execution_snapshot=None,
+    transitions=None,
+    alerts=None,
+):
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    ingestion_payload = ingestion_snapshot if isinstance(ingestion_snapshot, dict) else _build_ingestion_health_rows(station_filter=station)
+    scheduler_running = bool(ingestion_payload.get("scheduler_running"))
+    freshness_threshold_seconds = int(
+        os.getenv("INGESTION_FRESHNESS_HEALTH_THRESHOLD_SECONDS", ingestion_payload.get("stale_after_seconds") or 180)
+    )
+    max_freshness_lag_seconds = max(
+        [
+            int(row.get("freshness_lag_seconds"))
+            for row in (ingestion_payload.get("stations") or [])
+            if row.get("freshness_lag_seconds") is not None
+        ]
+        or [0]
+    )
+    if not scheduler_running:
+        ingestion_status = "BLOCKED"
+        ingestion_reason = "scheduler_not_running"
+    elif max_freshness_lag_seconds > freshness_threshold_seconds:
+        ingestion_status = "DEGRADED"
+        ingestion_reason = "stale_observations"
+    else:
+        ingestion_status = "OK"
+        ingestion_reason = "observations_current"
+
+    hydration_view = hydration_snapshot if isinstance(hydration_snapshot, dict) else _build_runtime_authority_hydration_snapshot(
+        stations=[row.get("station") for row in (ingestion_payload.get("stations") or []) if row.get("station")]
+    )
+    hydration_execution = (
+        hydration_execution_snapshot
+        if isinstance(hydration_execution_snapshot, dict)
+        else get_last_hydration_execution_snapshot()
+    )
+    hydration_station_keys = set((hydration_view.get("stations") or {}).keys()) | set(hydration_execution.keys())
+    if station:
+        hydration_station_keys = {(station or "").strip().upper()}
+    hydration_station_rows = [hydration_execution.get(code) or {} for code in hydration_station_keys]
+
+    any_cache_not_written = any(bool(row) and not bool(row.get("cache_written")) for row in hydration_station_rows)
+    ladder_cache_stale_threshold_seconds = int(os.getenv("HYDRATION_LADDER_CACHE_STALE_THRESHOLD_SECONDS", "1800"))
+    ladder_cache_ages = []
+    for row in hydration_station_rows:
+        evaluated_at_utc = row.get("evaluated_at_utc")
+        if not evaluated_at_utc:
+            continue
+        cache_age = _safe_lag_seconds(now_utc=datetime.now(timezone.utc), iso_timestamp=evaluated_at_utc)
+        if cache_age is not None:
+            ladder_cache_ages.append(cache_age)
+    max_ladder_cache_age_seconds = max(ladder_cache_ages or [0])
+
+    if any_cache_not_written:
+        hydration_status = "BLOCKED"
+        hydration_reason = "hydration_cache_not_written"
+    elif max_ladder_cache_age_seconds > ladder_cache_stale_threshold_seconds:
+        hydration_status = "DEGRADED"
+        hydration_reason = "ladder_cache_stale"
+    else:
+        hydration_status = "OK"
+        hydration_reason = "hydration_ready"
+
+    transition_rows = transitions if isinstance(transitions, list) else get_transition_history(station=station, limit=50)
+    latest_evaluation = get_latest_station_market_evaluation_context(station=station)
+    market_evaluated = any(bool(row.get("latest_market_evaluated")) for row in latest_evaluation.values())
+
+    suppressed_transition_threshold = int(os.getenv("EVALUATION_SUPPRESSED_REPEAT_THRESHOLD", "3"))
+    suppressed_transition_count = sum(
+        1
+        for row in transition_rows
+        if str(row.get("alert_classification") or "").strip().upper() == "MARKET_SUPPRESSED"
+    )
+
+    alert_rows = alerts if isinstance(alerts, list) else get_recent_alerts(50)
+    normalized_station = (station or "").strip().upper()
+    if normalized_station:
+        alert_rows = [row for row in alert_rows if (row.get("station") or "").strip().upper() == normalized_station]
+    alerts_recent_window_seconds = int(os.getenv("EVALUATION_ALERTS_RECENT_WINDOW_SECONDS", "3600"))
+    recent_alert_count = 0
+    for row in alert_rows:
+        alert_timestamp = row.get("sent_utc") or row.get("timestamp") or row.get("created_utc")
+        alert_age = _safe_lag_seconds(now_utc=datetime.now(timezone.utc), iso_timestamp=alert_timestamp)
+        if alert_age is not None and alert_age <= alerts_recent_window_seconds:
+            recent_alert_count += 1
+
+    if transition_rows and not market_evaluated:
+        evaluation_status = "BLOCKED"
+        evaluation_reason = "evaluation_not_executed"
+    elif suppressed_transition_count >= suppressed_transition_threshold:
+        evaluation_status = "OK"
+        evaluation_reason = "market_conditions_not_met"
+    elif recent_alert_count > 0:
+        evaluation_status = "OK"
+        evaluation_reason = "alerts_active"
+    else:
+        evaluation_status = "OK"
+        evaluation_reason = "market_conditions_not_met"
+
+    return {
+        "ingestion": {
+            "status": ingestion_status,
+            "reason": ingestion_reason,
+            "last_updated_utc": ingestion_payload.get("last_poll_utc") or now_iso,
+        },
+        "hydration": {
+            "status": hydration_status,
+            "reason": hydration_reason,
+            "last_updated_utc": _max_iso_timestamp(row.get("evaluated_at_utc") for row in hydration_station_rows) or now_iso,
+        },
+        "evaluation": {
+            "status": evaluation_status,
+            "reason": evaluation_reason,
+            "last_updated_utc": (
+                _max_iso_timestamp(row.get("timestamp_utc") for row in transition_rows)
+                or _max_iso_timestamp((row.get("sent_utc") or row.get("timestamp") or row.get("created_utc")) for row in alert_rows)
+                or now_iso
+            ),
+        },
+    }
+
+
 def _derive_alert_block(alert_block_class):
     block_reason_by_class = {
         "NO_OBSERVATION": "No accepted observation exists for the current station-local trading day.",
@@ -1507,7 +1640,19 @@ def observability_ingestion_health():
       - stale: station has no accepted observation
     """
     payload = _build_ingestion_health_rows()
-    return jsonify({"ok": True, **payload}), 200
+    hydration_snapshot = _build_runtime_authority_hydration_snapshot(
+        stations=[row.get("station") for row in (payload.get("stations") or []) if row.get("station")]
+    )
+    return jsonify(
+        {
+            "ok": True,
+            **payload,
+            "system_health": compute_system_health_snapshot(
+                ingestion_snapshot=payload,
+                hydration_snapshot=hydration_snapshot,
+            ),
+        }
+    ), 200
 
 
 @app.route("/observability/ingestion-runtime", methods=["GET"])
@@ -1950,6 +2095,10 @@ def observability_station_summary():
             "station": station,
             "count": len(summary_rows),
             "rows": summary_rows,
+            "system_health": compute_system_health_snapshot(
+                station=station,
+                ingestion_snapshot=ingestion_payload,
+            ),
         }
     ), 200
 
@@ -2184,6 +2333,7 @@ def observability_runtime_authority_snapshot():
     alerts = get_recent_alerts(50)
     if station:
         alerts = [row for row in alerts if (row.get("station") or "").strip().upper() == station]
+    hydration_execution = get_last_hydration_execution_snapshot()
 
     db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
@@ -2195,7 +2345,7 @@ def observability_runtime_authority_snapshot():
             "scheduler_health_snapshot": scheduler_snapshot,
             "hydration_snapshot": hydration_snapshot,
             "kalshi_connectivity": get_kalshi_connectivity_snapshot(),
-            "hydration_execution": get_last_hydration_execution_snapshot(),
+            "hydration_execution": hydration_execution,
             "latest_transitions": {
                 "count": len(transitions),
                 "bounded_limit": 50,
@@ -2210,6 +2360,14 @@ def observability_runtime_authority_snapshot():
                 "path": db_path,
                 "exists": os.path.exists(db_path),
             },
+            "system_health": compute_system_health_snapshot(
+                station=station,
+                ingestion_snapshot=scheduler_snapshot,
+                hydration_snapshot=hydration_snapshot,
+                hydration_execution_snapshot=hydration_execution,
+                transitions=transitions,
+                alerts=alerts,
+            ),
         }
     ), 200
 
