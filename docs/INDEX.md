@@ -13,11 +13,12 @@
 - `docs/env_vars.md` — environment variable catalog with canonical cross-references.
 - `docs/testing.md` — testing entrypoint references (non-inventory).
 - `docs/PR_REVIEW_CHECKLIST.md` — review gate checklist aligned to canonical docs.
-- `docs/REFERENCE_OLD_SCOPE.md` — non-canonical historical deprecation note.
+- `docs/DOCUMENTATION_INDEX.md` — canonical doctrine/reference/archive map for the current docs corpus.
 
 ## Archived docs
-- Historical/superseded materials live under `docs/ARCHIVE/`.
+- Historical/superseded materials live under `docs/archive/`.
 - Archived files are informational only and are not current requirements.
+- `docs/archive/planning/REFERENCE_OLD_SCOPE.md` remains historical context only.
 
 ## Documentation rules
 - API surface is defined only in `docs/API_REFERENCE.md`.

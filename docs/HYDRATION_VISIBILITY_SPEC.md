@@ -2,7 +2,7 @@
 
 ## Scope and Authority
 
-This specification addresses **Silent Zone #3 (Hydration causality ambiguity)** identified in `docs/VISIBILITY_SURFACE_MAP.md`.
+This specification addresses **Silent Zone #3 (Hydration causality ambiguity)** identified in `docs/archive/planning/VISIBILITY_SURFACE_MAP.md`.
 
 Design intent is restricted to **visibility only**. This spec does not change:
 
