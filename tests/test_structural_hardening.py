@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 from core import kalshi_monitor, metar_monitor
@@ -43,7 +44,8 @@ class StructuralHardeningTests(unittest.TestCase):
         mock_compute,
         *_mocks,
     ):
-        mock_compute.return_value = ("s", "e", None, None)
+        now = datetime.now(timezone.utc)
+        mock_compute.return_value = ("s", "e", now, now)
 
         result = metar_monitor.fetch_window("KDEN", 3, source="nws")
 
@@ -56,51 +58,51 @@ class StructuralHardeningTests(unittest.TestCase):
     @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
     @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
     @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
-    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"attempted": True, "cache_valid": False, "series_discovered": False}})
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
     @patch("core.metar_monitor._fetch_range_strict")
     @patch("core.metar_monitor._ingest_obs")
-    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
+    @patch("core.kalshi_monitor.process_hydration_queue_worker")
     @patch("core.metar_monitor._save_cache")
-    def test_poll_once_skips_station_when_ladder_not_hydrated(self, _save, mock_hydrate, mock_ingest, mock_fetch, *_mocks):
+    def test_poll_once_enqueues_station_when_ladder_not_hydrated(self, _save, _worker, mock_ingest, mock_fetch, mock_enqueue, *_mocks):
         metar_monitor._poll_once()
 
-        mock_fetch.assert_not_called()
-        mock_ingest.assert_not_called()
-        mock_hydrate.assert_not_called()
+        mock_enqueue.assert_called_once_with("KDEN", reason="cache_stale")
+        mock_fetch.assert_called_once()
+        mock_ingest.assert_called_once()
 
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
     @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
     @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
-    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"attempted": True, "cache_valid": False, "series_discovered": True}})
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
     @patch("core.metar_monitor._fetch_range_strict")
     @patch("core.metar_monitor._ingest_obs")
-    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
+    @patch("core.kalshi_monitor.process_hydration_queue_worker")
     @patch("core.metar_monitor._save_cache")
-    def test_poll_once_records_ingestion_admission_for_non_hydrated_station(self, _save, _hydrate, _ingest, _fetch, *_mocks):
+    def test_poll_once_records_ingestion_admission_for_non_hydrated_station(self, _save, _worker, _ingest, _fetch, _enqueue, *_mocks):
         metar_monitor._poll_once()
 
         state = metar_monitor.get_state()
         admission = state["ingestion_admission"]["KDEN"]
         self.assertFalse(admission["hydration_passed"])
-        self.assertFalse(admission["admitted_to_fetch"])
-        self.assertEqual(admission["skip_reason"], "ladder_not_hydrated")
+        self.assertTrue(admission["admitted_to_fetch"])
+        self.assertIsNone(admission["skip_reason"])
         self.assertIsNotNone(admission["evaluated_at_utc"])
 
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3, "stations": ["KDEN"], "cache_file": "/tmp/cache.json"})
     @patch("core.metar_monitor._resolve_live_polling_stations", return_value=["KDEN"])
     @patch("core.kalshi_monitor.ensure_ladder_hydration_prerequisite", return_value={"status": "cache_stale"})
-    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"attempted": True, "cache_valid": False, "series_discovered": True}})
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
     @patch("core.metar_monitor._fetch_range_strict")
     @patch("core.metar_monitor._ingest_obs")
-    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot")
+    @patch("core.kalshi_monitor.process_hydration_queue_worker")
     @patch("core.metar_monitor._save_cache")
-    def test_poll_once_executes_hydrator_when_prereq_snapshot_requires_it(self, _save, mock_hydrate, _ingest, _fetch, *_mocks):
+    def test_poll_once_enqueues_hydrator_when_prerequisite_missing(self, _save, mock_worker, _ingest, _fetch, mock_enqueue, *_mocks):
         metar_monitor._poll_once()
 
-        mock_hydrate.assert_called_once_with(station="KDEN", market_types={"HIGH"})
+        mock_enqueue.assert_called_once_with("KDEN", reason="cache_stale")
+        mock_worker.assert_called_once_with(market_types={"HIGH"})
 
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={})

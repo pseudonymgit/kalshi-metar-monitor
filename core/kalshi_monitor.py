@@ -18,6 +18,7 @@ This module MUST NOT
 import base64
 import copy
 import contextvars
+import logging
 import os
 import re
 import sqlite3
@@ -62,6 +63,9 @@ _LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
 _LAST_SERIES_DISCOVERY_ERROR = None
 _MARKETS_CACHE_POPULATION_COUNT = 0
 _LAST_HYDRATION_EXECUTION = {}
+_hydration_queue = []
+_hydration_backoff_until = {}
+_last_hydration_request_ts = 0.0
 _LAST_PROXIMITY_REGIME = {}
 _PROXIMITY_RANK = {
     "FAR": 0,
@@ -86,6 +90,9 @@ _KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", def
 _FORBIDDEN_KALSHI_DOMAINS = frozenset({"observability", "diagnostics", "audit", "replay"})
 _KALSHI_PUBLIC_SESSION = requests.Session()
 _KALSHI_PUBLIC_SESSION.trust_env = False
+_LOGGER = logging.getLogger(__name__)
+MIN_HYDRATION_INTERVAL_SECONDS = 1
+HYDRATION_BACKOFF_SECONDS = 120
 
 class kalshi_execution_domain:
     def __init__(self, domain: str):
@@ -675,6 +682,81 @@ def get_kalshi_connectivity_snapshot() -> dict:
 def get_last_hydration_execution_snapshot() -> dict:
     with _SERIES_LOCK:
         return copy.deepcopy(_LAST_HYDRATION_EXECUTION)
+
+
+def enqueue_station_hydration(station: str, reason: str = "cache_missing") -> bool:
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return False
+
+    with _SERIES_LOCK:
+        if normalized_station in _hydration_queue:
+            return False
+        _hydration_queue.append(normalized_station)
+        _hydration_queue.sort()
+
+    _LOGGER.info("hydration_enqueued station=%s reason=%s", normalized_station, reason)
+    return True
+
+
+def hydration_queue_snapshot() -> dict:
+    with _SERIES_LOCK:
+        return {
+            "queue": list(_hydration_queue),
+            "backoff_until": dict(_hydration_backoff_until),
+            "last_hydration_request_ts": float(_last_hydration_request_ts or 0.0),
+        }
+
+
+def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict:
+    global _last_hydration_request_ts
+
+    if _current_kalshi_execution_domain() != "production":
+        return {"status": "skipped", "reason": "non_production_domain"}
+
+    now_ts = time.time()
+    with _SERIES_LOCK:
+        if not _hydration_queue:
+            return {"status": "idle", "reason": "queue_empty"}
+        if now_ts - float(_last_hydration_request_ts or 0.0) < MIN_HYDRATION_INTERVAL_SECONDS:
+            return {"status": "rate_limited", "reason": "interval_guard"}
+
+        station = _hydration_queue[0]
+        backoff_until_ts = float(_hydration_backoff_until.get(station) or 0.0)
+        if now_ts < backoff_until_ts:
+            return {
+                "status": "backoff",
+                "station": station,
+                "retry_after": int(max(backoff_until_ts - now_ts, 0)),
+            }
+
+        _hydration_queue.pop(0)
+        _last_hydration_request_ts = now_ts
+
+    selected_types = set(market_types or {"HIGH"})
+    _LOGGER.info("hydration_worker station=%s", station)
+    try:
+        result = hydrate_station_ladder_snapshot(station=station, market_types=selected_types)
+        with _SERIES_LOCK:
+            _hydration_backoff_until.pop(station, None)
+        _LOGGER.info("hydration_success station=%s", station)
+        return {"status": "hydrated", "station": station, "result": result}
+    except requests.HTTPError as exc:
+        status_code = getattr(getattr(exc, "response", None), "status_code", None)
+        if int(status_code or 0) == 429:
+            retry_after = int(now_ts + HYDRATION_BACKOFF_SECONDS)
+            with _SERIES_LOCK:
+                _hydration_backoff_until[station] = float(retry_after)
+                if station not in _hydration_queue:
+                    _hydration_queue.append(station)
+                    _hydration_queue.sort()
+            _LOGGER.warning(
+                "hydration_backoff station=%s retry_after=%s",
+                station,
+                retry_after,
+            )
+            return {"status": "backoff", "station": station, "retry_after": HYDRATION_BACKOFF_SECONDS}
+        raise
 
 
 # Replay safety rule: hydration is production-only because it performs
