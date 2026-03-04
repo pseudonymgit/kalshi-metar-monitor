@@ -69,6 +69,7 @@ from core.observability import (
 )
 from core.alert_integrity_monitor import build_alert_integrity_findings
 from core.ladder_cache_observability import build_ladder_cache_snapshot
+from core.hydration_health_classifier import classify_hydration_health
 from core.station_time import station_local_day_key, to_station_local
 
 app = Flask(__name__)
@@ -942,6 +943,11 @@ def compute_system_health_snapshot(
     hydration_view = hydration_snapshot if isinstance(hydration_snapshot, dict) else _build_runtime_authority_hydration_snapshot(
         stations=[row.get("station") for row in (ingestion_payload.get("stations") or []) if row.get("station")]
     )
+    ladder_cache_snapshot = build_ladder_cache_snapshot([
+        row.get("station") for row in (ingestion_payload.get("stations") or []) if row.get("station")
+    ])
+    hydration_health = classify_hydration_health(ladder_cache_snapshot)
+
     hydration_execution = (
         hydration_execution_snapshot
         if isinstance(hydration_execution_snapshot, dict)
@@ -1040,6 +1046,7 @@ def compute_system_health_snapshot(
             "status": hydration_status,
             "reason": hydration_reason,
             "last_updated_utc": _max_iso_timestamp(row.get("evaluated_at_utc") for row in hydration_station_rows) or now_iso,
+            "health": hydration_health,
         },
         "evaluation": {
             "status": evaluation_status,
