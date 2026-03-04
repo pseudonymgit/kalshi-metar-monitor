@@ -58,6 +58,7 @@ class ObservabilityStationSummaryTests(unittest.TestCase):
         payload = response.get_json()
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["count"], 2)
+        self.assertIn("system_health", payload)
 
         rows = {row["station"]: row for row in payload["rows"]}
         self.assertEqual(rows["KDEN"]["ingestion_status"], "healthy")
@@ -119,6 +120,7 @@ class ObservabilityStationSummaryTests(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(payload["station"], "KDEN")
         self.assertEqual(payload["count"], 1)
+        self.assertIn("system_health", payload)
 
         row = payload["rows"][0]
         self.assertEqual(row["station"], "KDEN")
