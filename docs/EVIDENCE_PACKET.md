@@ -187,7 +187,25 @@ No execution-domain guards were bypassed in this evidence run.
 
 ## LIVE Run Blocked
 
-- Blocking condition: egress path from this execution environment to `https://kalshi-metar-monitor.onrender.com` is denied by an HTTP CONNECT tunnel returning `403 Forbidden` before the Render app responds.
+- Blocking condition: egress path from this execution environment to `https://kalshi-metar-
+- monitor.onrender.com` is denied by an HTTP CONNECT tunnel returning `403 Forbidden` before the Render app responds.
 - Required to complete LIVE certification snapshot:
   - A network path (or proxy policy) that allows HTTPS CONNECT to `kalshi-metar-monitor.onrender.com`, **or**
   - Execution from a host/environment without the denying proxy in front of outbound HTTPS.
+
+
+
+
+## LIVE Render Evidence Run — 2026-03-04 (External Host)
+
+Collector host: developer workstation  
+Base URL: https://kalshi-metar-monitor.onrender.com  
+Bundle: evidence_out/bundle_20260304T021532Z/evidence_bundle.json
+
+Certification:
+
+A) Execution-domain symmetry: PASS  
+B) Hydration/cache stability: FAIL (cache_valid=false across stations)  
+C) Ingestion health: PASS  
+D) Discovery integrity: PASS  
+E) Transition→alert integrity: UNKNOWN
