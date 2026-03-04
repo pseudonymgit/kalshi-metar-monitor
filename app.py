@@ -1,3 +1,20 @@
+"""
+Application Entrypoint
+
+This module hosts HTTP orchestration for runtime control, diagnostics, and
+read-only observability surfaces.
+
+Responsibilities
+- Initialize Flask routes for scheduler control and debug tooling.
+- Bridge API requests into runtime modules with explicit authority boundaries.
+- Expose replay/debug endpoints without mutating core architecture semantics.
+
+This module MUST NOT
+- Reimplement runtime transition logic from core modules.
+- Bypass security boundaries for live execution domains.
+- Mutate observability-derived state as a source of runtime truth.
+"""
+
 import os
 import json
 import sys
@@ -2506,6 +2523,8 @@ def metar_test_alert():
     ), 200
 
 @app.route("/metar/force-poll", methods=["POST"])
+# Causal control endpoint: explicitly triggers one observation -> transition
+# -> evaluation loop without altering scheduler design boundaries.
 def metar_force_poll():
     """
     Runs one poll loop immediately (uses current default source) and returns counters.
@@ -2521,6 +2540,8 @@ def metar_force_poll():
     }), 200
 
 @app.route("/debug/replay", methods=["POST"])
+# Replay endpoint: executes deterministic historical reconstruction and
+# returns diagnostics; replay intentionally avoids live alert side effects.
 def debug_replay():
     data = request.get_json(force=True, silent=True) or {}
     station = (data.get("station") or "").strip().upper()

@@ -1,3 +1,20 @@
+"""
+Observability
+
+This module provides read-only runtime introspection over authoritative state
+and persisted event streams.
+
+Responsibilities
+- Expose transition, epoch, and scheduler visibility for diagnostics.
+- Compute deterministic read models from persisted data.
+- Enforce observability read-only execution boundaries.
+
+This module MUST NOT
+- Mutate authoritative runtime state.
+- Trigger ingestion, evaluation, or alert side effects.
+- Issue live Kalshi execution calls.
+"""
+
 import os
 import sqlite3
 from typing import Any, Dict, List, Optional, Tuple
@@ -10,6 +27,8 @@ from core.security_boundaries import (
 )
 
 
+# Architectural boundary: observability imports are validated so this
+# module cannot silently become a runtime execution authority.
 detect_illegal_cross_layer_imports(module_name=__name__, module_globals=globals())
 
 ReadOnlyRow = Tuple[Any, ...]
@@ -24,6 +43,8 @@ def _db_exists() -> bool:
     return os.path.exists(db_path)
 
 
+# Observability invariant: all database reads use SQLite read-only mode
+# so diagnostics can never mutate causal runtime history.
 def _query_rows_readonly(query: str, params: Tuple[Any, ...]) -> List[ReadOnlyRow]:
     db_path = _alert_db_path()
     if not os.path.exists(db_path):
@@ -97,6 +118,8 @@ def get_emitted_transition_stream(*, station: Optional[str] = None, limit: int =
     }
 
 
+# Causal flow reconstruction: persisted transitions -> deterministic
+# scoring projection. This is analysis-only and does not feed runtime logic.
 def get_settlement_epoch_scores(*, station: Optional[str] = None, limit: int = 200) -> Dict[str, Any]:
     """
     Read-only deterministic scoring derived from emitted transition history.
