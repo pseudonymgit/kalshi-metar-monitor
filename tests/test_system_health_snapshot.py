@@ -206,6 +206,86 @@ class SystemHealthSnapshotTests(unittest.TestCase):
         self.assertEqual(snapshot["hydration"]["status"], "BLOCKED")
         self.assertEqual(snapshot["hydration"]["reason"], "hydration_cache_not_written")
 
+    @patch("app.datetime")
+    def test_evaluation_suppression_breakdown_counts_reason_totals(self, mock_datetime):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        snapshot = app_module.compute_system_health_snapshot(
+            ingestion_snapshot={
+                "scheduler_running": True,
+                "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                "stale_after_seconds": 180,
+                "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+            },
+            hydration_snapshot={"stations": {}},
+            hydration_execution_snapshot={},
+            transitions=[
+                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "outside_price_band"},
+                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "OUTSIDE_PRICE_BAND"},
+                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "expired_market"},
+                {"alert_classification": "ALERT_SENT", "suppression_reason": "outside_price_band"},
+            ],
+            alerts=[],
+        )
+
+        self.assertEqual(
+            snapshot["evaluation"]["suppression_breakdown"],
+            {
+                "outside_price_band": 2,
+                "expired_market": 1,
+            },
+        )
+
+    @patch("app.datetime")
+    def test_evaluation_suppression_breakdown_uses_unknown_reason_bucket(self, mock_datetime):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        snapshot = app_module.compute_system_health_snapshot(
+            ingestion_snapshot={
+                "scheduler_running": True,
+                "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                "stale_after_seconds": 180,
+                "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+            },
+            hydration_snapshot={"stations": {}},
+            hydration_execution_snapshot={},
+            transitions=[
+                {"alert_classification": "MARKET_SUPPRESSED"},
+                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": ""},
+            ],
+            alerts=[],
+        )
+
+        self.assertEqual(snapshot["evaluation"]["suppression_breakdown"], {"unknown_reason": 2})
+
+    @patch("app.datetime")
+    def test_evaluation_suppression_breakdown_empty_when_no_transitions(self, mock_datetime):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        snapshot = app_module.compute_system_health_snapshot(
+            ingestion_snapshot={
+                "scheduler_running": True,
+                "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                "stale_after_seconds": 180,
+                "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+            },
+            hydration_snapshot={"stations": {}},
+            hydration_execution_snapshot={},
+            transitions=[],
+            alerts=[],
+        )
+
+        self.assertEqual(snapshot["evaluation"]["suppression_breakdown"], {})
+
 
 if __name__ == "__main__":
     unittest.main()
