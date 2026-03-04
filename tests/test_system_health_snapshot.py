@@ -89,6 +89,123 @@ class SystemHealthSnapshotTests(unittest.TestCase):
         self.assertEqual(snapshot["evaluation"]["status"], "BLOCKED")
         self.assertEqual(snapshot["evaluation"]["reason"], "evaluation_not_executed")
 
+    @patch("app.datetime")
+    def test_hydration_cache_valid_regression_degrades_health(self, mock_datetime):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        snapshot = app_module.compute_system_health_snapshot(
+            station="KDEN",
+            ingestion_snapshot={
+                "scheduler_running": True,
+                "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                "stale_after_seconds": 180,
+                "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+            },
+            hydration_snapshot={
+                "stations": {
+                    "KDEN": {
+                        "hydration_prerequisite": {
+                            "cache_valid": False,
+                            "series_discovered": True,
+                        }
+                    }
+                }
+            },
+            hydration_execution_snapshot={
+                "KDEN": {
+                    "station": "KDEN",
+                    "cache_written": True,
+                    "evaluated_at_utc": "2026-01-01T00:00:00+00:00",
+                }
+            },
+            transitions=[],
+            alerts=[],
+        )
+
+        self.assertEqual(snapshot["hydration"]["status"], "DEGRADED")
+        self.assertEqual(snapshot["hydration"]["reason"], "ladder_cache_invalid")
+
+    @patch("app.datetime")
+    def test_hydration_series_discovered_regression_degrades_health(self, mock_datetime):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        snapshot = app_module.compute_system_health_snapshot(
+            station="KDEN",
+            ingestion_snapshot={
+                "scheduler_running": True,
+                "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                "stale_after_seconds": 180,
+                "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+            },
+            hydration_snapshot={
+                "stations": {
+                    "KDEN": {
+                        "hydration_prerequisite": {
+                            "cache_valid": True,
+                            "series_discovered": False,
+                        }
+                    }
+                }
+            },
+            hydration_execution_snapshot={
+                "KDEN": {
+                    "station": "KDEN",
+                    "cache_written": True,
+                    "evaluated_at_utc": "2026-01-01T00:00:00+00:00",
+                }
+            },
+            transitions=[],
+            alerts=[],
+        )
+
+        self.assertEqual(snapshot["hydration"]["status"], "DEGRADED")
+        self.assertEqual(snapshot["hydration"]["reason"], "series_discovery_missing")
+
+    @patch("app.datetime")
+    def test_hydration_cache_not_written_precedence_over_degraded_signals(self, mock_datetime):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        snapshot = app_module.compute_system_health_snapshot(
+            station="KDEN",
+            ingestion_snapshot={
+                "scheduler_running": True,
+                "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                "stale_after_seconds": 180,
+                "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+            },
+            hydration_snapshot={
+                "stations": {
+                    "KDEN": {
+                        "hydration_prerequisite": {
+                            "cache_valid": False,
+                            "series_discovered": False,
+                        }
+                    }
+                }
+            },
+            hydration_execution_snapshot={
+                "KDEN": {
+                    "station": "KDEN",
+                    "cache_written": False,
+                    "evaluated_at_utc": "2026-01-01T00:00:00+00:00",
+                }
+            },
+            transitions=[],
+            alerts=[],
+        )
+
+        self.assertEqual(snapshot["hydration"]["status"], "BLOCKED")
+        self.assertEqual(snapshot["hydration"]["reason"], "hydration_cache_not_written")
+
 
 if __name__ == "__main__":
     unittest.main()

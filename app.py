@@ -932,8 +932,16 @@ def compute_system_health_snapshot(
     if station:
         hydration_station_keys = {(station or "").strip().upper()}
     hydration_station_rows = [hydration_execution.get(code) or {} for code in hydration_station_keys]
+    hydration_prerequisite_rows = [
+        ((hydration_view.get("stations") or {}).get(code) or {}).get("hydration_prerequisite") or {}
+        for code in hydration_station_keys
+    ]
 
     any_cache_not_written = any(bool(row) and not bool(row.get("cache_written")) for row in hydration_station_rows)
+    any_cache_invalid = any(bool(row) and not bool(row.get("cache_valid")) for row in hydration_prerequisite_rows)
+    any_series_discovery_missing = any(
+        bool(row) and not bool(row.get("series_discovered")) for row in hydration_prerequisite_rows
+    )
     ladder_cache_stale_threshold_seconds = int(os.getenv("HYDRATION_LADDER_CACHE_STALE_THRESHOLD_SECONDS", "1800"))
     ladder_cache_ages = []
     for row in hydration_station_rows:
@@ -948,6 +956,12 @@ def compute_system_health_snapshot(
     if any_cache_not_written:
         hydration_status = "BLOCKED"
         hydration_reason = "hydration_cache_not_written"
+    elif any_cache_invalid:
+        hydration_status = "DEGRADED"
+        hydration_reason = "ladder_cache_invalid"
+    elif any_series_discovery_missing:
+        hydration_status = "DEGRADED"
+        hydration_reason = "series_discovery_missing"
     elif max_ladder_cache_age_seconds > ladder_cache_stale_threshold_seconds:
         hydration_status = "DEGRADED"
         hydration_reason = "ladder_cache_stale"
