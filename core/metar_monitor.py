@@ -47,6 +47,7 @@ from core.transition_emitter import emit_transition_if_changed
 from core.replay_engine import execute_ordered_replay_stream
 from core.security_boundaries import enforce_execution_domain_guard
 from core.station_time import station_local_day_key, station_timezone_name, to_station_local
+from core.alert_schema import ALERT_SCHEMA_VERSION
 
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
@@ -61,7 +62,6 @@ FIRST_RUN_CUSHION_SEC = 300         # first contact: add 5 min cushion
 BOOTSTRAP_LOOKBACK_MINUTES = 60     # first contact: deterministic widened bootstrap window
 PUBLICATION_LAG_BUFFER_SECONDS = 90
 METAR_ACCEPTANCE_GRACE_SECONDS = min(900, OVERLAP_SECONDS * 5)  # 15 minutes max, bounded by overlap safety
-
 def _icao_tz_name(icao: str) -> str:
     return station_timezone_name(icao)
 
@@ -722,17 +722,83 @@ def _emit_alert(
     settlement_bucket_changed: bool = False,
     transition_correlation: Optional[Dict[str, Any]] = None,
 ) -> None:
+    transition_type = None
+    if settlement_bucket_changed:
+        transition_type = "settlement_up"
+    elif instant_bucket_changed:
+        if now_f > prev_f:
+            transition_type = "instant_up"
+        elif now_f < prev_f:
+            transition_type = "instant_down"
+
+    instant_before = int(math.floor(prev_f))
+    instant_after = int(math.floor(now_f))
+    settlement_bucket = None
+    running_max = now_f
+    if isinstance(transition_correlation, dict):
+        metadata = transition_correlation.get("metadata") or {}
+        settlement_bucket = metadata.get("previous_settlement_bucket")
+        if settlement_bucket_changed:
+            settlement_bucket = int(math.floor(now_f))
+        running_max = metadata.get("prev_running_max", running_max)
+
+    headline = f"{icao} transition detected"
+    summary_transition = transition_type or "transition"
     payload = {
-        "type": "temp_change",
+        "schema_version": ALERT_SCHEMA_VERSION,
+        "timestamp_utc": _now_utc_iso(),
         "station": icao,
-        "prev_temp_f": prev_f,
-        "temp_f": now_f,
-        "delta_f": delta_f,
-        "obs_time": obs_time,
-        "at_utc": _now_utc_iso(),
-        "instant_bucket_changed": bool(instant_bucket_changed),
-        "settlement_bucket_changed": bool(settlement_bucket_changed),
-        "transition_correlation": transition_correlation,
+        "classification": "STRUCTURAL",
+        "summary": {
+            "headline": headline,
+            "transition": summary_transition,
+            "temp_f": now_f,
+            "instant_bucket": instant_after,
+            "settlement_bucket": settlement_bucket,
+        },
+        "transition_context": {
+            "transition_type": transition_type,
+            "instant_before": instant_before,
+            "instant_after": instant_after,
+            "settlement_bucket": settlement_bucket,
+            "running_max": running_max,
+            "obs_time": obs_time,
+        },
+        "market_context": {
+            "series_ticker": None,
+            "event_ticker": None,
+            "market_type": None,
+            "strike": None,
+            "proximity_regime": None,
+            "hydrated": False,
+        },
+        "eligibility_evaluation": {
+            "markets_considered": 0,
+            "eligible_markets": 0,
+            "rejected_markets": 0,
+            "rejection_breakdown": {},
+        },
+        "suppression": {
+            "suppressed": False,
+            "reason": "",
+            "reason_category": "NO_TRANSITION",
+        },
+        "execution_context": {
+            "execution_domain": "production",
+            "hydration_state": {},
+            "scheduler_poll_count": get_metrics().get("poll_count"),
+        },
+        "legacy": {
+            "type": "temp_change",
+            "prev_temp_f": prev_f,
+            "temp_f": now_f,
+            "delta_f": delta_f,
+            "obs_time": obs_time,
+            "at_utc": _now_utc_iso(),
+            "instant_bucket_changed": bool(instant_bucket_changed),
+            "settlement_bucket_changed": bool(settlement_bucket_changed),
+            "transition_correlation": transition_correlation,
+        },
     }
     _send_alert(cfg.get("webhook", ""), payload)
 
@@ -1627,16 +1693,24 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
         return
     try:
         station = (payload.get("station") or "UNK").upper()
-        tf = payload.get("temp_f")
-        pf = payload.get("prev_temp_f")
-        df = payload.get("delta_f")
-        transition_correlation = payload.get("transition_correlation")
+        legacy = payload.get("legacy") if isinstance(payload.get("legacy"), dict) else payload
+        summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+        transition_context = payload.get("transition_context") if isinstance(payload.get("transition_context"), dict) else {}
+        market_context = payload.get("market_context") if isinstance(payload.get("market_context"), dict) else {}
+        eligibility_evaluation = payload.get("eligibility_evaluation") if isinstance(payload.get("eligibility_evaluation"), dict) else {}
+        suppression = payload.get("suppression") if isinstance(payload.get("suppression"), dict) else {}
+        execution_context = payload.get("execution_context") if isinstance(payload.get("execution_context"), dict) else {}
+
+        tf = summary.get("temp_f", legacy.get("temp_f"))
+        pf = legacy.get("prev_temp_f")
+        df = legacy.get("delta_f")
+        transition_correlation = legacy.get("transition_correlation")
 
         if tf is None:
             return
 
-        instant_bucket_changed = bool(payload.get("instant_bucket_changed"))
-        settlement_bucket_changed = bool(payload.get("settlement_bucket_changed"))
+        instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
+        settlement_bucket_changed = bool(legacy.get("settlement_bucket_changed"))
         # Alert gating: market evaluation only proceeds when a deterministic
         # transition is present; non-transition observations produce no alerts.
         if not instant_bucket_changed and not settlement_bucket_changed:
@@ -1681,6 +1755,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             saw_terminal_state = False
             markets_considered_count = 0
             eligible_markets_count = 0
+            hydrated_any = False
+            market_context_seeded = bool(market_context.get("event_ticker"))
             rejection_breakdown = {
                 "outside_price_band": 0,
                 "wrong_series": 0,
@@ -1695,6 +1771,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                     snapshot = build_structured_snapshot(station, {market_type_token})
                     markets = snapshot.get("markets") or []
                     hydration_snapshot = get_last_hydration_execution_snapshot().get(station, {})
+                    hydrated_any = hydrated_any or bool(hydration_snapshot.get("cache_written"))
                     raw_market_count = int(hydration_snapshot.get("raw_market_count") or 0)
                     filtered_market_count = int(hydration_snapshot.get("filtered_market_count") or 0)
                     rejection_counts = hydration_snapshot.get("rejection_counts") or {}
@@ -1801,7 +1878,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             prev_temp_f=pf,
                             now_temp_f=tf,
                             delta_f=df,
-                            obs_time_utc=payload.get("obs_time"),
+                            obs_time_utc=legacy.get("obs_time"),
                         )
                         if result and result.get("ok"):
                             market_alerts_sent += 1
@@ -1834,6 +1911,19 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         if raw_reason:
                             suppression_reason = raw_reason
 
+                    if not market_context_seeded:
+                        nearest_market = markets[0] if markets else None
+                        market_context.update(
+                            {
+                                "series_ticker": (nearest_market or {}).get("series_ticker"),
+                                "event_ticker": (nearest_market or {}).get("event_ticker"),
+                                "market_type": market_type_token,
+                                "strike": (nearest_market or {}).get("strike"),
+                                "hydrated": bool(hydration_snapshot.get("cache_written")),
+                            }
+                        )
+                        market_context_seeded = True
+
                     nearest_market = markets[0] if markets else None
                     nearest_strike = (nearest_market or {}).get("strike")
                     proximity_regime_tightened = False
@@ -1853,6 +1943,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 or _PROXIMITY_RANK[new_regime] > _PROXIMITY_RANK[old_regime]
                             )
                             _LAST_PROXIMITY_REGIME[regime_key] = new_regime
+                            market_context["proximity_regime"] = new_regime
 
 
             # Alert eligibility summary: transition -> market evaluation -> suppression
@@ -1881,6 +1972,63 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         "rejection_breakdown": rejection_breakdown,
                     },
                 )
+
+                payload["schema_version"] = ALERT_SCHEMA_VERSION
+                payload["timestamp_utc"] = payload.get("timestamp_utc") or _now_utc_iso()
+                payload["station"] = station
+                payload["summary"] = summary
+                payload["transition_context"] = transition_context
+                payload["market_context"] = market_context
+
+                suppressed = market_alerts_sent == 0
+                reason_category = "NO_TRANSITION"
+                reason_text = suppression_reason or ""
+                classification = "MARKET_ELIGIBLE" if not suppressed else "MARKET_SUPPRESSED"
+                if not hydrated_any:
+                    classification = "HYDRATION_BLOCKED"
+                    reason_category = "HYDRATION_BLOCK"
+                    reason_text = "hydration_cache_unavailable"
+                elif no_eligible_market_count == evaluated_market_attempts:
+                    reason_category = "NO_ELIGIBLE_MARKET"
+                    reason_text = reason_text or "no_eligible_market"
+                elif suppression_reason == "TERMINAL_STATE":
+                    reason_category = "SETTLEMENT_MISMATCH"
+
+                payload["classification"] = classification
+                summary["headline"] = f"{station} {classification.lower().replace('_', ' ')}"
+                summary["transition"] = transition_context.get("transition_type") or "transition"
+                summary["temp_f"] = tf
+                summary["instant_bucket"] = transition_context.get("instant_after")
+                summary["settlement_bucket"] = transition_context.get("settlement_bucket")
+
+                eligibility_evaluation.update(
+                    {
+                        "markets_considered": markets_considered_count,
+                        "eligible_markets": eligible_markets_count,
+                        "rejected_markets": max(markets_considered_count - eligible_markets_count, 0),
+                        "rejection_breakdown": rejection_breakdown,
+                    }
+                )
+                suppression.update(
+                    {
+                        "suppressed": suppressed,
+                        "reason": reason_text,
+                        "reason_category": reason_category,
+                    }
+                )
+                execution_context.update(
+                    {
+                        "execution_domain": "production",
+                        "hydration_state": {
+                            "hydrated": hydrated_any,
+                            "station_is_active": station_is_active,
+                        },
+                        "scheduler_poll_count": get_metrics().get("poll_count"),
+                    }
+                )
+                payload["eligibility_evaluation"] = eligibility_evaluation
+                payload["suppression"] = suppression
+                payload["execution_context"] = execution_context
         except Exception as e:
             print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
