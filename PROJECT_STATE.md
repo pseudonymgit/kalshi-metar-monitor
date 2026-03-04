@@ -219,3 +219,16 @@ No order throttling logic
 RSA auth unvalidated in production
 
 END OF SNAPSHOT
+
+10️⃣ Latest Task Result (2026-03-04)
+Task reviewed: `docs: add unittest testing guide` (just-completed, not merged on `main`).
+Result: REVISE.
+Reason: added root `testing.md` duplicates existing `docs/testing.md` and introduces canonical-doc location ambiguity.
+
+Current next action:
+- Consolidate testing guidance into `docs/testing.md` as single source of truth and point `README.md` there.
+
+New risks discovered:
+- Documentation drift risk from duplicate testing guides in different paths.
+- Index/governance mismatch risk if canonical docs are split between root and `docs/` without explicit policy.
+
