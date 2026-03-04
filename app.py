@@ -68,6 +68,7 @@ from core.observability import (
     get_current_settlement_epoch_summaries,
 )
 from core.alert_integrity_monitor import build_alert_integrity_findings
+from core.ladder_cache_observability import build_ladder_cache_snapshot
 from core.station_time import station_local_day_key, to_station_local
 
 app = Flask(__name__)
@@ -1792,6 +1793,13 @@ def observability_kalshi_connectivity_runtime():
             "ok": True,
         }
     ), 200
+
+
+@app.route("/observability/ladder_cache", methods=["GET"])
+def observability_ladder_cache():
+    station_universe = _canonical_live_station_universe()
+    snapshot = build_ladder_cache_snapshot(station_universe.get("stations") or [])
+    return jsonify(snapshot), 200
 
 
 def _parse_iso_timestamp(iso_timestamp):
