@@ -85,6 +85,22 @@ Purpose: ensure read-only observability boundaries remain explicit and testable.
 - [~] Hydration state surfacing consistency across endpoints *(partially complete; continue reconciliation of endpoint-level semantics)*
 - [ ] Runtime authority snapshot adoption as primary operator diagnosis surface
 
+### Infrastructure Reliability
+
+#### Deterministic Hydration Queue
+
+Status: Implemented.
+
+Purpose:
+- Prevent API rate-limit storms and ensure ladder cache stability.
+- Route all hydration triggers through deterministic queue scheduling.
+- Preserve replay and signal equivalence while decoupling network timing from poll execution.
+
+Future improvements:
+- Global hydration metrics
+- ladder_cache_age telemetry
+- hydration health monitoring
+
 ### P2 — MARKET EXPANSION (MERGED WORKSTREAM)
 
 LOW + HIGH Symmetric Market Enablement + City Optimization
@@ -213,6 +229,9 @@ Even if TTL not expired.
 Purpose:
 - Ensure fresh strikes/prices during decisive events.
 
+Implementation note:
+- Trigger paths enqueue deterministic hydration requests instead of issuing direct poll-loop Kalshi calls.
+
 #### Phase 6 — Signal Classification Layer
 
 Status: Scaffold planned.
@@ -279,6 +298,7 @@ After:
 #### Strategic roadmap
 
 - Support all Kalshi cities dynamically (remove static station map).
+- Dynamic city discovery and market onboarding must enqueue deterministic hydration work for newly activated stations.
 - Detect newly listed series automatically.
 - Auto-discover new market structures.
 - AI interpretation layer (non-authoritative, read-only).
@@ -289,6 +309,9 @@ After:
 
 Hydration gating is policy-level only.
 Ingest execution-domain flags must never be used for market-phase suppression.
+
+Hydration queueing is infrastructure-level only.
+Signal transitions and replay semantics remain unchanged.
 
 Execution domain symmetry:
 - `(True, True)` = production
