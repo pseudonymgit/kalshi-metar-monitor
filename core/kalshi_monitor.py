@@ -1259,12 +1259,14 @@ def send_composed_weather_market_alert(
                 distance_info = "MIN REACHED"
 
     local_time_display = "N/A"
+    local_dt = None
     if _to_local:
         try:
             local_dt = _to_local(normalized_station, datetime.now(timezone.utc))
             local_time_display = local_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
         except Exception:
             local_time_display = "N/A"
+            local_dt = None
 
     temp_display = "N/A" if current_temp_f is None else f"{float(current_temp_f):.1f}"
     prev_display = "N/A" if prev_temp_f is None else f"{float(prev_temp_f):.1f}"
@@ -1289,6 +1291,56 @@ def send_composed_weather_market_alert(
     epoch_context["station_local_timestamp"] = station_local_timestamp
 
     attention_phrase = _derive_attention_phrase(epoch_context)
+
+    hydration_snapshot = get_last_hydration_execution_snapshot().get(normalized_station, {})
+    hydration_status = "READY" if hydration_snapshot.get("cache_written") else "BLOCKED"
+    hydration_evaluated_at = parse_iso_utc(hydration_snapshot.get("evaluated_at_utc"))
+    ladder_cache_age_seconds = None
+    if hydration_evaluated_at is not None:
+        reference_dt = obs_dt if obs_dt is not None else datetime.now(timezone.utc)
+        ladder_cache_age_seconds = max(
+            0,
+            int((reference_dt - hydration_evaluated_at).total_seconds()),
+        )
+    markets_considered_count = int(hydration_snapshot.get("raw_market_count") or len(markets))
+    eligible_markets_count = len(markets)
+    rejected_markets_count = max(markets_considered_count - eligible_markets_count, 0)
+    rejection_counts = hydration_snapshot.get("rejection_counts") or {}
+    rejection_breakdown = {
+        "outside_price_band": max(int(hydration_snapshot.get("filtered_market_count") or 0) - eligible_markets_count, 0),
+        "wrong_series": int(rejection_counts.get("city_token_mismatch") or 0) + int(rejection_counts.get("market_type_mismatch") or 0),
+        "expired_market": int(rejection_counts.get("inactive_market") or 0),
+        "settlement_mismatch": int(rejection_counts.get("date_mismatch") or 0),
+        "unknown_reason": max(
+            rejected_markets_count
+            - (
+                max(int(hydration_snapshot.get("filtered_market_count") or 0) - eligible_markets_count, 0)
+                + int(rejection_counts.get("city_token_mismatch") or 0)
+                + int(rejection_counts.get("market_type_mismatch") or 0)
+                + int(rejection_counts.get("inactive_market") or 0)
+                + int(rejection_counts.get("date_mismatch") or 0)
+            ),
+            0,
+        ),
+    }
+    transition_type = (transition_reason or "").strip().lower() or None
+    instant_bucket_before = previous_bucket_index
+    instant_bucket_after = current_index
+    settlement_bucket = epoch_context.get("settlement_bucket")
+    running_max = epoch_context.get("running_max")
+    timestamp_utc = obs_time_utc
+    temperature_f = now_temp_f
+    reason_token = (transition_reason or "crossed").strip().lower() or "crossed"
+    decision = "FIRED"
+    reason = transition_reason or "ladder_transition"
+    alert_type = "ladder_transition"
+    direction = "UP" if direction_up else "DOWN"
+    event_ticker_value = event_ticker
+    summary = (
+        f"{normalized_station} {transition_type or reason_token} detected; "
+        f"{eligible_markets_count} eligible markets; "
+        f"alert fired ({reason})"
+    )
 
     header = f"{title_emoji} {normalized_station} {market_type or 'WEATHER'} — Ladder Cross {direction_icon}"
     ladder_block = "\n".join(ladder_rows)
@@ -1325,6 +1377,40 @@ def send_composed_weather_market_alert(
         "alert_context": {
             "attention_phrase": attention_phrase,
             **epoch_context,
+        },
+        "alert_schema_version": 2,
+        "alert_classification": "MARKET_ELIGIBLE",
+        "summary": summary,
+        "structural_event": {
+            "station": normalized_station,
+            "transition_type": transition_type,
+            "instant_bucket_before": instant_bucket_before,
+            "instant_bucket_after": instant_bucket_after,
+            "settlement_bucket": settlement_bucket,
+            "running_max": running_max,
+            "timestamp_utc": timestamp_utc,
+            "temperature_f": temperature_f,
+        },
+        "market_evaluation": {
+            "markets_considered_count": markets_considered_count,
+            "eligible_markets_count": eligible_markets_count,
+            "rejected_markets_count": rejected_markets_count,
+            "rejection_breakdown": rejection_breakdown,
+        },
+        "alert_decision": {
+            "decision": decision,
+            "reason": reason,
+            "alert_type": alert_type,
+            "bucket_index": current_index,
+            "direction": direction,
+            "event_ticker": event_ticker_value,
+        },
+        "execution_context": {
+            "hydration_status": hydration_status,
+            "series_discovered": bool(hydration_snapshot.get("series_ticker")),
+            "ladder_cache_age_seconds": ladder_cache_age_seconds,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "station_local_timestamp": station_local_timestamp or (local_dt.isoformat() if local_dt else None),
         },
     }
 
