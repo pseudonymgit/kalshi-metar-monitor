@@ -4,6 +4,7 @@
 - `docs/API_REFERENCE.md` — canonical API surface definition (only source of endpoint inventory).
 - `docs/ARCHITECTURE.md` — domain model, invariants, and structural constraints.
 - `docs/OPERATING_MODE.md` — governance, semantic authority, and production intent.
+- `docs/WORKFLOW_OPERATIONS.md` — canonical task taxonomy, merge rules, and reusable ChatGPT/Codex operating prompts.
 - `docs/OPERATIONS.md` — runbooks, deployment, and operational procedures.
 - `docs/ROLLING_TODO.md` — active roadmap and execution queue.
 - `docs/EXECUTION_VISIBILITY_STANDARD.md` — normative execution visibility requirements and enforcement standard.
