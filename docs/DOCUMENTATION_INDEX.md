@@ -6,6 +6,7 @@ This index defines the canonical documentation structure for the repository.
 - `docs/ARCHITECTURE.md` — Core architecture, domain model, and deterministic system boundaries.
 - `docs/EXECUTION_VISIBILITY_STANDARD.md` — Normative visibility and execution observability doctrine.
 - `docs/OPERATING_MODE.md` — Repository governance and release authority model.
+- `docs/WORKFLOW_OPERATIONS.md` — Canonical ChatGPT/Codex task model, packet-first review process, merge decision rules, and full reusable prompt library.
 - `docs/VISIBILITY_HOOK_CONTRACT.md` — Contract for instrumentation hook semantics and stability requirements.
 
 ## Integrity Reviews
