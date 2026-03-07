@@ -183,3 +183,187 @@ class SimulationEndpointHydrationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HydrationRecoverySafetyGateTests(unittest.TestCase):
+    def setUp(self):
+        import app as app_module
+
+        app_module._autostart_fallback_done = True
+        app_module.app.config["TESTING"] = False
+        self.client = app_module.app.test_client()
+
+    def _runtime_side_effect_snapshot(self):
+        return {
+            "hydration_queue": kalshi_monitor.hydration_queue_snapshot(),
+            "hydration_execution": kalshi_monitor.get_last_hydration_execution_snapshot(),
+            "ladder_state": kalshi_monitor.get_ladder_state_snapshot(),
+            "recent_alerts": metar_monitor.get_recent_alerts(limit=5),
+            "transition_history": metar_monitor.get_transition_history(limit=5),
+        }
+
+    @patch("app.process_hydration_queue_worker")
+    @patch("app.enqueue_station_hydration")
+    @patch("app._is_non_production_environment", return_value=False)
+    @patch("app._current_kalshi_execution_domain", return_value="replay")
+    def test_recovery_noop_in_replay_domain(self, _domain, _env, mock_enqueue, mock_worker):
+        before = self._runtime_side_effect_snapshot()
+
+        response = self.client.post("/ops/hydration-recovery", json={"station": "KDEN"})
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "no_op")
+        self.assertEqual(payload["reason"], "non_production_execution_domain")
+        self.assertEqual(payload["execution_domain"], "replay")
+        self.assertEqual(payload["queue_before"], payload["queue_after"])
+        mock_enqueue.assert_not_called()
+        mock_worker.assert_not_called()
+        self.assertEqual(before, self._runtime_side_effect_snapshot())
+
+    @patch("app.process_hydration_queue_worker")
+    @patch("app.enqueue_station_hydration")
+    @patch("app._is_non_production_environment", return_value=False)
+    @patch("app._current_kalshi_execution_domain", return_value="observability")
+    def test_recovery_noop_in_observability_domain(self, _domain, _env, mock_enqueue, mock_worker):
+        before = self._runtime_side_effect_snapshot()
+
+        response = self.client.post("/ops/hydration-recovery", json={"station": "KDEN"})
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "no_op")
+        self.assertEqual(payload["reason"], "non_production_execution_domain")
+        self.assertEqual(payload["execution_domain"], "observability")
+        self.assertEqual(payload["queue_before"], payload["queue_after"])
+        mock_enqueue.assert_not_called()
+        mock_worker.assert_not_called()
+        self.assertEqual(before, self._runtime_side_effect_snapshot())
+
+    @patch("app.process_hydration_queue_worker")
+    @patch("app.enqueue_station_hydration")
+    @patch("app._is_non_production_environment", return_value=True)
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    def test_recovery_noop_in_non_production_environment(self, _domain, _env, mock_enqueue, mock_worker):
+        before = kalshi_monitor.hydration_queue_snapshot()
+
+        response = self.client.post("/ops/hydration-recovery", json={"station": "KDEN"})
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "no_op")
+        self.assertEqual(payload["reason"], "non_production_environment")
+        self.assertEqual(payload["queue_before"], payload["queue_after"])
+        mock_enqueue.assert_not_called()
+        mock_worker.assert_not_called()
+        self.assertEqual(before, kalshi_monitor.hydration_queue_snapshot())
+
+    @patch("app._is_non_production_environment", return_value=False)
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    def test_recovery_refuses_when_allowlist_missing(self, _domain, _env):
+        with patch.dict("os.environ", {"HYDRATION_RECOVERY_STATION_ALLOWLIST": ""}, clear=False):
+            response = self.client.post("/ops/hydration-recovery", json={"station": "KDEN"})
+
+        self.assertEqual(response.status_code, 403)
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "refused")
+        self.assertEqual(payload["reason"], "allowlist_required")
+
+    @patch.dict("os.environ", {"HYDRATION_RECOVERY_STATION_ALLOWLIST": "KDEN"}, clear=False)
+    @patch("app._is_non_production_environment", return_value=False)
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    def test_recovery_refuses_station_not_in_allowlist(self, _domain, _env):
+        response = self.client.post("/ops/hydration-recovery", json={"station": "KPHL"})
+        self.assertEqual(response.status_code, 403)
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "refused")
+        self.assertEqual(payload["reason"], "station_not_allowlisted")
+
+
+    @patch.dict("os.environ", {"HYDRATION_RECOVERY_STATION_ALLOWLIST": "KDEN,KPHL"}, clear=False)
+    @patch("app.hydration_queue_snapshot")
+    @patch("app.process_hydration_queue_worker")
+    @patch("app.enqueue_station_hydration")
+    @patch("app._is_non_production_environment", return_value=False)
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    def test_bounded_recovery_executes_only_in_production_domain(self, _domain, _env, mock_enqueue, mock_worker, mock_queue):
+        mock_queue.side_effect = [
+            {
+                "queue": [],
+                "queue_depth": 0,
+                "queued_stations": [],
+                "backoff_until": {},
+                "backoff_stations": [],
+                "last_hydration_request_ts": 0.0,
+            },
+            {
+                "queue": ["KDEN"],
+                "queue_depth": 1,
+                "queued_stations": ["KDEN"],
+                "backoff_until": {},
+                "backoff_stations": [],
+                "last_hydration_request_ts": 8.0,
+            },
+        ]
+        mock_worker.side_effect = [
+            {"status": "hydrated", "station": "KDEN"},
+            {"status": "rate_limited", "reason": "interval_guard"},
+        ]
+
+        response = self.client.post(
+            "/ops/hydration-recovery",
+            json={"station": "KDEN", "bounded_limit": 2},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "executed")
+        self.assertEqual(payload["execution_domain"], "production")
+        self.assertEqual(payload["bounded_limit"], 2)
+        mock_enqueue.assert_called_once_with("KDEN", reason="ops_hydration_recovery")
+        self.assertEqual(mock_worker.call_count, 2)
+        self.assertEqual(payload["worker_runs"][0]["status"], "hydrated")
+
+    @patch.dict("os.environ", {"HYDRATION_RECOVERY_STATION_ALLOWLIST": "KDEN"}, clear=False)
+    @patch("app.hydration_queue_snapshot")
+    @patch("app.process_hydration_queue_worker")
+    @patch("app.enqueue_station_hydration")
+    @patch("app._is_non_production_environment", return_value=False)
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    def test_recovery_bounded_limit_is_clamped(self, _domain, _env, mock_enqueue, mock_worker, mock_queue):
+        mock_queue.side_effect = [
+            {
+                "queue": [],
+                "queue_depth": 0,
+                "queued_stations": [],
+                "backoff_until": {},
+                "backoff_stations": [],
+                "last_hydration_request_ts": 0.0,
+            },
+            {
+                "queue": ["KDEN"],
+                "queue_depth": 1,
+                "queued_stations": ["KDEN"],
+                "backoff_until": {},
+                "backoff_stations": [],
+                "last_hydration_request_ts": 3.0,
+            },
+        ]
+        mock_worker.side_effect = [
+            {"status": "hydrated", "station": "KDEN"},
+            {"status": "rate_limited", "reason": "interval_guard"},
+            {"status": "rate_limited", "reason": "interval_guard"},
+        ]
+
+        response = self.client.post(
+            "/ops/hydration-recovery",
+            json={"station": "KDEN", "bounded_limit": 999},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "executed")
+        self.assertEqual(payload["bounded_limit"], 3)
+        mock_enqueue.assert_called_once_with("KDEN", reason="ops_hydration_recovery")
+        self.assertEqual(mock_worker.call_count, 3)
+

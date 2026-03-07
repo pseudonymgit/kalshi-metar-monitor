@@ -54,6 +54,7 @@ from core.kalshi_monitor import (
     _current_kalshi_execution_domain,
     _kalshi_public_get,
     build_market_polling_station_universe,
+    enqueue_station_hydration,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
     get_kalshi_connectivity_snapshot,
@@ -61,6 +62,7 @@ from core.kalshi_monitor import (
     get_last_hydration_execution_snapshot,
     hydration_queue_snapshot,
     kalshi_execution_domain,
+    process_hydration_queue_worker,
     reset_kalshi_execution_domain,
     set_kalshi_execution_domain,
 )
@@ -1454,6 +1456,111 @@ def root():
 @app.route("/execution-domain", methods=["GET"])
 def execution_domain():
     return jsonify({"execution_domain": _current_kalshi_execution_domain()}), 200
+
+
+def _is_non_production_environment() -> bool:
+    if bool(app.config.get("TESTING")):
+        return True
+
+    environment = (
+        os.getenv("APP_ENV")
+        or os.getenv("ENVIRONMENT")
+        or os.getenv("FLASK_ENV")
+        or ""
+    ).strip().lower()
+    return environment in {
+        "development",
+        "dev",
+        "test",
+        "testing",
+        "local",
+        "ci",
+    }
+
+
+def _hydration_recovery_allowlist() -> set[str]:
+    return {
+        station.strip().upper()
+        for station in str(os.getenv("HYDRATION_RECOVERY_STATION_ALLOWLIST") or "").split(",")
+        if station and station.strip()
+    }
+
+
+@app.route("/ops/hydration-recovery", methods=["POST"])
+def hydration_recovery():
+    queue_before = hydration_queue_snapshot()
+    execution_domain = _current_kalshi_execution_domain()
+    data = request.get_json(force=True, silent=True) or {}
+    station = (data.get("station") or "").strip().upper()
+
+    if execution_domain != "production":
+        return jsonify(
+            {
+                "status": "no_op",
+                "reason": "non_production_execution_domain",
+                "execution_domain": execution_domain,
+                "queue_before": queue_before,
+                "queue_after": hydration_queue_snapshot(),
+            }
+        ), 200
+
+    if _is_non_production_environment():
+        return jsonify(
+            {
+                "status": "no_op",
+                "reason": "non_production_environment",
+                "execution_domain": execution_domain,
+                "queue_before": queue_before,
+                "queue_after": hydration_queue_snapshot(),
+            }
+        ), 200
+
+    if not station:
+        return jsonify({"error": "Missing JSON field: station"}), 400
+
+    allowlist = _hydration_recovery_allowlist()
+    if not allowlist:
+        return jsonify(
+            {
+                "status": "refused",
+                "reason": "allowlist_required",
+                "station": station,
+            }
+        ), 403
+
+    if station not in allowlist:
+        return jsonify(
+            {
+                "status": "refused",
+                "reason": "station_not_allowlisted",
+                "station": station,
+                "allowlist": sorted(allowlist),
+            }
+        ), 403
+
+    try:
+        requested_limit = int(data.get("bounded_limit", 1))
+    except (TypeError, ValueError):
+        requested_limit = 1
+    bounded_limit = max(1, min(requested_limit, 3))
+
+    enqueue_station_hydration(station, reason="ops_hydration_recovery")
+    worker_runs = [
+        process_hydration_queue_worker(market_types={"HIGH"})
+        for _ in range(bounded_limit)
+    ]
+
+    return jsonify(
+        {
+            "status": "executed",
+            "execution_domain": execution_domain,
+            "station": station,
+            "bounded_limit": bounded_limit,
+            "worker_runs": worker_runs,
+            "queue_before": queue_before,
+            "queue_after": hydration_queue_snapshot(),
+        }
+    ), 200
 
 
 @app.route("/kalshi/ping", methods=["GET"])
