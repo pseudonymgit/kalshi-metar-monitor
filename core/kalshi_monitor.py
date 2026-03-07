@@ -706,7 +706,7 @@ def hydration_queue_snapshot() -> dict:
         backoff_stations = sorted(
             station for station, until_ts in backoff_until.items() if float(until_ts or 0.0) > now_ts
         )
-        next_backoff_expiry = min([float(value or 0.0) for value in backoff_until.values()] or [0.0])
+        next_backoff_expiry = (min(backoff_until.values()) if backoff_until else None)
         return {
             "queue": list(_hydration_queue),
             "queue_depth": len(_hydration_queue),
@@ -714,7 +714,7 @@ def hydration_queue_snapshot() -> dict:
             "backoff_until": backoff_until,
             "backoff_stations": backoff_stations,
             "stations_in_backoff": len(backoff_stations),
-            "next_backoff_expiry": (next_backoff_expiry if next_backoff_expiry > 0 else None),
+            "next_backoff_expiry": (float(next_backoff_expiry) if next_backoff_expiry is not None else None),
             "last_hydration_request_ts": float(_last_hydration_request_ts or 0.0),
         }
 

@@ -170,6 +170,59 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             self.assertEqual(payload["hydration_stall_signal"]["hydration_reason"], "hydration_cache_not_written")
 
 
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}, "ingestion": {"status": "OK"}})
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": []})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 0})
+    @patch("app.os.path.exists", return_value=False)
+    @patch("app.get_kalshi_connectivity_snapshot", return_value={
+        "series_discovery_attempted": False,
+        "last_series_discovery_success_utc": None,
+        "last_series_discovery_error": None,
+        "markets_cache_population_count": 0,
+    })
+    @patch("app._build_ingestion_health_rows", return_value={"stations": []})
+    @patch("app._canonical_live_station_universe", return_value={"stations": []})
+    def test_runtime_authority_snapshot_is_read_only_for_observability_snapshots(self, *_mocks):
+        transitions = [{"station": "KDEN", "id": 1}]
+        alerts = [{"station": "KDEN", "id": 2}]
+        hydration_queue = {
+            "queue": ["KDEN"],
+            "queue_depth": 1,
+            "queued_stations": ["KDEN"],
+            "backoff_until": {"KDEN": 123.0},
+            "backoff_stations": ["KDEN"],
+            "stations_in_backoff": 1,
+            "next_backoff_expiry": 123.0,
+            "last_hydration_request_ts": 99.0,
+        }
+        hydration_execution = {"KDEN": {"cache_written": False}}
+        hydration_snapshot = {"stations": {"KDEN": {"cache_present": True}}}
+
+        with patch("app.get_transition_history", return_value=transitions),              patch("app.get_recent_alerts", return_value=alerts),              patch("app.hydration_queue_snapshot", return_value=hydration_queue),              patch("app.get_last_hydration_execution_snapshot", return_value=hydration_execution),              patch("app._build_runtime_authority_hydration_snapshot", return_value=hydration_snapshot):
+            before = {
+                "transitions": [dict(row) for row in transitions],
+                "alerts": [dict(row) for row in alerts],
+                "hydration_queue": {
+                    **hydration_queue,
+                    "queue": list(hydration_queue["queue"]),
+                    "queued_stations": list(hydration_queue["queued_stations"]),
+                    "backoff_until": dict(hydration_queue["backoff_until"]),
+                    "backoff_stations": list(hydration_queue["backoff_stations"]),
+                },
+                "hydration_execution": {k: dict(v) for k, v in hydration_execution.items()},
+                "hydration_snapshot": {"stations": {k: dict(v) for k, v in hydration_snapshot["stations"].items()}},
+            }
+
+            response = self.client.get("/observability/runtime-authority-snapshot")
+            self.assertEqual(response.status_code, 200)
+
+            self.assertEqual(transitions, before["transitions"])
+            self.assertEqual(alerts, before["alerts"])
+            self.assertEqual(hydration_queue, before["hydration_queue"])
+            self.assertEqual(hydration_execution, before["hydration_execution"])
+            self.assertEqual(hydration_snapshot, before["hydration_snapshot"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
