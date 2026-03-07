@@ -11,6 +11,8 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         app_module._autostart_fallback_done = True
         self.client = app.test_client()
 
+    @patch("app.hydration_queue_snapshot", return_value={"queue": ["KDEN"], "queue_depth": 1, "queued_stations": ["KDEN"], "backoff_until": {"KDEN": 120.0}, "backoff_stations": ["KDEN"], "stations_in_backoff": 1, "next_backoff_expiry": 120.0, "last_hydration_request_ts": 10.0})
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_cache_not_written"}})
     @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
     @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1})
     @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": False}})
@@ -29,6 +31,8 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         _mock_hydration_execution,
         _mock_transition_runtime,
         _mock_fire_audit,
+        _mock_system_health,
+        _mock_hydration_queue,
     ):
         mock_station_universe.return_value = {
             "stations": ["KDEN"],
@@ -69,7 +73,10 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         self.assertIn("STATION_ALERT_SILENCE", finding_types)
         self.assertIn("HYDRATION_STALL_CONDITION", finding_types)
         self.assertTrue(payload["hydration_stall_signal"]["hydration_stall_condition"])
+        self.assertEqual(payload["hydration_queue"]["stations_in_backoff"], 1)
 
+    @patch("app.hydration_queue_snapshot", return_value={"queue": [], "queue_depth": 0, "queued_stations": [], "backoff_until": {}, "backoff_stations": [], "stations_in_backoff": 0, "next_backoff_expiry": None, "last_hydration_request_ts": 0.0})
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}})
     @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 1}]})
     @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1})
     @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": True}})
@@ -85,6 +92,7 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         self.assertEqual(payload["finding_count"], 0)
         self.assertEqual(payload["findings"], [])
         self.assertFalse(payload["hydration_stall_signal"]["hydration_stall_condition"])
+        self.assertEqual(payload["hydration_queue"]["stations_in_backoff"], 0)
 
 
 if __name__ == "__main__":
