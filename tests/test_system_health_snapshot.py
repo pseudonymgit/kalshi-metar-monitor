@@ -206,6 +206,44 @@ class SystemHealthSnapshotTests(unittest.TestCase):
         self.assertEqual(snapshot["hydration"]["status"], "BLOCKED")
         self.assertEqual(snapshot["hydration"]["reason"], "hydration_cache_not_written")
 
+    @patch("app.hydration_queue_snapshot", return_value={"queue_depth": 2, "backoff_until": {"KDEN": 1234.0}})
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "fire_integrity": "TRANSITION_WITHOUT_ALERT"}]})
+    @patch("app.datetime")
+    def test_hydration_stall_signals_exposed_on_system_health(self, mock_datetime, *_mocks):
+        from datetime import datetime, timezone
+
+        mock_datetime.now.return_value = datetime(2026, 1, 1, 0, 30, 0, tzinfo=timezone.utc)
+        mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
+
+        with patch.dict("os.environ", {"HYDRATION_STALL_WINDOW_SECONDS": "900"}):
+            snapshot = app_module.compute_system_health_snapshot(
+                station="KDEN",
+                ingestion_snapshot={
+                    "scheduler_running": True,
+                    "last_poll_utc": "2026-01-01T00:00:00+00:00",
+                    "stale_after_seconds": 180,
+                    "stations": [{"station": "KDEN", "freshness_lag_seconds": 10}],
+                },
+                hydration_snapshot={"stations": {"KDEN": {}}},
+                hydration_execution_snapshot={
+                    "KDEN": {
+                        "station": "KDEN",
+                        "cache_written": False,
+                        "evaluated_at_utc": "2026-01-01T00:00:00+00:00",
+                    }
+                },
+                transitions=[],
+                alerts=[],
+            )
+
+        hydration = snapshot["hydration"]
+        self.assertEqual(hydration["hydration_queue_depth"], 2)
+        self.assertEqual(hydration["hydration_backoff_until"], {"KDEN": 1234.0})
+        self.assertEqual(hydration["stations_blocked_by_hydration"], ["KDEN"])
+        self.assertEqual(hydration["stations_blocked_beyond_window"], ["KDEN"])
+        self.assertTrue(hydration["prolonged_hydration_stall_detected"])
+        self.assertEqual(hydration["stall_window_seconds"], 900)
+
     @patch("app.datetime")
     def test_evaluation_suppression_breakdown_counts_reason_totals(self, mock_datetime):
         from datetime import datetime, timezone

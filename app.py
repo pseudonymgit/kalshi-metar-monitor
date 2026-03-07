@@ -54,6 +54,7 @@ from core.kalshi_monitor import (
     _current_kalshi_execution_domain,
     _kalshi_public_get,
     build_market_polling_station_universe,
+    enqueue_station_hydration,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
     get_kalshi_connectivity_snapshot,
@@ -61,6 +62,7 @@ from core.kalshi_monitor import (
     get_last_hydration_execution_snapshot,
     hydration_queue_snapshot,
     kalshi_execution_domain,
+    process_hydration_queue_worker,
     reset_kalshi_execution_domain,
     set_kalshi_execution_domain,
 )
@@ -908,6 +910,73 @@ def _max_iso_timestamp(values):
     return max(candidates) if candidates else None
 
 
+def _build_hydration_stall_state(*, station=None, hydration_execution=None, hydration_queue=None, fire_audit=None):
+    now_utc = datetime.now(timezone.utc)
+    normalized_station = (station or "").strip().upper()
+
+    hydration_execution_rows = (
+        hydration_execution if isinstance(hydration_execution, dict) else get_last_hydration_execution_snapshot()
+    )
+    queue_snapshot = hydration_queue if isinstance(hydration_queue, dict) else hydration_queue_snapshot()
+    if isinstance(fire_audit, dict):
+        fire_audit_snapshot = fire_audit
+    else:
+        try:
+            fire_audit_snapshot = _build_alert_fire_audit_rows()
+        except Exception:
+            fire_audit_snapshot = {"stations": []}
+
+    fire_integrity_by_station = {
+        (row.get("station") or "").strip().upper(): (row.get("fire_integrity") or "")
+        for row in (fire_audit_snapshot.get("stations") or [])
+        if isinstance(row, dict) and row.get("station")
+    }
+
+    stall_window_seconds = int(os.getenv("HYDRATION_STALL_WINDOW_SECONDS", "900"))
+    station_keys = sorted(
+        key
+        for key in hydration_execution_rows.keys()
+        if key and (not normalized_station or key == normalized_station)
+    )
+
+    stations_blocked_by_hydration = []
+    stations_blocked_beyond_window = []
+    for station_code in station_keys:
+        execution_row = hydration_execution_rows.get(station_code) or {}
+        if not execution_row or bool(execution_row.get("cache_written")):
+            continue
+
+        stations_blocked_by_hydration.append(station_code)
+        evaluated_at_utc = execution_row.get("evaluated_at_utc")
+        blockage_age_seconds = _safe_lag_seconds(now_utc=now_utc, iso_timestamp=evaluated_at_utc)
+        transition_without_alert = fire_integrity_by_station.get(station_code) == "TRANSITION_WITHOUT_ALERT"
+        prolonged = (
+            transition_without_alert
+            and blockage_age_seconds is not None
+            and blockage_age_seconds >= stall_window_seconds
+        )
+        if prolonged:
+            stations_blocked_beyond_window.append(station_code)
+
+    return {
+        "hydration_queue_depth": int(queue_snapshot.get("queue_depth") or 0),
+        "hydration_backoff_until": queue_snapshot.get("backoff_until") or {},
+        "stations_blocked_by_hydration": stations_blocked_by_hydration,
+        "stations_blocked_beyond_window": stations_blocked_beyond_window,
+        "prolonged_hydration_stall_detected": bool(stations_blocked_beyond_window),
+        "stall_window_seconds": stall_window_seconds,
+    }
+
+
+def _read_positive_bounded_int(payload, key, default, minimum, maximum):
+    raw_value = payload.get(key, default)
+    try:
+        value = int(raw_value)
+    except Exception:
+        value = default
+    return max(minimum, min(maximum, value))
+
+
 def compute_system_health_snapshot(
     *,
     station=None,
@@ -954,6 +1023,12 @@ def compute_system_health_snapshot(
         hydration_execution_snapshot
         if isinstance(hydration_execution_snapshot, dict)
         else get_last_hydration_execution_snapshot()
+    )
+    hydration_queue = hydration_queue_snapshot()
+    hydration_stall_state = _build_hydration_stall_state(
+        station=station,
+        hydration_execution=hydration_execution,
+        hydration_queue=hydration_queue,
     )
     hydration_station_keys = set((hydration_view.get("stations") or {}).keys()) | set(hydration_execution.keys())
     if station:
@@ -1049,6 +1124,12 @@ def compute_system_health_snapshot(
             "reason": hydration_reason,
             "last_updated_utc": _max_iso_timestamp(row.get("evaluated_at_utc") for row in hydration_station_rows) or now_iso,
             "health": hydration_health,
+            "hydration_queue_depth": hydration_stall_state.get("hydration_queue_depth"),
+            "hydration_backoff_until": hydration_stall_state.get("hydration_backoff_until"),
+            "stations_blocked_by_hydration": hydration_stall_state.get("stations_blocked_by_hydration"),
+            "stations_blocked_beyond_window": hydration_stall_state.get("stations_blocked_beyond_window"),
+            "prolonged_hydration_stall_detected": hydration_stall_state.get("prolonged_hydration_stall_detected"),
+            "stall_window_seconds": hydration_stall_state.get("stall_window_seconds"),
         },
         "evaluation": {
             "status": evaluation_status,
@@ -1810,6 +1891,70 @@ def observability_ladder_cache():
     station_universe = _canonical_live_station_universe()
     snapshot = build_ladder_cache_snapshot(station_universe.get("stations") or [])
     return jsonify(snapshot), 200
+
+
+@app.route("/observability/hydration-stall-runtime", methods=["GET"])
+def observability_hydration_stall_runtime():
+    station = (request.args.get("station") or "").strip().upper() or None
+    payload = _build_hydration_stall_state(station=station)
+    return jsonify(
+        {
+            "ok": True,
+            "station": station,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            **payload,
+        }
+    ), 200
+
+
+@app.route("/ops/hydration/recover-stalled", methods=["POST"])
+def ops_recover_stalled_hydration():
+    payload = request.get_json(silent=True) or {}
+    station = (str(payload.get("station") or "").strip().upper()) or None
+    dry_run = bool(payload.get("dry_run", False))
+    max_stations = _read_positive_bounded_int(payload, "max_stations", 3, 1, 25)
+    max_worker_runs = _read_positive_bounded_int(payload, "max_worker_runs", 5, 1, 100)
+
+    before = _build_hydration_stall_state(station=station)
+    candidates = before.get("stations_blocked_beyond_window") or before.get("stations_blocked_by_hydration") or []
+    target_stations = sorted(candidates)[:max_stations]
+
+    enqueued = []
+    worker_results = []
+    if not dry_run:
+        for station_code in target_stations:
+            if enqueue_station_hydration(station_code, reason="operator_recovery"):
+                enqueued.append(station_code)
+
+        for _ in range(max_worker_runs):
+            worker_result = process_hydration_queue_worker(market_types={"HIGH", "LOW"})
+            worker_results.append(worker_result)
+            if worker_result.get("status") in {"idle", "backoff", "rate_limited", "skipped"}:
+                break
+
+    hydration_execution = get_last_hydration_execution_snapshot()
+    restored_stations = sorted(
+        station_code
+        for station_code in target_stations
+        if bool((hydration_execution.get(station_code) or {}).get("cache_written"))
+    )
+
+    after = _build_hydration_stall_state(station=station)
+    return jsonify(
+        {
+            "ok": True,
+            "dry_run": dry_run,
+            "execution_domain": _current_kalshi_execution_domain(),
+            "scheduler_running": is_scheduler_running(),
+            "target_stations": target_stations,
+            "enqueued_stations": enqueued,
+            "worker_results": worker_results,
+            "restored_stations": restored_stations,
+            "before": before,
+            "after": after,
+        }
+    ), 200
 
 
 def _parse_iso_timestamp(iso_timestamp):
