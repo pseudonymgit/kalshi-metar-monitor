@@ -910,6 +910,55 @@ def _max_iso_timestamp(values):
     return max(candidates) if candidates else None
 
 
+def _build_hydration_stall_signal(*, station=None, hydration_execution_snapshot=None, transition_runtime_summary=None, alert_fire_audit_rows=None):
+    normalized_station = (station or "").strip().upper() or None
+
+    hydration_execution = (
+        hydration_execution_snapshot
+        if isinstance(hydration_execution_snapshot, dict)
+        else get_last_hydration_execution_snapshot()
+    )
+    if normalized_station:
+        hydration_rows = [hydration_execution.get(normalized_station) or {}]
+    else:
+        hydration_rows = [row for row in hydration_execution.values() if isinstance(row, dict)]
+    hydration_cache_not_written = any(bool(row) and not bool(row.get("cache_written")) for row in hydration_rows)
+
+    transition_runtime = (
+        transition_runtime_summary
+        if isinstance(transition_runtime_summary, dict)
+        else _get_transition_runtime_summary(normalized_station)
+        if normalized_station
+        else {"transitions_seen_today": 0}
+    )
+    transitions_seen_today = int((transition_runtime or {}).get("transitions_seen_today") or 0)
+
+    fire_audit = (
+        alert_fire_audit_rows
+        if isinstance(alert_fire_audit_rows, dict)
+        else _build_alert_fire_audit_rows()
+    )
+    alerts_sent_today = 0
+    fire_rows = (fire_audit.get("stations") or []) if isinstance(fire_audit, dict) else []
+    for row in fire_rows:
+        row_station = (row.get("station") or "").strip().upper()
+        if normalized_station and row_station != normalized_station:
+            continue
+        alerts_sent_today += int(row.get("alerts_sent_today") or 0)
+
+    hydration_stall_condition = bool(
+        hydration_cache_not_written and transitions_seen_today > 0 and alerts_sent_today == 0
+    )
+
+    return {
+        "station": normalized_station,
+        "hydration_cache_not_written": hydration_cache_not_written,
+        "transitions_seen_today": transitions_seen_today,
+        "alerts_sent_today": alerts_sent_today,
+        "hydration_stall_condition": hydration_stall_condition,
+    }
+
+
 def compute_system_health_snapshot(
     *,
     station=None,
@@ -2499,6 +2548,14 @@ def observability_runtime_authority_snapshot():
         alerts = [row for row in alerts if (row.get("station") or "").strip().upper() == station]
     hydration_execution = get_last_hydration_execution_snapshot()
     hydration_queue = hydration_queue_snapshot()
+    transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
+    fire_audit = _build_alert_fire_audit_rows()
+    hydration_stall_signal = _build_hydration_stall_signal(
+        station=station,
+        hydration_execution_snapshot=hydration_execution,
+        transition_runtime_summary=transition_runtime,
+        alert_fire_audit_rows=fire_audit,
+    )
 
     db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
@@ -2512,6 +2569,7 @@ def observability_runtime_authority_snapshot():
             "kalshi_connectivity": get_kalshi_connectivity_snapshot(),
             "hydration_execution": hydration_execution,
             "hydration_queue": hydration_queue,
+            "hydration_stall_signal": hydration_stall_signal,
             "latest_transitions": {
                 "count": len(transitions),
                 "bounded_limit": 50,
@@ -2549,12 +2607,23 @@ def integrity_alert_pipeline():
     if station:
         recent_alerts = [row for row in recent_alerts if (row.get("station") or "").strip().upper() == station]
 
+    hydration_execution = get_last_hydration_execution_snapshot()
+    transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
+    fire_audit = _build_alert_fire_audit_rows()
+    hydration_stall_signal = _build_hydration_stall_signal(
+        station=station,
+        hydration_execution_snapshot=hydration_execution,
+        transition_runtime_summary=transition_runtime,
+        alert_fire_audit_rows=fire_audit,
+    )
+
     payload = build_alert_integrity_findings(
         station_universe=station_universe,
         transitions=transitions,
         latest_evaluations=latest_evaluations,
         hydration_snapshot=hydration_snapshot,
         recent_alerts=recent_alerts,
+        hydration_stall_signal=hydration_stall_signal,
     )
 
     return jsonify({"ok": True, "station": station, **payload}), 200

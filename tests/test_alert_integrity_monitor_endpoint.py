@@ -11,6 +11,9 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         app_module._autostart_fallback_done = True
         self.client = app.test_client()
 
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1})
+    @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": False}})
     @patch("app.get_recent_alerts", return_value=[])
     @patch("app.get_latest_station_market_evaluation_context")
     @patch("app.get_transition_history")
@@ -23,6 +26,9 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         mock_transitions,
         mock_evals,
         _mock_alerts,
+        _mock_hydration_execution,
+        _mock_transition_runtime,
+        _mock_fire_audit,
     ):
         mock_station_universe.return_value = {
             "stations": ["KDEN"],
@@ -50,7 +56,7 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
             }
         }
 
-        response = self.client.get("/integrity/alert_pipeline")
+        response = self.client.get("/integrity/alert_pipeline?station=KDEN")
 
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
@@ -61,7 +67,12 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         self.assertIn("HYDRATION_DRIFT", finding_types)
         self.assertIn("MARKET_DISCOVERY_REGRESSION", finding_types)
         self.assertIn("STATION_ALERT_SILENCE", finding_types)
+        self.assertIn("HYDRATION_STALL_CONDITION", finding_types)
+        self.assertTrue(payload["hydration_stall_signal"]["hydration_stall_condition"])
 
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 1}]})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1})
+    @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": True}})
     @patch("app.get_recent_alerts", return_value=[{"station": "KDEN", "created_utc": "2030-01-01T00:00:05+00:00"}])
     @patch("app.get_latest_station_market_evaluation_context", return_value={"KDEN": {"latest_evaluation_timestamp_utc": "2030-01-01T00:00:01+00:00", "latest_evaluation_outcome": "ALERT_EMITTED", "latest_suppression_reason": ""}})
     @patch("app.get_transition_history", return_value=[{"station": "KDEN", "timestamp": "2030-01-01T00:00:00+00:00"}])
@@ -73,6 +84,7 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(payload["finding_count"], 0)
         self.assertEqual(payload["findings"], [])
+        self.assertFalse(payload["hydration_stall_signal"]["hydration_stall_condition"])
 
 
 if __name__ == "__main__":

@@ -56,9 +56,18 @@ Operational queue state is surfaced in existing observability payloads:
 - `/observability/runtime-authority-snapshot`
   - `hydration_queue.queue_depth`
   - `hydration_queue.queued_stations`
+  - `hydration_queue.stations_in_backoff`
+  - `hydration_queue.next_backoff_expiry`
+  - `hydration_queue.last_hydration_request_ts`
   - `hydration_queue.backoff_stations`
+  - `hydration_stall_signal.hydration_stall_condition`
+  - `hydration_stall_signal.hydration_cache_not_written`
+  - `hydration_stall_signal.transitions_seen_today`
+  - `hydration_stall_signal.alerts_sent_today`
 - `/observability/hydration-prerequisite-runtime`
   - `hydration_queue` snapshot for the same process epoch.
+- `/integrity/alert_pipeline`
+  - `hydration_stall_signal` snapshot and `HYDRATION_STALL_CONDITION` finding when the derived condition is true.
 
 These fields allow operators to distinguish cache-policy usability issues from
 queue transport/backoff pressure without introducing new write-capable surfaces.

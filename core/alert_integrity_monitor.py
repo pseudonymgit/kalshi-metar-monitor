@@ -13,6 +13,7 @@ FINDING_SUPPRESSION_WITHOUT_REASON = "SUPPRESSION_WITHOUT_REASON"
 FINDING_HYDRATION_DRIFT = "HYDRATION_DRIFT"
 FINDING_MARKET_DISCOVERY_REGRESSION = "MARKET_DISCOVERY_REGRESSION"
 FINDING_STATION_ALERT_SILENCE = "STATION_ALERT_SILENCE"
+FINDING_HYDRATION_STALL_CONDITION = "HYDRATION_STALL_CONDITION"
 
 
 def _parse_iso_utc(raw_value: Optional[str]) -> Optional[datetime]:
@@ -43,6 +44,7 @@ def build_alert_integrity_findings(
     latest_evaluations: Dict[str, Dict[str, Any]],
     hydration_snapshot: Dict[str, Any],
     recent_alerts: List[Dict[str, Any]],
+    hydration_stall_signal: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     now_utc = datetime.now(timezone.utc)
     now_iso = now_utc.isoformat()
@@ -88,6 +90,8 @@ def build_alert_integrity_findings(
     }
 
     findings: List[Dict[str, Any]] = []
+
+    stall_signal = hydration_stall_signal if isinstance(hydration_stall_signal, dict) else {}
 
     for station in stations:
         station_transitions = transitions_by_station.get(station) or []
@@ -190,10 +194,32 @@ def build_alert_integrity_findings(
                     )
                 )
 
+    if bool(stall_signal.get("hydration_stall_condition")):
+        findings.append(
+            _finding(
+                station=(stall_signal.get("station") or "GLOBAL"),
+                finding_type=FINDING_HYDRATION_STALL_CONDITION,
+                timestamp=now_iso,
+                supporting_metrics={
+                    "hydration_cache_not_written": bool(stall_signal.get("hydration_cache_not_written")),
+                    "transitions_seen_today": int(stall_signal.get("transitions_seen_today") or 0),
+                    "alerts_sent_today": int(stall_signal.get("alerts_sent_today") or 0),
+                    "hydration_stall_condition": True,
+                },
+            )
+        )
+
     return {
         "generated_utc": now_iso,
         "evaluation_window_seconds": evaluation_window_seconds,
         "silence_window_seconds": silence_window_seconds,
+        "hydration_stall_signal": {
+            "station": stall_signal.get("station"),
+            "hydration_cache_not_written": bool(stall_signal.get("hydration_cache_not_written")),
+            "transitions_seen_today": int(stall_signal.get("transitions_seen_today") or 0),
+            "alerts_sent_today": int(stall_signal.get("alerts_sent_today") or 0),
+            "hydration_stall_condition": bool(stall_signal.get("hydration_stall_condition")),
+        },
         "finding_count": len(findings),
         "findings": findings,
     }
