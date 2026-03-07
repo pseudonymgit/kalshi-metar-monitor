@@ -910,51 +910,22 @@ def _max_iso_timestamp(values):
     return max(candidates) if candidates else None
 
 
-def _build_hydration_stall_signal(*, station=None, hydration_execution_snapshot=None, transition_runtime_summary=None, alert_fire_audit_rows=None):
+def _build_hydration_stall_signal(*, station=None, hydration_reason=None, transitions_seen_today=0, alerts_sent_today=0):
     normalized_station = (station or "").strip().upper() or None
+    hydration_cache_not_written = str(hydration_reason or "").strip() == "hydration_cache_not_written"
 
-    hydration_execution = (
-        hydration_execution_snapshot
-        if isinstance(hydration_execution_snapshot, dict)
-        else get_last_hydration_execution_snapshot()
-    )
-    if normalized_station:
-        hydration_rows = [hydration_execution.get(normalized_station) or {}]
-    else:
-        hydration_rows = [row for row in hydration_execution.values() if isinstance(row, dict)]
-    hydration_cache_not_written = any(bool(row) and not bool(row.get("cache_written")) for row in hydration_rows)
-
-    transition_runtime = (
-        transition_runtime_summary
-        if isinstance(transition_runtime_summary, dict)
-        else _get_transition_runtime_summary(normalized_station)
-        if normalized_station
-        else {"transitions_seen_today": 0}
-    )
-    transitions_seen_today = int((transition_runtime or {}).get("transitions_seen_today") or 0)
-
-    fire_audit = (
-        alert_fire_audit_rows
-        if isinstance(alert_fire_audit_rows, dict)
-        else _build_alert_fire_audit_rows()
-    )
-    alerts_sent_today = 0
-    fire_rows = (fire_audit.get("stations") or []) if isinstance(fire_audit, dict) else []
-    for row in fire_rows:
-        row_station = (row.get("station") or "").strip().upper()
-        if normalized_station and row_station != normalized_station:
-            continue
-        alerts_sent_today += int(row.get("alerts_sent_today") or 0)
-
+    transitions_count = int(transitions_seen_today or 0)
+    alerts_count = int(alerts_sent_today or 0)
     hydration_stall_condition = bool(
-        hydration_cache_not_written and transitions_seen_today > 0 and alerts_sent_today == 0
+        hydration_cache_not_written and transitions_count > 0 and alerts_count == 0
     )
 
     return {
         "station": normalized_station,
+        "hydration_reason": (hydration_reason or None),
         "hydration_cache_not_written": hydration_cache_not_written,
-        "transitions_seen_today": transitions_seen_today,
-        "alerts_sent_today": alerts_sent_today,
+        "transitions_seen_today": transitions_count,
+        "alerts_sent_today": alerts_count,
         "hydration_stall_condition": hydration_stall_condition,
     }
 
@@ -2550,11 +2521,25 @@ def observability_runtime_authority_snapshot():
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
     fire_audit = _build_alert_fire_audit_rows()
+    alerts_sent_today = 0
+    for row in (fire_audit.get("stations") or []):
+        row_station = (row.get("station") or "").strip().upper()
+        if station and row_station != station:
+            continue
+        alerts_sent_today += int(row.get("alerts_sent_today") or 0)
+    system_health = compute_system_health_snapshot(
+        station=station,
+        ingestion_snapshot=scheduler_snapshot,
+        hydration_snapshot=hydration_snapshot,
+        hydration_execution_snapshot=hydration_execution,
+        transitions=transitions,
+        alerts=alerts,
+    )
     hydration_stall_signal = _build_hydration_stall_signal(
         station=station,
-        hydration_execution_snapshot=hydration_execution,
-        transition_runtime_summary=transition_runtime,
-        alert_fire_audit_rows=fire_audit,
+        hydration_reason=((system_health.get("hydration") or {}).get("reason")),
+        transitions_seen_today=int((transition_runtime or {}).get("transitions_seen_today") or 0),
+        alerts_sent_today=alerts_sent_today,
     )
 
     db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
@@ -2584,14 +2569,7 @@ def observability_runtime_authority_snapshot():
                 "path": db_path,
                 "exists": os.path.exists(db_path),
             },
-            "system_health": compute_system_health_snapshot(
-                station=station,
-                ingestion_snapshot=scheduler_snapshot,
-                hydration_snapshot=hydration_snapshot,
-                hydration_execution_snapshot=hydration_execution,
-                transitions=transitions,
-                alerts=alerts,
-            ),
+            "system_health": system_health,
         }
     ), 200
 
@@ -2607,14 +2585,30 @@ def integrity_alert_pipeline():
     if station:
         recent_alerts = [row for row in recent_alerts if (row.get("station") or "").strip().upper() == station]
 
-    hydration_execution = get_last_hydration_execution_snapshot()
+    hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
     fire_audit = _build_alert_fire_audit_rows()
+    alerts_sent_today = 0
+    for row in (fire_audit.get("stations") or []):
+        row_station = (row.get("station") or "").strip().upper()
+        if station and row_station != station:
+            continue
+        alerts_sent_today += int(row.get("alerts_sent_today") or 0)
+    hydration_reason = (
+        (compute_system_health_snapshot(
+            station=station,
+            ingestion_snapshot=_build_ingestion_health_rows(station_filter=station),
+            hydration_snapshot=hydration_snapshot,
+            hydration_execution_snapshot=get_last_hydration_execution_snapshot(),
+            transitions=transitions,
+            alerts=recent_alerts,
+        ).get("hydration") or {}).get("reason")
+    )
     hydration_stall_signal = _build_hydration_stall_signal(
         station=station,
-        hydration_execution_snapshot=hydration_execution,
-        transition_runtime_summary=transition_runtime,
-        alert_fire_audit_rows=fire_audit,
+        hydration_reason=hydration_reason,
+        transitions_seen_today=int((transition_runtime or {}).get("transitions_seen_today") or 0),
+        alerts_sent_today=alerts_sent_today,
     )
 
     payload = build_alert_integrity_findings(
@@ -2626,7 +2620,7 @@ def integrity_alert_pipeline():
         hydration_stall_signal=hydration_stall_signal,
     )
 
-    return jsonify({"ok": True, "station": station, **payload}), 200
+    return jsonify({"ok": True, "station": station, "hydration_queue": hydration_queue, **payload}), 200
 
 
 @app.route("/metar/status", methods=["GET"])

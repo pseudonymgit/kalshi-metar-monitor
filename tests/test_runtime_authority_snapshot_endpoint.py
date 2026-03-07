@@ -11,6 +11,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         app_module._autostart_fallback_done = True
         self.client = app.test_client()
 
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}, "ingestion": {"status": "OK"}})
     @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
     @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 2})
     @patch("app.os.path.exists", return_value=True)
@@ -94,9 +95,11 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["hydration_queue"]["backoff_stations"], ["KPHL"])
         self.assertEqual(payload["hydration_queue"]["stations_in_backoff"], 1)
         self.assertEqual(payload["hydration_queue"]["next_backoff_expiry"], 123.0)
+        self.assertEqual(payload["hydration_stall_signal"]["hydration_reason"], "hydration_ready")
         self.assertEqual(payload["hydration_stall_signal"]["hydration_cache_not_written"], False)
         self.assertEqual(payload["hydration_stall_signal"]["transitions_seen_today"], 2)
         self.assertEqual(payload["hydration_stall_signal"]["alerts_sent_today"], 0)
+        self.assertEqual(payload["hydration_stall_signal"]["hydration_reason"], "hydration_ready")
         self.assertEqual(payload["hydration_stall_signal"]["hydration_stall_condition"], False)
         self.assertEqual(payload["latest_transitions"]["bounded_limit"], 50)
         self.assertEqual(payload["latest_alerts"]["bounded_limit"], 50)
@@ -107,6 +110,8 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(payload["system_health"]["ingestion"]["status"], "OK")
 
     @patch("app._kalshi_public_get", side_effect=AssertionError("observability endpoint must remain read-only"))
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}, "ingestion": {"status": "OK"}})
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_cache_not_written"}, "ingestion": {"status": "OK"}})
     @patch("app._build_alert_fire_audit_rows", return_value={"stations": []})
     @patch("app.os.path.exists", return_value=False)
     @patch("app.get_recent_alerts", return_value=[])
@@ -163,6 +168,8 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             response = self.client.get("/observability/runtime-authority-snapshot")
             self.assertEqual(response.status_code, 200)
             self.assertEqual(execution_snapshot, before)
+            payload = response.get_json()
+            self.assertEqual(payload["hydration_stall_signal"]["hydration_reason"], "hydration_cache_not_written")
 
 
 

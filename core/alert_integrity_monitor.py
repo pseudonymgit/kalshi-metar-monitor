@@ -215,6 +215,7 @@ def build_alert_integrity_findings(
         "silence_window_seconds": silence_window_seconds,
         "hydration_stall_signal": {
             "station": stall_signal.get("station"),
+            "hydration_reason": stall_signal.get("hydration_reason"),
             "hydration_cache_not_written": bool(stall_signal.get("hydration_cache_not_written")),
             "transitions_seen_today": int(stall_signal.get("transitions_seen_today") or 0),
             "alerts_sent_today": int(stall_signal.get("alerts_sent_today") or 0),

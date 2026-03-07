@@ -73,6 +73,17 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(snapshot["stations_in_backoff"], 1)
         self.assertIsInstance(snapshot["next_backoff_expiry"], float)
 
+    @patch("core.kalshi_monitor.time.time", return_value=1500.0)
+    def test_next_backoff_expiry_derived_from_backoff_until_values(self, _time):
+        kalshi_monitor._hydration_backoff_until = {"KDEN": 1490.0, "KPHL": 1800.0, "KLAX": 1700.0}
+
+        snapshot = kalshi_monitor.hydration_queue_snapshot()
+
+        self.assertEqual(snapshot["stations_in_backoff"], 2)
+        self.assertEqual(snapshot["backoff_stations"], ["KLAX", "KPHL"])
+        self.assertEqual(snapshot["next_backoff_expiry"], 1490.0)
+
+
 
 if __name__ == "__main__":
     unittest.main()
