@@ -1446,6 +1446,54 @@ else:
         _merge_discovered_stations_into_watchlist()
         return None
 
+@app.get("/observability/pipeline-truth")
+def pipeline_truth():
+    station = request.args.get("station")
+    if not station:
+        return jsonify({"error": "station query parameter required"}), 400
+
+    from core.metar_monitor import get_transition_runtime_snapshot
+    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
+    from core.metar_monitor import get_market_eligibility_runtime_snapshot
+    from core.alert_integrity_monitor import build_alert_fire_audit_rows
+
+    transition = get_transition_runtime_snapshot(station)
+    hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
+    market = get_market_eligibility_runtime_snapshot(station)
+    audit = build_alert_fire_audit_rows()
+
+    transitions_seen_today = transition.get("transitions_seen_today", 0)
+    eligible_markets_count = market.get("eligible_markets_count", 0)
+    alerts_sent_today = 0
+    last_transition_timestamp = transition.get("last_transition_timestamp")
+
+    hydration_status = hydration.get("status")
+
+    blocking_stage = "NONE"
+    reason = None
+
+    if hydration_status != "cache_valid":
+        blocking_stage = "HYDRATION"
+        reason = "hydration_cache_invalid"
+    elif eligible_markets_count == 0:
+        blocking_stage = "MARKET_EVALUATION"
+        reason = "no_eligible_markets"
+    elif transitions_seen_today > 0 and alerts_sent_today == 0:
+        blocking_stage = "ALERT_EMISSION"
+        reason = "transition_without_alert"
+
+    return jsonify({
+        "station": station,
+        "pipeline_status": "ok",
+        "blocking_stage": blocking_stage,
+        "reason": reason,
+        "transitions_seen_today": transitions_seen_today,
+        "eligible_markets_count": eligible_markets_count,
+        "alerts_sent_today": alerts_sent_today,
+        "hydration_status": hydration_status,
+        "last_transition_timestamp": last_transition_timestamp,
+    })
+    
 @app.before_request
 def _set_request_execution_domain():
     path = str(request.path or "").lower()
