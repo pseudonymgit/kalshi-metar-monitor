@@ -684,6 +684,75 @@ Provides execution-truth evidence (scheduler health, hydration cache state, tran
 ### Safety Notes
 Read-only, bounded payload, and no execution mutation.
 
+### Observability Contract
+- `hydration_queue.stations_in_backoff` (`integer`): count of stations currently in hydration backoff.
+- `hydration_queue.next_backoff_expiry` (`number|null`): earliest epoch-seconds backoff expiry across all stations, or `null` when no station is backed off.
+- `hydration_stall_signal` (`object`): deterministic hydration stall signal that is read-only and derived from current runtime snapshots.
+
+`hydration_stall_signal` supports:
+- **Aggregate/global form** (`station = null`): emitted when no `station` query parameter is supplied.
+- **Per-station form** (`station = <ICAO>`): emitted when a station query parameter is supplied.
+
+`hydration_stall_signal` fields:
+- `station` (`string|null`)
+- `hydration_reason` (`string|null`)
+- `hydration_cache_not_written` (`boolean`)
+- `transitions_seen_today` (`integer`)
+- `alerts_sent_today` (`integer`)
+- `hydration_stall_condition` (`boolean`)
+
+`hydration_stall_condition` predicate is strictly:
+
+`hydration_cache_not_written`
+`AND transitions_seen_today > 0`
+`AND alerts_sent_today == 0`
+
+---
+
+## Endpoint
+`GET /integrity/alert_pipeline`
+
+### Domain
+Observability
+
+### Purpose
+Returns deterministic integrity findings for transitions, evaluations, hydration state, and alert emission consistency.
+
+### Execution Authority
+observability-only
+
+### Data Source
+Runtime state + SQLite audit
+
+### Trading Relevance
+Used to verify that transitions, hydration readiness, and alert emission remain causally consistent.
+
+### Safety Notes
+Read-only integrity diagnostics; no worker execution, scheduler execution, or transition/alert mutation.
+
+### Observability Contract
+- `hydration_queue.stations_in_backoff` (`integer`): count of stations currently in hydration backoff.
+- `hydration_queue.next_backoff_expiry` (`number|null`): earliest epoch-seconds backoff expiry across all stations, or `null` when no station is backed off.
+- `hydration_stall_signal` (`object`): deterministic hydration stall signal included with integrity findings.
+
+`hydration_stall_signal` supports:
+- **Aggregate/global form** (`station = null`): emitted when no `station` query parameter is supplied.
+- **Per-station form** (`station = <ICAO>`): emitted when a station query parameter is supplied.
+
+`hydration_stall_signal` fields:
+- `station` (`string|null`)
+- `hydration_reason` (`string|null`)
+- `hydration_cache_not_written` (`boolean`)
+- `transitions_seen_today` (`integer`)
+- `alerts_sent_today` (`integer`)
+- `hydration_stall_condition` (`boolean`)
+
+`hydration_stall_condition` predicate is strictly:
+
+`hydration_cache_not_written`
+`AND transitions_seen_today > 0`
+`AND alerts_sent_today == 0`
+
 ---
 
 ## Endpoint
