@@ -685,16 +685,13 @@ Provides execution-truth evidence (scheduler health, hydration cache state, tran
 Read-only, bounded payload, and no execution mutation.
 
 ### Observability Contract
-- `hydration_queue.stations_in_backoff`
-  - type: `integer`
-  - description: number of stations currently under hydration backoff.
-- `hydration_queue.next_backoff_expiry`
-  - type: `number | null`
-  - description: earliest timestamp when a hydration backoff expires.
-- `hydration_stall_signal`
-  - type: `boolean`
-  - description: indicates hydration stall condition.
-  - payload location: `hydration_stall_signal.hydration_stall_condition` (within the read-only signal object emitted by this endpoint).
+
+| field | type | description |
+| --- | --- | --- |
+| `hydration_queue.stations_in_backoff` | `integer` | number of stations currently under hydration backoff |
+| `hydration_queue.next_backoff_expiry` | `number \| null` | earliest timestamp when any hydration backoff expires |
+| `hydration_stall_signal` | `object` | hydration stall observability signal |
+| `hydration_stall_signal.hydration_stall_condition` | `boolean` | indicates hydration stall condition |
 
 Stall predicate (exact):
 
@@ -726,16 +723,13 @@ Used to verify that transitions, hydration readiness, and alert emission remain 
 Read-only integrity diagnostics; no worker execution, scheduler execution, or transition/alert mutation.
 
 ### Observability Contract
-- `hydration_queue.stations_in_backoff`
-  - type: `integer`
-  - description: number of stations currently under hydration backoff.
-- `hydration_queue.next_backoff_expiry`
-  - type: `number | null`
-  - description: earliest timestamp when a hydration backoff expires.
-- `hydration_stall_signal`
-  - type: `boolean`
-  - description: indicates hydration stall condition.
-  - payload location: `hydration_stall_signal.hydration_stall_condition` (within the read-only signal object emitted by this endpoint).
+
+| field | type | description |
+| --- | --- | --- |
+| `hydration_queue.stations_in_backoff` | `integer` | number of stations currently under hydration backoff |
+| `hydration_queue.next_backoff_expiry` | `number \| null` | earliest timestamp when any hydration backoff expires |
+| `hydration_stall_signal` | `object` | hydration stall observability signal |
+| `hydration_stall_signal.hydration_stall_condition` | `boolean` | indicates hydration stall condition |
 
 Stall predicate (exact):
 

@@ -263,6 +263,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertNotIsInstance(next_backoff_expiry, bool)
 
         self.assertIn("hydration_stall_signal", payload)
+        self.assertIs(type(payload["hydration_stall_signal"]), dict)
         self.assertIn("hydration_stall_condition", payload["hydration_stall_signal"])
         self.assertIs(type(payload["hydration_stall_signal"]["hydration_stall_condition"]), bool)
 
@@ -288,7 +289,7 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         payload_after = response.get_json()
 
-        existing_payload_before = {
+        legacy_payload_before = {
             "ok": True,
             "execution_mode": "observability",
             "station": "KDEN",
@@ -315,21 +316,23 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             "system_health": {"hydration": {"reason": "hydration_cache_not_written"}, "ingestion": {"status": "OK"}},
         }
 
-        payload_existing_after = {
+        legacy_payload_after = {
             key: value
             for key, value in payload_after.items()
             if key != "hydration_stall_signal"
         }
-        payload_existing_after["hydration_queue"] = {
+        legacy_payload_after["hydration_queue"] = {
             queue_key: queue_value
             for queue_key, queue_value in payload_after["hydration_queue"].items()
             if queue_key not in {"stations_in_backoff", "next_backoff_expiry"}
         }
 
-        existing_keys_before = set(existing_payload_before.keys())
-        existing_keys_after = set(payload_existing_after.keys())
-        self.assertEqual(existing_keys_before, existing_keys_after)
-        self.assertEqual(existing_payload_before, payload_existing_after)
+        legacy_keys_before = set(legacy_payload_before.keys())
+        legacy_keys_after = set(legacy_payload_after.keys())
+        legacy_values_before = legacy_payload_before
+        legacy_values_after = legacy_payload_after
+        self.assertEqual(legacy_keys_before, legacy_keys_after)
+        self.assertEqual(legacy_values_before, legacy_values_after)
 
         self.assertEqual(payload_after["hydration_queue"]["stations_in_backoff"], 1)
         self.assertEqual(payload_after["hydration_queue"]["next_backoff_expiry"], 123.0)

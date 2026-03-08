@@ -178,6 +178,7 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         self.assertNotIsInstance(next_backoff_expiry, bool)
 
         self.assertIn("hydration_stall_signal", payload)
+        self.assertIs(type(payload["hydration_stall_signal"]), dict)
         self.assertIn("hydration_stall_condition", payload["hydration_stall_signal"])
         self.assertIs(type(payload["hydration_stall_signal"]["hydration_stall_condition"]), bool)
 
