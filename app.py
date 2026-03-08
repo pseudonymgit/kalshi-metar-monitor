@@ -1458,18 +1458,15 @@ def pipeline_truth():
     args = request.args.copy()
     args["station"] = station
 
-    with app.test_request_context(query_string=args):
-        transition = observability_transition_runtime().get_json()
+    from core.metar_monitor import _build_transition_runtime
+    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, build_structured_snapshot_from_cache
+    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
 
-    with app.test_request_context(query_string=args):
-        hydration = observability_hydration_prerequisite_runtime().get_json()
-
-    with app.test_request_context(query_string=args):
-        market = observability_market_eligibility_runtime().get_json()
-
-    with app.test_request_context(query_string=args):
-        audit = observability_alert_fire_audit().get_json()
-        
+    transition = _build_transition_runtime(station)
+    hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
+    market = build_structured_snapshot_from_cache(station)
+    audit = _build_alert_fire_audit_rows()    
+    
     transitions_seen_today = transition.get("transitions_seen_today", 0)
     last_transition_timestamp = transition.get("last_transition_timestamp")
 
