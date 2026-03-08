@@ -1455,52 +1455,41 @@ def pipeline_truth():
 
     station = station.strip().upper()
 
-    transitions_seen_today = 0
-    eligible_markets_count = 0
+    # Import the same builders used by existing observability endpoints
+    from core.metar_monitor import _build_transition_runtime
+    from core.kalshi_monitor import _build_hydration_prerequisite_runtime
+    from core.metar_monitor import _build_market_eligibility_runtime
+    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
+
+    transition = _build_transition_runtime(station)
+    hydration = _build_hydration_prerequisite_runtime(station)
+    market = _build_market_eligibility_runtime(station)
+    audit = _build_alert_fire_audit_rows()
+
+    transitions_seen_today = transition.get("transitions_seen_today", 0)
+    last_transition_timestamp = transition.get("last_transition_timestamp")
+
+    hydration_status = hydration.get("hydration_state", {}).get("status")
+
+    eligible_markets_count = market.get("eligible_markets_count", 0)
+
     alerts_sent_today = 0
-    hydration_status = None
-    last_transition_timestamp = None
+    for row in audit.get("stations", []):
+        if row.get("station") == station:
+            alerts_sent_today = row.get("alerts_sent_today", 0)
+            break
+
     blocking_stage = "NONE"
     reason = None
-
-    # transition runtime
-    try:
-        transition = get_transition_runtime(station)
-        transitions_seen_today = transition.get("transitions_seen_today", 0)
-        last_transition_timestamp = transition.get("last_transition_timestamp")
-    except Exception:
-        pass
-
-    # hydration runtime
-    try:
-        hydration = get_hydration_prerequisite_runtime(station)
-        hydration_status = hydration.get("status")
-    except Exception:
-        pass
-
-    # market eligibility runtime
-    try:
-        market = get_market_eligibility_runtime(station)
-        eligible_markets_count = market.get("eligible_markets_count", 0)
-    except Exception:
-        pass
-
-    # alert fire audit
-    try:
-        audit = get_alert_fire_audit()
-        for row in audit.get("stations", []):
-            if row.get("station") == station:
-                alerts_sent_today = row.get("alerts_sent_today", 0)
-                break
-    except Exception:
-        pass
 
     if hydration_status != "cache_valid":
         blocking_stage = "HYDRATION"
         reason = "hydration_cache_invalid"
+
     elif eligible_markets_count == 0:
         blocking_stage = "MARKET_EVALUATION"
         reason = "no_eligible_markets"
+
     elif transitions_seen_today > 0 and alerts_sent_today == 0:
         blocking_stage = "ALERT_EMISSION"
         reason = "transition_without_alert"
@@ -1515,7 +1504,7 @@ def pipeline_truth():
         "alerts_sent_today": alerts_sent_today,
         "hydration_status": hydration_status,
         "last_transition_timestamp": last_transition_timestamp,
-    })
+    })  
     
 @app.before_request
 def _set_request_execution_domain():
