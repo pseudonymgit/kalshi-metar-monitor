@@ -1458,38 +1458,37 @@ def pipeline_truth():
     alerts_sent_today = 0
     hydration_status = None
     last_transition_timestamp = None
-    reason = None
     blocking_stage = "NONE"
+    reason = None
 
-    # read existing runtime snapshots safely
+    # read transition runtime
     try:
-        from core.metar_monitor import get_transition_runtime_snapshot
-        transition = get_transition_runtime_snapshot(station)
+        transition = get_transition_runtime(station)
         transitions_seen_today = transition.get("transitions_seen_today", 0)
         last_transition_timestamp = transition.get("last_transition_timestamp")
     except Exception:
         pass
 
+    # read hydration runtime
     try:
-        from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
-        hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
+        hydration = get_hydration_prerequisite_runtime(station)
         hydration_status = hydration.get("status")
     except Exception:
         pass
 
+    # read market eligibility runtime
     try:
-        from core.metar_monitor import get_market_eligibility_runtime_snapshot
-        market = get_market_eligibility_runtime_snapshot(station)
+        market = get_market_eligibility_runtime(station)
         eligible_markets_count = market.get("eligible_markets_count", 0)
     except Exception:
         pass
 
+    # read alert fire audit
     try:
-        from core.alert_integrity_monitor import build_alert_fire_audit_rows
-        audit = build_alert_fire_audit_rows()
-        for s in audit.get("stations", []):
-            if s.get("station") == station:
-                alerts_sent_today = s.get("alerts_sent_today", 0)
+        audit = get_alert_fire_audit()
+        for row in audit.get("stations", []):
+            if row.get("station") == station:
+                alerts_sent_today = row.get("alerts_sent_today", 0)
                 break
     except Exception:
         pass
