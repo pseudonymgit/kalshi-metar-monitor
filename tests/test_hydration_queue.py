@@ -33,6 +33,8 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(snapshot["queued_stations"], ["KDEN", "KPHL"])
         self.assertEqual(snapshot["backoff_until"], {})
         self.assertEqual(snapshot["backoff_stations"], [])
+        self.assertEqual(snapshot["stations_in_backoff"], 0)
+        self.assertEqual(snapshot["next_backoff_expiry"], None)
         self.assertEqual(snapshot["last_hydration_request_ts"], 0.0)
 
     @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
@@ -52,7 +54,7 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(mock_hydrate.call_count, 2)
 
     @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
-    @patch("core.kalshi_monitor.time.time", side_effect=[2000.0, 2001.0, 2002.0])
+    @patch("core.kalshi_monitor.time.time", side_effect=[2000.0, 2001.0, 2002.0, 2003.0])
     def test_429_sets_backoff_and_prevents_immediate_retry(self, _time, _domain):
         response = type("Response", (), {"status_code": 429})()
         error = kalshi_monitor.requests.HTTPError("rate limited")
@@ -67,6 +69,20 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(second["status"], "backoff")
         self.assertEqual(second["station"], "KDEN")
         self.assertGreater(second["retry_after"], 0)
+        snapshot = kalshi_monitor.hydration_queue_snapshot()
+        self.assertEqual(snapshot["stations_in_backoff"], 1)
+        self.assertIsInstance(snapshot["next_backoff_expiry"], float)
+
+    @patch("core.kalshi_monitor.time.time", return_value=1500.0)
+    def test_next_backoff_expiry_derived_from_backoff_until_values(self, _time):
+        kalshi_monitor._hydration_backoff_until = {"KDEN": 1490.0, "KPHL": 1800.0, "KLAX": 1700.0}
+
+        snapshot = kalshi_monitor.hydration_queue_snapshot()
+
+        self.assertEqual(snapshot["stations_in_backoff"], 2)
+        self.assertEqual(snapshot["backoff_stations"], ["KLAX", "KPHL"])
+        self.assertEqual(snapshot["next_backoff_expiry"], 1490.0)
+
 
 
 if __name__ == "__main__":
