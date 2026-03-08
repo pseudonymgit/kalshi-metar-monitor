@@ -150,6 +150,45 @@ def _now_utc_iso() -> str:
     return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
 
 
+def _parse_iso_utc_optional(raw):
+    if raw is None:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except Exception:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _alert_integrity_evaluation_window_seconds() -> int:
+    try:
+        return max(30, int(os.getenv("ALERT_INTEGRITY_EVALUATION_WINDOW_SECONDS", "300")))
+    except (TypeError, ValueError):
+        return 300
+
+
+def _is_recent_transition_active(
+    *,
+    reference_timestamp_utc: Optional[str],
+    transition_correlation: Optional[Dict[str, Any]],
+) -> bool:
+    reference_dt = _parse_iso_utc_optional(reference_timestamp_utc)
+    if reference_dt is None:
+        return False
+
+    if not isinstance(transition_correlation, dict):
+        return False
+
+    last_transition_timestamp = _parse_iso_utc_optional(transition_correlation.get("timestamp_utc"))
+    if last_transition_timestamp is None:
+        return False
+
+    elapsed_seconds = (reference_dt - last_transition_timestamp).total_seconds()
+    return 0 <= elapsed_seconds <= _alert_integrity_evaluation_window_seconds()
+
+
 def _iso_to_tz(iso_str: Optional[str], tz_name: str) -> Optional[str]:
     if not iso_str:
         return None
@@ -1729,12 +1768,30 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
 
         instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
         settlement_bucket_changed = bool(legacy.get("settlement_bucket_changed"))
-        # Alert gating: market evaluation only proceeds when a deterministic
-        # transition is present; non-transition observations produce no alerts.
-        if not instant_bucket_changed and not settlement_bucket_changed:
+        reference_timestamp_utc = legacy.get("obs_time") or payload.get("timestamp_utc")
+        recent_transition_active = _is_recent_transition_active(
+            reference_timestamp_utc=reference_timestamp_utc,
+            transition_correlation=transition_correlation if isinstance(transition_correlation, dict) else None,
+        )
+        # Alert gating: market evaluation proceeds when transition is current-cycle
+        # or deterministically active within the configured transition window.
+        if not instant_bucket_changed and not settlement_bucket_changed and not recent_transition_active:
+            _annotate_transition_history_market_eval(
+                station=station,
+                transition_correlation=transition_correlation,
+                alerts_sent=0,
+                evaluation_outcome="SUPPRESSED_NO_TRANSITION",
+                suppression_reason="NO_TRANSITION",
+            )
             return
 
-        now_ts = time.time()
+        rate_limit_reference_dt = _parse_iso_utc_optional(reference_timestamp_utc)
+        if rate_limit_reference_dt is None and isinstance(transition_correlation, dict):
+            rate_limit_reference_dt = _parse_iso_utc_optional(transition_correlation.get("timestamp_utc"))
+        if rate_limit_reference_dt is None:
+            return
+
+        now_ts = rate_limit_reference_dt.timestamp()
         with _KALSHI_RATE_LIMIT_LOCK:
             last_call_ts = _KALSHI_LAST_CALL_TS.get(station)
             # Throttle causal implication: suppress duplicate near-term Kalshi checks
@@ -1874,7 +1931,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         current_temp=tf,
                     )
 
-                    if transition.get("should_alert"):
+                    transition_active = bool(transition.get("should_alert"))
+                    if not transition_active:
+                        transition_active = recent_transition_active
+
+                    if transition_active:
                         direction = transition.get("direction") or "UP"
                         bucket_index = transition.get("bucket_index")
                         event_ticker = (markets[0] or {}).get("event_ticker") or ""
@@ -1899,7 +1960,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         result = send_composed_weather_market_alert(
                             station=station,
                             market_types={market_type_token},
-                            transition_reason=transition.get("reason"),
+                            transition_reason=transition.get("reason") or "window_active",
                             prev_temp_f=pf,
                             now_temp_f=tf,
                             delta_f=df,
@@ -1924,7 +1985,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 temp_f=float(tf),
                                 bucket_index=result.get("bucket_index"),
                                 metadata={
-                                    "reason": transition.get("reason"),
+                                    "reason": transition.get("reason") or "window_active",
                                     "attention_phrase": result.get("attention_phrase"),
                                     "alert_context": result.get("alert_context"),
                                 },
