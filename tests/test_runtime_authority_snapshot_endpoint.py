@@ -230,5 +230,111 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
 
 
 
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}, "ingestion": {"status": "OK"}})
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 2})
+    @patch("app.os.path.exists", return_value=True)
+    @patch("app.get_recent_alerts", return_value=[])
+    @patch("app.get_transition_history", return_value=[])
+    @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {}})
+    @patch("app.get_last_hydration_execution_snapshot", return_value={})
+    @patch("app.hydration_queue_snapshot", return_value={"queue": ["KDEN"], "queue_depth": 1, "queued_stations": ["KDEN"], "backoff_until": {"KDEN": 123.0}, "backoff_stations": ["KDEN"], "stations_in_backoff": 1, "next_backoff_expiry": 123.0, "last_hydration_request_ts": 99.0})
+    @patch("app.get_kalshi_connectivity_snapshot", return_value={
+        "series_discovery_attempted": True,
+        "last_series_discovery_success_utc": "2025-01-01T00:00:00+00:00",
+        "last_series_discovery_error": None,
+        "markets_cache_population_count": 1,
+    })
+    @patch("app._build_ingestion_health_rows", return_value={"stations": []})
+    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
+    def test_runtime_authority_snapshot_enforces_hydration_observability_schema_contract(self, *_mocks):
+        response = self.client.get("/observability/runtime-authority-snapshot?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertIn("hydration_queue", payload)
+        self.assertIn("hydration_stall_signal", payload)
+        self.assertIn("stations_in_backoff", payload["hydration_queue"])
+        self.assertIs(type(payload["hydration_queue"]["stations_in_backoff"]), int)
+
+        self.assertIn("next_backoff_expiry", payload["hydration_queue"])
+        next_backoff_expiry = payload["hydration_queue"]["next_backoff_expiry"]
+        self.assertIn(type(next_backoff_expiry), (float, int, type(None)))
+        self.assertNotIsInstance(next_backoff_expiry, bool)
+
+        self.assertIn("hydration_stall_signal", payload)
+        self.assertIn("hydration_stall_condition", payload["hydration_stall_signal"])
+        self.assertIs(type(payload["hydration_stall_signal"]["hydration_stall_condition"]), bool)
+
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_cache_not_written"}, "ingestion": {"status": "OK"}})
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 2})
+    @patch("app.os.path.exists", return_value=True)
+    @patch("app.get_recent_alerts", return_value=[{"id": 7, "station": "KDEN"}])
+    @patch("app.get_transition_history", return_value=[{"id": 4, "station": "KDEN"}])
+    @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {"KDEN": {"cache_present": True}}})
+    @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": False}})
+    @patch("app.hydration_queue_snapshot", return_value={"queue": ["KDEN"], "queue_depth": 1, "queued_stations": ["KDEN"], "backoff_until": {"KDEN": 123.0}, "backoff_stations": ["KDEN"], "stations_in_backoff": 1, "next_backoff_expiry": 123.0, "last_hydration_request_ts": 99.0})
+    @patch("app.get_kalshi_connectivity_snapshot", return_value={
+        "series_discovery_attempted": True,
+        "last_series_discovery_success_utc": "2025-01-01T00:00:00+00:00",
+        "last_series_discovery_error": None,
+        "markets_cache_population_count": 1,
+    })
+    @patch("app._build_ingestion_health_rows", return_value={"generated_utc": "2025-01-01T00:00:00+00:00", "stale_after_seconds": 180, "scheduler_running": True, "stations": [{"station": "KDEN", "status": "healthy"}]})
+    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
+    def test_runtime_authority_snapshot_hydration_observability_fields_are_additive(self, *_mocks):
+        response = self.client.get("/observability/runtime-authority-snapshot?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+        payload_after = response.get_json()
+
+        existing_payload_before = {
+            "ok": True,
+            "execution_mode": "observability",
+            "station": "KDEN",
+            "scheduler_health_snapshot": {"generated_utc": "2025-01-01T00:00:00+00:00", "stale_after_seconds": 180, "scheduler_running": True, "stations": [{"station": "KDEN", "status": "healthy"}]},
+            "hydration_snapshot": {"stations": {"KDEN": {"cache_present": True}}},
+            "kalshi_connectivity": {
+                "series_discovery_attempted": True,
+                "last_series_discovery_success_utc": "2025-01-01T00:00:00+00:00",
+                "last_series_discovery_error": None,
+                "markets_cache_population_count": 1,
+            },
+            "hydration_execution": {"KDEN": {"cache_written": False}},
+            "hydration_queue": {
+                "queue": ["KDEN"],
+                "queue_depth": 1,
+                "queued_stations": ["KDEN"],
+                "backoff_until": {"KDEN": 123.0},
+                "backoff_stations": ["KDEN"],
+                "last_hydration_request_ts": 99.0,
+            },
+            "latest_transitions": {"count": 1, "bounded_limit": 50, "rows": [{"id": 4, "station": "KDEN"}]},
+            "latest_alerts": {"count": 1, "bounded_limit": 50, "rows": [{"id": 7, "station": "KDEN"}]},
+            "db": {"path": "/var/data/alerts.db", "exists": True},
+            "system_health": {"hydration": {"reason": "hydration_cache_not_written"}, "ingestion": {"status": "OK"}},
+        }
+
+        payload_existing_after = {
+            key: value
+            for key, value in payload_after.items()
+            if key != "hydration_stall_signal"
+        }
+        payload_existing_after["hydration_queue"] = {
+            queue_key: queue_value
+            for queue_key, queue_value in payload_after["hydration_queue"].items()
+            if queue_key not in {"stations_in_backoff", "next_backoff_expiry"}
+        }
+
+        existing_keys_before = set(existing_payload_before.keys())
+        existing_keys_after = set(payload_existing_after.keys())
+        self.assertEqual(existing_keys_before, existing_keys_after)
+        self.assertEqual(existing_payload_before, payload_existing_after)
+
+        self.assertEqual(payload_after["hydration_queue"]["stations_in_backoff"], 1)
+        self.assertEqual(payload_after["hydration_queue"]["next_backoff_expiry"], 123.0)
+        self.assertIs(type(payload_after["hydration_stall_signal"]["hydration_stall_condition"]), bool)
+
+
 if __name__ == "__main__":
     unittest.main()

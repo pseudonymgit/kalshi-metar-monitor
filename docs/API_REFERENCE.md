@@ -684,6 +684,65 @@ Provides execution-truth evidence (scheduler health, hydration cache state, tran
 ### Safety Notes
 Read-only, bounded payload, and no execution mutation.
 
+### Observability Contract
+- `hydration_queue.stations_in_backoff`
+  - type: `integer`
+  - description: number of stations currently under hydration backoff.
+- `hydration_queue.next_backoff_expiry`
+  - type: `number | null`
+  - description: earliest timestamp when a hydration backoff expires.
+- `hydration_stall_signal`
+  - type: `boolean`
+  - description: indicates hydration stall condition.
+  - payload location: `hydration_stall_signal.hydration_stall_condition` (within the read-only signal object emitted by this endpoint).
+
+Stall predicate (exact):
+
+`hydration_cache_not_written`
+`AND transitions_seen_today > 0`
+`AND alerts_sent_today == 0`
+
+---
+
+## Endpoint
+`GET /integrity/alert_pipeline`
+
+### Domain
+Observability
+
+### Purpose
+Returns deterministic integrity findings for transitions, evaluations, hydration state, and alert emission consistency.
+
+### Execution Authority
+observability-only
+
+### Data Source
+Runtime state + SQLite audit
+
+### Trading Relevance
+Used to verify that transitions, hydration readiness, and alert emission remain causally consistent.
+
+### Safety Notes
+Read-only integrity diagnostics; no worker execution, scheduler execution, or transition/alert mutation.
+
+### Observability Contract
+- `hydration_queue.stations_in_backoff`
+  - type: `integer`
+  - description: number of stations currently under hydration backoff.
+- `hydration_queue.next_backoff_expiry`
+  - type: `number | null`
+  - description: earliest timestamp when a hydration backoff expires.
+- `hydration_stall_signal`
+  - type: `boolean`
+  - description: indicates hydration stall condition.
+  - payload location: `hydration_stall_signal.hydration_stall_condition` (within the read-only signal object emitted by this endpoint).
+
+Stall predicate (exact):
+
+`hydration_cache_not_written`
+`AND transitions_seen_today > 0`
+`AND alerts_sent_today == 0`
+
 ---
 
 ## Endpoint

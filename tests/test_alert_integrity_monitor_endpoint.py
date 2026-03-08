@@ -154,5 +154,33 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
 
 
 
+    @patch("app.hydration_queue_snapshot", return_value={"queue": ["KDEN"], "queue_depth": 1, "queued_stations": ["KDEN"], "backoff_until": {"KDEN": 120.0}, "backoff_stations": ["KDEN"], "stations_in_backoff": 1, "next_backoff_expiry": 120.0, "last_hydration_request_ts": 10.0})
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_cache_not_written"}})
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1})
+    @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": False}})
+    @patch("app.get_recent_alerts", return_value=[])
+    @patch("app.get_latest_station_market_evaluation_context", return_value={})
+    @patch("app.get_transition_history", return_value=[])
+    @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {}})
+    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"], "configured_stations": {"KDEN"}, "discovered_stations": set(), "watchlist_stations": set()})
+    def test_integrity_endpoint_enforces_hydration_observability_schema_contract(self, *_mocks):
+        response = self.client.get("/integrity/alert_pipeline?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertIn("stations_in_backoff", payload["hydration_queue"])
+        self.assertIs(type(payload["hydration_queue"]["stations_in_backoff"]), int)
+
+        self.assertIn("next_backoff_expiry", payload["hydration_queue"])
+        next_backoff_expiry = payload["hydration_queue"]["next_backoff_expiry"]
+        self.assertIn(type(next_backoff_expiry), (float, int, type(None)))
+        self.assertNotIsInstance(next_backoff_expiry, bool)
+
+        self.assertIn("hydration_stall_signal", payload)
+        self.assertIn("hydration_stall_condition", payload["hydration_stall_signal"])
+        self.assertIs(type(payload["hydration_stall_signal"]["hydration_stall_condition"]), bool)
+
+
 if __name__ == "__main__":
     unittest.main()
