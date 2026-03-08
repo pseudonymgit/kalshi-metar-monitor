@@ -1449,15 +1449,12 @@ else:
 @app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
     station = request.args.get("station")
-    if not station:
-    return jsonify({"error": "station query parameter required"}), 400
 
-station = station.upper()
-
-    if not station:
+    if not station or not station.strip():
         return jsonify({"error": "station query parameter required"}), 400
 
-    # deterministic defaults
+    station = station.strip().upper()
+
     transitions_seen_today = 0
     eligible_markets_count = 0
     alerts_sent_today = 0
@@ -1466,7 +1463,7 @@ station = station.upper()
     blocking_stage = "NONE"
     reason = None
 
-    # read transition runtime
+    # transition runtime
     try:
         transition = get_transition_runtime(station)
         transitions_seen_today = transition.get("transitions_seen_today", 0)
@@ -1474,21 +1471,21 @@ station = station.upper()
     except Exception:
         pass
 
-    # read hydration runtime
+    # hydration runtime
     try:
         hydration = get_hydration_prerequisite_runtime(station)
         hydration_status = hydration.get("status")
     except Exception:
         pass
 
-    # read market eligibility runtime
+    # market eligibility runtime
     try:
         market = get_market_eligibility_runtime(station)
         eligible_markets_count = market.get("eligible_markets_count", 0)
     except Exception:
         pass
 
-    # read alert fire audit
+    # alert fire audit
     try:
         audit = get_alert_fire_audit()
         for row in audit.get("stations", []):
@@ -1498,7 +1495,6 @@ station = station.upper()
     except Exception:
         pass
 
-    # classification rules
     if hydration_status != "cache_valid":
         blocking_stage = "HYDRATION"
         reason = "hydration_cache_invalid"
