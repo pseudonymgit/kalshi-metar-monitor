@@ -1458,7 +1458,7 @@ def pipeline_truth():
     args = request.args.copy()
     args["station"] = station
 
-    from core.metar_monitor import _build_transition_runtime
+
     from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, build_structured_snapshot_from_cache
     from core.alert_integrity_monitor import _build_alert_fire_audit_rows
 
