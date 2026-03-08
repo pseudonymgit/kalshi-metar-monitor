@@ -1455,9 +1455,16 @@ def pipeline_truth():
 
     station = station.strip().upper()
 
-    transition = observability_transition_runtime(station).get_json()
-    hydration = observability_hydration_prerequisite_runtime(station).get_json()
-    market = observability_market_eligibility_runtime(station).get_json()
+   request.args = request.args.copy()
+    request.args["station"] = station
+    transition = observability_transition_runtime().get_json()
+
+    request.args["station"] = station
+    hydration = observability_hydration_prerequisite_runtime().get_json()
+
+    request.args["station"] = station
+    market = observability_market_eligibility_runtime().get_json()
+
     audit = observability_alert_fire_audit().get_json()
 
     transitions_seen_today = transition.get("transitions_seen_today", 0)
