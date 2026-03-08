@@ -1452,11 +1452,8 @@ def pipeline_truth():
     if not station:
         return jsonify({"error": "station query parameter required"}), 400
 
-    from core.metar_monitor import get_transition_runtime_snapshot
     from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
-    from core.metar_monitor import get_market_eligibility_runtime_snapshot
-    from core.alert_integrity_monitor import build_alert_fire_audit_rows
-
+    
     transition = get_transition_runtime_snapshot(station)
     hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
     market = get_market_eligibility_runtime_snapshot(station)
@@ -2636,7 +2633,10 @@ def integrity_alert_pipeline():
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
     fire_audit = _build_alert_fire_audit_rows()
-    alerts_sent_today = 0
+    alerts_sent_today = next(
+    (s["alerts_sent_today"] for s in audit["stations"] if s["station"] == station),
+    0
+    )
     for row in (fire_audit.get("stations") or []):
         row_station = (row.get("station") or "").strip().upper()
         if station and row_station != station:
