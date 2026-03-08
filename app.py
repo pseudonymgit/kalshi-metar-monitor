@@ -926,10 +926,20 @@ def _build_pipeline_truth_summary(station: str):
 
     alerts_sent_today = 0
     if local_trading_date:
-        alerts_sent_today = _count_composed_alerts_for_station_local_day(
-            station=normalized_station,
-            local_trading_date=local_trading_date,
-        )
+        station_alerts = get_recent_alerts(500)
+        for alert in station_alerts:
+            if (alert.get("station") or "").strip().upper() != normalized_station:
+                continue
+            if (alert.get("alert_type") or "") != "composed_alert_sent":
+                continue
+            created_utc = alert.get("created_utc")
+            if not created_utc:
+                continue
+            try:
+                if station_local_day_key(normalized_station, created_utc) == local_trading_date:
+                    alerts_sent_today += 1
+            except Exception:
+                continue
 
     hydration_state = (get_hydration_prerequisite_state_snapshot() or {}).get(normalized_station) or {}
     hydration_cache_valid = bool(hydration_state.get("cache_valid"))
