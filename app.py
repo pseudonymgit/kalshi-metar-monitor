@@ -1455,7 +1455,7 @@ def pipeline_truth():
 
     station = station.strip().upper()
 
-       args = request.args.copy()
+    args = request.args.copy()
     args["station"] = station
 
     with app.test_request_context(query_string=args):
