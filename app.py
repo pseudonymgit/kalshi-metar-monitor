@@ -1450,6 +1450,11 @@ else:
 def pipeline_truth():
     station = request.args.get("station")
     if not station:
+    return jsonify({"error": "station query parameter required"}), 400
+
+station = station.upper()
+
+    if not station:
         return jsonify({"error": "station query parameter required"}), 400
 
     # deterministic defaults
