@@ -1446,29 +1446,55 @@ else:
         _merge_discovered_stations_into_watchlist()
         return None
 
-@app.get("/observability/pipeline-truth")
+@app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
     station = request.args.get("station")
     if not station:
         return jsonify({"error": "station query parameter required"}), 400
 
-    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
-    
-    transition = get_transition_runtime_snapshot(station)
-    hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
-    market = get_market_eligibility_runtime_snapshot(station)
-    audit = build_alert_fire_audit_rows()
-
-    transitions_seen_today = transition.get("transitions_seen_today", 0)
-    eligible_markets_count = market.get("eligible_markets_count", 0)
+    # deterministic defaults
+    transitions_seen_today = 0
+    eligible_markets_count = 0
     alerts_sent_today = 0
-    last_transition_timestamp = transition.get("last_transition_timestamp")
-
-    hydration_status = hydration.get("status")
-
-    blocking_stage = "NONE"
+    hydration_status = None
+    last_transition_timestamp = None
     reason = None
+    blocking_stage = "NONE"
 
+    # read existing runtime snapshots safely
+    try:
+        from core.metar_monitor import get_transition_runtime_snapshot
+        transition = get_transition_runtime_snapshot(station)
+        transitions_seen_today = transition.get("transitions_seen_today", 0)
+        last_transition_timestamp = transition.get("last_transition_timestamp")
+    except Exception:
+        pass
+
+    try:
+        from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
+        hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
+        hydration_status = hydration.get("status")
+    except Exception:
+        pass
+
+    try:
+        from core.metar_monitor import get_market_eligibility_runtime_snapshot
+        market = get_market_eligibility_runtime_snapshot(station)
+        eligible_markets_count = market.get("eligible_markets_count", 0)
+    except Exception:
+        pass
+
+    try:
+        from core.alert_integrity_monitor import build_alert_fire_audit_rows
+        audit = build_alert_fire_audit_rows()
+        for s in audit.get("stations", []):
+            if s.get("station") == station:
+                alerts_sent_today = s.get("alerts_sent_today", 0)
+                break
+    except Exception:
+        pass
+
+    # classification rules
     if hydration_status != "cache_valid":
         blocking_stage = "HYDRATION"
         reason = "hydration_cache_invalid"
