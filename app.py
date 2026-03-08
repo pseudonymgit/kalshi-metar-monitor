@@ -1455,16 +1455,10 @@ def pipeline_truth():
 
     station = station.strip().upper()
 
-    # Import the same builders used by existing observability endpoints
-    from core.metar_monitor import _build_transition_runtime
-    from core.kalshi_monitor import _build_hydration_prerequisite_runtime
-    from core.metar_monitor import _build_market_eligibility_runtime
-    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
-
-    transition = _build_transition_runtime(station)
-    hydration = _build_hydration_prerequisite_runtime(station)
-    market = _build_market_eligibility_runtime(station)
-    audit = _build_alert_fire_audit_rows()
+    transition = observability_transition_runtime(station).get_json()
+    hydration = observability_hydration_prerequisite_runtime(station).get_json()
+    market = observability_market_eligibility_runtime(station).get_json()
+    audit = observability_alert_fire_audit().get_json()
 
     transitions_seen_today = transition.get("transitions_seen_today", 0)
     last_transition_timestamp = transition.get("last_transition_timestamp")
