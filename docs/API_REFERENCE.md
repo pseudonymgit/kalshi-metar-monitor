@@ -685,23 +685,18 @@ Provides execution-truth evidence (scheduler health, hydration cache state, tran
 Read-only, bounded payload, and no execution mutation.
 
 ### Observability Contract
-- `hydration_queue.stations_in_backoff` (`integer`): count of stations currently in hydration backoff.
-- `hydration_queue.next_backoff_expiry` (`number|null`): earliest epoch-seconds backoff expiry across all stations, or `null` when no station is backed off.
-- `hydration_stall_signal` (`object`): deterministic hydration stall signal that is read-only and derived from current runtime snapshots.
+- `hydration_queue.stations_in_backoff`
+  - type: `integer`
+  - description: number of stations currently under hydration backoff.
+- `hydration_queue.next_backoff_expiry`
+  - type: `number | null`
+  - description: earliest timestamp when a hydration backoff expires.
+- `hydration_stall_signal`
+  - type: `boolean`
+  - description: indicates hydration stall condition.
+  - payload location: `hydration_stall_signal.hydration_stall_condition` (within the read-only signal object emitted by this endpoint).
 
-`hydration_stall_signal` supports:
-- **Aggregate/global form** (`station = null`): emitted when no `station` query parameter is supplied.
-- **Per-station form** (`station = <ICAO>`): emitted when a station query parameter is supplied.
-
-`hydration_stall_signal` fields:
-- `station` (`string|null`)
-- `hydration_reason` (`string|null`)
-- `hydration_cache_not_written` (`boolean`)
-- `transitions_seen_today` (`integer`)
-- `alerts_sent_today` (`integer`)
-- `hydration_stall_condition` (`boolean`)
-
-`hydration_stall_condition` predicate is strictly:
+Stall predicate (exact):
 
 `hydration_cache_not_written`
 `AND transitions_seen_today > 0`
@@ -731,23 +726,18 @@ Used to verify that transitions, hydration readiness, and alert emission remain 
 Read-only integrity diagnostics; no worker execution, scheduler execution, or transition/alert mutation.
 
 ### Observability Contract
-- `hydration_queue.stations_in_backoff` (`integer`): count of stations currently in hydration backoff.
-- `hydration_queue.next_backoff_expiry` (`number|null`): earliest epoch-seconds backoff expiry across all stations, or `null` when no station is backed off.
-- `hydration_stall_signal` (`object`): deterministic hydration stall signal included with integrity findings.
+- `hydration_queue.stations_in_backoff`
+  - type: `integer`
+  - description: number of stations currently under hydration backoff.
+- `hydration_queue.next_backoff_expiry`
+  - type: `number | null`
+  - description: earliest timestamp when a hydration backoff expires.
+- `hydration_stall_signal`
+  - type: `boolean`
+  - description: indicates hydration stall condition.
+  - payload location: `hydration_stall_signal.hydration_stall_condition` (within the read-only signal object emitted by this endpoint).
 
-`hydration_stall_signal` supports:
-- **Aggregate/global form** (`station = null`): emitted when no `station` query parameter is supplied.
-- **Per-station form** (`station = <ICAO>`): emitted when a station query parameter is supplied.
-
-`hydration_stall_signal` fields:
-- `station` (`string|null`)
-- `hydration_reason` (`string|null`)
-- `hydration_cache_not_written` (`boolean`)
-- `transitions_seen_today` (`integer`)
-- `alerts_sent_today` (`integer`)
-- `hydration_stall_condition` (`boolean`)
-
-`hydration_stall_condition` predicate is strictly:
+Stall predicate (exact):
 
 `hydration_cache_not_written`
 `AND transitions_seen_today > 0`

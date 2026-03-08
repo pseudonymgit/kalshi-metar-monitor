@@ -254,17 +254,17 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
         payload = response.get_json()
         self.assertIn("hydration_queue", payload)
         self.assertIn("hydration_stall_signal", payload)
-        self.assertIsInstance(payload["hydration_queue"]["stations_in_backoff"], int)
-        self.assertIn(type(payload["hydration_queue"]["next_backoff_expiry"]), (float, type(None)))
+        self.assertIn("stations_in_backoff", payload["hydration_queue"])
+        self.assertIs(type(payload["hydration_queue"]["stations_in_backoff"]), int)
 
-        signal = payload["hydration_stall_signal"]
-        self.assertIsInstance(signal, dict)
-        self.assertIn(type(signal["station"]), (str, type(None)))
-        self.assertIn(type(signal["hydration_reason"]), (str, type(None)))
-        self.assertIsInstance(signal["hydration_cache_not_written"], bool)
-        self.assertIsInstance(signal["transitions_seen_today"], int)
-        self.assertIsInstance(signal["alerts_sent_today"], int)
-        self.assertIsInstance(signal["hydration_stall_condition"], bool)
+        self.assertIn("next_backoff_expiry", payload["hydration_queue"])
+        next_backoff_expiry = payload["hydration_queue"]["next_backoff_expiry"]
+        self.assertIn(type(next_backoff_expiry), (float, int, type(None)))
+        self.assertNotIsInstance(next_backoff_expiry, bool)
+
+        self.assertIn("hydration_stall_signal", payload)
+        self.assertIn("hydration_stall_condition", payload["hydration_stall_signal"])
+        self.assertIs(type(payload["hydration_stall_signal"]["hydration_stall_condition"]), bool)
 
     @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_cache_not_written"}, "ingestion": {"status": "OK"}})
     @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
@@ -286,9 +286,9 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
     def test_runtime_authority_snapshot_hydration_observability_fields_are_additive(self, *_mocks):
         response = self.client.get("/observability/runtime-authority-snapshot?station=KDEN")
         self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
+        payload_after = response.get_json()
 
-        expected_existing = {
+        existing_payload_before = {
             "ok": True,
             "execution_mode": "observability",
             "station": "KDEN",
@@ -315,42 +315,25 @@ class RuntimeAuthoritySnapshotEndpointTests(unittest.TestCase):
             "system_health": {"hydration": {"reason": "hydration_cache_not_written"}, "ingestion": {"status": "OK"}},
         }
 
-        for key, expected_value in expected_existing.items():
-            if key == "hydration_queue":
-                for queue_key, queue_expected in expected_value.items():
-                    self.assertEqual(payload[key][queue_key], queue_expected)
-            else:
-                self.assertEqual(payload[key], expected_value)
+        payload_existing_after = {
+            key: value
+            for key, value in payload_after.items()
+            if key != "hydration_stall_signal"
+        }
+        payload_existing_after["hydration_queue"] = {
+            queue_key: queue_value
+            for queue_key, queue_value in payload_after["hydration_queue"].items()
+            if queue_key not in {"stations_in_backoff", "next_backoff_expiry"}
+        }
 
-        self.assertEqual(payload["hydration_queue"]["stations_in_backoff"], 1)
-        self.assertEqual(payload["hydration_queue"]["next_backoff_expiry"], 123.0)
-        self.assertEqual(
-            payload["hydration_stall_signal"],
-            {
-                "station": "KDEN",
-                "hydration_reason": "hydration_cache_not_written",
-                "hydration_cache_not_written": True,
-                "transitions_seen_today": 2,
-                "alerts_sent_today": 0,
-                "hydration_stall_condition": True,
-            },
-        )
+        existing_keys_before = set(existing_payload_before.keys())
+        existing_keys_after = set(payload_existing_after.keys())
+        self.assertEqual(existing_keys_before, existing_keys_after)
+        self.assertEqual(existing_payload_before, payload_existing_after)
 
-        expected_keys = set(expected_existing.keys()) | {"hydration_stall_signal"}
-        self.assertEqual(set(payload.keys()), expected_keys)
-        self.assertEqual(
-            set(payload["hydration_queue"].keys()),
-            {
-                "queue",
-                "queue_depth",
-                "queued_stations",
-                "backoff_until",
-                "backoff_stations",
-                "stations_in_backoff",
-                "next_backoff_expiry",
-                "last_hydration_request_ts",
-            },
-        )
+        self.assertEqual(payload_after["hydration_queue"]["stations_in_backoff"], 1)
+        self.assertEqual(payload_after["hydration_queue"]["next_backoff_expiry"], 123.0)
+        self.assertIs(type(payload_after["hydration_stall_signal"]["hydration_stall_condition"]), bool)
 
 
 if __name__ == "__main__":

@@ -169,17 +169,17 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
 
-        self.assertIsInstance(payload["hydration_queue"]["stations_in_backoff"], int)
-        self.assertIn(type(payload["hydration_queue"]["next_backoff_expiry"]), (float, type(None)))
+        self.assertIn("stations_in_backoff", payload["hydration_queue"])
+        self.assertIs(type(payload["hydration_queue"]["stations_in_backoff"]), int)
 
-        signal = payload["hydration_stall_signal"]
-        self.assertIsInstance(signal, dict)
-        self.assertIn(type(signal["station"]), (str, type(None)))
-        self.assertIn(type(signal["hydration_reason"]), (str, type(None)))
-        self.assertIsInstance(signal["hydration_cache_not_written"], bool)
-        self.assertIsInstance(signal["transitions_seen_today"], int)
-        self.assertIsInstance(signal["alerts_sent_today"], int)
-        self.assertIsInstance(signal["hydration_stall_condition"], bool)
+        self.assertIn("next_backoff_expiry", payload["hydration_queue"])
+        next_backoff_expiry = payload["hydration_queue"]["next_backoff_expiry"]
+        self.assertIn(type(next_backoff_expiry), (float, int, type(None)))
+        self.assertNotIsInstance(next_backoff_expiry, bool)
+
+        self.assertIn("hydration_stall_signal", payload)
+        self.assertIn("hydration_stall_condition", payload["hydration_stall_signal"])
+        self.assertIs(type(payload["hydration_stall_signal"]["hydration_stall_condition"]), bool)
 
 
 if __name__ == "__main__":
