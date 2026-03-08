@@ -863,6 +863,109 @@ def _build_alert_fire_audit_rows():
     }
 
 
+def _build_pipeline_truth_summary(station: str):
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return None
+
+    state = get_state() or {}
+    latest_observation_timestamp = (state.get("last_seen_iso") or {}).get(normalized_station)
+
+    transitions = get_transition_history(station=normalized_station, limit=200)
+    last_transition_timestamp = None
+    local_trading_date = None
+
+    for row in transitions:
+        transition_timestamp = (
+            row.get("timestamp")
+            or row.get("created_utc")
+            or row.get("event_timestamp_utc")
+            or ((row.get("metadata") or {}).get("obs_time"))
+        )
+        if not transition_timestamp:
+            continue
+        if last_transition_timestamp is None:
+            last_transition_timestamp = transition_timestamp
+        if local_trading_date is None:
+            try:
+                local_trading_date = station_local_day_key(normalized_station, transition_timestamp)
+            except Exception:
+                local_trading_date = None
+        if local_trading_date is not None:
+            break
+
+    if local_trading_date is None and latest_observation_timestamp:
+        try:
+            local_trading_date = station_local_day_key(normalized_station, latest_observation_timestamp)
+        except Exception:
+            local_trading_date = None
+
+    transitions_seen_today = 0
+    if local_trading_date:
+        for row in transitions:
+            transition_timestamp = (
+                row.get("timestamp")
+                or row.get("created_utc")
+                or row.get("event_timestamp_utc")
+                or ((row.get("metadata") or {}).get("obs_time"))
+            )
+            if not transition_timestamp:
+                continue
+            try:
+                transition_local_day = station_local_day_key(normalized_station, transition_timestamp)
+            except Exception:
+                continue
+            if transition_local_day != local_trading_date:
+                continue
+            if (row.get("transition_type") or "") == "settlement_up":
+                transitions_seen_today += 1
+
+    latest_market_eval = get_latest_station_market_evaluation_context(station=normalized_station).get(normalized_station, {})
+    eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
+    eligible_markets_count = int(eligibility_runtime.get("eligible_markets_count") or 0)
+
+    alerts_sent_today = 0
+    if local_trading_date:
+        alerts_sent_today = _count_composed_alerts_for_station_local_day(
+            station=normalized_station,
+            local_trading_date=local_trading_date,
+        )
+
+    hydration_state = (get_hydration_prerequisite_state_snapshot() or {}).get(normalized_station) or {}
+    hydration_cache_valid = bool(hydration_state.get("cache_valid"))
+    hydration_status = hydration_state.get("status") or ("cache_valid" if hydration_cache_valid else "cache_invalid")
+
+    blocking_stage = "NONE"
+    reason = "pipeline_not_blocked"
+    if not latest_observation_timestamp:
+        blocking_stage = "INGESTION"
+        reason = "no_accepted_observation"
+    elif transitions_seen_today == 0:
+        blocking_stage = "TRANSITION"
+        reason = "no_settlement_up_transition_for_local_trading_day"
+    elif not hydration_cache_valid:
+        blocking_stage = "HYDRATION"
+        reason = hydration_state.get("reason") or "hydration_cache_invalid"
+    elif eligible_markets_count == 0:
+        blocking_stage = "MARKET_EVALUATION"
+        reason = "no_eligible_markets"
+    elif transitions_seen_today > 0 and alerts_sent_today == 0:
+        blocking_stage = "ALERT_EMISSION"
+        reason = "transitions_detected_without_alert_emission"
+
+    return {
+        "station": normalized_station,
+        "pipeline_status": "BLOCKED" if blocking_stage != "NONE" else "PASSING",
+        "blocking_stage": blocking_stage,
+        "reason": reason,
+        "transitions_seen_today": transitions_seen_today,
+        "eligible_markets_count": eligible_markets_count,
+        "alerts_sent_today": alerts_sent_today,
+        "hydration_status": hydration_status,
+        "last_transition_timestamp": last_transition_timestamp,
+    }
+
+
 def _build_runtime_authority_hydration_snapshot(*, stations):
     from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, get_ladder_state_snapshot
 
@@ -2491,6 +2594,16 @@ def observability_alert_diagnostics():
 @app.route("/observability/alert-fire-audit", methods=["GET"])
 def observability_alert_fire_audit():
     payload = _build_alert_fire_audit_rows()
+    return jsonify({"ok": True, **payload}), 200
+
+
+@app.route("/observability/pipeline-truth", methods=["GET"])
+def observability_pipeline_truth():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    payload = _build_pipeline_truth_summary(station)
     return jsonify({"ok": True, **payload}), 200
 
 
