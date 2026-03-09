@@ -1462,7 +1462,7 @@ else:
 
 @app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
-    station = (request.args.get("station") or "").strip().upper()
+    station = request.args.get("station", "").strip().upper()
     if not station:
         return jsonify({"error": "station query parameter required"}), 400
 
@@ -1482,20 +1482,30 @@ def pipeline_truth():
             }
         ), 200
 
-    transition = _get_transition_runtime_summary(station)
-    hydration = _build_hydration_prerequisite_runtime_payload(station)
-    market = _build_market_eligibility_runtime_payload(station)
-    audit = _build_alert_fire_audit_rows()
+    internal_client = app.test_client()
 
-    transitions_seen_today = int(transition.get("transitions_seen_today") or 0)
-    eligible_markets_count = int(market.get("eligible_markets_count") or 0)
-    alerts_sent_today = 0
-    for row in audit.get("stations") or []:
-        if row.get("station") == station:
-            alerts_sent_today = int(row.get("alerts_sent_today") or 0)
-            break
+    def _internal_observability_get(path: str):
+        response = internal_client.get(path, query_string={"station": station})
+        if response.status_code != 200:
+            raise RuntimeError(f"internal_observability_call_failed:{path}:{response.status_code}")
+        payload = response.get_json(silent=True)
+        if not isinstance(payload, dict):
+            raise RuntimeError(f"internal_observability_payload_invalid:{path}")
+        return payload
 
-    hydration_status = (hydration.get("hydration_state") or {}).get("status") or "unknown"
+    transition_payload = _internal_observability_get("/observability/transition-runtime")
+    hydration_payload = _internal_observability_get("/observability/hydration-prerequisite-runtime")
+    market_payload = _internal_observability_get("/observability/market-eligibility-runtime")
+    integrity_payload = _internal_observability_get("/integrity/alert_pipeline")
+
+    transitions_seen_today = int(transition_payload.get("transitions_seen_today") or 0)
+    eligible_markets_count = int(market_payload.get("eligible_markets_count") or 0)
+    alerts_sent_today = int(
+        ((integrity_payload.get("hydration_stall_signal") or {}).get("alerts_sent_today")) or 0
+    )
+    hydration_status = (hydration_payload.get("hydration_state") or {}).get("status") or "unknown"
+    last_transition_timestamp = transition_payload.get("last_transition_timestamp")
+
     blocking_stage = "NONE"
     reason = "ready"
     if hydration_status != "cache_valid":
@@ -1518,10 +1528,10 @@ def pipeline_truth():
             "eligible_markets_count": eligible_markets_count,
             "alerts_sent_today": alerts_sent_today,
             "hydration_status": hydration_status,
-            "last_transition_timestamp": transition.get("last_transition_timestamp"),
+            "last_transition_timestamp": last_transition_timestamp,
         }
     ), 200
-    
+
 @app.before_request
 def _set_request_execution_domain():
     path = str(request.path or "").lower()

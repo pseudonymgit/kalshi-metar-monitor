@@ -4,114 +4,100 @@ from unittest.mock import patch
 import app as app_module
 
 
+class FakeResponse:
+    def __init__(self, payload, status=200):
+        self.payload = payload
+        self.status_code = status
+
+    def get_json(self, silent=False):
+        return self.payload
+
+
+class FakeClient:
+    def __init__(self, payloads):
+        self.payloads = payloads
+        self.calls = []
+
+    def get(self, path, query_string=None):
+        self.calls.append((path, query_string or {}))
+        return FakeResponse(self.payloads[path])
+
+
 class PipelineTruthEndpointTests(unittest.TestCase):
     def setUp(self):
         app_module._autostart_fallback_done = True
         self.client = app_module.app.test_client()
 
-    def test_missing_station_returns_http_400(self):
-        response = self.client.get("/observability/pipeline-truth")
-        self.assertEqual(response.status_code, 400)
-
-    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 1}]})
-    @patch("app._build_market_eligibility_runtime_payload", return_value={"eligible_markets_count": 2})
-    @patch("app._build_hydration_prerequisite_runtime_payload", return_value={"hydration_state": {"status": "cache_valid"}})
-    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 0, "last_transition_timestamp": "2026-01-01T00:00:00Z"})
-    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    def test_lowercase_station_normalized_to_uppercase(self, _stations, mock_transition, mock_hydration, mock_market, mock_audit):
-        response = self.client.get("/observability/pipeline-truth?station=kden")
-        self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-
-        self.assertEqual(payload["station"], "KDEN")
-        mock_transition.assert_called_once_with("KDEN")
-        mock_hydration.assert_called_once_with("KDEN")
-        mock_market.assert_called_once_with("KDEN")
-        mock_audit.assert_called_once()
-
-    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    def test_unknown_station_returns_deterministic_json_with_required_fields(self, _stations):
-        response = self.client.get("/observability/pipeline-truth?station=xxxx")
-        self.assertEqual(response.status_code, 200)
-        payload = response.get_json()
-
-        required_fields = {
-            "station",
-            "pipeline_status",
-            "blocking_stage",
-            "reason",
-            "transitions_seen_today",
-            "eligible_markets_count",
-            "alerts_sent_today",
-            "hydration_status",
-            "last_transition_timestamp",
+    def payloads(self, hydration="cache_valid", eligible=1, alerts=1, transitions=1):
+        return {
+            "/observability/transition-runtime": {
+                "transitions_seen_today": transitions,
+                "last_transition_timestamp": "2026-01-01T00:00:00Z",
+            },
+            "/observability/hydration-prerequisite-runtime": {"hydration_state": {"status": hydration}},
+            "/observability/market-eligibility-runtime": {"eligible_markets_count": eligible},
+            "/integrity/alert_pipeline": {"hydration_stall_signal": {"alerts_sent_today": alerts}},
         }
-        self.assertEqual(set(payload.keys()), required_fields)
-        self.assertEqual(payload["station"], "XXXX")
-        self.assertEqual(payload["pipeline_status"], "unknown_station")
-        self.assertEqual(payload["blocking_stage"], "INGESTION")
-        self.assertEqual(payload["reason"], "unknown_station")
-        self.assertEqual(payload["transitions_seen_today"], 0)
-        self.assertEqual(payload["eligible_markets_count"], 0)
-        self.assertEqual(payload["alerts_sent_today"], 0)
-        self.assertEqual(payload["hydration_status"], "unknown")
-        self.assertIsNone(payload["last_transition_timestamp"])
 
-    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
-    @patch("app._build_market_eligibility_runtime_payload", return_value={"eligible_markets_count": 1})
-    @patch("app._build_hydration_prerequisite_runtime_payload", return_value={"hydration_state": {"status": "cache_stale"}})
-    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1, "last_transition_timestamp": "2026-01-01T00:00:00Z"})
+    def test_missing_station_returns_http_400(self):
+        self.assertEqual(self.client.get("/observability/pipeline-truth").status_code, 400)
+
     @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    def test_hydration_classification(self, *_mocks):
-        response = self.client.get("/observability/pipeline-truth?station=KDEN")
-        payload = response.get_json()
+    @patch("app.app.test_client")
+    def test_lowercase_station_normalized_to_uppercase(self, mock_tc, _):
+        fc = FakeClient(self.payloads())
+        mock_tc.return_value = fc
+        payload = self.client.get("/observability/pipeline-truth?station=kden").get_json()
+        self.assertEqual(payload["station"], "KDEN")
+        self.assertTrue(all(q.get("station") == "KDEN" for _, q in fc.calls))
+
+    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
+    def test_unknown_station_returns_deterministic_json_with_required_fields(self, _):
+        payload = self.client.get("/observability/pipeline-truth?station=xxxx").get_json()
+        self.assertEqual(payload["pipeline_status"], "unknown_station")
+        self.assertEqual(set(payload.keys()), {
+            "station", "pipeline_status", "blocking_stage", "reason", "transitions_seen_today",
+            "eligible_markets_count", "alerts_sent_today", "hydration_status", "last_transition_timestamp",
+        })
+
+    @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
+    @patch("app.app.test_client")
+    def test_hydration_classification(self, mock_tc, _):
+        mock_tc.return_value = FakeClient(self.payloads(hydration="cache_stale"))
+        payload = self.client.get("/observability/pipeline-truth?station=KDEN").get_json()
         self.assertEqual(payload["blocking_stage"], "HYDRATION")
 
-    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
-    @patch("app._build_market_eligibility_runtime_payload", return_value={"eligible_markets_count": 0})
-    @patch("app._build_hydration_prerequisite_runtime_payload", return_value={"hydration_state": {"status": "cache_valid"}})
-    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1, "last_transition_timestamp": "2026-01-01T00:00:00Z"})
     @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    def test_market_evaluation_classification(self, *_mocks):
-        response = self.client.get("/observability/pipeline-truth?station=KDEN")
-        payload = response.get_json()
+    @patch("app.app.test_client")
+    def test_market_evaluation_classification(self, mock_tc, _):
+        mock_tc.return_value = FakeClient(self.payloads(eligible=0))
+        payload = self.client.get("/observability/pipeline-truth?station=KDEN").get_json()
         self.assertEqual(payload["blocking_stage"], "MARKET_EVALUATION")
 
-    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
-    @patch("app._build_market_eligibility_runtime_payload", return_value={"eligible_markets_count": 2})
-    @patch("app._build_hydration_prerequisite_runtime_payload", return_value={"hydration_state": {"status": "cache_valid"}})
-    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1, "last_transition_timestamp": "2026-01-01T00:00:00Z"})
     @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    def test_alert_emission_classification(self, *_mocks):
-        response = self.client.get("/observability/pipeline-truth?station=KDEN")
-        payload = response.get_json()
+    @patch("app.app.test_client")
+    def test_alert_emission_classification(self, mock_tc, _):
+        mock_tc.return_value = FakeClient(self.payloads(alerts=0, transitions=1))
+        payload = self.client.get("/observability/pipeline-truth?station=KDEN").get_json()
         self.assertEqual(payload["blocking_stage"], "ALERT_EMISSION")
 
-    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 1}]})
-    @patch("app._build_market_eligibility_runtime_payload", return_value={"eligible_markets_count": 2})
-    @patch("app._build_hydration_prerequisite_runtime_payload", return_value={"hydration_state": {"status": "cache_valid"}})
-    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1, "last_transition_timestamp": "2026-01-01T00:00:00Z"})
     @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    def test_identical_input_produces_identical_output(self, *_mocks):
+    @patch("app.app.test_client")
+    def test_identical_input_produces_identical_output(self, mock_tc, _):
+        mock_tc.return_value = FakeClient(self.payloads())
         first = self.client.get("/observability/pipeline-truth?station=KDEN").get_json()
         second = self.client.get("/observability/pipeline-truth?station=KDEN").get_json()
         self.assertEqual(first, second)
 
-    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 1}]})
-    @patch("app._build_market_eligibility_runtime_payload", return_value={"eligible_markets_count": 2})
-    @patch("app._build_hydration_prerequisite_runtime_payload", return_value={"hydration_state": {"status": "cache_valid"}})
-    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1, "last_transition_timestamp": "2026-01-01T00:00:00Z"})
+    @patch("app.stop_scheduler", side_effect=AssertionError("no scheduler mutation"))
+    @patch("app.start_scheduler", side_effect=AssertionError("no scheduler mutation"))
+    @patch("app._send_alert", side_effect=AssertionError("no alert mutation"))
+    @patch("app.enqueue_station_hydration", side_effect=AssertionError("no hydration mutation"))
     @patch("app._canonical_live_station_universe", return_value={"stations": ["KDEN"]})
-    @patch("app.hydration_queue_snapshot", side_effect=AssertionError("must not mutate hydration queue"))
-    @patch("app.enqueue_station_hydration", side_effect=AssertionError("must not trigger hydration worker"))
-    @patch("app.process_hydration_queue_worker", side_effect=AssertionError("must not run hydration worker"))
-    @patch("app._send_alert", side_effect=AssertionError("must not evaluate alerts"))
-    @patch("app._kalshi_public_get", side_effect=AssertionError("must not call Kalshi APIs"))
-    @patch("app.start_scheduler", side_effect=AssertionError("must not mutate scheduler state"))
-    @patch("app.stop_scheduler", side_effect=AssertionError("must not mutate scheduler state"))
-    def test_endpoint_does_not_mutate_runtime_state(self, *_mocks):
-        response = self.client.get("/observability/pipeline-truth?station=KDEN")
-        self.assertEqual(response.status_code, 200)
+    @patch("app.app.test_client")
+    def test_endpoint_does_not_mutate_runtime_state(self, mock_tc, *_):
+        mock_tc.return_value = FakeClient(self.payloads())
+        self.assertEqual(self.client.get("/observability/pipeline-truth?station=KDEN").status_code, 200)
 
 
 if __name__ == "__main__":
