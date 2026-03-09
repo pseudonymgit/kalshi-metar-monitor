@@ -1457,7 +1457,7 @@ def pipeline_truth():
 
         station = station.strip().upper()
 
-        transition = {}
+        hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
         hydration = {}
         market = {}
         audit = {"stations": []}
