@@ -2588,7 +2588,7 @@ def observability_runtime_authority_snapshot():
     hydration_execution = get_last_hydration_execution_snapshot()
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
-    fire_audit = _build_alert_fire_audit_rows()
+    audit = {"stations": []}
     alerts_sent_today = 0
     for row in (fire_audit.get("stations") or []):
         row_station = (row.get("station") or "").strip().upper()
@@ -2655,7 +2655,7 @@ def integrity_alert_pipeline():
 
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
-    fire_audit = _build_alert_fire_audit_rows()
+    audit = {"stations": []}
     alerts_sent_today = next(
     (s["alerts_sent_today"] for s in audit["stations"] if s["station"] == station),
     0
