@@ -1446,58 +1446,57 @@ else:
         _merge_discovered_stations_into_watchlist()
         return None
 
-@app.route("/observability/pipeline-truth", methods=["GET"])
+@app.route("/observability/pipeline-truth")
 def pipeline_truth():
-    station = request.args.get("station")
 
-    if not station or not station.strip():
-        return jsonify({"error": "station query parameter required"}), 400
+    station = request.args.get("station", "").strip().upper()
 
-    station = station.strip().upper()
+    if not station:
+        return jsonify({"error": "station required"}), 400
 
-    args = request.args.copy()
-    args["station"] = station
+    args = {"station": station}
 
+    with app.test_request_context(query_string=args):
+        transition = observability_transition_runtime().get_json()
 
-    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, build_structured_snapshot_from_cache
-    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
+    with app.test_request_context(query_string=args):
+        hydration = observability_hydration_prerequisite_runtime().get_json()
 
-    transition = _build_transition_runtime(station)
-    hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
-    market = build_structured_snapshot_from_cache(station)
-    audit = _build_alert_fire_audit_rows()    
-    
+    with app.test_request_context(query_string=args):
+        market = observability_market_eligibility_runtime().get_json()
+
+    with app.test_request_context(query_string=args):
+        audit = observability_alert_fire_audit().get_json()
+
     transitions_seen_today = transition.get("transitions_seen_today", 0)
     last_transition_timestamp = transition.get("last_transition_timestamp")
 
-    hydration_status = hydration.get("hydration_state", {}).get("status")
+    hydration_status = hydration.get("status")
 
     eligible_markets_count = market.get("eligible_markets_count", 0)
 
-    alerts_sent_today = 0
-    for row in audit.get("stations", []):
-        if row.get("station") == station:
-            alerts_sent_today = row.get("alerts_sent_today", 0)
-            break
+    alerts_sent_today = audit.get("alerts_sent_today", 0)
 
     blocking_stage = "NONE"
     reason = None
 
     if hydration_status != "cache_valid":
         blocking_stage = "HYDRATION"
-        reason = "hydration_cache_invalid"
+        reason = "hydration cache invalid"
 
     elif eligible_markets_count == 0:
         blocking_stage = "MARKET_EVALUATION"
-        reason = "no_eligible_markets"
+        reason = "no eligible markets"
 
     elif transitions_seen_today > 0 and alerts_sent_today == 0:
         blocking_stage = "ALERT_EMISSION"
-        reason = "transition_without_alert"
+        reason = "transition occurred but no alert emitted"
+
+    pipeline_status = "BLOCKED" if blocking_stage != "NONE" else "CLEAR"
 
     return jsonify({
         "station": station,
-        "pipeline_status": "ok",
+        "pipeline_status": pipeline_status,
         "blocking_stage": blocking_stage,
         "reason": reason,
         "transitions_seen_today": transitions_seen_today,
@@ -1505,7 +1504,7 @@ def pipeline_truth():
         "alerts_sent_today": alerts_sent_today,
         "hydration_status": hydration_status,
         "last_transition_timestamp": last_transition_timestamp,
-    })  
+    })
     
 @app.before_request
 def _set_request_execution_domain():
