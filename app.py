@@ -863,6 +863,45 @@ def _build_alert_fire_audit_rows():
     }
 
 
+def _build_hydration_prerequisite_runtime_payload(station: str):
+    hydration_snapshot = get_hydration_prerequisite_state_snapshot() or {}
+    return {
+        "station": station,
+        "execution_domain": _current_kalshi_execution_domain(),
+        "scheduler_running": is_scheduler_running(),
+        "hydration_state": hydration_snapshot.get(station) or {},
+        "hydration_queue": hydration_queue_snapshot(),
+        "ok": True,
+    }
+
+
+def _build_market_eligibility_runtime_payload(station: str):
+    latest_market_eval = get_latest_station_market_evaluation_context(station=station).get(station, {})
+    eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
+    rejection_breakdown = eligibility_runtime.get("rejection_breakdown") or {}
+    latest_transition = (get_transition_history(station=station, limit=1) or [{}])[0]
+
+    return {
+        "ok": True,
+        "station": station,
+        "scheduler_running": is_scheduler_running(),
+        "execution_domain": _current_kalshi_execution_domain(),
+        "latest_settlement_integer": latest_transition.get("settlement_bucket"),
+        "markets_considered_count": int(eligibility_runtime.get("markets_considered_count") or 0),
+        "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
+        "rejected_markets_count": int(eligibility_runtime.get("rejected_markets_count") or 0),
+        "rejection_breakdown": {
+            "outside_price_band": int(rejection_breakdown.get("outside_price_band") or 0),
+            "wrong_series": int(rejection_breakdown.get("wrong_series") or 0),
+            "expired_market": int(rejection_breakdown.get("expired_market") or 0),
+            "settlement_mismatch": int(rejection_breakdown.get("settlement_mismatch") or 0),
+            "unknown_reason": int(rejection_breakdown.get("unknown_reason") or 0),
+        },
+        "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
+        "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
+    }
+
+
 def _build_runtime_authority_hydration_snapshot(*, stations):
     from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, get_ladder_state_snapshot
 
@@ -1250,32 +1289,7 @@ def observability_market_eligibility_runtime():
     if not station:
         return jsonify({"ok": False, "error": "station query param required"}), 400
 
-    latest_market_eval = get_latest_station_market_evaluation_context(station=station).get(station, {})
-    eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
-    rejection_breakdown = eligibility_runtime.get("rejection_breakdown") or {}
-    latest_transition = (get_transition_history(station=station, limit=1) or [{}])[0]
-
-    return jsonify(
-        {
-            "ok": True,
-            "station": station,
-            "scheduler_running": is_scheduler_running(),
-            "execution_domain": _current_kalshi_execution_domain(),
-            "latest_settlement_integer": latest_transition.get("settlement_bucket"),
-            "markets_considered_count": int(eligibility_runtime.get("markets_considered_count") or 0),
-            "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
-            "rejected_markets_count": int(eligibility_runtime.get("rejected_markets_count") or 0),
-            "rejection_breakdown": {
-                "outside_price_band": int(rejection_breakdown.get("outside_price_band") or 0),
-                "wrong_series": int(rejection_breakdown.get("wrong_series") or 0),
-                "expired_market": int(rejection_breakdown.get("expired_market") or 0),
-                "settlement_mismatch": int(rejection_breakdown.get("settlement_mismatch") or 0),
-                "unknown_reason": int(rejection_breakdown.get("unknown_reason") or 0),
-            },
-            "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
-            "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
-        }
-    ), 200
+    return jsonify(_build_market_eligibility_runtime_payload(station)), 200
 @app.route("/observability/internal-alert-runtime", methods=["GET"])
 def observability_internal_alert_runtime():
     station = (request.args.get("station") or "").strip().upper()
@@ -1448,64 +1462,65 @@ else:
 
 @app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
-    station = request.args.get("station")
-
-    if not station or not station.strip():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
         return jsonify({"error": "station query parameter required"}), 400
 
-    station = station.strip().upper()
+    known_stations = set(_canonical_live_station_universe().get("stations") or [])
+    if station not in known_stations:
+        return jsonify(
+            {
+                "station": station,
+                "pipeline_status": "unknown_station",
+                "blocking_stage": "INGESTION",
+                "reason": "unknown_station",
+                "transitions_seen_today": 0,
+                "eligible_markets_count": 0,
+                "alerts_sent_today": 0,
+                "hydration_status": "unknown",
+                "last_transition_timestamp": None,
+            }
+        ), 200
 
-    args = request.args.copy()
-    args["station"] = station
+    transition = _get_transition_runtime_summary(station)
+    hydration = _build_hydration_prerequisite_runtime_payload(station)
+    market = _build_market_eligibility_runtime_payload(station)
+    audit = _build_alert_fire_audit_rows()
 
-
-    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot, build_structured_snapshot_from_cache
-    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
-
-    transition = _build_transition_runtime(station)
-    hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
-    market = build_structured_snapshot_from_cache(station)
-    audit = _build_alert_fire_audit_rows()    
-    
-    transitions_seen_today = transition.get("transitions_seen_today", 0)
-    last_transition_timestamp = transition.get("last_transition_timestamp")
-
-    hydration_status = hydration.get("hydration_state", {}).get("status")
-
-    eligible_markets_count = market.get("eligible_markets_count", 0)
-
+    transitions_seen_today = int(transition.get("transitions_seen_today") or 0)
+    eligible_markets_count = int(market.get("eligible_markets_count") or 0)
     alerts_sent_today = 0
-    for row in audit.get("stations", []):
+    for row in audit.get("stations") or []:
         if row.get("station") == station:
-            alerts_sent_today = row.get("alerts_sent_today", 0)
+            alerts_sent_today = int(row.get("alerts_sent_today") or 0)
             break
 
+    hydration_status = (hydration.get("hydration_state") or {}).get("status") or "unknown"
     blocking_stage = "NONE"
-    reason = None
-
+    reason = "ready"
     if hydration_status != "cache_valid":
         blocking_stage = "HYDRATION"
         reason = "hydration_cache_invalid"
-
     elif eligible_markets_count == 0:
         blocking_stage = "MARKET_EVALUATION"
         reason = "no_eligible_markets"
-
     elif transitions_seen_today > 0 and alerts_sent_today == 0:
         blocking_stage = "ALERT_EMISSION"
         reason = "transition_without_alert"
 
-    return jsonify({
-        "station": station,
-        "pipeline_status": "ok",
-        "blocking_stage": blocking_stage,
-        "reason": reason,
-        "transitions_seen_today": transitions_seen_today,
-        "eligible_markets_count": eligible_markets_count,
-        "alerts_sent_today": alerts_sent_today,
-        "hydration_status": hydration_status,
-        "last_transition_timestamp": last_transition_timestamp,
-    })  
+    return jsonify(
+        {
+            "station": station,
+            "pipeline_status": "ok",
+            "blocking_stage": blocking_stage,
+            "reason": reason,
+            "transitions_seen_today": transitions_seen_today,
+            "eligible_markets_count": eligible_markets_count,
+            "alerts_sent_today": alerts_sent_today,
+            "hydration_status": hydration_status,
+            "last_transition_timestamp": transition.get("last_transition_timestamp"),
+        }
+    ), 200
     
 @app.before_request
 def _set_request_execution_domain():
@@ -1967,17 +1982,7 @@ def observability_hydration_prerequisite_runtime():
     if not station:
         return jsonify({"ok": False, "error": "station query param required"}), 400
 
-    hydration_snapshot = get_hydration_prerequisite_state_snapshot() or {}
-    return jsonify(
-        {
-            "station": station,
-            "execution_domain": _current_kalshi_execution_domain(),
-            "scheduler_running": is_scheduler_running(),
-            "hydration_state": hydration_snapshot.get(station) or {},
-            "hydration_queue": hydration_queue_snapshot(),
-            "ok": True,
-        }
-    ), 200
+    return jsonify(_build_hydration_prerequisite_runtime_payload(station)), 200
 
 
 @app.route("/observability/kalshi-connectivity-runtime", methods=["GET"])
