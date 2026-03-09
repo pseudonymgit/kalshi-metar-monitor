@@ -1730,6 +1730,24 @@ def kalshi_health():
         
 # --- Debug helpers ---
 
+@app.route("/debug/simulate-temperature", methods=["GET"])
+def debug_simulate_temperature():
+    station = (request.args.get("station") or "").strip().upper()
+    temp = request.args.get("temp")
+
+    if not station or temp is None:
+        return jsonify({"error": "station and temp required"}), 400
+
+    try:
+        temp = float(temp)
+    except ValueError:
+        return jsonify({"error": "temp must be numeric"}), 400
+
+    from core.metar_monitor import _simulate_temperature_for_testing
+    result = _simulate_temperature_for_testing(station, temp)
+
+    return jsonify(result)
+    
 @app.route("/debug/version", methods=["GET"])
 def debug_version():
     import core.metar_monitor as mm
