@@ -1449,6 +1449,9 @@ else:
 
 @app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
+    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
+    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
+    
     try:
         station = request.args.get("station")
 
