@@ -1457,17 +1457,10 @@ def pipeline_truth():
 
         station = station.strip().upper()
 
-        with app.test_request_context(query_string={"station": station}):
-            transition = observability_transition_runtime().get_json() or {}
-
-        with app.test_request_context(query_string={"station": station}):
-            hydration = observability_hydration_prerequisite_runtime().get_json() or {}
-
-        with app.test_request_context(query_string={"station": station}):
-            market = observability_market_eligibility_runtime().get_json() or {}
-
-        with app.test_request_context(query_string={"station": station}):
-            audit = observability_alert_fire_audit().get_json() or {}
+        transition = {}
+        hydration = {}
+        market = {}
+        audit = {"stations": []}
 
         transitions_seen_today = transition.get("transitions_seen_today", 0)
         last_transition_timestamp = transition.get("last_transition_timestamp")
