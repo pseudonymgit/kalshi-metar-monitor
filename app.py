@@ -1446,65 +1446,70 @@ else:
         _merge_discovered_stations_into_watchlist()
         return None
 
-@app.route("/observability/pipeline-truth")
+@app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
+    try:
+        station = request.args.get("station")
 
-    station = request.args.get("station", "").strip().upper()
+        if not station or not station.strip():
+            return jsonify({"error": "station query parameter required"}), 400
 
-    if not station:
-        return jsonify({"error": "station required"}), 400
+        station = station.strip().upper()
 
-    args = {"station": station}
+        with app.test_request_context(query_string={"station": station}):
+            transition = observability_transition_runtime().get_json() or {}
 
-    with app.test_request_context(query_string={"station": station}):
-        transition = observability_transition_runtime().get_json() or {}
+        with app.test_request_context(query_string={"station": station}):
+            hydration = observability_hydration_prerequisite_runtime().get_json() or {}
 
-    with app.test_request_context(query_string={"station": station}):
-        hydration = observability_hydration_prerequisite_runtime().get_json() or {}
+        with app.test_request_context(query_string={"station": station}):
+            market = observability_market_eligibility_runtime().get_json() or {}
 
-    with app.test_request_context(query_string={"station": station}):
-        market = observability_market_eligibility_runtime().get_json() or {}
+        with app.test_request_context(query_string={"station": station}):
+            audit = observability_alert_fire_audit().get_json() or {}
 
-    with app.test_request_context(query_string={"station": station}):
-        audit = observability_alert_fire_audit().get_json() or {}
-    
-    transitions_seen_today = transition.get("transitions_seen_today", 0)
-    last_transition_timestamp = transition.get("last_transition_timestamp")
+        transitions_seen_today = transition.get("transitions_seen_today", 0)
+        last_transition_timestamp = transition.get("last_transition_timestamp")
 
-    hydration_status = hydration.get("status")
+        hydration_status = hydration.get("hydration_status")
 
-    eligible_markets_count = market.get("eligible_markets_count", 0)
+        eligible_markets_count = market.get("eligible_markets_count", 0)
 
-    alerts_sent_today = audit.get("alerts_sent_today", 0)
+        alerts_sent_today = audit.get("alerts_sent_today", 0)
 
-    blocking_stage = "NONE"
-    reason = None
+        blocking_stage = "NONE"
+        reason = None
 
-    if hydration_status != "cache_valid":
-        blocking_stage = "HYDRATION"
-        reason = "hydration cache invalid"
+        if hydration_status != "cache_valid":
+            blocking_stage = "HYDRATION"
+            reason = "hydration_cache_invalid"
 
-    elif eligible_markets_count == 0:
-        blocking_stage = "MARKET_EVALUATION"
-        reason = "no eligible markets"
+        elif eligible_markets_count == 0:
+            blocking_stage = "MARKET_EVALUATION"
+            reason = "no_eligible_markets"
 
-    elif transitions_seen_today > 0 and alerts_sent_today == 0:
-        blocking_stage = "ALERT_EMISSION"
-        reason = "transition occurred but no alert emitted"
+        elif transitions_seen_today > 0 and alerts_sent_today == 0:
+            blocking_stage = "ALERT_EMISSION"
+            reason = "transition_without_alert"
 
-    pipeline_status = "BLOCKED" if blocking_stage != "NONE" else "CLEAR"
+        return jsonify({
+            "station": station,
+            "pipeline_status": "ok",
+            "blocking_stage": blocking_stage,
+            "reason": reason,
+            "transitions_seen_today": transitions_seen_today,
+            "eligible_markets_count": eligible_markets_count,
+            "alerts_sent_today": alerts_sent_today,
+            "hydration_status": hydration_status,
+            "last_transition_timestamp": last_transition_timestamp,
+        })
 
-    return jsonify({
-        "station": station,
-        "pipeline_status": pipeline_status,
-        "blocking_stage": blocking_stage,
-        "reason": reason,
-        "transitions_seen_today": transitions_seen_today,
-        "eligible_markets_count": eligible_markets_count,
-        "alerts_sent_today": alerts_sent_today,
-        "hydration_status": hydration_status,
-        "last_transition_timestamp": last_transition_timestamp,
-    })
+    except Exception as e:
+        import traceback
+        return jsonify({
+            "error": "internal",
+            "trace": traceback.format_exc()
+        }), 500
     
 @app.before_request
 def _set_request_execution_domain():
