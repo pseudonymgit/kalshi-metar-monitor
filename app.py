@@ -72,6 +72,7 @@ from core.observability import (
     get_current_settlement_epoch_summaries,
 )
 from core.alert_integrity_monitor import build_alert_integrity_findings
+from core.alert_integrity_monitor import _build_alert_fire_audit_rows
 from core.ladder_cache_observability import build_ladder_cache_snapshot
 from core.hydration_health_classifier import classify_hydration_health
 from core.station_time import station_local_day_key, to_station_local
@@ -1449,9 +1450,6 @@ else:
 
 @app.route("/observability/pipeline-truth", methods=["GET"])
 def pipeline_truth():
-    from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
-    from core.alert_integrity_monitor import _build_alert_fire_audit_rows
-    
     try:
         station = request.args.get("station")
 
