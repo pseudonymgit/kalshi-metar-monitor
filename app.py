@@ -1472,7 +1472,7 @@ def pipeline_truth():
         transitions_seen_today = transition.get("transitions_seen_today", 0)
         last_transition_timestamp = transition.get("last_transition_timestamp")
 
-        hydration_status = hydration.get("hydration_status")
+        hydration_status = (hydration or {}).get("hydration_state", {}).get("status")
 
         eligible_markets_count = market.get("eligible_markets_count", 0)
 
