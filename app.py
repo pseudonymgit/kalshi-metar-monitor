@@ -1456,7 +1456,7 @@ def pipeline_truth():
             return jsonify({"error": "station query parameter required"}), 400
 
         station = station.strip().upper()
-
+        transition = {}
         hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
         hydration = {}
         market = {}
