@@ -22,6 +22,7 @@ import logging
 import sqlite3
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify, g
+from werkzeug.exceptions import HTTPException
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -1774,8 +1775,10 @@ def debug_ladder_state():
         **snapshot
     }), 200
 
-@app.errorhandler(500)
-def err_500(e):
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return e
     import traceback
     return jsonify({"error": "internal", "trace": traceback.format_exc()}), 500
 
