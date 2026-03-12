@@ -1264,6 +1264,7 @@ def observability_market_eligibility_runtime():
     enabled_market_types = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
     if not enabled_market_types:
         enabled_market_types = {"HIGH"}
+
     cache_snapshot = build_structured_snapshot_from_cache(station, enabled_market_types)
     cache_rejection_breakdown = cache_snapshot.get("rejection_counts") or {}
 
@@ -1300,15 +1301,16 @@ def observability_market_eligibility_runtime():
 
     markets_considered_count = int(current_cache_probe.get("raw_market_count") or 0)
     eligible_markets_count = int(current_cache_probe.get("filtered_market_count") or 0)
+
     if markets_considered_count == 0:
-        latest_evaluation_outcome = "NO_MARKETS_CACHED"
-        latest_suppression_reason = "cache_empty"
+        live_evaluation_outcome = "NO_MARKETS_CACHED"
+        live_suppression_reason = "cache_empty"
     elif eligible_markets_count == 0:
-        latest_evaluation_outcome = "NO_ELIGIBLE_MARKET"
-        latest_suppression_reason = "filtered_to_zero"
+        live_evaluation_outcome = "NO_ELIGIBLE_MARKET"
+        live_suppression_reason = "filtered_to_zero"
     else:
-        latest_evaluation_outcome = "ELIGIBLE_MARKET_PRESENT"
-        latest_suppression_reason = None
+        live_evaluation_outcome = "ELIGIBLE_MARKET_PRESENT"
+        live_suppression_reason = None
 
     return jsonify(
         {
@@ -1321,12 +1323,13 @@ def observability_market_eligibility_runtime():
             "eligible_markets_count": eligible_markets_count,
             "rejected_markets_count": max(markets_considered_count - eligible_markets_count, 0),
             "rejection_breakdown": dict(current_cache_probe.get("rejection_breakdown") or {}),
-            "latest_evaluation_outcome": latest_evaluation_outcome,
-            "latest_suppression_reason": latest_suppression_reason,
+            "latest_evaluation_outcome": live_evaluation_outcome,
+            "latest_suppression_reason": live_suppression_reason,
             "latest_persisted_evaluation": latest_persisted_evaluation,
             "current_cache_probe": current_cache_probe,
         }
     ), 200
+    
 @app.route("/observability/internal-alert-runtime", methods=["GET"])
 def observability_internal_alert_runtime():
     station = (request.args.get("station") or "").strip().upper()
