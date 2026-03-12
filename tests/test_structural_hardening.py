@@ -130,14 +130,14 @@ class StructuralHardeningTests(unittest.TestCase):
         "core.kalshi_monitor._kalshi_public_get",
         side_effect=[
             {"events": [{"event_ticker": "KXHIGHDEN-26MAR12"}]},
-            {"markets": []},
+            {"markets": [{"ticker": "KXHIGHDEN-26MAR12-T80"}]},
         ],
     )
     def test_cache_metadata_present(self, mock_get, *_mocks):
         kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
         self.assertEqual(mock_get.call_args_list[0].args[0], "/events?series_ticker=KXHIGHDEN")
-        self.assertEqual(mock_get.call_args_list[1].args[0], "/events/KXHIGHDEN-26MAR12/markets")
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12")
 
         cached = kalshi_monitor.get_cached_series_markets("KXHIGHDEN")
         self.assertIsNotNone(cached)
@@ -164,7 +164,26 @@ class StructuralHardeningTests(unittest.TestCase):
     def test_cache_metadata_prefers_station_day_event_ticker(self, mock_get, *_mocks):
         kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
-        self.assertEqual(mock_get.call_args_list[1].args[0], "/events/KXHIGHDEN-26MAR12/markets")
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12")
+
+    @patch("core.kalshi_monitor.station_local_day_key", return_value="2026-03-12")
+    @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": "KXHIGHDEN"})
+    @patch(
+        "core.kalshi_monitor._kalshi_public_get",
+        side_effect=[
+            {"events": [{"event_ticker": "KXHIGHDEN-26MAR12", "status": "active"}]},
+            {"markets": []},
+        ],
+    )
+    def test_empty_market_fetch_does_not_write_cache(self, mock_get, *_mocks):
+        with kalshi_monitor._SERIES_LOCK:
+            kalshi_monitor._SERIES_MARKETS_CACHE.clear()
+
+        snapshot = kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
+
+        self.assertFalse(snapshot.get("cache_written"))
+        self.assertIsNone(kalshi_monitor.get_cached_series_markets("KXHIGHDEN"))
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12")
 
     def test_no_direct_state_mutation_for_temperature_domains(self):
         source = open("core/metar_monitor.py", "r", encoding="utf-8").read()
@@ -396,4 +415,3 @@ class HydrationRecoverySafetyGateTests(unittest.TestCase):
         self.assertEqual(payload["bounded_limit"], 3)
         mock_enqueue.assert_called_once_with("KDEN", reason="ops_hydration_recovery")
         self.assertEqual(mock_worker.call_count, 3)
-
