@@ -920,7 +920,7 @@ def build_structured_snapshot(station: str, market_types: set):
         )
         if event_ticker:
             
-            data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
+            data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}&limit=100")
             markets = data.get("markets") or []
             _LOGGER.info(
                 "hydration_market_fetch station=%s event=%s markets=%s",
