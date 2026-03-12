@@ -1300,6 +1300,15 @@ def observability_market_eligibility_runtime():
 
     markets_considered_count = int(current_cache_probe.get("raw_market_count") or 0)
     eligible_markets_count = int(current_cache_probe.get("filtered_market_count") or 0)
+    if markets_considered_count == 0:
+        latest_evaluation_outcome = "NO_MARKETS_CACHED"
+        latest_suppression_reason = "cache_empty"
+    elif eligible_markets_count == 0:
+        latest_evaluation_outcome = "NO_ELIGIBLE_MARKET"
+        latest_suppression_reason = "filtered_to_zero"
+    else:
+        latest_evaluation_outcome = "ELIGIBLE_MARKET_PRESENT"
+        latest_suppression_reason = None
 
     return jsonify(
         {
@@ -1312,8 +1321,8 @@ def observability_market_eligibility_runtime():
             "eligible_markets_count": eligible_markets_count,
             "rejected_markets_count": max(markets_considered_count - eligible_markets_count, 0),
             "rejection_breakdown": dict(current_cache_probe.get("rejection_breakdown") or {}),
-            "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
-            "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
+            "latest_evaluation_outcome": latest_evaluation_outcome,
+            "latest_suppression_reason": latest_suppression_reason,
             "latest_persisted_evaluation": latest_persisted_evaluation,
             "current_cache_probe": current_cache_probe,
         }
