@@ -14,6 +14,7 @@ class InternalAlertRuntimeEndpointTests(unittest.TestCase):
     @patch("app.kalshi_execution_domain", return_value="production")
     @patch("app.is_scheduler_running", return_value=False)
     @patch("app.get_recent_alerts", return_value=[])
+    @patch("app.get_latest_station_signal_runtime", return_value={"KDEN": {"signal_type": None, "suppression_reason": "NO_SIGNAL_CONDITION_MATCH", "cooldown_state": {}}})
     @patch("app.get_latest_station_market_evaluation_context", return_value={})
     @patch("app.get_transition_history", return_value=[])
     @patch("app.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"cache_valid": True}})
@@ -31,6 +32,9 @@ class InternalAlertRuntimeEndpointTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(payload["scheduler_running"])
+        self.assertIn("signal_type", payload)
+        self.assertIn("suppression_reason", payload)
+        self.assertIn("cooldown_state", payload)
 
     @patch("app.kalshi_execution_domain", return_value="production")
     @patch("app.is_scheduler_running", return_value=True)

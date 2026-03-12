@@ -11,3 +11,6 @@ def test_pipeline_truth_unknown_station(client):
     assert "station" in data
     assert "blocking_stage" in data
     assert "pipeline_status" in data
+    assert "signal_type" in data
+    assert "suppression_reason" in data
+    assert "cooldown_state" in data
