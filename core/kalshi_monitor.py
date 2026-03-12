@@ -575,6 +575,23 @@ def get_cached_series_markets(series_ticker: str) -> dict | None:
         }
 
 
+def get_station_hydration_cache_probe(station: str) -> dict:
+    normalized_station = (station or "").strip().upper()
+    with _SERIES_LOCK:
+        series_ticker = (_SERIES_BY_STATION.get(normalized_station) or "").strip().upper() or None
+        cache_entry = _SERIES_MARKETS_CACHE.get(series_ticker) if series_ticker else None
+        raw_market_count = len((cache_entry or {}).get("markets") or [])
+        return {
+            "station": normalized_station,
+            "series_ticker": series_ticker,
+            "raw_market_count": raw_market_count,
+            "cache_present": cache_entry is not None,
+            "markets_cached": raw_market_count > 0,
+            "station_local_day": (cache_entry or {}).get("station_local_day"),
+            "hydrated_at_utc": (cache_entry or {}).get("hydrated_at_utc"),
+        }
+
+
 def _station_local_previous_day(station: str, now_utc_iso: str) -> str:
     current_utc = parse_iso_utc(now_utc_iso)
     current_local = to_station_local(station, current_utc)
