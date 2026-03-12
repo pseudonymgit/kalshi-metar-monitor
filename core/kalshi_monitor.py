@@ -329,9 +329,23 @@ def _get_all_public_markets(max_pages=5, page_limit=200):
         if cursor:
             path = f"{path}&cursor={cursor}"
 
-        data = _kalshi_public_get(path)
-        markets.extend(data.get("markets", []))
+        data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}&limit=200")
 
+        _LOGGER.warning(
+            "kalshi_probe station=%s series=%s response_keys=%s",
+            normalized_station,
+            series_ticker,
+            list(data.keys()) if isinstance(data, dict) else type(data),
+        )
+
+        markets = data.get("markets") or []
+
+        _LOGGER.warning(
+            "kalshi_probe_market_count station=%s markets=%s",
+            normalized_station,
+            len(markets),
+        )
+        
         cursor = data.get("cursor")
         if not cursor:
             break
