@@ -45,7 +45,7 @@ If the latest evaluation outcome is suppression-class but no suppression reason 
 
 ### 3) Hydration drift
 
-If ladder cache state exists while hydration prerequisites report `series_discovered = false`, the monitor emits:
+If ladder cache state exists while hydration prerequisites report `hydration_state.series_discovered = false`, the monitor emits:
 
 - `HYDRATION_DRIFT`
 

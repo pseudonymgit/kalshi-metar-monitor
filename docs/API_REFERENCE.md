@@ -867,3 +867,391 @@ Low-level inspection during incident/debug workflows.
 
 ### Safety Notes
 Debug-only internal visibility endpoint.
+
+---
+
+## Endpoint
+`GET /execution-domain`
+
+### Domain
+Observability
+
+### Purpose
+Returns current execution-domain mode and station-authority context used by runtime flows.
+
+### Method
+GET
+
+### Key Response Fields
+- `execution_domain`
+
+---
+
+## Endpoint
+`POST /ops/hydration-recovery`
+
+### Domain
+Operations
+
+### Purpose
+Triggers deterministic hydration-recovery handling for a station-scoped operator request.
+
+### Method
+POST
+
+### Key Response Fields
+- `status`
+- `reason`
+- `station`
+- `queue_before`
+- `queue_after`
+
+---
+
+## Endpoint
+`GET /debug/simulate-temperature`
+
+### Domain
+Debug
+
+### Purpose
+Returns deterministic simulation preview payload for temperature-driven ladder debugging.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `icao`
+- `temp_f`
+- `alerts_generated`
+- `crossed_integer`
+
+---
+
+## Endpoint
+`GET /observability/pipeline-truth`
+
+### Domain
+Observability
+
+### Purpose
+Provides a read-only consolidated truth snapshot of pipeline state for operator diagnosis.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `pipeline_status`
+- `blocking_stage`
+- `reason`
+- `hydration_status`
+
+---
+
+## Endpoint
+`GET /observability/hydration-prerequisite-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station-scoped hydration prerequisite runtime snapshot used by execution gating.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `hydration_state.cache_valid`
+- `hydration_state.series_discovered`
+- `hydration_state.markets_cached`
+- `hydration_queue`
+
+---
+
+## Endpoint
+`GET /observability/market-eligibility-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station-scoped market eligibility runtime classification and rejection context.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `markets_considered_count`
+- `eligible_markets_count`
+- `rejected_markets_count`
+- `rejection_breakdown`
+- `latest_evaluation_outcome`
+
+---
+
+## Endpoint
+`GET /observability/transition-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station transition-runtime state used to explain latest transition decisions.
+
+### Method
+GET
+
+### Key Response Fields
+- `scheduler_running`
+- `latest_observation_temp_f`
+- `current_settlement_integer`
+- `transitions_seen_today`
+- `last_transition_type`
+
+---
+
+## Endpoint
+`GET /observability/internal-alert-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station-scoped internal alert runtime context and suppression diagnostics.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `hydration_state`
+- `ingestion_admission`
+- `latest_market_outcome`
+- `first_blocking_stage`
+- `diagnostic_class`
+
+---
+
+## Endpoint
+`GET /observability/alert-decision-trace`
+
+### Domain
+Observability
+
+### Purpose
+Returns deterministic causal trace for alert decision sequencing.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `execution_mode`
+- `station`
+- `decision_chain`
+- `terminal_state`
+
+---
+
+## Endpoint
+`GET /observability/ingestion-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station-level ingestion runtime counters and latest ingest decision metadata.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `last_fetch_status`
+- `fetched_observation_count`
+- `ingested_observation_count`
+- `rejected_observation_count`
+
+---
+
+## Endpoint
+`GET /observability/ingestion-window-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station ingest-window boundaries and sampled rejected-observation diagnostics.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `window_start_utc`
+- `window_end_utc`
+- `sample_rejected_observations`
+
+---
+
+## Endpoint
+`GET /observability/nws-fetch-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns station-scoped most recent NWS fetch diagnostic details.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `last_fetch_timestamp_utc`
+- `request_url`
+- `http_status`
+- `feature_count`
+
+---
+
+## Endpoint
+`GET /observability/kalshi-connectivity-runtime`
+
+### Domain
+Observability
+
+### Purpose
+Returns Kalshi connectivity snapshot used for runtime observability diagnostics.
+
+### Method
+GET
+
+### Key Response Fields
+- `connectivity_snapshot`
+- `execution_domain`
+- `scheduler_running`
+
+---
+
+## Endpoint
+`GET /observability/ladder_cache`
+
+### Domain
+Observability
+
+### Purpose
+Returns per-station ladder cache and hydration-state observability snapshot.
+
+### Method
+GET
+
+### Key Response Fields
+- `generated_utc`
+- `stations[]`
+- `stations[].hydration_state.cache_valid`
+- `stations[].hydration_state.series_discovered`
+
+---
+
+## Endpoint
+`GET /observability/ingestion-root-cause`
+
+### Domain
+Observability
+
+### Purpose
+Returns deterministic root-cause classification for station ingestion outcomes.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `last_fetch_status`
+- `window_start_utc`
+- `window_end_utc`
+- `dominant_rejection_reason`
+- `deterministic_root_cause`
+
+---
+
+## Endpoint
+`GET /observability/ingestion-diagnostic-class`
+
+### Domain
+Observability
+
+### Purpose
+Returns high-level ingestion diagnostic class and operator-facing explanation.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `diagnostic_class`
+- `explanation`
+- `scheduler_running`
+
+---
+
+## Endpoint
+`GET /observability/alert-causality-class`
+
+### Domain
+Observability
+
+### Purpose
+Returns deterministic alert-causality class describing why alerts fired or were suppressed.
+
+### Method
+GET
+
+### Key Response Fields
+- `station`
+- `alert_causality_class`
+- `explanation`
+- `scheduler_running`
+
+---
+
+## Endpoint
+`GET /integrity/alert_pipeline`
+
+### Domain
+Observability
+
+### Purpose
+Returns alert-pipeline integrity findings and supporting metrics for silent-failure detection.
+
+### Method
+GET
+
+### Key Response Fields
+- `generated_utc`
+- `findings`
+- `window_seconds`
+- `hydration_queue`
+
+---
+
+## Endpoint
+`GET /integrity/replay_parity`
+
+### Domain
+Observability
+
+### Purpose
+Returns replay parity integrity snapshot comparing live and replay transition evidence.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `result`
