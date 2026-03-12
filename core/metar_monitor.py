@@ -2125,6 +2125,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 classify_proximity,
                 enqueue_station_hydration,
                 get_hydration_prerequisite_state_snapshot,
+                hydration_queue_snapshot,
                 process_ladder_transition,
                 send_composed_weather_market_alert,
             )
@@ -2198,6 +2199,30 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             station,
                             reason=f"alert_market_eval_{hydration_state.get('status') or 'cache_missing'}",
                         )
+                        hydration_queue = hydration_queue_snapshot(reference_ts=now_ts) or {}
+                        warmup_window_seconds = int(os.getenv("HYDRATION_MISSING_LADDER_WARMUP_SECONDS", "900"))
+                        station_in_queue = station in set(hydration_queue.get("queued_stations") or [])
+                        backoff_until_ts = float((hydration_queue.get("backoff_until") or {}).get(station) or 0.0)
+                        in_backoff_flow = backoff_until_ts > now_ts
+                        attempted_recently = False
+                        evaluated_at_utc = _parse_iso_utc_optional(hydration_state.get("evaluated_at_utc"))
+                        if evaluated_at_utc is not None:
+                            attempted_recently = (now_ts - evaluated_at_utc.timestamp()) <= warmup_window_seconds
+                        warmup_suppressed = (
+                            bool(hydration_state.get("attempted"))
+                            and bool(hydration_state.get("series_discovered"))
+                            and not bool(hydration_state.get("markets_cached"))
+                            and is_scheduler_running()
+                            and (station_in_queue or in_backoff_flow or attempted_recently)
+                        )
+                        if warmup_suppressed:
+                            suppression_reason = "ladder_hydration_warmup"
+                            _ALERT_LOGGER.info(
+                                "SUPPRESS ladder_missing station=%s type=%s reason=ladder_hydration_warmup",
+                                station,
+                                market_type_token,
+                            )
+                            continue
                         if should_alert_on_missing:
                             try:
                                 if _to_local:
