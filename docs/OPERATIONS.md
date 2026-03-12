@@ -66,3 +66,14 @@ Status:
 See `docs/API_REFERENCE.md` for canonical endpoint definitions.
 
 Do not duplicate endpoint inventories in operational runbooks.
+
+
+## Common Pipeline Failure Modes
+
+| Symptom | Diagnostic Endpoint | Fields to Inspect | Interpretation |
+|---|---|---|---|
+| `ladder_not_hydrated` | `GET /observability/hydration-prerequisite-runtime?station=...` | `hydration_state.cache_valid`, `hydration_state.series_discovered`, `hydration_state.markets_cached` | Hydration prerequisites are not usable for market evaluation yet. |
+| `SUPPRESSED_NO_TRANSITION` | `GET /observability/internal-alert-runtime?station=...` | `latest_market_outcome`, `latest_transition`, `diagnostic_class` | Alert path evaluated, but no qualifying runtime transition reached emission criteria. |
+| `no eligible markets` | `GET /observability/market-eligibility-runtime?station=...` | `eligible_markets_count`, `rejected_markets_count`, `rejection_breakdown` | Market evaluation ran but deterministic filters left zero eligible ladders. |
+| `missing_webhook` | `GET /observability/alert-decision-trace?station=...` | `terminal_state`, `decision_chain`, `execution_mode` | Alert decision path is blocked before delivery because webhook configuration is absent. |
+| `webhook_failed` | `GET /observability/internal-alert-runtime?station=...` | `latest_market_outcome`, `alerts_emitted_today`, `diagnostic_class` | Alert decision reached delivery stage, but downstream webhook attempt failed. |
