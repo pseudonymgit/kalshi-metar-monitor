@@ -55,7 +55,9 @@ from core.metar_monitor import (
 from core.kalshi_monitor import (
     _current_kalshi_execution_domain,
     _kalshi_public_get,
+    _parse_target_market_types,
     build_market_polling_station_universe,
+    build_structured_snapshot_from_cache,
     enqueue_station_hydration,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
@@ -1256,8 +1258,48 @@ def observability_market_eligibility_runtime():
 
     latest_market_eval = get_latest_station_market_evaluation_context(station=station).get(station, {})
     eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
-    rejection_breakdown = eligibility_runtime.get("rejection_breakdown") or {}
+    persisted_rejection_breakdown = eligibility_runtime.get("rejection_breakdown") or {}
     latest_transition = (get_transition_history(station=station, limit=1) or [{}])[0]
+
+    enabled_market_types = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
+    if not enabled_market_types:
+        enabled_market_types = {"HIGH"}
+    cache_snapshot = build_structured_snapshot_from_cache(station, enabled_market_types)
+    cache_rejection_breakdown = cache_snapshot.get("rejection_counts") or {}
+
+    current_cache_probe = {
+        "station": station,
+        "series_ticker": cache_snapshot.get("series_ticker"),
+        "raw_market_count": int(cache_snapshot.get("raw_market_count") or 0),
+        "filtered_market_count": int(cache_snapshot.get("filtered_market_count") or 0),
+        "rejection_breakdown": {
+            "outside_price_band": int(cache_rejection_breakdown.get("outside_price_band") or 0),
+            "wrong_series": int(cache_rejection_breakdown.get("wrong_series") or 0),
+            "expired_market": int(cache_rejection_breakdown.get("expired_market") or 0),
+            "settlement_mismatch": int(cache_rejection_breakdown.get("settlement_mismatch") or 0),
+            "unknown_reason": int(cache_rejection_breakdown.get("unknown_reason") or 0),
+        },
+    }
+
+    latest_persisted_evaluation = {
+        "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
+        "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
+        "market_eligibility_runtime": {
+            "markets_considered_count": int(eligibility_runtime.get("markets_considered_count") or 0),
+            "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
+            "rejected_markets_count": int(eligibility_runtime.get("rejected_markets_count") or 0),
+            "rejection_breakdown": {
+                "outside_price_band": int(persisted_rejection_breakdown.get("outside_price_band") or 0),
+                "wrong_series": int(persisted_rejection_breakdown.get("wrong_series") or 0),
+                "expired_market": int(persisted_rejection_breakdown.get("expired_market") or 0),
+                "settlement_mismatch": int(persisted_rejection_breakdown.get("settlement_mismatch") or 0),
+                "unknown_reason": int(persisted_rejection_breakdown.get("unknown_reason") or 0),
+            },
+        },
+    }
+
+    markets_considered_count = int(current_cache_probe.get("raw_market_count") or 0)
+    eligible_markets_count = int(current_cache_probe.get("filtered_market_count") or 0)
 
     return jsonify(
         {
@@ -1266,18 +1308,14 @@ def observability_market_eligibility_runtime():
             "scheduler_running": is_scheduler_running(),
             "execution_domain": _current_kalshi_execution_domain(),
             "latest_settlement_integer": latest_transition.get("settlement_bucket"),
-            "markets_considered_count": int(eligibility_runtime.get("markets_considered_count") or 0),
-            "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
-            "rejected_markets_count": int(eligibility_runtime.get("rejected_markets_count") or 0),
-            "rejection_breakdown": {
-                "outside_price_band": int(rejection_breakdown.get("outside_price_band") or 0),
-                "wrong_series": int(rejection_breakdown.get("wrong_series") or 0),
-                "expired_market": int(rejection_breakdown.get("expired_market") or 0),
-                "settlement_mismatch": int(rejection_breakdown.get("settlement_mismatch") or 0),
-                "unknown_reason": int(rejection_breakdown.get("unknown_reason") or 0),
-            },
+            "markets_considered_count": markets_considered_count,
+            "eligible_markets_count": eligible_markets_count,
+            "rejected_markets_count": max(markets_considered_count - eligible_markets_count, 0),
+            "rejection_breakdown": dict(current_cache_probe.get("rejection_breakdown") or {}),
             "latest_evaluation_outcome": latest_market_eval.get("latest_evaluation_outcome"),
             "latest_suppression_reason": latest_market_eval.get("latest_suppression_reason"),
+            "latest_persisted_evaluation": latest_persisted_evaluation,
+            "current_cache_probe": current_cache_probe,
         }
     ), 200
 @app.route("/observability/internal-alert-runtime", methods=["GET"])

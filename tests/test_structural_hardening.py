@@ -30,6 +30,23 @@ class StructuralHardeningTests(unittest.TestCase):
         self.assertEqual(result["status"], "cache_valid")
         self.assertTrue(result["rollover_grace"])
 
+
+    @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": "KXHIGHDEN"})
+    @patch("core.kalshi_monitor._station_local_previous_day", return_value="2025-03-09")
+    @patch("core.kalshi_monitor.station_local_day_key", return_value="2025-03-10")
+    @patch(
+        "core.kalshi_monitor.get_cached_series_markets",
+        return_value={
+            "markets": [],
+            "hydrated_at_utc": "2025-01-01T10:00:00+00:00",
+            "station_local_day": "2025-03-10",
+        },
+    )
+    def test_hydration_prerequisite_marks_markets_cached_false_when_markets_empty(self, *_mocks):
+        kalshi_monitor.ensure_ladder_hydration_prerequisite("KDEN")
+        snapshot = kalshi_monitor.get_hydration_prerequisite_state_snapshot()
+        self.assertFalse(snapshot["KDEN"]["markets_cached"])
+
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={"default_source": "nws", "lookback_min": 3})
     @patch("core.metar_monitor._compute_window")

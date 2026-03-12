@@ -594,7 +594,8 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
     station_day = station_local_day_key(normalized_station, now_utc_iso)
     series_ticker = ensure_series_discovery_loaded().get(normalized_station)
     series_discovered = bool(series_ticker)
-    markets_cached = bool(get_cached_series_markets(series_ticker)) if series_ticker else False
+    cached = get_cached_series_markets(series_ticker) if series_ticker else None
+    markets_cached = bool((cached or {}).get("markets"))
 
     if not series_ticker:
         result = {"status": "cache_missing", "reason": "series_missing", "station_local_day": station_day}
@@ -610,7 +611,6 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
             }
         return result
 
-    cached = get_cached_series_markets(series_ticker)
     if cached is None:
         result = {"status": "cache_missing", "reason": "cache_missing", "series_ticker": series_ticker, "station_local_day": station_day}
         with _SERIES_LOCK:
