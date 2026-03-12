@@ -23,6 +23,9 @@ Market Availability (Kalshi listings)
 → Observability Domain
 → Scoring Domain
 
+Runtime pipeline order clarification: METAR ingestion → hydration prerequisite → market eligibility evaluation → transition detection → alert decision → alert delivery.
+This sequence defines the canonical live execution path used by runtime diagnostics and observability interpretation.
+
 
 ## Station-Universe Resolution Order
 
@@ -59,6 +62,9 @@ That reference is authoritative for endpoint domain assignment, execution author
 - Holds transition authority.
 - Transition authority transfers atomically at emission creation inside the authoritative evaluation cycle.
 - No intermediate mutable transition state may exist outside that cycle.
+
+Runtime transition taxonomy clarification: the full runtime transition set is `instant_up`, `instant_down`, `settlement_up`, `reversion_after_settlement`, and `goldilocks_reversion`.
+If another document presents a simplified transition model, treat it as a conceptual summary rather than the authoritative runtime taxonomy.
 
 ### Historical Domain
 
@@ -140,3 +146,17 @@ DO NOT:
 - Do not treat transition history as replay reconstruction authority.
 - Keep scoring normalization independent of wall-clock timestamps and execution duration.
 - Any proposed Phase 1 behavioral modification requires explicit versioning and explicit documentation updates.
+
+
+## Runtime Pipeline Order
+
+The deterministic runtime pipeline executes in the following order:
+
+METAR ingestion  
+→ hydration prerequisite  
+→ market eligibility evaluation  
+→ transition detection  
+→ alert decision  
+→ alert delivery
+
+This ordering reflects the runtime gating logic implemented in the ingestion and hydration checks.
