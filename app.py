@@ -23,6 +23,7 @@ import sqlite3
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify, g
 from werkzeug.exceptions import HTTPException
+from core.util import parse_iso_utc
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -2079,7 +2080,13 @@ def observability_hydration_prerequisite_runtime():
             "persisted_hydration_state": persisted_hydration_state,
             "hydration_state": persisted_hydration_state,
             "current_cache_probe": current_cache_probe,
-            "hydration_queue": hydration_queue_snapshot(),
+            "hydration_queue": hydration_queue_snapshot(
+                reference_ts=parse_iso_utc(
+                    str((persisted_hydration_state or {}).get("evaluated_at_utc") or "")
+                ).timestamp()
+                if (persisted_hydration_state or {}).get("evaluated_at_utc")
+                else None
+            ),         
             "ok": True,
         }
     ), 200
