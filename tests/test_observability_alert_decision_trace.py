@@ -12,6 +12,7 @@ class AlertDecisionTraceEndpointTests(unittest.TestCase):
         self.client = app.test_client()
 
     @patch("app.get_recent_alerts", return_value=[])
+    @patch("app.get_latest_station_signal_runtime", return_value={"KDEN": {"signal_type": "near_boundary_momentum_up", "suppression_reason": None, "cooldown_state": {"station_active": True}}})
     @patch("app.get_latest_station_market_evaluation_context", return_value={})
     @patch("app.get_transition_history", return_value=[])
     @patch("app.get_hydration_prerequisite_state_snapshot")
@@ -22,6 +23,7 @@ class AlertDecisionTraceEndpointTests(unittest.TestCase):
         mock_hydration_state,
         _mock_transition_history,
         _mock_latest_eval,
+        _mock_latest_signal,
         _mock_recent_alerts,
     ):
         mock_get_state.return_value = {
@@ -44,6 +46,8 @@ class AlertDecisionTraceEndpointTests(unittest.TestCase):
         self.assertEqual(payload["execution_mode"], "observability")
         self.assertEqual(payload["station"], "KDEN")
         self.assertEqual(payload["terminal_state"], "BLOCKED_INGESTION_ADMISSION")
+        self.assertEqual(payload["signal_type"], "near_boundary_momentum_up")
+        self.assertIn("cooldown_state", payload)
         self.assertEqual(len(payload["decision_chain"]), 1)
         self.assertEqual(payload["decision_chain"][0]["stage"], "INGESTION_ADMISSION")
         self.assertEqual(payload["decision_chain"][0]["status"], "BLOCK")

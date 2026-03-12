@@ -77,3 +77,15 @@ Do not duplicate endpoint inventories in operational runbooks.
 | `no eligible markets` | `GET /observability/market-eligibility-runtime?station=...` | `eligible_markets_count`, `rejected_markets_count`, `rejection_breakdown` | Market evaluation ran but deterministic filters left zero eligible ladders. |
 | `missing_webhook` | `GET /observability/alert-decision-trace?station=...` | `terminal_state`, `decision_chain`, `execution_mode` | Alert decision path is blocked before delivery because webhook configuration is absent. |
 | `webhook_failed` | `GET /observability/internal-alert-runtime?station=...` | `latest_market_outcome`, `alerts_emitted_today`, `diagnostic_class` | Alert decision reached delivery stage, but downstream webhook attempt failed. |
+
+## Signal-layer troubleshooting
+
+### near_boundary_momentum_up
+- Confirm `hydration_state.cache_valid=true` and `eligible_markets_count>0`.
+- Check `/observability/internal-alert-runtime` for `signal_type`, `suppression_reason`, and `cooldown_state`.
+- Common suppressions: `NO_ELIGIBLE_MARKETS`, `STATION_COOLDOWN_ACTIVE`, `HYDRATION_CACHE_INVALID`.
+
+### goldilocks_reversion_alert
+- Verify a `settlement_up` occurred first in the current epoch.
+- Verify the epoch saw both a spike (`>= settlement + 1.2°F`) and reversion (`<= settlement - 0.2°F`).
+- Use `/observability/alert-decision-trace` and `/observability/pipeline-truth` to inspect latest signal suppression and cooldown state.
