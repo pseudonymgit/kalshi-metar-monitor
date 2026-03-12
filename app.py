@@ -61,6 +61,7 @@ from core.kalshi_monitor import (
     enqueue_station_hydration,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
+    get_station_hydration_cache_probe,
     get_kalshi_connectivity_snapshot,
     get_hydration_prerequisite_state_snapshot,
     get_last_hydration_execution_snapshot,
@@ -2045,12 +2046,39 @@ def observability_hydration_prerequisite_runtime():
         return jsonify({"ok": False, "error": "station query param required"}), 400
 
     hydration_snapshot = get_hydration_prerequisite_state_snapshot() or {}
+    persisted_hydration_state = hydration_snapshot.get(station) or {}
+    current_cache_probe = get_station_hydration_cache_probe(station)
+    cache_present = bool(current_cache_probe.get("cache_present"))
+    raw_market_count = int(current_cache_probe.get("raw_market_count") or 0)
+
+    if not cache_present:
+        status = "cache_missing"
+        reason = "cache_missing"
+        cache_valid = False
+        markets_cached = False
+    elif raw_market_count == 0:
+        status = "cache_missing"
+        reason = "cache_empty"
+        cache_valid = False
+        markets_cached = False
+    else:
+        status = "cache_valid"
+        reason = None
+        cache_valid = True
+        markets_cached = True
+
     return jsonify(
         {
             "station": station,
             "execution_domain": _current_kalshi_execution_domain(),
             "scheduler_running": is_scheduler_running(),
-            "hydration_state": hydration_snapshot.get(station) or {},
+            "status": status,
+            "reason": reason,
+            "cache_valid": cache_valid,
+            "markets_cached": markets_cached,
+            "persisted_hydration_state": persisted_hydration_state,
+            "hydration_state": persisted_hydration_state,
+            "current_cache_probe": current_cache_probe,
             "hydration_queue": hydration_queue_snapshot(),
             "ok": True,
         }
