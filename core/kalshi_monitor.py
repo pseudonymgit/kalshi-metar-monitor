@@ -714,9 +714,9 @@ def enqueue_station_hydration(station: str, reason: str = "cache_missing") -> bo
     return True
 
 
-def hydration_queue_snapshot() -> dict:
+def hydration_queue_snapshot(*, reference_ts: float | None = None) -> dict:
     with _SERIES_LOCK:
-        now_ts = time.time()
+        now_ts = float(reference_ts) if reference_ts is not None else time.time()
         backoff_until = dict(_hydration_backoff_until)
         backoff_stations = sorted(
             station for station, until_ts in backoff_until.items() if float(until_ts or 0.0) > now_ts

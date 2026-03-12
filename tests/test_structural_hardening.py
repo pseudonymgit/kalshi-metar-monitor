@@ -154,7 +154,7 @@ class StructuralHardeningTests(unittest.TestCase):
         kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
         self.assertEqual(mock_get.call_args_list[0].args[0], "/events?series_ticker=KXHIGHDEN")
-        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12")
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
 
         cached = kalshi_monitor.get_cached_series_markets("KXHIGHDEN")
         self.assertIsNotNone(cached)
@@ -181,7 +181,7 @@ class StructuralHardeningTests(unittest.TestCase):
     def test_cache_metadata_prefers_station_day_event_ticker(self, mock_get, *_mocks):
         kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
-        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12")
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
 
     @patch("core.kalshi_monitor.station_local_day_key", return_value="2026-03-12")
     @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": "KXHIGHDEN"})
@@ -200,7 +200,7 @@ class StructuralHardeningTests(unittest.TestCase):
 
         self.assertFalse(snapshot.get("cache_written"))
         self.assertIsNone(kalshi_monitor.get_cached_series_markets("KXHIGHDEN"))
-        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12")
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
 
     def test_no_direct_state_mutation_for_temperature_domains(self):
         source = open("core/metar_monitor.py", "r", encoding="utf-8").read()

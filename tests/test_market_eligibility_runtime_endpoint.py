@@ -88,7 +88,7 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["current_cache_probe"]["filtered_market_count"], 2)
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["markets_considered_count"], 12)
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["eligible_markets_count"], 3)
-        self.assertEqual(payload["latest_evaluation_outcome"], "NO_ELIGIBLE_MARKET")
+        self.assertEqual(payload["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
         self.assertIsNone(payload["latest_suppression_reason"])
 
 
@@ -120,8 +120,70 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["markets_considered_count"], 7)
         self.assertEqual(payload["eligible_markets_count"], 4)
+        self.assertEqual(payload["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
+        self.assertIsNone(payload["latest_suppression_reason"])
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["markets_considered_count"], 0)
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["eligible_markets_count"], 0)
+
+    @patch("app.get_transition_history", return_value=[{"settlement_bucket": 61}])
+    @patch("app.build_structured_snapshot_from_cache", return_value={
+        "series_ticker": "KXHIGHDEN",
+        "raw_market_count": 0,
+        "filtered_market_count": 0,
+        "rejection_counts": {},
+    })
+    @patch("app.get_latest_station_market_evaluation_context", return_value={
+        "KDEN": {
+            "latest_evaluation_outcome": "ELIGIBLE_MARKET_PRESENT",
+            "latest_suppression_reason": None,
+            "market_eligibility_runtime": {
+                "markets_considered_count": 5,
+                "eligible_markets_count": 2,
+                "rejected_markets_count": 3,
+                "rejection_breakdown": {},
+            },
+        }
+    })
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    @patch("app.is_scheduler_running", return_value=True)
+    def test_live_probe_empty_cache_sets_no_markets_cached(self, *_mocks):
+        response = self.client.get("/observability/market-eligibility-runtime?station=KDEN")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["latest_evaluation_outcome"], "NO_MARKETS_CACHED")
+        self.assertEqual(payload["latest_suppression_reason"], "cache_empty")
+        self.assertEqual(payload["latest_persisted_evaluation"]["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
+
+    @patch("app.get_transition_history", return_value=[{"settlement_bucket": 61}])
+    @patch("app.build_structured_snapshot_from_cache", return_value={
+        "series_ticker": "KXHIGHDEN",
+        "raw_market_count": 4,
+        "filtered_market_count": 0,
+        "rejection_counts": {},
+    })
+    @patch("app.get_latest_station_market_evaluation_context", return_value={
+        "KDEN": {
+            "latest_evaluation_outcome": "ELIGIBLE_MARKET_PRESENT",
+            "latest_suppression_reason": None,
+            "market_eligibility_runtime": {
+                "markets_considered_count": 5,
+                "eligible_markets_count": 2,
+                "rejected_markets_count": 3,
+                "rejection_breakdown": {},
+            },
+        }
+    })
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    @patch("app.is_scheduler_running", return_value=True)
+    def test_live_probe_filtered_zero_sets_no_eligible_market(self, *_mocks):
+        response = self.client.get("/observability/market-eligibility-runtime?station=KDEN")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["latest_evaluation_outcome"], "NO_ELIGIBLE_MARKET")
+        self.assertEqual(payload["latest_suppression_reason"], "filtered_to_zero")
+        self.assertEqual(payload["latest_persisted_evaluation"]["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
 
 
 if __name__ == "__main__":
