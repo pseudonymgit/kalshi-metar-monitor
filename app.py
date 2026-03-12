@@ -46,6 +46,7 @@ from core.metar_monitor import (
     get_station_ingestion_window_runtime,
     get_last_nws_fetch_diagnostic,
     get_latest_station_market_evaluation_context,
+    get_latest_station_signal_runtime,
     run_replay_for_station_day,
     is_scheduler_running,
     set_live_station_universe_resolver,
@@ -1136,6 +1137,7 @@ def _get_alert_runtime_snapshot(station: str):
     )
 
     latest_market_eval = get_latest_station_market_evaluation_context(station=normalized_station).get(normalized_station, {})
+    latest_signal_runtime = get_latest_station_signal_runtime(station=normalized_station).get(normalized_station, {})
     latest_outcome = (latest_market_eval.get("latest_evaluation_outcome") or "").strip().upper()
     latest_suppression_reason = (latest_market_eval.get("latest_suppression_reason") or "").strip().upper()
 
@@ -1158,6 +1160,7 @@ def _get_alert_runtime_snapshot(station: str):
         "latest_market_eval": latest_market_eval,
         "latest_outcome": latest_outcome,
         "latest_suppression_reason": latest_suppression_reason,
+        "latest_signal_runtime": latest_signal_runtime,
         "station_alerts": station_alerts,
     }
 
@@ -1313,6 +1316,9 @@ def observability_internal_alert_runtime():
             },
             "latest_transition": runtime_snapshot["latest_transition"],
             "latest_market_outcome": runtime_snapshot["latest_outcome"] or "UNKNOWN",
+            "signal_type": (runtime_snapshot.get("latest_signal_runtime") or {}).get("signal_type"),
+            "suppression_reason": (runtime_snapshot.get("latest_signal_runtime") or {}).get("suppression_reason"),
+            "cooldown_state": (runtime_snapshot.get("latest_signal_runtime") or {}).get("cooldown_state") or {},
             "alerts_emitted_today": alerts_emitted_today,
             "first_blocking_stage": first_blocking_stage,
             "diagnostic_class": _derive_runtime_diagnostic(first_blocking_stage, runtime_snapshot),
@@ -1458,7 +1464,6 @@ def pipeline_truth():
         station = station.strip().upper()
         transition = {}
         hydration = get_hydration_prerequisite_state_snapshot().get(station, {})
-        hydration = {}
         market = {}
         audit = {"stations": []}
 
@@ -1470,6 +1475,7 @@ def pipeline_truth():
         eligible_markets_count = market.get("eligible_markets_count", 0)
 
         alerts_sent_today = audit.get("alerts_sent_today", 0)
+        signal_runtime = get_latest_station_signal_runtime(station=station).get(station, {})
 
         blocking_stage = "NONE"
         reason = None
@@ -1496,6 +1502,9 @@ def pipeline_truth():
             "alerts_sent_today": alerts_sent_today,
             "hydration_status": hydration_status,
             "last_transition_timestamp": last_transition_timestamp,
+            "signal_type": signal_runtime.get("signal_type"),
+            "suppression_reason": signal_runtime.get("suppression_reason"),
+            "cooldown_state": signal_runtime.get("cooldown_state") or {},
         })
 
     except Exception as e:
@@ -2580,7 +2589,17 @@ def observability_alert_decision_trace():
         return jsonify({"ok": False, "error": "station query param required"}), 400
 
     payload = _build_alert_decision_trace(station=station)
-    return jsonify({"ok": True, "execution_mode": "observability", **payload}), 200
+    signal_runtime = get_latest_station_signal_runtime(station=station).get(station, {})
+    return jsonify(
+        {
+            "ok": True,
+            "execution_mode": "observability",
+            **payload,
+            "signal_type": signal_runtime.get("signal_type"),
+            "suppression_reason": signal_runtime.get("suppression_reason"),
+            "cooldown_state": signal_runtime.get("cooldown_state") or {},
+        }
+    ), 200
 
 
 @app.route("/observability/runtime-authority-snapshot", methods=["GET"])
