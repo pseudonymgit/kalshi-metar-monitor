@@ -38,7 +38,7 @@ from core.authoritative_state import (
     commit_temperature_state,
     immutable_public_state_snapshot,
     read_temperature_state,
-    reset_station_daily_state,
+    reset_station_daily_state as _reset_station_daily_state_authoritative,
     set_latest_observation,
     state_lock,
     state_ref,
@@ -90,6 +90,21 @@ _TRANSITION_HISTORY = deque(maxlen=500)
 _TRANSITION_LOCK = threading.Lock()
 _LAST_SETTLEMENT_UP_TS = {}
 _LAST_NWS_FETCH_DIAGNOSTIC = {}
+_SIGNAL_OBSERVATION_WINDOWS: Dict[str, deque] = {}
+_SIGNAL_STATION_LAST_EMIT: Dict[str, float] = {}
+_SIGNAL_BOUNDARY_LAST_EMIT: Dict[Tuple[str, int, int], float] = {}
+_SIGNAL_EPOCH_COUNTER: Dict[str, int] = {}
+_SIGNAL_GOLDILOCKS_EPOCH_TRACKER: Dict[Tuple[str, int], Dict[str, Any]] = {}
+_LATEST_SIGNAL_RUNTIME: Dict[str, Dict[str, Any]] = {}
+
+_SIGNAL_STATION_COOLDOWN_SECONDS = 300
+_SIGNAL_BOUNDARY_COOLDOWN_SECONDS = 900
+_SIGNAL_MOMENTUM_WINDOW_SIZE = 3
+
+
+def reset_station_daily_state(icao: str, local_day: str) -> None:
+    _reset_station_daily_state_authoritative(icao, local_day)
+    _LAST_SETTLEMENT_UP_TS.pop((icao or "").strip().upper(), None)
 
 
 # =========================
@@ -842,6 +857,228 @@ def _emit_alert(
     _send_alert(cfg.get("webhook", ""), payload)
 
 
+def _observation_seconds(obs_time: str) -> Optional[float]:
+    obs_dt = _parse_iso_utc_optional(obs_time)
+    if obs_dt is None:
+        return None
+    return obs_dt.timestamp()
+
+
+def _current_signal_epoch(station: str) -> int:
+    return int(_SIGNAL_EPOCH_COUNTER.get(station, 0) or 0)
+
+
+def _record_signal_runtime(station: str, runtime: Dict[str, Any]) -> None:
+    _LATEST_SIGNAL_RUNTIME[(station or "").strip().upper()] = copy.deepcopy(runtime)
+
+
+def _get_signal_runtime(station: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    normalized_station = (station or "").strip().upper()
+    if normalized_station:
+        runtime = _LATEST_SIGNAL_RUNTIME.get(normalized_station)
+        return {normalized_station: copy.deepcopy(runtime)} if isinstance(runtime, dict) else {}
+    return copy.deepcopy(_LATEST_SIGNAL_RUNTIME)
+
+
+def _emit_signal_alert(*, station: str, obs_time: str, temp_f: float, signal_context: Dict[str, Any], cfg: Dict[str, Any]) -> None:
+    payload = {
+        "schema_version": ALERT_SCHEMA_VERSION,
+        "timestamp_utc": _now_utc_iso(),
+        "station": station,
+        "classification": "SIGNAL",
+        "summary": {
+            "headline": f"{station} signal alert",
+            "transition": signal_context.get("signal_type"),
+            "temp_f": float(temp_f),
+            "instant_bucket": int(math.floor(temp_f)),
+            "settlement_bucket": signal_context.get("settlement_bucket_at_up"),
+        },
+        "signal_context": copy.deepcopy(signal_context),
+        "legacy": {
+            "type": "signal_alert",
+            "obs_time": obs_time,
+            "temp_f": float(temp_f),
+            "signal_type": signal_context.get("signal_type"),
+        },
+    }
+    _audit_alert(
+        station=station,
+        market_type="SIGNAL",
+        event_ticker=str(signal_context.get("dedupe_key") or ""),
+        alert_type=str(signal_context.get("signal_type") or "signal"),
+        direction="UP" if str(signal_context.get("signal_type") or "").endswith("_up") else "REVERSAL",
+        temp_f=float(temp_f),
+        bucket_index=int(math.floor(temp_f)),
+        metadata={"signal_context": copy.deepcopy(signal_context)},
+    )
+    _send_alert(cfg.get("webhook", ""), payload)
+
+
+def get_latest_station_signal_runtime(station: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    return _get_signal_runtime(station)
+
+
+def _evaluate_deterministic_signal_layer(
+    *,
+    station: str,
+    now_f: float,
+    obs_time: str,
+    transition_type: Optional[str],
+    settlement_bucket: int,
+    hydration_cache_valid: bool,
+    eligible_markets_count: int,
+    cfg: Dict[str, Any],
+) -> None:
+    station = (station or "").strip().upper()
+    obs_seconds = _observation_seconds(obs_time)
+    if obs_seconds is None:
+        return
+
+    window = _SIGNAL_OBSERVATION_WINDOWS.setdefault(station, deque(maxlen=_SIGNAL_MOMENTUM_WINDOW_SIZE))
+    window.append({"temp_f": float(now_f), "obs_time": obs_time, "seconds": obs_seconds})
+
+    if transition_type == "settlement_up":
+        _SIGNAL_EPOCH_COUNTER[station] = _current_signal_epoch(station) + 1
+    epoch_id = _current_signal_epoch(station)
+
+    for key in list(_SIGNAL_BOUNDARY_LAST_EMIT.keys()):
+        key_station, key_boundary, _key_epoch = key
+        if key_station == station and now_f >= float(key_boundary):
+            _SIGNAL_BOUNDARY_LAST_EMIT.pop(key, None)
+
+    station_last_emit = _SIGNAL_STATION_LAST_EMIT.get(station)
+    station_cooldown_active = station_last_emit is not None and (obs_seconds - station_last_emit) < _SIGNAL_STATION_COOLDOWN_SECONDS
+
+    runtime = {
+        "station": station,
+        "obs_time": obs_time,
+        "signal_type": None,
+        "signal_emitted": False,
+        "suppression_reason": None,
+        "cooldown_state": {
+            "station_active": station_cooldown_active,
+            "station_cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
+            "boundary_active": False,
+            "boundary_cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS,
+        },
+    }
+
+    if not hydration_cache_valid:
+        runtime["suppression_reason"] = "HYDRATION_CACHE_INVALID"
+        _record_signal_runtime(station, runtime)
+        return
+    if int(eligible_markets_count) <= 0:
+        runtime["suppression_reason"] = "NO_ELIGIBLE_MARKETS"
+        _record_signal_runtime(station, runtime)
+        return
+    if station_cooldown_active:
+        runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+
+    next_integer = int(math.floor(now_f)) + 1
+    distance_to_integer = float(next_integer) - float(now_f)
+    momentum = None
+    pressure_to_boundary_seconds = None
+    boundary_cooldown_active = False
+    boundary_key = (station, int(next_integer), int(epoch_id))
+    boundary_last_emit = _SIGNAL_BOUNDARY_LAST_EMIT.get(boundary_key)
+    if boundary_last_emit is not None and (obs_seconds - boundary_last_emit) < _SIGNAL_BOUNDARY_COOLDOWN_SECONDS:
+        boundary_cooldown_active = True
+    runtime["cooldown_state"]["boundary_active"] = boundary_cooldown_active
+
+    near_boundary_all_conditions = False
+    if 0.0 < distance_to_integer <= 0.10 and len(window) == _SIGNAL_MOMENTUM_WINDOW_SIZE:
+        x1, x2, x3 = window[0], window[1], window[2]
+        monotonic = x1["temp_f"] <= x2["temp_f"] <= x3["temp_f"]
+        increasing_time = x1["seconds"] < x2["seconds"] < x3["seconds"]
+        movement_ok = (x3["temp_f"] - x1["temp_f"]) >= 0.05
+        total_seconds = x3["seconds"] - x1["seconds"]
+        if increasing_time and total_seconds > 0:
+            momentum = (x3["temp_f"] - x1["temp_f"]) / total_seconds
+            if momentum > 0:
+                pressure_to_boundary_seconds = distance_to_integer / momentum
+        near_boundary_all_conditions = bool(
+            monotonic
+            and increasing_time
+            and movement_ok
+            and momentum is not None
+            and momentum >= 0.002
+        )
+
+    if near_boundary_all_conditions and not station_cooldown_active and not boundary_cooldown_active:
+        signal_context = {
+            "signal_type": "near_boundary_momentum_up",
+            "signal_version": 1,
+            "station": station,
+            "obs_time": obs_time,
+            "dedupe_key": f"near_boundary_momentum_up:{station}:{epoch_id}:{next_integer}",
+            "cooldown_applied": True,
+            "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS,
+            "distance_to_next_integer": distance_to_integer,
+            "momentum_f_per_sec": momentum,
+            "momentum_window_size": _SIGNAL_MOMENTUM_WINDOW_SIZE,
+            "next_integer_boundary": next_integer,
+            "pressure_to_boundary_seconds": pressure_to_boundary_seconds,
+        }
+        _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+        _SIGNAL_BOUNDARY_LAST_EMIT[boundary_key] = obs_seconds
+        _emit_signal_alert(station=station, obs_time=obs_time, temp_f=now_f, signal_context=signal_context, cfg=cfg)
+        runtime.update({"signal_type": "near_boundary_momentum_up", "signal_emitted": True, "suppression_reason": None})
+        runtime["cooldown_state"]["station_active"] = True
+        runtime["cooldown_state"]["boundary_active"] = True
+        _record_signal_runtime(station, runtime)
+        return
+
+    epoch_key = (station, int(epoch_id))
+    tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+    if transition_type == "settlement_up":
+        tracker = {
+            "settlement_bucket_at_up": int(settlement_bucket),
+            "max_temp_after_up": float(now_f),
+            "exceeded_by_one_or_more": float(now_f) >= float(settlement_bucket) + 1.2,
+            "reverted_below_settlement": float(now_f) <= float(settlement_bucket) - 0.2,
+            "alert_emitted": False,
+            "settlement_up_obs_time": obs_time,
+        }
+        _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[epoch_key] = tracker
+    elif isinstance(tracker, dict):
+        tracker["max_temp_after_up"] = max(float(tracker.get("max_temp_after_up") or now_f), float(now_f))
+        tracker["exceeded_by_one_or_more"] = bool(tracker.get("exceeded_by_one_or_more")) or (
+            tracker["max_temp_after_up"] >= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) + 1.2
+        )
+        tracker["reverted_below_settlement"] = bool(tracker.get("reverted_below_settlement")) or (
+            float(now_f) <= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) - 0.2
+        )
+
+    if isinstance(tracker, dict):
+        if bool(tracker.get("alert_emitted")):
+            runtime["suppression_reason"] = "EPOCH_ALERT_ALREADY_EMITTED"
+        elif station_cooldown_active:
+            runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+        elif bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
+            signal_context = {
+                "signal_type": "goldilocks_reversion_alert",
+                "signal_version": 1,
+                "station": station,
+                "obs_time": obs_time,
+                "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
+                "cooldown_applied": True,
+                "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
+                "settlement_bucket_at_up": int(tracker.get("settlement_bucket_at_up") or settlement_bucket),
+                "max_temp_after_up": float(tracker.get("max_temp_after_up") or now_f),
+                "reverted_temp": float(now_f),
+                "epoch_id": int(epoch_id),
+            }
+            tracker["alert_emitted"] = True
+            _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+            _emit_signal_alert(station=station, obs_time=obs_time, temp_f=now_f, signal_context=signal_context, cfg=cfg)
+            runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None})
+            runtime["cooldown_state"]["station_active"] = True
+
+    if runtime["signal_type"] is None and runtime["suppression_reason"] is None:
+        runtime["suppression_reason"] = "NO_SIGNAL_CONDITION_MATCH"
+    _record_signal_runtime(station, runtime)
+
+
 def _process_temperature_event(
     icao: str,
     temp_f: float,
@@ -937,6 +1174,31 @@ def _process_temperature_event(
                     emit_fn=_log_transition_event,
                 )
 
+    hydration_cache_valid = False
+    eligible_markets_count = 0
+    try:
+        from core.kalshi_monitor import get_hydration_prerequisite_state_snapshot
+
+        hydration_state = get_hydration_prerequisite_state_snapshot().get(normalized_station) or {}
+        hydration_cache_valid = bool(hydration_state.get("cache_valid"))
+    except Exception:
+        hydration_cache_valid = False
+
+    latest_market_eval = get_latest_station_market_evaluation_context(station=normalized_station).get(normalized_station, {})
+    eligibility_runtime = latest_market_eval.get("market_eligibility_runtime") or {}
+    eligible_markets_count = int(eligibility_runtime.get("eligible_markets_count") or 0)
+
+    _evaluate_deterministic_signal_layer(
+        station=normalized_station,
+        now_f=now_f,
+        obs_time=obs_time,
+        transition_type=transition_type,
+        settlement_bucket=settlement_bucket,
+        hydration_cache_valid=hydration_cache_valid,
+        eligible_markets_count=eligible_markets_count,
+        cfg=cfg,
+    )
+
     alerts = 0
     if (
         last_observed_integer is not None
@@ -992,12 +1254,35 @@ def _snapshot_station_state(station: str) -> Dict[str, Any]:
             "last_seen_iso": _STATE["last_seen_iso"].get(station),
             "last_obs": copy.deepcopy(last_obs),
             "last_reset_date_local": _STATE["last_reset_date_local"].get(station),
+            "last_settlement_up_ts": _LAST_SETTLEMENT_UP_TS.get(station),
+            "signal_observation_window": list(_SIGNAL_OBSERVATION_WINDOWS.get(station) or []),
+            "signal_station_last_emit": _SIGNAL_STATION_LAST_EMIT.get(station),
+            "signal_epoch_counter": _SIGNAL_EPOCH_COUNTER.get(station),
+            "signal_goldilocks_epoch_tracker": {
+                key[1]: copy.deepcopy(value)
+                for key, value in _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.items()
+                if key[0] == station
+            },
+            "signal_boundary_last_emit": {
+                (key[1], key[2]): value
+                for key, value in _SIGNAL_BOUNDARY_LAST_EMIT.items()
+                if key[0] == station
+            },
+            "latest_signal_runtime": copy.deepcopy(_LATEST_SIGNAL_RUNTIME.get(station)),
         }
 
 
 def _restore_station_state(station: str, snapshot: Dict[str, Any]) -> None:
     station = (station or "").strip().upper()
     _LAST_SETTLEMENT_UP_TS.pop(station, None)
+    _SIGNAL_OBSERVATION_WINDOWS.pop(station, None)
+    _SIGNAL_STATION_LAST_EMIT.pop(station, None)
+    _SIGNAL_EPOCH_COUNTER.pop(station, None)
+    _LATEST_SIGNAL_RUNTIME.pop(station, None)
+    for key in [k for k in _SIGNAL_GOLDILOCKS_EPOCH_TRACKER if k[0] == station]:
+        _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.pop(key, None)
+    for key in [k for k in _SIGNAL_BOUNDARY_LAST_EMIT if k[0] == station]:
+        _SIGNAL_BOUNDARY_LAST_EMIT.pop(key, None)
     reset_station_daily_state(station, snapshot.get("last_reset_date_local") or "")
     if snapshot.get("last_observed_integer") is not None:
         commit_temperature_state(
@@ -1011,6 +1296,27 @@ def _restore_station_state(station: str, snapshot: Dict[str, Any]) -> None:
         set_latest_observation(station, snapshot["last_obs"], snapshot["last_seen_iso"])
     else:
         clear_latest_observation(station)
+    prior_window = snapshot.get("signal_observation_window") or []
+    if prior_window:
+        restored_window = deque(maxlen=_SIGNAL_MOMENTUM_WINDOW_SIZE)
+        for row in prior_window:
+            if isinstance(row, dict):
+                restored_window.append(copy.deepcopy(row))
+        if restored_window:
+            _SIGNAL_OBSERVATION_WINDOWS[station] = restored_window
+    if snapshot.get("signal_station_last_emit") is not None:
+        _SIGNAL_STATION_LAST_EMIT[station] = float(snapshot["signal_station_last_emit"])
+    if snapshot.get("last_settlement_up_ts"):
+        _LAST_SETTLEMENT_UP_TS[station] = str(snapshot.get("last_settlement_up_ts"))
+    if snapshot.get("signal_epoch_counter") is not None:
+        _SIGNAL_EPOCH_COUNTER[station] = int(snapshot["signal_epoch_counter"])
+    for epoch_id, tracker in (snapshot.get("signal_goldilocks_epoch_tracker") or {}).items():
+        _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[(station, int(epoch_id))] = copy.deepcopy(tracker)
+    for boundary_key, ts in (snapshot.get("signal_boundary_last_emit") or {}).items():
+        boundary, epoch_id = boundary_key
+        _SIGNAL_BOUNDARY_LAST_EMIT[(station, int(boundary), int(epoch_id))] = float(ts)
+    if isinstance(snapshot.get("latest_signal_runtime"), dict):
+        _LATEST_SIGNAL_RUNTIME[station] = copy.deepcopy(snapshot["latest_signal_runtime"])
 
 
 def _reset_replay_runtime_state_for_station(
@@ -1019,6 +1325,14 @@ def _reset_replay_runtime_state_for_station(
 ) -> None:
     station = (station or "").strip().upper()
     _LAST_SETTLEMENT_UP_TS.pop(station, None)
+    _SIGNAL_OBSERVATION_WINDOWS.pop(station, None)
+    _SIGNAL_STATION_LAST_EMIT.pop(station, None)
+    _SIGNAL_EPOCH_COUNTER.pop(station, None)
+    _LATEST_SIGNAL_RUNTIME.pop(station, None)
+    for key in [k for k in _SIGNAL_GOLDILOCKS_EPOCH_TRACKER if k[0] == station]:
+        _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.pop(key, None)
+    for key in [k for k in _SIGNAL_BOUNDARY_LAST_EMIT if k[0] == station]:
+        _SIGNAL_BOUNDARY_LAST_EMIT.pop(key, None)
     reset_station_daily_state(station, replay_local_day)
     clear_latest_observation(station)
 
@@ -1887,11 +2201,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                         if should_alert_on_missing:
                             try:
                                 if _to_local:
-                                    local_date = _to_local(station, datetime.now(timezone.utc)).date().isoformat()
+                                    local_date = _to_local(station, rate_limit_reference_dt).date().isoformat()
                                 else:
-                                    local_date = datetime.now(timezone.utc).date().isoformat()
+                                    local_date = rate_limit_reference_dt.date().isoformat()
                             except Exception:
-                                local_date = datetime.now(timezone.utc).date().isoformat()
+                                local_date = rate_limit_reference_dt.date().isoformat()
 
                             dedupe_key = f"{station}_{market_type_token}_{local_date}"
 

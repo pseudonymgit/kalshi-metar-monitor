@@ -160,3 +160,36 @@ METAR ingestion
 → alert delivery
 
 This ordering reflects the runtime gating logic implemented in the ingestion and hydration checks.
+
+## Deterministic Signal Layer
+
+The signal layer runs inside `_process_temperature_event()` after transition classification and before temperature state commit. It is deterministic and replay-safe because it depends only on:
+
+- observation timestamps
+- observation temperatures
+- deterministic in-memory runtime state
+
+No wall-clock functions (`time.time()`, `datetime.now()`) are used in signal decision paths.
+
+### `near_boundary_momentum_up`
+
+Emits only when all are true:
+- `0 < distance_to_integer <= 0.10°F`
+- last 3 observations are monotonic non-decreasing with strictly increasing observation timestamps
+- `x3 - x1 >= 0.05°F`
+- momentum slope `>= 0.002°F/s`
+- hydration cache valid and eligible market count > 0
+- station and boundary cooldown constraints are satisfied
+
+The informational metric `pressure_to_boundary_seconds` is included in payload context and does not gate emission.
+
+### `goldilocks_reversion_alert`
+
+Tracks per-station deterministic settlement epoch state after `settlement_up`:
+- settlement bucket at up
+- max post-up temperature
+- exceeded (`+1.2°F`) flag
+- reverted (`-0.2°F`) flag
+- alert emitted flag
+
+Alert emits once per epoch after spike+reversion are both observed, subject to station cooldown and hydration/eligibility suppression checks.

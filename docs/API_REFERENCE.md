@@ -947,6 +947,9 @@ GET
 - `blocking_stage`
 - `reason`
 - `hydration_status`
+- `signal_type`
+- `suppression_reason`
+- `cooldown_state`
 
 ---
 
@@ -1031,6 +1034,9 @@ GET
 - `hydration_state`
 - `ingestion_admission`
 - `latest_market_outcome`
+- `signal_type`
+- `suppression_reason`
+- `cooldown_state`
 - `first_blocking_stage`
 - `diagnostic_class`
 
@@ -1054,6 +1060,9 @@ GET
 - `station`
 - `decision_chain`
 - `terminal_state`
+- `signal_type`
+- `suppression_reason`
+- `cooldown_state`
 
 ---
 
