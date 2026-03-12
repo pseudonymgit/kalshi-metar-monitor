@@ -863,6 +863,38 @@ def classify_proximity(distance_f: float) -> str:
     return "FAR"
 
 
+def _select_event_ticker_for_series(events: list[dict], station: str, series_ticker: str) -> str | None:
+    normalized_station = (station or "").strip().upper()
+    normalized_series_ticker = (series_ticker or "").strip().upper()
+    if not normalized_series_ticker:
+        return None
+
+    date_token = _station_local_kalshi_date_token(normalized_station)
+
+    candidates: list[tuple[int, str]] = []
+    for event in (events or []):
+        event_ticker = str((event or {}).get("event_ticker") or "").strip().upper()
+        if not event_ticker:
+            continue
+
+        score = 0
+        if event_ticker.startswith(f"{normalized_series_ticker}-"):
+            score += 4
+        if date_token and event_ticker.endswith(f"-{date_token}"):
+            score += 2
+
+        status = str((event or {}).get("status") or "").strip().lower()
+        if status == "open":
+            score += 1
+
+        candidates.append((score, event_ticker))
+
+    if not candidates:
+        return None
+
+    return sorted(candidates, key=lambda item: (-item[0], item[1]))[0][1]
+
+
 def build_structured_snapshot(station: str, market_types: set):
     global _MARKETS_CACHE_POPULATION_COUNT
     normalized_station = (station or "").strip().upper()
@@ -879,8 +911,15 @@ def build_structured_snapshot(station: str, market_types: set):
     fetched_markets = []
     cache_written = False
     if series_ticker:
-        data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}")
-        fetched_markets.extend(data.get("markets", []))
+        events_data = _kalshi_public_get(f"/events?series_ticker={series_ticker}")
+        event_ticker = _select_event_ticker_for_series(
+            events=events_data.get("events") or [],
+            station=normalized_station,
+            series_ticker=series_ticker,
+        )
+        if event_ticker:
+            data = _kalshi_public_get(f"/events/{event_ticker}/markets")
+            fetched_markets.extend(data.get("markets", []))
         with _SERIES_LOCK:
             _SERIES_MARKETS_CACHE[series_ticker] = {
                 "markets": list(fetched_markets),
