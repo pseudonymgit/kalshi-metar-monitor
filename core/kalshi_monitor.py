@@ -91,6 +91,7 @@ _FORBIDDEN_KALSHI_DOMAINS = frozenset({"observability", "diagnostics", "audit", 
 _KALSHI_PUBLIC_SESSION = requests.Session()
 _KALSHI_PUBLIC_SESSION.trust_env = False
 _LOGGER = logging.getLogger(__name__)
+logger = _LOGGER
 MIN_HYDRATION_INTERVAL_SECONDS = 1
 HYDRATION_BACKOFF_SECONDS = 120
 
@@ -884,7 +885,7 @@ def _select_event_ticker_for_series(events: list[dict], station: str, series_tic
             score += 2
 
         status = str((event or {}).get("status") or "").strip().lower()
-        if status == "open":
+        if status in ("open", "active"):
             score += 1
 
         candidates.append((score, event_ticker))
@@ -918,16 +919,24 @@ def build_structured_snapshot(station: str, market_types: set):
             series_ticker=series_ticker,
         )
         if event_ticker:
-            data = _kalshi_public_get(f"/events/{event_ticker}/markets")
-            fetched_markets.extend(data.get("markets", []))
-        with _SERIES_LOCK:
-            _SERIES_MARKETS_CACHE[series_ticker] = {
-                "markets": list(fetched_markets),
-                "hydrated_at_utc": evaluated_at_utc,
-                "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
-            }
-            _MARKETS_CACHE_POPULATION_COUNT += 1
-        cache_written = True
+            data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}")
+            markets = data.get("markets") or []
+            logger.info(
+                "hydration_market_fetch station=%s event=%s markets=%s",
+                station,
+                event_ticker,
+                len(markets),
+            )
+            fetched_markets.extend(markets)
+        if fetched_markets:
+            with _SERIES_LOCK:
+                _SERIES_MARKETS_CACHE[series_ticker] = {
+                    "markets": list(fetched_markets),
+                    "hydrated_at_utc": evaluated_at_utc,
+                    "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
+                }
+                _MARKETS_CACHE_POPULATION_COUNT += 1
+            cache_written = True
 
     rejection_counts = {}
     filtered_markets = _filter_structured_markets(
