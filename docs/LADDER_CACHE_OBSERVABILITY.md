@@ -43,8 +43,8 @@ This endpoint is observability-only:
   - `market_count`: number of cached markets for the station's known series ticker.
   - `ladder_cache_age_seconds`: age of the cached ladder (`generated_utc - hydrated_at_utc`) in whole seconds; `null` when cache metadata is unavailable.
   - `hydration.cache_present`: whether a cache entry exists for the known series ticker.
-  - `hydration.series_discovered`: whether a series ticker is known from runtime hydration execution snapshot.
-  - `hydration.cache_valid`: latest hydration prerequisite validity bit.
+  - `hydration_state.series_discovered`: whether a series ticker is known from runtime hydration execution snapshot.
+  - `hydration_state.cache_valid`: latest hydration prerequisite validity bit.
   - `last_hydration_execution_utc`: last hydration evaluation timestamp for station, if available.
 
 ## Data Sources

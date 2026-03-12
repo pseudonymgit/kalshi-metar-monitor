@@ -8,14 +8,14 @@ health signals from `build_ladder_cache_snapshot()` output.
 Per station, classifier emits one `status`:
 
 - `DISCOVERY_MISSING`
-  - `hydration.series_discovered` is false.
+  - `hydration_state.series_discovered` is false.
 - `CACHE_MISSING`
   - discovery exists but `hydration.cache_present` is false.
 - `CACHE_STALE`
   - cache exists, but `ladder_cache_age_seconds` is missing or exceeds
     `HYDRATION_LADDER_CACHE_STALE_THRESHOLD_SECONDS` (default `1800`).
 - `PARTIAL_HYDRATION`
-  - cache exists and is fresh, but `hydration.cache_valid` is false.
+  - cache exists and is fresh, but `hydration_state.cache_valid` is false.
 - `HEALTHY`
   - discovery exists, cache exists, cache age is within threshold, and
     cache is valid.
