@@ -2054,6 +2054,8 @@ def _simulate_temperature_for_testing(
         "webhook_status_code": None,
         "webhook_exception": None,
         "webhook_response_text": None,
+        "delivery_blocking_stage": None,
+        "delivery_blocking_reason": None,
     }
     delivery_attempted = bool(
         delivery_result.get("delivery_attempted")
@@ -2077,6 +2079,8 @@ def _simulate_temperature_for_testing(
         "webhook_status_code": delivery_result.get("webhook_status_code"),
         "webhook_exception": delivery_result.get("webhook_exception"),
         "webhook_response_text": delivery_result.get("webhook_response_text"),
+        "delivery_blocking_stage": delivery_result.get("delivery_blocking_stage"),
+        "delivery_blocking_reason": delivery_result.get("delivery_blocking_reason"),
         "previous_integer": previous_integer,
         "current_integer": current_integer,
         "crossed_integer": previous_integer is not None and previous_integer != current_integer,
@@ -2090,9 +2094,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         "webhook_status_code": None,
         "webhook_exception": None,
         "webhook_response_text": None,
+        "delivery_blocking_stage": None,
+        "delivery_blocking_reason": None,
     }
 
     if not webhook:
+        result["delivery_blocking_stage"] = "config"
+        result["delivery_blocking_reason"] = "WEBHOOK_MISSING"
         return result
     try:
         station = (payload.get("station") or "UNK").upper()
@@ -2110,6 +2118,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         transition_correlation = legacy.get("transition_correlation")
 
         if tf is None:
+            result["delivery_blocking_stage"] = "payload"
+            result["delivery_blocking_reason"] = "MISSING_TEMP_F"
             return result
 
         instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
@@ -2129,12 +2139,16 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 evaluation_outcome="SUPPRESSED_NO_TRANSITION",
                 suppression_reason="NO_TRANSITION",
             )
+            result["delivery_blocking_stage"] = "transition_gate"
+            result["delivery_blocking_reason"] = "NO_TRANSITION"
             return result
 
         rate_limit_reference_dt = _parse_iso_utc_optional(reference_timestamp_utc)
         if rate_limit_reference_dt is None and isinstance(transition_correlation, dict):
             rate_limit_reference_dt = _parse_iso_utc_optional(transition_correlation.get("timestamp_utc"))
         if rate_limit_reference_dt is None:
+            result["delivery_blocking_stage"] = "rate_limit_gate"
+            result["delivery_blocking_reason"] = "MISSING_REFERENCE_TIMESTAMP"
             return result
 
         now_ts = rate_limit_reference_dt.timestamp()
@@ -2143,6 +2157,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             # Throttle causal implication: suppress duplicate near-term Kalshi checks
             # while leaving previously recorded transition history intact.
             if last_call_ts is not None and (now_ts - last_call_ts) < _KALSHI_CALL_THROTTLE_SECONDS:
+                result["delivery_blocking_stage"] = "rate_limit_gate"
+                result["delivery_blocking_reason"] = "KALSHI_CALL_THROTTLE"
                 return result
             _KALSHI_LAST_CALL_TS[station] = now_ts
 
