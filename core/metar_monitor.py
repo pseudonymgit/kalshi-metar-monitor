@@ -2048,13 +2048,20 @@ def _simulate_temperature_for_testing(
     with _STATE_LOCK:
         current_integer = _STATE["last_observed_integer"].get(icao)
 
-    delivery_attempted = allow_alert_delivery and alerts > 0
-    delivery_result = delivery_results[-1] if delivery_attempted and delivery_results else {
+    delivery_result = delivery_results[-1] if delivery_results else {
+        "delivery_attempted": False,
         "delivery_succeeded": False,
         "webhook_status_code": None,
         "webhook_exception": None,
         "webhook_response_text": None,
     }
+    delivery_attempted = bool(
+        delivery_result.get("delivery_attempted")
+        or delivery_result.get("webhook_status_code") is not None
+        or delivery_result.get("webhook_exception") is not None
+        or delivery_result.get("webhook_response_text") is not None
+        or bool(delivery_result.get("delivery_succeeded", False))
+    )
 
     if logger:
         logger.info(f"Simulated ladder event for {icao} at {temp_f}F (alerts={alerts})")
@@ -2078,6 +2085,7 @@ def _simulate_temperature_for_testing(
 
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     result = {
+        "delivery_attempted": False,
         "delivery_succeeded": False,
         "webhook_status_code": None,
         "webhook_exception": None,
@@ -2273,6 +2281,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                 timeout=10,
                             )
                             result = {
+                                "delivery_attempted": True,
                                 "delivery_succeeded": 200 <= int(response.status_code) < 300,
                                 "webhook_status_code": int(response.status_code),
                                 "webhook_exception": None,
@@ -2337,6 +2346,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                         )
                         if send_result:
                             result = {
+                                "delivery_attempted": bool(
+                                    send_result.get("delivery_attempted")
+                                    or send_result.get("webhook_status_code") is not None
+                                    or send_result.get("webhook_exception") is not None
+                                    or send_result.get("webhook_response_text") is not None
+                                ),
                                 "delivery_succeeded": bool(send_result.get("delivery_succeeded", bool(send_result.get("ok")))),
                                 "webhook_status_code": send_result.get("webhook_status_code"),
                                 "webhook_exception": send_result.get("webhook_exception"),
