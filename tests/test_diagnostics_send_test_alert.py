@@ -42,6 +42,8 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
             "webhook_status_code": 204,
             "webhook_exception": None,
             "webhook_response_text": "ok",
+            "delivery_blocking_stage": None,
+            "delivery_blocking_reason": None,
             "suppression_reason": None,
         }
 
@@ -60,6 +62,8 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
         self.assertEqual(payload["webhook_status_code"], 204)
         self.assertIsNone(payload["webhook_exception"])
         self.assertEqual(payload["webhook_response_text"], "ok")
+        self.assertIsNone(payload["delivery_blocking_stage"])
+        self.assertIsNone(payload["delivery_blocking_reason"])
         self.assertIsNone(payload["suppression_reason"])
         mock_run.assert_called_once_with(icao="KDEN", temp_f=49.2, deliver=True)
 
@@ -78,6 +82,8 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
             "webhook_status_code": 500,
             "webhook_exception": None,
             "webhook_response_text": "server error",
+            "delivery_blocking_stage": None,
+            "delivery_blocking_reason": None,
             "suppression_reason": None,
         }
 
@@ -90,6 +96,8 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
         self.assertEqual(payload["webhook_status_code"], 500)
         self.assertIsNone(payload["webhook_exception"])
         self.assertEqual(payload["webhook_response_text"], "server error")
+        self.assertIsNone(payload["delivery_blocking_stage"])
+        self.assertIsNone(payload["delivery_blocking_reason"])
 
     @patch("app.get_station_hydration_cache_probe")
     @patch("app.get_hydration_prerequisite_state_snapshot")
@@ -106,6 +114,8 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
             "webhook_status_code": None,
             "webhook_exception": None,
             "webhook_response_text": None,
+            "delivery_blocking_stage": None,
+            "delivery_blocking_reason": None,
             "suppression_reason": "NO_TRANSITION",
         }
 
@@ -119,6 +129,38 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
         self.assertIsNone(payload["webhook_status_code"])
         self.assertIsNone(payload["webhook_exception"])
         self.assertIsNone(payload["webhook_response_text"])
+        self.assertIsNone(payload["delivery_blocking_stage"])
+        self.assertIsNone(payload["delivery_blocking_reason"])
+
+    @patch("app.get_station_hydration_cache_probe")
+    @patch("app.get_hydration_prerequisite_state_snapshot")
+    @patch("app._run_simulate_ladder")
+    def test_send_test_alert_generated_event_blocked_delivery_has_explicit_blocking_diagnostics(self, mock_run, mock_hydration_snapshot, mock_cache_probe):
+        mock_hydration_snapshot.return_value = {"KDEN": {"status": "cache_valid"}}
+        mock_cache_probe.return_value = {"cache_present": True, "raw_market_count": 2}
+        mock_run.return_value = {
+            "ok": True,
+            "alerts_generated": 1,
+            "delivery_requested": True,
+            "delivery_attempted": False,
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": None,
+            "webhook_response_text": None,
+            "delivery_blocking_stage": "rate_limit_gate",
+            "delivery_blocking_reason": "KALSHI_CALL_THROTTLE",
+            "suppression_reason": None,
+        }
+
+        response = self.client.get("/debug/send-test-alert?temp=49.2")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertEqual(payload["alerts_generated"], 1)
+        self.assertEqual(payload["delivery_requested"], True)
+        self.assertEqual(payload["delivery_attempted"], False)
+        self.assertEqual(payload["delivery_blocking_stage"], "rate_limit_gate")
+        self.assertEqual(payload["delivery_blocking_reason"], "KALSHI_CALL_THROTTLE")
 
     @patch("app.get_station_hydration_cache_probe")
     @patch("app.get_hydration_prerequisite_state_snapshot")
@@ -166,6 +208,8 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
             "webhook_status_code": 204,
             "webhook_exception": None,
             "webhook_response_text": "ok",
+            "delivery_blocking_stage": None,
+            "delivery_blocking_reason": None,
             "suppression_reason": None,
         }
 
