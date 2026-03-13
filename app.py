@@ -1677,7 +1677,7 @@ def diagnostics_page():
             "<p><code>/metar/simulate-ladder</code> = POST-only underlying route.</p>",
             "<h2>POST-only Endpoints (non-clickable)</h2>",
             "<p><code>/metar/simulate-ladder</code> &mdash; method = <strong>POST</strong></p>",
-            "<pre>{\n  \"station\": \"KDEN\",\n  \"temp\": 49.2,\n  \"deliver\": true\n}</pre>",
+            "<pre>{\n  \"icao\": \"KDEN\",\n  \"temp_f\": 49.2,\n  \"deliver\": true\n}</pre>",
             "<p>Browser address bar cannot invoke POST.</p>",
             "</body></html>",
         ]
