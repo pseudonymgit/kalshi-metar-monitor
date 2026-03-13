@@ -176,6 +176,70 @@ class SignalLayerAlertTests(unittest.TestCase):
         self.assertIn("KDEN_HIGH_2025-01-01", metar_monitor._MISSING_LADDER_DEDUPE)
         self.assertEqual(captured_local_conversion["ts"], "2025-01-01T12:00:00+00:00")
 
+
+    @patch.dict("os.environ", {"ALERT_ON_MISSING_LADDER": "true", "KALSHI_TARGET_MARKET_TYPE": "HIGH"}, clear=False)
+    @patch("core.metar_monitor.requests.post", return_value=SimpleNamespace(status_code=200))
+    @patch("core.metar_monitor._audit_alert")
+    @patch("core.kalshi_monitor.send_composed_weather_market_alert", return_value=None)
+    @patch("core.kalshi_monitor.process_ladder_transition", return_value=(False, "NO_TRANSITION", None))
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"cache_valid": True, "status": "cache_valid"}})
+    @patch("core.kalshi_monitor.enqueue_station_hydration", return_value=None)
+    @patch("core.kalshi_monitor.classify_proximity", return_value="NEAR")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache", return_value={"markets": [], "raw_market_count": 3, "filtered_market_count": 2, "pre_directional_market_count": 2, "post_directional_market_count": 0, "empty_reason": "no_directional_ladder_match", "rejection_counts": {}})
+    @patch("core.kalshi_monitor._parse_target_market_types", return_value={"HIGH"})
+    @patch("core.kalshi_monitor._get_active_stations", return_value={"KDEN"})
+    def test_send_alert_directional_collapse_uses_ladder_selection_empty(self, _active, _types, _snapshot, _proximity, _enqueue, _hydration_state, _transition, _send_composed, mock_audit, mock_post):
+        payload = {
+            "station": "KDEN",
+            "summary": {"temp_f": 69.5},
+            "legacy": {
+                "temp_f": 69.5,
+                "prev_temp_f": 69.4,
+                "delta_f": 0.1,
+                "obs_time": "2025-01-01T12:00:00+00:00",
+                "instant_bucket_changed": True,
+                "settlement_bucket_changed": False,
+                "transition_correlation": {"timestamp_utc": "2025-01-01T12:00:00+00:00", "transition_event_id": 1},
+            },
+        }
+
+        metar_monitor._send_alert("https://example.com/webhook", payload)
+
+        mock_post.assert_called_once()
+        self.assertIn("Ladder selection empty", mock_post.call_args.kwargs["json"]["content"])
+        self.assertEqual(mock_audit.call_args.kwargs["alert_type"], "ladder_selection_empty")
+
+    @patch.dict("os.environ", {"ALERT_ON_MISSING_LADDER": "true", "KALSHI_TARGET_MARKET_TYPE": "HIGH"}, clear=False)
+    @patch("core.metar_monitor.requests.post", return_value=SimpleNamespace(status_code=200))
+    @patch("core.metar_monitor._audit_alert")
+    @patch("core.kalshi_monitor.send_composed_weather_market_alert", return_value=None)
+    @patch("core.kalshi_monitor.process_ladder_transition", return_value=(False, "NO_TRANSITION", None))
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot", return_value={"KDEN": {"cache_valid": False, "status": "cache_missing"}})
+    @patch("core.kalshi_monitor.enqueue_station_hydration", return_value=None)
+    @patch("core.kalshi_monitor.classify_proximity", return_value="NEAR")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache", return_value={"markets": [], "raw_market_count": 0, "filtered_market_count": 0, "pre_directional_market_count": 0, "post_directional_market_count": 0, "empty_reason": "cache_missing_or_empty", "rejection_counts": {}})
+    @patch("core.kalshi_monitor._parse_target_market_types", return_value={"HIGH"})
+    @patch("core.kalshi_monitor._get_active_stations", return_value={"KDEN"})
+    def test_send_alert_true_cache_missing_remains_ladder_missing(self, _active, _types, _snapshot, _proximity, _enqueue, _hydration_state, _transition, _send_composed, mock_audit, mock_post):
+        payload = {
+            "station": "KDEN",
+            "summary": {"temp_f": 69.5},
+            "legacy": {
+                "temp_f": 69.5,
+                "prev_temp_f": 69.4,
+                "delta_f": 0.1,
+                "obs_time": "2025-01-01T12:00:00+00:00",
+                "instant_bucket_changed": True,
+                "settlement_bucket_changed": False,
+                "transition_correlation": {"timestamp_utc": "2025-01-01T12:00:00+00:00", "transition_event_id": 1},
+            },
+        }
+
+        metar_monitor._send_alert("https://example.com/webhook", payload)
+
+        mock_post.assert_called_once()
+        self.assertIn("Ladder missing", mock_post.call_args.kwargs["json"]["content"])
+        self.assertEqual(mock_audit.call_args.kwargs["alert_type"], "ladder_missing")
     @patch.dict("os.environ", {"ALERT_ON_MISSING_LADDER": "true", "KALSHI_TARGET_MARKET_TYPE": "HIGH", "HYDRATION_MISSING_LADDER_WARMUP_SECONDS": "900"}, clear=False)
     @patch("core.metar_monitor.is_scheduler_running", return_value=True)
     @patch("core.metar_monitor.requests.post", return_value=SimpleNamespace(status_code=200))

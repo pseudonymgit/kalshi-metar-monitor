@@ -2238,10 +2238,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                     hydrated_any = hydrated_any or hydration_usable or bool(snapshot.get("cache_written"))
                     raw_market_count = int(snapshot.get("raw_market_count") or 0)
                     filtered_market_count = int(snapshot.get("filtered_market_count") or 0)
+                    pre_directional_market_count = int(snapshot.get("pre_directional_market_count") or len(markets))
+                    empty_reason = str(snapshot.get("empty_reason") or "")
                     rejection_counts = snapshot.get("rejection_counts") or {}
 
                     markets_considered_count += raw_market_count
-                    eligible_markets_count += len(markets)
+                    eligible_markets_count += pre_directional_market_count
 
                     wrong_series_rejections = int(rejection_counts.get("city_token_mismatch") or 0) + int(rejection_counts.get("market_type_mismatch") or 0)
                     settlement_mismatch_rejections = int(rejection_counts.get("date_mismatch") or 0)
@@ -2308,15 +2310,19 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                             with _MISSING_LADDER_LOCK:
                                 if dedupe_key in _MISSING_LADDER_DEDUPE:
                                     continue
+                            missing_alert_type = "ladder_selection_empty" if empty_reason == "no_directional_ladder_match" else "ladder_missing"
+                            missing_message_label = "Ladder selection empty" if missing_alert_type == "ladder_selection_empty" else "Ladder missing"
                             _ALERT_LOGGER.info(
-                                "WARN ladder_missing station=%s type=%s market_type=%s",
+                                "WARN %s station=%s type=%s market_type=%s reason=%s",
+                                missing_alert_type,
                                 station,
                                 market_type_token,
                                 market_type_token,
+                                empty_reason or "unknown",
                             )
                             response = requests.post(
                                 webhook,
-                                json={"content": f"⚠️ Ladder missing — station={station} type={market_type_token} temp={tf}°F"},
+                                json={"content": f"⚠️ {missing_message_label} — station={station} type={market_type_token} temp={tf}°F reason={empty_reason or 'unknown'}"},
                                 timeout=10,
                             )
                             result = {
@@ -2333,11 +2339,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                     station=station,
                                     market_type=market_type_token,
                                     event_ticker="",
-                                    alert_type="ladder_missing",
+                                    alert_type=missing_alert_type,
                                     direction=None,
                                     temp_f=float(tf),
                                     bucket_index=None,
-                                    metadata={"status_code": response.status_code},
+                                    metadata={"status_code": response.status_code, "empty_reason": empty_reason or None},
                                 )
                         continue
 

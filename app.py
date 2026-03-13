@@ -1275,6 +1275,9 @@ def observability_market_eligibility_runtime():
         "series_ticker": cache_snapshot.get("series_ticker"),
         "raw_market_count": int(cache_snapshot.get("raw_market_count") or 0),
         "filtered_market_count": int(cache_snapshot.get("filtered_market_count") or 0),
+        "pre_directional_market_count": int(cache_snapshot.get("pre_directional_market_count") or 0),
+        "post_directional_market_count": int(cache_snapshot.get("post_directional_market_count") or 0),
+        "empty_reason": cache_snapshot.get("empty_reason"),
         "rejection_breakdown": {
             "outside_price_band": int(cache_rejection_breakdown.get("outside_price_band") or 0),
             "wrong_series": int(cache_rejection_breakdown.get("wrong_series") or 0),
@@ -1302,7 +1305,8 @@ def observability_market_eligibility_runtime():
     }
 
     markets_considered_count = int(current_cache_probe.get("raw_market_count") or 0)
-    eligible_markets_count = int(current_cache_probe.get("filtered_market_count") or 0)
+    eligible_markets_count = int(current_cache_probe.get("pre_directional_market_count") or 0)
+    final_ladders_count = int(current_cache_probe.get("post_directional_market_count") or 0)
 
     if markets_considered_count == 0:
         live_evaluation_outcome = "NO_MARKETS_CACHED"
@@ -1310,6 +1314,9 @@ def observability_market_eligibility_runtime():
     elif eligible_markets_count == 0:
         live_evaluation_outcome = "NO_ELIGIBLE_MARKET"
         live_suppression_reason = "filtered_to_zero"
+    elif final_ladders_count == 0:
+        live_evaluation_outcome = "NO_DIRECTIONAL_LADDER_MATCH"
+        live_suppression_reason = "no_directional_ladder_match"
     else:
         live_evaluation_outcome = "ELIGIBLE_MARKET_PRESENT"
         live_suppression_reason = None
