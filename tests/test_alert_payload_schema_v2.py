@@ -75,6 +75,9 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
         )
 
         self.assertTrue(result["ok"])
+        self.assertTrue(result["delivery_succeeded"])
+        self.assertEqual(result["webhook_status_code"], 204)
+        self.assertIsNone(result["webhook_exception"])
         sent_payload = mock_post.call_args.kwargs["json"]
         self.assertEqual(int(sent_payload["alert_schema_version"]), 2)
         self.assertEqual(sent_payload["alert_classification"], "MARKET_ELIGIBLE")
@@ -88,6 +91,70 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
         self.assertIn("alert_decision", sent_payload)
         self.assertIn("execution_context", sent_payload)
         self.assertEqual(sent_payload["alert_decision"]["decision"], "FIRED")
+
+    @patch("core.kalshi_monitor.requests.post")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache")
+    def test_composed_alert_returns_webhook_failure_details(self, mock_snapshot, mock_post):
+        os.environ["ALERT_WEBHOOK_URL"] = "https://example.com/webhook"
+        mock_snapshot.return_value = {
+            "markets": [{"event_ticker": "KXHIGHAUS-26DEC31", "strike_type": "between", "floor_strike": 82, "cap_strike": 83}],
+            "observed": {"current_temp_f": 82.4},
+            "market_types": ["HIGH"],
+        }
+
+        class Response:
+            status_code = 500
+            text = "failed"
+
+        mock_post.return_value = Response()
+
+        result = kalshi_monitor.send_composed_weather_market_alert(station="KAUS", market_types={"HIGH"})
+
+        self.assertFalse(result["ok"])
+        self.assertFalse(result["delivery_succeeded"])
+        self.assertEqual(result["webhook_status_code"], 500)
+        self.assertIsNone(result["webhook_exception"])
+        self.assertEqual(result["webhook_response_text"], "failed")
+
+    @patch("core.kalshi_monitor.requests.post")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache")
+    def test_composed_alert_trims_webhook_response_text(self, mock_snapshot, mock_post):
+        os.environ["ALERT_WEBHOOK_URL"] = "https://example.com/webhook"
+        mock_snapshot.return_value = {
+            "markets": [{"event_ticker": "KXHIGHAUS-26DEC31", "strike_type": "between", "floor_strike": 82, "cap_strike": 83}],
+            "observed": {"current_temp_f": 82.4},
+            "market_types": ["HIGH"],
+        }
+
+        class Response:
+            status_code = 500
+            text = "x" * 500
+
+        mock_post.return_value = Response()
+
+        result = kalshi_monitor.send_composed_weather_market_alert(station="KAUS", market_types={"HIGH"})
+
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["webhook_status_code"], 500)
+        self.assertEqual(len(result["webhook_response_text"]), 200)
+
+    @patch("core.kalshi_monitor.requests.post", side_effect=Exception("boom"))
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache")
+    def test_composed_alert_returns_webhook_exception_details(self, mock_snapshot, _mock_post):
+        os.environ["ALERT_WEBHOOK_URL"] = "https://example.com/webhook"
+        mock_snapshot.return_value = {
+            "markets": [{"event_ticker": "KXHIGHAUS-26DEC31", "strike_type": "between", "floor_strike": 82, "cap_strike": 83}],
+            "observed": {"current_temp_f": 82.4},
+            "market_types": ["HIGH"],
+        }
+
+        result = kalshi_monitor.send_composed_weather_market_alert(station="KAUS", market_types={"HIGH"})
+
+        self.assertFalse(result["ok"])
+        self.assertFalse(result["delivery_succeeded"])
+        self.assertIsNone(result["webhook_status_code"])
+        self.assertEqual(result["webhook_exception"], "boom")
+        self.assertIsNone(result["webhook_response_text"])
 
     @patch("core.kalshi_monitor.enqueue_station_hydration")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", side_effect=AssertionError("send path must not hydrate inline"))

@@ -1389,7 +1389,14 @@ def send_composed_weather_market_alert(
 
     webhook_url = (os.getenv("ALERT_WEBHOOK_URL") or "").strip()
     if not webhook_url:
-        return {"ok": False, "reason": "missing_webhook"}
+        return {
+            "ok": False,
+            "reason": "missing_webhook",
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": None,
+            "webhook_response_text": None,
+        }
 
     def _to_price(value, fallback):
         chosen = value if value is not None else fallback
@@ -1784,9 +1791,27 @@ def send_composed_weather_market_alert(
         },
     }
 
-    response = requests.post(webhook_url, json=payload, timeout=10)
+    try:
+        response = requests.post(webhook_url, json=payload, timeout=10)
+    except Exception as e:
+        return {
+            "ok": False,
+            "reason": "webhook_exception",
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": str(e),
+            "webhook_response_text": None,
+        }
+    webhook_response_text = str(getattr(response, "text", "") or "")[:200] or None
     if not (200 <= response.status_code < 300):
-        return {"ok": False, "reason": "webhook_failed"}
+        return {
+            "ok": False,
+            "reason": "webhook_failed",
+            "delivery_succeeded": False,
+            "webhook_status_code": int(response.status_code),
+            "webhook_exception": None,
+            "webhook_response_text": webhook_response_text,
+        }
 
     key = f"{normalized_station}_{','.join(sorted(snapshot.get('market_types', [])))}"
     _last_composed_sent[key] = datetime.utcnow().isoformat() + "Z"
@@ -1801,6 +1826,10 @@ def send_composed_weather_market_alert(
 
     return {
         "ok": True,
+        "delivery_succeeded": True,
+        "webhook_status_code": int(response.status_code),
+        "webhook_exception": None,
+        "webhook_response_text": webhook_response_text,
         "markets_included": len(markets),
         "observed": current_temp_f,
         "event_ticker": event_ticker,

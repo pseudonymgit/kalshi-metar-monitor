@@ -1944,6 +1944,10 @@ def debug_send_test_alert():
             "alerts_generated": result.get("alerts_generated", 0),
             "delivery_requested": result.get("delivery_requested", False),
             "delivery_attempted": result.get("delivery_attempted", False),
+            "delivery_succeeded": result.get("delivery_succeeded", False),
+            "webhook_status_code": result.get("webhook_status_code"),
+            "webhook_exception": result.get("webhook_exception"),
+            "webhook_response_text": result.get("webhook_response_text"),
             "suppression_reason": result.get("suppression_reason"),
         }
     ), 200

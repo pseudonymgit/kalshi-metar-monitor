@@ -80,6 +80,12 @@ _LIVE_STATION_UNIVERSE_RESOLVER = None
 _AUDIT_LOCK = threading.Lock()
 _MISSING_LADDER_DEDUPE = {}
 _MISSING_LADDER_LOCK = threading.Lock()
+_LAST_WEBHOOK_DELIVERY_RESULT = {
+    "delivery_succeeded": False,
+    "webhook_status_code": None,
+    "webhook_exception": None,
+    "webhook_response_text": None,
+}
 _KALSHI_RATE_LIMIT_LOCK = threading.Lock()
 _KALSHI_LAST_CALL_TS = {}
 # Rate-limit invariant: this window throttles repeated market evaluation
@@ -2042,6 +2048,12 @@ def _simulate_temperature_for_testing(
         current_integer = _STATE["last_observed_integer"].get(icao)
 
     delivery_attempted = allow_alert_delivery and alerts > 0
+    delivery_result = dict(_LAST_WEBHOOK_DELIVERY_RESULT) if delivery_attempted else {
+        "delivery_succeeded": False,
+        "webhook_status_code": None,
+        "webhook_exception": None,
+        "webhook_response_text": None,
+    }
 
     if logger:
         logger.info(f"Simulated ladder event for {icao} at {temp_f}F (alerts={alerts})")
@@ -2053,15 +2065,30 @@ def _simulate_temperature_for_testing(
         "alerts_generated": alerts,
         "delivery_requested": allow_alert_delivery,
         "delivery_attempted": delivery_attempted,
+        "delivery_succeeded": bool(delivery_result.get("delivery_succeeded", False)),
+        "webhook_status_code": delivery_result.get("webhook_status_code"),
+        "webhook_exception": delivery_result.get("webhook_exception"),
+        "webhook_response_text": delivery_result.get("webhook_response_text"),
         "previous_integer": previous_integer,
         "current_integer": current_integer,
         "crossed_integer": previous_integer is not None and previous_integer != current_integer,
     }
 
 
-def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
+def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    result = {
+        "delivery_succeeded": False,
+        "webhook_status_code": None,
+        "webhook_exception": None,
+        "webhook_response_text": None,
+    }
+
+    def _finalize(current: Dict[str, Any]) -> Dict[str, Any]:
+        _LAST_WEBHOOK_DELIVERY_RESULT.update(current)
+        return current
+
     if not webhook:
-        return
+        return _finalize(result)
     try:
         station = (payload.get("station") or "UNK").upper()
         legacy = payload.get("legacy") if isinstance(payload.get("legacy"), dict) else payload
@@ -2078,7 +2105,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
         transition_correlation = legacy.get("transition_correlation")
 
         if tf is None:
-            return
+            return _finalize(result)
 
         instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
         settlement_bucket_changed = bool(legacy.get("settlement_bucket_changed"))
@@ -2097,13 +2124,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 evaluation_outcome="SUPPRESSED_NO_TRANSITION",
                 suppression_reason="NO_TRANSITION",
             )
-            return
+            return _finalize(result)
 
         rate_limit_reference_dt = _parse_iso_utc_optional(reference_timestamp_utc)
         if rate_limit_reference_dt is None and isinstance(transition_correlation, dict):
             rate_limit_reference_dt = _parse_iso_utc_optional(transition_correlation.get("timestamp_utc"))
         if rate_limit_reference_dt is None:
-            return
+            return _finalize(result)
 
         now_ts = rate_limit_reference_dt.timestamp()
         with _KALSHI_RATE_LIMIT_LOCK:
@@ -2111,7 +2138,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
             # Throttle causal implication: suppress duplicate near-term Kalshi checks
             # while leaving previously recorded transition history intact.
             if last_call_ts is not None and (now_ts - last_call_ts) < _KALSHI_CALL_THROTTLE_SECONDS:
-                return
+                return _finalize(result)
             _KALSHI_LAST_CALL_TS[station] = now_ts
 
         try:
@@ -2248,6 +2275,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 json={"content": f"⚠️ Ladder missing — station={station} type={market_type_token} temp={tf}°F"},
                                 timeout=10,
                             )
+                            result = {
+                                "delivery_succeeded": 200 <= int(response.status_code) < 300,
+                                "webhook_status_code": int(response.status_code),
+                                "webhook_exception": None,
+                                "webhook_response_text": str(getattr(response, "text", "") or "")[:200] or None,
+                            }
                             if 200 <= response.status_code < 300:
                                 with _MISSING_LADDER_LOCK:
                                     _MISSING_LADDER_DEDUPE[dedupe_key] = True
@@ -2296,7 +2329,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             bucket_index=bucket_index,
                             metadata={"reason": transition.get("reason")},
                         )
-                        result = send_composed_weather_market_alert(
+                        send_result = send_composed_weather_market_alert(
                             station=station,
                             market_types={market_type_token},
                             transition_reason=transition.get("reason") or "window_active",
@@ -2305,9 +2338,16 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                             delta_f=df,
                             obs_time_utc=legacy.get("obs_time"),
                         )
-                        if result and result.get("ok"):
+                        if send_result:
+                            result = {
+                                "delivery_succeeded": bool(send_result.get("delivery_succeeded", bool(send_result.get("ok")))),
+                                "webhook_status_code": send_result.get("webhook_status_code"),
+                                "webhook_exception": send_result.get("webhook_exception"),
+                                "webhook_response_text": send_result.get("webhook_response_text"),
+                            }
+                        if send_result and send_result.get("ok"):
                             market_alerts_sent += 1
-                            send_event_ticker = result.get("event_ticker") or event_ticker
+                            send_event_ticker = send_result.get("event_ticker") or event_ticker
                             _ALERT_LOGGER.info(
                                 "SEND composed_alert station=%s type=%s market_type=%s event=%s",
                                 station,
@@ -2322,11 +2362,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                                 alert_type="composed_alert_sent",
                                 direction=direction,
                                 temp_f=float(tf),
-                                bucket_index=result.get("bucket_index"),
+                                bucket_index=send_result.get("bucket_index"),
                                 metadata={
                                     "reason": transition.get("reason") or "window_active",
-                                    "attention_phrase": result.get("attention_phrase"),
-                                    "alert_context": result.get("alert_context"),
+                                    "attention_phrase": send_result.get("attention_phrase"),
+                                    "alert_context": send_result.get("alert_context"),
                                 },
                             )
                     else:
@@ -2460,9 +2500,22 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> None:
                 payload["suppression"] = suppression
                 payload["execution_context"] = execution_context
         except Exception as e:
+            result = {
+                "delivery_succeeded": False,
+                "webhook_status_code": None,
+                "webhook_exception": str(e),
+                "webhook_response_text": None,
+            }
             print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
+        result = {
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": str(e),
+            "webhook_response_text": None,
+        }
         print(f"[ERROR] station={payload.get('station') or 'UNK'} function=_send_alert: {e}")
+    return _finalize(result)
 
 
 # =========================
