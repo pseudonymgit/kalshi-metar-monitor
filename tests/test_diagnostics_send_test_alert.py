@@ -81,6 +81,92 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
 
     @patch("app.get_station_hydration_cache_probe")
     @patch("app.get_hydration_prerequisite_state_snapshot")
+    @patch("core.kalshi_monitor.process_hydration_queue_worker")
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
+    @patch("app._simulate_temperature_for_testing")
+    def test_send_test_alert_generated_event_no_delivery_attempt_returns_upstream_blocking_diagnostics(
+        self,
+        mock_simulate,
+        mock_enqueue,
+        mock_worker,
+        mock_hydration_snapshot,
+        mock_cache_probe,
+    ):
+        mock_hydration_snapshot.return_value = {"KDEN": {"status": "cache_valid"}}
+        mock_cache_probe.return_value = {"cache_present": True, "raw_market_count": 2}
+        mock_simulate.return_value = {
+            "ok": True,
+            "alerts_generated": 1,
+            "delivery_requested": False,
+            "delivery_attempted": False,
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": None,
+            "webhook_response_text": None,
+            "delivery_blocking_stage": "delivery_gate",
+            "delivery_blocking_reason": "ALERT_DELIVERY_DISABLED",
+            "suppression_reason": None,
+        }
+
+        response = self.client.get("/debug/send-test-alert?temp=49.2&deliver=false")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertEqual(payload["alerts_generated"], 1)
+        self.assertEqual(payload["delivery_requested"], False)
+        self.assertEqual(payload["delivery_attempted"], False)
+        self.assertEqual(payload["delivery_succeeded"], False)
+        self.assertEqual(payload["delivery_blocking_stage"], "delivery_gate")
+        self.assertEqual(payload["delivery_blocking_reason"], "ALERT_DELIVERY_DISABLED")
+        mock_enqueue.assert_called_once_with("KDEN", reason="simulate_ladder")
+        mock_worker.assert_called_once_with(market_types={"HIGH", "LOW"})
+        mock_simulate.assert_called_once_with("KDEN", 49.2, logger=app.logger, allow_alert_delivery=False)
+
+    @patch("app.get_station_hydration_cache_probe")
+    @patch("app.get_hydration_prerequisite_state_snapshot")
+    @patch("core.kalshi_monitor.process_hydration_queue_worker")
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
+    @patch("app._simulate_temperature_for_testing")
+    def test_send_test_alert_delivery_requested_but_not_attempted_preserves_upstream_blocking_diagnostics(
+        self,
+        mock_simulate,
+        mock_enqueue,
+        mock_worker,
+        mock_hydration_snapshot,
+        mock_cache_probe,
+    ):
+        mock_hydration_snapshot.return_value = {"KDEN": {"status": "cache_valid"}}
+        mock_cache_probe.return_value = {"cache_present": True, "raw_market_count": 2}
+        mock_simulate.return_value = {
+            "ok": True,
+            "alerts_generated": 1,
+            "delivery_requested": True,
+            "delivery_attempted": False,
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": None,
+            "webhook_response_text": None,
+            "delivery_blocking_stage": "config",
+            "delivery_blocking_reason": "WEBHOOK_MISSING",
+            "suppression_reason": None,
+        }
+
+        response = self.client.get("/debug/send-test-alert?temp=49.2&deliver=true")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertEqual(payload["alerts_generated"], 1)
+        self.assertEqual(payload["delivery_requested"], True)
+        self.assertEqual(payload["delivery_attempted"], False)
+        self.assertEqual(payload["delivery_succeeded"], False)
+        self.assertEqual(payload["delivery_blocking_stage"], "config")
+        self.assertEqual(payload["delivery_blocking_reason"], "WEBHOOK_MISSING")
+        mock_enqueue.assert_called_once_with("KDEN", reason="simulate_ladder")
+        mock_worker.assert_called_once_with(market_types={"HIGH", "LOW"})
+        mock_simulate.assert_called_once_with("KDEN", 49.2, logger=app.logger, allow_alert_delivery=True)
+
+    @patch("app.get_station_hydration_cache_probe")
+    @patch("app.get_hydration_prerequisite_state_snapshot")
     @patch("app._run_simulate_ladder")
     def test_send_test_alert_defaults_and_response_contract(self, mock_run, mock_hydration_snapshot, mock_cache_probe):
         mock_hydration_snapshot.return_value = {"KDEN": {"status": "cache_valid"}}
