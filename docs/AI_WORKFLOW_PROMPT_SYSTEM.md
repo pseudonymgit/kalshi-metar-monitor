@@ -14,10 +14,10 @@ Optimization goals:
 - operational debugging clarity
 
 ## Merge Vocabulary
-- **MERGE**: target reality verified, no blockers, ready as-is.
-- **MERGE WITH MINOR FIXES**: no blockers; small edits required before merge.
-- **REVISE**: blockers exist; implementation changes required.
-- **ABANDON**: premise invalid or target no longer relevant.
+- **MERGE**: target reality verified, scoped task solved, no blockers.
+- **MERGE WITH MINOR FIXES**: target reality verified, no blockers; only tiny non-blocking edits remain.
+- **REVISE**: target reality verified, but scoped blockers remain and implementation changes are required.
+- **ABANDON**: target reality is not trustworthy, premise is stale, scope is wrong, or the review target is invalid.
 
 ## Core Workflow Diagnosis
 - Prompts fail when they do not force reality checks at key seams.
@@ -41,7 +41,7 @@ Optimization goals:
 - **Premise Staleness Rule**: re-validate branch, files, and assumptions before action.
 - **Scope Ledger**: explicitly list allowed/disallowed files and honor it.
 - **Review Finding Classification**: stable IDs by severity: **[B#]** blocker, **[M#]** minor, **[F#]** follow-up.
-- **No Silent No-Op**: if no material change is produced, declare it explicitly with cause.
+- **No Silent No-Op**: a no-op is allowed only when file-level evidence proves the requested fix is already present in verified target reality.
 - **Wrong-Surface Suspicion Rule**: abort when requested outcome and touched surfaces do not align.
 - **Route Capability Labeling for Ops/Debug**: label endpoints/actions as preview-only vs delivery-capable.
 - **Review Target Receipt**: reviewer must echo exact commit/branch/files reviewed.
@@ -79,7 +79,9 @@ IMMEDIATE NEXT TASK
 - <single next action>
 
 SUCCESS CRITERIA
-- <observable completion signals>
+- solved/open lists reflect validated current truth.
+- runtime-sensitive facts are clearly separated from facts that must be rechecked.
+- immediate next task is singular and executable.
 
 OUTPUT CONTRACT
 - Report only operational status for next operator action.
@@ -103,10 +105,12 @@ SCOPE LEDGER
   - <paths/surfaces>
 
 PREFLIGHT (MANDATORY)
-1. Confirm task is implementation.
-2. Confirm target files exist and are current.
-3. Confirm scope ledger is satisfiable without broadening.
-4. Confirm no runtime/test/config changes are required unless explicitly in scope.
+1. Confirm premise is still true in target reality.
+2. Confirm issue is not already fixed.
+3. Confirm target files/surfaces are correct and current.
+4. Confirm requested outcome belongs in this surface.
+5. Confirm scope ledger is satisfiable without broadening.
+6. Confirm no runtime/test/config changes are required unless explicitly in scope.
 
 IMPLEMENTATION RULES
 - Make minimal, surgical edits.
@@ -131,13 +135,15 @@ TASK TYPE: REVIEW
 OUTPUT MODE: STRUCTURED REVIEW ONLY
 
 TARGET VERIFICATION (MANDATORY BEFORE REVIEW)
-- Verify branch, commit, diff, and requested scope.
+- Verify checkout, branch, commit, diff source, files actually reviewed, scoped task match, and premise stale check.
 
 STOP CONDITION
-- If target verification fails, stop and return ABANDON or REVISE basis.
+- If target reality is not trustworthy, stop and return ABANDON with evidence.
 
 SUCCESS CRITERIA
-- Findings are actionable, scoped, and tied to verified reality.
+- Review is grounded in verified target reality.
+- Findings are actionable, scoped, and classified as [B#], [M#], or [F#].
+- REVISE includes a narrow revision prompt tied only to blocker IDs.
 
 REQUIRED OUTPUT
 - REVIEW RECEIPT
@@ -171,8 +177,10 @@ PREFLIGHT (MANDATORY)
 3. Verify requested fixes fit allowed scope.
 
 REVISION RULES
-- Resolve specified findings with minimal edits.
+- Resolve only specified blocker findings ([B#]).
+- Do not address minor fixes or follow-ups unless explicitly instructed.
 - Do not introduce unrelated cleanup.
+- Do not broaden scope.
 
 SUCCESS CRITERIA
 - Targeted findings resolved; no new scope introduced.
@@ -197,6 +205,8 @@ OUTPUT MODE: FINDINGS ONLY
 RULES
 - No code or config changes.
 - No remediation disguised as diagnostics.
+- No patch text, pseudo-diff, or refactor plan.
+- Use NEXT BEST TASK for follow-up only.
 
 QUESTION
 - <exact operational question>
