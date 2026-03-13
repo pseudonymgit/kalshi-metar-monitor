@@ -53,6 +53,9 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
             "series_ticker": "KXHIGHDEN",
             "raw_market_count": 5,
             "filtered_market_count": 2,
+            "pre_directional_market_count": 2,
+            "post_directional_market_count": 1,
+            "empty_reason": None,
             "rejection_counts": {
                 "outside_price_band": 1,
                 "wrong_series": 1,
@@ -86,6 +89,9 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["current_cache_probe"]["series_ticker"], "KXHIGHDEN")
         self.assertEqual(payload["current_cache_probe"]["raw_market_count"], 5)
         self.assertEqual(payload["current_cache_probe"]["filtered_market_count"], 2)
+        self.assertEqual(payload["current_cache_probe"]["pre_directional_market_count"], 2)
+        self.assertEqual(payload["current_cache_probe"]["post_directional_market_count"], 1)
+        self.assertIsNone(payload["current_cache_probe"]["empty_reason"])
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["markets_considered_count"], 12)
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["eligible_markets_count"], 3)
         self.assertEqual(payload["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
@@ -97,6 +103,9 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         "series_ticker": "KXHIGHDEN",
         "raw_market_count": 7,
         "filtered_market_count": 4,
+        "pre_directional_market_count": 4,
+        "post_directional_market_count": 1,
+        "empty_reason": None,
         "rejection_counts": {},
     })
     @patch("app.get_latest_station_market_evaluation_context", return_value={
@@ -130,6 +139,9 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         "series_ticker": "KXHIGHDEN",
         "raw_market_count": 0,
         "filtered_market_count": 0,
+        "pre_directional_market_count": 0,
+        "post_directional_market_count": 0,
+        "empty_reason": "cache_missing_or_empty",
         "rejection_counts": {},
     })
     @patch("app.get_latest_station_market_evaluation_context", return_value={
@@ -160,6 +172,9 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         "series_ticker": "KXHIGHDEN",
         "raw_market_count": 4,
         "filtered_market_count": 0,
+        "pre_directional_market_count": 0,
+        "post_directional_market_count": 0,
+        "empty_reason": "filtered_to_zero",
         "rejection_counts": {},
     })
     @patch("app.get_latest_station_market_evaluation_context", return_value={
@@ -184,6 +199,43 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["latest_evaluation_outcome"], "NO_ELIGIBLE_MARKET")
         self.assertEqual(payload["latest_suppression_reason"], "filtered_to_zero")
         self.assertEqual(payload["latest_persisted_evaluation"]["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
+
+
+    @patch("app.get_transition_history", return_value=[{"settlement_bucket": 61}])
+    @patch("app.build_structured_snapshot_from_cache", return_value={
+        "series_ticker": "KXHIGHDEN",
+        "raw_market_count": 4,
+        "filtered_market_count": 2,
+        "pre_directional_market_count": 2,
+        "post_directional_market_count": 0,
+        "empty_reason": "no_directional_ladder_match",
+        "rejection_counts": {},
+    })
+    @patch("app.get_latest_station_market_evaluation_context", return_value={
+        "KDEN": {
+            "latest_evaluation_outcome": "ELIGIBLE_MARKET_PRESENT",
+            "latest_suppression_reason": None,
+            "market_eligibility_runtime": {
+                "markets_considered_count": 5,
+                "eligible_markets_count": 2,
+                "rejected_markets_count": 3,
+                "rejection_breakdown": {},
+            },
+        }
+    })
+    @patch("app._current_kalshi_execution_domain", return_value="production")
+    @patch("app.is_scheduler_running", return_value=True)
+    def test_live_probe_directional_collapse_reports_non_ambiguous_reason(self, *_mocks):
+        response = self.client.get("/observability/market-eligibility-runtime?station=KDEN")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["eligible_markets_count"], 2)
+        self.assertEqual(payload["current_cache_probe"]["post_directional_market_count"], 0)
+        self.assertEqual(payload["current_cache_probe"]["empty_reason"], "no_directional_ladder_match")
+        self.assertEqual(payload["latest_evaluation_outcome"], "NO_DIRECTIONAL_LADDER_MATCH")
+        self.assertEqual(payload["latest_suppression_reason"], "no_directional_ladder_match")
+
 
 
 if __name__ == "__main__":
