@@ -189,10 +189,12 @@ class StructuralHardeningTests(unittest.TestCase):
 
         self.assertEqual(len(captured_delivery_lists), 2)
         self.assertIsNot(captured_delivery_lists[0], captured_delivery_lists[1])
+        self.assertTrue(first["delivery_attempted"])
         self.assertFalse(first["delivery_succeeded"])
         self.assertEqual(first["webhook_status_code"], 500)
         self.assertEqual(first["webhook_exception"], "boom")
         self.assertEqual(first["webhook_response_text"], "failed")
+        self.assertTrue(second["delivery_attempted"])
         self.assertFalse(second["delivery_succeeded"])
         self.assertEqual(second["webhook_status_code"], 500)
 
