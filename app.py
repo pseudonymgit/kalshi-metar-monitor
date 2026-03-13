@@ -1933,6 +1933,35 @@ def debug_send_test_alert():
 
     deliver_raw = request.args.get("deliver", "true")
     deliver = str(deliver_raw).strip().lower() in {"1", "true", "yes", "on"}
+
+    hydration_snapshot = get_hydration_prerequisite_state_snapshot() or {}
+    persisted_hydration_state = hydration_snapshot.get(station) or {}
+    current_cache_probe = get_station_hydration_cache_probe(station)
+    cache_valid = bool(current_cache_probe.get("cache_present")) and int(current_cache_probe.get("raw_market_count") or 0) > 0
+    markets_cached = int(current_cache_probe.get("raw_market_count") or 0) > 0
+
+    if deliver and (not cache_valid or not markets_cached):
+        return jsonify(
+            {
+                "ok": False,
+                "station": station,
+                "temp": temp_f,
+                "deliver": deliver,
+                "preflight_failed": True,
+                "preflight_reason": "HYDRATION_CACHE_INVALID",
+                "alerts_generated": 0,
+                "delivery_requested": True,
+                "delivery_attempted": False,
+                "delivery_succeeded": False,
+                "hydration_state": {
+                    "cache_valid": cache_valid,
+                    "markets_cached": markets_cached,
+                    "persisted_hydration_state": persisted_hydration_state,
+                    "current_cache_probe": current_cache_probe,
+                },
+            }
+        ), 200
+
     result = _run_simulate_ladder(icao=station, temp_f=temp_f, deliver=deliver)
 
     return jsonify(
