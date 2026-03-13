@@ -142,6 +142,49 @@ class StructuralHardeningTests(unittest.TestCase):
         self.assertIsNone(result["webhook_exception"])
         self.assertIsNone(result["webhook_response_text"])
 
+    @patch("core.metar_monitor.commit_temperature_state")
+    @patch("core.metar_monitor._evaluate_deterministic_signal_layer")
+    @patch("core.metar_monitor.get_latest_station_market_evaluation_context", return_value={})
+    @patch("core.metar_monitor.emit_transition_if_changed", return_value={})
+    @patch(
+        "core.metar_monitor.read_temperature_state",
+        return_value={
+            "last_observed_integer": 70,
+            "running_daily_max": 70.0,
+            "last_settlement_bucket": 70,
+            "last_instant_bucket": 70,
+        },
+    )
+    @patch("core.metar_monitor._maybe_daily_reset_local")
+    def test_process_temperature_event_generated_event_blocked_before_send_has_real_upstream_blocking_reason(
+        self,
+        _reset,
+        _state,
+        _emit_transition,
+        _market_eval,
+        _signal_eval,
+        _commit,
+    ):
+        delivery_results = []
+
+        alerts = metar_monitor._process_temperature_event(
+            icao="KDEN",
+            temp_f=71.1,
+            obs_time="2026-03-13T00:00:00Z",
+            cfg={},
+            last_temp_f=70.1,
+            allow_alert_delivery=False,
+            delivery_results=delivery_results,
+        )
+
+        self.assertEqual(alerts, 1)
+        self.assertEqual(len(delivery_results), 1)
+        self.assertFalse(delivery_results[0]["delivery_attempted"])
+        self.assertEqual(delivery_results[0]["delivery_blocking_stage"], "delivery_gate")
+        self.assertEqual(delivery_results[0]["delivery_blocking_reason"], "ALERT_DELIVERY_DISABLED")
+        self.assertNotEqual(delivery_results[0]["delivery_blocking_stage"], "delivery_result_propagation")
+        self.assertNotEqual(delivery_results[0]["delivery_blocking_reason"], "DELIVERY_RESULT_MISSING")
+
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={})
     def test_simulation_alert_generated_uses_own_success_delivery_result(self, *_mocks):

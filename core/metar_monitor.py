@@ -1230,6 +1230,18 @@ def _process_temperature_event(
             )
             if delivery_results is not None:
                 delivery_results.append(send_result)
+        elif delivery_results is not None:
+            delivery_results.append(
+                {
+                    "delivery_attempted": False,
+                    "delivery_succeeded": False,
+                    "webhook_status_code": None,
+                    "webhook_exception": None,
+                    "webhook_response_text": None,
+                    "delivery_blocking_stage": "delivery_gate",
+                    "delivery_blocking_reason": "ALERT_DELIVERY_DISABLED",
+                }
+            )
         alerts = 1
 
     commit_temperature_state(
