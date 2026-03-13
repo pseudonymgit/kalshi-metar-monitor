@@ -1654,6 +1654,9 @@ def diagnostics_page():
             paths = [
                 "/debug/simulate-temperature?station=KDEN&temp=49.2",
                 "/debug/send-test-alert?station=KDEN&temp=49.2&deliver=true",
+                "/debug/run-hydration-recovery?station=KDEN",
+                "/debug/run-metar-start",
+                "/debug/run-metar-stop",
                 "/debug/alerts?limit=20",
                 "/debug/state",
             ]
@@ -1669,13 +1672,22 @@ def diagnostics_page():
 
     html.extend(
         [
-            "<h2>Test Alert Delivery</h2>",
+            "<h2>Browser-usable wrappers for POST endpoints</h2>",
+            "<p>Convenience GET wrappers for browser/manual ops use; canonical POST endpoints remain unchanged.</p>",
+            f"<p><a href='{base_url}/debug/run-hydration-recovery?station=KDEN'>/debug/run-hydration-recovery?station=KDEN</a></p>",
+            f"<p><a href='{base_url}/debug/run-metar-start'>/debug/run-metar-start</a></p>",
+            f"<p><a href='{base_url}/debug/run-metar-stop'>/debug/run-metar-stop</a></p>",
             f"<p><a href='{base_url}/debug/send-test-alert?station=KDEN&temp=49.2&deliver=true'>/debug/send-test-alert?station=KDEN&temp=49.2&deliver=true</a></p>",
+            "<h2>Test Alert Delivery</h2>",
             "<p>This route uses the real delivery-capable simulation path.</p>",
             "<p><code>/debug/simulate-temperature</code> = preview only / no delivery.</p>",
             "<p><code>/debug/send-test-alert</code> = delivery-capable diagnostic wrapper.</p>",
             "<p><code>/metar/simulate-ladder</code> = POST-only underlying route.</p>",
             "<h2>POST-only Endpoints (non-clickable)</h2>",
+            "<p><code>/ops/hydration-recovery</code> &mdash; method = <strong>POST</strong></p>",
+            "<p><code>/metar/start</code> &mdash; method = <strong>POST</strong></p>",
+            "<p><code>/metar/stop</code> &mdash; method = <strong>POST</strong></p>",
+            "<p><code>/metar/test-alert</code> &mdash; method = <strong>POST</strong></p>",
             "<p><code>/metar/simulate-ladder</code> &mdash; method = <strong>POST</strong></p>",
             "<pre>{\n  \"icao\": \"KDEN\",\n  \"temp_f\": 49.2,\n  \"deliver\": true\n}</pre>",
             "<p>Browser address bar cannot invoke POST.</p>",
@@ -1737,10 +1749,18 @@ def _hydration_recovery_allowlist() -> set[str]:
 
 @app.route("/ops/hydration-recovery", methods=["POST"])
 def hydration_recovery():
-    queue_before = hydration_queue_snapshot()
-    execution_domain = _current_kalshi_execution_domain()
     data = request.get_json(force=True, silent=True) or {}
     station = (data.get("station") or "").strip().upper()
+    try:
+        bounded_limit = int(data.get("bounded_limit", 1))
+    except (TypeError, ValueError):
+        bounded_limit = 1
+    return _run_hydration_recovery(station=station, requested_limit=bounded_limit)
+
+
+def _run_hydration_recovery(*, station: str, requested_limit: int):
+    queue_before = hydration_queue_snapshot()
+    execution_domain = _current_kalshi_execution_domain()
 
     if execution_domain != "production":
         return jsonify(
@@ -1787,10 +1807,6 @@ def hydration_recovery():
             }
         ), 403
 
-    try:
-        requested_limit = int(data.get("bounded_limit", 1))
-    except (TypeError, ValueError):
-        requested_limit = 1
     bounded_limit = max(1, min(requested_limit, 3))
 
     enqueue_station_hydration(station, reason="ops_hydration_recovery")
@@ -1810,6 +1826,17 @@ def hydration_recovery():
             "queue_after": hydration_queue_snapshot(),
         }
     ), 200
+
+
+@app.route("/debug/run-hydration-recovery", methods=["GET"])
+def debug_run_hydration_recovery():
+    station = (request.args.get("station") or "").strip().upper()
+    raw_limit = request.args.get("bounded_limit", "1")
+    try:
+        requested_limit = int(raw_limit)
+    except (TypeError, ValueError):
+        requested_limit = 1
+    return _run_hydration_recovery(station=station, requested_limit=requested_limit)
 
 
 @app.route("/kalshi/ping", methods=["GET"])
@@ -3046,13 +3073,31 @@ def metar_simulate_ladder():
 
 @app.route("/metar/start", methods=["POST"])
 def metar_start():
+    return _run_metar_start()
+
+
+def _run_metar_start():
     start_scheduler(log)
     return jsonify({"ok": True, "scheduler": "started"}), 200
 
 @app.route("/metar/stop", methods=["POST"])
 def metar_stop():
+    return _run_metar_stop()
+
+
+def _run_metar_stop():
     stop_scheduler()
     return jsonify({"ok": True, "scheduler": "stopped"}), 200
+
+
+@app.route("/debug/run-metar-start", methods=["GET"])
+def debug_run_metar_start():
+    return _run_metar_start()
+
+
+@app.route("/debug/run-metar-stop", methods=["GET"])
+def debug_run_metar_stop():
+    return _run_metar_stop()
 
 # -------- Test + Ops helpers (single definitions) --------
 
