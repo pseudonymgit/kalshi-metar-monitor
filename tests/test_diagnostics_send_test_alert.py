@@ -83,6 +83,31 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
         self.assertIsNone(payload["webhook_exception"])
         self.assertEqual(payload["webhook_response_text"], "server error")
 
+    @patch("app._run_simulate_ladder")
+    def test_send_test_alert_no_alert_generated_has_null_delivery_details(self, mock_run):
+        mock_run.return_value = {
+            "ok": True,
+            "alerts_generated": 0,
+            "delivery_requested": True,
+            "delivery_attempted": False,
+            "delivery_succeeded": False,
+            "webhook_status_code": None,
+            "webhook_exception": None,
+            "webhook_response_text": None,
+            "suppression_reason": "NO_TRANSITION",
+        }
+
+        response = self.client.get("/debug/send-test-alert?temp=49.2")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertEqual(payload["alerts_generated"], 0)
+        self.assertEqual(payload["delivery_attempted"], False)
+        self.assertEqual(payload["delivery_succeeded"], False)
+        self.assertIsNone(payload["webhook_status_code"])
+        self.assertIsNone(payload["webhook_exception"])
+        self.assertIsNone(payload["webhook_response_text"])
+
 
 if __name__ == "__main__":
     unittest.main()

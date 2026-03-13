@@ -129,6 +129,73 @@ class StructuralHardeningTests(unittest.TestCase):
 
         mock_ingest.assert_called_once()
 
+    @patch("core.metar_monitor.ensure_state_loaded")
+    @patch("core.metar_monitor.get_default_config", return_value={})
+    def test_simulation_no_alert_generated_reports_null_delivery_fields(self, *_mocks):
+        with patch("core.metar_monitor._ingest_obs", return_value=(1, 0)):
+            result = metar_monitor._simulate_temperature_for_testing("KDEN", 71.1, allow_alert_delivery=True)
+
+        self.assertEqual(result["alerts_generated"], 0)
+        self.assertFalse(result["delivery_attempted"])
+        self.assertFalse(result["delivery_succeeded"])
+        self.assertIsNone(result["webhook_status_code"])
+        self.assertIsNone(result["webhook_exception"])
+        self.assertIsNone(result["webhook_response_text"])
+
+    @patch("core.metar_monitor.ensure_state_loaded")
+    @patch("core.metar_monitor.get_default_config", return_value={})
+    def test_simulation_alert_generated_uses_own_success_delivery_result(self, *_mocks):
+        def _ingest_side_effect(*args, **kwargs):
+            kwargs["delivery_results"].append(
+                {
+                    "delivery_succeeded": True,
+                    "webhook_status_code": 204,
+                    "webhook_exception": None,
+                    "webhook_response_text": "ok",
+                }
+            )
+            return (1, 1)
+
+        with patch("core.metar_monitor._ingest_obs", side_effect=_ingest_side_effect):
+            result = metar_monitor._simulate_temperature_for_testing("KDEN", 71.1, allow_alert_delivery=True)
+
+        self.assertTrue(result["delivery_attempted"])
+        self.assertTrue(result["delivery_succeeded"])
+        self.assertEqual(result["webhook_status_code"], 204)
+        self.assertIsNone(result["webhook_exception"])
+        self.assertEqual(result["webhook_response_text"], "ok")
+
+    @patch("core.metar_monitor.ensure_state_loaded")
+    @patch("core.metar_monitor.get_default_config", return_value={})
+    def test_simulation_alert_generated_uses_own_failed_delivery_result(self, *_mocks):
+        captured_delivery_lists = []
+
+        def _ingest_side_effect(*args, **kwargs):
+            delivery_results = kwargs["delivery_results"]
+            captured_delivery_lists.append(delivery_results)
+            delivery_results.append(
+                {
+                    "delivery_succeeded": False,
+                    "webhook_status_code": 500,
+                    "webhook_exception": "boom",
+                    "webhook_response_text": "failed",
+                }
+            )
+            return (1, 1)
+
+        with patch("core.metar_monitor._ingest_obs", side_effect=_ingest_side_effect):
+            first = metar_monitor._simulate_temperature_for_testing("KDEN", 71.1, allow_alert_delivery=True)
+            second = metar_monitor._simulate_temperature_for_testing("KDEN", 72.1, allow_alert_delivery=True)
+
+        self.assertEqual(len(captured_delivery_lists), 2)
+        self.assertIsNot(captured_delivery_lists[0], captured_delivery_lists[1])
+        self.assertFalse(first["delivery_succeeded"])
+        self.assertEqual(first["webhook_status_code"], 500)
+        self.assertEqual(first["webhook_exception"], "boom")
+        self.assertEqual(first["webhook_response_text"], "failed")
+        self.assertFalse(second["delivery_succeeded"])
+        self.assertEqual(second["webhook_status_code"], 500)
+
     def test_observability_domain_blocks_live_kalshi_calls(self):
         with kalshi_monitor.kalshi_execution_domain("observability"):
             with self.assertRaises(RuntimeError):

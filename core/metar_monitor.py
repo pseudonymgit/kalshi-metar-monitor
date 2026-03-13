@@ -80,12 +80,6 @@ _LIVE_STATION_UNIVERSE_RESOLVER = None
 _AUDIT_LOCK = threading.Lock()
 _MISSING_LADDER_DEDUPE = {}
 _MISSING_LADDER_LOCK = threading.Lock()
-_LAST_WEBHOOK_DELIVERY_RESULT = {
-    "delivery_succeeded": False,
-    "webhook_status_code": None,
-    "webhook_exception": None,
-    "webhook_response_text": None,
-}
 _KALSHI_RATE_LIMIT_LOCK = threading.Lock()
 _KALSHI_LAST_CALL_TS = {}
 # Rate-limit invariant: this window throttles repeated market evaluation
@@ -696,6 +690,7 @@ def _ingest_obs(
     persist_cache: bool = True,
     window_start: Optional[datetime] = None,
     window_end: Optional[datetime] = None,
+    delivery_results: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[int, int]:
     """
     Ingests observations in chronological order.
@@ -752,6 +747,7 @@ def _ingest_obs(
             cfg=cfg,
             last_temp_f=last_temp,
             allow_alert_delivery=allow_alert_delivery,
+            delivery_results=delivery_results,
         )
 
         last_temp = obs["temp_f"]
@@ -781,7 +777,7 @@ def _emit_alert(
     instant_bucket_changed: bool = False,
     settlement_bucket_changed: bool = False,
     transition_correlation: Optional[Dict[str, Any]] = None,
-) -> None:
+) -> Dict[str, Any]:
     transition_type = None
     if settlement_bucket_changed:
         transition_type = "settlement_up"
@@ -860,7 +856,7 @@ def _emit_alert(
             "transition_correlation": transition_correlation,
         },
     }
-    _send_alert(cfg.get("webhook", ""), payload)
+    return _send_alert(cfg.get("webhook", ""), payload)
 
 
 def _observation_seconds(obs_time: str) -> Optional[float]:
@@ -1092,6 +1088,7 @@ def _process_temperature_event(
     cfg: Dict[str, Any],
     last_temp_f: Optional[float] = None,
     allow_alert_delivery: bool = True,
+    delivery_results: Optional[List[Dict[str, Any]]] = None,
 ) -> int:
     prev_f = float(last_temp_f) if last_temp_f is not None else float(temp_f)
     now_f = float(temp_f)
@@ -1220,7 +1217,7 @@ def _process_temperature_event(
         # integer-cross criteria were met and delivery is explicitly enabled.
         if allow_alert_delivery:
             d = round(now_f - prev_f, 1)
-            _emit_alert(
+            send_result = _emit_alert(
                 icao,
                 prev_f=prev_f,
                 now_f=now_f,
@@ -1231,6 +1228,8 @@ def _process_temperature_event(
                 settlement_bucket_changed=settlement_changed,
                 transition_correlation=transition_correlation,
             )
+            if delivery_results is not None:
+                delivery_results.append(send_result)
         alerts = 1
 
     commit_temperature_state(
@@ -2036,19 +2035,21 @@ def _simulate_temperature_for_testing(
         previous_integer = _STATE["last_observed_integer"].get(icao)
 
     simulated_obs = _obs_tuple(float(temp_f), ts, {"simulated": True}, "simulated")
+    delivery_results: List[Dict[str, Any]] = []
     _, alerts = _ingest_obs(
         icao,
         [simulated_obs],
         cfg,
         allow_alert_delivery=allow_alert_delivery,
         persist_cache=allow_alert_delivery,
+        delivery_results=delivery_results,
     )
 
     with _STATE_LOCK:
         current_integer = _STATE["last_observed_integer"].get(icao)
 
     delivery_attempted = allow_alert_delivery and alerts > 0
-    delivery_result = dict(_LAST_WEBHOOK_DELIVERY_RESULT) if delivery_attempted else {
+    delivery_result = delivery_results[-1] if delivery_attempted and delivery_results else {
         "delivery_succeeded": False,
         "webhook_status_code": None,
         "webhook_exception": None,
@@ -2083,12 +2084,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         "webhook_response_text": None,
     }
 
-    def _finalize(current: Dict[str, Any]) -> Dict[str, Any]:
-        _LAST_WEBHOOK_DELIVERY_RESULT.update(current)
-        return current
-
     if not webhook:
-        return _finalize(result)
+        return result
     try:
         station = (payload.get("station") or "UNK").upper()
         legacy = payload.get("legacy") if isinstance(payload.get("legacy"), dict) else payload
@@ -2105,7 +2102,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         transition_correlation = legacy.get("transition_correlation")
 
         if tf is None:
-            return _finalize(result)
+            return result
 
         instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
         settlement_bucket_changed = bool(legacy.get("settlement_bucket_changed"))
@@ -2124,13 +2121,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 evaluation_outcome="SUPPRESSED_NO_TRANSITION",
                 suppression_reason="NO_TRANSITION",
             )
-            return _finalize(result)
+            return result
 
         rate_limit_reference_dt = _parse_iso_utc_optional(reference_timestamp_utc)
         if rate_limit_reference_dt is None and isinstance(transition_correlation, dict):
             rate_limit_reference_dt = _parse_iso_utc_optional(transition_correlation.get("timestamp_utc"))
         if rate_limit_reference_dt is None:
-            return _finalize(result)
+            return result
 
         now_ts = rate_limit_reference_dt.timestamp()
         with _KALSHI_RATE_LIMIT_LOCK:
@@ -2138,7 +2135,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             # Throttle causal implication: suppress duplicate near-term Kalshi checks
             # while leaving previously recorded transition history intact.
             if last_call_ts is not None and (now_ts - last_call_ts) < _KALSHI_CALL_THROTTLE_SECONDS:
-                return _finalize(result)
+                return result
             _KALSHI_LAST_CALL_TS[station] = now_ts
 
         try:
@@ -2515,7 +2512,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             "webhook_response_text": None,
         }
         print(f"[ERROR] station={payload.get('station') or 'UNK'} function=_send_alert: {e}")
-    return _finalize(result)
+    return result
 
 
 # =========================
