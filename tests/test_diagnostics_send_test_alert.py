@@ -34,6 +34,10 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
             "alerts_generated": 1,
             "delivery_requested": True,
             "delivery_attempted": True,
+            "delivery_succeeded": True,
+            "webhook_status_code": 204,
+            "webhook_exception": None,
+            "webhook_response_text": "ok",
             "suppression_reason": None,
         }
 
@@ -48,8 +52,36 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
         self.assertEqual(payload["alerts_generated"], 1)
         self.assertEqual(payload["delivery_requested"], True)
         self.assertEqual(payload["delivery_attempted"], True)
+        self.assertEqual(payload["delivery_succeeded"], True)
+        self.assertEqual(payload["webhook_status_code"], 204)
+        self.assertIsNone(payload["webhook_exception"])
+        self.assertEqual(payload["webhook_response_text"], "ok")
         self.assertIsNone(payload["suppression_reason"])
         mock_run.assert_called_once_with(icao="KDEN", temp_f=49.2, deliver=True)
+
+    @patch("app._run_simulate_ladder")
+    def test_send_test_alert_includes_failed_delivery_details(self, mock_run):
+        mock_run.return_value = {
+            "ok": True,
+            "alerts_generated": 1,
+            "delivery_requested": True,
+            "delivery_attempted": True,
+            "delivery_succeeded": False,
+            "webhook_status_code": 500,
+            "webhook_exception": None,
+            "webhook_response_text": "server error",
+            "suppression_reason": None,
+        }
+
+        response = self.client.get("/debug/send-test-alert?temp=49.2")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertEqual(payload["delivery_attempted"], True)
+        self.assertEqual(payload["delivery_succeeded"], False)
+        self.assertEqual(payload["webhook_status_code"], 500)
+        self.assertIsNone(payload["webhook_exception"])
+        self.assertEqual(payload["webhook_response_text"], "server error")
 
 
 if __name__ == "__main__":
