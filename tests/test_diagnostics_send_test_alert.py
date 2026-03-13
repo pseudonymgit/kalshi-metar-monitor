@@ -21,6 +21,58 @@ class DiagnosticsPageTests(unittest.TestCase):
         self.assertIn("/debug/alerts?limit=20", body)
         self.assertIn("/debug/state", body)
 
+    def test_diagnostics_page_contains_browser_usable_post_wrappers(self):
+        response = self.client.get("/diagnostics")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("Browser-usable wrappers for POST endpoints", body)
+        self.assertIn("/debug/run-hydration-recovery?station=KDEN", body)
+        self.assertIn("/debug/run-metar-start", body)
+        self.assertIn("/debug/run-metar-stop", body)
+
+
+class BrowserWrapperEndpointTests(unittest.TestCase):
+    def setUp(self):
+        app_module._autostart_fallback_done = True
+        self.client = app.test_client()
+
+    @patch("app._run_hydration_recovery")
+    def test_debug_run_hydration_recovery_uses_existing_recovery_path(self, mock_run):
+        mock_run.return_value = ({"status": "executed"}, 200)
+
+        response = self.client.get("/debug/run-hydration-recovery?station=KDEN")
+
+        self.assertEqual(response.status_code, 200)
+        mock_run.assert_called_once_with(station="KDEN", requested_limit=1)
+
+    @patch("app.start_scheduler")
+    def test_debug_run_metar_start_uses_existing_start_logic(self, mock_start):
+        response = self.client.get("/debug/run-metar-start")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"ok": True, "scheduler": "started"})
+        mock_start.assert_called_once_with(app_module.log)
+
+    @patch("app.stop_scheduler")
+    def test_debug_run_metar_stop_uses_existing_stop_logic(self, mock_stop):
+        response = self.client.get("/debug/run-metar-stop")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"ok": True, "scheduler": "stopped"})
+        mock_stop.assert_called_once_with()
+
+    @patch("app.start_scheduler")
+    def test_canonical_post_metar_start_remains_unchanged(self, mock_start):
+        response = self.client.post("/metar/start")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"ok": True, "scheduler": "started"})
+        mock_start.assert_called_once_with(app_module.log)
+
+    @patch("app.stop_scheduler")
+    def test_canonical_post_metar_stop_remains_unchanged(self, mock_stop):
+        response = self.client.post("/metar/stop")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"ok": True, "scheduler": "stopped"})
+        mock_stop.assert_called_once_with()
+
 
 class DebugSendTestAlertEndpointTests(unittest.TestCase):
     def setUp(self):
