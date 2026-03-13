@@ -1230,6 +1230,18 @@ def _process_temperature_event(
             )
             if delivery_results is not None:
                 delivery_results.append(send_result)
+        elif delivery_results is not None:
+            delivery_results.append(
+                {
+                    "delivery_attempted": False,
+                    "delivery_succeeded": False,
+                    "webhook_status_code": None,
+                    "webhook_exception": None,
+                    "webhook_response_text": None,
+                    "delivery_blocking_stage": "delivery_gate",
+                    "delivery_blocking_reason": "ALERT_DELIVERY_DISABLED",
+                }
+            )
         alerts = 1
 
     commit_temperature_state(
@@ -2064,7 +2076,18 @@ def _simulate_temperature_for_testing(
         or delivery_result.get("webhook_response_text") is not None
         or bool(delivery_result.get("delivery_succeeded", False))
     )
-
+    if (
+        alerts > 0
+        and allow_alert_delivery
+        and not delivery_attempted
+        and delivery_result.get("delivery_blocking_stage") is None
+        and delivery_result.get("delivery_blocking_reason") is None
+    ):
+        delivery_result = {
+            **delivery_result,
+            "delivery_blocking_stage": "invariant_violation",
+            "delivery_blocking_reason": "MISSING_DELIVERY_RESULT_FOR_GENERATED_ALERT",
+        }
     if logger:
         logger.info(f"Simulated ladder event for {icao} at {temp_f}F (alerts={alerts})")
 
