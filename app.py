@@ -1739,11 +1739,83 @@ def _is_non_production_environment() -> bool:
     }
 
 
-def _hydration_recovery_allowlist() -> set[str]:
-    return {
+def _hydration_recovery_historical_station_registry() -> set[str]:
+    stations = set()
+
+    try:
+        state = get_state() or {}
+    except Exception:
+        state = {}
+
+    stations.update(
         station.strip().upper()
-        for station in str(os.getenv("HYDRATION_RECOVERY_STATION_ALLOWLIST") or "").split(",")
+        for station in (state.get("stations") or [])
         if station and station.strip()
+    )
+
+    for field in (
+        "last_obs",
+        "last_seen_iso",
+        "last_observed_integer",
+        "running_daily_max",
+        "last_settlement_bucket",
+        "last_instant_bucket",
+    ):
+        source = state.get(field) or {}
+        if isinstance(source, dict):
+            stations.update(
+                station.strip().upper()
+                for station in source.keys()
+                if isinstance(station, str) and station.strip()
+            )
+
+    try:
+        transition_rows = get_transition_history(limit=200) or []
+    except Exception:
+        transition_rows = []
+    stations.update(
+        (row.get("station") or "").strip().upper()
+        for row in transition_rows
+        if isinstance(row, dict) and (row.get("station") or "").strip()
+    )
+
+    try:
+        hydration_execution = get_last_hydration_execution_snapshot() or {}
+    except Exception:
+        hydration_execution = {}
+    if isinstance(hydration_execution, dict):
+        stations.update(
+            station.strip().upper()
+            for station in hydration_execution.keys()
+            if isinstance(station, str) and station.strip()
+        )
+
+    return stations
+
+
+def _hydration_recovery_station_eligibility(station: str) -> tuple[bool, str, dict[str, list[str]]]:
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return False, "station_missing", {}
+
+    station_universe = _canonical_live_station_universe()
+    live_station_universe = set(station_universe.get("stations") or [])
+    configured_station_universe = set()
+    for key in ("configured_stations", "watchlist_stations"):
+        configured_station_universe.update(station_universe.get(key) or set())
+    historical_station_universe = _hydration_recovery_historical_station_registry()
+
+    if normalized_station in live_station_universe:
+        return True, "live_discovered", {}
+    if normalized_station in configured_station_universe:
+        return True, "configured", {}
+    if normalized_station in historical_station_universe:
+        return True, "historical_registry", {}
+
+    return False, "station_not_known_to_system", {
+        "live_discovered_stations": sorted(live_station_universe),
+        "configured_or_monitored_stations": sorted(configured_station_universe),
+        "historical_worked_station_registry": sorted(historical_station_universe),
     }
 
 
@@ -1787,24 +1859,16 @@ def _run_hydration_recovery(*, station: str, requested_limit: int):
     if not station:
         return jsonify({"error": "Missing JSON field: station"}), 400
 
-    allowlist = _hydration_recovery_allowlist()
-    if not allowlist:
+    allowed, allow_reason, debug_sources = _hydration_recovery_station_eligibility(station)
+    if not allowed:
         return jsonify(
             {
                 "status": "refused",
-                "reason": "allowlist_required",
+                "reason": allow_reason,
                 "station": station,
+                "allowed": False,
             }
-        ), 403
-
-    if station not in allowlist:
-        return jsonify(
-            {
-                "status": "refused",
-                "reason": "station_not_allowlisted",
-                "station": station,
-                "allowlist": sorted(allowlist),
-            }
+            | debug_sources
         ), 403
 
     bounded_limit = max(1, min(requested_limit, 3))
@@ -1820,6 +1884,8 @@ def _run_hydration_recovery(*, station: str, requested_limit: int):
             "status": "executed",
             "execution_domain": execution_domain,
             "station": station,
+            "allowed": True,
+            "allow_reason": allow_reason,
             "bounded_limit": bounded_limit,
             "worker_runs": worker_runs,
             "queue_before": queue_before,
