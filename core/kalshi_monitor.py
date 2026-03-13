@@ -1087,6 +1087,7 @@ def build_structured_snapshot_from_cache(station: str, market_types: set):
     )
 
     markets = []
+    pre_directional_market_count = 0
     for market in filtered_markets:
         ticker = market.get("ticker") or ""
         strike_type = market.get("strike_type")
@@ -1123,6 +1124,7 @@ def build_structured_snapshot_from_cache(station: str, market_types: set):
         )
 
     markets.sort(key=lambda x: x["strike"])
+    pre_directional_market_count = len(markets)
     observed_value = None
     if get_metar_state:
         try:
@@ -1156,6 +1158,17 @@ def build_structured_snapshot_from_cache(station: str, market_types: set):
         "series_ticker": series_ticker,
         "market_types": sorted(selected_types),
         "markets": markets,
+        "pre_directional_market_count": pre_directional_market_count,
+        "post_directional_market_count": len(markets),
+        "empty_reason": (
+            "cache_missing_or_empty"
+            if len(cached_markets) == 0
+            else "filtered_to_zero"
+            if len(filtered_markets) == 0
+            else "no_directional_ladder_match"
+            if len(markets) == 0
+            else None
+        ),
         "raw_market_count": len(cached_markets),
         "filtered_market_count": len(filtered_markets),
         "rejection_counts": dict(rejection_counts),
