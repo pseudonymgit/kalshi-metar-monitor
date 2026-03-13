@@ -1977,6 +1977,8 @@ def debug_send_test_alert():
             "webhook_status_code": result.get("webhook_status_code"),
             "webhook_exception": result.get("webhook_exception"),
             "webhook_response_text": result.get("webhook_response_text"),
+            "delivery_blocking_stage": result.get("delivery_blocking_stage"),
+            "delivery_blocking_reason": result.get("delivery_blocking_reason"),
             "suppression_reason": result.get("suppression_reason"),
         }
     ), 200
