@@ -1572,7 +1572,7 @@ def _set_request_execution_domain():
     domain = "production"
     if path.startswith("/observability/"):
         domain = "observability"
-    elif path.startswith("/diagnostics/"):
+    elif path == "/diagnostics" or path.startswith("/diagnostics/"):
         domain = "diagnostics"
     elif path.startswith("/audit/"):
         domain = "audit"
@@ -1591,6 +1591,115 @@ def _clear_request_execution_domain(_exc):
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "ok"}), 200
+
+
+@app.route("/diagnostics", methods=["GET"])
+def diagnostics_page():
+    base_url = request.host_url.rstrip("/")
+    quick_links = [
+        "/observability/hydration-prerequisite-runtime?station=KDEN",
+        "/observability/market-eligibility-runtime?station=KDEN",
+        "/observability/internal-alert-runtime?station=KDEN",
+        "/observability/alert-decision-trace?station=KDEN",
+        "/observability/transition-runtime?station=KDEN",
+    ]
+    grouped_get_links = [
+        ("Runtime / Status", [
+            "/",
+            "/execution-domain",
+            "/metar/status",
+            "/observability/kalshi-connectivity-runtime",
+        ]),
+        ("Hydration / Cache", [
+            "/observability/hydration-prerequisite-runtime?station=KDEN",
+            "/observability/ladder_cache",
+        ]),
+        ("Market Eligibility", [
+            "/observability/market-eligibility-runtime?station=KDEN",
+        ]),
+        ("Alert / Decision Diagnostics", [
+            "/observability/internal-alert-runtime?station=KDEN",
+            "/observability/alert-decision-trace?station=KDEN",
+        ]),
+        ("Transition / Ladder State", [
+            "/observability/transition-runtime?station=KDEN",
+            "/observability/pipeline-truth?station=KDEN",
+            "/debug/ladder-state",
+        ]),
+        ("Ingestion / Fetch", [
+            "/observability/ingestion-runtime?station=KDEN",
+            "/observability/ingestion-window-runtime?station=KDEN",
+            "/observability/nws-fetch-runtime?station=KDEN",
+            "/observability/ingestion-root-cause?station=KDEN",
+        ]),
+        ("Test / Simulation", []),
+    ]
+
+    html = [
+        "<!doctype html>",
+        "<html><head><meta charset='utf-8'><title>Diagnostics</title></head><body>",
+        "<h1>Diagnostics Endpoint Index</h1>",
+        f"<p>Base URL: <code>{base_url}</code></p>",
+        "<h2>Vital Checks</h2>",
+        "<ul>",
+    ]
+
+    for path in quick_links:
+        full_url = f"{base_url}{path}"
+        html.append(f"<li><a href='{full_url}'>{path}</a></li>")
+    html.append("</ul>")
+
+    for section, paths in grouped_get_links:
+        if section == "Test / Simulation":
+            paths = [
+                "/debug/simulate-temperature?station=KDEN&temp=49.2",
+                "/debug/send-test-alert?station=KDEN&temp=49.2&deliver=true",
+                "/debug/alerts?limit=20",
+                "/debug/state",
+            ]
+        html.append(f"<h2>{section}</h2>")
+        if paths:
+            html.append("<ul>")
+            for path in paths:
+                full_url = f"{base_url}{path}"
+                html.append(f"<li><a href='{full_url}'>{path}</a></li>")
+            html.append("</ul>")
+        else:
+            html.append("<p>No GET endpoints listed in this section.</p>")
+
+    html.extend(
+        [
+            "<h2>Test Alert Delivery</h2>",
+            f"<p><a href='{base_url}/debug/send-test-alert?station=KDEN&temp=49.2&deliver=true'>/debug/send-test-alert?station=KDEN&temp=49.2&deliver=true</a></p>",
+            "<p>This route uses the real delivery-capable simulation path.</p>",
+            "<p><code>/debug/simulate-temperature</code> = preview only / no delivery.</p>",
+            "<p><code>/debug/send-test-alert</code> = delivery-capable diagnostic wrapper.</p>",
+            "<p><code>/metar/simulate-ladder</code> = POST-only underlying route.</p>",
+            "<h2>POST-only Endpoints (non-clickable)</h2>",
+            "<p><code>/metar/simulate-ladder</code> &mdash; method = <strong>POST</strong></p>",
+            "<pre>{\n  \"station\": \"KDEN\",\n  \"temp\": 49.2,\n  \"deliver\": true\n}</pre>",
+            "<p>Browser address bar cannot invoke POST.</p>",
+            "</body></html>",
+        ]
+    )
+    return "".join(html), 200, {"Content-Type": "text/html; charset=utf-8"}
+
+
+def _run_simulate_ladder(*, icao: str, temp_f: float, deliver: bool):
+    from core.kalshi_monitor import enqueue_station_hydration, process_hydration_queue_worker
+
+    enqueue_station_hydration(icao, reason="simulate_ladder")
+    try:
+        process_hydration_queue_worker(market_types={"HIGH", "LOW"})
+    except Exception as e:
+        log.warning(f"simulation ladder hydration worker failed station={icao}: {e}")
+
+    return _simulate_temperature_for_testing(
+        icao,
+        temp_f,
+        logger=app.logger,
+        allow_alert_delivery=deliver,
+    )
 
 
 @app.route("/execution-domain", methods=["GET"])
@@ -1808,6 +1917,36 @@ def debug_simulate_temperature():
     result = _simulate_temperature_for_testing(station, temp)
 
     return jsonify(result)
+
+
+@app.route("/debug/send-test-alert", methods=["GET"])
+def debug_send_test_alert():
+    station = (request.args.get("station") or "KDEN").strip().upper() or "KDEN"
+    temp = request.args.get("temp")
+    if temp is None:
+        return jsonify({"error": "temp required"}), 400
+
+    try:
+        temp_f = float(temp)
+    except ValueError:
+        return jsonify({"error": "temp must be numeric"}), 400
+
+    deliver_raw = request.args.get("deliver", "true")
+    deliver = str(deliver_raw).strip().lower() in {"1", "true", "yes", "on"}
+    result = _run_simulate_ladder(icao=station, temp_f=temp_f, deliver=deliver)
+
+    return jsonify(
+        {
+            "ok": bool(result.get("ok", True)),
+            "station": station,
+            "temp": temp_f,
+            "deliver": deliver,
+            "alerts_generated": result.get("alerts_generated", 0),
+            "delivery_requested": result.get("delivery_requested", False),
+            "delivery_attempted": result.get("delivery_attempted", False),
+            "suppression_reason": result.get("suppression_reason"),
+        }
+    ), 200
     
 @app.route("/debug/version", methods=["GET"])
 def debug_version():
@@ -2868,22 +3007,7 @@ def metar_simulate_ladder():
     except Exception:
         return jsonify({"error": "temp_f must be numeric"}), 400
 
-    from core.kalshi_monitor import enqueue_station_hydration, process_hydration_queue_worker
-
-    enqueue_station_hydration(icao, reason="simulate_ladder")
-    try:
-        process_hydration_queue_worker(market_types={"HIGH", "LOW"})
-    except Exception as e:
-        log.warning(f"simulation ladder hydration worker failed station={icao}: {e}")
-
-    return jsonify(
-        _simulate_temperature_for_testing(
-            icao,
-            temp_f,
-            logger=app.logger,
-            allow_alert_delivery=deliver,
-        )
-    ), 200
+    return jsonify(_run_simulate_ladder(icao=icao, temp_f=temp_f, deliver=deliver)), 200
 
 @app.route("/metar/start", methods=["POST"])
 def metar_start():
