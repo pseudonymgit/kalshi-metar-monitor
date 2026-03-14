@@ -44,6 +44,7 @@ from core.metar_monitor import (
     _simulate_temperature_for_testing,
     get_recent_alerts,
     get_transition_history,
+    get_alert_review_diagnostics,
     get_station_ingestion_runtime,
     get_station_ingestion_window_runtime,
     get_last_nws_fetch_diagnostic,
@@ -2288,6 +2289,19 @@ def retention_prune():
     return jsonify(prune_old_alerts()), 200
 
 
+
+
+@app.route("/diagnostics/alert_review", methods=["GET"])
+def diagnostics_alert_review():
+    raw_limit = request.args.get("limit", "50")
+    try:
+        limit = int(raw_limit)
+    except (TypeError, ValueError):
+        limit = 50
+
+    return jsonify(get_alert_review_diagnostics(limit=limit)), 200
+
+
 @app.route("/observability/transitions", methods=["GET"])
 def observability_transitions():
     station = (request.args.get("station") or "").strip().upper() or None
@@ -3131,15 +3145,20 @@ def integrity_alert_pipeline():
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
     fire_audit = _build_alert_fire_audit_rows()
-    alerts_sent_today = next(
-    (s["alerts_sent_today"] for s in fire_audit.get("stations", []) if s["station"] == station),
-    0
-    )
-    for row in (fire_audit.get("stations") or []):
-        row_station = (row.get("station") or "").strip().upper()
-        if station and row_station != station:
-            continue
-        alerts_sent_today += int(row.get("alerts_sent_today") or 0)
+    if station:
+        alerts_sent_today = next(
+            (
+                int(row.get("alerts_sent_today") or 0)
+                for row in (fire_audit.get("stations") or [])
+                if (row.get("station") or "").strip().upper() == station
+            ),
+            0,
+        )
+    else:
+        alerts_sent_today = sum(
+            int(row.get("alerts_sent_today") or 0)
+            for row in (fire_audit.get("stations") or [])
+        )
     hydration_reason = (
         (compute_system_health_snapshot(
             station=station,
