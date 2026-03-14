@@ -8,7 +8,8 @@ Production Flask service that ingests METAR observations, detects integer temper
 
 ## Canonical Production Intent
 - Markets are the source of truth for which stations are active.
-- METAR ingestion follows market availability and monitors both `HIGH` and `LOW` markets symmetrically.
+- METAR ingestion follows market availability; default runtime monitoring is `HIGH` only unless `KALSHI_TARGET_MARKET_TYPE` is configured.
+- Symmetric `HIGH` and `LOW` monitoring is supported when `KALSHI_TARGET_MARKET_TYPE=HIGH,LOW`.
 - Settlement buckets are monotonic per station-day; alerts are transition-driven.
 - Replay must reproduce live transitions exactly.
 - Observability is read-only from persisted runtime state + cached market data and must not trigger live Kalshi calls.
@@ -54,6 +55,8 @@ Within station-local alert window (11:00–19:00):
 Policy notes:
 - Raw integer-cross (temp-only) alerts are permanently removed.
 - Composed alerts are the only alert type.
+
+Missing-ladder alerts are a separate path controlled by `ALERT_ON_MISSING_LADDER`. When enabled, the monitor may emit webhook messages with alert types `ladder_missing` or `ladder_selection_empty`; an audit row is written and daily dedupe prevents repeated alerts for the same station/market-type/day. This path is not part of composed alert window logic.
 
 ## Weather Ladder Alert Architecture
 
@@ -105,7 +108,7 @@ Allowed high-signal log events:
 
 Contract:
 - No per-poll logging.
-- No debug prints.
+- Structured logging is required for normal operation; emergency print statements may exist in failure paths.
 - High-signal logs only.
 
 Bucket detection rules:

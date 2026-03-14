@@ -877,7 +877,7 @@ Debug-only internal visibility endpoint.
 Observability
 
 ### Purpose
-Returns current execution-domain mode and station-authority context used by runtime flows.
+Returns current execution-domain mode used by runtime flows.
 
 ### Method
 GET
@@ -936,7 +936,9 @@ GET
 Observability
 
 ### Purpose
-Provides a read-only consolidated truth snapshot of pipeline state for operator diagnosis.
+Provides a diagnostic / partial observability surface for pipeline state troubleshooting.
+
+This endpoint should not be treated as authoritative runtime state.
 
 ### Method
 GET

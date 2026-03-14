@@ -7,7 +7,7 @@ Kalshi METAR Monitor is a deterministic live-trading reliability system.
 Its production purpose is to:
 - derive active station authority from currently tradable Kalshi weather markets,
 - ingest METAR observations for those market-authoritative stations,
-- emit deterministic transition-driven alerts for `HIGH` and `LOW` ladders,
+- emit deterministic transition-driven alerts for `HIGH` ladders by default (with `LOW` also supported when `KALSHI_TARGET_MARKET_TYPE=HIGH,LOW`),
 - preserve exact replay equivalence with live execution,
 - detect Goldilocks structural events that can create temporary trader-awareness asymmetry.
 
@@ -23,7 +23,7 @@ Market Availability (Kalshi listings)
 → Observability Domain
 → Scoring Domain
 
-Runtime pipeline order clarification: METAR ingestion → hydration prerequisite → market eligibility evaluation → transition detection → alert decision → alert delivery.
+Runtime pipeline order clarification: observation ingest → transition detection / emission → signal evaluation → alert-path hydration → market eligibility evaluation → delivery decision → webhook → audit recording.
 This sequence defines the canonical live execution path used by runtime diagnostics and observability interpretation.
 
 
@@ -139,7 +139,7 @@ DO NOT:
 
 - Preserve Phase 1 behavioral semantics as immutable baseline.
 - Preserve market-derived station authority.
-- Preserve symmetric `LOW` + `HIGH` monitoring behavior.
+- Preserve `HIGH` default monitoring behavior and configured `LOW` + `HIGH` symmetric behavior when enabled.
 - Keep alerts transition-driven only.
 - Do not introduce execution causality into Replay, Observability, Scoring, or Security domains.
 - Do not use external initialization values for Replay.
@@ -152,12 +152,14 @@ DO NOT:
 
 The deterministic runtime pipeline executes in the following order:
 
-METAR ingestion  
-→ hydration prerequisite  
+observation ingest  
+→ transition detection / emission  
+→ signal evaluation  
+→ alert-path hydration  
 → market eligibility evaluation  
-→ transition detection  
-→ alert decision  
-→ alert delivery
+→ delivery decision  
+→ webhook  
+→ audit recording
 
 This ordering reflects the runtime gating logic implemented in the ingestion and hydration checks.
 
