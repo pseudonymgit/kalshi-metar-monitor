@@ -25,6 +25,8 @@
 
 - Observability endpoints read persisted runtime state and cached market data.
 - Observability endpoints MUST NOT trigger live Kalshi API calls.
+- Flask startup lifecycle hooks may still run on a first-request path (for example, `before_first_request` can trigger scheduler/bootstrap discovery before handler execution).
+- The guarded fallback startup path in `before_request` explicitly excludes `/observability/*` requests.
 - Cache hydration is performed by ingestion/execution cycles.
 - Operations runbooks must ensure cache hydration before treating observability snapshots as complete.
 
