@@ -11,7 +11,8 @@
 - Markets are the source of truth for active stations.
 - METAR ingestion follows market availability for those stations.
 - Watchlist/config controls are operational filters and cannot supersede market-derived station authority.
-- `HIGH` and `LOW` monitoring are symmetric production paths.
+- Default runtime monitoring targets `HIGH` markets only.
+- Symmetric `HIGH` and `LOW` monitoring is supported when `KALSHI_TARGET_MARKET_TYPE=HIGH,LOW`.
 
 ## Deterministic Execution Notes
 
