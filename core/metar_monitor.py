@@ -2183,7 +2183,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             not instant_bucket_changed
             and not settlement_bucket_changed
             and not recent_transition_active
-            and eligible_markets_count == 0
         ):
             _annotate_transition_history_market_eval(
                 station=station,
