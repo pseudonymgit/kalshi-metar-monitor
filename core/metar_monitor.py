@@ -2186,6 +2186,18 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 alerts_sent=0,
                 evaluation_outcome="SUPPRESSED_NO_TRANSITION",
                 suppression_reason="NO_TRANSITION",
+        if (
+            not instant_bucket_changed
+            and not settlement_bucket_changed
+            and not recent_transition_active
+            and eligible_markets_count == 0
+        ):
+            _annotate_transition_history_market_eval(
+                station=station,
+                transition_correlation=transition_correlation,
+                alerts_sent=0,
+                evaluation_outcome="SUPPRESSED_NO_TRANSITION",
+                suppression_reason="NO_TRANSITION",
             )
             result["delivery_blocking_stage"] = "transition_gate"
             result["delivery_blocking_reason"] = "NO_TRANSITION"
