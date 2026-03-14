@@ -135,8 +135,10 @@ def build_alert_integrity_findings(
                     )
                 )
 
-        suppression_reason = (latest_eval.get("latest_suppression_reason") or "").strip()
-        eval_outcome = (latest_eval.get("latest_evaluation_outcome") or "").strip().upper()
+        raw_suppression_reason = latest_eval.get("latest_suppression_reason")
+        suppression_reason = str(raw_suppression_reason).strip() if raw_suppression_reason is not None else ""
+        raw_eval_outcome = latest_eval.get("latest_evaluation_outcome")
+        eval_outcome = str(raw_eval_outcome).strip().upper() if raw_eval_outcome is not None else ""
         outcome_reason_token = None
         if eval_outcome.startswith("SUPPRESSED_"):
             outcome_reason_token = eval_outcome[len("SUPPRESSED_") :]
