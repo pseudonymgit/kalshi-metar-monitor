@@ -2063,8 +2063,8 @@ def debug_simulate_directional_collapse():
         {
             "alert_type": result.get("alert_type"),
             "empty_reason": result.get("empty_reason"),
-            "delivery_attempted": bool(result.get("delivery_attempted") or result.get("webhook_status_code") is not None),
-            "delivery_succeeded": bool(result.get("delivery_succeeded", False)),
+            "delivery_attempted": result.get("delivery_attempted"),
+            "delivery_succeeded": result.get("delivery_succeeded"),
             "webhook_status_code": result.get("webhook_status_code"),
             "alert_id": result.get("alert_id"),
         }
