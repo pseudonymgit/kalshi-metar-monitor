@@ -293,16 +293,30 @@ def get_metrics():
 # enforces execution-domain guards before any network side effect occurs.
 def _kalshi_public_get(path):
     execution_domain = _current_kalshi_execution_domain()
+    normalized_path = path if path.startswith("/") else f"/{path}"
+
     if execution_domain in _FORBIDDEN_KALSHI_DOMAINS:
+        request_path = str(request.path or "") if has_request_context() else None
+        _LOGGER.warning(
+            "kalshi_public_get_blocked domain=%s path=%s request_path=%s",
+            execution_domain,
+            normalized_path,
+            request_path,
+        )
         raise RuntimeError(f"Live Kalshi call attempted in forbidden execution domain '{execution_domain}'")
     if has_request_context() and str(request.path or "").startswith("/observability/"):
+        _LOGGER.warning(
+            "kalshi_public_get_blocked domain=%s path=%s request_path=%s",
+            execution_domain,
+            normalized_path,
+            str(request.path or ""),
+        )
         raise RuntimeError("Live Kalshi call attempted in observability path")
 
     base_url = (
         os.getenv("KALSHI_PUBLIC_BASE_URL")
         or "https://api.elections.kalshi.com/trade-api/v2"
     ).rstrip("/")
-    normalized_path = path if path.startswith("/") else f"/{path}"
     response = _KALSHI_PUBLIC_SESSION.get(f"{base_url}{normalized_path}", timeout=10)
     response.raise_for_status()
     return response.json()
@@ -557,6 +571,11 @@ def ensure_series_discovery_loaded():
             if record_connectivity_state:
                 _LAST_SERIES_DISCOVERY_ERROR = str(exc)
             raise
+
+
+def get_series_discovery_cache_snapshot() -> dict:
+    with _SERIES_LOCK:
+        return dict(_SERIES_BY_STATION)
 
 
 def get_cached_series_markets(series_ticker: str) -> dict | None:
