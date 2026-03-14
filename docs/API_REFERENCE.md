@@ -262,7 +262,7 @@ Performs strict-source window ingest for one station and returns latest-known ob
 execution-affecting
 
 ### Data Source
-Runtime state
+Runtime state + live METAR source fetch
 
 ### Trading Relevance
 Operator tool to force deterministic ingest window processing for a station.
@@ -285,7 +285,7 @@ Returns latest METAR state for a station.
 read-only
 
 ### Data Source
-Runtime state
+Runtime state + live METAR source fetch
 
 ### Trading Relevance
 Used to check current observed temperature/state for a station.
@@ -308,7 +308,7 @@ Fetches current observations for multiple stations (`icaos` query parameter).
 execution-affecting
 
 ### Data Source
-Runtime state
+Runtime state + live METAR source fetch
 
 ### Trading Relevance
 Operator shortcut to refresh/check a station set.
@@ -630,7 +630,7 @@ Returns deterministic diagnostic rows about alert pipeline decisions.
 observability-only
 
 ### Data Source
-Runtime state
+Runtime state + SQLite audit + cached market data
 
 ### Trading Relevance
 Used to inspect suppression/no-fire reasons and diagnose missed alerts.
@@ -653,7 +653,7 @@ Returns alert fire-audit rows for operator review.
 observability-only
 
 ### Data Source
-SQLite audit
+Runtime state + SQLite audit + cached market data
 
 ### Trading Relevance
 Used to audit whether expected alert fires occurred for transitions.
@@ -867,6 +867,121 @@ Low-level inspection during incident/debug workflows.
 
 ### Safety Notes
 Debug-only internal visibility endpoint.
+
+---
+
+## Endpoint
+`GET /diagnostics`
+
+### Domain
+Debug
+
+### Purpose
+Returns consolidated runtime diagnostics for operational debugging.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `diagnostics`
+
+---
+
+## Endpoint
+`GET /debug/run-hydration-recovery`
+
+### Domain
+Debug
+
+### Purpose
+Runs hydration-recovery debug path for station-scoped diagnostics.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `station`
+- `queue_before`
+- `queue_after`
+
+---
+
+## Endpoint
+`GET /debug/simulate-directional-collapse`
+
+### Domain
+Debug
+
+### Purpose
+Returns directional-collapse simulation diagnostics for debug workflows.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `station`
+- `collapse_direction`
+- `diagnostic`
+
+---
+
+## Endpoint
+`GET /debug/send-test-alert`
+
+### Domain
+Debug
+
+### Purpose
+Triggers debug test-alert path for delivery verification workflows.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `status`
+- `delivery_attempted`
+
+---
+
+## Endpoint
+`GET /debug/run-metar-start`
+
+### Domain
+Debug
+
+### Purpose
+Runs METAR start lifecycle path through debug interface.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `scheduler_running`
+- `status`
+
+---
+
+## Endpoint
+`GET /debug/run-metar-stop`
+
+### Domain
+Debug
+
+### Purpose
+Runs METAR stop lifecycle path through debug interface.
+
+### Method
+GET
+
+### Key Response Fields
+- `ok`
+- `scheduler_running`
+- `status`
 
 ---
 
