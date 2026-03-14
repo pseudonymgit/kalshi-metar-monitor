@@ -1,243 +1,409 @@
-# CODEX MASTER TEMPLATE (AUTH PERSISTED VIA SETUP SCRIPT)
+# CODEX_MASTER_TEMPLATE.md
 
-==================================================
-GLOBAL EXECUTION GOVERNANCE
-==================================================
+This document defines common workflow rules that apply to every prompt.
 
-AUTHENTICATED PR MODE ONLY
+Every real prompt should begin with:
 
-All repository mutations MUST occur via Pull Request.
-Execution operates under deterministic governance rules.
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
 
-- Session handoff template at `docs/CODEX_HANDOFF_TEMPLATE.md` is mandatory for all future Codex sessions in this repository.
+This master template contains only universal workflow governance.
+Project-specific constraints must be supplied in the task prompt itself.
 
-Agent behavior is PATCH-ONLY.
-Conversation output is NOT authoritative.
-Git diff output IS authoritative.
+---
 
-Git authentication is preconfigured via setup script.
+## 1. Task Type Discipline
 
-DO NOT:
-- read GITHUB_TOKEN
-- modify credential helpers
-- modify ~/.git-credentials
-- attempt authentication changes
+Every task must be explicitly treated as one of:
 
-Authentication exists outside agent authority.
+- HANDOFF
+- DIAGNOSTICS ONLY
+- ANALYSIS
+- REVIEW
+- IMPLEMENTATION
+- REVISION
 
---------------------------------------------------
+If task type is ambiguous, stop and report the ambiguity.
+Do not guess.
 
-==================================================
-MANDATORY OUTPUT CONTRACT (NON-NEGOTIABLE)
-==================================================
+Do not blur task modes.
 
-ALL IMPLEMENTATION RESPONSES MUST:
+Examples:
+- diagnostics is not implementation
+- review is not implementation
+- revision is not a new feature task
+- post-merge follow-up work is a new implementation task, not a revision of an old merged patch
 
-1. Produce EXACTLY ONE unified git diff
-2. Contained inside EXACTLY ONE triple-backtick code block
-3. Begin with:
-   diff --git a/
-4. Contain NO prose before or after the block
-5. Contain NO markdown headings
-6. Contain NO explanations
-7. Contain NO secondary code blocks
+---
 
-If these conditions are not satisfied:
+## 2. Target Reality Rule
 
-→ RESPONSE IS INVALID  
-→ DISCARD AND REGENERATE
+Before acting, verify target reality.
 
-Agent MUST internally validate output before responding.
+Target reality means the actual current branch, commit, file, diff, artifact, or environment the task refers to.
 
---------------------------------------------------
+Conversation history is contextual, not authoritative.
+Repository state, inspected files, diffs, and current branch reality are authoritative.
 
-OUTPUT VALIDATION CHECKLIST (SELF-ENFORCED)
+Do not proceed on assumed branch state, assumed file state, or assumed task continuity.
 
-Before returning response verify:
+---
 
-- One and only one code block exists
-- Diff header present
-- Patch applies cleanly
-- No unrelated files modified
-- No formatting-only edits introduced
+## 3. Stale Premise Rule
 
-If validation fails:
-Regenerate silently.
+Abort if the prompt premise is stale.
 
---------------------------------------------------
+A premise is stale if any of the following are true:
 
-==================================================
-GIT PRECHECK (IDEMPOTENT + AUTH SAFE)
-==================================================
+- target files no longer exist
+- referenced code or docs moved
+- repository state contradicts the prompt assumptions
+- the requested fix is already present
+- a prior merge changed the relevant surface
+- the requested review target is no longer the active target reality
+- the task was framed against an older branch reality that has since changed
 
-Before making edits run:
+If stale:
+- stop
+- report that the premise is stale
+- provide concise evidence
 
-if ! git remote | grep -q origin; then
-  git remote add origin https://github.com/pseudonymgit/kalshi-metar-monitor.git
-fi
+Do not continue on stale assumptions.
 
-git remote -v
+---
 
-if ! git ls-remote origin HEAD > /dev/null 2>&1; then
-  echo "ERROR: git authentication failed or origin misconfigured."
-  exit 1
-fi
+## 4. Wrong-Surface Rule
 
-Rules:
+Verify that the requested outcome belongs in the surface being changed.
 
-- origin must exist
-- authentication failure aborts execution
-- credentials MUST NOT be modified
+Examples:
+- docs task must not drift into runtime code
+- test task must not silently redesign application behavior
+- route contract task must not patch unrelated core semantics
+- review task must not mutate code
+- diagnostics task must not smuggle in remediation
 
---------------------------------------------------
+If the requested outcome belongs in a different surface than the one being changed:
+- stop
+- report wrong-surface mismatch
+- do not patch the nearest plausible file
 
-==================================================
-BRANCH BASE SAFETY (MANDATORY)
-==================================================
+---
 
-Before creating branch:
+## 5. No Silent No-Op Rule
 
-git checkout main
-git pull origin main
+A no-op is allowed only when file-level evidence proves the requested change is already present in verified target reality.
 
-One feature → one branch → one merge.
-Never stack branches.
+If returning no-op, provide:
+- file inspected
+- relevant lines, sections, or surfaces examined
+- why the change is unnecessary
 
---------------------------------------------------
+Do not claim “already fixed” without proof.
 
-==================================================
-BRANCH RULES
-==================================================
+---
 
-Never commit directly to main.
+## 6. Scope Ledger Rule
 
-Always create:
+Maintain strict scope discipline.
 
-feature/<short-description>
-fix/<short-description>
-phase2/<short-description>
-test/<short-description>
+For mutation tasks, track:
+- files inspected
+- files modified
+- files intentionally untouched
 
---------------------------------------------------
+Do not modify files outside declared allowed scope unless the task prompt explicitly permits it and the reason is stated.
 
-==================================================
-PHASE 1 PROTECTION (ABSOLUTE LAW)
-==================================================
+Minimal, scoped changes are preferred over broad or “helpful” rewrites.
 
-The following are IMMUTABLE:
+---
 
-- core/metar_monitor.py behavior
-- Alert semantics
-- Integer floor-cross logic
-- Station-local 11:00–19:00 window
-- Station-local reset
-- Scheduler lifecycle
-- Thread idempotency
-- requirements.txt
+## 7. Change Discipline
 
-If modification appears required:
-
-STOP.
-Declare proposed Phase 1.x change.
-Request confirmation.
-
-No implicit mutation allowed.
-
---------------------------------------------------
-
-==================================================
-ARCHITECTURAL SAFETY RULES
-==================================================
-
-Agent MUST NOT:
-
-- introduce probabilistic logic
-- introduce ML behavior
-- change ingestion ordering
-- change transition emission logic
-- alter replay equivalence
-- introduce hidden side effects
-- move execution authority boundaries
-
-Observability MUST remain read-only.
-
---------------------------------------------------
-
-==================================================
-CHANGE DISCIPLINE
-==================================================
-
-Allowed:
+Default allowed:
 - minimal targeted fixes
-- bounded observability additions
+- narrow documentation updates
 - deterministic hardening
+- bounded test additions
+- scoped review-driven revisions
 
-Forbidden:
+Default forbidden unless explicitly requested:
 - refactors
 - stylistic rewrites
+- broad cleanup
 - renames
-- dependency additions
-- boot-flow mutation
+- dependency changes
+- architecture redesign
+- behavior changes outside the scoped task
+- unrelated edits in nearby files
 
-Unless explicitly requested.
+Minimal patch beats clever patch.
 
---------------------------------------------------
+---
 
-==================================================
-KALSHI EXECUTION RULES
-==================================================
+## 8. Output Mode Policy
 
-Public API:
-https://api.elections.kalshi.com/trade-api/v2
+Output mode depends on task type.
 
-RSA MODE (DORMANT):
+### Mutation tasks
+Mutation tasks must return unified diff only.
 
-- No /trade-api/v2 duplication
-- timestamp + METHOD + path + body
-- milliseconds timestamp
-- RSA PKCS1v15 + SHA256
-- Base64 encoded
-- Never expose key material
+Mutation tasks include:
+- IMPLEMENTATION
+- REVISION
+- docs-only patch tasks
+- test-only patch tasks
 
---------------------------------------------------
+### Non-mutation tasks
+Non-mutation tasks follow task-defined output format.
 
-==================================================
-PR CREATION FLOW
-==================================================
+Typical defaults:
+- HANDOFF -> operational status only
+- DIAGNOSTICS ONLY -> findings only
+- ANALYSIS -> explanation allowed
+- REVIEW -> structured review only
 
-After implementation:
+Do not return unified diff for diagnostics or review unless explicitly asked.
 
-git checkout -b <branch>
-git add relevant files
-git commit -m "<clear message>"
-git push -u origin <branch>
-gh pr create --fill
-gh pr view --web
+---
 
-Return ONLY unified diff.
+## 9. Unified Diff Rule for Mutation Tasks
 
---------------------------------------------------
+For mutation tasks:
 
-==================================================
-MERGE AUTHORITY RULE
-==================================================
+- return exactly one unified diff
+- no prose before or after the diff unless the prompt explicitly allows abort output
+- no second diff
+- no extra code blocks
+- no explanations outside the diff
 
-No PR may merge unless reviewer states:
+The patch must be:
+- scoped
+- minimal
+- free of unrelated file changes
+- free of formatting-only drift unless formatting is the task
 
-"Phase 1 semantics preserved."
+If a mutation task cannot be completed cleanly, use the task’s abort format instead of inventing partial prose.
 
---------------------------------------------------
+---
 
-==================================================
-OPERATING MODE
-==================================================
+## 10. Diagnostics Separation Rule
 
-SOLO-DEV CONTROLLED RELEASE
+Diagnostics tasks must not:
+- modify code
+- modify config
+- produce patch text
+- produce pseudo-diff
+- produce refactor plans disguised as findings
+- silently convert into implementation work
 
-Branch → PR → AI Review → Merge
+Diagnostics outputs should identify:
+- the exact question
+- the surfaces examined
+- the seam of disagreement or uncertainty
+- the most likely current explanation
+- the next best task
 
-No direct commits to main.
+---
 
---------------------------------------------------
+## 11. Review Protocol
 
-END OF TEMPLATE
+Review tasks must:
+
+- verify target reality before judging content
+- identify the exact checkout, branch, commit, diff source, and files reviewed
+- stop with ABANDON if target reality is not trustworthy
+- distinguish blockers, minor fixes, and follow-ups
+- remain scoped to the requested task
+- include a narrow revision prompt when verdict is REVISE
+
+Review tasks must not:
+- patch code
+- review the whole repo unless explicitly asked
+- continue on stale branch assumptions
+- judge old branch reality as if it were current
+
+---
+
+## 12. Review Vocabulary
+
+Use these verdicts exactly:
+
+- MERGE
+- MERGE WITH MINOR FIXES
+- REVISE
+- ABANDON
+
+Definitions:
+
+- **MERGE**: target reality verified, scoped task solved, no blockers
+- **MERGE WITH MINOR FIXES**: target reality verified, no blockers; only tiny non-blocking edits remain
+- **REVISE**: target reality verified, but scoped blockers remain and implementation changes are required
+- **ABANDON**: target reality is not trustworthy, premise is stale, scope is wrong, or the review target is invalid
+
+Do not invent substitute verdict labels.
+
+---
+
+## 13. Finding Classification
+
+Use stable finding IDs:
+
+- blockers: `[B1]`, `[B2]`, ...
+- minor fixes: `[M1]`, `[M2]`, ...
+- follow-ups: `[F1]`, `[F2]`, ...
+
+Revisions should chain only from blocker IDs unless explicitly instructed otherwise.
+
+Do not blur blockers with follow-ups.
+
+---
+
+## 14. Revision Discipline
+
+Revision tasks must:
+
+- verify the review receipt being addressed
+- verify blocker IDs still apply
+- fix only specified blocker findings unless explicitly instructed otherwise
+- avoid unrelated cleanup
+- remain minimal and scoped
+
+Revision tasks must not:
+- reopen solved areas
+- re-solve the wrong issue
+- address minor fixes or follow-ups unless explicitly instructed
+- drift into new implementation scope
+
+---
+
+## 15. PR-Only Mutation Policy
+
+All repository mutation must occur via branch -> PR -> merge.
+
+Never commit directly to main.
+Never mutate repository state outside PR workflow.
+
+This applies even to:
+- docs changes
+- test-only changes
+- small fixes
+- operational patches
+
+Emergency work still follows:
+branch -> PR -> merge
+
+---
+
+## 16. Git / GitHub Command Policy
+
+Git operations are allowed only when the task requires repository mutation.
+
+### Non-mutation tasks
+Do not:
+- run git setup
+- create branches
+- push
+- create PRs
+
+### Mutation tasks
+Git and PR operations are allowed when needed to complete the task.
+
+Do not:
+- modify credentials
+- read secrets
+- alter auth configuration
+- change repository remotes unless explicitly required
+
+Do not perform Git operations just because they exist in the workflow. Use them only when task type requires mutation.
+
+---
+
+## 17. Mutation Workflow Policy
+
+When repository mutation is required:
+
+1. verify current repository state
+2. branch from current main or designated base
+3. apply only the scoped change
+4. commit only the scoped files
+5. push the branch
+6. open or update the PR
+7. preserve clear review trace
+
+One task -> one branch -> one PR -> one merge
+
+Do not combine unrelated tasks on one branch.
+
+---
+
+## 18. Branch Naming Policy
+
+Use one of these prefixes:
+
+- `feature/`
+- `fix/`
+- `docs/`
+- `review/`
+- `ops/`
+- `test/`
+- `phase2/`
+
+Use the narrowest truthful prefix.
+
+Examples:
+- `fix/send-test-alert-blocking-diagnostics`
+- `docs/ai-workflow-prompt-system`
+- `test/endpoint-deliver-false-coverage`
+
+---
+
+## 19. Authority Order
+
+When instructions interact, use this precedence:
+
+1. system / platform rules
+2. this master template
+3. task prompt
+4. project-specific context inside the task prompt
+
+Do not treat project-specific context as universal.
+Do not treat task-specific wishes as permission to violate this master template.
+
+---
+
+## 20. Requirement for Real Prompts
+
+Every real prompt must still define:
+
+- Task Type
+- Target Reality
+- Scope
+- Success Criteria
+- Output Contract
+
+If any of those are missing, the prompt is under-specified.
+
+Project-specific constraints must be supplied in the real prompt itself.
+Do not assume repository doctrine from this master template.
+
+---
+
+## 21. Practical Operating Rule
+
+Use this master template for universal workflow rules only.
+
+Put these in the real prompt when relevant:
+- repository name
+- branch / commit
+- project overview
+- roadmap
+- protected files
+- architecture references
+- domain invariants
+- project-specific governance
+- allowed/disallowed files for the task
+- current blockers
+- current objective
+
+This file defines constants.
+The real prompt supplies current conditions.
