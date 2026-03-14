@@ -70,12 +70,15 @@ observation -> transition detection -> transition persistence -> alert payload a
 - `MARKET_SUPPRESSED`: transition evaluated but suppressed by market checks.
 - `HYDRATION_BLOCKED`: market hydration state prevented eligibility evaluation.
 
+> Runtime also emits classification `SIGNAL` for signal-layer alerts via the signal alert emission path.
+> Signal alerts use a different payload structure and are not part of the transition alert schema contract.
+
 ## Suppression categories
 
 - `NO_TRANSITION`: no ladder transition qualified for market alert.
 - `NO_ELIGIBLE_MARKET`: hydration/evaluation found no eligible ladder market.
 - `SETTLEMENT_MISMATCH`: transition suppressed due to terminal or settlement mismatch state.
-- `EXPIRED_MARKET`: only expired/inactive markets were available.
+- `EXPIRED_MARKET`: documented as a suppression category but is not currently emitted as `suppression.reason_category` by runtime logic. Expired markets are instead tracked in `eligibility_evaluation.rejection_breakdown.expired_market`.
 - `HYDRATION_BLOCK`: hydration prerequisites blocked market evaluation.
 
 ## Replay delivery clarification
