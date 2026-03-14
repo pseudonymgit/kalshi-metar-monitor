@@ -1,233 +1,586 @@
 # AI Workflow Prompt System
 
 ## Purpose
-This system governs handoff -> implementation -> review -> revision -> merge.
 
-Optimization goals:
-- small surgical diffs
-- deterministic scope control
-- fewer revise/review loops
-- branch/checkout awareness
-- stale-premise detection
-- no-op revision prevention
-- trustworthy merge decisions
-- operational debugging clarity
+This system governs a delivery loop:
+
+`handoff -> implementation -> review -> revision -> merge`
+
+It is optimized for:
+
+* small surgical diffs
+* deterministic scope control
+* fewer review / revise loops
+* branch / checkout awareness
+* stale-premise detection
+* no-op revision prevention
+* trustworthy merge decisions
+* operational debugging clarity
+
+This system assumes a universal master workflow doc exists at:
+
+`/docs/CODEX_MASTER_TEMPLATE.md`
+
+Every real prompt should begin with:
+
+```text
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+```
+
+The master template holds common rules that apply across all prompts.
+
+This document defines the actual prompt system and task templates that the orchestrator or operator uses.
+
+---
 
 ## Merge Vocabulary
-- **MERGE**: target reality verified, scoped task solved, no blockers.
-- **MERGE WITH MINOR FIXES**: target reality verified, no blockers; only tiny non-blocking edits remain.
-- **REVISE**: target reality verified, but scoped blockers remain and implementation changes are required.
-- **ABANDON**: target reality is not trustworthy, premise is stale, scope is wrong, or the review target is invalid.
+
+Use these verdicts exactly:
+
+* **MERGE**: target reality verified, scoped task solved, no blockers
+* **MERGE WITH MINOR FIXES**: target reality verified, no blockers; only tiny non-blocking edits remain
+* **REVISE**: target reality verified, but scoped blockers remain and implementation changes are required
+* **ABANDON**: target reality is not trustworthy, premise is stale, scope is wrong, or the review target is invalid
+
+Do not invent substitute verdict labels.
+
+---
 
 ## Core Workflow Diagnosis
-- Prompts fail when they do not force reality checks at key seams.
-- Every prompt type starts with a preflight gate.
-- Every prompt type ends with a constrained output contract.
-- Diagnosis and implementation are separate tasks.
-- Review verifies target reality before judging content.
+
+Failures usually happen when prompts do not force reality checks at the right seams.
+
+The most common causes are:
+
+* task premise is stale, but nobody stops
+* the agent works in the wrong surface
+* review judges the wrong checkout or stale branch
+* revision drifts beyond blocker findings
+* diagnostics quietly mutate into implementation
+* unrelated work contaminates a mutation branch
+* branch reality and conversation reality diverge
+
+To prevent that:
+
+* every prompt must define task type explicitly
+* every prompt must define target reality explicitly
+* every prompt must define scope explicitly
+* every prompt must define success criteria explicitly
+* every prompt must define output contract explicitly
+
+If one of those is missing, the prompt is under-specified.
+
+---
 
 ## Failure Modes to Prevent
-- wrong-scope work
-- wrong checkout / stale review
-- fake no-op revision
-- large diffs for tiny fixes
-- technically detailed but operationally useless reviews
-- preview-only vs delivery-capable confusion
-- persisted vs live state confusion
-- queue vs cache confusion
-- requested vs attempted vs succeeded confusion
 
-## Guardrails
-- **Premise Staleness Rule**: re-validate branch, files, and assumptions before action.
-- **Scope Ledger**: explicitly list allowed/disallowed files and honor it.
-- **Review Finding Classification**: stable IDs by severity: **[B#]** blocker, **[M#]** minor, **[F#]** follow-up.
-- **No Silent No-Op**: a no-op is allowed only when file-level evidence proves the requested fix is already present in verified target reality.
-- **Wrong-Surface Suspicion Rule**: abort when requested outcome and touched surfaces do not align.
-- **Route Capability Labeling for Ops/Debug**: label endpoints/actions as preview-only vs delivery-capable.
-- **Review Target Receipt**: reviewer must echo exact commit/branch/files reviewed.
+This system is designed to reduce:
+
+* wrong-scope work
+* wrong checkout / stale review
+* fake no-op revision
+* large diffs for tiny fixes
+* technically detailed but operationally useless reviews
+* preview-only vs delivery-capable confusion
+* persisted vs live state confusion
+* queue vs cache confusion
+* requested vs attempted vs succeeded confusion
+* mixed-purpose branches
+* review of the wrong target reality
+* post-merge work incorrectly treated as revision of an old task
+
+---
+
+## Global Rules Assumed from the Master Template
+
+The master template is assumed to enforce the following across all tasks:
+
+* task type discipline
+* target-reality verification
+* stale-premise abort rule
+* wrong-surface detection
+* no silent no-op
+* scope-ledger discipline
+* review vocabulary
+* blocker / minor / follow-up IDs
+* mutation tasks return unified diff only
+* diagnostics remain diagnostics-only
+* review remains review-only
+* PR-only mutation workflow
+* Git operations only when mutation is required
+* branch naming policy
+* authority order
+
+Because those live in the master template, the prompt templates below do not need to restate them in full.
+
+---
 
 ## Five-Slot Prompt Framework
+
 Every serious prompt must define:
-1. Task Type
-2. Target Reality
-3. Scope
-4. Success Criteria
-5. Output Contract
+
+1. **Task Type**
+2. **Target Reality**
+3. **Scope**
+4. **Success Criteria**
+5. **Output Contract**
 
 If any slot is missing, the prompt is under-specified.
 
+Project-specific rules do **not** belong in the master template.
+They belong in the real prompt under a section like:
+
+* `PROJECT-SPECIFIC CONTEXT`
+* `PROJECT GOVERNANCE / CONSTRAINTS`
+
+That keeps the master universal and the task prompt grounded.
+
+---
+
 ## Reusable Prompt Templates
 
-### Handoff Template
-```md
+## 1. Handoff Prompt
+
+Use this when handing work to a new chat and you want continuity without replaying the entire project history.
+
+```text
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+
 TASK TYPE: HANDOFF
 OUTPUT MODE: OPERATIONAL STATUS ONLY
 
 TARGET REALITY
-- Branch, commit, and active objective.
+- Branch: <branch>
+- Commit: <commit>
+- Status validated at: <timestamp/reference>
+- Active objective: <single current objective>
+
+PROJECT-SPECIFIC CONTEXT
+- Repository: <repo name>
+- Relevant governance / architecture references:
+  - <doc/path>
+  - <doc/path>
+- Governing constraints:
+  - <constraint>
+  - <constraint>
+  - <constraint>
 
 CURRENT TRUTH (VALIDATED)
 - Solved:
-  - <validated completed items only>
+  - <validated completed item>
+  - <validated completed item>
 - Open blockers:
-  - <validated unresolved items only>
-
-KNOWN FAILURE PATTERNS
-- <specific pitfalls seen in this workstream>
+  - [B1] <validated unresolved blocker>
+  - [B2] <validated unresolved blocker>
 
 IMMEDIATE NEXT TASK
-- <single next action>
+- <single next action only>
+
+PROJECT OVERVIEW
+- Project: <name>
+- Purpose: <1-2 sentence operational purpose>
+- Success condition:
+  - <what done means at project level>
+
+ROADMAP
+- Current phase: <phase>
+- Priority queue:
+  1. <active item>
+  2. <next item>
+  3. <later item>
+- Rule: work only on item 1 unless explicitly redirected.
+
+KNOWN FAILURE PATTERNS
+- <specific stale-premise risk>
+- <specific wrong-scope risk>
+- <specific checkout/review risk>
+- <specific runtime-vs-persisted truth risk, if relevant>
+
+SCOPE NOTES
+- Allowed files/surfaces for immediate next task: <paths or n/a>
+- Disallowed without explicit justification: <paths or n/a>
+
+STALE-PREMISE WARNINGS
+- <fact that must be rechecked>
+- <fact that must not be assumed>
 
 SUCCESS CRITERIA
-- solved/open lists reflect validated current truth.
-- runtime-sensitive facts are clearly separated from facts that must be rechecked.
-- immediate next task is singular and executable.
+- Solved/open lists reflect validated current truth.
+- Runtime-sensitive facts are clearly separated from facts requiring recheck.
+- Immediate next task is singular and executable.
+- Overview and roadmap guide execution without expanding scope.
 
 OUTPUT CONTRACT
-- Report only operational status for next operator action.
-- Preserve strict solved/open separation.
+- Return only operational status blocks.
 - Do not replay project lore.
 - Do not reopen solved work without new contradictory evidence.
+- Do not broaden scope.
 ```
 
-### Implementation Template
-```md
+---
+
+## 2. Implementation Prompt
+
+Use this for a new scoped change on current reality.
+
+```text
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+
 TASK TYPE: IMPLEMENTATION
 OUTPUT MODE: UNIFIED DIFF ONLY
 
 TARGET REALITY
-- Branch/commit and exact artifact to change.
+- Branch/commit to modify: <branch>@<commit or base>
+- Target artifact/surface: <file(s), endpoint, doc, test, etc.>
+- Task premise: <claim that must be true before patching>
+
+PROJECT-SPECIFIC CONTEXT
+- Repository: <repo name>
+- Relevant governance / architecture references:
+  - <doc/path>
+  - <doc/path>
+- Immutable invariants / protected semantics:
+  - <rule>
+  - <rule>
+- Protected files/surfaces:
+  - <path>
+  - <path>
+
+SCOPE
+- Goal: <exact narrow change>
+- In scope:
+  - <specific behavior / artifact>
+  - <specific behavior / artifact>
+- Out of scope:
+  - <explicitly excluded area>
+  - <explicitly excluded area>
 
 SCOPE LEDGER
 - ALLOWED FILES:
-  - <paths>
+  - <path>
+  - <path>
 - DISALLOWED WITHOUT EXPLICIT JUSTIFICATION:
-  - <paths/surfaces>
-
-PREFLIGHT (MANDATORY)
-1. Confirm premise is still true in target reality.
-2. Confirm issue is not already fixed.
-3. Confirm target files/surfaces are correct and current.
-4. Confirm requested outcome belongs in this surface.
-5. Confirm scope ledger is satisfiable without broadening.
-6. Confirm no runtime/test/config changes are required unless explicitly in scope.
-
-IMPLEMENTATION RULES
-- Make minimal, surgical edits.
-- Preserve determinism and declared invariants.
-- Abort on wrong-surface signals.
+  - <path/surface>
+  - <path/surface>
 
 SUCCESS CRITERIA
-- Required behavior/docs state achieved within allowed scope.
+- <explicit condition>
+- <explicit condition>
+- No unrelated files changed.
+- Patch remains minimal and scoped.
+
+OUTPUT CONTRACT
+- Return unified diff only.
+- No prose unless aborting.
+
+TASK INSTRUCTIONS
+- Make the minimum number of lines change necessary.
+- Preserve deterministic behavior and stated invariants.
+- Do not refactor.
+- Do not perform unrelated cleanup.
+- Do not broaden scope.
+- Prefer a test-only or docs-only patch when sufficient.
 
 ABORT PATH
+If preflight fails, return exactly:
+
 ABORT_REASON:
-- wrong-surface request, or
-- scope ledger violation required, or
-- stale/ambiguous target reality
+- <reason>
+
 EVIDENCE:
-- concise proof
+- <concise proof>
 ```
 
-### Review Template
-```md
+---
+
+## 3. Review Prompt
+
+Use this to judge whether an existing diff or branch is merge-ready.
+
+```text
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+
 TASK TYPE: REVIEW
 OUTPUT MODE: STRUCTURED REVIEW ONLY
 
-TARGET VERIFICATION (MANDATORY BEFORE REVIEW)
-- Verify checkout, branch, commit, diff source, files actually reviewed, scoped task match, and premise stale check.
+TARGET REALITY
+- Review target branch: <branch>
+- Review target commit or diff source: <commit / PR / diff reference>
+- Scoped task under review: <single task description>
 
-STOP CONDITION
-- If target reality is not trustworthy, stop and return ABANDON with evidence.
+PROJECT-SPECIFIC CONTEXT
+- Repository: <repo name>
+- Relevant governance / architecture references:
+  - <doc/path>
+  - <doc/path>
+- Immutable invariants / protected semantics:
+  - <rule>
+  - <rule>
+
+SCOPE
+- Review only:
+  - <file/surface>
+  - <file/surface>
+- Do not review:
+  - <out-of-scope area>
+  - <out-of-scope area>
+
+FILES EXPECTED IN SCOPE
+- <path>
+- <path>
 
 SUCCESS CRITERIA
 - Review is grounded in verified target reality.
-- Findings are actionable, scoped, and classified as [B#], [M#], or [F#].
+- Review covers only the scoped task/files.
+- Findings are actionable and classified as [B#], [M#], or [F#].
 - REVISE includes a narrow revision prompt tied only to blocker IDs.
 
+OUTPUT CONTRACT
+- Return structured review only.
+- Do not patch code.
+- Do not generate unified diff.
+
+REQUIRED REVIEW CHECKS
+1. Verify target reality before judging content.
+2. Confirm scoped files match the requested task.
+3. Check for scope creep.
+4. Check that stated invariants were preserved.
+5. Distinguish blockers from minor fixes and follow-ups.
+6. Stop with ABANDON if target reality is not trustworthy.
+
 REQUIRED OUTPUT
-- REVIEW RECEIPT
-- TARGET_VERIFICATION
-- VERDICT: MERGE | MERGE WITH MINOR FIXES | REVISE | ABANDON
-- SUMMARY
-- BLOCKERS ([B#])
-- MINOR FIXES ([M#])
-- FOLLOW-UPS ([F#])
-- MERGE BASIS
-- REVISION PROMPT
+REVIEW RECEIPT
+- checkout: <...>
+- branch: <...>
+- commit: <...>
+- diff source: <...>
+- files actually reviewed: <...>
+
+TARGET_VERIFICATION
+- target present: yes/no
+- scoped task match: yes/no
+- premise stale: yes/no
+
+VERDICT
+- MERGE
+or
+- MERGE WITH MINOR FIXES
+or
+- REVISE
+or
+- ABANDON
+
+SUMMARY
+- <concise operational summary>
+
+BLOCKERS
+- [B1] <issue>
+- [B2] <issue>
+
+MINOR FIXES
+- [M1] <issue>
+- [M2] <issue>
+
+FOLLOW-UPS
+- [F1] <issue>
+- [F2] <issue>
+
+MERGE BASIS
+- <why this verdict follows>
+
+REVISION PROMPT
+- <required only when VERDICT is REVISE>
 ```
 
-### Revision Template
-```md
+---
+
+## 4. Revision Prompt
+
+Use this when review findings exist and you want only those blockers fixed.
+
+```text
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+
 TASK TYPE: REVISION
 OUTPUT MODE: UNIFIED DIFF ONLY
 
 TARGET REALITY
-- Branch/commit and findings to address.
+- Branch/commit to modify: <branch>@<commit or base>
+- Source review receipt: <review reference>
+- Source blocker IDs to fix: <[B1], [B2], ...>
+
+PROJECT-SPECIFIC CONTEXT
+- Repository: <repo name>
+- Relevant governance / architecture references:
+  - <doc/path>
+  - <doc/path>
+- Immutable invariants / protected semantics:
+  - <rule>
+  - <rule>
+
+SCOPE
+- Fix only these blocker findings:
+  - [B1] <issue>
+  - [B2] <issue>
+- Explicitly out of scope:
+  - <minor fix not requested>
+  - <follow-up not requested>
+  - <unrelated cleanup>
 
 SCOPE LEDGER
 - ALLOWED FILES:
-  - <paths>
+  - <path>
+  - <path>
 - DISALLOWED WITHOUT EXPLICIT JUSTIFICATION:
-  - <paths/surfaces>
+  - <path/surface>
+  - <path/surface>
 
-PREFLIGHT (MANDATORY)
-1. Verify review receipt and finding IDs being addressed.
-2. Verify target branch/commit still matches review basis.
-3. Verify requested fixes fit allowed scope.
+SUCCESS CRITERIA
+- All listed blocker IDs are resolved.
+- No unrelated changes are introduced.
+- No minor fixes or follow-ups are addressed unless explicitly instructed.
+- Patch remains minimal and scoped.
+
+OUTPUT CONTRACT
+- Return unified diff only.
+- No prose unless aborting.
 
 REVISION RULES
 - Resolve only specified blocker findings ([B#]).
-- Do not address minor fixes or follow-ups unless explicitly instructed.
-- Do not introduce unrelated cleanup.
+- Do not reopen solved areas.
 - Do not broaden scope.
-
-SUCCESS CRITERIA
-- Targeted findings resolved; no new scope introduced.
+- Do not introduce unrelated cleanup.
+- Do not address minor fixes or follow-ups unless explicitly instructed.
 
 NO-OP RULE
-- If requested revision produces no material diff, return explicit no-op with reason and evidence.
+- If no patch is needed, prove why with file-level evidence in the abort format.
 
 ABORT PATH
+If preflight fails, return exactly:
+
 ABORT_REASON:
-- stale premise, or
-- wrong surface, or
-- scope expansion required
+- <reason>
+
 EVIDENCE:
-- concise proof
+- <concise proof>
 ```
 
-### Diagnostics-Only Template
-```md
+---
+
+## 5. Diagnostics-Only Prompt
+
+Use this when truth is unclear and you need to understand what is happening before deciding whether code should change.
+
+```text
+You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+
 TASK TYPE: DIAGNOSTICS ONLY
 OUTPUT MODE: FINDINGS ONLY
 
-RULES
-- No code or config changes.
+TARGET REALITY
+- Branch/commit or environment under diagnosis: <target>
+- Observed symptom: <exact symptom/question>
+
+PROJECT-SPECIFIC CONTEXT
+- Repository: <repo name>
+- Relevant governance / architecture references:
+  - <doc/path>
+  - <doc/path>
+- Relevant invariants / operating assumptions:
+  - <rule>
+  - <rule>
+
+SCOPE
+- Diagnose only:
+  - <surface/question>
+  - <surface/question>
+- Do not implement:
+  - code changes
+  - config changes
+  - refactor plans
+
+SUCCESS CRITERIA
+- Identify the actual seam of disagreement or uncertainty.
+- Surfaces examined are explicit.
+- Conclusion distinguishes confirmed cause from remaining uncertainty.
+- Output remains diagnostic-only.
+- Next best task is singular and actionable.
+
+OUTPUT CONTRACT
+- Return findings only.
+- No code changes.
+- No patch text.
+- No pseudo-diff.
 - No remediation disguised as diagnostics.
-- No patch text, pseudo-diff, or refactor plan.
-- Use NEXT BEST TASK for follow-up only.
 
 QUESTION
 - <exact operational question>
 
-TARGET REALITY
-- Environment, branch/commit, and observed symptoms.
-
 REQUIRED ANALYSIS
-- Requested vs attempted vs succeeded.
-- Persisted vs live state seams.
-- Queue vs cache seams.
-- Preview-only vs delivery-capable route/path labeling.
-
-SUCCESS CRITERIA
-- Produces operationally usable diagnosis and next action.
+- requested vs attempted vs succeeded, if relevant
+- persisted vs live state, if relevant
+- queue vs cache seam, if relevant
+- preview-only vs delivery-capable route/path labeling, if relevant
+- exact surfaces/functions/files involved
 
 REQUIRED OUTPUT
-- QUESTION
-- FINDINGS
-- SURFACES EXAMINED
-- STATE-SEAM ANALYSIS
-- CONCLUSION
-- NEXT BEST TASK
+QUESTION
+- <restated question>
+
+SURFACES EXAMINED
+- <file/function/route>
+- <file/function/route>
+
+FINDINGS
+- [F1] <finding>
+- [F2] <finding>
+- [F3] <finding>
+
+STATE-SEAM ANALYSIS
+- <where truth diverges or becomes unclear>
+
+CONCLUSION
+- <most likely current explanation>
+
+NEXT BEST TASK
+- <single next action>
 ```
+
+---
+
+## Prompt Selection Rules
+
+Use:
+
+* **Handoff** for moving work to a new chat
+* **Implementation** for a new scoped change on current reality
+* **Review** for judging an existing diff / branch / PR
+* **Revision** for fixing only review blockers
+* **Diagnostics-only** for determining current truth before deciding whether change is needed
+
+Important distinctions:
+
+* post-merge follow-up work is a **new implementation**, not a revision
+* diagnostics is not implementation
+* review is not implementation
+* revision is not a new feature task
+* mixed-purpose branches should be repaired before serious review
+
+---
+
+## Practical Operating Rule
+
+Each real prompt should stay lean because `/docs/CODEX_MASTER_TEMPLATE.md` already carries the universal rules.
+
+So the real prompt should focus on:
+
+* current task type
+* current target reality
+* project-specific context
+* actual scope
+* success criteria
+* output contract
+
+That is the working system.
+
+If you want, I can also give you a **shorter, more token-efficient version** of this same AI Workflow Prompt System that is easier to store as a repo doc.
