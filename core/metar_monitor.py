@@ -2208,7 +2208,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 result["delivery_blocking_stage"] = "rate_limit_gate"
                 result["delivery_blocking_reason"] = "KALSHI_CALL_THROTTLE"
                 return result
-            _KALSHI_LAST_CALL_TS[station] = now_ts
 
         try:
             from core.kalshi_monitor import (
@@ -2374,36 +2373,48 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                             if explanation:
                                 content += f" explanation={explanation}"
 
-                            response = requests.post(
-                                webhook,
-                                json={"content": content},
-                                timeout=10,
-                            )
+                            webhook_status_code = None
+                            webhook_exception = None
+                            webhook_response_text = None
+                            try:
+                                response = requests.post(
+                                    webhook,
+                                    json={"content": content},
+                                    timeout=10,
+                                )
+                                webhook_status_code = int(response.status_code)
+                                webhook_response_text = str(getattr(response, "text", "") or "")[:200] or None
+                            except Exception as exc:
+                                webhook_exception = str(exc)
+
                             result = {
                                 "delivery_attempted": True,
-                                "delivery_succeeded": 200 <= int(response.status_code) < 300,
-                                "webhook_status_code": int(response.status_code),
-                                "webhook_exception": None,
-                                "webhook_response_text": str(getattr(response, "text", "") or "")[:200] or None,
+                                "delivery_succeeded": bool(
+                                    webhook_status_code is not None and 200 <= webhook_status_code < 300
+                                ),
+                                "webhook_status_code": webhook_status_code,
+                                "webhook_exception": webhook_exception,
+                                "webhook_response_text": webhook_response_text,
                             }
-                            if 200 <= response.status_code < 300:
+                            _audit_alert(
+                                station=station,
+                                market_type=market_type_token,
+                                event_ticker="",
+                                alert_type=missing_alert_type,
+                                direction=None,
+                                temp_f=float(tf),
+                                bucket_index=None,
+                                metadata={
+                                    "status_code": webhook_status_code,
+                                    "webhook_exception": webhook_exception,
+                                    "empty_reason": empty_reason or None,
+                                    "cause": cause,
+                                    "explanation": explanation,
+                                },
+                            )
+                            if webhook_status_code is not None and 200 <= webhook_status_code < 300:
                                 with _MISSING_LADDER_LOCK:
                                     _MISSING_LADDER_DEDUPE[dedupe_key] = True
-                                _audit_alert(
-                                    station=station,
-                                    market_type=market_type_token,
-                                    event_ticker="",
-                                    alert_type=missing_alert_type,
-                                    direction=None,
-                                    temp_f=float(tf),
-                                    bucket_index=None,
-                                    metadata={
-                                        "status_code": response.status_code,
-                                        "empty_reason": empty_reason or None,
-                                        "cause": cause,
-                                        "explanation": explanation,
-                                    },
-                                )
                         continue
 
                     transition = process_ladder_transition(
@@ -2615,6 +2626,9 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 payload["eligibility_evaluation"] = eligibility_evaluation
                 payload["suppression"] = suppression
                 payload["execution_context"] = execution_context
+
+            with _KALSHI_RATE_LIMIT_LOCK:
+                _KALSHI_LAST_CALL_TS[station] = now_ts
         except Exception as e:
             result = {
                 "delivery_succeeded": False,
@@ -2954,6 +2968,7 @@ def _poll_once(logger=None):
         from core.kalshi_monitor import (
             enqueue_station_hydration,
             ensure_ladder_hydration_prerequisite,
+            _parse_target_market_types,
             process_hydration_queue_worker,
         )
 
@@ -2980,7 +2995,12 @@ def _poll_once(logger=None):
                 )
 
         try:
-            process_hydration_queue_worker(market_types={"HIGH"})
+            hydration_market_types = _parse_target_market_types(
+                os.getenv("KALSHI_TARGET_MARKET_TYPE")
+            )
+            if not hydration_market_types:
+                hydration_market_types = {"HIGH"}
+            process_hydration_queue_worker(market_types=hydration_market_types)
         except Exception as e:
             if logger:
                 logger.warning(f"poll_hydration_worker_failed: {e}")

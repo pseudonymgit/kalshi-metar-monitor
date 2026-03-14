@@ -1533,6 +1533,9 @@ else:
         global _autostart_fallback_done
         if _autostart_fallback_done:
             return None
+        path = str(request.path or "").lower()
+        if path.startswith("/observability/"):
+            return None
         _autostart_fallback_done = True
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
@@ -3060,7 +3063,7 @@ def observability_runtime_authority_snapshot():
     hydration_execution = get_last_hydration_execution_snapshot()
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
-    audit = {"stations": []}
+    fire_audit = _build_alert_fire_audit_rows()
     alerts_sent_today = 0
     for row in (fire_audit.get("stations") or []):
         row_station = (row.get("station") or "").strip().upper()
@@ -3127,9 +3130,9 @@ def integrity_alert_pipeline():
 
     hydration_queue = hydration_queue_snapshot()
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
-    audit = {"stations": []}
+    fire_audit = _build_alert_fire_audit_rows()
     alerts_sent_today = next(
-    (s["alerts_sent_today"] for s in audit["stations"] if s["station"] == station),
+    (s["alerts_sent_today"] for s in fire_audit.get("stations", []) if s["station"] == station),
     0
     )
     for row in (fire_audit.get("stations") or []):
