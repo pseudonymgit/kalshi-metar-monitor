@@ -279,6 +279,17 @@ class StructuralHardeningTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 kalshi_monitor._kalshi_public_get("/markets?limit=1")
 
+    def test_observability_domain_block_logs_guardrail_context(self):
+        with self.assertLogs("core.kalshi_monitor", level="WARNING") as captured:
+            with kalshi_monitor.kalshi_execution_domain("observability"):
+                with self.assertRaises(RuntimeError):
+                    kalshi_monitor._kalshi_public_get("/markets?limit=1")
+
+        rendered = "\n".join(captured.output)
+        self.assertIn("kalshi_public_get_blocked", rendered)
+        self.assertIn("domain=observability", rendered)
+        self.assertIn("path=/markets?limit=1", rendered)
+
     @patch("core.kalshi_monitor.build_structured_snapshot", return_value={"markets": []})
     @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": "KXHIGHDEN"})
     @patch("core.kalshi_monitor.get_cached_series_markets", return_value={"markets": [], "hydrated_at_utc": "2025-01-01T00:00:00+00:00", "station_local_day": "2025-01-01"})

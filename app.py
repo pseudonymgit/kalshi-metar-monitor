@@ -21,6 +21,7 @@ import sys
 import logging
 import sqlite3
 from datetime import datetime, timezone
+from time import monotonic
 from flask import Flask, request, jsonify, g
 from werkzeug.exceptions import HTTPException
 from core.station_time import station_local_day_key, to_station_local, parse_iso_utc
@@ -62,6 +63,7 @@ from core.kalshi_monitor import (
     enqueue_station_hydration,
     ensure_series_discovery_loaded,
     get_cached_series_markets,
+    get_series_discovery_cache_snapshot,
     get_station_hydration_cache_probe,
     get_kalshi_connectivity_snapshot,
     get_hydration_prerequisite_state_snapshot,
@@ -87,6 +89,9 @@ log = app.logger
 log.setLevel(logging.INFO)
 
 _autostart_fallback_done = False
+
+_MARKET_COVERAGE_OBSERVABILITY_MEMO = {}
+_MARKET_COVERAGE_OBSERVABILITY_MEMO_TTL_SECONDS = 3.0
 
 
 def _merge_discovered_stations_into_watchlist():
@@ -408,6 +413,12 @@ def _build_market_coverage_rows(station_filter=None):
         _station_local_kalshi_date_token,
     )
 
+    memo_key = station_filter or "__all__"
+    now_mono = monotonic()
+    memo_entry = _MARKET_COVERAGE_OBSERVABILITY_MEMO.get(memo_key)
+    if memo_entry and (now_mono - memo_entry["created_mono"]) <= _MARKET_COVERAGE_OBSERVABILITY_MEMO_TTL_SECONDS:
+        return memo_entry["payload"]
+
     station_universe = _canonical_live_station_universe(station_filter=station_filter)
     stations = station_universe.get("stations") or []
     configured_stations = station_universe.get("configured_stations") or set()
@@ -418,9 +429,21 @@ def _build_market_coverage_rows(station_filter=None):
         enabled_market_types = {"HIGH"}
 
     webhook_configured = bool((os.getenv("ALERT_WEBHOOK_URL") or "").strip())
+    series_discovery_source = "cache_only"
+    series_discovery_error = None
     with kalshi_execution_domain("observability"):
-        series_by_station = ensure_series_discovery_loaded()
+        try:
+            series_by_station = get_series_discovery_cache_snapshot()
+            if not series_by_station:
+                series_discovery_source = "cache_only_fallback"
+        except Exception as exc:
+            series_by_station = {}
+            series_discovery_source = "cache_only_fallback"
+            series_discovery_error = str(exc)
     live_ingestion_stations = set(stations)
+
+    now_utc = datetime.now(timezone.utc)
+    expected_day = now_utc.date().isoformat()
 
     rows = []
     for station in stations:
@@ -440,7 +463,6 @@ def _build_market_coverage_rows(station_filter=None):
                     "hydrated_at_utc": cached_data.get("hydrated_at_utc"),
                     "station_local_day": cached_data.get("station_local_day"),
                 }
-                expected_day = station_local_day_key(station, datetime.utcnow().replace(tzinfo=timezone.utc).isoformat())
                 cached_day = cached_data.get("station_local_day")
                 cache_status = "cache_valid" if (cached_day is None or cached_day == expected_day) else "cache_stale"
 
@@ -553,11 +575,20 @@ def _build_market_coverage_rows(station_filter=None):
                 }
             )
 
-    return {
+    payload = {
         "station": station_filter,
         "stations_evaluated": stations,
         "rows": rows,
+        "series_discovery_source": series_discovery_source,
     }
+    if series_discovery_error:
+        payload["series_discovery_error"] = series_discovery_error
+
+    _MARKET_COVERAGE_OBSERVABILITY_MEMO[memo_key] = {
+        "created_mono": now_mono,
+        "payload": payload,
+    }
+    return payload
 
 
 def _station_universe(station_filter=None):
