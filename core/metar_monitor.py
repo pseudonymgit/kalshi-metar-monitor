@@ -2173,6 +2173,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
         settlement_bucket_changed = bool(legacy.get("settlement_bucket_changed"))
         reference_timestamp_utc = legacy.get("obs_time") or payload.get("timestamp_utc")
+        transition_correlation = payload.get("legacy", {}).get("transition_correlation")
         recent_transition_active = _is_recent_transition_active(
             reference_timestamp_utc=reference_timestamp_utc,
             transition_correlation=transition_correlation if isinstance(transition_correlation, dict) else None,
@@ -2183,6 +2184,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             not instant_bucket_changed
             and not settlement_bucket_changed
             and not recent_transition_active
+            and not transition_correlation
         ):
             _annotate_transition_history_market_eval(
                 station=station,
