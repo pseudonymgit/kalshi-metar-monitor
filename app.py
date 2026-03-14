@@ -2019,6 +2019,58 @@ def debug_simulate_temperature():
     return jsonify(result)
 
 
+@app.route("/debug/simulate-directional-collapse", methods=["GET"])
+def debug_simulate_directional_collapse():
+    """DEBUG / SIMULATION ONLY: force directional ladder collapse alert path."""
+    if (os.getenv("ALLOW_DEBUG_SIMULATION", "").strip().lower() != "true"):
+        return jsonify(
+            {
+                "error": "debug simulation disabled",
+                "hint": "set ALLOW_DEBUG_SIMULATION=true to enable",
+            }
+        ), 403
+
+    station = "KDEN"
+    now_utc = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+    payload = {
+        "station": station,
+        "summary": {"temp_f": 72.0},
+        "legacy": {
+            "temp_f": 72.0,
+            "prev_temp_f": 71.9,
+            "delta_f": 0.1,
+            "obs_time": now_utc,
+            "instant_bucket_changed": True,
+            "settlement_bucket_changed": False,
+        },
+        "debug_force_missing_ladder_alert": True,
+        "debug_target_market_types": ["HIGH"],
+        "debug_market_snapshot_override": {
+            "markets": [],
+            "raw_market_count": 6,
+            "filtered_market_count": 6,
+            "pre_directional_market_count": 6,
+            "post_directional_market_count": 0,
+            "empty_reason": "no_directional_ladder_match",
+            "rejection_counts": {},
+        },
+    }
+
+    result = _send_alert(os.getenv("ALERT_WEBHOOK_URL", ""), payload)
+
+    return jsonify(
+        {
+            "alert_type": result.get("alert_type"),
+            "empty_reason": result.get("empty_reason"),
+            "delivery_attempted": bool(result.get("delivery_attempted") or result.get("webhook_status_code") is not None),
+            "delivery_succeeded": bool(result.get("delivery_succeeded", False)),
+            "webhook_status_code": result.get("webhook_status_code"),
+            "alert_id": result.get("alert_id"),
+        }
+    ), 200
+
+
 @app.route("/debug/send-test-alert", methods=["GET"])
 def debug_send_test_alert():
     station = (request.args.get("station") or "KDEN").strip().upper() or "KDEN"

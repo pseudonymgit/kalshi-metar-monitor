@@ -2204,11 +2204,22 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             active = _get_active_stations()
             station_is_active = active is None or station in active
             should_alert_on_missing = os.getenv("ALERT_ON_MISSING_LADDER", "false").lower() in ("1", "true", "yes", "y")
+            if bool(payload.get("debug_force_missing_ladder_alert")):
+                should_alert_on_missing = True
             target_market_types = _parse_target_market_types(
                 os.getenv("KALSHI_TARGET_MARKET_TYPE")
             )
             if not target_market_types:
                 target_market_types = {"HIGH"}
+            debug_target_market_types = payload.get("debug_target_market_types")
+            if isinstance(debug_target_market_types, (list, tuple, set)):
+                forced_market_types = {
+                    str(market_type).strip().upper()
+                    for market_type in debug_target_market_types
+                    if str(market_type).strip()
+                }
+                if forced_market_types:
+                    target_market_types = forced_market_types
 
             evaluated_market_attempts = 0
             no_eligible_market_count = 0
@@ -2233,6 +2244,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 for market_type_token in sorted(target_market_types):
                     evaluated_market_attempts += 1
                     snapshot = build_structured_snapshot_from_cache(station, {market_type_token})
+                    debug_snapshot_override = payload.get("debug_market_snapshot_override")
+                    if isinstance(debug_snapshot_override, dict):
+                        snapshot = {
+                            **snapshot,
+                            **debug_snapshot_override,
+                        }
+                        snapshot["markets"] = list(debug_snapshot_override.get("markets") or [])
                     markets = snapshot.get("markets") or []
                     hydration_usable = bool(hydration_state.get("cache_valid"))
                     hydrated_any = hydrated_any or hydration_usable or bool(snapshot.get("cache_written"))
