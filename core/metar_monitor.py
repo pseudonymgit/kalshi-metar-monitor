@@ -2559,7 +2559,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 elif no_eligible_market_count == evaluated_market_attempts:
                     evaluation_outcome = "NO_ELIGIBLE_MARKET"
                 else:
-                    reason_token = suppression_reason or "NO_TRANSITION"
+                    reason_token = suppression_reason or "MARKET_RULE"
                     evaluation_outcome = f"SUPPRESSED_{reason_token}"
 
                 _annotate_transition_history_market_eval(
