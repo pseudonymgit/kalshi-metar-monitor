@@ -10,14 +10,14 @@ CHANGE POLICY
 
 - No direct commits to main.
 - All changes must go through Pull Request.
-- All PRs must pass PR_REVIEW_CHECKLIST.md.
+- All PRs must pass docs/PR_REVIEW_CHECKLIST.md.
 - No PR may be merged unless ChatGPT explicitly states:
 
   "Phase 1 semantics preserved."
 
 If Phase 1 behavior is intentionally modified:
 
-- PHASE1.md version must be incremented.
+- docs/phase_current.md version must be incremented.
 - Semantic change must be documented.
 - ChatGPT must explicitly approve the new version.
 
