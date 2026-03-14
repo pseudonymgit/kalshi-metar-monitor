@@ -275,5 +275,63 @@ class DebugSendTestAlertEndpointTests(unittest.TestCase):
         mock_run.assert_called_once_with(icao="KDEN", temp_f=49.2, deliver=True)
 
 
+
+class DebugSimulateDirectionalCollapseEndpointTests(unittest.TestCase):
+    def setUp(self):
+        app_module._autostart_fallback_done = True
+        self.client = app.test_client()
+
+    def test_simulate_directional_collapse_requires_explicit_env_guard(self):
+        with patch.dict("os.environ", {}, clear=False):
+            response = self.client.get("/debug/simulate-directional-collapse")
+
+        self.assertEqual(response.status_code, 403)
+        payload = response.get_json()
+        self.assertEqual(payload["error"], "debug simulation disabled")
+        self.assertEqual(payload["hint"], "set ALLOW_DEBUG_SIMULATION=true to enable")
+
+    @patch("app._send_alert")
+    def test_simulate_directional_collapse_uses_real_alert_result_and_snapshot_override(self, mock_send_alert):
+        mock_send_alert.return_value = {
+            "alert_type": "ladder_selection_empty",
+            "empty_reason": "no_directional_ladder_match",
+            "delivery_attempted": True,
+            "delivery_succeeded": True,
+            "webhook_status_code": 204,
+            "alert_id": 12345,
+        }
+
+        with patch.dict("os.environ", {"ALLOW_DEBUG_SIMULATION": "true"}, clear=False):
+            response = self.client.get("/debug/simulate-directional-collapse")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+
+        self.assertEqual(payload["alert_type"], "ladder_selection_empty")
+        self.assertEqual(payload["empty_reason"], "no_directional_ladder_match")
+        self.assertEqual(payload["delivery_attempted"], True)
+        self.assertEqual(payload["delivery_succeeded"], True)
+        self.assertEqual(payload["webhook_status_code"], 204)
+        self.assertEqual(payload["alert_id"], 12345)
+
+        mock_send_alert.assert_called_once()
+        webhook_arg, alert_payload = mock_send_alert.call_args.args
+        self.assertIsInstance(webhook_arg, str)
+        self.assertEqual(alert_payload["station"], "KDEN")
+        self.assertEqual(alert_payload["summary"]["temp_f"], 72.0)
+        self.assertEqual(alert_payload["legacy"]["temp_f"], 72.0)
+        self.assertEqual(alert_payload["legacy"]["prev_temp_f"], 71.9)
+        self.assertEqual(alert_payload["legacy"]["delta_f"], 0.1)
+        self.assertEqual(alert_payload["legacy"]["instant_bucket_changed"], True)
+        self.assertEqual(alert_payload["legacy"]["settlement_bucket_changed"], False)
+        self.assertEqual(alert_payload["debug_force_missing_ladder_alert"], True)
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["markets"], [])
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["raw_market_count"], 6)
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["filtered_market_count"], 6)
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["pre_directional_market_count"], 6)
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["post_directional_market_count"], 0)
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["empty_reason"], "no_directional_ladder_match")
+        self.assertEqual(alert_payload["debug_market_snapshot_override"]["rejection_counts"], {})
+
 if __name__ == "__main__":
     unittest.main()
+
