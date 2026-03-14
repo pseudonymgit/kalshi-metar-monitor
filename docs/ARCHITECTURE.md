@@ -23,7 +23,7 @@ Market Availability (Kalshi listings)
 → Observability Domain
 → Scoring Domain
 
-Runtime pipeline order clarification: observation ingest → transition detection / emission → signal evaluation → alert-path hydration → market eligibility evaluation → delivery decision → webhook → audit recording.
+Runtime pipeline order clarification: observation ingest → transition classification / emission → signal evaluation → alert gating → market evaluation (which may enqueue hydration when cache prerequisites are missing) → delivery attempts, with audit writes occurring both before delivery for certain structural transition records and after delivery for successful composed alerts.
 This sequence defines the canonical live execution path used by runtime diagnostics and observability interpretation.
 
 
@@ -153,15 +153,17 @@ DO NOT:
 The deterministic runtime pipeline executes in the following order:
 
 observation ingest  
-→ transition detection / emission  
+→ transition classification / emission  
 → signal evaluation  
-→ alert-path hydration  
-→ market eligibility evaluation  
-→ delivery decision  
-→ webhook  
-→ audit recording
+→ alert gating  
+→ market evaluation (may enqueue hydration when cache prerequisites are missing)  
+→ delivery attempts
 
-This ordering reflects the runtime gating logic implemented in the ingestion and hydration checks.
+Audit writes can occur:
+- before delivery for certain structural transition records
+- after delivery for successful composed alerts
+
+This ordering reflects the runtime gating logic implemented in transition handling, alert gating, and market evaluation checks.
 
 ## Deterministic Signal Layer
 
@@ -172,6 +174,13 @@ The signal layer runs inside `_process_temperature_event()` after transition cla
 - deterministic in-memory runtime state
 
 No wall-clock functions (`time.time()`, `datetime.now()`) are used in signal decision paths.
+
+## Deterministic Alert Origins
+
+Two deterministic alert origins exist:
+
+- Structural alerts originate from authoritative transition emission.
+- Signal alerts originate from deterministic signal-layer evaluation, still require transition gating, and may produce audited alert records independent of transition emission objects.
 
 ### `near_boundary_momentum_up`
 
