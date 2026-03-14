@@ -36,6 +36,20 @@ class KalshiConnectivityRuntimeEndpointTests(unittest.TestCase):
         )
         self.assertTrue(payload["ok"])
 
+    @patch("app._merge_discovered_stations_into_watchlist", side_effect=AssertionError("observability startup must remain read-only"))
+    @patch("app.ensure_series_discovery_loaded", side_effect=AssertionError("observability startup must remain read-only"))
+    @patch("app.ensure_scheduler_started", side_effect=AssertionError("observability startup must remain read-only"))
+    @patch("app._current_kalshi_execution_domain", return_value="observability")
+    @patch("app.is_scheduler_running", return_value=False)
+    @patch("app.get_kalshi_connectivity_snapshot", return_value={})
+    def test_observability_path_bypasses_autostart_hooks(self, *_mocks):
+        app_module._autostart_fallback_done = False
+
+        response = self.client.get("/observability/kalshi-connectivity-runtime")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(app_module._autostart_fallback_done)
+
 
 if __name__ == "__main__":
     unittest.main()
