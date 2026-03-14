@@ -184,6 +184,31 @@ def _alert_integrity_evaluation_window_seconds() -> int:
         return 300
 
 
+def _resolve_missing_ladder_cause(empty_reason: str) -> Tuple[str, str]:
+    reason_key = str(empty_reason or "").strip()
+    cause_map = {
+        "no_directional_ladder_match": (
+            "directional_ladder_mismatch",
+            "markets exist but none match the requested directional ladder",
+        ),
+        "filtered_to_zero": (
+            "market_filters_removed_all_candidates",
+            "markets exist but eligibility filters removed all candidates",
+        ),
+        "cache_missing_or_empty": (
+            "market_cache_empty",
+            "no ladder markets are currently cached for this station",
+        ),
+    }
+    return cause_map.get(
+        reason_key,
+        (
+            "unknown_missing_ladder_cause",
+            "missing ladder condition detected but no human-readable explanation is mapped",
+        ),
+    )
+
+
 def _is_recent_transition_active(
     *,
     reference_timestamp_utc: Optional[str],
@@ -2330,17 +2355,28 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                     continue
                             missing_alert_type = "ladder_selection_empty" if empty_reason == "no_directional_ladder_match" else "ladder_missing"
                             missing_message_label = "Ladder selection empty" if missing_alert_type == "ladder_selection_empty" else "Ladder missing"
+                            cause, explanation = _resolve_missing_ladder_cause(empty_reason)
                             _ALERT_LOGGER.info(
-                                "WARN %s station=%s type=%s market_type=%s reason=%s",
+                                "WARN %s station=%s market_type=%s reason=%s cause=%s",
                                 missing_alert_type,
                                 station,
                                 market_type_token,
-                                market_type_token,
                                 empty_reason or "unknown",
+                                cause,
                             )
+                            content = (
+                                f"⚠️ {missing_message_label} — "
+                                f"station={station} type={market_type_token} temp={tf}°F "
+                                f"reason={empty_reason or 'unknown'} "
+                                f"cause={cause}"
+                            )
+
+                            if explanation:
+                                content += f" explanation={explanation}"
+
                             response = requests.post(
                                 webhook,
-                                json={"content": f"⚠️ {missing_message_label} — station={station} type={market_type_token} temp={tf}°F reason={empty_reason or 'unknown'}"},
+                                json={"content": content},
                                 timeout=10,
                             )
                             result = {
@@ -2361,7 +2397,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                     direction=None,
                                     temp_f=float(tf),
                                     bucket_index=None,
-                                    metadata={"status_code": response.status_code, "empty_reason": empty_reason or None},
+                                    metadata={
+                                        "status_code": response.status_code,
+                                        "empty_reason": empty_reason or None,
+                                        "cause": cause,
+                                        "explanation": explanation,
+                                    },
                                 )
                         continue
 

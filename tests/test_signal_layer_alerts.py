@@ -118,6 +118,12 @@ class SignalLayerAlertTests(unittest.TestCase):
 
         self.assertEqual(first, second)
 
+    def test_unknown_missing_ladder_reason_maps_to_default(self):
+        cause, explanation = metar_monitor._resolve_missing_ladder_cause("unexpected_reason")
+
+        self.assertEqual(cause, "unknown_missing_ladder_cause")
+        self.assertIn("missing ladder condition detected", explanation)
+
     def test_snapshot_restore_preserves_last_settlement_up_timestamp(self):
         metar_monitor._LAST_SETTLEMENT_UP_TS["KDEN"] = "2025-01-01T12:00:00+00:00"
 
@@ -207,7 +213,17 @@ class SignalLayerAlertTests(unittest.TestCase):
 
         mock_post.assert_called_once()
         self.assertIn("Ladder selection empty", mock_post.call_args.kwargs["json"]["content"])
+        self.assertIn("cause=directional_ladder_mismatch", mock_post.call_args.kwargs["json"]["content"])
+        self.assertIn(
+            "explanation=markets exist but none match the requested directional ladder",
+            mock_post.call_args.kwargs["json"]["content"],
+        )
         self.assertEqual(mock_audit.call_args.kwargs["alert_type"], "ladder_selection_empty")
+        self.assertEqual(mock_audit.call_args.kwargs["metadata"]["cause"], "directional_ladder_mismatch")
+        self.assertEqual(
+            mock_audit.call_args.kwargs["metadata"]["explanation"],
+            "markets exist but none match the requested directional ladder",
+        )
 
     @patch.dict("os.environ", {"ALERT_ON_MISSING_LADDER": "true", "KALSHI_TARGET_MARKET_TYPE": "HIGH"}, clear=False)
     @patch("core.metar_monitor.requests.post", return_value=SimpleNamespace(status_code=200))
@@ -239,7 +255,17 @@ class SignalLayerAlertTests(unittest.TestCase):
 
         mock_post.assert_called_once()
         self.assertIn("Ladder missing", mock_post.call_args.kwargs["json"]["content"])
+        self.assertIn("cause=market_cache_empty", mock_post.call_args.kwargs["json"]["content"])
+        self.assertIn(
+            "explanation=no ladder markets are currently cached for this station",
+            mock_post.call_args.kwargs["json"]["content"],
+        )
         self.assertEqual(mock_audit.call_args.kwargs["alert_type"], "ladder_missing")
+        self.assertEqual(mock_audit.call_args.kwargs["metadata"]["cause"], "market_cache_empty")
+        self.assertEqual(
+            mock_audit.call_args.kwargs["metadata"]["explanation"],
+            "no ladder markets are currently cached for this station",
+        )
     @patch.dict("os.environ", {"ALERT_ON_MISSING_LADDER": "true", "KALSHI_TARGET_MARKET_TYPE": "HIGH", "HYDRATION_MISSING_LADDER_WARMUP_SECONDS": "900"}, clear=False)
     @patch("core.metar_monitor.is_scheduler_running", return_value=True)
     @patch("core.metar_monitor.requests.post", return_value=SimpleNamespace(status_code=200))
