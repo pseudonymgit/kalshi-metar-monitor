@@ -75,6 +75,63 @@ class AlertIntegrityMonitorEndpointTests(unittest.TestCase):
         self.assertTrue(payload["hydration_stall_signal"]["hydration_stall_condition"])
         self.assertEqual(payload["hydration_queue"]["stations_in_backoff"], 1)
 
+
+    @patch("app.hydration_queue_snapshot", return_value={"queue": [], "queue_depth": 0, "queued_stations": [], "backoff_until": {}, "backoff_stations": [], "stations_in_backoff": 0, "next_backoff_expiry": None, "last_hydration_request_ts": 0.0})
+    @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}})
+    @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 0}]})
+    @patch("app._get_transition_runtime_summary", return_value={"transitions_seen_today": 1})
+    @patch("app.get_last_hydration_execution_snapshot", return_value={"KDEN": {"cache_written": True}})
+    @patch("app.get_recent_alerts", return_value=[])
+    @patch("app.get_latest_station_market_evaluation_context")
+    @patch("app.get_transition_history")
+    @patch("app._build_runtime_authority_hydration_snapshot")
+    @patch("app._canonical_live_station_universe")
+    def test_integrity_endpoint_treats_market_rule_suppression_as_reasoned(
+        self,
+        mock_station_universe,
+        mock_hydration,
+        mock_transitions,
+        mock_evals,
+        _mock_alerts,
+        _mock_hydration_execution,
+        _mock_transition_runtime,
+        _mock_fire_audit,
+        _mock_system_health,
+        _mock_hydration_queue,
+    ):
+        mock_station_universe.return_value = {
+            "stations": ["KDEN"],
+            "configured_stations": {"KDEN"},
+            "discovered_stations": {"KDEN"},
+            "watchlist_stations": set(),
+        }
+        mock_transitions.return_value = [{"station": "KDEN", "timestamp": "2030-01-01T00:00:00+00:00"}]
+        mock_evals.return_value = {
+            "KDEN": {
+                "latest_evaluation_timestamp_utc": "2030-01-01T00:00:01+00:00",
+                "latest_evaluation_outcome": "SUPPRESSED_MARKET_RULE",
+                "latest_suppression_reason": "",
+            }
+        }
+        mock_hydration.return_value = {
+            "stations": {
+                "KDEN": {
+                    "cache_present": True,
+                    "hydration_prerequisite": {
+                        "series_discovered": True,
+                        "cache_valid": True,
+                    },
+                }
+            }
+        }
+
+        response = self.client.get("/integrity/alert_pipeline?station=KDEN")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        finding_types = {row["finding_type"] for row in payload["findings"]}
+        self.assertNotIn("SUPPRESSION_WITHOUT_REASON", finding_types)
+
     @patch("app.hydration_queue_snapshot", return_value={"queue": [], "queue_depth": 0, "queued_stations": [], "backoff_until": {}, "backoff_stations": [], "stations_in_backoff": 0, "next_backoff_expiry": None, "last_hydration_request_ts": 0.0})
     @patch("app.compute_system_health_snapshot", return_value={"hydration": {"reason": "hydration_ready"}})
     @patch("app._build_alert_fire_audit_rows", return_value={"stations": [{"station": "KDEN", "alerts_sent_today": 1}]})
