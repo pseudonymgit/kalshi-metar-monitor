@@ -1,5 +1,7 @@
 # HYDRATION VISIBILITY SPEC
 
+> Historical design specification — not canonical runtime documentation.
+
 ## Scope and Authority
 
 This specification addresses **Silent Zone #3 (Hydration causality ambiguity)** identified in `docs/archive/planning/VISIBILITY_SURFACE_MAP.md`.
