@@ -15,6 +15,11 @@ FINDING_MARKET_DISCOVERY_REGRESSION = "MARKET_DISCOVERY_REGRESSION"
 FINDING_STATION_ALERT_SILENCE = "STATION_ALERT_SILENCE"
 FINDING_HYDRATION_STALL_CONDITION = "HYDRATION_STALL_CONDITION"
 
+_ACCEPTED_SUPPRESSION_REASON_TOKENS = {
+    "NO_TRANSITION",
+    "MARKET_RULE",
+}
+
 
 def _parse_iso_utc(raw_value: Optional[str]) -> Optional[datetime]:
     if not raw_value:
@@ -132,7 +137,16 @@ def build_alert_integrity_findings(
 
         suppression_reason = (latest_eval.get("latest_suppression_reason") or "").strip()
         eval_outcome = (latest_eval.get("latest_evaluation_outcome") or "").strip().upper()
-        if "SUPPRESS" in eval_outcome and not suppression_reason:
+        outcome_reason_token = None
+        if eval_outcome.startswith("SUPPRESSED_"):
+            outcome_reason_token = eval_outcome[len("SUPPRESSED_") :]
+
+        has_valid_reason_token = bool(
+            suppression_reason
+            or (outcome_reason_token and outcome_reason_token in _ACCEPTED_SUPPRESSION_REASON_TOKENS)
+        )
+
+        if "SUPPRESS" in eval_outcome and not has_valid_reason_token:
             findings.append(
                 _finding(
                     station=station,
