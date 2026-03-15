@@ -82,16 +82,18 @@ class AlertReviewDiagnosticsBuilderTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["total_transitions"], 3)
         self.assertEqual(payload["summary"]["transitions_with_markets"], 2)
         self.assertEqual(payload["summary"]["transitions_without_markets"], 1)
-        self.assertEqual(payload["summary"]["transitions_suppressed_price_band"], 1)
-        self.assertEqual(payload["summary"]["transitions_suppressed_other_rules"], 1)
-        self.assertEqual(payload["summary"]["transitions_emitted_alert"], 1)
+        self.assertEqual(payload["summary"]["suppressed_price_band"], 1)
+        self.assertEqual(payload["summary"]["suppressed_market_rules"], 1)
+        self.assertEqual(payload["summary"]["alerts_emitted"], 1)
 
         first = payload["transitions"][0]
         self.assertEqual(first["station"], "KDEN")
-        self.assertEqual(first["markets_discovered_count"], 5)
-        self.assertEqual(first["markets_inside_price_band"], 2)
-        self.assertEqual(first["markets_after_settlement_filter"], 1)
-        self.assertEqual(first["markets_after_all_rules"], 0)
+        self.assertEqual(first["markets_considered_count"], 5)
+        self.assertEqual(first["rejected_markets_count"], 5)
+        self.assertEqual(first["market_evaluation_context"]["eligible_markets_count"], 0)
+        self.assertEqual(first["rejection_breakdown"]["outside_price_band"], 3)
+        self.assertEqual(first["decision_outcome"]["runtime_suppression_reason"], "LADDER_HYDRATION_WARMUP")
+        self.assertEqual(first["diagnostic_suppression_reason"], "LADDER_HYDRATION_WARMUP")
 
     @patch("core.metar_monitor.get_transition_history", return_value=[])
     def test_alert_review_diagnostics_empty(self, _mock_history):
@@ -109,14 +111,33 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
         self.client = app_module.app.test_client()
 
     @patch("app.get_alert_review_diagnostics")
-    def test_alert_review_endpoint_returns_collector_payload(self, mock_collector):
+    @patch("app.get_recent_alerts", return_value=[])
+    @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {}})
+    @patch("app.get_latest_station_market_evaluation_context", return_value={})
+    @patch("app.get_transition_history", return_value=[])
+    @patch("app._canonical_live_station_universe", return_value={"stations": []})
+    def test_alert_review_endpoint_returns_collector_payload(
+        self,
+        _mock_universe,
+        _mock_transitions,
+        _mock_evals,
+        _mock_hydration,
+        _mock_alerts,
+        mock_collector,
+    ):
         mock_collector.return_value = {"ok": True, "summary": {}, "transitions": []}
 
         response = self.client.get("/diagnostics/alert_review?limit=20")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["ok"], True)
-        mock_collector.assert_called_once_with(limit=20)
+        mock_collector.assert_called_once_with(
+            limit=20,
+            transitions=[],
+            latest_evaluations={},
+            hydration_snapshot={"stations": {}},
+            recent_alerts=[],
+        )
 
 
 if __name__ == "__main__":

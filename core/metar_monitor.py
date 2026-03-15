@@ -1724,21 +1724,47 @@ def get_transition_history(station=None, day: Optional[str] = None, limit=50):
     return history[:bounded_limit]
 
 
-def get_alert_review_diagnostics(limit: int = 50) -> Dict[str, Any]:
+def get_alert_review_diagnostics(
+    limit: int = 50,
+    transitions: Optional[List[Dict[str, Any]]] = None,
+    latest_evaluations: Optional[Dict[str, Dict[str, Any]]] = None,
+    hydration_snapshot: Optional[Dict[str, Any]] = None,
+    recent_alerts: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
     try:
         bounded_limit = max(1, min(int(limit), 200))
     except Exception:
         bounded_limit = 50
 
-    transitions = get_transition_history(limit=bounded_limit)
+    transitions = list(transitions) if isinstance(transitions, list) else get_transition_history(limit=bounded_limit)
+    latest_evaluations = latest_evaluations if isinstance(latest_evaluations, dict) else {}
+    hydration_stations = (
+        hydration_snapshot.get("stations")
+        if isinstance(hydration_snapshot, dict) and isinstance(hydration_snapshot.get("stations"), dict)
+        else {}
+    )
+    recent_alerts = recent_alerts if isinstance(recent_alerts, list) else []
+    alert_counts_by_transition_key: Dict[Tuple[str, str, str], int] = {}
+    for alert in recent_alerts:
+        if not isinstance(alert, dict):
+            continue
+        key = (
+            (alert.get("station") or "").strip().upper(),
+            str(alert.get("timestamp_utc") or ""),
+            str(alert.get("transition_type") or "").strip(),
+        )
+        if not key[0]:
+            continue
+        alert_counts_by_transition_key[key] = alert_counts_by_transition_key.get(key, 0) + 1
+
     rows: List[Dict[str, Any]] = []
     summary = {
         "total_transitions": 0,
         "transitions_with_markets": 0,
         "transitions_without_markets": 0,
-        "transitions_suppressed_price_band": 0,
-        "transitions_suppressed_other_rules": 0,
-        "transitions_emitted_alert": 0,
+        "suppressed_price_band": 0,
+        "suppressed_market_rules": 0,
+        "alerts_emitted": 0,
     }
 
     for row in transitions:
@@ -1750,6 +1776,16 @@ def get_alert_review_diagnostics(limit: int = 50) -> Dict[str, Any]:
             if isinstance(metadata.get("market_eligibility_runtime"), dict)
             else {}
         )
+        station = (row.get("station") or "").strip().upper()
+        latest_eval = latest_evaluations.get(station) if station else {}
+        latest_runtime = (
+            latest_eval.get("market_eligibility_runtime")
+            if isinstance(latest_eval, dict) and isinstance(latest_eval.get("market_eligibility_runtime"), dict)
+            else {}
+        )
+        if not runtime and latest_runtime:
+            runtime = latest_runtime
+
         breakdown = runtime.get("rejection_breakdown") if isinstance(runtime.get("rejection_breakdown"), dict) else {}
 
         markets_considered_count = int(runtime.get("markets_considered_count") or 0)
@@ -1759,39 +1795,72 @@ def get_alert_review_diagnostics(limit: int = 50) -> Dict[str, Any]:
         wrong_series = int(breakdown.get("wrong_series") or 0)
         expired_market = int(breakdown.get("expired_market") or 0)
         unknown_reason = int(breakdown.get("unknown_reason") or 0)
+        rejected_markets_count = max(markets_considered_count - eligible_markets_count, 0)
 
         markets_inside_price_band = max(markets_considered_count - outside_price_band, 0)
         markets_after_settlement_filter = max(markets_inside_price_band - settlement_mismatch, 0)
         markets_after_all_rules = max(eligible_markets_count, 0)
 
         alerts_sent = int(row.get("alerts_sent") or metadata.get("alerts_sent") or 0)
+        alert_history_count = alert_counts_by_transition_key.get(
+            (station, str(row.get("timestamp_utc") or ""), str(row.get("transition_type") or "").strip()),
+            0,
+        )
         evaluation_outcome = (
             str(row.get("evaluation_outcome") or metadata.get("evaluation_outcome") or "").strip().upper() or "UNKNOWN"
         )
-        suppression_reason = str(row.get("suppression_reason") or metadata.get("suppression_reason") or "").strip().upper()
+        runtime_suppression_reason = str(
+            row.get("suppression_reason") or metadata.get("suppression_reason") or ""
+        ).strip().upper()
+
+        if runtime_suppression_reason:
+            diagnostic_suppression_reason = runtime_suppression_reason
+        elif alerts_sent > 0:
+            diagnostic_suppression_reason = ""
+        elif markets_considered_count == 0:
+            diagnostic_suppression_reason = "NO_MARKETS_DISCOVERED"
+        elif outside_price_band > 0 and eligible_markets_count == 0:
+            diagnostic_suppression_reason = "OUTSIDE_PRICE_BAND"
+        elif rejected_markets_count > 0:
+            diagnostic_suppression_reason = "MARKET_RULES"
+        elif isinstance(hydration_stations.get(station), dict) and not hydration_stations.get(station).get("cache_written"):
+            diagnostic_suppression_reason = "HYDRATION_NOT_READY"
+        else:
+            diagnostic_suppression_reason = "UNKNOWN"
+
+        hydration_runtime = hydration_stations.get(station) if station else {}
 
         transition_diag = {
-            "station": (row.get("station") or "").strip().upper(),
+            "station": station,
             "timestamp": row.get("timestamp_utc"),
             "transition_type": row.get("transition_type"),
             "instant_bucket_before": row.get("instant_bucket_before"),
             "instant_bucket_after": row.get("instant_bucket_after"),
             "settlement_bucket": row.get("settlement_bucket"),
             "running_max": row.get("running_max"),
-            "markets_discovered_count": markets_considered_count,
             "markets_considered_count": markets_considered_count,
             "eligible_markets_count": eligible_markets_count,
-            "outside_price_band": outside_price_band,
-            "settlement_mismatch": settlement_mismatch,
-            "wrong_series": wrong_series,
-            "expired_market": expired_market,
-            "unknown_reason": unknown_reason,
-            "alerts_sent": alerts_sent,
-            "evaluation_outcome": evaluation_outcome,
-            "suppression_reason": suppression_reason,
-            "markets_inside_price_band": markets_inside_price_band,
-            "markets_after_settlement_filter": markets_after_settlement_filter,
-            "markets_after_all_rules": markets_after_all_rules,
+            "rejected_markets_count": rejected_markets_count,
+            "market_evaluation_context": {
+                "markets_considered_count": markets_considered_count,
+                "eligible_markets_count": eligible_markets_count,
+                "rejected_markets_count": rejected_markets_count,
+            },
+            "rejection_breakdown": {
+                "outside_price_band": outside_price_band,
+                "settlement_mismatch": settlement_mismatch,
+                "wrong_series": wrong_series,
+                "expired_market": expired_market,
+                "unknown_reason": unknown_reason,
+            },
+            "decision_outcome": {
+                "alerts_sent": alerts_sent,
+                "evaluation_outcome": evaluation_outcome,
+                "runtime_suppression_reason": runtime_suppression_reason,
+            },
+            "diagnostic_suppression_reason": diagnostic_suppression_reason,
+            "alert_history_matches": alert_history_count,
+            "hydration_cache_written": bool(hydration_runtime.get("cache_written")) if isinstance(hydration_runtime, dict) else None,
         }
         rows.append(transition_diag)
 
@@ -1803,14 +1872,14 @@ def get_alert_review_diagnostics(limit: int = 50) -> Dict[str, Any]:
 
         emitted_alert = alerts_sent > 0 or evaluation_outcome == "ALERT_SENT"
         if emitted_alert:
-            summary["transitions_emitted_alert"] += 1
+            summary["alerts_emitted"] += 1
             continue
 
         price_band_suppressed = markets_considered_count > 0 and markets_after_all_rules == 0 and outside_price_band > 0
         if price_band_suppressed:
-            summary["transitions_suppressed_price_band"] += 1
+            summary["suppressed_price_band"] += 1
         elif evaluation_outcome != "UNKNOWN":
-            summary["transitions_suppressed_other_rules"] += 1
+            summary["suppressed_market_rules"] += 1
 
     return {
         "ok": True,
