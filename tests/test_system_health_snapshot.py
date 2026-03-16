@@ -223,10 +223,10 @@ class SystemHealthSnapshotTests(unittest.TestCase):
             hydration_snapshot={"stations": {}},
             hydration_execution_snapshot={},
             transitions=[
-                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "outside_price_band"},
-                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "OUTSIDE_PRICE_BAND"},
+                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "directional_strike_rejected"},
+                {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "DIRECTIONAL_STRIKE_REJECTED"},
                 {"alert_classification": "MARKET_SUPPRESSED", "suppression_reason": "expired_market"},
-                {"alert_classification": "ALERT_SENT", "suppression_reason": "outside_price_band"},
+                {"alert_classification": "ALERT_SENT", "suppression_reason": "directional_strike_rejected"},
             ],
             alerts=[],
         )
@@ -234,7 +234,7 @@ class SystemHealthSnapshotTests(unittest.TestCase):
         self.assertEqual(
             snapshot["evaluation"]["suppression_breakdown"],
             {
-                "outside_price_band": 2,
+                "directional_strike_rejected": 2,
                 "expired_market": 1,
             },
         )

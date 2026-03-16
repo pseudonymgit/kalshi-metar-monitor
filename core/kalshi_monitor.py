@@ -96,6 +96,73 @@ _LOGGER = logging.getLogger(__name__)
 logger = _LOGGER
 MIN_HYDRATION_INTERVAL_SECONDS = 1
 HYDRATION_BACKOFF_SECONDS = 120
+DIRECTIONAL_STRIKE_WINDOW_SIZE = 3
+
+
+def _market_strike_value(market):
+    if not isinstance(market, dict):
+        return None
+
+    direct = market.get("strike")
+    if direct is not None:
+        try:
+            return float(direct)
+        except Exception:
+            return None
+
+    floor = market.get("floor_strike")
+    cap = market.get("cap_strike")
+
+    if floor is not None:
+        try:
+            return float(floor)
+        except Exception:
+            pass
+
+    if floor is not None and cap is not None:
+        try:
+            return (float(floor) + float(cap)) / 2.0
+        except Exception:
+            return None
+
+    return None
+
+
+def _directional_strike_window(markets, observed_value, direction):
+    if observed_value is None:
+        return list(markets)
+
+    try:
+        observed = float(observed_value)
+    except Exception:
+        return list(markets)
+
+    window_size = max(int(os.getenv("DIRECTIONAL_STRIKE_WINDOW_SIZE", str(DIRECTIONAL_STRIKE_WINDOW_SIZE))), 1)
+    ladder = []
+    for market in markets:
+        strike_value = _market_strike_value(market)
+        if strike_value is None:
+            continue
+        ladder.append((strike_value, market))
+
+    if not ladder:
+        return []
+
+    if direction == "HIGH":
+        directional = [entry for entry in ladder if entry[0] > observed]
+        if directional:
+            directional.sort(key=lambda entry: entry[0])
+            return [entry[1] for entry in directional[:window_size]]
+        return [max(ladder, key=lambda entry: entry[0])[1]]
+
+    if direction == "LOW":
+        directional = [entry for entry in ladder if entry[0] < observed]
+        if directional:
+            directional.sort(key=lambda entry: entry[0], reverse=True)
+            return [entry[1] for entry in directional[:window_size]]
+        return [min(ladder, key=lambda entry: entry[0])[1]]
+
+    return [entry[1] for entry in ladder]
 
 class kalshi_execution_domain:
     def __init__(self, domain: str):
@@ -1214,13 +1281,7 @@ def build_structured_snapshot(station: str, market_types: set):
 
     if observed_value is not None and len(selected_types) == 1:
         direction = next(iter(sorted(selected_types)))
-
-        if direction == "HIGH":
-            higher = [m for m in markets if m["strike"] > observed_value]
-            markets = [min(higher, key=lambda x: x["strike"])] if higher else []
-        elif direction == "LOW":
-            lower = [m for m in markets if m["strike"] < observed_value]
-            markets = [max(lower, key=lambda x: x["strike"])] if lower else []
+        markets = _directional_strike_window(markets, observed_value, direction)
 
     return {
         "station": normalized_station,
@@ -1310,12 +1371,7 @@ def build_structured_snapshot_from_cache(station: str, market_types: set):
 
     if observed_value is not None and len(selected_types) == 1:
         direction = next(iter(sorted(selected_types)))
-        if direction == "HIGH":
-            higher = [m for m in markets if m["strike"] > observed_value]
-            markets = [min(higher, key=lambda x: x["strike"])] if higher else []
-        elif direction == "LOW":
-            lower = [m for m in markets if m["strike"] < observed_value]
-            markets = [max(lower, key=lambda x: x["strike"])] if lower else []
+        markets = _directional_strike_window(markets, observed_value, direction)
 
     return {
         "station": normalized_station,
@@ -1790,7 +1846,7 @@ def send_composed_weather_market_alert(
     rejected_markets_count = max(markets_considered_count - eligible_markets_count, 0)
     rejection_counts = hydration_snapshot.get("rejection_counts") or {}
     rejection_breakdown = {
-        "outside_price_band": max(int(hydration_snapshot.get("filtered_market_count") or 0) - eligible_markets_count, 0),
+        "directional_strike_rejected": max(int(hydration_snapshot.get("filtered_market_count") or 0) - eligible_markets_count, 0),
         "wrong_series": int(rejection_counts.get("city_token_mismatch") or 0) + int(rejection_counts.get("market_type_mismatch") or 0),
         "expired_market": int(rejection_counts.get("inactive_market") or 0),
         "settlement_mismatch": int(rejection_counts.get("date_mismatch") or 0),

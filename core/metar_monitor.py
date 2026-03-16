@@ -1888,7 +1888,7 @@ def get_alert_review_diagnostics(
         "total_transitions": 0,
         "transitions_with_markets": 0,
         "transitions_without_markets": 0,
-        "suppressed_price_band": 0,
+        "suppressed_directional_strike": 0,
         "suppressed_market_rules": 0,
         "suppressed_hydration": 0,
         "alerts_emitted": 0,
@@ -1897,7 +1897,7 @@ def get_alert_review_diagnostics(
         "markets_considered_count": 0,
         "eligible_markets_count": 0,
         "rejected_markets_count": 0,
-        "price_band_rejections": 0,
+        "directional_strike_rejections": 0,
         "settlement_mismatch_rejections": 0,
         "wrong_series_rejections": 0,
         "expired_market_rejections": 0,
@@ -1926,15 +1926,15 @@ def get_alert_review_diagnostics(
 
         markets_considered_count = int(runtime.get("markets_considered_count") or 0)
         eligible_markets_count = int(runtime.get("eligible_markets_count") or 0)
-        outside_price_band = int(breakdown.get("outside_price_band") or 0)
+        directional_strike_rejected = int(breakdown.get("directional_strike_rejected") or 0)
         settlement_mismatch = int(breakdown.get("settlement_mismatch") or 0)
         wrong_series = int(breakdown.get("wrong_series") or 0)
         expired_market = int(breakdown.get("expired_market") or 0)
         unknown_reason = int(breakdown.get("unknown_reason") or 0)
         rejected_markets_count = max(markets_considered_count - eligible_markets_count, 0)
 
-        markets_inside_price_band = max(markets_considered_count - outside_price_band, 0)
-        markets_after_settlement_filter = max(markets_inside_price_band - settlement_mismatch, 0)
+        markets_after_directional_filter = max(markets_considered_count - directional_strike_rejected, 0)
+        markets_after_settlement_filter = max(markets_after_directional_filter - settlement_mismatch, 0)
         markets_after_all_rules = max(eligible_markets_count, 0)
 
         alerts_sent = int(row.get("alerts_sent") or metadata.get("alerts_sent") or 0)
@@ -1959,8 +1959,8 @@ def get_alert_review_diagnostics(
             diagnostic_suppression_reason = ""
         elif markets_considered_count == 0:
             diagnostic_suppression_reason = "NO_MARKETS_DISCOVERED"
-        elif outside_price_band > 0 and eligible_markets_count == 0:
-            diagnostic_suppression_reason = "OUTSIDE_PRICE_BAND"
+        elif directional_strike_rejected > 0 and eligible_markets_count == 0:
+            diagnostic_suppression_reason = "DIRECTIONAL_STRIKE_REJECTED"
         elif rejected_markets_count > 0:
             diagnostic_suppression_reason = "MARKET_RULES"
         elif isinstance(hydration_runtime, dict) and not hydration_cache_written:
@@ -1985,7 +1985,7 @@ def get_alert_review_diagnostics(
                 "rejected_markets_count": rejected_markets_count,
             },
             "rejection_breakdown": {
-                "outside_price_band": outside_price_band,
+                "directional_strike_rejected": directional_strike_rejected,
                 "settlement_mismatch": settlement_mismatch,
                 "wrong_series": wrong_series,
                 "expired_market": expired_market,
@@ -2004,7 +2004,7 @@ def get_alert_review_diagnostics(
         market_totals["markets_considered_count"] += markets_considered_count
         market_totals["eligible_markets_count"] += eligible_markets_count
         market_totals["rejected_markets_count"] += rejected_markets_count
-        market_totals["price_band_rejections"] += outside_price_band
+        market_totals["directional_strike_rejections"] += directional_strike_rejected
         market_totals["settlement_mismatch_rejections"] += settlement_mismatch
         market_totals["wrong_series_rejections"] += wrong_series
         market_totals["expired_market_rejections"] += expired_market
@@ -2020,9 +2020,9 @@ def get_alert_review_diagnostics(
             summary["alerts_emitted"] += 1
             continue
 
-        price_band_suppressed = markets_considered_count > 0 and markets_after_all_rules == 0 and outside_price_band > 0
-        if price_band_suppressed:
-            summary["suppressed_price_band"] += 1
+        directional_strike_suppressed = markets_considered_count > 0 and markets_after_all_rules == 0 and directional_strike_rejected > 0
+        if directional_strike_suppressed:
+            summary["suppressed_directional_strike"] += 1
         elif evaluation_outcome != "UNKNOWN":
             summary["suppressed_market_rules"] += 1
 
@@ -2033,7 +2033,7 @@ def get_alert_review_diagnostics(
         "avg_markets_considered": market_totals["markets_considered_count"] / denominator,
         "avg_eligible_markets": market_totals["eligible_markets_count"] / denominator,
         "avg_rejected_markets": market_totals["rejected_markets_count"] / denominator,
-        "price_band_rejections": market_totals["price_band_rejections"],
+        "directional_strike_rejections": market_totals["directional_strike_rejections"],
         "settlement_mismatch_rejections": market_totals["settlement_mismatch_rejections"],
         "wrong_series_rejections": market_totals["wrong_series_rejections"],
         "expired_market_rejections": market_totals["expired_market_rejections"],
@@ -2583,7 +2583,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             hydrated_any = False
             market_context_seeded = bool(market_context.get("event_ticker"))
             rejection_breakdown = {
-                "outside_price_band": 0,
+                "directional_strike_rejected": 0,
                 "wrong_series": 0,
                 "expired_market": 0,
                 "settlement_mismatch": 0,
@@ -2608,24 +2608,23 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                     hydrated_any = hydrated_any or hydration_usable or bool(snapshot.get("cache_written"))
                     raw_market_count = int(snapshot.get("raw_market_count") or 0)
                     filtered_market_count = int(snapshot.get("filtered_market_count") or 0)
-                    pre_directional_market_count = int(snapshot.get("pre_directional_market_count") or len(markets))
                     empty_reason = str(snapshot.get("empty_reason") or "")
                     rejection_counts = snapshot.get("rejection_counts") or {}
 
                     markets_considered_count += raw_market_count
-                    eligible_markets_count += pre_directional_market_count
+                    eligible_markets_count += len(markets)
 
                     wrong_series_rejections = int(rejection_counts.get("city_token_mismatch") or 0) + int(rejection_counts.get("market_type_mismatch") or 0)
                     settlement_mismatch_rejections = int(rejection_counts.get("date_mismatch") or 0)
                     expired_rejections = int(rejection_counts.get("inactive_market") or 0)
-                    outside_price_band_rejections = max(filtered_market_count - len(markets), 0)
-                    known_rejections = wrong_series_rejections + settlement_mismatch_rejections + expired_rejections + outside_price_band_rejections
+                    directional_strike_rejected = max(filtered_market_count - len(markets), 0)
+                    known_rejections = wrong_series_rejections + settlement_mismatch_rejections + expired_rejections + directional_strike_rejected
                     unknown_rejections = max(raw_market_count - len(markets) - known_rejections, 0)
 
                     rejection_breakdown["wrong_series"] += wrong_series_rejections
                     rejection_breakdown["settlement_mismatch"] += settlement_mismatch_rejections
                     rejection_breakdown["expired_market"] += expired_rejections
-                    rejection_breakdown["outside_price_band"] += outside_price_band_rejections
+                    rejection_breakdown["directional_strike_rejected"] += directional_strike_rejected
                     rejection_breakdown["unknown_reason"] += unknown_rejections
 
                     _ALERT_LOGGER.info(
