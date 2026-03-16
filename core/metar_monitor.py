@@ -28,6 +28,7 @@ import sqlite3
 import threading
 import requests
 import time
+import re
 from collections import deque
 from io import StringIO
 from datetime import datetime, timezone, timedelta
@@ -510,8 +511,135 @@ def _tgftp_latest_url(icao: str) -> str:
 # =========================
 # Parse helpers
 # =========================
-def _obs_tuple(temp_f: float, ts_iso: str, raw: Any, source: str) -> Dict[str, Any]:
-    return {"temp_f": round(float(temp_f), 1), "obs_time": ts_iso, "raw": raw, "source": source}
+def _obs_tuple(
+    temp_f: float,
+    ts_iso: str,
+    raw: Any,
+    source: str,
+    extras: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    obs = {
+        "temp_f": round(float(temp_f), 1),
+        "obs_time": ts_iso,
+        "raw": raw,
+        "source": source,
+        "temperature_c": None,
+        "dewpoint_c": None,
+        "wind_direction_deg": None,
+        "wind_speed_kt": None,
+        "wind_gust_kt": None,
+        "altimeter_in_hg": None,
+        "sea_level_pressure_mb": None,
+        "visibility_mi": None,
+        "ceiling_ft": None,
+        "cloud_layers": None,
+        "weather_codes": None,
+        "observation_age_seconds": None,
+        "station_id": None,
+    }
+    if extras:
+        obs.update({k: v for k, v in extras.items() if k in obs})
+    return obs
+
+
+def _to_float_or_none(value: Any) -> Optional[float]:
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except Exception:
+        return None
+
+
+def _to_int_or_none(value: Any) -> Optional[int]:
+    numeric = _to_float_or_none(value)
+    if numeric is None:
+        return None
+    return int(round(numeric))
+
+
+def _nws_extract_weather_codes(props: Dict[str, Any]) -> Optional[List[str]]:
+    codes: List[str] = []
+    present_weather = props.get("presentWeather") if isinstance(props, dict) else None
+    if isinstance(present_weather, list):
+        for item in present_weather:
+            if not isinstance(item, dict):
+                continue
+            for key in ("rawString", "weather", "weatherCode", "value"):
+                val = item.get(key)
+                if isinstance(val, str) and val.strip():
+                    token = val.strip().upper()
+                    if token not in codes:
+                        codes.append(token)
+    raw_message = props.get("rawMessage") if isinstance(props, dict) else None
+    if isinstance(raw_message, str) and raw_message:
+        for token in re.findall(r"\b(?:\+|-)?[A-Z]{2,6}\b", raw_message):
+            normalized = token.upper()
+            if normalized not in codes:
+                codes.append(normalized)
+    return codes or None
+
+
+def _nws_optional_metrics(props: Dict[str, Any], station: str) -> Dict[str, Any]:
+    station_id = props.get("stationIdentifier")
+    if not station_id and isinstance(props.get("station"), str):
+        station_id = props["station"].rstrip("/").split("/")[-1]
+    metrics: Dict[str, Any] = {
+        "temperature_c": _to_float_or_none((props.get("temperature") or {}).get("value")),
+        "dewpoint_c": _to_float_or_none((props.get("dewpoint") or {}).get("value")),
+        "wind_direction_deg": _to_int_or_none((props.get("windDirection") or {}).get("value")),
+        "wind_speed_kt": None,
+        "wind_gust_kt": None,
+        "altimeter_in_hg": None,
+        "sea_level_pressure_mb": None,
+        "visibility_mi": None,
+        "ceiling_ft": None,
+        "cloud_layers": None,
+        "weather_codes": _nws_extract_weather_codes(props),
+        "observation_age_seconds": _to_float_or_none(props.get("observation_age_seconds")),
+        "station_id": (station_id or station).strip().upper() if (station_id or station) else None,
+    }
+
+    wind_speed_mps = _to_float_or_none((props.get("windSpeed") or {}).get("value"))
+    if wind_speed_mps is not None:
+        metrics["wind_speed_kt"] = round(wind_speed_mps * 1.943844, 1)
+
+    wind_gust_mps = _to_float_or_none((props.get("windGust") or {}).get("value"))
+    if wind_gust_mps is not None:
+        metrics["wind_gust_kt"] = round(wind_gust_mps * 1.943844, 1)
+
+    altimeter_pa = _to_float_or_none((props.get("barometricPressure") or {}).get("value"))
+    if altimeter_pa is not None:
+        metrics["altimeter_in_hg"] = round(altimeter_pa / 3386.389, 2)
+
+    sea_level_pressure_pa = _to_float_or_none((props.get("seaLevelPressure") or {}).get("value"))
+    if sea_level_pressure_pa is not None:
+        metrics["sea_level_pressure_mb"] = round(sea_level_pressure_pa / 100.0, 1)
+
+    visibility_m = _to_float_or_none((props.get("visibility") or {}).get("value"))
+    if visibility_m is not None:
+        metrics["visibility_mi"] = round(visibility_m / 1609.344, 2)
+
+    ceiling_m = _to_float_or_none((props.get("ceiling") or {}).get("value"))
+    if ceiling_m is not None:
+        metrics["ceiling_ft"] = int(round(ceiling_m * 3.28084))
+
+    cloud_layers = props.get("cloudLayers")
+    if isinstance(cloud_layers, list):
+        normalized_layers: List[Dict[str, Any]] = []
+        for layer in cloud_layers:
+            if not isinstance(layer, dict):
+                continue
+            layer_base_m = _to_float_or_none((layer.get("base") or {}).get("value"))
+            normalized_layers.append(
+                {
+                    "base_ft": int(round(layer_base_m * 3.28084)) if layer_base_m is not None else None,
+                    "amount": layer.get("amount"),
+                }
+            )
+        metrics["cloud_layers"] = normalized_layers or None
+
+    return metrics
 
 
 def _record_timeout(icao: str):
@@ -531,7 +659,16 @@ def _parse_nws_collection(j: Dict[str, Any]) -> List[Dict[str, Any]]:
         ts = props.get("timestamp")
         if val_c is None or not ts:
             continue
-        out.append(_obs_tuple(_c_to_f(float(val_c)), ts, props, "nws"))
+        station_identifier = props.get("stationIdentifier")
+        out.append(
+            _obs_tuple(
+                _c_to_f(float(val_c)),
+                ts,
+                props,
+                "nws",
+                extras=_nws_optional_metrics(props, station_identifier or ""),
+            )
+        )
     out.sort(key=lambda x: _parse_iso(x["obs_time"]))
     return out
 
@@ -557,7 +694,7 @@ def _parse_iem_csv(text: str, start_dt: datetime, end_dt: datetime) -> List[Dict
             tf = float(tmpf)
         except Exception:
             continue
-        out.append(_obs_tuple(tf, ts.isoformat(), row, "iem"))
+        out.append(_obs_tuple(tf, ts.isoformat(), row, "iem", extras={"station_id": (row.get("station") or "").strip().upper() or None}))
     out.sort(key=lambda x: _parse_iso(x["obs_time"]))
     return out
 
@@ -587,7 +724,8 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
         ts = datetime.strptime(ts_line, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc).isoformat()
     except Exception:
         ts = _now_utc_iso()
-    return _obs_tuple(temp_f, ts, metar_line, "tgftp")
+    station_token = metar_line.split()[0].strip().upper() if metar_line.split() else None
+    return _obs_tuple(temp_f, ts, metar_line, "tgftp", extras={"station_id": station_token})
 
 
 # =========================
@@ -685,7 +823,7 @@ def _fetch_nws_latest_single(icao: str, cfg: Dict[str, Any]) -> Optional[Dict[st
     ts = props.get("timestamp")
     if val_c is None or not ts:
         return None
-    return _obs_tuple(_c_to_f(float(val_c)), ts, props, "nws")
+    return _obs_tuple(_c_to_f(float(val_c)), ts, props, "nws", extras=_nws_optional_metrics(props, icao))
 
 
 def _fetch_range_iem(icao: str, start_dt: datetime, end_dt: datetime, cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
