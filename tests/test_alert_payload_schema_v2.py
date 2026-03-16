@@ -193,6 +193,58 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
         snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"HIGH"})
         self.assertEqual(snapshot["observed"]["current_temp_f"], 69.7)
 
+    @patch("core.kalshi_monitor._SERIES_MARKETS_CACHE", {
+        "KXHIGHDEN": {
+            "markets": [
+                {"ticker": "KXHIGHDEN-26DEC31-B67", "strike_type": "between", "floor_strike": 67, "cap_strike": 68, "event_ticker": "KXHIGHDEN-26DEC31", "status": "active"},
+                {"ticker": "KXHIGHDEN-26DEC31-B68", "strike_type": "between", "floor_strike": 68, "cap_strike": 69, "event_ticker": "KXHIGHDEN-26DEC31", "status": "active"},
+                {"ticker": "KXHIGHDEN-26DEC31-B69", "strike_type": "between", "floor_strike": 69, "cap_strike": 70, "event_ticker": "KXHIGHDEN-26DEC31", "status": "active"},
+                {"ticker": "KXHIGHDEN-26DEC31-B70", "strike_type": "between", "floor_strike": 70, "cap_strike": 71, "event_ticker": "KXHIGHDEN-26DEC31", "status": "active"},
+                {"ticker": "KXHIGHDEN-26DEC31-B71", "strike_type": "between", "floor_strike": 71, "cap_strike": 72, "event_ticker": "KXHIGHDEN-26DEC31", "status": "active"},
+                {"ticker": "KXHIGHDEN-26DEC31-B72", "strike_type": "between", "floor_strike": 72, "cap_strike": 73, "event_ticker": "KXHIGHDEN-26DEC31", "status": "active"},
+            ],
+            "hydrated_at_utc": "2026-01-01T12:00:00+00:00",
+            "station_local_day": "2026-01-01",
+        }
+    })
+    @patch("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXHIGHDEN"})
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26DEC31")
+    @patch("core.kalshi_monitor.get_metar_state", return_value={"last_obs": {"KDEN": {"temp_f": 69.8}}})
+    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
+    def test_cache_snapshot_uses_directional_strike_window_for_high(self, *_mocks):
+        snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"HIGH"})
+        self.assertEqual([m["strike"] for m in snapshot["markets"]], [70, 71, 72])
+        self.assertEqual(snapshot["pre_directional_market_count"], 6)
+        self.assertEqual(snapshot["post_directional_market_count"], 3)
+
+    @patch("core.kalshi_monitor._SERIES_MARKETS_CACHE", {
+        "KXLOWDEN": {
+            "markets": [
+                {"ticker": "KXLOWDEN-26DEC31-B67", "strike_type": "between", "floor_strike": 67, "cap_strike": 68, "event_ticker": "KXLOWDEN-26DEC31", "status": "active"},
+                {"ticker": "KXLOWDEN-26DEC31-B68", "strike_type": "between", "floor_strike": 68, "cap_strike": 69, "event_ticker": "KXLOWDEN-26DEC31", "status": "active"},
+                {"ticker": "KXLOWDEN-26DEC31-B69", "strike_type": "between", "floor_strike": 69, "cap_strike": 70, "event_ticker": "KXLOWDEN-26DEC31", "status": "active"},
+            ],
+            "hydrated_at_utc": "2026-01-01T12:00:00+00:00",
+            "station_local_day": "2026-01-01",
+        }
+    })
+    @patch("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXLOWDEN"})
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26DEC31")
+    @patch("core.kalshi_monitor.get_metar_state", return_value={"last_obs": {"KDEN": {"temp_f": 65.0}}})
+    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
+    def test_cache_snapshot_directional_fallback_keeps_lowest_strike_for_low(self, *_mocks):
+        snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"LOW"})
+        self.assertEqual([m["strike"] for m in snapshot["markets"]], [67])
+
+    def test_directional_window_normalizes_strike_sources(self):
+        markets = [
+            {"floor_strike": 70, "cap_strike": 71, "ticker": "A"},
+            {"floor_strike": "71", "cap_strike": "72", "ticker": "B"},
+            {"strike": 72, "ticker": "C"},
+        ]
+        selected = kalshi_monitor._directional_strike_window(markets, 69.8, "HIGH")
+        self.assertEqual([m["ticker"] for m in selected], ["A", "B", "C"])
+
 
 if __name__ == "__main__":
     unittest.main()

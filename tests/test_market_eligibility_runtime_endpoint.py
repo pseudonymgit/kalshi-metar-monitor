@@ -40,7 +40,7 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
                     "eligible_markets_count": 3,
                     "rejected_markets_count": 9,
                     "rejection_breakdown": {
-                        "outside_price_band": 2,
+                        "directional_strike_rejected": 2,
                         "wrong_series": 1,
                         "expired_market": 3,
                         "settlement_mismatch": 2,
@@ -57,11 +57,10 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
             "post_directional_market_count": 1,
             "empty_reason": None,
             "rejection_counts": {
-                "outside_price_band": 1,
-                "wrong_series": 1,
-                "expired_market": 1,
-                "settlement_mismatch": 0,
-                "unknown_reason": 0,
+                "city_token_mismatch": 1,
+                "market_type_mismatch": 0,
+                "inactive_market": 1,
+                "date_mismatch": 0,
             },
         }
 
@@ -73,12 +72,12 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["execution_domain"], "production")
         self.assertEqual(payload["latest_settlement_integer"], 61)
         self.assertEqual(payload["markets_considered_count"], 5)
-        self.assertEqual(payload["eligible_markets_count"], 2)
-        self.assertEqual(payload["rejected_markets_count"], 3)
+        self.assertEqual(payload["eligible_markets_count"], 1)
+        self.assertEqual(payload["rejected_markets_count"], 4)
         self.assertEqual(
             payload["rejection_breakdown"],
             {
-                "outside_price_band": 1,
+                "directional_strike_rejected": 1,
                 "wrong_series": 1,
                 "expired_market": 1,
                 "settlement_mismatch": 0,
@@ -128,7 +127,7 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["markets_considered_count"], 7)
-        self.assertEqual(payload["eligible_markets_count"], 4)
+        self.assertEqual(payload["eligible_markets_count"], 1)
         self.assertEqual(payload["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
         self.assertIsNone(payload["latest_suppression_reason"])
         self.assertEqual(payload["latest_persisted_evaluation"]["market_eligibility_runtime"]["markets_considered_count"], 0)
@@ -208,7 +207,7 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         "filtered_market_count": 2,
         "pre_directional_market_count": 2,
         "post_directional_market_count": 0,
-        "empty_reason": "no_directional_ladder_match",
+        "empty_reason": "filtered_to_zero",
         "rejection_counts": {},
     })
     @patch("app.get_latest_station_market_evaluation_context", return_value={
@@ -230,11 +229,11 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         payload = response.get_json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(payload["eligible_markets_count"], 2)
+        self.assertEqual(payload["eligible_markets_count"], 0)
         self.assertEqual(payload["current_cache_probe"]["post_directional_market_count"], 0)
-        self.assertEqual(payload["current_cache_probe"]["empty_reason"], "no_directional_ladder_match")
-        self.assertEqual(payload["latest_evaluation_outcome"], "NO_DIRECTIONAL_LADDER_MATCH")
-        self.assertEqual(payload["latest_suppression_reason"], "no_directional_ladder_match")
+        self.assertEqual(payload["current_cache_probe"]["empty_reason"], "filtered_to_zero")
+        self.assertEqual(payload["latest_evaluation_outcome"], "NO_ELIGIBLE_MARKET")
+        self.assertEqual(payload["latest_suppression_reason"], "filtered_to_zero")
 
 
 
