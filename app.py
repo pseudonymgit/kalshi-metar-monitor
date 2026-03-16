@@ -1311,11 +1311,16 @@ def observability_market_eligibility_runtime():
         "post_directional_market_count": int(cache_snapshot.get("post_directional_market_count") or 0),
         "empty_reason": cache_snapshot.get("empty_reason"),
         "rejection_breakdown": {
-            "outside_price_band": int(cache_rejection_breakdown.get("outside_price_band") or 0),
-            "wrong_series": int(cache_rejection_breakdown.get("wrong_series") or 0),
-            "expired_market": int(cache_rejection_breakdown.get("expired_market") or 0),
-            "settlement_mismatch": int(cache_rejection_breakdown.get("settlement_mismatch") or 0),
-            "unknown_reason": int(cache_rejection_breakdown.get("unknown_reason") or 0),
+            "directional_strike_rejected": max(
+                int(cache_snapshot.get("filtered_market_count") or 0)
+                - int(cache_snapshot.get("post_directional_market_count") or 0),
+                0,
+            ),
+            "wrong_series": int(cache_rejection_breakdown.get("city_token_mismatch") or 0)
+            + int(cache_rejection_breakdown.get("market_type_mismatch") or 0),
+            "expired_market": int(cache_rejection_breakdown.get("inactive_market") or 0),
+            "settlement_mismatch": int(cache_rejection_breakdown.get("date_mismatch") or 0),
+            "unknown_reason": 0,
         },
     }
 
@@ -1327,7 +1332,7 @@ def observability_market_eligibility_runtime():
             "eligible_markets_count": int(eligibility_runtime.get("eligible_markets_count") or 0),
             "rejected_markets_count": int(eligibility_runtime.get("rejected_markets_count") or 0),
             "rejection_breakdown": {
-                "outside_price_band": int(persisted_rejection_breakdown.get("outside_price_band") or 0),
+                "directional_strike_rejected": int(persisted_rejection_breakdown.get("directional_strike_rejected") or 0),
                 "wrong_series": int(persisted_rejection_breakdown.get("wrong_series") or 0),
                 "expired_market": int(persisted_rejection_breakdown.get("expired_market") or 0),
                 "settlement_mismatch": int(persisted_rejection_breakdown.get("settlement_mismatch") or 0),
@@ -1337,7 +1342,7 @@ def observability_market_eligibility_runtime():
     }
 
     markets_considered_count = int(current_cache_probe.get("raw_market_count") or 0)
-    eligible_markets_count = int(current_cache_probe.get("pre_directional_market_count") or 0)
+    eligible_markets_count = int(current_cache_probe.get("post_directional_market_count") or 0)
     final_ladders_count = int(current_cache_probe.get("post_directional_market_count") or 0)
 
     if markets_considered_count == 0:
