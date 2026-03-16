@@ -24,7 +24,7 @@ class AlertReviewDiagnosticsBuilderTests(unittest.TestCase):
                     "markets_considered_count": 5,
                     "eligible_markets_count": 0,
                     "rejection_breakdown": {
-                        "outside_price_band": 3,
+                        "directional_strike_rejected": 3,
                         "settlement_mismatch": 1,
                         "wrong_series": 1,
                         "expired_market": 0,
@@ -48,7 +48,7 @@ class AlertReviewDiagnosticsBuilderTests(unittest.TestCase):
                         "markets_considered_count": 2,
                         "eligible_markets_count": 1,
                         "rejection_breakdown": {
-                            "outside_price_band": 1,
+                            "directional_strike_rejected": 1,
                             "settlement_mismatch": 0,
                             "wrong_series": 0,
                             "expired_market": 0,
@@ -81,7 +81,7 @@ class AlertReviewDiagnosticsBuilderTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["total_transitions"], 3)
         self.assertEqual(payload["summary"]["transitions_with_markets"], 2)
         self.assertEqual(payload["summary"]["transitions_without_markets"], 1)
-        self.assertEqual(payload["summary"]["suppressed_price_band"], 1)
+        self.assertEqual(payload["summary"]["suppressed_directional_strike"], 1)
         self.assertEqual(payload["summary"]["suppressed_market_rules"], 1)
         self.assertEqual(payload["summary"]["suppressed_hydration"], 0)
         self.assertEqual(payload["summary"]["alerts_emitted"], 1)
@@ -94,7 +94,7 @@ class AlertReviewDiagnosticsBuilderTests(unittest.TestCase):
         self.assertEqual(first["markets_considered_count"], 5)
         self.assertEqual(first["rejected_markets_count"], 5)
         self.assertEqual(first["market_evaluation_context"]["eligible_markets_count"], 0)
-        self.assertEqual(first["rejection_breakdown"]["outside_price_band"], 3)
+        self.assertEqual(first["rejection_breakdown"]["directional_strike_rejected"], 3)
         self.assertEqual(first["decision_outcome"]["runtime_suppression_reason"], "LADDER_HYDRATION_WARMUP")
         self.assertEqual(first["decision_outcome"]["diagnostic_suppression_reason"], "LADDER_HYDRATION_WARMUP")
 
@@ -132,7 +132,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
                 "alerts_emitted": 0,
                 "transitions_with_markets": 0,
                 "transitions_without_markets": 0,
-                "suppressed_price_band": 0,
+                "suppressed_directional_strike": 0,
                 "suppressed_market_rules": 0,
                 "suppressed_hydration": 0,
             },
@@ -140,7 +140,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
                 "avg_markets_considered": 0.0,
                 "avg_eligible_markets": 0.0,
                 "avg_rejected_markets": 0.0,
-                "price_band_rejections": 0,
+                "directional_strike_rejections": 0,
                 "settlement_mismatch_rejections": 0,
                 "wrong_series_rejections": 0,
                 "expired_market_rejections": 0,
@@ -174,7 +174,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
                 "alerts_emitted": 1,
                 "transitions_with_markets": 1,
                 "transitions_without_markets": 1,
-                "suppressed_price_band": 0,
+                "suppressed_directional_strike": 0,
                 "suppressed_market_rules": 1,
                 "suppressed_hydration": 0,
             },
@@ -182,7 +182,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
                 "avg_markets_considered": 2.0,
                 "avg_eligible_markets": 0.5,
                 "avg_rejected_markets": 1.5,
-                "price_band_rejections": 1,
+                "directional_strike_rejections": 1,
                 "settlement_mismatch_rejections": 1,
                 "wrong_series_rejections": 1,
                 "expired_market_rejections": 0,
@@ -199,7 +199,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
                     "eligible_markets_count": 1,
                     "rejected_markets_count": 3,
                     "rejection_breakdown": {
-                        "outside_price_band": 1,
+                        "directional_strike_rejected": 1,
                         "settlement_mismatch": 1,
                         "wrong_series": 1,
                         "expired_market": 0,
@@ -222,7 +222,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
                     "eligible_markets_count": 0,
                     "rejected_markets_count": 0,
                     "rejection_breakdown": {
-                        "outside_price_band": 0,
+                        "directional_strike_rejected": 0,
                         "settlement_mismatch": 0,
                         "wrong_series": 0,
                         "expired_market": 0,
@@ -245,7 +245,7 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
         self.assertEqual(payload["market_statistics"]["avg_markets_considered"], 2.0)
         self.assertEqual(payload["market_statistics"]["avg_eligible_markets"], 0.5)
         self.assertEqual(payload["market_statistics"]["avg_rejected_markets"], 1.5)
-        self.assertEqual(payload["market_statistics"]["price_band_rejections"], 1)
+        self.assertEqual(payload["market_statistics"]["directional_strike_rejections"], 1)
         self.assertEqual(payload["market_statistics"]["settlement_mismatch_rejections"], 1)
         self.assertEqual(payload["market_statistics"]["wrong_series_rejections"], 1)
         self.assertEqual(payload["market_statistics"]["expired_market_rejections"], 0)
