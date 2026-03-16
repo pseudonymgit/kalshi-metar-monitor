@@ -2291,31 +2291,40 @@ def retention_prune():
 
 
 
-@app.route("/diagnostics/alert_review", methods=["GET"])
-def diagnostics_alert_review():
+@app.route("/diagnostics/alert_review_bundle", methods=["GET"])
+def diagnostics_alert_review_bundle():
     station = (request.args.get("station") or "").strip().upper() or None
-    raw_limit = request.args.get("limit", "50")
+    raw_limit = request.args.get("limit", "100")
     try:
         limit = int(raw_limit)
     except (TypeError, ValueError):
-        limit = 50
+        limit = 100
 
-    station_universe = _canonical_live_station_universe(station_filter=station)
     transitions = get_transition_history(station=station, limit=limit)
     latest_evaluations = get_latest_station_market_evaluation_context(station=station)
-    hydration_snapshot = _build_runtime_authority_hydration_snapshot(stations=station_universe.get("stations") or [])
     recent_alerts = get_recent_alerts(limit)
     if station:
         recent_alerts = [row for row in recent_alerts if (row.get("station") or "").strip().upper() == station]
 
-    payload = get_alert_review_diagnostics(
+    hydration_stations = {
+        str(candidate).strip().upper()
+        for candidate in (
+            ([station] if station else [])
+            + [row.get("station") for row in transitions if isinstance(row, dict)]
+            + [row.get("station") for row in recent_alerts if isinstance(row, dict)]
+        )
+        if candidate and str(candidate).strip()
+    }
+    hydration_snapshot = _build_runtime_authority_hydration_snapshot(stations=sorted(hydration_stations))
+
+    diagnostics_payload = get_alert_review_diagnostics(
         limit=limit,
         transitions=transitions,
         latest_evaluations=latest_evaluations,
         hydration_snapshot=hydration_snapshot,
         recent_alerts=recent_alerts,
     )
-    return jsonify(payload), 200
+    return jsonify(diagnostics_payload), 200
 
 
 @app.route("/observability/transitions", methods=["GET"])

@@ -78,31 +78,34 @@ class AlertReviewDiagnosticsBuilderTests(unittest.TestCase):
 
         payload = metar_monitor.get_alert_review_diagnostics(limit=50)
 
-        self.assertTrue(payload["ok"])
         self.assertEqual(payload["summary"]["total_transitions"], 3)
         self.assertEqual(payload["summary"]["transitions_with_markets"], 2)
         self.assertEqual(payload["summary"]["transitions_without_markets"], 1)
         self.assertEqual(payload["summary"]["suppressed_price_band"], 1)
         self.assertEqual(payload["summary"]["suppressed_market_rules"], 1)
+        self.assertEqual(payload["summary"]["suppressed_hydration"], 0)
         self.assertEqual(payload["summary"]["alerts_emitted"], 1)
+        self.assertEqual(payload["market_statistics"]["avg_markets_considered"], 7 / 3)
+        self.assertEqual(payload["market_statistics"]["avg_eligible_markets"], 1 / 3)
+        self.assertEqual(payload["market_statistics"]["avg_rejected_markets"], 2.0)
 
-        first = payload["transitions"][0]
+        first = payload["transition_samples"][0]
         self.assertEqual(first["station"], "KDEN")
         self.assertEqual(first["markets_considered_count"], 5)
         self.assertEqual(first["rejected_markets_count"], 5)
         self.assertEqual(first["market_evaluation_context"]["eligible_markets_count"], 0)
         self.assertEqual(first["rejection_breakdown"]["outside_price_band"], 3)
         self.assertEqual(first["decision_outcome"]["runtime_suppression_reason"], "LADDER_HYDRATION_WARMUP")
-        self.assertEqual(first["diagnostic_suppression_reason"], "LADDER_HYDRATION_WARMUP")
+        self.assertEqual(first["decision_outcome"]["diagnostic_suppression_reason"], "LADDER_HYDRATION_WARMUP")
 
     @patch("core.metar_monitor.get_transition_history", return_value=[])
     def test_alert_review_diagnostics_empty(self, _mock_history):
         payload = metar_monitor.get_alert_review_diagnostics(limit="bad")
 
-        self.assertTrue(payload["ok"])
-        self.assertEqual(payload["limit"], 50)
         self.assertEqual(payload["summary"]["total_transitions"], 0)
-        self.assertEqual(payload["transitions"], [])
+        self.assertEqual(payload["summary"]["suppressed_hydration"], 0)
+        self.assertEqual(payload["market_statistics"]["avg_markets_considered"], 0.0)
+        self.assertEqual(payload["transition_samples"], [])
 
 
 class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
@@ -115,28 +118,140 @@ class AlertReviewDiagnosticsEndpointTests(unittest.TestCase):
     @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {}})
     @patch("app.get_latest_station_market_evaluation_context", return_value={})
     @patch("app.get_transition_history", return_value=[])
-    @patch("app._canonical_live_station_universe", return_value={"stations": []})
-    def test_alert_review_endpoint_returns_collector_payload(
+    def test_alert_review_bundle_endpoint_empty_payload(
         self,
-        _mock_universe,
         _mock_transitions,
         _mock_evals,
         _mock_hydration,
         _mock_alerts,
-        mock_collector,
+        mock_diagnostics,
     ):
-        mock_collector.return_value = {"ok": True, "summary": {}, "transitions": []}
+        mock_diagnostics.return_value = {
+            "summary": {
+                "total_transitions": 0,
+                "alerts_emitted": 0,
+                "transitions_with_markets": 0,
+                "transitions_without_markets": 0,
+                "suppressed_price_band": 0,
+                "suppressed_market_rules": 0,
+                "suppressed_hydration": 0,
+            },
+            "market_statistics": {
+                "avg_markets_considered": 0.0,
+                "avg_eligible_markets": 0.0,
+                "avg_rejected_markets": 0.0,
+                "price_band_rejections": 0,
+                "settlement_mismatch_rejections": 0,
+                "wrong_series_rejections": 0,
+                "expired_market_rejections": 0,
+            },
+            "transition_samples": [],
+        }
 
-        response = self.client.get("/diagnostics/alert_review?limit=20")
+        response = self.client.get("/diagnostics/alert_review_bundle")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json()["ok"], True)
-        mock_collector.assert_called_once_with(
-            limit=20,
-            transitions=[],
-            latest_evaluations={},
-            hydration_snapshot={"stations": {}},
-            recent_alerts=[],
+        payload = response.get_json()
+        self.assertEqual(payload, mock_diagnostics.return_value)
+        self.assertEqual(payload["summary"]["suppressed_hydration"], 0)
+
+    @patch("app.get_alert_review_diagnostics")
+    @patch("app.get_recent_alerts", return_value=[])
+    @patch("app._build_runtime_authority_hydration_snapshot", return_value={"stations": {}})
+    @patch("app.get_latest_station_market_evaluation_context", return_value={})
+    @patch("app.get_transition_history", return_value=[])
+    def test_alert_review_bundle_endpoint_aggregates_from_diagnostics_rows(
+        self,
+        _mock_transitions,
+        _mock_evals,
+        _mock_hydration,
+        _mock_alerts,
+        mock_diagnostics,
+    ):
+        mock_diagnostics.return_value = {
+            "summary": {
+                "total_transitions": 2,
+                "alerts_emitted": 1,
+                "transitions_with_markets": 1,
+                "transitions_without_markets": 1,
+                "suppressed_price_band": 0,
+                "suppressed_market_rules": 1,
+                "suppressed_hydration": 0,
+            },
+            "market_statistics": {
+                "avg_markets_considered": 2.0,
+                "avg_eligible_markets": 0.5,
+                "avg_rejected_markets": 1.5,
+                "price_band_rejections": 1,
+                "settlement_mismatch_rejections": 1,
+                "wrong_series_rejections": 1,
+                "expired_market_rejections": 0,
+            },
+            "transition_samples": [
+                {
+                    "station": "KDEN",
+                    "timestamp": "2026-01-01T00:00:00Z",
+                    "transition_type": "instant_up",
+                    "instant_bucket_before": 60,
+                    "instant_bucket_after": 61,
+                    "settlement_bucket": 61,
+                    "markets_considered_count": 4,
+                    "eligible_markets_count": 1,
+                    "rejected_markets_count": 3,
+                    "rejection_breakdown": {
+                        "outside_price_band": 1,
+                        "settlement_mismatch": 1,
+                        "wrong_series": 1,
+                        "expired_market": 0,
+                    },
+                    "decision_outcome": {
+                        "alerts_sent": 0,
+                        "evaluation_outcome": "NO_ELIGIBLE_MARKET",
+                        "runtime_suppression_reason": "",
+                        "diagnostic_suppression_reason": "MARKET_RULES",
+                    },
+                },
+                {
+                    "station": "KDEN",
+                    "timestamp": "2026-01-01T00:01:00Z",
+                    "transition_type": "instant_up",
+                    "instant_bucket_before": 61,
+                    "instant_bucket_after": 62,
+                    "settlement_bucket": 62,
+                    "markets_considered_count": 0,
+                    "eligible_markets_count": 0,
+                    "rejected_markets_count": 0,
+                    "rejection_breakdown": {
+                        "outside_price_band": 0,
+                        "settlement_mismatch": 0,
+                        "wrong_series": 0,
+                        "expired_market": 0,
+                    },
+                    "decision_outcome": {
+                        "alerts_sent": 0,
+                        "evaluation_outcome": "UNKNOWN",
+                        "runtime_suppression_reason": "",
+                        "diagnostic_suppression_reason": "HYDRATION_NOT_READY",
+                    },
+                },
+            ],
+        }
+
+        response = self.client.get("/diagnostics/alert_review_bundle?station=KDEN&limit=2")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertEqual(payload["summary"]["suppressed_hydration"], 0)
+        self.assertEqual(payload["market_statistics"]["avg_markets_considered"], 2.0)
+        self.assertEqual(payload["market_statistics"]["avg_eligible_markets"], 0.5)
+        self.assertEqual(payload["market_statistics"]["avg_rejected_markets"], 1.5)
+        self.assertEqual(payload["market_statistics"]["price_band_rejections"], 1)
+        self.assertEqual(payload["market_statistics"]["settlement_mismatch_rejections"], 1)
+        self.assertEqual(payload["market_statistics"]["wrong_series_rejections"], 1)
+        self.assertEqual(payload["market_statistics"]["expired_market_rejections"], 0)
+        self.assertEqual(
+            payload["transition_samples"][1]["decision_outcome"]["diagnostic_suppression_reason"],
+            "HYDRATION_NOT_READY",
         )
 
 

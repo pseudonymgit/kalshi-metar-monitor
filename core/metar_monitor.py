@@ -1744,18 +1744,6 @@ def get_alert_review_diagnostics(
         else {}
     )
     recent_alerts = recent_alerts if isinstance(recent_alerts, list) else []
-    alert_counts_by_transition_key: Dict[Tuple[str, str, str], int] = {}
-    for alert in recent_alerts:
-        if not isinstance(alert, dict):
-            continue
-        key = (
-            (alert.get("station") or "").strip().upper(),
-            str(alert.get("timestamp_utc") or ""),
-            str(alert.get("transition_type") or "").strip(),
-        )
-        if not key[0]:
-            continue
-        alert_counts_by_transition_key[key] = alert_counts_by_transition_key.get(key, 0) + 1
 
     rows: List[Dict[str, Any]] = []
     summary = {
@@ -1764,7 +1752,17 @@ def get_alert_review_diagnostics(
         "transitions_without_markets": 0,
         "suppressed_price_band": 0,
         "suppressed_market_rules": 0,
+        "suppressed_hydration": 0,
         "alerts_emitted": 0,
+    }
+    market_totals = {
+        "markets_considered_count": 0,
+        "eligible_markets_count": 0,
+        "rejected_markets_count": 0,
+        "price_band_rejections": 0,
+        "settlement_mismatch_rejections": 0,
+        "wrong_series_rejections": 0,
+        "expired_market_rejections": 0,
     }
 
     for row in transitions:
@@ -1802,10 +1800,6 @@ def get_alert_review_diagnostics(
         markets_after_all_rules = max(eligible_markets_count, 0)
 
         alerts_sent = int(row.get("alerts_sent") or metadata.get("alerts_sent") or 0)
-        alert_history_count = alert_counts_by_transition_key.get(
-            (station, str(row.get("timestamp_utc") or ""), str(row.get("transition_type") or "").strip()),
-            0,
-        )
         evaluation_outcome = (
             str(row.get("evaluation_outcome") or metadata.get("evaluation_outcome") or "").strip().upper() or "UNKNOWN"
         )
@@ -1857,12 +1851,19 @@ def get_alert_review_diagnostics(
                 "alerts_sent": alerts_sent,
                 "evaluation_outcome": evaluation_outcome,
                 "runtime_suppression_reason": runtime_suppression_reason,
+                "diagnostic_suppression_reason": diagnostic_suppression_reason,
             },
-            "diagnostic_suppression_reason": diagnostic_suppression_reason,
-            "alert_history_matches": alert_history_count,
             "hydration_cache_written": bool(hydration_runtime.get("cache_written")) if isinstance(hydration_runtime, dict) else None,
         }
         rows.append(transition_diag)
+
+        market_totals["markets_considered_count"] += markets_considered_count
+        market_totals["eligible_markets_count"] += eligible_markets_count
+        market_totals["rejected_markets_count"] += rejected_markets_count
+        market_totals["price_band_rejections"] += outside_price_band
+        market_totals["settlement_mismatch_rejections"] += settlement_mismatch
+        market_totals["wrong_series_rejections"] += wrong_series
+        market_totals["expired_market_rejections"] += expired_market
 
         summary["total_transitions"] += 1
         if markets_considered_count > 0:
@@ -1881,11 +1882,23 @@ def get_alert_review_diagnostics(
         elif evaluation_outcome != "UNKNOWN":
             summary["suppressed_market_rules"] += 1
 
+    transition_count = len(rows)
+    denominator = float(transition_count) if transition_count else 1.0
+
+    market_statistics = {
+        "avg_markets_considered": market_totals["markets_considered_count"] / denominator,
+        "avg_eligible_markets": market_totals["eligible_markets_count"] / denominator,
+        "avg_rejected_markets": market_totals["rejected_markets_count"] / denominator,
+        "price_band_rejections": market_totals["price_band_rejections"],
+        "settlement_mismatch_rejections": market_totals["settlement_mismatch_rejections"],
+        "wrong_series_rejections": market_totals["wrong_series_rejections"],
+        "expired_market_rejections": market_totals["expired_market_rejections"],
+    }
+
     return {
-        "ok": True,
-        "limit": bounded_limit,
         "summary": summary,
-        "transitions": rows,
+        "market_statistics": market_statistics,
+        "transition_samples": rows,
     }
 
 
