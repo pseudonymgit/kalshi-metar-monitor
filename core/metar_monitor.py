@@ -1807,6 +1807,14 @@ def get_alert_review_diagnostics(
             row.get("suppression_reason") or metadata.get("suppression_reason") or ""
         ).strip().upper()
 
+        hydration_runtime = hydration_stations.get(station) if station else {}
+        hydration_prerequisite = (
+            hydration_runtime.get("hydration_prerequisite")
+            if isinstance(hydration_runtime, dict) and isinstance(hydration_runtime.get("hydration_prerequisite"), dict)
+            else {}
+        )
+        hydration_cache_written = bool(hydration_prerequisite.get("cache_valid"))
+
         if runtime_suppression_reason:
             diagnostic_suppression_reason = runtime_suppression_reason
         elif alerts_sent > 0:
@@ -1817,12 +1825,10 @@ def get_alert_review_diagnostics(
             diagnostic_suppression_reason = "OUTSIDE_PRICE_BAND"
         elif rejected_markets_count > 0:
             diagnostic_suppression_reason = "MARKET_RULES"
-        elif isinstance(hydration_stations.get(station), dict) and not hydration_stations.get(station).get("cache_written"):
+        elif isinstance(hydration_runtime, dict) and not hydration_cache_written:
             diagnostic_suppression_reason = "HYDRATION_NOT_READY"
         else:
             diagnostic_suppression_reason = "UNKNOWN"
-
-        hydration_runtime = hydration_stations.get(station) if station else {}
 
         transition_diag = {
             "station": station,
@@ -1853,7 +1859,7 @@ def get_alert_review_diagnostics(
                 "runtime_suppression_reason": runtime_suppression_reason,
                 "diagnostic_suppression_reason": diagnostic_suppression_reason,
             },
-            "hydration_cache_written": bool(hydration_runtime.get("cache_written")) if isinstance(hydration_runtime, dict) else None,
+            "hydration_cache_written": hydration_cache_written if isinstance(hydration_runtime, dict) else None,
         }
         rows.append(transition_diag)
 
