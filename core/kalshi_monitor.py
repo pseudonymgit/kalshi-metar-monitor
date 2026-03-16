@@ -61,6 +61,8 @@ _HYDRATION_PREREQUISITE_STATE = {}
 _SERIES_DISCOVERY_ATTEMPT_COUNT = 0
 _LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
 _LAST_SERIES_DISCOVERY_ERROR = None
+_DISCOVERED_WEATHER_MARKETS = []
+_DISCOVERED_WEATHER_MARKETS_BY_STATION = {}
 _MARKETS_CACHE_POPULATION_COUNT = 0
 _LAST_HYDRATION_EXECUTION = {}
 _hydration_queue = []
@@ -131,6 +133,13 @@ _EXPLICIT_SETTLEMENT_STATION_OVERRIDES = {
     "AUS": "KAUS",
     "PHL": "KPHL",
     "PHIL": "KPHL",
+}
+
+_SETTLEMENT_ICAO_PATTERN = re.compile(r"\bK[A-Z]{3}\b")
+_WEATHER_MARKET_TYPE_LABELS = {
+    "HIGH_TEMP": "HIGH_TEMP",
+    "LOW_TEMP": "LOW_TEMP",
+    "PRECIP": "PRECIP",
 }
 
 
@@ -367,6 +376,134 @@ def _get_all_public_markets(max_pages=5, page_limit=200):
     return markets
 
 
+def _classify_weather_market_type(market: dict) -> str | None:
+    marker_strings = [
+        str(market.get("ticker") or "").strip().upper(),
+        str(market.get("title") or "").strip().upper(),
+        str(market.get("subtitle") or "").strip().upper(),
+        str(market.get("series_ticker") or "").strip().upper(),
+        str(market.get("category") or "").strip().upper(),
+    ]
+    marker_blob = " ".join(token for token in marker_strings if token)
+
+    if any(token in marker_blob for token in ("TMAX", "HIGH TEMP", "HIGHEST TEMPERATURE", "DAILY HIGH")):
+        return _WEATHER_MARKET_TYPE_LABELS["HIGH_TEMP"]
+    if any(token in marker_blob for token in ("TMIN", "LOW TEMP", "LOWEST TEMPERATURE", "DAILY LOW")):
+        return _WEATHER_MARKET_TYPE_LABELS["LOW_TEMP"]
+    if any(token in marker_blob for token in ("PRECIP", "RAIN", "RAINFALL")):
+        return _WEATHER_MARKET_TYPE_LABELS["PRECIP"]
+    return None
+
+
+def _extract_station_from_settlement_market_metadata(market: dict) -> str | None:
+    settlement_metadata = market.get("settlement_metadata")
+    if isinstance(settlement_metadata, dict):
+        for key in ("station", "icao", "station_code", "settlement_station"):
+            value = settlement_metadata.get(key)
+            normalized_value = str(value or "").strip().upper()
+            if _SETTLEMENT_ICAO_PATTERN.fullmatch(normalized_value):
+                return normalized_value
+
+    for key in ("settlement_station", "station", "station_code", "icao"):
+        value = market.get(key)
+        normalized_value = str(value or "").strip().upper()
+        if _SETTLEMENT_ICAO_PATTERN.fullmatch(normalized_value):
+            return normalized_value
+
+    settlement_text_sources = [
+        market.get("settlement_rule"),
+        market.get("settlement_rules"),
+        market.get("rules_primary"),
+        market.get("rules"),
+    ]
+    if isinstance(settlement_metadata, dict):
+        settlement_text_sources.extend(
+            settlement_metadata.get(key)
+            for key in ("rule", "rules", "settlement_rule", "description", "details")
+        )
+
+    settlement_blob = " ".join(
+        str(fragment).strip().upper()
+        for fragment in settlement_text_sources
+        if isinstance(fragment, str) and fragment.strip()
+    )
+    if not settlement_blob:
+        return None
+
+    match = _SETTLEMENT_ICAO_PATTERN.search(settlement_blob)
+    if not match:
+        return None
+    return match.group(0)
+
+
+def _parse_market_expiration(market: dict):
+    for key in (
+        "expiration_time",
+        "expiration",
+        "close_time",
+        "settlement_time",
+        "settlement_date",
+    ):
+        parsed = parse_iso_utc(market.get(key))
+        if parsed is not None:
+            return parsed
+    return None
+
+
+def discover_kalshi_weather_markets(max_pages=5, page_limit=200):
+    discovered_markets = []
+    discovered_by_station = {}
+    cursor = None
+
+    for _ in range(max_pages):
+        path = f"/markets?limit={int(page_limit)}&status=open"
+        if cursor:
+            path = f"{path}&cursor={cursor}"
+
+        data = _kalshi_public_get(path)
+        markets = data.get("markets") or []
+
+        for market in markets:
+            if str(market.get("status") or "").strip().upper() != "OPEN":
+                continue
+
+            market_type = _classify_weather_market_type(market)
+            if market_type is None:
+                continue
+
+            station = _extract_station_from_settlement_market_metadata(market)
+            if not station:
+                continue
+
+            market_symbol = str(market.get("ticker") or market.get("symbol") or "").strip().upper()
+            if not market_symbol:
+                continue
+
+            normalized_market = {
+                "market_symbol": market_symbol,
+                "market_type": market_type,
+                "station": station,
+                "expiration": _parse_market_expiration(market),
+                "active": True,
+            }
+            discovered_markets.append(normalized_market)
+            discovered_by_station.setdefault(station, []).append(market_symbol)
+
+        cursor = data.get("cursor")
+        if not cursor:
+            break
+
+    with _SERIES_LOCK:
+        global _DISCOVERED_WEATHER_MARKETS, _DISCOVERED_WEATHER_MARKETS_BY_STATION
+        _DISCOVERED_WEATHER_MARKETS = list(discovered_markets)
+        _DISCOVERED_WEATHER_MARKETS_BY_STATION = {
+            station: sorted(set(symbols))
+            for station, symbols in discovered_by_station.items()
+        }
+
+    return list(discovered_markets)
+
+
 def build_market_derived_station_universe(max_pages=5, page_limit=200):
     city_tokens = set()
     cursor = None
@@ -431,6 +568,14 @@ def build_market_polling_station_universe(max_pages=5, page_limit=200):
             stations.add(station)
 
     return sorted(stations)
+
+
+def get_discovered_weather_market_station_mapping() -> dict:
+    with _SERIES_LOCK:
+        return {
+            station: list(markets)
+            for station, markets in _DISCOVERED_WEATHER_MARKETS_BY_STATION.items()
+        }
 
 
 def _format_change(prev, curr):
