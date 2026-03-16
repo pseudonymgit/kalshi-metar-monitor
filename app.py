@@ -2289,6 +2289,19 @@ def retention_prune():
     return jsonify(prune_old_alerts()), 200
 
 
+@app.route("/alert-review-diagnostics", methods=["GET"])
+def alert_review_diagnostics():
+    limit = request.args.get("limit", default=50)
+    payload = get_alert_review_diagnostics(limit=limit)
+    return jsonify(payload), 200
+
+
+@app.route("/recent-alerts", methods=["GET"])
+def recent_alerts():
+    payload = get_recent_alerts()
+    return jsonify(payload), 200
+
+
 
 
 @app.route("/diagnostics/alert_review_bundle", methods=["GET"])
