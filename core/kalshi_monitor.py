@@ -864,8 +864,12 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
     series_tickers = _normalize_series_tickers(ensure_series_discovery_loaded().get(normalized_station))
     series_ticker = series_tickers[0] if series_tickers else None
     series_discovered = bool(series_tickers)
-    cached = get_cached_series_markets(series_ticker) if series_ticker else None
-    markets_cached = bool((cached or {}).get("markets"))
+    cache_entries = {
+        ticker: get_cached_series_markets(ticker)
+        for ticker in series_tickers
+    }
+    cached = cache_entries.get(series_ticker) if series_ticker else None
+    markets_cached = any(bool((entry or {}).get("markets")) for entry in cache_entries.values())
 
     if not series_tickers:
         result = {"status": "cache_missing", "reason": "series_missing", "station_local_day": station_day}
@@ -881,7 +885,8 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
             }
         return result
 
-    if cached is None:
+    missing_cache_series = [ticker for ticker in series_tickers if cache_entries.get(ticker) is None]
+    if missing_cache_series:
         result = {"status": "cache_missing", "reason": "cache_missing", "series_ticker": series_ticker, "station_local_day": station_day}
         with _SERIES_LOCK:
             _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
@@ -895,15 +900,29 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
             }
         return result
 
-    cached_day = cached.get("station_local_day")
+    stale_cache_entries = []
+    for ticker in series_tickers:
+        entry = cache_entries.get(ticker) or {}
+        stale_cache_entries.append((ticker, entry.get("station_local_day"), entry.get("hydrated_at_utc")))
+
     rollover_grace = False
     yesterday_day = _station_local_previous_day(normalized_station, now_utc_iso)
 
-    if cached_day == station_day:
-        rollover_grace = False
-    elif yesterday_day is not None and cached_day == yesterday_day:
-        rollover_grace = True
-    else:
+    invalid_entry = None
+    if stale_cache_entries:
+        invalid_entry = next(
+            (
+                (ticker, cached_day, hydrated_at_utc)
+                for ticker, cached_day, hydrated_at_utc in stale_cache_entries
+                if cached_day != station_day and (yesterday_day is None or cached_day != yesterday_day)
+            ),
+            None,
+        )
+        if invalid_entry is None and all(cached_day == yesterday_day for _, cached_day, _ in stale_cache_entries):
+            rollover_grace = True
+
+    if invalid_entry is not None:
+        _, cached_day, hydrated_at_utc = invalid_entry
         result = {
             "status": "cache_stale",
             "reason": "station_local_day_mismatch",
@@ -911,7 +930,7 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
             "station_local_day": station_day,
             "yesterday_station_local_day": yesterday_day,
             "cached_station_local_day": cached_day,
-            "hydrated_at_utc": cached.get("hydrated_at_utc"),
+            "hydrated_at_utc": hydrated_at_utc,
         }
         with _SERIES_LOCK:
             _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
@@ -929,7 +948,10 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
         "status": "cache_valid",
         "series_ticker": series_ticker,
         "station_local_day": station_day,
-        "hydrated_at_utc": cached.get("hydrated_at_utc"),
+        "hydrated_at_utc": max(
+            (entry.get("hydrated_at_utc") for entry in cache_entries.values() if (entry or {}).get("hydrated_at_utc")),
+            default=None,
+        ),
         "rollover_grace": rollover_grace,
     }
     with _SERIES_LOCK:
@@ -1065,13 +1087,13 @@ def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dic
     snapshot = build_structured_snapshot(normalized_station, market_types)
     series_tickers = _normalize_series_tickers(ensure_series_discovery_loaded().get(normalized_station))
     series_ticker = series_tickers[0] if series_tickers else None
-    cached = get_cached_series_markets(series_ticker) if series_ticker else None
+    cache_entries = [get_cached_series_markets(ticker) for ticker in series_tickers]
     return {
         "station": normalized_station,
         "series_ticker": series_ticker,
         "status": "hydrated",
-        "hydrated_at_utc": (cached or {}).get("hydrated_at_utc"),
-        "station_local_day": (cached or {}).get("station_local_day"),
+        "hydrated_at_utc": max((entry.get("hydrated_at_utc") for entry in cache_entries if (entry or {}).get("hydrated_at_utc")), default=None),
+        "station_local_day": next((entry.get("station_local_day") for entry in cache_entries if (entry or {}).get("station_local_day")), None),
         "market_count": len(snapshot.get("markets") or []),
     }
 
@@ -1215,15 +1237,14 @@ def build_structured_snapshot(station: str, market_types: set):
                 len(series_markets),
             )
             fetched_markets.extend(series_markets)
-        if series_markets:
-            with _SERIES_LOCK:
-                _SERIES_MARKETS_CACHE[series_ticker_item] = {
-                    "markets": list(series_markets),
-                    "hydrated_at_utc": evaluated_at_utc,
-                    "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
-                }
-                _MARKETS_CACHE_POPULATION_COUNT += 1
-            cache_written = True
+        with _SERIES_LOCK:
+            _SERIES_MARKETS_CACHE[series_ticker_item] = {
+                "markets": list(series_markets),
+                "hydrated_at_utc": evaluated_at_utc,
+                "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
+            }
+            _MARKETS_CACHE_POPULATION_COUNT += 1
+        cache_written = True
 
     rejection_counts = {}
     filtered_markets = _filter_structured_markets(
