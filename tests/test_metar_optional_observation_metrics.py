@@ -80,6 +80,22 @@ class MetarOptionalObservationMetricsTests(unittest.TestCase):
         self.assertIsNone(parsed["dewpoint_c"])
         self.assertIsNone(parsed["wind_speed_kt"])
 
+    def test_parse_tgftp_text_supports_negative_metar_temperature_token(self):
+        parsed = _parse_tgftp_text("2026/03/03 01:00\nKDEN 030100Z 27010KT 10SM FEW060 M02/M05 A2992")
+
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed["temp_f"], 28.4)
+
+    def test_parse_tgftp_text_ignores_missing_temperature_token(self):
+        parsed = _parse_tgftp_text("2026/03/03 01:00\nKDEN 030100Z 27010KT 10SM FEW060 //// A2992")
+
+        self.assertIsNone(parsed)
+
+    def test_parse_tgftp_text_rejects_malformed_temperature_token(self):
+        parsed = _parse_tgftp_text("2026/03/03 01:00\nKDEN 030100Z 27010KT 10SM FEW060 XX/YY A2992")
+
+        self.assertIsNone(parsed)
+
 
 if __name__ == "__main__":
     unittest.main()
