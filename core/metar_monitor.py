@@ -706,17 +706,27 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
     ts_line = lines[0].strip()
     metar_line = lines[-1].strip()
 
+    def _parse_metar_temp_c(token: str) -> Optional[float]:
+        left = (token or "").strip().partition("/")[0]
+        if not left or left == "////":
+            return None
+        match = re.fullmatch(r"(M?)(\d{2})", left)
+        if not match:
+            return None
+        sign, digits = match.groups()
+        value = float(digits)
+        return -value if sign == "M" else value
+
     # Find temp from token like 12/01 or M02/M05
     temp_f: Optional[float] = None
     for token in metar_line.split():
-        if "/" in token and len(token) <= 6:
-            left, _, _right = token.partition("/")
-            try:
-                c = -float(left[1:]) if left.startswith("M") else float(left)
-                temp_f = _c_to_f(c)
-                break
-            except Exception:
-                continue
+        if "/" not in token or len(token) > 9:
+            continue
+        c = _parse_metar_temp_c(token)
+        if c is None:
+            continue
+        temp_f = _c_to_f(c)
+        break
     if temp_f is None:
         return None
 
