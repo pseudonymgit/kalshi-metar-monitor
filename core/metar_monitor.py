@@ -2583,7 +2583,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             hydrated_any = False
             market_context_seeded = bool(market_context.get("event_ticker"))
             rejection_breakdown = {
-                "directional_strike_rejected": 0,
+                "directional_strike_rejections": 0,
                 "wrong_series": 0,
                 "expired_market": 0,
                 "settlement_mismatch": 0,
