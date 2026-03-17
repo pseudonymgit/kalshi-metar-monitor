@@ -1081,9 +1081,9 @@ def _filter_structured_markets(markets, station, market_types, rejection_counts=
 
     for market in markets:
         ticker = (market.get("ticker") or "").upper()
-        status = market.get("status")
+        status = str(market.get("status") or "")
 
-        if status and status != "active":
+        if status and status.upper() not in {"OPEN", "ACTIVE"}:
             _record_rejection("inactive_market")
             continue
 
