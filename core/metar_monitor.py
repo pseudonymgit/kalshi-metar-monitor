@@ -2595,7 +2595,11 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             if station_is_active:
                 for market_type_token in sorted(target_market_types):
                     evaluated_market_attempts += 1
-                    snapshot = build_structured_snapshot_from_cache(station, {market_type_token})
+                    snapshot = build_structured_snapshot_from_cache(
+                        station,
+                        {market_type_token},
+                        observation_time_utc=reference_timestamp_utc,
+                    )
                     debug_snapshot_override = payload.get("debug_market_snapshot_override")
                     if isinstance(debug_snapshot_override, dict):
                         snapshot = {
