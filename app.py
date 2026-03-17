@@ -20,6 +20,7 @@ import json
 import sys
 import logging
 import sqlite3
+import threading
 from datetime import datetime, timezone
 from time import monotonic
 from flask import Flask, request, jsonify, g
@@ -93,6 +94,7 @@ log.setLevel(logging.INFO)
 _autostart_fallback_done = False
 
 _MARKET_COVERAGE_OBSERVABILITY_MEMO = {}
+_MARKET_COVERAGE_OBSERVABILITY_LOCK = threading.Lock()
 _MARKET_COVERAGE_OBSERVABILITY_MEMO_TTL_SECONDS = 3.0
 
 
@@ -417,9 +419,10 @@ def _build_market_coverage_rows(station_filter=None):
 
     memo_key = station_filter or "__all__"
     now_mono = monotonic()
-    memo_entry = _MARKET_COVERAGE_OBSERVABILITY_MEMO.get(memo_key)
-    if memo_entry and (now_mono - memo_entry["created_mono"]) <= _MARKET_COVERAGE_OBSERVABILITY_MEMO_TTL_SECONDS:
-        return memo_entry["payload"]
+    with _MARKET_COVERAGE_OBSERVABILITY_LOCK:
+        memo_entry = _MARKET_COVERAGE_OBSERVABILITY_MEMO.get(memo_key)
+        if memo_entry and (now_mono - memo_entry["created_mono"]) <= _MARKET_COVERAGE_OBSERVABILITY_MEMO_TTL_SECONDS:
+            return memo_entry["payload"]
 
     station_universe = _canonical_live_station_universe(station_filter=station_filter)
     stations = station_universe.get("stations") or []
@@ -586,10 +589,11 @@ def _build_market_coverage_rows(station_filter=None):
     if series_discovery_error:
         payload["series_discovery_error"] = series_discovery_error
 
-    _MARKET_COVERAGE_OBSERVABILITY_MEMO[memo_key] = {
-        "created_mono": now_mono,
-        "payload": payload,
-    }
+    with _MARKET_COVERAGE_OBSERVABILITY_LOCK:
+        _MARKET_COVERAGE_OBSERVABILITY_MEMO[memo_key] = {
+            "created_mono": now_mono,
+            "payload": payload,
+        }
     return payload
 
 
