@@ -1897,7 +1897,7 @@ def get_alert_review_diagnostics(
         "markets_considered_count": 0,
         "eligible_markets_count": 0,
         "rejected_markets_count": 0,
-        "directional_strike_rejections": 0,
+        "directional_strike_rejected": 0,
         "settlement_mismatch_rejections": 0,
         "wrong_series_rejections": 0,
         "expired_market_rejections": 0,
