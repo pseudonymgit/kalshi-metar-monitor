@@ -348,15 +348,42 @@ class StructuralHardeningTests(unittest.TestCase):
             {"markets": []},
         ],
     )
-    def test_empty_market_fetch_does_not_write_cache(self, mock_get, *_mocks):
+    def test_empty_market_fetch_writes_cache_entry(self, mock_get, *_mocks):
         with kalshi_monitor._SERIES_LOCK:
             kalshi_monitor._SERIES_MARKETS_CACHE.clear()
 
         snapshot = kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
-        self.assertFalse(snapshot.get("cache_written"))
-        self.assertIsNone(kalshi_monitor.get_cached_series_markets("KXHIGHDEN"))
+        self.assertEqual((kalshi_monitor.get_cached_series_markets("KXHIGHDEN") or {}).get("markets"), [])
         self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
+
+    @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXDENHIGH"]})
+    @patch("core.kalshi_monitor._station_local_previous_day", return_value="2025-03-09")
+    @patch("core.kalshi_monitor.station_local_day_key", return_value="2025-03-10")
+    @patch(
+        "core.kalshi_monitor.get_cached_series_markets",
+        side_effect=[
+            {"markets": [{"ticker": "A"}], "hydrated_at_utc": "2025-01-01T10:00:00+00:00", "station_local_day": "2025-03-10"},
+            None,
+        ],
+    )
+    def test_hydration_prerequisite_requires_cache_for_all_discovered_series(self, *_mocks):
+        result = kalshi_monitor.ensure_ladder_hydration_prerequisite("KDEN")
+        self.assertEqual(result["status"], "cache_missing")
+
+    @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXDENHIGH"]})
+    @patch("core.kalshi_monitor.build_structured_snapshot", return_value={"markets": []})
+    @patch(
+        "core.kalshi_monitor.get_cached_series_markets",
+        side_effect=[
+            {"markets": [], "hydrated_at_utc": "2025-01-01T10:00:00+00:00", "station_local_day": "2025-03-10"},
+            {"markets": [], "hydrated_at_utc": "2025-01-01T10:05:00+00:00", "station_local_day": "2025-03-10"},
+        ],
+    )
+    def test_hydrate_snapshot_reads_all_series_cache_entries(self, *_mocks):
+        with kalshi_monitor.kalshi_execution_domain("production"):
+            result = kalshi_monitor.hydrate_station_ladder_snapshot("KDEN", {"HIGH"})
+        self.assertEqual(result["hydrated_at_utc"], "2025-01-01T10:05:00+00:00")
 
     def test_no_direct_state_mutation_for_temperature_domains(self):
         source = open("core/metar_monitor.py", "r", encoding="utf-8").read()
