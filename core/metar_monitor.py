@@ -1045,7 +1045,8 @@ def _current_signal_epoch(station: str) -> int:
 
 
 def _record_signal_runtime(station: str, runtime: Dict[str, Any]) -> None:
-    _LATEST_SIGNAL_RUNTIME[(station or "").strip().upper()] = copy.deepcopy(runtime)
+    with _SIGNAL_LOCK:
+        _LATEST_SIGNAL_RUNTIME[(station or "").strip().upper()] = copy.deepcopy(runtime)
 
 
 def _get_signal_runtime(station: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
@@ -1112,6 +1113,8 @@ def _evaluate_deterministic_signal_layer(
         return
 
     pending_signal_context = None
+    pending_runtime_record = None
+    early_exit = False
 
     with _SIGNAL_LOCK:
         window = _SIGNAL_OBSERVATION_WINDOWS.setdefault(station, deque(maxlen=_SIGNAL_MOMENTUM_WINDOW_SIZE))
@@ -1145,116 +1148,122 @@ def _evaluate_deterministic_signal_layer(
 
         if not hydration_cache_valid:
             runtime["suppression_reason"] = "HYDRATION_CACHE_INVALID"
-            _record_signal_runtime(station, runtime)
-            return
-        if int(eligible_markets_count) <= 0:
+            pending_runtime_record = runtime
+            early_exit = True
+        elif int(eligible_markets_count) <= 0:
             runtime["suppression_reason"] = "NO_ELIGIBLE_MARKETS"
-            _record_signal_runtime(station, runtime)
-            return
-        if station_cooldown_active:
-            runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+            pending_runtime_record = runtime
+            early_exit = True
+        else:
+            if station_cooldown_active:
+                runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
 
-        next_integer = int(math.floor(now_f)) + 1
-        distance_to_integer = float(next_integer) - float(now_f)
-        momentum = None
-        pressure_to_boundary_seconds = None
-        boundary_cooldown_active = False
-        boundary_key = (station, int(next_integer), int(epoch_id))
-        boundary_last_emit = _SIGNAL_BOUNDARY_LAST_EMIT.get(boundary_key)
-        if boundary_last_emit is not None and (obs_seconds - boundary_last_emit) < _SIGNAL_BOUNDARY_COOLDOWN_SECONDS:
-            boundary_cooldown_active = True
-        runtime["cooldown_state"]["boundary_active"] = boundary_cooldown_active
+            next_integer = int(math.floor(now_f)) + 1
+            distance_to_integer = float(next_integer) - float(now_f)
+            momentum = None
+            pressure_to_boundary_seconds = None
+            boundary_cooldown_active = False
+            boundary_key = (station, int(next_integer), int(epoch_id))
+            boundary_last_emit = _SIGNAL_BOUNDARY_LAST_EMIT.get(boundary_key)
+            if boundary_last_emit is not None and (obs_seconds - boundary_last_emit) < _SIGNAL_BOUNDARY_COOLDOWN_SECONDS:
+                boundary_cooldown_active = True
+            runtime["cooldown_state"]["boundary_active"] = boundary_cooldown_active
 
-        near_boundary_all_conditions = False
-        if 0.0 < distance_to_integer <= 0.10 and len(window) == _SIGNAL_MOMENTUM_WINDOW_SIZE:
-            x1, x2, x3 = window[0], window[1], window[2]
-            monotonic = x1["temp_f"] <= x2["temp_f"] <= x3["temp_f"]
-            increasing_time = x1["seconds"] < x2["seconds"] < x3["seconds"]
-            movement_ok = (x3["temp_f"] - x1["temp_f"]) >= 0.05
-            total_seconds = x3["seconds"] - x1["seconds"]
-            if increasing_time and total_seconds > 0:
-                momentum = (x3["temp_f"] - x1["temp_f"]) / total_seconds
-                if momentum > 0:
-                    pressure_to_boundary_seconds = distance_to_integer / momentum
-            near_boundary_all_conditions = bool(
-                monotonic
-                and increasing_time
-                and movement_ok
-                and momentum is not None
-                and momentum >= 0.002
-            )
+            near_boundary_all_conditions = False
+            if 0.0 < distance_to_integer <= 0.10 and len(window) == _SIGNAL_MOMENTUM_WINDOW_SIZE:
+                x1, x2, x3 = window[0], window[1], window[2]
+                monotonic = x1["temp_f"] <= x2["temp_f"] <= x3["temp_f"]
+                increasing_time = x1["seconds"] < x2["seconds"] < x3["seconds"]
+                movement_ok = (x3["temp_f"] - x1["temp_f"]) >= 0.05
+                total_seconds = x3["seconds"] - x1["seconds"]
+                if increasing_time and total_seconds > 0:
+                    momentum = (x3["temp_f"] - x1["temp_f"]) / total_seconds
+                    if momentum > 0:
+                        pressure_to_boundary_seconds = distance_to_integer / momentum
+                near_boundary_all_conditions = bool(
+                    monotonic
+                    and increasing_time
+                    and movement_ok
+                    and momentum is not None
+                    and momentum >= 0.002
+                )
 
-        if near_boundary_all_conditions and not station_cooldown_active and not boundary_cooldown_active:
-            pending_signal_context = {
-                "signal_type": "near_boundary_momentum_up",
-                "signal_version": 1,
-                "station": station,
-                "obs_time": obs_time,
-                "dedupe_key": f"near_boundary_momentum_up:{station}:{epoch_id}:{next_integer}",
-                "cooldown_applied": True,
-                "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS,
-                "distance_to_next_integer": distance_to_integer,
-                "momentum_f_per_sec": momentum,
-                "momentum_window_size": _SIGNAL_MOMENTUM_WINDOW_SIZE,
-                "next_integer_boundary": next_integer,
-                "pressure_to_boundary_seconds": pressure_to_boundary_seconds,
-            }
-            _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
-            _SIGNAL_BOUNDARY_LAST_EMIT[boundary_key] = obs_seconds
-            runtime.update({"signal_type": "near_boundary_momentum_up", "signal_emitted": True, "suppression_reason": None})
-            runtime["cooldown_state"]["station_active"] = True
-            runtime["cooldown_state"]["boundary_active"] = True
-            _record_signal_runtime(station, runtime)
-
-        if pending_signal_context is None:
-            epoch_key = (station, int(epoch_id))
-            tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
-            if transition_type == "settlement_up":
-                tracker = {
-                    "settlement_bucket_at_up": int(settlement_bucket),
-                    "max_temp_after_up": float(now_f),
-                    "exceeded_by_one_or_more": float(now_f) >= float(settlement_bucket) + 1.2,
-                    "reverted_below_settlement": float(now_f) <= float(settlement_bucket) - 0.2,
-                    "alert_emitted": False,
-                    "settlement_up_obs_time": obs_time,
+            if near_boundary_all_conditions and not station_cooldown_active and not boundary_cooldown_active:
+                pending_signal_context = {
+                    "signal_type": "near_boundary_momentum_up",
+                    "signal_version": 1,
+                    "station": station,
+                    "obs_time": obs_time,
+                    "dedupe_key": f"near_boundary_momentum_up:{station}:{epoch_id}:{next_integer}",
+                    "cooldown_applied": True,
+                    "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS,
+                    "distance_to_next_integer": distance_to_integer,
+                    "momentum_f_per_sec": momentum,
+                    "momentum_window_size": _SIGNAL_MOMENTUM_WINDOW_SIZE,
+                    "next_integer_boundary": next_integer,
+                    "pressure_to_boundary_seconds": pressure_to_boundary_seconds,
                 }
-                _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[epoch_key] = tracker
-            elif isinstance(tracker, dict):
-                tracker["max_temp_after_up"] = max(float(tracker.get("max_temp_after_up") or now_f), float(now_f))
-                tracker["exceeded_by_one_or_more"] = bool(tracker.get("exceeded_by_one_or_more")) or (
-                    tracker["max_temp_after_up"] >= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) + 1.2
-                )
-                tracker["reverted_below_settlement"] = bool(tracker.get("reverted_below_settlement")) or (
-                    float(now_f) <= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) - 0.2
-                )
+                _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+                _SIGNAL_BOUNDARY_LAST_EMIT[boundary_key] = obs_seconds
+                runtime.update({"signal_type": "near_boundary_momentum_up", "signal_emitted": True, "suppression_reason": None})
+                runtime["cooldown_state"]["station_active"] = True
+                runtime["cooldown_state"]["boundary_active"] = True
 
-            if isinstance(tracker, dict):
-                if bool(tracker.get("alert_emitted")):
-                    runtime["suppression_reason"] = "EPOCH_ALERT_ALREADY_EMITTED"
-                elif station_cooldown_active:
-                    runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
-                elif bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
-                    pending_signal_context = {
-                        "signal_type": "goldilocks_reversion_alert",
-                        "signal_version": 1,
-                        "station": station,
-                        "obs_time": obs_time,
-                        "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
-                        "cooldown_applied": True,
-                        "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
-                        "settlement_bucket_at_up": int(tracker.get("settlement_bucket_at_up") or settlement_bucket),
-                        "max_temp_after_up": float(tracker.get("max_temp_after_up") or now_f),
-                        "reverted_temp": float(now_f),
-                        "epoch_id": int(epoch_id),
+            if pending_signal_context is None:
+                epoch_key = (station, int(epoch_id))
+                tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+                if transition_type == "settlement_up":
+                    tracker = {
+                        "settlement_bucket_at_up": int(settlement_bucket),
+                        "max_temp_after_up": float(now_f),
+                        "exceeded_by_one_or_more": float(now_f) >= float(settlement_bucket) + 1.2,
+                        "reverted_below_settlement": float(now_f) <= float(settlement_bucket) - 0.2,
+                        "alert_emitted": False,
+                        "settlement_up_obs_time": obs_time,
                     }
-                    tracker["alert_emitted"] = True
-                    _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
-                    runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None})
-                    runtime["cooldown_state"]["station_active"] = True
+                    _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[epoch_key] = tracker
+                elif isinstance(tracker, dict):
+                    tracker["max_temp_after_up"] = max(float(tracker.get("max_temp_after_up") or now_f), float(now_f))
+                    tracker["exceeded_by_one_or_more"] = bool(tracker.get("exceeded_by_one_or_more")) or (
+                        tracker["max_temp_after_up"] >= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) + 1.2
+                    )
+                    tracker["reverted_below_settlement"] = bool(tracker.get("reverted_below_settlement")) or (
+                        float(now_f) <= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) - 0.2
+                    )
 
-            if runtime["signal_type"] is None and runtime["suppression_reason"] is None:
-                runtime["suppression_reason"] = "NO_SIGNAL_CONDITION_MATCH"
-            _record_signal_runtime(station, runtime)
+                if isinstance(tracker, dict):
+                    if bool(tracker.get("alert_emitted")):
+                        runtime["suppression_reason"] = "EPOCH_ALERT_ALREADY_EMITTED"
+                    elif station_cooldown_active:
+                        runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+                    elif bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
+                        pending_signal_context = {
+                            "signal_type": "goldilocks_reversion_alert",
+                            "signal_version": 1,
+                            "station": station,
+                            "obs_time": obs_time,
+                            "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
+                            "cooldown_applied": True,
+                            "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
+                            "settlement_bucket_at_up": int(tracker.get("settlement_bucket_at_up") or settlement_bucket),
+                            "max_temp_after_up": float(tracker.get("max_temp_after_up") or now_f),
+                            "reverted_temp": float(now_f),
+                            "epoch_id": int(epoch_id),
+                        }
+                        tracker["alert_emitted"] = True
+                        _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+                        runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None})
+                        runtime["cooldown_state"]["station_active"] = True
+
+                if runtime["signal_type"] is None and runtime["suppression_reason"] is None:
+                    runtime["suppression_reason"] = "NO_SIGNAL_CONDITION_MATCH"
+                pending_runtime_record = runtime
+
+    if pending_runtime_record is not None:
+        _record_signal_runtime(station, pending_runtime_record)
+
+    if early_exit:
+        return
 
     if pending_signal_context is not None:
         _emit_signal_alert(station=station, obs_time=obs_time, temp_f=now_f, signal_context=pending_signal_context, cfg=cfg)
