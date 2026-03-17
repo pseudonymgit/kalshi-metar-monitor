@@ -2788,10 +2788,14 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                     "explanation": explanation,
                                 },
                             )
-                            if webhook_status_code is not None and 200 <= webhook_status_code < 300:
-                                with _MISSING_LADDER_LOCK:
+                     
+                            with _MISSING_LADDER_LOCK:
+                                _MISSING_LADDER_PENDING.discard(dedupe_key)
+
+                                if webhook_status_code is not None and 200 <= webhook_status_code < 300:
                                     _MISSING_LADDER_DEDUPE[dedupe_key] = True
-                        continue
+
+                            continue
 
                     transition = process_ladder_transition(
                         station=station,
