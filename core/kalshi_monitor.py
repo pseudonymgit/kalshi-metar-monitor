@@ -800,7 +800,18 @@ def ensure_series_discovery_loaded():
             if not discovered:
                 raise RuntimeError("series discovery returned 0 station mappings")
 
-            _SERIES_BY_STATION = discovered
+            normalized_discovered = {}
+            for station, value in discovered.items():
+                if isinstance(value, str):
+                    normalized = [value]
+                elif isinstance(value, list):
+                    normalized = [v for v in value if v]
+                else:
+                    normalized = _normalize_series_tickers(value)
+
+                normalized_discovered[station] = normalized
+
+            _SERIES_BY_STATION = normalized_discovered
             _SERIES_DISCOVERED = True
             if record_connectivity_state:
                 _LAST_SERIES_DISCOVERY_SUCCESS_UTC = datetime.now(timezone.utc).isoformat()
