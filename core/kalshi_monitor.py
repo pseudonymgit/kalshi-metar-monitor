@@ -693,20 +693,14 @@ def _station_local_kalshi_date_token(station, observation_time_utc: str | dateti
 
 
 def _normalize_series_tickers(series_tickers):
-    if isinstance(series_tickers, str):
-        normalized = (series_tickers or "").strip().upper()
-        return [normalized] if normalized else []
+    if not series_tickers:
+        return []
 
-    if isinstance(series_tickers, (list, tuple, set)):
-        normalized = []
-        seen = set()
-        for ticker in series_tickers:
-            normalized_ticker = (ticker or "").strip().upper()
-            if not normalized_ticker or normalized_ticker in seen:
-                continue
-            seen.add(normalized_ticker)
-            normalized.append(normalized_ticker)
-        return normalized
+    if isinstance(series_tickers, str):
+        return [series_tickers]
+
+    if isinstance(series_tickers, list):
+        return [ticker for ticker in series_tickers if ticker]
 
     return []
 
