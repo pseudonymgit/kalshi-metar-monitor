@@ -1280,6 +1280,49 @@ def build_structured_snapshot(
     fetched_markets = []
     cache_written = False
     for series_ticker_item in series_tickers:
+        inferred_market_type = None
+        if series_ticker_item.startswith("KXHIGH"):
+            inferred_market_type = "HIGH"
+        elif series_ticker_item.startswith("KXLOW"):
+            inferred_market_type = "LOW"
+
+        inferred_event_ticker = None
+        if inferred_market_type:
+            inferred_event_ticker = _build_weather_event_ticker(
+                normalized_station,
+                inferred_market_type,
+                observation_time_utc=evaluated_at_utc,
+            )
+
+        series_markets = []
+        direct_markets_resolved = False
+        if inferred_event_ticker:
+            try:
+                inferred_data = _kalshi_public_get(f"/markets?event_ticker={inferred_event_ticker}&limit=100")
+                series_markets = inferred_data.get("markets") or []
+                if series_markets:
+                    direct_markets_resolved = True
+                    _LOGGER.info(
+                        "hydration_market_fetch station=%s event=%s markets=%s",
+                        normalized_station,
+                        inferred_event_ticker,
+                        len(series_markets),
+                    )
+            except Exception:
+                series_markets = []
+
+        if direct_markets_resolved:
+            fetched_markets.extend(series_markets)
+            with _SERIES_LOCK:
+                _SERIES_MARKETS_CACHE[series_ticker_item] = {
+                    "markets": list(series_markets),
+                    "hydrated_at_utc": evaluated_at_utc,
+                    "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
+                }
+                _MARKETS_CACHE_POPULATION_COUNT += 1
+            cache_written = True
+            continue
+
         with _SERIES_LOCK:
             cached_events_entry = copy.deepcopy(_SERIES_EVENTS_CACHE.get(series_ticker_item))
 
@@ -1308,7 +1351,6 @@ def build_structured_snapshot(
             series_ticker=series_ticker_item,
             observation_time_utc=evaluated_at_utc,
         )
-        series_markets = []
         if event_ticker:
             data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}&limit=100")
             series_markets = data.get("markets") or []
