@@ -867,9 +867,8 @@ def get_cached_series_markets(series_ticker: str) -> dict | None:
         if cached_entry is None:
             return None
         return {
-            "markets": list(cached_entry.get("markets") or []),
-            "hydrated_at_utc": cached_entry.get("hydrated_at_utc"),
-            "station_local_day": cached_entry.get("station_local_day"),
+            **cached_entry,
+            "markets": [dict(market) for market in (cached_entry.get("markets") or [])],
         }
 
 
