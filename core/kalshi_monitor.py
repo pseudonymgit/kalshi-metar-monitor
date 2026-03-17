@@ -57,6 +57,7 @@ _PROXIMITY_LOCK = threading.Lock()
 _SERIES_BY_STATION = {}
 _SERIES_DISCOVERED = False
 _SERIES_MARKETS_CACHE = {}
+_SERIES_EVENTS_CACHE = {}
 _HYDRATION_PREREQUISITE_STATE = {}
 _SERIES_DISCOVERY_ATTEMPT_COUNT = 0
 _LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
@@ -97,6 +98,7 @@ logger = _LOGGER
 MIN_HYDRATION_INTERVAL_SECONDS = 1
 HYDRATION_BACKOFF_SECONDS = 120
 DIRECTIONAL_STRIKE_WINDOW_SIZE = 3
+SERIES_EVENTS_CACHE_TTL_SECONDS = 60
 
 
 def _market_strike_value(market):
@@ -1278,7 +1280,28 @@ def build_structured_snapshot(
     fetched_markets = []
     cache_written = False
     for series_ticker_item in series_tickers:
-        events_data = _kalshi_public_get(f"/events?series_ticker={series_ticker_item}")
+        with _SERIES_LOCK:
+            cached_events_entry = copy.deepcopy(_SERIES_EVENTS_CACHE.get(series_ticker_item))
+
+        cache_reference_utc = parse_iso_utc(evaluated_at_utc)
+
+        cached_events = None
+        if cached_events_entry and cache_reference_utc is not None:
+            cached_fetched_at = parse_iso_utc(cached_events_entry.get("fetched_at_utc"))
+            if cached_fetched_at is not None:
+                age_seconds = (cache_reference_utc - cached_fetched_at).total_seconds()
+                if age_seconds < SERIES_EVENTS_CACHE_TTL_SECONDS:
+                    cached_events = list(cached_events_entry.get("events") or [])
+
+        if cached_events is not None:
+            events_data = {"events": cached_events}
+        else:
+            events_data = _kalshi_public_get(f"/events?series_ticker={series_ticker_item}")
+            with _SERIES_LOCK:
+                _SERIES_EVENTS_CACHE[series_ticker_item] = {
+                    "events": list(events_data.get("events") or []),
+                    "fetched_at_utc": evaluated_at_utc,
+                }
         event_ticker = _select_event_ticker_for_series(
             events=events_data.get("events") or [],
             station=normalized_station,
