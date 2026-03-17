@@ -1631,6 +1631,17 @@ def _log_transition_event(
     current_temp: float,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
+    execution_domain = "production"
+    try:
+        from core.kalshi_monitor import _current_kalshi_execution_domain
+
+        execution_domain = _current_kalshi_execution_domain()
+    except Exception:
+        execution_domain = "production"
+
+    if execution_domain != "production":
+        return None
+
     now_iso = _now_utc_iso()
     event_metadata = dict(metadata or {})
     event_metadata.setdefault("alert_schema_version", 2)
