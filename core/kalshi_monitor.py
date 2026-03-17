@@ -685,6 +685,25 @@ def _station_local_kalshi_date_token(station):
     return now_local.strftime("%y%b%d").upper()
 
 
+def _normalize_series_tickers(series_tickers):
+    if isinstance(series_tickers, str):
+        normalized = (series_tickers or "").strip().upper()
+        return [normalized] if normalized else []
+
+    if isinstance(series_tickers, (list, tuple, set)):
+        normalized = []
+        seen = set()
+        for ticker in series_tickers:
+            normalized_ticker = (ticker or "").strip().upper()
+            if not normalized_ticker or normalized_ticker in seen:
+                continue
+            seen.add(normalized_ticker)
+            normalized.append(normalized_ticker)
+        return normalized
+
+    return []
+
+
 def _discover_series_for_stations():
     data = _kalshi_public_get("/series?tags=Daily%20temperature")
     series_items = data.get("series") or []
@@ -748,7 +767,8 @@ def _discover_series_for_stations():
                 candidates.append((score, ticker))
 
         if candidates:
-            discovered[station_code] = sorted(candidates, key=lambda candidate: (-candidate[0], candidate[1]))[0][1]
+            ranked_candidates = sorted(candidates, key=lambda candidate: (-candidate[0], candidate[1]))
+            discovered[station_code] = _normalize_series_tickers([candidate[1] for candidate in ranked_candidates])
 
     return discovered
 
@@ -809,17 +829,18 @@ def get_cached_series_markets(series_ticker: str) -> dict | None:
 def get_station_hydration_cache_probe(station: str) -> dict:
     normalized_station = (station or "").strip().upper()
     with _SERIES_LOCK:
-        series_ticker = (_SERIES_BY_STATION.get(normalized_station) or "").strip().upper() or None
-        cache_entry = _SERIES_MARKETS_CACHE.get(series_ticker) if series_ticker else None
-        raw_market_count = len((cache_entry or {}).get("markets") or [])
+        series_tickers = _normalize_series_tickers(_SERIES_BY_STATION.get(normalized_station))
+        series_ticker = series_tickers[0] if series_tickers else None
+        cache_entries = [_SERIES_MARKETS_CACHE.get(ticker) or {} for ticker in series_tickers]
+        raw_market_count = sum(len(entry.get("markets") or []) for entry in cache_entries)
         return {
             "station": normalized_station,
-            "series_ticker": series_ticker,
+            "series_ticker": series_ticker if len(series_tickers) <= 1 else list(series_tickers),
             "raw_market_count": raw_market_count,
-            "cache_present": cache_entry is not None,
+            "cache_present": any(entry for entry in cache_entries),
             "markets_cached": raw_market_count > 0,
-            "station_local_day": (cache_entry or {}).get("station_local_day"),
-            "hydrated_at_utc": (cache_entry or {}).get("hydrated_at_utc"),
+            "station_local_day": next((entry.get("station_local_day") for entry in cache_entries if entry.get("station_local_day")), None),
+            "hydrated_at_utc": max((entry.get("hydrated_at_utc") for entry in cache_entries if entry.get("hydrated_at_utc")), default=None),
         }
 
 
@@ -840,12 +861,13 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
 
     now_utc_iso = datetime.now(timezone.utc).isoformat()
     station_day = station_local_day_key(normalized_station, now_utc_iso)
-    series_ticker = ensure_series_discovery_loaded().get(normalized_station)
-    series_discovered = bool(series_ticker)
+    series_tickers = _normalize_series_tickers(ensure_series_discovery_loaded().get(normalized_station))
+    series_ticker = series_tickers[0] if series_tickers else None
+    series_discovered = bool(series_tickers)
     cached = get_cached_series_markets(series_ticker) if series_ticker else None
     markets_cached = bool((cached or {}).get("markets"))
 
-    if not series_ticker:
+    if not series_tickers:
         result = {"status": "cache_missing", "reason": "series_missing", "station_local_day": station_day}
         with _SERIES_LOCK:
             _HYDRATION_PREREQUISITE_STATE[normalized_station] = {
@@ -885,7 +907,7 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
         result = {
             "status": "cache_stale",
             "reason": "station_local_day_mismatch",
-            "series_ticker": series_ticker,
+            "series_ticker": series_ticker if len(series_tickers) <= 1 else list(series_tickers),
             "station_local_day": station_day,
             "yesterday_station_local_day": yesterday_day,
             "cached_station_local_day": cached_day,
@@ -1041,7 +1063,8 @@ def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dic
 
     normalized_station = (station or "").strip().upper()
     snapshot = build_structured_snapshot(normalized_station, market_types)
-    series_ticker = ensure_series_discovery_loaded().get(normalized_station)
+    series_tickers = _normalize_series_tickers(ensure_series_discovery_loaded().get(normalized_station))
+    series_ticker = series_tickers[0] if series_tickers else None
     cached = get_cached_series_markets(series_ticker) if series_ticker else None
     return {
         "station": normalized_station,
@@ -1163,7 +1186,8 @@ def build_structured_snapshot(station: str, market_types: set):
     normalized_station = (station or "").strip().upper()
     evaluated_at_utc = datetime.now(timezone.utc).isoformat()
     series_by_station = ensure_series_discovery_loaded()
-    series_ticker = series_by_station.get(normalized_station)
+    series_tickers = _normalize_series_tickers(series_by_station.get(normalized_station))
+    series_ticker = series_tickers[0] if series_tickers else None
 
     selected_types = {
         token.strip().upper()
@@ -1173,29 +1197,28 @@ def build_structured_snapshot(station: str, market_types: set):
 
     fetched_markets = []
     cache_written = False
-    if series_ticker:
-        events_data = _kalshi_public_get(f"/events?series_ticker={series_ticker}")
+    for series_ticker_item in series_tickers:
+        events_data = _kalshi_public_get(f"/events?series_ticker={series_ticker_item}")
         event_ticker = _select_event_ticker_for_series(
             events=events_data.get("events") or [],
             station=normalized_station,
-            series_ticker=series_ticker,
+            series_ticker=series_ticker_item,
         )
+        series_markets = []
         if event_ticker:
-            
             data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}&limit=100")
-            markets = data.get("markets") or []
+            series_markets = data.get("markets") or []
             _LOGGER.info(
                 "hydration_market_fetch station=%s event=%s markets=%s",
                 normalized_station,
                 event_ticker,
-                len(markets),
+                len(series_markets),
             )
-            
-            fetched_markets.extend(markets)
-        if fetched_markets:
+            fetched_markets.extend(series_markets)
+        if series_markets:
             with _SERIES_LOCK:
-                _SERIES_MARKETS_CACHE[series_ticker] = {
-                    "markets": list(fetched_markets),
+                _SERIES_MARKETS_CACHE[series_ticker_item] = {
+                    "markets": list(series_markets),
                     "hydrated_at_utc": evaluated_at_utc,
                     "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
                 }
@@ -1300,8 +1323,11 @@ def build_structured_snapshot_from_cache(station: str, market_types: set):
     }
 
     with _SERIES_LOCK:
-        series_ticker = (_SERIES_BY_STATION.get(normalized_station) or "").strip().upper() or None
-        cached_markets = list((_SERIES_MARKETS_CACHE.get(series_ticker) or {}).get("markets") or []) if series_ticker else []
+        series_tickers = _normalize_series_tickers(_SERIES_BY_STATION.get(normalized_station))
+        series_ticker = series_tickers[0] if series_tickers else None
+        cached_markets = []
+        for ticker in series_tickers:
+            cached_markets.extend(list((_SERIES_MARKETS_CACHE.get(ticker) or {}).get("markets") or []))
 
     rejection_counts = {}
     filtered_markets = _filter_structured_markets(
