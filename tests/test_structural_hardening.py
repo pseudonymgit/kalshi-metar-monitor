@@ -337,9 +337,9 @@ class StructuralHardeningTests(unittest.TestCase):
     def test_cache_metadata_prefers_station_day_event_ticker(self, mock_get, *_mocks):
         kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
+        self.assertEqual(mock_get.call_count, 2)
         self.assertEqual(mock_get.call_args_list[0].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
         self.assertEqual(mock_get.call_args_list[1].args[0], "/events?series_ticker=KXHIGHDEN")
-        self.assertEqual(mock_get.call_args_list[2].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
 
     @patch("core.kalshi_monitor.station_local_day_key", return_value="2026-03-12")
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26MAR12")
@@ -378,14 +378,10 @@ class StructuralHardeningTests(unittest.TestCase):
             kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
             kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
 
-        self.assertEqual(mock_get.call_count, 5)
+        self.assertEqual(mock_get.call_count, 3)
         self.assertEqual(mock_get.call_args_list[0].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
         self.assertEqual(mock_get.call_args_list[1].args[0], "/events?series_ticker=KXHIGHDEN")
         self.assertEqual(mock_get.call_args_list[2].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
-        self.assertEqual(mock_get.call_args_list[3].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
-        self.assertEqual(mock_get.call_args_list[4].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
-
-
 
     @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": "KXHIGHDEN"})
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26MAR12")
@@ -414,10 +410,26 @@ class StructuralHardeningTests(unittest.TestCase):
                 observation_time_utc="2026-03-12T12:00:00+00:00",
             )
 
-        self.assertEqual(mock_get.call_count, 3)
+        self.assertEqual(mock_get.call_count, 2)
         self.assertEqual(mock_get.call_args_list[0].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
         self.assertEqual(mock_get.call_args_list[1].args[0], "/events?series_ticker=KXHIGHDEN")
-        self.assertEqual(mock_get.call_args_list[2].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
+
+
+    @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXHIGHALT"]})
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26MAR12")
+    @patch(
+        "core.kalshi_monitor._kalshi_public_get",
+        side_effect=[
+            {"markets": []},
+            {"events": [{"event_ticker": "KXHIGHDEN-26MAR12", "status": "active"}]},
+        ],
+    )
+    def test_snapshot_reuses_event_market_fetch_within_single_build(self, mock_get, *_mocks):
+        kalshi_monitor.build_structured_snapshot("KDEN", {"HIGH"})
+
+        self.assertEqual(mock_get.call_count, 2)
+        self.assertEqual(mock_get.call_args_list[0].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
+        self.assertEqual(mock_get.call_args_list[1].args[0], "/events?series_ticker=KXHIGHALT")
 
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26MAR12")
     def test_filter_structured_markets_uses_observation_timestamp_for_date_token(self, mock_date_token):
