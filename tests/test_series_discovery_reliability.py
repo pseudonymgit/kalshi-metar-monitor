@@ -29,7 +29,7 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        self.assertEqual(discovered.get("KDEN"), "KXHIGHDEN")
+        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXDENHIGH"])
 
     def test_ensure_discovery_raises_and_does_not_mark_discovered_on_empty_mapping(self):
         kalshi_monitor._SERIES_DISCOVERED = False
