@@ -56,6 +56,9 @@ class TransitionEvaluationWindowTests(unittest.TestCase):
         metar_monitor._KALSHI_LAST_CALL_TS.clear()
         metar_monitor._TRANSITION_HISTORY.clear()
 
+    def test_parse_iso_returns_none_for_invalid_timestamp(self):
+        self.assertIsNone(metar_monitor._parse_iso("not-a-timestamp"))
+
     def test_parse_iso_utc_optional_is_deterministic(self):
         self.assertEqual(
             metar_monitor._parse_iso_utc_optional("2026-01-01T00:00:00Z").isoformat(),
