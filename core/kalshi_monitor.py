@@ -1278,6 +1278,7 @@ def build_structured_snapshot(
     }
 
     fetched_markets = []
+    event_market_cache = {}
     cache_written = False
     for series_ticker_item in series_tickers:
         inferred_market_type = None
@@ -1298,8 +1299,12 @@ def build_structured_snapshot(
         direct_markets_resolved = False
         if inferred_event_ticker:
             try:
-                inferred_data = _kalshi_public_get(f"/markets?event_ticker={inferred_event_ticker}&limit=100")
-                series_markets = inferred_data.get("markets") or []
+                if inferred_event_ticker in event_market_cache:
+                    series_markets = list(event_market_cache[inferred_event_ticker])
+                else:
+                    inferred_data = _kalshi_public_get(f"/markets?event_ticker={inferred_event_ticker}&limit=100")
+                    series_markets = inferred_data.get("markets") or []
+                    event_market_cache[inferred_event_ticker] = list(series_markets)
                 if series_markets:
                     direct_markets_resolved = True
                     _LOGGER.info(
@@ -1352,8 +1357,12 @@ def build_structured_snapshot(
             observation_time_utc=evaluated_at_utc,
         )
         if event_ticker:
-            data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}&limit=100")
-            series_markets = data.get("markets") or []
+            if event_ticker in event_market_cache:
+                series_markets = list(event_market_cache[event_ticker])
+            else:
+                data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}&limit=100")
+                series_markets = data.get("markets") or []
+                event_market_cache[event_ticker] = list(series_markets)
             _LOGGER.info(
                 "hydration_market_fetch station=%s event=%s markets=%s",
                 normalized_station,
