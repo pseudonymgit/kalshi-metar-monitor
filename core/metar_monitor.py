@@ -155,11 +155,11 @@ def _c_to_f(c: float) -> float:
     return c * 9.0 / 5.0 + 32.0
 
 
-def _parse_iso(s: str) -> datetime:
+def _parse_iso(s: str) -> Optional[datetime]:
     try:
         return datetime.fromisoformat(s.replace("Z", "+00:00"))
     except Exception:
-        return datetime.utcnow().replace(tzinfo=timezone.utc)
+        return None
 
 
 def _now_utc_iso() -> str:
