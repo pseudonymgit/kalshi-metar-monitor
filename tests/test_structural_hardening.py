@@ -180,7 +180,8 @@ class StructuralHardeningTests(unittest.TestCase):
         _emit_transition,
         _commit_state,
         mock_read_state,
-        *_mocks,
+        mock_market_eval,
+        mock_signal_eval,
     ):
         mock_read_state.return_value = {
             "last_observed_integer": 70,
@@ -205,6 +206,40 @@ class StructuralHardeningTests(unittest.TestCase):
         self.assertFalse(delivery_results[0]["delivery_attempted"])
         self.assertEqual(delivery_results[0]["delivery_blocking_stage"], "delivery_gate")
         self.assertEqual(delivery_results[0]["delivery_blocking_reason"], "ALERT_DELIVERY_DISABLED")
+        mock_signal_eval.assert_called_once()
+
+
+    @patch("core.metar_monitor._evaluate_deterministic_signal_layer")
+    @patch("core.metar_monitor.get_latest_station_market_evaluation_context", return_value={"KDEN": {}})
+    @patch("core.metar_monitor.read_temperature_state")
+    @patch("core.metar_monitor.commit_temperature_state")
+    @patch("core.metar_monitor.emit_transition_if_changed", return_value=None)
+    def test_process_event_evaluates_signal_layer_when_no_structural_transition(
+        self,
+        _emit_transition,
+        _commit_state,
+        mock_read_state,
+        mock_market_eval,
+        mock_signal_eval,
+    ):
+        mock_read_state.return_value = {
+            "last_observed_integer": 70,
+            "running_daily_max": 70.9,
+            "last_settlement_bucket": 70,
+            "last_instant_bucket": 70,
+        }
+
+        metar_monitor._process_temperature_event(
+            icao="KDEN",
+            temp_f=70.95,
+            obs_time="2025-01-01T00:00:00Z",
+            cfg={},
+            last_temp_f=70.9,
+            allow_alert_delivery=False,
+            delivery_results=[],
+        )
+
+        mock_signal_eval.assert_called_once()
 
     @patch("core.metar_monitor.ensure_state_loaded")
     @patch("core.metar_monitor.get_default_config", return_value={})
