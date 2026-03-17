@@ -914,7 +914,7 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
 
     now_utc_iso = datetime.now(timezone.utc).isoformat()
     station_day = station_local_day_key(normalized_station, now_utc_iso)
-    series_tickers = _normalize_series_tickers(ensure_series_discovery_loaded().get(normalized_station))
+    series_tickers = ensure_series_discovery_loaded().get(normalized_station) or []
     series_ticker = series_tickers[0] if series_tickers else None
     series_discovered = bool(series_tickers)
     cache_entries = {
@@ -1138,7 +1138,7 @@ def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dic
 
     normalized_station = (station or "").strip().upper()
     snapshot = build_structured_snapshot(normalized_station, market_types)
-    series_tickers = _normalize_series_tickers(ensure_series_discovery_loaded().get(normalized_station))
+    series_tickers = ensure_series_discovery_loaded().get(normalized_station) or []
     series_ticker = series_tickers[0] if series_tickers else None
     cache_entries = [get_cached_series_markets(ticker) for ticker in series_tickers]
     return {
@@ -1279,7 +1279,7 @@ def build_structured_snapshot(
     else:
         evaluated_at_utc = datetime.now(timezone.utc).isoformat()
     series_by_station = ensure_series_discovery_loaded()
-    series_tickers = _normalize_series_tickers(series_by_station.get(normalized_station))
+    series_tickers = series_by_station.get(normalized_station) or []
     series_ticker = series_tickers[0] if series_tickers else None
 
     selected_types = {
