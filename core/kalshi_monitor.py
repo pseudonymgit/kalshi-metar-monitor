@@ -815,6 +815,41 @@ def get_series_discovery_cache_snapshot() -> dict:
         return dict(_SERIES_BY_STATION)
 
 
+def get_series_surface_snapshot() -> dict:
+    with _SERIES_LOCK:
+        stations = []
+        for station in sorted(_SERIES_BY_STATION.keys()):
+            series_tickers = _normalize_series_tickers(_SERIES_BY_STATION.get(station))
+            series_rows = []
+            total_raw_market_count = 0
+
+            for series_ticker in series_tickers:
+                cache_entry = _SERIES_MARKETS_CACHE.get(series_ticker)
+                hydrated = cache_entry is not None
+                raw_market_count = len((cache_entry or {}).get("markets") or [])
+                total_raw_market_count += raw_market_count
+                series_rows.append(
+                    {
+                        "series_ticker": series_ticker,
+                        "hydrated": hydrated,
+                        "raw_market_count": raw_market_count,
+                        "hydrated_at_utc": (cache_entry or {}).get("hydrated_at_utc"),
+                        "station_local_day": (cache_entry or {}).get("station_local_day"),
+                    }
+                )
+
+            stations.append(
+                {
+                    "station": station,
+                    "series_tickers": list(series_tickers),
+                    "series": series_rows,
+                    "total_raw_market_count": total_raw_market_count,
+                }
+            )
+
+        return {"generated_utc": datetime.now(timezone.utc).isoformat(), "stations": stations}
+
+
 def get_cached_series_markets(series_ticker: str) -> dict | None:
     normalized_series_ticker = (series_ticker or "").strip().upper()
     if not normalized_series_ticker:
