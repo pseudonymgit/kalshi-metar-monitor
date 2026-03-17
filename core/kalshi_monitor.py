@@ -671,8 +671,13 @@ def _get_active_stations():
     }
 
 
-def _station_local_kalshi_date_token(station):
-    now_utc = datetime.now(timezone.utc)
+def _station_local_kalshi_date_token(station, observation_time_utc: str | datetime | None = None):
+    if isinstance(observation_time_utc, datetime):
+        now_utc = observation_time_utc.astimezone(timezone.utc) if observation_time_utc.tzinfo else observation_time_utc.replace(tzinfo=timezone.utc)
+    elif observation_time_utc is not None:
+        now_utc = parse_iso_utc(str(observation_time_utc)) or datetime.now(timezone.utc)
+    else:
+        now_utc = datetime.now(timezone.utc)
 
     if _to_local:
         try:
@@ -1097,16 +1102,16 @@ def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dic
         "market_count": len(snapshot.get("markets") or []),
     }
 
-def _build_weather_event_ticker(station: str, market_type: str):
+def _build_weather_event_ticker(station: str, market_type: str, observation_time_utc: str | datetime | None = None):
     city_token = _STATION_CITY_TOKEN_MAP.get(station)
     if not city_token:
         return None
 
-    date_token = _station_local_kalshi_date_token(station)
+    date_token = _station_local_kalshi_date_token(station, observation_time_utc=observation_time_utc)
     return f"KX{market_type}{city_token}-{date_token}"
 
 
-def _filter_structured_markets(markets, station, market_types, rejection_counts=None):
+def _filter_structured_markets(markets, station, market_types, rejection_counts=None, observation_time_utc: str | datetime | None = None):
     rejection_counts = rejection_counts if isinstance(rejection_counts, dict) else None
 
     def _record_rejection(reason: str):
@@ -1120,7 +1125,7 @@ def _filter_structured_markets(markets, station, market_types, rejection_counts=
     if not city_token:
         return []
 
-    date_token = _station_local_kalshi_date_token(normalized_station)
+    date_token = _station_local_kalshi_date_token(normalized_station, observation_time_utc=observation_time_utc)
 
     filtered = []
 
@@ -1171,13 +1176,18 @@ def classify_proximity(distance_f: float) -> str:
     return "FAR"
 
 
-def _select_event_ticker_for_series(events: list[dict], station: str, series_ticker: str) -> str | None:
+def _select_event_ticker_for_series(
+    events: list[dict],
+    station: str,
+    series_ticker: str,
+    observation_time_utc: str | datetime | None = None,
+) -> str | None:
     normalized_station = (station or "").strip().upper()
     normalized_series_ticker = (series_ticker or "").strip().upper()
     if not normalized_series_ticker:
         return None
 
-    date_token = _station_local_kalshi_date_token(normalized_station)
+    date_token = _station_local_kalshi_date_token(normalized_station, observation_time_utc=observation_time_utc)
 
     candidates: list[tuple[int, str]] = []
     for event in (events or []):
@@ -1203,10 +1213,23 @@ def _select_event_ticker_for_series(events: list[dict], station: str, series_tic
     return sorted(candidates, key=lambda item: (-item[0], item[1]))[0][1]
 
 
-def build_structured_snapshot(station: str, market_types: set):
+def build_structured_snapshot(
+    station: str,
+    market_types: set,
+    observation_time_utc: str | datetime | None = None,
+):
     global _MARKETS_CACHE_POPULATION_COUNT
     normalized_station = (station or "").strip().upper()
-    evaluated_at_utc = datetime.now(timezone.utc).isoformat()
+    if isinstance(observation_time_utc, datetime):
+        evaluated_at_utc = (
+            observation_time_utc.astimezone(timezone.utc)
+            if observation_time_utc.tzinfo
+            else observation_time_utc.replace(tzinfo=timezone.utc)
+        ).isoformat()
+    elif observation_time_utc is not None:
+        evaluated_at_utc = (parse_iso_utc(str(observation_time_utc)) or datetime.now(timezone.utc)).isoformat()
+    else:
+        evaluated_at_utc = datetime.now(timezone.utc).isoformat()
     series_by_station = ensure_series_discovery_loaded()
     series_tickers = _normalize_series_tickers(series_by_station.get(normalized_station))
     series_ticker = series_tickers[0] if series_tickers else None
@@ -1225,6 +1248,7 @@ def build_structured_snapshot(station: str, market_types: set):
             events=events_data.get("events") or [],
             station=normalized_station,
             series_ticker=series_ticker_item,
+            observation_time_utc=evaluated_at_utc,
         )
         series_markets = []
         if event_ticker:
@@ -1252,6 +1276,7 @@ def build_structured_snapshot(station: str, market_types: set):
         normalized_station,
         selected_types,
         rejection_counts,
+        observation_time_utc=evaluated_at_utc,
     )
 
     with _SERIES_LOCK:
@@ -1335,7 +1360,11 @@ def build_structured_snapshot(station: str, market_types: set):
     }
 
 
-def build_structured_snapshot_from_cache(station: str, market_types: set):
+def build_structured_snapshot_from_cache(
+    station: str,
+    market_types: set,
+    observation_time_utc: str | datetime | None = None,
+):
     normalized_station = (station or "").strip().upper()
     selected_types = {
         token.strip().upper()
@@ -1356,6 +1385,7 @@ def build_structured_snapshot_from_cache(station: str, market_types: set):
         normalized_station,
         selected_types,
         rejection_counts,
+        observation_time_utc=observation_time_utc,
     )
 
     markets = []
@@ -1658,7 +1688,11 @@ def send_composed_weather_market_alert(
     obs_time_utc=None,
 ):
     normalized_station = (station or "").strip().upper()
-    snapshot = build_structured_snapshot_from_cache(normalized_station, market_types)
+    snapshot = build_structured_snapshot_from_cache(
+        normalized_station,
+        market_types,
+        observation_time_utc=obs_time_utc,
+    )
     markets = snapshot.get("markets", [])
     current_temp_f = (snapshot.get("observed") or {}).get("current_temp_f")
     market_types_list = snapshot.get("market_types", [])
