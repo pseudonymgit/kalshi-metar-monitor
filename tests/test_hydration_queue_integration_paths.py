@@ -59,6 +59,13 @@ class TransitionEvaluationWindowTests(unittest.TestCase):
     def test_parse_iso_returns_none_for_invalid_timestamp(self):
         self.assertIsNone(metar_monitor._parse_iso("not-a-timestamp"))
 
+    @patch("core.metar_monitor.datetime", wraps=metar_monitor.datetime)
+    def test_parse_iso_does_not_fallback_to_wall_clock(self, mock_datetime):
+        mock_datetime.utcnow.side_effect = AssertionError("utcnow must not be called")
+
+        self.assertIsNone(metar_monitor._parse_iso("not-a-timestamp"))
+        mock_datetime.utcnow.assert_not_called()
+
     def test_parse_iso_utc_optional_is_deterministic(self):
         self.assertEqual(
             metar_monitor._parse_iso_utc_optional("2026-01-01T00:00:00Z").isoformat(),
