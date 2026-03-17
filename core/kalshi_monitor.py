@@ -779,7 +779,10 @@ def ensure_series_discovery_loaded():
     global _SERIES_DISCOVERY_ATTEMPT_COUNT, _LAST_SERIES_DISCOVERY_SUCCESS_UTC, _LAST_SERIES_DISCOVERY_ERROR
     with _SERIES_LOCK:
         if _SERIES_DISCOVERED:
-            return dict(_SERIES_BY_STATION)
+            return {
+                station: list(series)
+                for station, series in _SERIES_BY_STATION.items()
+            }
 
         record_connectivity_state = True
         if _current_kalshi_execution_domain() != "production":
@@ -810,7 +813,10 @@ def ensure_series_discovery_loaded():
             if record_connectivity_state:
                 _LAST_SERIES_DISCOVERY_SUCCESS_UTC = datetime.now(timezone.utc).isoformat()
                 _LAST_SERIES_DISCOVERY_ERROR = None
-            return dict(_SERIES_BY_STATION)
+            return {
+                station: list(series)
+                for station, series in _SERIES_BY_STATION.items()
+            }
         except Exception as exc:
             if record_connectivity_state:
                 _LAST_SERIES_DISCOVERY_ERROR = str(exc)
@@ -819,7 +825,10 @@ def ensure_series_discovery_loaded():
 
 def get_series_discovery_cache_snapshot() -> dict:
     with _SERIES_LOCK:
-        return dict(_SERIES_BY_STATION)
+        return {
+            station: list(series)
+            for station, series in _SERIES_BY_STATION.items()
+        }
 
 
 def get_series_surface_snapshot() -> dict:
