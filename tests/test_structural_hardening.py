@@ -357,6 +357,40 @@ class StructuralHardeningTests(unittest.TestCase):
         self.assertEqual((kalshi_monitor.get_cached_series_markets("KXHIGHDEN") or {}).get("markets"), [])
         self.assertEqual(mock_get.call_args_list[1].args[0], "/markets?event_ticker=KXHIGHDEN-26MAR12&limit=100")
 
+
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26MAR12")
+    def test_filter_structured_markets_uses_observation_timestamp_for_date_token(self, mock_date_token):
+        kalshi_monitor._filter_structured_markets(
+            [{"ticker": "KXHIGHDEN-26MAR12-B80", "status": "open"}],
+            "KDEN",
+            {"HIGH"},
+            observation_time_utc="2026-03-12T06:00:00+00:00",
+        )
+
+        self.assertEqual(
+            mock_date_token.call_args.kwargs.get("observation_time_utc"),
+            "2026-03-12T06:00:00+00:00",
+        )
+
+    @patch("core.kalshi_monitor._filter_structured_markets", return_value=[])
+    def test_snapshot_from_cache_forwards_observation_timestamp(self, mock_filter):
+        with patch.dict("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXHIGHDEN"}, clear=True):
+            with patch.dict(
+                "core.kalshi_monitor._SERIES_MARKETS_CACHE",
+                {"KXHIGHDEN": {"markets": []}},
+                clear=True,
+            ):
+                kalshi_monitor.build_structured_snapshot_from_cache(
+                    "KDEN",
+                    {"HIGH"},
+                    observation_time_utc="2026-03-12T06:00:00+00:00",
+                )
+
+        self.assertEqual(
+            mock_filter.call_args.kwargs.get("observation_time_utc"),
+            "2026-03-12T06:00:00+00:00",
+        )
+
     @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXDENHIGH"]})
     @patch("core.kalshi_monitor._station_local_previous_day", return_value="2025-03-09")
     @patch("core.kalshi_monitor.station_local_day_key", return_value="2025-03-10")
