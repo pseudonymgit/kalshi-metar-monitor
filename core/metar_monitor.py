@@ -80,7 +80,6 @@ _SCHEDULER_LOCK = threading.Lock()
 _LIVE_STATION_UNIVERSE_RESOLVER = None
 _AUDIT_LOCK = threading.Lock()
 _MISSING_LADDER_DEDUPE = {}
-_MISSING_LADDER_PENDING: set[str] = set()
 _MISSING_LADDER_LOCK = threading.Lock()
 _KALSHI_RATE_LIMIT_LOCK = threading.Lock()
 _KALSHI_LAST_CALL_TS = {}
@@ -2729,9 +2728,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                             with _MISSING_LADDER_LOCK:
                                 if dedupe_key in _MISSING_LADDER_DEDUPE:
                                     continue
-                                if dedupe_key in _MISSING_LADDER_PENDING:
-                                    continue
-                                _MISSING_LADDER_PENDING.add(dedupe_key)
+                                _MISSING_LADDER_DEDUPE[dedupe_key] = True
                             missing_alert_type = "ladder_selection_empty" if empty_reason == "no_directional_ladder_match" else "ladder_missing"
                             missing_message_label = "Ladder selection empty" if missing_alert_type == "ladder_selection_empty" else "Ladder missing"
                             cause, explanation = _resolve_missing_ladder_cause(empty_reason)
@@ -2793,11 +2790,6 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                 },
                             )
                      
-                            with _MISSING_LADDER_LOCK:
-                                _MISSING_LADDER_PENDING.discard(dedupe_key)
-
-                                if webhook_status_code is not None and 200 <= webhook_status_code < 300:
-                                    _MISSING_LADDER_DEDUPE[dedupe_key] = True
 
                             continue
 
