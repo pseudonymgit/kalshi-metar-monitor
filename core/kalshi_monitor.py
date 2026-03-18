@@ -1376,9 +1376,8 @@ def build_structured_snapshot(
             observation_time_utc=evaluated_at_utc,
         )
         if event_ticker:
-            cached_event_markets = event_market_cache.get(event_ticker)
-            if cached_event_markets:
-                series_markets = list(cached_event_markets)
+            if event_ticker in event_market_cache:
+                series_markets = list(event_market_cache[event_ticker])
             else:
                 data = _kalshi_public_get(f"/markets?event_ticker={event_ticker}&limit=100")
                 series_markets = data.get("markets") or []
