@@ -452,21 +452,45 @@ def _build_market_coverage_rows(station_filter=None):
         station_ingestion_configured = station in configured_stations
         station_in_live_ingestion_universe = station in live_ingestion_stations
         station_active = active_stations is None or station in active_stations
-        series_ticker = series_by_station.get(station)
+        discovered_series = series_by_station.get(station)
+        if isinstance(discovered_series, str):
+            series_tickers = [discovered_series]
+        elif isinstance(discovered_series, (list, tuple, set)):
+            series_tickers = [ticker for ticker in discovered_series if ticker]
+        else:
+            series_tickers = []
 
         discovered_markets = []
         cache_status = "cache_missing"
         cache_metadata = {}
-        if series_ticker:
-            cached_data = get_cached_series_markets(series_ticker)
-            if cached_data is not None:
-                discovered_markets = cached_data.get("markets") or []
-                cache_metadata = {
-                    "hydrated_at_utc": cached_data.get("hydrated_at_utc"),
-                    "station_local_day": cached_data.get("station_local_day"),
-                }
+        cache_entries = [
+            cached_data
+            for series_ticker in series_tickers
+            for cached_data in [get_cached_series_markets(series_ticker)]
+            if cached_data is not None
+        ]
+        if cache_entries:
+            discovered_markets = [
+                market
+                for cached_data in cache_entries
+                for market in (cached_data.get("markets") or [])
+            ]
+            cache_metadata = {
+                "hydrated_at_utc": max(
+                    (cached_data.get("hydrated_at_utc") for cached_data in cache_entries if cached_data.get("hydrated_at_utc")),
+                    default=None,
+                ),
+                "station_local_day": next(
+                    (cached_data.get("station_local_day") for cached_data in cache_entries if cached_data.get("station_local_day")),
+                    None,
+                ),
+            }
+            cache_status = "cache_valid"
+            for cached_data in cache_entries:
                 cached_day = cached_data.get("station_local_day")
-                cache_status = "cache_valid" if (cached_day is None or cached_day == expected_day) else "cache_stale"
+                if cached_day is not None and cached_day != expected_day:
+                    cache_status = "cache_stale"
+                    break
 
         for market_type in ["HIGH", "LOW"]:
             market_type_enabled = market_type in enabled_market_types
