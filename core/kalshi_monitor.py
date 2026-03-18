@@ -1281,7 +1281,13 @@ def build_structured_snapshot(
     else:
         evaluated_at_utc = datetime.now(timezone.utc).isoformat()
     series_by_station = ensure_series_discovery_loaded()
-    series_tickers = series_by_station.get(normalized_station) or []
+    discovered_series_tickers = series_by_station.get(normalized_station)
+    if isinstance(discovered_series_tickers, str):
+        series_tickers = [discovered_series_tickers]
+    elif isinstance(discovered_series_tickers, (list, tuple, set)):
+        series_tickers = [ticker for ticker in discovered_series_tickers if ticker]
+    else:
+        series_tickers = []
     series_ticker = series_tickers[0] if series_tickers else None
 
     selected_types = {
