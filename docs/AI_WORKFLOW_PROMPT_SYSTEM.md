@@ -115,6 +115,50 @@ Because those live in the master template, the prompt templates below do not nee
 
 ---
 
+## Wrong-Surface Detection
+
+Before proposing a patch, Codex must verify that
+the failing behavior originates from the inspected code.
+
+Diagnostics must report:
+
+FAILURE_SOURCE_CONFIDENCE
+HIGH / MEDIUM / LOW
+
+If confidence is LOW, additional inspection is required
+before proposing modifications.
+
+---
+
+## Patch Discipline
+
+All patches must satisfy:
+
+* smallest possible change
+* no refactors
+* no formatting-only edits
+* no unrelated logic changes
+
+Default patch scope:
+
+single function unless explicitly required.
+
+---
+
+## Diagnostic Output Structure
+
+All diagnostics must return the following fields:
+
+REPO_STATE
+FAILURE_CAUSE
+CODE_LOCATION
+RAW_URL
+MINIMAL_PATCH_REQUIRED
+
+This structure ensures consistent orchestration review.
+
+---
+
 ## Five-Slot Prompt Framework
 
 Every serious prompt must define:
@@ -512,6 +556,14 @@ OUTPUT CONTRACT
 - No patch text.
 - No pseudo-diff.
 - No remediation disguised as diagnostics.
+
+DIAGNOSTIC OUTPUT STRUCTURE
+- REPO_STATE
+- FAILURE_CAUSE
+- CODE_LOCATION
+- RAW_URL
+- MINIMAL_PATCH_REQUIRED
+- FAILURE_SOURCE_CONFIDENCE
 
 QUESTION
 - <exact operational question>
