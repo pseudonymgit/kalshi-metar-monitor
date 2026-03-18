@@ -2673,7 +2673,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                     rejection_breakdown["wrong_series"] += wrong_series_rejections
                     rejection_breakdown["settlement_mismatch"] += settlement_mismatch_rejections
                     rejection_breakdown["expired_market"] += expired_rejections
-                    rejection_breakdown["directional_strike_rejected"] += directional_strike_rejected
+                    rejection_breakdown["directional_strike_rejections"] += directional_strike_rejected
                     rejection_breakdown["unknown_reason"] += unknown_rejections
 
                     _ALERT_LOGGER.info(
