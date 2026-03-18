@@ -48,6 +48,50 @@ Do not proceed on assumed branch state, assumed file state, or assumed task cont
 
 ---
 
+## 2A. Repository Reference Rule
+
+When referencing repository code, always include:
+
+- file path
+- line number range (if applicable)
+- raw GitHub URL
+
+Raw URL format:
+
+https://raw.githubusercontent.com/<owner>/<repo>/<branch-or-commit>/<path>
+
+Example:
+
+core/metar_monitor.py
+lines 1700–1820
+
+RAW_URL
+https://raw.githubusercontent.com/pseudonymgit/kalshi-metar-monitor/main/core/metar_monitor.py
+
+Full files must not be pasted unless explicitly requested.
+
+---
+
+## 2B. Repository State Verification
+
+All diagnostics must report repository state.
+
+Return:
+
+REPO_STATE
+branch
+commit hash
+
+Example:
+
+REPO_STATE
+branch: work
+commit: a4d9c108e4af0377a6971f6ba30ea4cbb5e5be7f
+
+This prevents stale-premise reasoning.
+
+---
+
 ## 3. Stale Premise Rule
 
 Abort if the prompt premise is stale.
