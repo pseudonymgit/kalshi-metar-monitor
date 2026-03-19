@@ -1873,6 +1873,118 @@ def _annotate_transition_history_market_eval(
         )
 
 
+def _annotate_transition_history_alert_path_truth(
+    station: str,
+    transition_correlation: Optional[Dict[str, Any]],
+    alert_path_truth: Optional[Dict[str, Any]],
+) -> None:
+    normalized_station = (station or "").strip().upper()
+    if not isinstance(alert_path_truth, dict):
+        return
+
+    transition_id = None
+    transition_timestamp = None
+    if isinstance(transition_correlation, dict):
+        raw_id = transition_correlation.get("transition_event_id")
+        if raw_id is not None:
+            try:
+                transition_id = int(raw_id)
+            except Exception:
+                transition_id = None
+        raw_timestamp = transition_correlation.get("timestamp_utc")
+        if raw_timestamp is not None:
+            transition_timestamp = str(raw_timestamp)
+
+    if transition_id is None and not transition_timestamp:
+        return
+
+    safe_truth = copy.deepcopy(alert_path_truth)
+
+    with _TRANSITION_LOCK:
+        for entry in reversed(_TRANSITION_HISTORY):
+            if entry.get("station") != normalized_station:
+                continue
+            if transition_id is not None and int(entry.get("transition_event_id") or 0) != transition_id:
+                continue
+            if transition_id is None and transition_timestamp and entry.get("timestamp_utc") != transition_timestamp:
+                continue
+            existing_truth = (
+                copy.deepcopy(entry.get("alert_path_truth"))
+                if isinstance(entry.get("alert_path_truth"), dict)
+                else {}
+            )
+            entry["alert_path_truth"] = {
+                **existing_truth,
+                **safe_truth,
+            }
+            break
+
+    try:
+        db_path = _alert_db_path()
+        if not os.path.exists(db_path):
+            return
+
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(db_path, timeout=1)
+            try:
+                cur = conn.execute(
+                    """
+                    SELECT id, metadata_json
+                    FROM transition_events
+                    WHERE station = ?
+                    AND (
+                        (? IS NOT NULL AND id = ?)
+                        OR (? IS NULL AND ? IS NOT NULL AND created_utc = ?)
+                    )
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (
+                        normalized_station,
+                        transition_id,
+                        transition_id,
+                        transition_id,
+                        transition_timestamp,
+                        transition_timestamp,
+                    ),
+                )
+                row = cur.fetchone()
+                if not row:
+                    return
+
+                metadata: Dict[str, Any] = {}
+                raw_metadata = row[1]
+                if raw_metadata:
+                    try:
+                        metadata = json.loads(raw_metadata)
+                    except Exception:
+                        metadata = {"raw_metadata_json": raw_metadata}
+
+                existing_truth = (
+                    copy.deepcopy(metadata.get("alert_path_truth"))
+                    if isinstance(metadata.get("alert_path_truth"), dict)
+                    else {}
+                )
+                metadata["alert_path_truth"] = {
+                    **existing_truth,
+                    **safe_truth,
+                }
+
+                conn.execute(
+                    "UPDATE transition_events SET metadata_json = ? WHERE id = ?",
+                    (json.dumps(metadata, sort_keys=True), row[0]),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning(
+            "transition_alert_path_truth_annotation_failed station=%s error=%s",
+            normalized_station,
+            e,
+        )
+
+
 def get_transition_history(station=None, day: Optional[str] = None, limit=50):
     normalized_station = (station or "").strip().upper()
     normalized_day = (day or "").strip()
@@ -2513,14 +2625,69 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         "delivery_blocking_reason": None,
     }
 
+    station = (payload.get("station") or "UNK").upper()
+    legacy = payload.get("legacy") if isinstance(payload.get("legacy"), dict) else payload
+    summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+    transition_correlation = legacy.get("transition_correlation")
+    alert_path_truth = {
+        "send_alert_entered": True,
+        "blocking_stage": None,
+        "suppression_or_non_emission_reason": None,
+        "webhook_send_attempted": False,
+        "webhook_send_succeeded": False,
+        "webhook_send_failed": False,
+    }
+    webhook_send_attempted = False
+    webhook_send_succeeded = False
+    webhook_send_failed = False
+    webhook_failure_reason = None
+
+    def _persist_alert_path_truth(**updates: Any) -> None:
+        nonlocal alert_path_truth
+        if updates:
+            alert_path_truth = {
+                **alert_path_truth,
+                **updates,
+            }
+        _annotate_transition_history_alert_path_truth(
+            station=station,
+            transition_correlation=transition_correlation,
+            alert_path_truth=alert_path_truth,
+        )
+
+    def _record_webhook_outcome(
+        attempted: bool,
+        succeeded: bool,
+        *,
+        status_code: Optional[Any] = None,
+        exception: Optional[Any] = None,
+    ) -> None:
+        nonlocal webhook_send_attempted, webhook_send_succeeded, webhook_send_failed, webhook_failure_reason
+        webhook_send_attempted = webhook_send_attempted or bool(attempted)
+        if not attempted:
+            return
+        if succeeded:
+            webhook_send_succeeded = True
+            return
+        webhook_send_failed = True
+        if exception:
+            webhook_failure_reason = str(exception)
+        elif status_code is not None:
+            webhook_failure_reason = f"HTTP_{status_code}"
+        elif webhook_failure_reason is None:
+            webhook_failure_reason = "WEBHOOK_SEND_FAILED"
+
+    _persist_alert_path_truth()
+
     if not webhook:
         result["delivery_blocking_stage"] = "config"
         result["delivery_blocking_reason"] = "WEBHOOK_MISSING"
+        _persist_alert_path_truth(
+            blocking_stage="config",
+            suppression_or_non_emission_reason="WEBHOOK_MISSING",
+        )
         return result
     try:
-        station = (payload.get("station") or "UNK").upper()
-        legacy = payload.get("legacy") if isinstance(payload.get("legacy"), dict) else payload
-        summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
         transition_context = payload.get("transition_context") if isinstance(payload.get("transition_context"), dict) else {}
         market_context = payload.get("market_context") if isinstance(payload.get("market_context"), dict) else {}
         eligibility_evaluation = payload.get("eligibility_evaluation") if isinstance(payload.get("eligibility_evaluation"), dict) else {}
@@ -2535,6 +2702,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         if tf is None:
             result["delivery_blocking_stage"] = "payload"
             result["delivery_blocking_reason"] = "MISSING_TEMP_F"
+            _persist_alert_path_truth(
+                blocking_stage="payload",
+                suppression_or_non_emission_reason="MISSING_TEMP_F",
+            )
             return result
 
         instant_bucket_changed = bool(legacy.get("instant_bucket_changed"))
@@ -2562,6 +2733,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             )
             result["delivery_blocking_stage"] = "transition_gate"
             result["delivery_blocking_reason"] = "NO_TRANSITION"
+            _persist_alert_path_truth(
+                blocking_stage="transition_gate",
+                suppression_or_non_emission_reason="NO_TRANSITION",
+            )
             return result
 
         rate_limit_reference_dt = _parse_iso_utc_optional(reference_timestamp_utc)
@@ -2570,6 +2745,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         if rate_limit_reference_dt is None:
             result["delivery_blocking_stage"] = "rate_limit_gate"
             result["delivery_blocking_reason"] = "MISSING_REFERENCE_TIMESTAMP"
+            _persist_alert_path_truth(
+                blocking_stage="rate_limit_gate",
+                suppression_or_non_emission_reason="MISSING_REFERENCE_TIMESTAMP",
+            )
             return result
 
         now_ts = rate_limit_reference_dt.timestamp()
@@ -2580,6 +2759,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             if last_call_ts is not None and (now_ts - last_call_ts) < _KALSHI_CALL_THROTTLE_SECONDS:
                 result["delivery_blocking_stage"] = "rate_limit_gate"
                 result["delivery_blocking_reason"] = "KALSHI_CALL_THROTTLE"
+                _persist_alert_path_truth(
+                    blocking_stage="rate_limit_gate",
+                    suppression_or_non_emission_reason="KALSHI_CALL_THROTTLE",
+                )
                 return result
 
         try:
@@ -2773,6 +2956,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                 "webhook_exception": webhook_exception,
                                 "webhook_response_text": webhook_response_text,
                             }
+                            _record_webhook_outcome(
+                                True,
+                                bool(result.get("delivery_succeeded")),
+                                status_code=webhook_status_code,
+                                exception=webhook_exception,
+                            )
                             _audit_alert(
                                 station=station,
                                 market_type=market_type_token,
@@ -2848,6 +3037,12 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                 "webhook_exception": send_result.get("webhook_exception"),
                                 "webhook_response_text": send_result.get("webhook_response_text"),
                             }
+                            _record_webhook_outcome(
+                                bool(result.get("delivery_attempted")),
+                                bool(result.get("delivery_succeeded")),
+                                status_code=result.get("webhook_status_code"),
+                                exception=result.get("webhook_exception"),
+                            )
                         if send_result and send_result.get("ok"):
                             market_alerts_sent += 1
                             send_event_ticker = send_result.get("event_ticker") or event_ticker
@@ -3003,6 +3198,57 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 payload["suppression"] = suppression
                 payload["execution_context"] = execution_context
 
+                alert_path_updates = {
+                    "webhook_send_attempted": webhook_send_attempted,
+                    "webhook_send_succeeded": webhook_send_succeeded,
+                    "webhook_send_failed": webhook_send_failed,
+                }
+                if market_alerts_sent > 0:
+                    alert_path_updates.update(
+                        {
+                            "blocking_stage": None,
+                            "suppression_or_non_emission_reason": None,
+                        }
+                    )
+                elif webhook_send_attempted and not webhook_send_succeeded:
+                    alert_path_updates.update(
+                        {
+                            "blocking_stage": "webhook_delivery",
+                            "suppression_or_non_emission_reason": webhook_failure_reason or "WEBHOOK_SEND_FAILED",
+                        }
+                    )
+                elif evaluation_outcome == "NO_ELIGIBLE_MARKET":
+                    alert_path_updates.update(
+                        {
+                            "blocking_stage": "market_match",
+                            "suppression_or_non_emission_reason": "NO_ELIGIBLE_MARKET",
+                        }
+                    )
+                elif evaluation_outcome == "TERMINAL_STATE":
+                    alert_path_updates.update(
+                        {
+                            "blocking_stage": "suppression_gate",
+                            "suppression_or_non_emission_reason": "TERMINAL_STATE",
+                        }
+                    )
+                elif safe_outcome := (evaluation_outcome or "").strip().upper():
+                    if safe_outcome.startswith("SUPPRESSED_"):
+                        alert_path_updates.update(
+                            {
+                                "blocking_stage": "suppression_gate",
+                                "suppression_or_non_emission_reason": suppression_reason or safe_outcome,
+                            }
+                        )
+                    else:
+                        alert_path_updates.update(
+                            {
+                                "blocking_stage": "alert_emission",
+                                "suppression_or_non_emission_reason": safe_outcome,
+                            }
+                        )
+
+                _persist_alert_path_truth(**alert_path_updates)
+
             with _KALSHI_RATE_LIMIT_LOCK:
                 _KALSHI_LAST_CALL_TS[station] = now_ts
         except Exception as e:
@@ -3012,6 +3258,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 "webhook_exception": str(e),
                 "webhook_response_text": None,
             }
+            _persist_alert_path_truth(
+                webhook_send_attempted=webhook_send_attempted,
+                webhook_send_succeeded=webhook_send_succeeded,
+                webhook_send_failed=webhook_send_failed,
+                blocking_stage="send_alert_exception",
+                suppression_or_non_emission_reason=str(e),
+            )
             print(f"[ERROR] station={station} function=_send_alert: {e}")
     except Exception as e:
         result = {
@@ -3020,6 +3273,13 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             "webhook_exception": str(e),
             "webhook_response_text": None,
         }
+        _persist_alert_path_truth(
+            webhook_send_attempted=webhook_send_attempted,
+            webhook_send_succeeded=webhook_send_succeeded,
+            webhook_send_failed=webhook_send_failed,
+            blocking_stage="send_alert_exception",
+            suppression_or_non_emission_reason=str(e),
+        )
         print(f"[ERROR] station={payload.get('station') or 'UNK'} function=_send_alert: {e}")
     return result
 
