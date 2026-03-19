@@ -3114,6 +3114,127 @@ def observability_alert_fire_audit():
     return jsonify({"ok": True, **payload}), 200
 
 
+@app.route("/observability/alert-path-truth", methods=["GET"])
+def observability_alert_path_truth():
+    station = (request.args.get("station") or "").strip().upper()
+    if not station:
+        return jsonify({"ok": False, "error": "station query param required"}), 400
+
+    def _fallback_alert_path_truth(transition_row):
+        if not isinstance(transition_row, dict):
+            return {
+                "send_alert_entered": False,
+                "blocking_stage": None,
+                "suppression_or_non_emission_reason": None,
+                "webhook_send_attempted": False,
+                "webhook_send_succeeded": False,
+                "webhook_send_failed": False,
+            }
+
+        metadata = transition_row.get("metadata") if isinstance(transition_row.get("metadata"), dict) else {}
+        evaluation_outcome = str(
+            transition_row.get("evaluation_outcome")
+            or metadata.get("evaluation_outcome")
+            or ""
+        ).strip().upper()
+        suppression_reason = str(
+            transition_row.get("suppression_reason")
+            or metadata.get("suppression_reason")
+            or ""
+        ).strip().upper() or None
+        alerts_sent = int(
+            transition_row.get("alerts_sent")
+            or metadata.get("alerts_sent")
+            or 0
+        )
+
+        if alerts_sent > 0 or evaluation_outcome == "ALERT_SENT":
+            return {
+                "send_alert_entered": True,
+                "blocking_stage": None,
+                "suppression_or_non_emission_reason": None,
+                "webhook_send_attempted": True,
+                "webhook_send_succeeded": True,
+                "webhook_send_failed": False,
+            }
+        if evaluation_outcome == "NO_ELIGIBLE_MARKET":
+            return {
+                "send_alert_entered": True,
+                "blocking_stage": "market_match",
+                "suppression_or_non_emission_reason": "NO_ELIGIBLE_MARKET",
+                "webhook_send_attempted": False,
+                "webhook_send_succeeded": False,
+                "webhook_send_failed": False,
+            }
+        if evaluation_outcome == "TERMINAL_STATE":
+            return {
+                "send_alert_entered": True,
+                "blocking_stage": "suppression_gate",
+                "suppression_or_non_emission_reason": "TERMINAL_STATE",
+                "webhook_send_attempted": False,
+                "webhook_send_succeeded": False,
+                "webhook_send_failed": False,
+            }
+        if evaluation_outcome.startswith("SUPPRESSED_"):
+            return {
+                "send_alert_entered": True,
+                "blocking_stage": "suppression_gate",
+                "suppression_or_non_emission_reason": suppression_reason or evaluation_outcome,
+                "webhook_send_attempted": False,
+                "webhook_send_succeeded": False,
+                "webhook_send_failed": False,
+            }
+
+        return {
+            "send_alert_entered": False,
+            "blocking_stage": None,
+            "suppression_or_non_emission_reason": None,
+            "webhook_send_attempted": False,
+            "webhook_send_succeeded": False,
+            "webhook_send_failed": False,
+        }
+
+    state = get_state() or {}
+    latest_observation_utc = (state.get("last_seen_iso") or {}).get(station)
+    latest_observation = (state.get("last_obs") or {}).get(station) or None
+
+    transitions = get_transition_history(station=station, limit=50)
+    latest_transition = transitions[0] if transitions else None
+    persisted_truth = None
+    if isinstance(latest_transition, dict):
+        persisted_truth = latest_transition.get("alert_path_truth")
+        if not isinstance(persisted_truth, dict):
+            metadata = latest_transition.get("metadata") if isinstance(latest_transition.get("metadata"), dict) else {}
+            persisted_truth = metadata.get("alert_path_truth")
+
+    alert_path_truth = (
+        dict(persisted_truth)
+        if isinstance(persisted_truth, dict)
+        else _fallback_alert_path_truth(latest_transition)
+    )
+    truth_source = "persisted_transition_record" if isinstance(persisted_truth, dict) else "runtime_fallback"
+
+    return jsonify(
+        {
+            "ok": True,
+            "execution_mode": "observability",
+            "station": station,
+            "truth_source": truth_source,
+            "latest_accepted_observation": {
+                "observed_at_utc": latest_observation_utc,
+                "observation": latest_observation,
+            },
+            "latest_emitted_transition": latest_transition,
+            "send_alert_entered": bool(alert_path_truth.get("send_alert_entered")),
+            "blocking_stage": alert_path_truth.get("blocking_stage"),
+            "suppression_or_non_emission_reason": alert_path_truth.get("suppression_or_non_emission_reason"),
+            "webhook_send_attempted": bool(alert_path_truth.get("webhook_send_attempted")),
+            "webhook_send_succeeded": bool(alert_path_truth.get("webhook_send_succeeded")),
+            "webhook_send_failed": bool(alert_path_truth.get("webhook_send_failed")),
+        }
+    ), 200
+
+
 @app.route("/observability/alert-decision-trace", methods=["GET"])
 def observability_alert_decision_trace():
     station = (request.args.get("station") or "").strip().upper()
