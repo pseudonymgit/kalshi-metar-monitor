@@ -1,4 +1,8 @@
 import copy
+import json
+import os
+import sqlite3
+import tempfile
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -387,40 +391,98 @@ class AlertPathTruthEndpointTests(unittest.TestCase):
         app_module._autostart_fallback_done = True
         self.client = app.test_client()
 
-    @patch("app.get_transition_history")
+    def _write_transition_events(self, db_path, rows):
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute(
+                """
+                CREATE TABLE transition_events (
+                    id INTEGER PRIMARY KEY,
+                    created_utc TEXT,
+                    station TEXT,
+                    transition_type TEXT,
+                    instant_bucket_before INTEGER,
+                    instant_bucket_after INTEGER,
+                    settlement_bucket INTEGER,
+                    running_max REAL,
+                    current_temp REAL,
+                    metadata_json TEXT
+                )
+                """
+            )
+            conn.executemany(
+                """
+                INSERT INTO transition_events (
+                    id,
+                    created_utc,
+                    station,
+                    transition_type,
+                    instant_bucket_before,
+                    instant_bucket_after,
+                    settlement_bucket,
+                    running_max,
+                    current_temp,
+                    metadata_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                rows,
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
     @patch("app.get_state")
-    def test_endpoint_returns_latest_correlated_transition_truth(self, mock_get_state, mock_get_transition_history):
+    def test_endpoint_returns_latest_correlated_transition_truth(self, mock_get_state):
         mock_get_state.return_value = {
             "last_seen_iso": {"KDEN": "2026-03-19T10:05:00Z"},
             "last_obs": {"KDEN": {"temp_f": 70.2, "raw_text": "KDEN 191005Z AUTO ..."}},
         }
-        mock_get_transition_history.return_value = [
-            {
-                "station": "KDEN",
-                "transition_type": "settlement_up",
-                "timestamp_utc": "2026-03-19T10:06:00Z",
-                "transition_event_id": 999,
-                "settlement_bucket": 70,
-                "metadata": {"obs_time": "2026-03-19T09:59:00Z"},
-                "alert_path_truth": {
-                    "send_alert_entered": True,
-                    "blocking_stage": "suppression_gate",
-                    "suppression_or_non_emission_reason": "LADDER_HYDRATION_WARMUP",
-                    "webhook_send_attempted": False,
-                    "webhook_send_succeeded": False,
-                    "webhook_send_failed": False,
-                },
-            },
-            {
-                "station": "KDEN",
-                "transition_type": "settlement_down",
-                "timestamp_utc": "2026-03-19T10:00:00Z",
-                "transition_event_id": 321,
-                "metadata": {},
-            },
-        ]
 
-        response = self.client.get("/observability/alert-path-truth?station=kden")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "alerts.db")
+            self._write_transition_events(
+                db_path,
+                [
+                    (
+                        321,
+                        "2026-03-19T10:00:00Z",
+                        "KDEN",
+                        "settlement_down",
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        json.dumps({}),
+                    ),
+                    (
+                        999,
+                        "2026-03-19T10:06:00Z",
+                        "KDEN",
+                        "settlement_up",
+                        None,
+                        None,
+                        70,
+                        None,
+                        None,
+                        json.dumps(
+                            {
+                                "obs_time": "2026-03-19T09:59:00Z",
+                                "alert_path_truth": {
+                                    "send_alert_entered": True,
+                                    "blocking_stage": "suppression_gate",
+                                    "suppression_or_non_emission_reason": "LADDER_HYDRATION_WARMUP",
+                                    "webhook_send_attempted": False,
+                                    "webhook_send_succeeded": False,
+                                    "webhook_send_failed": False,
+                                },
+                            }
+                        ),
+                    ),
+                ],
+            )
+            with patch.dict(os.environ, {"ALERT_DB_PATH": db_path}, clear=False):
+                response = self.client.get("/observability/alert-path-truth?station=kden")
         payload = response.get_json()
 
         self.assertEqual(response.status_code, 200)
@@ -439,43 +501,64 @@ class AlertPathTruthEndpointTests(unittest.TestCase):
         self.assertFalse(payload["webhook_send_succeeded"])
         self.assertFalse(payload["webhook_send_failed"])
 
-    @patch("app.get_transition_history")
     @patch("app.get_state")
-    def test_endpoint_falls_back_to_latest_transition_runtime_truth(self, mock_get_state, mock_get_transition_history):
+    def test_endpoint_falls_back_to_latest_transition_runtime_truth(self, mock_get_state):
         mock_get_state.return_value = {
             "last_seen_iso": {"KDEN": "2026-03-19T10:07:00Z"},
             "last_obs": {"KDEN": {"temp_f": 70.8}},
         }
-        mock_get_transition_history.return_value = [
-            {
-                "station": "KDEN",
-                "transition_type": "settlement_up",
-                "timestamp_utc": "2026-03-19T10:06:00Z",
-                "transition_event_id": 999,
-                "metadata": {
-                    "evaluation_outcome": "SUPPRESSED_RATE_LIMIT",
-                    "suppression_reason": "RATE_LIMIT",
-                    "alerts_sent": 0,
-                },
-            },
-            {
-                "station": "KDEN",
-                "transition_type": "settlement_down",
-                "timestamp_utc": "2026-03-19T10:00:00Z",
-                "transition_event_id": 321,
-                "metadata": {"obs_time": "2026-03-19T09:59:00Z"},
-                "alert_path_truth": {
-                    "send_alert_entered": True,
-                    "blocking_stage": "suppression_gate",
-                    "suppression_or_non_emission_reason": "LADDER_HYDRATION_WARMUP",
-                    "webhook_send_attempted": False,
-                    "webhook_send_succeeded": False,
-                    "webhook_send_failed": False,
-                },
-            },
-        ]
 
-        response = self.client.get("/observability/alert-path-truth?station=KDEN")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "alerts.db")
+            self._write_transition_events(
+                db_path,
+                [
+                    (
+                        321,
+                        "2026-03-19T10:00:00Z",
+                        "KDEN",
+                        "settlement_down",
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        json.dumps(
+                            {
+                                "obs_time": "2026-03-19T09:59:00Z",
+                                "alert_path_truth": {
+                                    "send_alert_entered": True,
+                                    "blocking_stage": "suppression_gate",
+                                    "suppression_or_non_emission_reason": "LADDER_HYDRATION_WARMUP",
+                                    "webhook_send_attempted": False,
+                                    "webhook_send_succeeded": False,
+                                    "webhook_send_failed": False,
+                                },
+                            }
+                        ),
+                    ),
+                    (
+                        999,
+                        "2026-03-19T10:06:00Z",
+                        "KDEN",
+                        "settlement_up",
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        json.dumps(
+                            {
+                                "evaluation_outcome": "SUPPRESSED_RATE_LIMIT",
+                                "suppression_reason": "RATE_LIMIT",
+                                "alerts_sent": 0,
+                            }
+                        ),
+                    ),
+                ],
+            )
+            with patch.dict(os.environ, {"ALERT_DB_PATH": db_path}, clear=False):
+                response = self.client.get("/observability/alert-path-truth?station=KDEN")
         payload = response.get_json()
 
         self.assertEqual(response.status_code, 200)
@@ -489,6 +572,55 @@ class AlertPathTruthEndpointTests(unittest.TestCase):
         self.assertFalse(payload["webhook_send_attempted"])
         self.assertFalse(payload["webhook_send_succeeded"])
         self.assertFalse(payload["webhook_send_failed"])
+
+    def test_persisted_transition_helper_prefers_event_id_before_timestamp(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "alerts.db")
+            self._write_transition_events(
+                db_path,
+                [
+                    (
+                        321,
+                        "2026-03-19T10:00:00Z",
+                        "KDEN",
+                        "settlement_down",
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        json.dumps({"suppression_reason": "EVENT_ID_MATCH"}),
+                    ),
+                    (
+                        999,
+                        "2026-03-19T10:06:00Z",
+                        "KDEN",
+                        "settlement_up",
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        json.dumps({"suppression_reason": "TIMESTAMP_MATCH"}),
+                    ),
+                ],
+            )
+            with patch.dict(os.environ, {"ALERT_DB_PATH": db_path}, clear=False):
+                row = app_module._get_persisted_transition_row_for_station(
+                    station="KDEN",
+                    transition_event_id=321,
+                    timestamp_utc="2026-03-19T10:06:00Z",
+                )
+                fallback_row = app_module._get_persisted_transition_row_for_station(
+                    station="KDEN",
+                    transition_event_id=12345,
+                    timestamp_utc="2026-03-19T10:06:00Z",
+                )
+
+        self.assertEqual(row["transition_event_id"], 321)
+        self.assertEqual(row["suppression_reason"], "EVENT_ID_MATCH")
+        self.assertEqual(fallback_row["transition_event_id"], 999)
+        self.assertEqual(fallback_row["suppression_reason"], "TIMESTAMP_MATCH")
 
 
 if __name__ == "__main__":
