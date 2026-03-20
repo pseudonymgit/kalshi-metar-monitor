@@ -3771,6 +3771,7 @@ def _poll_once(logger=None):
         stations = _resolve_live_polling_stations(cfg)
 
         from core.kalshi_monitor import (
+            _configured_target_market_types,
             enqueue_station_hydration,
             ensure_ladder_hydration_prerequisite,
             _parse_target_market_types,
