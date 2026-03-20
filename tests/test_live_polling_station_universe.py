@@ -47,7 +47,7 @@ class LivePollingStationUniverseTests(unittest.TestCase):
 
         self.assertEqual(polling_stations, observability_stations)
 
-    @patch("app.build_market_polling_station_universe", return_value=["KDEN", "KNYC"])
+    @patch("app.discover_market_derived_station_codes", return_value=["KDEN", "KNYC"])
     def test_market_derived_stations_replace_union_logic_when_available(self, *_mocks):
         with patch("app.get_default_config", return_value={"stations": ["KMIA"]}), \
              patch("app.get_state", return_value={"stations": ["KLAX"]}), \
@@ -61,7 +61,7 @@ class LivePollingStationUniverseTests(unittest.TestCase):
     @patch("app.get_state", return_value={"stations": ["KDEN"]})
     @patch("app.get_watchlist", return_value={"watchlist": ["KDEN"], "count": 1})
     @patch("app.ensure_series_discovery_loaded", return_value={"KMIA": "KXHIGHMIA"})
-    @patch("app.build_market_polling_station_universe", side_effect=RuntimeError("boom"))
+    @patch("app.discover_market_derived_station_codes", side_effect=RuntimeError("boom"))
     def test_market_derived_failure_falls_back_to_existing_union_logic(self, *_mocks):
         station_universe = app_module._canonical_live_station_universe()
 
