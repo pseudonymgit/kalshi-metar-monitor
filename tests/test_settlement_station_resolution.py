@@ -12,7 +12,7 @@ class SettlementStationResolutionTests(unittest.TestCase):
         self.assertEqual(kalshi_monitor.resolve_settlement_station("NYC"), "KNYC")
 
     def test_market_derived_station_universe_updates_when_market_removed(self):
-        with patch(
+        with patch("core.kalshi_monitor.discover_kalshi_weather_markets", return_value=[]), patch(
             "core.kalshi_monitor.build_market_derived_station_universe",
             side_effect=[["DEN", "NYC"], ["DEN"]],
         ):
@@ -23,7 +23,7 @@ class SettlementStationResolutionTests(unittest.TestCase):
         self.assertEqual(updated, ["KDEN"])
 
     def test_build_market_polling_station_universe_ignores_resolver_exceptions(self):
-        with patch(
+        with patch("core.kalshi_monitor.discover_kalshi_weather_markets", return_value=[]), patch(
             "core.kalshi_monitor.build_market_derived_station_universe",
             return_value=["DEN", "NYC"],
         ), patch(
@@ -51,5 +51,19 @@ class SettlementStationResolutionTests(unittest.TestCase):
         self.assertEqual(tokens, ["DEN", "NYC"])
 
 
+    def test_discover_market_derived_station_codes_prefers_weather_market_station_metadata(self):
+        with patch(
+            "core.kalshi_monitor.discover_kalshi_weather_markets",
+            return_value=[{"station": "KSEA"}, {"station": "KDEN"}],
+        ), patch(
+            "core.kalshi_monitor.build_market_derived_station_universe",
+            side_effect=AssertionError("token fallback should not be used when station metadata exists"),
+        ):
+            stations = kalshi_monitor.discover_market_derived_station_codes()
+
+        self.assertEqual(stations, ["KDEN", "KSEA"])
+
+
 if __name__ == "__main__":
     unittest.main()
+

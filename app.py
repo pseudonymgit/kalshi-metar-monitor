@@ -62,6 +62,7 @@ from core.kalshi_monitor import (
     _kalshi_public_get,
     _parse_target_market_types,
     build_market_polling_station_universe,
+    discover_market_derived_station_codes,
     build_structured_snapshot_from_cache,
     enqueue_station_hydration,
     ensure_series_discovery_loaded,
@@ -122,7 +123,7 @@ def _merge_discovered_stations_into_watchlist():
 
 def _canonical_live_station_universe(station_filter=None):
     try:
-        market_polling_stations = build_market_polling_station_universe()
+        market_polling_stations = discover_market_derived_station_codes()
     except Exception:
         market_polling_stations = []
 

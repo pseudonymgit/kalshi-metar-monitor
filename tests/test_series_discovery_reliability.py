@@ -55,6 +55,18 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
 
         self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN", "KXDENHIGH"])
 
+    def test_discovery_uses_market_derived_station_codes_outside_static_mapping(self):
+        series_items = {
+            "series": [
+                {"frequency": "daily", "title": "Seattle highest temperature", "ticker": "KXHIGHSEA"},
+            ]
+        }
+        with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items), \
+             patch("core.kalshi_monitor.discover_market_derived_station_codes", return_value=["KSEA"]):
+            discovered = kalshi_monitor._discover_series_for_stations()
+
+        self.assertEqual(discovered.get("KSEA"), ["KXHIGHSEA"])
+
     def test_ensure_discovery_raises_and_does_not_mark_discovered_on_empty_mapping(self):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}

@@ -632,10 +632,16 @@ def resolve_settlement_station(token: str) -> str | None:
     return _EXPLICIT_SETTLEMENT_STATION_OVERRIDES.get(normalized_token)
 
 
-def build_market_polling_station_universe(max_pages=5, page_limit=200):
-    tokens = build_market_derived_station_universe(max_pages=max_pages, page_limit=page_limit)
-    stations = set()
+def discover_market_derived_station_codes(max_pages=5, page_limit=200):
+    stations = {
+        str(market.get("station") or "").strip().upper()
+        for market in discover_kalshi_weather_markets(max_pages=max_pages, page_limit=page_limit)
+        if str(market.get("station") or "").strip()
+    }
+    if stations:
+        return sorted(stations)
 
+    tokens = build_market_derived_station_universe(max_pages=max_pages, page_limit=page_limit)
     for token in tokens:
         try:
             station = resolve_settlement_station(token)
@@ -645,6 +651,10 @@ def build_market_polling_station_universe(max_pages=5, page_limit=200):
             stations.add(station)
 
     return sorted(stations)
+
+
+def build_market_polling_station_universe(max_pages=5, page_limit=200):
+    return discover_market_derived_station_codes(max_pages=max_pages, page_limit=page_limit)
 
 
 def get_discovered_weather_market_station_mapping() -> dict:
@@ -751,7 +761,13 @@ def _series_tickers_for_market_types(series_tickers, market_types: set[str] | No
 def _discover_series_for_stations():
     data = _kalshi_public_get("/series?tags=Daily%20temperature")
     series_items = data.get("series") or []
-    configured_stations = set((_get_active_stations() or set()))
+
+    try:
+        configured_stations = set(discover_market_derived_station_codes())
+    except Exception:
+        configured_stations = set()
+
+    configured_stations.update((_get_active_stations() or set()))
     configured_stations.update(_STATION_CITY_TOKEN_MAP.keys())
 
     reverse_city_token_map = {
@@ -783,6 +799,7 @@ def _discover_series_for_stations():
     for station in sorted(configured_stations):
         station_code = (station or "").strip().upper()
         city_token = _STATION_CITY_TOKEN_MAP.get(station_code, "")
+        station_token = station_code[1:] if station_code.startswith("K") and len(station_code) == 4 else station_code
 
         candidates = []
         for item in series_items:
@@ -798,7 +815,8 @@ def _discover_series_for_stations():
             if not ticker:
                 continue
 
-            if station_code in ticker or (city_token and city_token in ticker):
+            token_match = station_code in ticker or (city_token and city_token in ticker) or (station_token and station_token in ticker)
+            if token_match:
                 score = 0
                 if city_token:
                     if ticker == f"KX{market_type}{city_token}":
@@ -808,6 +826,13 @@ def _discover_series_for_stations():
                     elif ticker.startswith(f"KX{market_type}") and city_token in ticker:
                         score = 3
                     elif market_type in ticker and city_token in ticker:
+                        score = 2
+                    else:
+                        score = 1
+                elif station_token:
+                    if ticker == f"KX{market_type}{station_token}":
+                        score = 3
+                    elif ticker == f"KX{station_token}{market_type}":
                         score = 2
                     else:
                         score = 1
