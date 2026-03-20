@@ -232,6 +232,54 @@ class ObservabilityMarketCoverageTests(unittest.TestCase):
         self.assertEqual(payload["series_discovery_source"], "cache_only_fallback")
         self.assertEqual(payload["series_discovery_error"], "cache unavailable")
 
+    @patch.dict(
+        "os.environ",
+        {
+            "KALSHI_TARGET_MARKET_TYPE": "HIGH,LOW",
+            "ALERT_WEBHOOK_URL": "https://example.com/webhook",
+        },
+        clear=False,
+    )
+    @patch("app.datetime")
+    @patch("app.get_default_config", return_value={"stations": ["KDEN"], "poll_seconds": 60})
+    @patch("app.get_state", return_value={"stations": ["KDEN"], "last_seen_iso": {}, "last_poll_utc": None})
+    @patch("app.get_watchlist", return_value={"watchlist": ["KDEN"], "count": 1})
+    @patch("app.get_series_discovery_cache_snapshot", return_value={"KDEN": "KXHIGHDEN"})
+    @patch("app.get_cached_series_markets", return_value={"markets": [], "station_local_day": "2026-01-01"})
+    @patch("app.station_local_day_key", return_value="2026-01-01")
+    def test_market_coverage_uses_station_local_day_for_cache_freshness(self, _day_key, mock_cached_markets, _cache, _watch, _state, _config, datetime_mock):
+        datetime_mock.now.return_value = app_module.parse_iso_utc("2026-01-02T01:00:00+00:00")
+
+        response = self.client.get("/observability/market-coverage?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        rows = {row["market_type"]: row for row in payload["rows"]}
+        self.assertEqual(rows["HIGH"]["series_market_cache_status"], "cache_valid")
+        self.assertEqual(rows["LOW"]["series_market_cache_status"], "cache_valid")
+        self.assertEqual(mock_cached_markets.call_args.args[0], "KXHIGHDEN")
+
+    @patch.dict(
+        "os.environ",
+        {
+            "KALSHI_TARGET_MARKET_TYPE": "HIGH,LOW",
+            "ALERT_WEBHOOK_URL": "https://example.com/webhook",
+        },
+        clear=False,
+    )
+    @patch("app.get_default_config", return_value={"stations": ["KDEN"], "poll_seconds": 60})
+    @patch("app.get_state", return_value={"stations": ["KDEN"], "last_seen_iso": {}, "last_poll_utc": None})
+    @patch("app.get_watchlist", return_value={"watchlist": ["KDEN"], "count": 1})
+    @patch("app.get_series_discovery_cache_snapshot", return_value={"KDEN": ["KXHIGHDEN", "KXLOWDEN"]})
+    @patch("app.get_cached_series_markets", side_effect=[{"markets": []}, {"markets": []}])
+    def test_market_coverage_handles_multiple_discovered_series_without_500(self, *_mocks):
+        response = self.client.get("/observability/market-coverage?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["count"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()
