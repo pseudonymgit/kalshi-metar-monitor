@@ -2890,7 +2890,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                             and (station_in_queue or in_backoff_flow or attempted_recently)
                         )
                         if warmup_suppressed:
-                            suppression_reason = "ladder_hydration_warmup"
+                            suppression_reason = "LADDER_HYDRATION_WARMUP"
                             _ALERT_LOGGER.info(
                                 "SUPPRESS ladder_missing station=%s type=%s reason=ladder_hydration_warmup",
                                 station,
@@ -3126,7 +3126,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 elif saw_terminal_state:
                     evaluation_outcome = "TERMINAL_STATE"
                 elif no_eligible_market_count == evaluated_market_attempts:
-                    evaluation_outcome = "NO_ELIGIBLE_MARKET"
+                    if suppression_reason == "LADDER_HYDRATION_WARMUP":
+                        evaluation_outcome = "SUPPRESSED_LADDER_HYDRATION_WARMUP"
+                    else:
+                        evaluation_outcome = "NO_ELIGIBLE_MARKET"
                 else:
                     reason_token = suppression_reason or "MARKET_RULE"
                     evaluation_outcome = f"SUPPRESSED_{reason_token}"
