@@ -128,6 +128,9 @@ def _canonical_live_station_universe(station_filter=None):
         observability_read_only = str(request.path or "").startswith("/observability/")
 
     market_polling_stations = []
+    # Production polling prefers market-derived station discovery when available,
+    # while observability stays read-only by using cached/non-authoritative inputs only.
+    # Keep this split explicit rather than collapsing both paths into one.
     if not observability_read_only:
         try:
             market_polling_stations = discover_market_derived_station_codes()
@@ -1670,6 +1673,8 @@ else:
         if _autostart_fallback_done:
             return None
         path = str(request.path or "").lower()
+        # Observability requests must not become implicit runtime initializers;
+        # this early return intentionally preserves read-only observability behavior.
         if path.startswith("/observability/"):
             return None
         _autostart_fallback_done = True

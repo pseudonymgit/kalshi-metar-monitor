@@ -105,6 +105,8 @@ _SIGNAL_MOMENTUM_WINDOW_SIZE = 3
 
 
 def reset_station_daily_state(icao: str, local_day: str) -> None:
+    # This wrapper is the required reset seam because it also clears local
+    # suppression/runtime state; resetting authoritative state alone is insufficient.
     _reset_station_daily_state_authoritative(icao, local_day)
     _LAST_SETTLEMENT_UP_TS.pop((icao or "").strip().upper(), None)
 
