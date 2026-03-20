@@ -60,6 +60,40 @@ class LadderCacheObservabilityBuilderTests(unittest.TestCase):
         self.assertFalse(by_station["KPHL"]["hydration"]["cache_valid"])
 
 
+    @patch("core.ladder_cache_observability.get_cached_series_markets")
+    @patch("core.ladder_cache_observability.get_last_hydration_execution_snapshot")
+    @patch("core.ladder_cache_observability.get_hydration_prerequisite_state_snapshot")
+    def test_builds_station_rows_for_multiple_series(self, prereq_mock, execution_mock, cached_mock):
+        now = datetime.now(timezone.utc)
+        hydrated_at = (now - timedelta(seconds=30)).isoformat()
+
+        prereq_mock.return_value = {
+            "KDEN": {"cache_valid": True},
+        }
+        execution_mock.return_value = {
+            "KDEN": {
+                "series_tickers": ["KXHIGHDEN", "KXLOWDEN"],
+                "evaluated_at_utc": now.isoformat(),
+            }
+        }
+
+        def _cached(series_ticker):
+            if series_ticker == "KXHIGHDEN":
+                return {"markets": [{"ticker": "A"}], "hydrated_at_utc": hydrated_at}
+            if series_ticker == "KXLOWDEN":
+                return {"markets": [{"ticker": "B"}, {"ticker": "C"}], "hydrated_at_utc": hydrated_at}
+            return None
+
+        cached_mock.side_effect = _cached
+
+        payload = build_ladder_cache_snapshot(["KDEN"])
+        by_station = {row["station"]: row for row in payload["stations"]}
+
+        self.assertEqual(by_station["KDEN"]["series_tickers"], ["KXHIGHDEN", "KXLOWDEN"])
+        self.assertEqual(by_station["KDEN"]["series_ticker"], ["KXHIGHDEN", "KXLOWDEN"])
+        self.assertEqual(by_station["KDEN"]["market_count"], 3)
+        self.assertTrue(by_station["KDEN"]["hydration"]["cache_present"])
+
 class LadderCacheObservabilityEndpointTests(unittest.TestCase):
     def setUp(self):
         app_module._autostart_fallback_done = True
