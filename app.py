@@ -22,7 +22,7 @@ import logging
 import sqlite3
 from datetime import datetime, timezone
 from time import monotonic
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, has_request_context
 from werkzeug.exceptions import HTTPException
 from core.station_time import station_local_day_key, to_station_local, parse_iso_utc
 # Make local 'core' importable on Render
@@ -122,10 +122,16 @@ def _merge_discovered_stations_into_watchlist():
 
 
 def _canonical_live_station_universe(station_filter=None):
-    try:
-        market_polling_stations = discover_market_derived_station_codes()
-    except Exception:
-        market_polling_stations = []
+    observability_read_only = _current_kalshi_execution_domain() == "observability"
+    if not observability_read_only and has_request_context():
+        observability_read_only = str(request.path or "").startswith("/observability/")
+
+    market_polling_stations = []
+    if not observability_read_only:
+        try:
+            market_polling_stations = discover_market_derived_station_codes()
+        except Exception:
+            market_polling_stations = []
 
     if market_polling_stations:
         live_stations = sorted(
@@ -158,7 +164,11 @@ def _canonical_live_station_universe(station_filter=None):
     )
 
     try:
-        discovered_series = ensure_series_discovery_loaded() or {}
+        discovered_series = (
+            get_series_discovery_cache_snapshot()
+            if observability_read_only
+            else (ensure_series_discovery_loaded() or {})
+        )
     except Exception:
         discovered_series = {}
 
