@@ -123,7 +123,8 @@ If another document presents a simplified transition model, treat it as a concep
 - Cache hydration expectations must be explicit in operations docs and runbooks.
 - Observability may expose deterministic artifacts from downstream deterministic derivation layers within architectural constraints.
 - Observability shall not assume or define signal-layer authority.
-- Alert absence alone must never be used to infer hydration failure or discovery failure; operators must corroborate with runtime-authority and market-coverage surfaces.
+- Alert absence alone must never be used to infer hydration failure or discovery failure; operators must corroborate with `/observability/runtime-authority-snapshot` and market-coverage surfaces.
+- `/observability/pipeline-truth` is currently a partial/non-authoritative troubleshooting surface and must not be treated as canonical execution truth.
 
 ## Governance Invariants
 

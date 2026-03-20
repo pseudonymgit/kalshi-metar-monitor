@@ -43,6 +43,7 @@ Tasks:
 - [ ] Add replay-based regression verification hook
 - [ ] Define suppression transparency for regression-class events
 - [ ] Production runtime discovery snapshot validation
+- [ ] Replace `/observability/pipeline-truth` in operator runbooks with `/observability/runtime-authority-snapshot` as the primary diagnosis surface
 
 ### P0 — ALERT GOVERNANCE HARDENING (NEW)
 
@@ -83,7 +84,8 @@ Purpose: ensure read-only observability boundaries remain explicit and testable.
 
 - [x] Confirm observability endpoints do not perform live Kalshi calls *(completed by domain guards and endpoint tests)*
 - [~] Hydration state surfacing consistency across endpoints *(partially complete; continue reconciliation of endpoint-level semantics)*
-- [ ] Runtime authority snapshot adoption as primary operator diagnosis surface
+- [~] Runtime authority snapshot adoption as primary operator diagnosis surface *(runtime-authority snapshot is the intended primary surface; remove remaining pipeline-truth/operator-doc dependencies)*
+- [~] Hydration observability semantics reconciliation *(persisted-vs-live authority remains mixed across some payloads/endpoints; keep this explicit until resolved)*
 
 ### Infrastructure Reliability
 
@@ -117,6 +119,7 @@ LOW + HIGH Symmetric Market Enablement + City Optimization
 - [ ] Replace static ICAO→Kalshi mapping with formulaic resolver
 - [~] Auto-detect newly listed Kalshi temperature markets *(partially complete via series discovery; validate failure modes)*
 - [ ] Emit alert when unknown market detected
+- [ ] Remove stale `NO_DIRECTIONAL_LADDER_MATCH` cleanup remnant from market-eligibility observability docs/runtime expectations
 - [ ] Optimize city selection for diversified weather regimes
 - [ ] Expand ingestion simultaneously with LOW activation
 
