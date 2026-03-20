@@ -445,13 +445,13 @@ def _build_market_coverage_rows(station_filter=None):
     live_ingestion_stations = set(stations)
 
     now_utc = datetime.now(timezone.utc)
-    expected_day = now_utc.date().isoformat()
 
     rows = []
     for station in stations:
         station_ingestion_configured = station in configured_stations
         station_in_live_ingestion_universe = station in live_ingestion_stations
         station_active = active_stations is None or station in active_stations
+        expected_day = station_local_day_key(station, now_utc.isoformat())
         discovered_series = series_by_station.get(station)
         if isinstance(discovered_series, str):
             series_tickers = [discovered_series]
@@ -459,6 +459,7 @@ def _build_market_coverage_rows(station_filter=None):
             series_tickers = [ticker for ticker in discovered_series if ticker]
         else:
             series_tickers = []
+        series_ticker = series_tickers[0] if series_tickers else None
 
         discovered_markets = []
         cache_status = "cache_missing"
