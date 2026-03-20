@@ -50,6 +50,44 @@ class HydrationQueueIntegrationPathTests(unittest.TestCase):
 
         self.assertTrue(mock_enqueue.called)
 
+class ConfiguredHydrationMarketTypeTests(unittest.TestCase):
+    @patch.dict("os.environ", {"KALSHI_TARGET_MARKET_TYPE": "HIGH,LOW"}, clear=False)
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})
+    def test_hydration_queue_worker_uses_configured_market_types_by_default(self, mock_hydrate, _domain):
+        from core import kalshi_monitor
+
+        kalshi_monitor._hydration_queue[:] = ["KDEN"]
+        kalshi_monitor._hydration_backoff_until.clear()
+        kalshi_monitor._last_hydration_request_ts = 0.0
+
+        try:
+            result = kalshi_monitor.process_hydration_queue_worker()
+        finally:
+            kalshi_monitor._hydration_queue.clear()
+            kalshi_monitor._hydration_backoff_until.clear()
+            kalshi_monitor._last_hydration_request_ts = 0.0
+
+        self.assertEqual(result["status"], "hydrated")
+        mock_hydrate.assert_called_once_with(station="KDEN", market_types={"HIGH", "LOW"})
+
+    @patch.dict("os.environ", {"KALSHI_TARGET_MARKET_TYPE": "HIGH"}, clear=False)
+    @patch(
+        "core.kalshi_monitor.get_cached_series_markets",
+        side_effect=lambda ticker: {"markets": [], "station_local_day": "2026-01-01", "hydrated_at_utc": "2026-01-01T12:00:00+00:00"} if ticker == "KXHIGHDEN" else None,
+    )
+    @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXLOWDEN"]})
+    @patch("core.kalshi_monitor.station_local_day_key", return_value="2026-01-01")
+    @patch("core.kalshi_monitor.datetime")
+    def test_hydration_prerequisite_ignores_low_cache_when_low_disabled(self, datetime_mock, _day_key, _discovery, _cache):
+        from core import kalshi_monitor
+
+        datetime_mock.now.return_value = kalshi_monitor.parse_iso_utc("2026-01-01T12:00:00+00:00")
+        result = kalshi_monitor.ensure_ladder_hydration_prerequisite("KDEN")
+
+        self.assertEqual(result["status"], "cache_valid")
+        self.assertEqual(result["series_ticker"], "KXHIGHDEN")
+
 
 class TransitionEvaluationWindowTests(unittest.TestCase):
     def setUp(self):
