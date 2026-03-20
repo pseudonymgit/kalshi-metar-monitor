@@ -174,6 +174,76 @@ def _directional_strike_window(markets, observed_value, direction):
 
     return [entry[1] for entry in ladder]
 
+
+def _assemble_structured_snapshot_markets(filtered_markets, normalized_station, selected_types):
+    markets = []
+
+    for market in filtered_markets:
+        ticker = market.get("ticker") or ""
+        strike_type = market.get("strike_type")
+        floor = market.get("floor_strike")
+        cap = market.get("cap_strike")
+
+        if strike_type == "between" and floor is not None:
+            strike = int(floor)
+        elif strike_type == "less" and cap is not None:
+            strike = int(cap)
+        elif strike_type == "greater" and floor is not None:
+            strike = int(floor)
+        else:
+            strike = _extract_strike_from_ticker(ticker)
+
+        if strike is None:
+            continue
+
+        markets.append(
+            {
+                "ticker": ticker,
+                "strike": strike,
+                "strike_type": strike_type,
+                "floor_strike": floor,
+                "cap_strike": cap,
+                "event_ticker": market.get("event_ticker"),
+                "last_price": market.get("last_price"),
+                "yes_bid": market.get("yes_bid"),
+                "yes_ask": market.get("yes_ask"),
+                "no_bid": market.get("no_bid"),
+                "no_ask": market.get("no_ask"),
+                "status": market.get("status"),
+            }
+        )
+
+    markets.sort(key=lambda x: x["strike"])
+    pre_directional_market_count = len(markets)
+    observed_value = None
+    if get_metar_state:
+        try:
+            observed_value = (
+                get_metar_state().get("last_obs", {})
+                .get(normalized_station, {})
+                .get("temp_f")
+            )
+        except Exception:
+            pass
+    if observed_value is None:
+        try:
+            state_snapshot = immutable_public_state_snapshot()
+            last = state_snapshot["last_obs"].get(normalized_station)
+            if last and "temp_f" in last:
+                observed_value = float(last["temp_f"])
+        except Exception:
+            pass
+
+    if observed_value is not None and len(selected_types) == 1:
+        direction = next(iter(sorted(selected_types)))
+        markets = _directional_strike_window(markets, observed_value, direction)
+
+    return {
+        "markets": markets,
+        "observed_value": observed_value,
+        "pre_directional_market_count": pre_directional_market_count,
+    }
+
 class kalshi_execution_domain:
     def __init__(self, domain: str):
         self._domain = (domain or "production").strip().lower() or "production"
@@ -1495,73 +1565,17 @@ def build_structured_snapshot(
             "cache_written": cache_written,
         }
 
-    markets = []
-
-    for market in filtered_markets:
-        ticker = market.get("ticker") or ""
-
-        strike_type = market.get("strike_type")
-        floor = market.get("floor_strike")
-        cap = market.get("cap_strike")
-
-        if strike_type == "between" and floor is not None:
-            strike = int(floor)
-        elif strike_type == "less" and cap is not None:
-            strike = int(cap)
-        elif strike_type == "greater" and floor is not None:
-            strike = int(floor)
-        else:
-            strike = _extract_strike_from_ticker(ticker)
-
-        if strike is None:
-            continue
-
-        markets.append(
-            {
-                "ticker": ticker,
-                "strike": strike,
-                "strike_type": strike_type,
-                "floor_strike": floor,
-                "cap_strike": cap,
-                "event_ticker": market.get("event_ticker"),
-                "last_price": market.get("last_price"),
-                "yes_bid": market.get("yes_bid"),
-                "yes_ask": market.get("yes_ask"),
-                "no_bid": market.get("no_bid"),
-                "no_ask": market.get("no_ask"),
-                "status": market.get("status"),
-            }
-        )
-
-    markets.sort(key=lambda x: x["strike"])
-    observed_value = None
-    if get_metar_state:
-        try:
-            observed_value = (
-                get_metar_state().get("last_obs", {})
-                .get(normalized_station, {})
-                .get("temp_f")
-            )
-        except Exception:
-            pass
-    if observed_value is None:
-        try:
-            state_snapshot = immutable_public_state_snapshot()
-            last = state_snapshot["last_obs"].get(normalized_station)
-            if last and "temp_f" in last:
-                observed_value = float(last["temp_f"])
-        except Exception:
-            pass
-
-    if observed_value is not None and len(selected_types) == 1:
-        direction = next(iter(sorted(selected_types)))
-        markets = _directional_strike_window(markets, observed_value, direction)
+    structured_markets = _assemble_structured_snapshot_markets(
+        filtered_markets,
+        normalized_station,
+        selected_types,
+    )
 
     return {
         "station": normalized_station,
         "market_types": sorted(selected_types),
-        "markets": markets,
-        "observed": {"current_temp_f": observed_value},
+        "markets": structured_markets["markets"],
+        "observed": {"current_temp_f": structured_markets["observed_value"]},
     }
 
 
@@ -1593,83 +1607,27 @@ def build_structured_snapshot_from_cache(
         observation_time_utc=observation_time_utc,
     )
 
-    markets = []
-    pre_directional_market_count = 0
-    for market in filtered_markets:
-        ticker = market.get("ticker") or ""
-        strike_type = market.get("strike_type")
-        floor = market.get("floor_strike")
-        cap = market.get("cap_strike")
-
-        if strike_type == "between" and floor is not None:
-            strike = int(floor)
-        elif strike_type == "less" and cap is not None:
-            strike = int(cap)
-        elif strike_type == "greater" and floor is not None:
-            strike = int(floor)
-        else:
-            strike = _extract_strike_from_ticker(ticker)
-
-        if strike is None:
-            continue
-
-        markets.append(
-            {
-                "ticker": ticker,
-                "strike": strike,
-                "strike_type": strike_type,
-                "floor_strike": floor,
-                "cap_strike": cap,
-                "event_ticker": market.get("event_ticker"),
-                "last_price": market.get("last_price"),
-                "yes_bid": market.get("yes_bid"),
-                "yes_ask": market.get("yes_ask"),
-                "no_bid": market.get("no_bid"),
-                "no_ask": market.get("no_ask"),
-                "status": market.get("status"),
-            }
-        )
-
-    markets.sort(key=lambda x: x["strike"])
-    pre_directional_market_count = len(markets)
-    observed_value = None
-    if get_metar_state:
-        try:
-            observed_value = (
-                get_metar_state().get("last_obs", {})
-                .get(normalized_station, {})
-                .get("temp_f")
-            )
-        except Exception:
-            pass
-    if observed_value is None:
-        try:
-            state_snapshot = immutable_public_state_snapshot()
-            last = state_snapshot["last_obs"].get(normalized_station)
-            if last and "temp_f" in last:
-                observed_value = float(last["temp_f"])
-        except Exception:
-            pass
-
-    if observed_value is not None and len(selected_types) == 1:
-        direction = next(iter(sorted(selected_types)))
-        markets = _directional_strike_window(markets, observed_value, direction)
+    structured_markets = _assemble_structured_snapshot_markets(
+        filtered_markets,
+        normalized_station,
+        selected_types,
+    )
 
     return {
         "station": normalized_station,
         "series_ticker": series_ticker,
         "series_tickers": list(series_tickers),
         "market_types": sorted(selected_types),
-        "markets": markets,
-        "pre_directional_market_count": pre_directional_market_count,
-        "post_directional_market_count": len(markets),
+        "markets": structured_markets["markets"],
+        "pre_directional_market_count": structured_markets["pre_directional_market_count"],
+        "post_directional_market_count": len(structured_markets["markets"]),
         "empty_reason": (
             "cache_missing_or_empty"
             if len(cached_markets) == 0
             else "filtered_to_zero"
             if len(filtered_markets) == 0
             else "no_directional_ladder_match"
-            if len(markets) == 0
+            if len(structured_markets["markets"]) == 0
             else None
         ),
         "raw_market_count": len(cached_markets),
@@ -1677,7 +1635,7 @@ def build_structured_snapshot_from_cache(
         "rejection_counts": dict(rejection_counts),
         "cache_written": bool(cached_markets),
         "hydration_source": "cache_only",
-        "observed": {"current_temp_f": observed_value},
+        "observed": {"current_temp_f": structured_markets["observed_value"]},
     }
 
 
