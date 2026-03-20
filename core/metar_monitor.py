@@ -2022,7 +2022,11 @@ def _annotate_transition_history_alert_path_truth(
         )
 
 
-def get_transition_history(station=None, day: Optional[str] = None, limit=50):
+def _normalize_transition_history_query(
+    station=None,
+    day: Optional[str] = None,
+    limit=50,
+) -> Tuple[str, str, int]:
     normalized_station = (station or "").strip().upper()
     normalized_day = (day or "").strip()
     try:
@@ -2032,6 +2036,61 @@ def get_transition_history(station=None, day: Optional[str] = None, limit=50):
 
     if normalized_day:
         datetime.strptime(normalized_day, "%Y-%m-%d")
+
+    return normalized_station, normalized_day, bounded_limit
+
+
+
+def _load_transition_event_metadata(raw_metadata: Any) -> Dict[str, Any]:
+    if not raw_metadata:
+        return {}
+    try:
+        parsed = json.loads(raw_metadata)
+    except Exception:
+        return {"raw_metadata_json": raw_metadata}
+    return parsed if isinstance(parsed, dict) else {"raw_metadata_json": raw_metadata}
+
+
+
+def _build_transition_history_row_from_persisted(row: Tuple[Any, ...]) -> Dict[str, Any]:
+    metadata = _load_transition_event_metadata(row[9])
+    transition_row: Dict[str, Any] = {
+        "station": (row[2] or "").strip().upper(),
+        "transition_type": row[3],
+        "instant_bucket_before": row[4],
+        "instant_bucket_after": row[5],
+        "settlement_bucket": row[6],
+        "running_max": row[7],
+        "current_temp": row[8],
+        "timestamp_utc": row[1],
+        "transition_event_id": row[0],
+        "metadata": metadata,
+    }
+
+    promoted_metadata_fields = (
+        "market_evaluated",
+        "alerts_sent",
+        "evaluation_outcome",
+        "alert_schema_version",
+        "alert_classification",
+        "suppression_reason",
+        "market_eligibility_runtime",
+        "alert_path_truth",
+    )
+    for field in promoted_metadata_fields:
+        if field in metadata:
+            transition_row[field] = copy.deepcopy(metadata[field])
+
+    return transition_row
+
+
+
+def get_transition_history(station=None, day: Optional[str] = None, limit=50):
+    normalized_station, normalized_day, bounded_limit = _normalize_transition_history_query(
+        station=station,
+        day=day,
+        limit=limit,
+    )
 
     with _TRANSITION_LOCK:
         history = list(_TRANSITION_HISTORY)
@@ -2054,6 +2113,66 @@ def get_transition_history(station=None, day: Optional[str] = None, limit=50):
 
     history = list(reversed(history))
     return history[:bounded_limit]
+
+
+
+def get_persisted_transition_history(station=None, day: Optional[str] = None, limit=50):
+    normalized_station, normalized_day, bounded_limit = _normalize_transition_history_query(
+        station=station,
+        day=day,
+        limit=limit,
+    )
+
+    db_path = _alert_db_path()
+    if not os.path.exists(db_path):
+        return []
+
+    query = """
+        SELECT id, created_utc, station, transition_type,
+               instant_bucket_before, instant_bucket_after,
+               settlement_bucket, running_max, current_temp,
+               metadata_json
+        FROM transition_events
+    """
+    params: List[Any] = []
+    conditions = []
+    if normalized_station:
+        conditions.append("station = ?")
+        params.append(normalized_station)
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    query += " ORDER BY id DESC"
+    if not normalized_day:
+        query += " LIMIT ?"
+        params.append(bounded_limit)
+
+    try:
+        with _AUDIT_LOCK:
+            conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1)
+            try:
+                rows = conn.execute(query, tuple(params)).fetchall()
+            finally:
+                conn.close()
+    except Exception:
+        return []
+
+    history = []
+    for row in rows:
+        transition_row = _build_transition_history_row_from_persisted(row)
+        if normalized_day:
+            obs_time = (transition_row.get("metadata") or {}).get("obs_time")
+            if not obs_time:
+                continue
+            try:
+                if station_local_day_key(transition_row.get("station") or normalized_station, obs_time) != normalized_day:
+                    continue
+            except Exception:
+                continue
+        history.append(transition_row)
+        if len(history) >= bounded_limit:
+            break
+
+    return history
 
 
 def get_alert_review_diagnostics(
