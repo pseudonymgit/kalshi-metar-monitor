@@ -259,6 +259,95 @@ def _get_recent_alert_rows_for_preview(*, station=None, limit=25):
         )
     return alerts
 
+
+def _get_persisted_transition_row_for_station(*, station, transition_event_id=None, timestamp_utc=None):
+    normalized_station = (station or "").strip().upper()
+    if not normalized_station:
+        return None
+
+    db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    if not os.path.exists(db_path):
+        return None
+
+    def _decode_transition_row(row):
+        metadata = {}
+        if row[9]:
+            try:
+                metadata = json.loads(row[9])
+            except Exception:
+                metadata = {}
+
+        transition = {
+            "station": row[2],
+            "transition_type": row[3],
+            "instant_bucket_before": row[4],
+            "instant_bucket_after": row[5],
+            "settlement_bucket": row[6],
+            "running_max": row[7],
+            "current_temp": row[8],
+            "timestamp_utc": row[1],
+            "transition_event_id": row[0],
+            "metadata": metadata,
+        }
+        for field in (
+            "market_evaluated",
+            "alerts_sent",
+            "evaluation_outcome",
+            "alert_schema_version",
+            "alert_classification",
+            "suppression_reason",
+            "market_eligibility_runtime",
+            "alert_path_truth",
+        ):
+            if field in metadata:
+                transition[field] = metadata.get(field)
+        return transition
+
+    query_base = """
+        SELECT id, created_utc, station, transition_type,
+               instant_bucket_before, instant_bucket_after,
+               settlement_bucket, running_max, current_temp,
+               metadata_json
+        FROM transition_events
+        WHERE station = ?
+    """
+
+    try:
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1)
+        try:
+            if transition_event_id is not None:
+                try:
+                    normalized_transition_event_id = int(transition_event_id)
+                except Exception:
+                    normalized_transition_event_id = None
+                if normalized_transition_event_id is not None:
+                    row = conn.execute(
+                        query_base + " AND id = ? ORDER BY id DESC LIMIT 1",
+                        (normalized_station, normalized_transition_event_id),
+                    ).fetchone()
+                    if row:
+                        return _decode_transition_row(row)
+
+            if timestamp_utc:
+                row = conn.execute(
+                    query_base + " AND created_utc = ? ORDER BY id DESC LIMIT 1",
+                    (normalized_station, str(timestamp_utc)),
+                ).fetchone()
+                if row:
+                    return _decode_transition_row(row)
+
+            row = conn.execute(
+                query_base + " ORDER BY id DESC LIMIT 1",
+                (normalized_station,),
+            ).fetchone()
+        finally:
+            conn.close()
+    except Exception:
+        return None
+
+    return _decode_transition_row(row) if row else None
+
+
 def _safe_lag_seconds(*, now_utc: datetime, iso_timestamp: str):
     if not iso_timestamp:
         return None
@@ -3222,8 +3311,7 @@ def observability_alert_path_truth():
     latest_observation_utc = (state.get("last_seen_iso") or {}).get(station)
     latest_observation = (state.get("last_obs") or {}).get(station) or None
 
-    transitions = get_transition_history(station=station, limit=50)
-    latest_transition = transitions[0] if transitions else None
+    latest_transition = _get_persisted_transition_row_for_station(station=station)
     persisted_truth = None
     if isinstance(latest_transition, dict):
         persisted_truth = latest_transition.get("alert_path_truth")
