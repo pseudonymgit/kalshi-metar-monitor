@@ -297,7 +297,7 @@ class SignalLayerAlertTests(unittest.TestCase):
         metar_monitor._send_alert("https://example.com/webhook", payload)
 
         mock_post.assert_not_called()
-        self.assertEqual(mock_annotate.call_args.kwargs.get("suppression_reason"), "ladder_hydration_warmup")
+        self.assertEqual(mock_annotate.call_args.kwargs.get("suppression_reason"), "LADDER_HYDRATION_WARMUP")
 
     @patch.dict("os.environ", {"ALERT_ON_MISSING_LADDER": "true", "KALSHI_TARGET_MARKET_TYPE": "HIGH", "HYDRATION_MISSING_LADDER_WARMUP_SECONDS": "900"}, clear=False)
     @patch("core.metar_monitor.is_scheduler_running", return_value=True)

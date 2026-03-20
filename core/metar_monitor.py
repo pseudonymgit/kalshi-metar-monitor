@@ -1749,14 +1749,10 @@ def _log_transition_event(
     return None
 
 
-def _annotate_transition_history_market_eval(
+def _find_correlated_transition_entry(
     station: str,
     transition_correlation: Optional[Dict[str, Any]],
-    alerts_sent: int,
-    evaluation_outcome: str,
-    suppression_reason: Optional[str] = None,
-    market_eligibility_runtime: Optional[Dict[str, Any]] = None,
-) -> None:
+) -> Optional[Dict[str, Any]]:
     normalized_station = (station or "").strip().upper()
     transition_id = None
     transition_timestamp = None
@@ -1770,6 +1766,47 @@ def _annotate_transition_history_market_eval(
         raw_timestamp = transition_correlation.get("timestamp_utc")
         if raw_timestamp is not None:
             transition_timestamp = str(raw_timestamp)
+    if transition_id is None and not transition_timestamp:
+        return None
+
+    with _TRANSITION_LOCK:
+        for entry in reversed(_TRANSITION_HISTORY):
+            if entry.get("station") != normalized_station:
+                continue
+            if transition_id is not None and int(entry.get("transition_event_id") or 0) != transition_id:
+                continue
+            if transition_id is None and transition_timestamp and entry.get("timestamp_utc") != transition_timestamp:
+                continue
+            return entry
+    return None
+
+
+
+def _annotate_transition_history_market_eval(
+    station: str,
+    transition_correlation: Optional[Dict[str, Any]],
+    alerts_sent: int,
+    evaluation_outcome: str,
+    suppression_reason: Optional[str] = None,
+    market_eligibility_runtime: Optional[Dict[str, Any]] = None,
+) -> None:
+    normalized_station = (station or "").strip().upper()
+    correlated_transition = _find_correlated_transition_entry(
+        station=station,
+        transition_correlation=transition_correlation,
+    )
+    transition_id = None
+    transition_timestamp = None
+    if correlated_transition is not None:
+        raw_transition_id = correlated_transition.get("transition_event_id")
+        if raw_transition_id is not None:
+            try:
+                transition_id = int(raw_transition_id)
+            except Exception:
+                transition_id = None
+        raw_transition_timestamp = correlated_transition.get("timestamp_utc")
+        if raw_transition_timestamp is not None:
+            transition_timestamp = str(raw_transition_timestamp)
     if transition_id is None and not transition_timestamp:
         _ALERT_LOGGER.warning(
             "transition_market_eval_annotation_skipped station=%s reason=missing_correlation",
@@ -2882,12 +2919,21 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                         evaluated_at_utc = _parse_iso_utc_optional(hydration_state.get("evaluated_at_utc"))
                         if evaluated_at_utc is not None:
                             attempted_recently = (now_ts - evaluated_at_utc.timestamp()) <= warmup_window_seconds
+                        correlated_transition = _find_correlated_transition_entry(
+                            station=station,
+                            transition_correlation=transition_correlation if isinstance(transition_correlation, dict) else None,
+                        )
+                        authoritative_reversion_after_settlement = (
+                            isinstance(correlated_transition, dict)
+                            and correlated_transition.get("transition_type") == "reversion_after_settlement"
+                        )
                         warmup_suppressed = (
                             bool(hydration_state.get("attempted"))
                             and bool(hydration_state.get("series_discovered"))
                             and not bool(hydration_state.get("markets_cached"))
                             and is_scheduler_running()
                             and (station_in_queue or in_backoff_flow or attempted_recently)
+                            and not authoritative_reversion_after_settlement
                         )
                         if warmup_suppressed:
                             suppression_reason = "LADDER_HYDRATION_WARMUP"
