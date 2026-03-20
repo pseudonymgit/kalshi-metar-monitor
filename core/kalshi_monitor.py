@@ -1297,19 +1297,20 @@ def _select_event_ticker_for_series(
         return None
 
     date_token = _station_local_kalshi_date_token(normalized_station, observation_time_utc=observation_time_utc)
+    if not date_token:
+        return None
 
     candidates: list[tuple[int, str]] = []
     for event in (events or []):
         event_ticker = str((event or {}).get("event_ticker") or "").strip().upper()
         if not event_ticker:
             continue
+        if not event_ticker.startswith(f"{normalized_series_ticker}-"):
+            continue
+        if not event_ticker.endswith(f"-{date_token}"):
+            continue
 
         score = 0
-        if event_ticker.startswith(f"{normalized_series_ticker}-"):
-            score += 4
-        if date_token and event_ticker.endswith(f"-{date_token}"):
-            score += 2
-
         status = str((event or {}).get("status") or "").strip().lower()
         if status in ("open", "active"):
             score += 1
