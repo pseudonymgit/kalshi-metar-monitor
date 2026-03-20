@@ -34,17 +34,6 @@ from core.station_time import parse_iso_utc, station_local_day_key, to_station_l
 from core.alert_schema import ALERT_SCHEMA_VERSION
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
-
-# Optional reuse of Phase 1 timezone helper
-try:
-    from core.metar_monitor import _to_local
-except Exception:
-    _to_local = None
-
-try:
-    from core.metar_monitor import get_state as get_metar_state
-except Exception:
-    get_metar_state = None
     
 _last_market_state = {}
 _last_composed_sent = {}
@@ -99,6 +88,16 @@ MIN_HYDRATION_INTERVAL_SECONDS = 1
 HYDRATION_BACKOFF_SECONDS = 120
 DIRECTIONAL_STRIKE_WINDOW_SIZE = 3
 SERIES_EVENTS_CACHE_TTL_SECONDS = 60
+
+
+def _observed_station_temp_f(station: str):
+    try:
+        last = (immutable_public_state_snapshot().get("last_obs") or {}).get((station or "").strip().upper())
+        if last and "temp_f" in last:
+            return float(last["temp_f"])
+    except Exception:
+        pass
+    return None
 
 
 def _market_strike_value(market):
@@ -699,12 +698,9 @@ def _station_local_kalshi_date_token(station, observation_time_utc: str | dateti
     else:
         now_utc = datetime.now(timezone.utc)
 
-    if _to_local:
-        try:
-            now_local = _to_local(station, now_utc)
-        except Exception:
-            now_local = now_utc
-    else:
+    try:
+        now_local = to_station_local(station, now_utc)
+    except Exception:
         now_local = now_utc
 
     return now_local.strftime("%y%b%d").upper()
@@ -1534,24 +1530,7 @@ def build_structured_snapshot(
         )
 
     markets.sort(key=lambda x: x["strike"])
-    observed_value = None
-    if get_metar_state:
-        try:
-            observed_value = (
-                get_metar_state().get("last_obs", {})
-                .get(normalized_station, {})
-                .get("temp_f")
-            )
-        except Exception:
-            pass
-    if observed_value is None:
-        try:
-            state_snapshot = immutable_public_state_snapshot()
-            last = state_snapshot["last_obs"].get(normalized_station)
-            if last and "temp_f" in last:
-                observed_value = float(last["temp_f"])
-        except Exception:
-            pass
+    observed_value = _observed_station_temp_f(normalized_station)
 
     if observed_value is not None and len(selected_types) == 1:
         direction = next(iter(sorted(selected_types)))
@@ -1632,24 +1611,7 @@ def build_structured_snapshot_from_cache(
 
     markets.sort(key=lambda x: x["strike"])
     pre_directional_market_count = len(markets)
-    observed_value = None
-    if get_metar_state:
-        try:
-            observed_value = (
-                get_metar_state().get("last_obs", {})
-                .get(normalized_station, {})
-                .get("temp_f")
-            )
-        except Exception:
-            pass
-    if observed_value is None:
-        try:
-            state_snapshot = immutable_public_state_snapshot()
-            last = state_snapshot["last_obs"].get(normalized_station)
-            if last and "temp_f" in last:
-                observed_value = float(last["temp_f"])
-        except Exception:
-            pass
+    observed_value = _observed_station_temp_f(normalized_station)
 
     if observed_value is not None and len(selected_types) == 1:
         direction = next(iter(sorted(selected_types)))
@@ -2092,13 +2054,12 @@ def send_composed_weather_market_alert(
 
     local_time_display = "N/A"
     local_dt = None
-    if _to_local:
-        try:
-            local_dt = _to_local(normalized_station, datetime.now(timezone.utc))
-            local_time_display = local_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
-        except Exception:
-            local_time_display = "N/A"
-            local_dt = None
+    try:
+        local_dt = to_station_local(normalized_station, datetime.now(timezone.utc))
+        local_time_display = local_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+    except Exception:
+        local_time_display = "N/A"
+        local_dt = None
 
     temp_display = "N/A" if current_temp_f is None else f"{float(current_temp_f):.1f}"
     prev_display = "N/A" if prev_temp_f is None else f"{float(prev_temp_f):.1f}"
