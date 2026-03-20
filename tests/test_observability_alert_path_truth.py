@@ -177,6 +177,108 @@ class AlertPathTruthClassificationTests(unittest.TestCase):
         self.assertFalse(alert_path_truth["webhook_send_succeeded"])
         self.assertFalse(alert_path_truth["webhook_send_failed"])
 
+    @patch("core.metar_monitor.is_scheduler_running", return_value=True)
+    @patch("core.kalshi_monitor.send_composed_weather_market_alert")
+    @patch("core.kalshi_monitor.process_ladder_transition")
+    @patch("core.kalshi_monitor.hydration_queue_snapshot")
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot")
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
+    @patch("core.kalshi_monitor.classify_proximity")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache")
+    @patch("core.kalshi_monitor._parse_target_market_types")
+    @patch("core.kalshi_monitor._get_active_stations")
+    def test_send_alert_preserves_warmup_reason_when_no_eligible_markets(
+        self,
+        mock_get_active_stations,
+        mock_parse_target_market_types,
+        mock_build_structured_snapshot_from_cache,
+        mock_classify_proximity,
+        mock_enqueue_station_hydration,
+        mock_get_hydration_prerequisite_state_snapshot,
+        mock_hydration_queue_snapshot,
+        mock_process_ladder_transition,
+        mock_send_composed_weather_market_alert,
+        mock_is_scheduler_running,
+    ):
+        del mock_classify_proximity
+        del mock_enqueue_station_hydration
+        del mock_process_ladder_transition
+        del mock_send_composed_weather_market_alert
+        del mock_is_scheduler_running
+        mock_get_active_stations.return_value = {"KDEN"}
+        mock_parse_target_market_types.return_value = {"HIGH"}
+        mock_build_structured_snapshot_from_cache.return_value = {
+            "markets": [],
+            "raw_market_count": 0,
+            "filtered_market_count": 0,
+            "rejection_counts": {},
+            "cache_written": False,
+            "empty_reason": "cache_missing_or_empty",
+        }
+        mock_get_hydration_prerequisite_state_snapshot.return_value = {
+            "KDEN": {
+                "cache_valid": False,
+                "attempted": True,
+                "series_discovered": True,
+                "markets_cached": False,
+                "evaluated_at_utc": "2026-03-19T10:00:00Z",
+                "status": "cache_missing",
+            }
+        }
+        mock_hydration_queue_snapshot.return_value = {
+            "queued_stations": ["KDEN"],
+            "backoff_until": {},
+        }
+
+        with metar_monitor._TRANSITION_LOCK:
+            metar_monitor._TRANSITION_HISTORY.clear()
+            metar_monitor._TRANSITION_HISTORY.append(
+                {
+                    "station": "KDEN",
+                    "transition_type": "reversion_after_settlement",
+                    "instant_bucket_before": 69,
+                    "instant_bucket_after": 70,
+                    "settlement_bucket": 70,
+                    "running_max": 70.2,
+                    "current_temp": 70.2,
+                    "timestamp_utc": "2026-03-19T10:00:00Z",
+                    "transition_event_id": 655,
+                    "metadata": {"obs_time": "2026-03-19T09:59:00Z"},
+                }
+            )
+
+        payload = {
+            "station": "KDEN",
+            "summary": {"temp_f": 70.2},
+            "legacy": {
+                "temp_f": 70.2,
+                "obs_time": "2026-03-19T10:05:00Z",
+                "transition_correlation": {
+                    "transition_event_id": 655,
+                    "timestamp_utc": "2026-03-19T10:00:00Z",
+                },
+            },
+        }
+
+        result = metar_monitor._send_alert("https://example.test/webhook", payload)
+        latest_transition = metar_monitor.get_transition_history(station="KDEN", limit=1)[0]
+        alert_path_truth = latest_transition.get("alert_path_truth") or {}
+
+        self.assertFalse(result["delivery_attempted"])
+        self.assertEqual(
+            latest_transition.get("evaluation_outcome"),
+            "SUPPRESSED_LADDER_HYDRATION_WARMUP",
+        )
+        self.assertEqual(latest_transition.get("suppression_reason"), "LADDER_HYDRATION_WARMUP")
+        self.assertEqual(alert_path_truth["blocking_stage"], "suppression_gate")
+        self.assertEqual(
+            alert_path_truth["suppression_or_non_emission_reason"],
+            "LADDER_HYDRATION_WARMUP",
+        )
+        self.assertFalse(alert_path_truth["webhook_send_attempted"])
+        self.assertFalse(alert_path_truth["webhook_send_succeeded"])
+        self.assertFalse(alert_path_truth["webhook_send_failed"])
+
 
 class AlertPathTruthEndpointTests(unittest.TestCase):
     def setUp(self):
