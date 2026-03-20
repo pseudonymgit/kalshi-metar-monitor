@@ -713,6 +713,41 @@ def _normalize_series_tickers(series_tickers):
     return []
 
 
+def _configured_target_market_types():
+    configured = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
+    return configured or {"HIGH"}
+
+
+def _infer_series_market_type(*, ticker: str = "", title: str = ""):
+    normalized_ticker = str(ticker or "").strip().upper()
+    normalized_title = str(title or "").strip().upper()
+    marker_blob = f"{normalized_ticker} {normalized_title}".strip()
+
+    if any(token in marker_blob for token in ("KXHIGH", " HIGH", "HIGH ", "HIGHEST TEMPERATURE", "DAILY HIGH")):
+        return "HIGH"
+    if any(token in marker_blob for token in ("KXLOW", " LOW", "LOW ", "LOWEST TEMPERATURE", "DAILY LOW")):
+        return "LOW"
+    return None
+
+
+def _series_tickers_for_market_types(series_tickers, market_types: set[str] | None = None):
+    normalized_series_tickers = _normalize_series_tickers(series_tickers)
+    selected_types = {
+        token.strip().upper()
+        for token in (market_types or set())
+        if token and token.strip().upper() in {"HIGH", "LOW"}
+    }
+    if not selected_types:
+        return normalized_series_tickers
+
+    filtered = []
+    for ticker in normalized_series_tickers:
+        inferred_market_type = _infer_series_market_type(ticker=ticker)
+        if inferred_market_type is None or inferred_market_type in selected_types:
+            filtered.append(ticker)
+    return filtered
+
+
 def _discover_series_for_stations():
     data = _kalshi_public_get("/series?tags=Daily%20temperature")
     series_items = data.get("series") or []
@@ -731,12 +766,14 @@ def _discover_series_for_stations():
 
         if frequency != "daily":
             continue
-        if "highest" not in title:
+        market_type = _infer_series_market_type(ticker=ticker, title=title)
+        if market_type not in {"HIGH", "LOW"}:
             continue
-        if not ticker.startswith("KXHIGH"):
+        prefix = f"KX{market_type}"
+        if not ticker.startswith(prefix):
             continue
 
-        discovered_token = ticker[len("KXHIGH"):]
+        discovered_token = ticker[len(prefix):]
         discovered_station = reverse_city_token_map.get(discovered_token)
         if discovered_station:
             configured_stations.add(discovered_station)
@@ -755,7 +792,8 @@ def _discover_series_for_stations():
 
             if frequency != "daily":
                 continue
-            if "highest" not in title.lower():
+            market_type = _infer_series_market_type(ticker=ticker, title=title)
+            if market_type not in {"HIGH", "LOW"}:
                 continue
             if not ticker:
                 continue
@@ -763,13 +801,13 @@ def _discover_series_for_stations():
             if station_code in ticker or (city_token and city_token in ticker):
                 score = 0
                 if city_token:
-                    if ticker == f"KXHIGH{city_token}":
+                    if ticker == f"KX{market_type}{city_token}":
                         score = 5
-                    elif ticker == f"KX{city_token}HIGH":
+                    elif ticker == f"KX{city_token}{market_type}":
                         score = 4
-                    elif ticker.startswith("KXHIGH") and city_token in ticker:
+                    elif ticker.startswith(f"KX{market_type}") and city_token in ticker:
                         score = 3
-                    elif "HIGH" in ticker and city_token in ticker:
+                    elif market_type in ticker and city_token in ticker:
                         score = 2
                     else:
                         score = 1
@@ -892,7 +930,10 @@ def get_cached_series_markets(series_ticker: str) -> dict | None:
 def get_station_hydration_cache_probe(station: str) -> dict:
     normalized_station = (station or "").strip().upper()
     with _SERIES_LOCK:
-        series_tickers = _normalize_series_tickers(_SERIES_BY_STATION.get(normalized_station))
+        series_tickers = _series_tickers_for_market_types(
+            _SERIES_BY_STATION.get(normalized_station),
+            _configured_target_market_types(),
+        )
         series_ticker = series_tickers[0] if series_tickers else None
         cache_entries = [_SERIES_MARKETS_CACHE.get(ticker) or {} for ticker in series_tickers]
         raw_market_count = sum(len(entry.get("markets") or []) for entry in cache_entries)
@@ -924,7 +965,10 @@ def ensure_ladder_hydration_prerequisite(station: str) -> dict:
 
     now_utc_iso = datetime.now(timezone.utc).isoformat()
     station_day = station_local_day_key(normalized_station, now_utc_iso)
-    series_tickers = ensure_series_discovery_loaded().get(normalized_station) or []
+    series_tickers = _series_tickers_for_market_types(
+        ensure_series_discovery_loaded().get(normalized_station),
+        _configured_target_market_types(),
+    )
     series_ticker = series_tickers[0] if series_tickers else None
     series_discovered = bool(series_tickers)
     cache_entries = {
@@ -1114,7 +1158,11 @@ def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict
         _hydration_queue.pop(0)
         _last_hydration_request_ts = now_ts
 
-    selected_types = set(market_types or {"HIGH"})
+    selected_types = {
+        token.strip().upper()
+        for token in (market_types or _configured_target_market_types())
+        if token and token.strip().upper() in {"HIGH", "LOW"}
+    }
     _LOGGER.info("hydration_worker station=%s", station)
     try:
         result = hydrate_station_ladder_snapshot(station=station, market_types=selected_types)
@@ -1148,7 +1196,10 @@ def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dic
 
     normalized_station = (station or "").strip().upper()
     snapshot = build_structured_snapshot(normalized_station, market_types)
-    series_tickers = ensure_series_discovery_loaded().get(normalized_station) or []
+    series_tickers = _series_tickers_for_market_types(
+        ensure_series_discovery_loaded().get(normalized_station),
+        market_types,
+    )
     series_ticker = series_tickers[0] if series_tickers else None
     cache_entries = [get_cached_series_markets(ticker) for ticker in series_tickers]
     return {
@@ -1290,12 +1341,7 @@ def build_structured_snapshot(
         evaluated_at_utc = datetime.now(timezone.utc).isoformat()
     series_by_station = ensure_series_discovery_loaded()
     discovered_series_tickers = series_by_station.get(normalized_station)
-    if isinstance(discovered_series_tickers, str):
-        series_tickers = [discovered_series_tickers]
-    elif isinstance(discovered_series_tickers, (list, tuple, set)):
-        series_tickers = [ticker for ticker in discovered_series_tickers if ticker]
-    else:
-        series_tickers = []
+    series_tickers = _series_tickers_for_market_types(discovered_series_tickers, market_types)
     series_ticker = series_tickers[0] if series_tickers else None
 
     selected_types = {
@@ -1308,11 +1354,7 @@ def build_structured_snapshot(
     event_market_cache = {}
     cache_written = False
     for series_ticker_item in series_tickers:
-        inferred_market_type = None
-        if series_ticker_item.startswith("KXHIGH"):
-            inferred_market_type = "HIGH"
-        elif series_ticker_item.startswith("KXLOW"):
-            inferred_market_type = "LOW"
+        inferred_market_type = _infer_series_market_type(ticker=series_ticker_item)
 
         inferred_event_ticker = None
         if inferred_market_type:
@@ -1420,6 +1462,7 @@ def build_structured_snapshot(
             "evaluated_at_utc": evaluated_at_utc,
             "station": normalized_station,
             "series_ticker": series_ticker,
+            "series_tickers": list(series_tickers),
             "raw_market_count": len(fetched_markets),
             "filtered_market_count": len(filtered_markets),
             "rejection_counts": dict(rejection_counts),
@@ -1509,7 +1552,7 @@ def build_structured_snapshot_from_cache(
     }
 
     with _SERIES_LOCK:
-        series_tickers = _normalize_series_tickers(_SERIES_BY_STATION.get(normalized_station))
+        series_tickers = _series_tickers_for_market_types(_SERIES_BY_STATION.get(normalized_station), market_types)
         series_ticker = series_tickers[0] if series_tickers else None
         cached_markets = []
         for ticker in series_tickers:
@@ -1589,6 +1632,7 @@ def build_structured_snapshot_from_cache(
     return {
         "station": normalized_station,
         "series_ticker": series_ticker,
+        "series_tickers": list(series_tickers),
         "market_types": sorted(selected_types),
         "markets": markets,
         "pre_directional_market_count": pre_directional_market_count,
