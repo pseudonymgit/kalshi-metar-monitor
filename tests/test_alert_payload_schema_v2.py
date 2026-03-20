@@ -187,8 +187,7 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
     })
     @patch("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXHIGHDEN"})
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26DEC31")
-    @patch("core.kalshi_monitor.get_metar_state", return_value={"last_obs": {"KDEN": {"temp_f": 69.7}}})
-    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
+    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {"KDEN": {"temp_f": 69.7}}})
     def test_cache_only_snapshot_reads_observed_temp_from_last_obs(self, *_mocks):
         snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"HIGH"})
         self.assertEqual(snapshot["observed"]["current_temp_f"], 69.7)
@@ -209,8 +208,7 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
     })
     @patch("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXHIGHDEN"})
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26DEC31")
-    @patch("core.kalshi_monitor.get_metar_state", return_value={"last_obs": {"KDEN": {"temp_f": 69.8}}})
-    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
+    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {"KDEN": {"temp_f": 69.8}}})
     def test_cache_snapshot_uses_directional_strike_window_for_high(self, *_mocks):
         snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"HIGH"})
         self.assertEqual([m["strike"] for m in snapshot["markets"]], [70, 71, 72, 69])
@@ -230,8 +228,7 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
     })
     @patch("core.kalshi_monitor._SERIES_BY_STATION", {"KDEN": "KXLOWDEN"})
     @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26DEC31")
-    @patch("core.kalshi_monitor.get_metar_state", return_value={"last_obs": {"KDEN": {"temp_f": 65.0}}})
-    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
+    @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {"KDEN": {"temp_f": 65.0}}})
     def test_cache_snapshot_directional_fallback_keeps_lowest_strike_for_low(self, *_mocks):
         snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"LOW"})
         self.assertEqual([m["strike"] for m in snapshot["markets"]], [67])
