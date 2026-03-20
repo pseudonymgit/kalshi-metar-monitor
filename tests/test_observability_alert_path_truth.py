@@ -64,6 +64,120 @@ class AlertPathTruthPersistenceTests(unittest.TestCase):
         self.assertFalse(alert_path_truth["webhook_send_failed"])
 
 
+class AlertPathTruthClassificationTests(unittest.TestCase):
+    def setUp(self):
+        self._transition_history = copy.deepcopy(metar_monitor._TRANSITION_HISTORY)
+        self._kalshi_last_call_ts = copy.deepcopy(metar_monitor._KALSHI_LAST_CALL_TS)
+        app_module._autostart_fallback_done = True
+
+    def tearDown(self):
+        with metar_monitor._TRANSITION_LOCK:
+            metar_monitor._TRANSITION_HISTORY.clear()
+            metar_monitor._TRANSITION_HISTORY.extend(copy.deepcopy(self._transition_history))
+        with metar_monitor._KALSHI_RATE_LIMIT_LOCK:
+            metar_monitor._KALSHI_LAST_CALL_TS.clear()
+            metar_monitor._KALSHI_LAST_CALL_TS.update(copy.deepcopy(self._kalshi_last_call_ts))
+
+    @patch("core.kalshi_monitor.send_composed_weather_market_alert")
+    @patch("core.kalshi_monitor.process_ladder_transition")
+    @patch("core.kalshi_monitor.hydration_queue_snapshot")
+    @patch("core.kalshi_monitor.get_hydration_prerequisite_state_snapshot")
+    @patch("core.kalshi_monitor.enqueue_station_hydration")
+    @patch("core.kalshi_monitor.classify_proximity")
+    @patch("core.kalshi_monitor.build_structured_snapshot_from_cache")
+    @patch("core.kalshi_monitor._parse_target_market_types")
+    @patch("core.kalshi_monitor._get_active_stations")
+    def test_send_alert_records_specific_reason_for_eligible_non_alertable_market(
+        self,
+        mock_get_active_stations,
+        mock_parse_target_market_types,
+        mock_build_structured_snapshot_from_cache,
+        mock_classify_proximity,
+        mock_enqueue_station_hydration,
+        mock_get_hydration_prerequisite_state_snapshot,
+        mock_hydration_queue_snapshot,
+        mock_process_ladder_transition,
+        mock_send_composed_weather_market_alert,
+    ):
+        del mock_enqueue_station_hydration
+        del mock_hydration_queue_snapshot
+        mock_get_active_stations.return_value = {"KDEN"}
+        mock_parse_target_market_types.return_value = {"HIGH"}
+        mock_build_structured_snapshot_from_cache.return_value = {
+            "markets": [
+                {
+                    "event_ticker": "KXHIGHDEN-26MAR19",
+                    "series_ticker": "KXHIGHDEN",
+                    "strike": 70,
+                }
+            ],
+            "raw_market_count": 1,
+            "filtered_market_count": 1,
+            "rejection_counts": {},
+            "cache_written": True,
+        }
+        mock_classify_proximity.return_value = "FAR"
+        mock_get_hydration_prerequisite_state_snapshot.return_value = {
+            "KDEN": {"cache_valid": True}
+        }
+        mock_process_ladder_transition.return_value = {
+            "should_alert": False,
+            "reason": None,
+            "bucket_index": 0,
+            "direction": None,
+            "terminal_state_blocked": False,
+            "outcome_hint": "ELIGIBLE_NOT_ALERTABLE",
+        }
+        mock_send_composed_weather_market_alert.return_value = None
+
+        with metar_monitor._TRANSITION_LOCK:
+            metar_monitor._TRANSITION_HISTORY.clear()
+            metar_monitor._TRANSITION_HISTORY.append(
+                {
+                    "station": "KDEN",
+                    "transition_type": "settlement_up",
+                    "instant_bucket_before": 69,
+                    "instant_bucket_after": 70,
+                    "settlement_bucket": 70,
+                    "running_max": 70.2,
+                    "current_temp": 70.2,
+                    "timestamp_utc": "2026-03-19T10:00:00Z",
+                    "transition_event_id": 654,
+                    "metadata": {"obs_time": "2026-03-19T09:59:00Z"},
+                }
+            )
+
+        payload = {
+            "station": "KDEN",
+            "summary": {"temp_f": 70.2},
+            "legacy": {
+                "temp_f": 70.2,
+                "obs_time": "2026-03-19T09:59:00Z",
+                "instant_bucket_changed": True,
+                "transition_correlation": {
+                    "transition_event_id": 654,
+                    "timestamp_utc": "2026-03-19T10:00:00Z",
+                },
+            },
+        }
+
+        result = metar_monitor._send_alert("https://example.test/webhook", payload)
+        latest_transition = metar_monitor.get_transition_history(station="KDEN", limit=1)[0]
+        alert_path_truth = latest_transition.get("alert_path_truth") or {}
+
+        self.assertFalse(result["delivery_attempted"])
+        self.assertEqual(latest_transition.get("evaluation_outcome"), "SUPPRESSED_ELIGIBLE_NOT_ALERTABLE")
+        self.assertEqual(latest_transition.get("suppression_reason"), "ELIGIBLE_NOT_ALERTABLE")
+        self.assertEqual(alert_path_truth["blocking_stage"], "suppression_gate")
+        self.assertEqual(
+            alert_path_truth["suppression_or_non_emission_reason"],
+            "ELIGIBLE_NOT_ALERTABLE",
+        )
+        self.assertFalse(alert_path_truth["webhook_send_attempted"])
+        self.assertFalse(alert_path_truth["webhook_send_succeeded"])
+        self.assertFalse(alert_path_truth["webhook_send_failed"])
+
+
 class AlertPathTruthEndpointTests(unittest.TestCase):
     def setUp(self):
         app_module._autostart_fallback_done = True
