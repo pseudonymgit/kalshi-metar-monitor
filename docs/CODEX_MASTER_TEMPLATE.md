@@ -8,6 +8,7 @@ You must follow /docs/CODEX_MASTER_TEMPLATE.md.
 
 This master template contains only universal workflow governance.
 Project-specific constraints must be supplied in the task prompt itself.
+If a repository defines its own collaboration doctrine, reference it alongside this file rather than copying it into the master template.
 
 ---
 

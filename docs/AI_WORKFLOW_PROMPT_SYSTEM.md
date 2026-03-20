@@ -21,13 +21,19 @@ This system assumes a universal master workflow doc exists at:
 
 `/docs/CODEX_MASTER_TEMPLATE.md`
 
+This repository also defines a project-specific collaboration doctrine at:
+
+`/docs/DAN_WORKING_STYLE.md`
+
 Every real prompt should begin with:
 
 ```text
 You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+You must follow /docs/DAN_WORKING_STYLE.md.
 ```
 
 The master template holds common rules that apply across all prompts.
+The Dan working style doc adds project-local collaboration defaults without changing the universal template.
 
 This document defines the actual prompt system and task templates that the orchestrator or operator uses.
 
@@ -172,7 +178,7 @@ Every serious prompt must define:
 If any slot is missing, the prompt is under-specified.
 
 Project-specific rules do **not** belong in the master template.
-They belong in the real prompt under a section like:
+They belong in the real prompt, and project-specific collaboration doctrine can be attached by referencing `/docs/DAN_WORKING_STYLE.md`, under a section like:
 
 * `PROJECT-SPECIFIC CONTEXT`
 * `PROJECT GOVERNANCE / CONSTRAINTS`
@@ -189,6 +195,7 @@ Use this when handing work to a new chat and you want continuity without replayi
 
 ```text
 You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+You must follow /docs/DAN_WORKING_STYLE.md.
 
 TASK TYPE: HANDOFF
 OUTPUT MODE: OPERATIONAL STATUS ONLY
