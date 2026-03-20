@@ -213,9 +213,9 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
     @patch("core.kalshi_monitor.immutable_public_state_snapshot", return_value={"last_obs": {}})
     def test_cache_snapshot_uses_directional_strike_window_for_high(self, *_mocks):
         snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"HIGH"})
-        self.assertEqual([m["strike"] for m in snapshot["markets"]], [70, 71, 72])
+        self.assertEqual([m["strike"] for m in snapshot["markets"]], [70, 71, 72, 69])
         self.assertEqual(snapshot["pre_directional_market_count"], 6)
-        self.assertEqual(snapshot["post_directional_market_count"], 3)
+        self.assertEqual(snapshot["post_directional_market_count"], 4)
 
     @patch("core.kalshi_monitor._SERIES_MARKETS_CACHE", {
         "KXLOWDEN": {
@@ -235,6 +235,30 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
     def test_cache_snapshot_directional_fallback_keeps_lowest_strike_for_low(self, *_mocks):
         snapshot = kalshi_monitor.build_structured_snapshot_from_cache("KDEN", {"LOW"})
         self.assertEqual([m["strike"] for m in snapshot["markets"]], [67])
+
+    def test_directional_window_keeps_nearest_crossed_or_equal_market_for_high(self):
+        markets = [
+            {"strike": 69, "ticker": "CROSSED"},
+            {"strike": 70, "ticker": "FIRST"},
+            {"strike": 71, "ticker": "SECOND"},
+            {"strike": 72, "ticker": "THIRD"},
+        ]
+
+        selected = kalshi_monitor._directional_strike_window(markets, 69.8, "HIGH")
+
+        self.assertEqual([m["ticker"] for m in selected], ["FIRST", "SECOND", "THIRD", "CROSSED"])
+
+    def test_directional_window_keeps_nearest_crossed_or_equal_market_for_low(self):
+        markets = [
+            {"strike": 67, "ticker": "THIRD"},
+            {"strike": 68, "ticker": "SECOND"},
+            {"strike": 69, "ticker": "FIRST"},
+            {"strike": 70, "ticker": "CROSSED"},
+        ]
+
+        selected = kalshi_monitor._directional_strike_window(markets, 69.2, "LOW")
+
+        self.assertEqual([m["ticker"] for m in selected], ["FIRST", "SECOND", "THIRD", "CROSSED"])
 
     def test_directional_window_normalizes_strike_sources(self):
         markets = [
