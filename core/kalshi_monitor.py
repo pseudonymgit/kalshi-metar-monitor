@@ -1751,13 +1751,19 @@ def process_ladder_transition(station, market_type, snapshot, current_temp):
         else:
             direction = "UP"
 
+    outcome_hint = None
+    if terminal_state_blocked:
+        outcome_hint = "TERMINAL_STATE"
+    elif not should_alert and reason is None:
+        outcome_hint = "ELIGIBLE_NOT_ALERTABLE"
+
     return {
         "should_alert": should_alert,
         "reason": reason,
         "bucket_index": bucket_index,
         "direction": direction,
         "terminal_state_blocked": terminal_state_blocked,
-        "outcome_hint": "TERMINAL_STATE" if terminal_state_blocked else None,
+        "outcome_hint": outcome_hint,
     }
 
 

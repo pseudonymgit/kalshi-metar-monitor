@@ -3073,6 +3073,10 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                         raw_reason = (transition.get("reason") or "").strip().upper()
                         if raw_reason:
                             suppression_reason = raw_reason
+                        else:
+                            outcome_hint = (transition.get("outcome_hint") or "").strip().upper()
+                            if outcome_hint:
+                                suppression_reason = outcome_hint
 
                     if not market_context_seeded:
                         nearest_market = markets[0] if markets else None
