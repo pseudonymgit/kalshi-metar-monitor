@@ -31,6 +31,30 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
 
         self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXDENHIGH"])
 
+    def test_discovery_includes_low_only_series(self):
+        series_items = {
+            "series": [
+                {"frequency": "daily", "title": "Denver lowest temperature", "ticker": "KXLOWDEN"},
+            ]
+        }
+        with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
+            discovered = kalshi_monitor._discover_series_for_stations()
+
+        self.assertEqual(discovered.get("KDEN"), ["KXLOWDEN"])
+
+    def test_discovery_keeps_high_and_low_series_in_deterministic_order(self):
+        series_items = {
+            "series": [
+                {"frequency": "daily", "title": "Denver lowest temperature", "ticker": "KXLOWDEN"},
+                {"frequency": "daily", "title": "Denver highest temperature", "ticker": "KXDENHIGH"},
+                {"frequency": "daily", "title": "Denver highest temperature", "ticker": "KXHIGHDEN"},
+            ]
+        }
+        with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
+            discovered = kalshi_monitor._discover_series_for_stations()
+
+        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN", "KXDENHIGH"])
+
     def test_ensure_discovery_raises_and_does_not_mark_discovered_on_empty_mapping(self):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}

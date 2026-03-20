@@ -67,6 +67,117 @@ class ObservabilityMarketCoverageTests(unittest.TestCase):
     @patch.dict(
         "os.environ",
         {
+            "KALSHI_TARGET_MARKET_TYPE": "HIGH",
+            "ALERT_WEBHOOK_URL": "https://example.com/webhook",
+        },
+        clear=False,
+    )
+    @patch("app.get_default_config", return_value={"stations": ["KDEN"], "poll_seconds": 60})
+    @patch("app.get_state", return_value={"stations": ["KDEN"], "last_seen_iso": {}, "last_poll_utc": None})
+    @patch("app.get_watchlist", return_value={"watchlist": ["KDEN"], "count": 1})
+    @patch("app.get_series_discovery_cache_snapshot", return_value={"KDEN": ["KXHIGHDEN", "KXLOWDEN"]})
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26JAN01")
+    @patch(
+        "app.get_cached_series_markets",
+        side_effect=[
+            {
+                "markets": [
+                    {
+                        "ticker": "KXHIGHDEN-26JAN01-T70",
+                        "status": "active",
+                        "strike_type": "between",
+                        "floor_strike": 70,
+                        "cap_strike": 71,
+                    }
+                ]
+            },
+            {
+                "markets": [
+                    {
+                        "ticker": "KXLOWDEN-26JAN01-T30",
+                        "status": "active",
+                        "strike_type": "between",
+                        "floor_strike": 30,
+                        "cap_strike": 31,
+                    }
+                ]
+            },
+        ],
+    )
+    def test_market_coverage_keeps_low_discovery_visible_when_low_disabled(self, mock_cached_series_markets, *_mocks):
+        response = self.client.get("/observability/market-coverage?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        rows = {row["market_type"]: row for row in payload["rows"]}
+
+        self.assertEqual(rows["HIGH"]["discovered_series_ticker"], "KXHIGHDEN")
+        self.assertEqual(rows["HIGH"]["coverage_reason"], "eligible_but_runtime_transition_terminal_rate_limit_gates_apply")
+        self.assertEqual(rows["LOW"]["discovered_series_ticker"], "KXLOWDEN")
+        self.assertEqual(rows["LOW"]["coverage_reason"], "market_type_disabled_by_config")
+        self.assertEqual(mock_cached_series_markets.call_count, 2)
+
+    @patch.dict(
+        "os.environ",
+        {
+            "KALSHI_TARGET_MARKET_TYPE": "HIGH,LOW",
+            "ALERT_WEBHOOK_URL": "https://example.com/webhook",
+        },
+        clear=False,
+    )
+    @patch("app.get_default_config", return_value={"stations": ["KDEN"], "poll_seconds": 60})
+    @patch("app.get_state", return_value={"stations": ["KDEN"], "last_seen_iso": {}, "last_poll_utc": None})
+    @patch("app.get_watchlist", return_value={"watchlist": ["KDEN"], "count": 1})
+    @patch("app.get_series_discovery_cache_snapshot", return_value={"KDEN": ["KXHIGHDEN", "KXLOWDEN"]})
+    @patch("core.kalshi_monitor._station_local_kalshi_date_token", return_value="26JAN01")
+    @patch(
+        "app.get_cached_series_markets",
+        side_effect=[
+            {
+                "markets": [
+                    {
+                        "ticker": "KXHIGHDEN-26JAN01-T70",
+                        "status": "active",
+                        "strike_type": "between",
+                        "floor_strike": 70,
+                        "cap_strike": 71,
+                    }
+                ],
+                "hydrated_at_utc": "2026-01-01T00:00:00+00:00",
+                "station_local_day": "2026-01-01",
+            },
+            {
+                "markets": [
+                    {
+                        "ticker": "KXLOWDEN-26JAN01-T30",
+                        "status": "active",
+                        "strike_type": "between",
+                        "floor_strike": 30,
+                        "cap_strike": 31,
+                    }
+                ],
+                "hydrated_at_utc": "2026-01-01T00:01:00+00:00",
+                "station_local_day": "2026-01-01",
+            },
+        ],
+    )
+    @patch("app.station_local_day_key", return_value="2026-01-01")
+    def test_market_coverage_uses_matching_series_per_market_type_when_both_enabled(self, _day_key, *_mocks):
+        response = self.client.get("/observability/market-coverage?station=KDEN")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.get_json()
+        rows = {row["market_type"]: row for row in payload["rows"]}
+
+        self.assertEqual(rows["HIGH"]["discovered_series_ticker"], "KXHIGHDEN")
+        self.assertEqual(rows["LOW"]["discovered_series_ticker"], "KXLOWDEN")
+        self.assertEqual(rows["HIGH"]["discovered_market_count"], 1)
+        self.assertEqual(rows["LOW"]["discovered_market_count"], 1)
+        self.assertEqual(rows["LOW"]["series_market_cache_status"], "cache_valid")
+
+    @patch.dict(
+        "os.environ",
+        {
             "KALSHI_TARGET_MARKET_TYPE": "HIGH,LOW",
             "ALERT_WEBHOOK_URL": "https://example.com/webhook",
         },
@@ -144,7 +255,7 @@ class ObservabilityMarketCoverageTests(unittest.TestCase):
         self.assertTrue(rows[("KMIA", "HIGH")]["station_in_live_ingestion_universe"])
         self.assertTrue(rows[("KMIA", "LOW")]["station_in_live_ingestion_universe"])
         self.assertEqual(rows[("KMIA", "HIGH")]["coverage_reason"], "no_eligible_markets_after_filters")
-        self.assertEqual(rows[("KMIA", "LOW")]["coverage_reason"], "no_eligible_markets_after_filters")
+        self.assertEqual(rows[("KMIA", "LOW")]["coverage_reason"], "no_discovered_series")
         self.assertFalse(rows[("KMIA", "HIGH")]["evaluation_possible"])
 
     @patch.dict(
@@ -256,7 +367,7 @@ class ObservabilityMarketCoverageTests(unittest.TestCase):
         payload = response.get_json()
         rows = {row["market_type"]: row for row in payload["rows"]}
         self.assertEqual(rows["HIGH"]["series_market_cache_status"], "cache_valid")
-        self.assertEqual(rows["LOW"]["series_market_cache_status"], "cache_valid")
+        self.assertEqual(rows["LOW"]["series_market_cache_status"], "cache_missing")
         self.assertEqual(mock_cached_markets.call_args.args[0], "KXHIGHDEN")
 
     @patch.dict(
