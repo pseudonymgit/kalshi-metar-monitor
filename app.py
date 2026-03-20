@@ -56,7 +56,9 @@ from core.metar_monitor import (
 )
 
 from core.kalshi_monitor import (
+    _configured_target_market_types,
     _current_kalshi_execution_domain,
+    _infer_series_market_type,
     _kalshi_public_get,
     _parse_target_market_types,
     build_market_polling_station_universe,
@@ -411,7 +413,6 @@ def _build_market_coverage_rows(station_filter=None):
         _STATION_CITY_TOKEN_MAP,
         _filter_structured_markets,
         _get_active_stations,
-        _parse_target_market_types,
         _station_local_kalshi_date_token,
     )
 
@@ -426,9 +427,7 @@ def _build_market_coverage_rows(station_filter=None):
     configured_stations = station_universe.get("configured_stations") or set()
 
     active_stations = _get_active_stations()
-    enabled_market_types = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
-    if not enabled_market_types:
-        enabled_market_types = {"HIGH"}
+    enabled_market_types = _configured_target_market_types()
 
     webhook_configured = bool((os.getenv("ALERT_WEBHOOK_URL") or "").strip())
     series_discovery_source = "cache_only"
@@ -459,41 +458,47 @@ def _build_market_coverage_rows(station_filter=None):
             series_tickers = [ticker for ticker in discovered_series if ticker]
         else:
             series_tickers = []
-        series_ticker = series_tickers[0] if series_tickers else None
 
-        discovered_markets = []
-        cache_status = "cache_missing"
-        cache_metadata = {}
-        cache_entries = [
-            cached_data
+        cache_entries_by_series = {
+            series_ticker: get_cached_series_markets(series_ticker)
             for series_ticker in series_tickers
-            for cached_data in [get_cached_series_markets(series_ticker)]
-            if cached_data is not None
-        ]
-        if cache_entries:
+        }
+
+        for market_type in ["HIGH", "LOW"]:
+            market_type_series_tickers = [
+                ticker for ticker in series_tickers
+                if _infer_series_market_type(ticker=ticker) in {None, market_type}
+            ]
+            series_ticker = market_type_series_tickers[0] if market_type_series_tickers else None
+            cache_entries = [
+                cache_entries_by_series.get(ticker)
+                for ticker in market_type_series_tickers
+                if cache_entries_by_series.get(ticker) is not None
+            ]
             discovered_markets = [
                 market
                 for cached_data in cache_entries
                 for market in (cached_data.get("markets") or [])
             ]
-            cache_metadata = {
-                "hydrated_at_utc": max(
-                    (cached_data.get("hydrated_at_utc") for cached_data in cache_entries if cached_data.get("hydrated_at_utc")),
-                    default=None,
-                ),
-                "station_local_day": next(
-                    (cached_data.get("station_local_day") for cached_data in cache_entries if cached_data.get("station_local_day")),
-                    None,
-                ),
-            }
-            cache_status = "cache_valid"
-            for cached_data in cache_entries:
-                cached_day = cached_data.get("station_local_day")
-                if cached_day is not None and cached_day != expected_day:
-                    cache_status = "cache_stale"
-                    break
-
-        for market_type in ["HIGH", "LOW"]:
+            cache_status = "cache_missing"
+            cache_metadata = {}
+            if cache_entries:
+                cache_metadata = {
+                    "hydrated_at_utc": max(
+                        (cached_data.get("hydrated_at_utc") for cached_data in cache_entries if cached_data.get("hydrated_at_utc")),
+                        default=None,
+                    ),
+                    "station_local_day": next(
+                        (cached_data.get("station_local_day") for cached_data in cache_entries if cached_data.get("station_local_day")),
+                        None,
+                    ),
+                }
+                cache_status = "cache_valid"
+                for cached_data in cache_entries:
+                    cached_day = cached_data.get("station_local_day")
+                    if cached_day is not None and cached_day != expected_day:
+                        cache_status = "cache_stale"
+                        break
             market_type_enabled = market_type in enabled_market_types
             filtered_markets = _filter_structured_markets(discovered_markets, station, {market_type})
             eligible_markets = [market for market in filtered_markets if _market_has_supported_strike(market)]
@@ -1321,9 +1326,7 @@ def observability_market_eligibility_runtime():
     persisted_rejection_breakdown = eligibility_runtime.get("rejection_breakdown") or {}
     latest_transition = (get_transition_history(station=station, limit=1) or [{}])[0]
 
-    enabled_market_types = _parse_target_market_types(os.getenv("KALSHI_TARGET_MARKET_TYPE"))
-    if not enabled_market_types:
-        enabled_market_types = {"HIGH"}
+    enabled_market_types = _configured_target_market_types()
 
     cache_snapshot = build_structured_snapshot_from_cache(station, enabled_market_types)
     cache_rejection_breakdown = cache_snapshot.get("rejection_counts") or {}
@@ -1948,7 +1951,7 @@ def _run_hydration_recovery(*, station: str, requested_limit: int):
 
     enqueue_station_hydration(station, reason="ops_hydration_recovery")
     worker_runs = [
-        process_hydration_queue_worker(market_types={"HIGH"})
+        process_hydration_queue_worker(market_types=_configured_target_market_types())
         for _ in range(bounded_limit)
     ]
 
