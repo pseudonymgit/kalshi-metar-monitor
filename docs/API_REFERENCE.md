@@ -1051,9 +1051,9 @@ GET
 Observability
 
 ### Purpose
-Provides a diagnostic / partial observability surface for pipeline state troubleshooting.
+Provides a logic-stubbed / partial diagnostic surface for pipeline troubleshooting.
 
-This endpoint should not be treated as authoritative runtime state.
+This endpoint is not authoritative runtime state and should not be used as the primary operator diagnosis surface. Prefer `GET /observability/runtime-authority-snapshot` for execution-truth diagnosis.
 
 ### Method
 GET
@@ -1063,7 +1063,7 @@ GET
 - `pipeline_status`
 - `blocking_stage`
 - `reason`
-- `hydration_status`
+- `hydration_status` *(currently often `null` because this route reads a partial/stubbed shape)*
 - `signal_type`
 - `suppression_reason`
 - `cooldown_state`
@@ -1099,6 +1099,8 @@ Observability
 
 ### Purpose
 Returns station-scoped market eligibility runtime classification and rejection context.
+
+Operator note: current route output still contains a stale cleanup remnant. `NO_DIRECTIONAL_LADDER_MATCH` is effectively unreachable in current logic because `eligible_markets_count` and `final_ladders_count` derive from the same post-directional count. Treat zero-eligible outcomes as `NO_ELIGIBLE_MARKET` unless code reality changes.
 
 ### Method
 GET

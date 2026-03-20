@@ -23,7 +23,7 @@
 
 ## Observability Isolation Model
 
-- Observability endpoints read persisted runtime state and cached market data.
+- Observability endpoints read persisted runtime state and cached market data. Persisted-vs-live authority is still mixed in some payloads/endpoints, so operators must treat endpoint semantics as surface-specific rather than globally reconciled.
 - Observability endpoints MUST NOT trigger live Kalshi API calls.
 - Flask startup lifecycle hooks may still run on a first-request path (for example, `before_first_request` can trigger scheduler/bootstrap discovery before handler execution).
 - The guarded fallback startup path in `before_request` explicitly excludes `/observability/*` requests.
@@ -77,7 +77,7 @@ Do not duplicate endpoint inventories in operational runbooks.
 |---|---|---|---|
 | `ladder_not_hydrated` | `GET /observability/hydration-prerequisite-runtime?station=...` | `hydration_state.cache_valid`, `hydration_state.series_discovered`, `hydration_state.markets_cached` | Hydration prerequisites are not usable for market evaluation yet. |
 | `SUPPRESSED_NO_TRANSITION` | `GET /observability/internal-alert-runtime?station=...` | `latest_market_outcome`, `latest_transition`, `diagnostic_class` | Alert path evaluated, but no qualifying runtime transition reached emission criteria. |
-| `no eligible markets` | `GET /observability/market-eligibility-runtime?station=...` | `eligible_markets_count`, `rejected_markets_count`, `rejection_breakdown` | Market evaluation ran but deterministic filters left zero eligible ladders. |
+| `no eligible markets` | `GET /observability/market-eligibility-runtime?station=...` | `eligible_markets_count`, `rejected_markets_count`, `rejection_breakdown` | Market evaluation ran but deterministic filters left zero eligible ladders. Ignore `NO_DIRECTIONAL_LADDER_MATCH` if it appears in older notes; that branch is effectively unreachable in current route logic. |
 | `missing_webhook` | `GET /observability/alert-decision-trace?station=...` | `terminal_state`, `decision_chain`, `execution_mode` | Alert decision path is blocked before delivery because webhook configuration is absent. |
 | `webhook_failed` | `GET /observability/internal-alert-runtime?station=...` | `latest_market_outcome`, `alerts_emitted_today`, `diagnostic_class` | Alert decision reached delivery stage, but downstream webhook attempt failed. |
 
@@ -91,4 +91,4 @@ Do not duplicate endpoint inventories in operational runbooks.
 ### goldilocks_reversion_alert
 - Verify a `settlement_up` occurred first in the current epoch.
 - Verify the epoch saw both a spike (`>= settlement + 1.2°F`) and reversion (`<= settlement - 0.2°F`).
-- Use `/observability/alert-decision-trace` and `/observability/pipeline-truth` to inspect latest signal suppression and cooldown state.
+- Use `/observability/alert-decision-trace` plus `/observability/runtime-authority-snapshot` as the primary diagnosis surfaces. `/observability/pipeline-truth` remains partial/logic-stubbed and is not authoritative operator evidence.
