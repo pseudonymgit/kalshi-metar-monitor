@@ -153,7 +153,9 @@ single function unless explicitly required.
 
 ## Diagnostic Output Structure
 
-All diagnostics must return the following fields:
+Diagnostics must always include `REPO_STATE` and then follow the task-defined output mode from `/docs/CODEX_MASTER_TEMPLATE.md`.
+
+When a diagnostics prompt explicitly asks for the standard repo diagnosis schema, include:
 
 REPO_STATE
 FAILURE_CAUSE
@@ -161,7 +163,7 @@ CODE_LOCATION
 RAW_URL
 MINIMAL_PATCH_REQUIRED
 
-This structure ensures consistent orchestration review.
+Treat that schema as the default diagnostics template, not a stronger rule than the task-specific output contract.
 
 ---
 
