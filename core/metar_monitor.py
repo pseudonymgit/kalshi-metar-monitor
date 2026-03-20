@@ -2807,6 +2807,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 _LAST_PROXIMITY_REGIME,
                 _PROXIMITY_LOCK,
                 _PROXIMITY_RANK,
+                _configured_target_market_types,
                 _get_active_stations,
                 _parse_target_market_types,
                 build_structured_snapshot_from_cache,
@@ -2823,11 +2824,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             should_alert_on_missing = os.getenv("ALERT_ON_MISSING_LADDER", "false").lower() in ("1", "true", "yes", "y")
             if bool(payload.get("debug_force_missing_ladder_alert")):
                 should_alert_on_missing = True
-            target_market_types = _parse_target_market_types(
-                os.getenv("KALSHI_TARGET_MARKET_TYPE")
-            )
-            if not target_market_types:
-                target_market_types = {"HIGH"}
+            target_market_types = _configured_target_market_types()
             debug_target_market_types = payload.get("debug_target_market_types")
             if isinstance(debug_target_market_types, (list, tuple, set)):
                 forced_market_types = {
@@ -3684,11 +3681,7 @@ def _poll_once(logger=None):
                 )
 
         try:
-            hydration_market_types = _parse_target_market_types(
-                os.getenv("KALSHI_TARGET_MARKET_TYPE")
-            )
-            if not hydration_market_types:
-                hydration_market_types = {"HIGH"}
+            hydration_market_types = _configured_target_market_types()
             process_hydration_queue_worker(market_types=hydration_market_types)
         except Exception as e:
             if logger:
