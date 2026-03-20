@@ -152,16 +152,24 @@ def _directional_strike_window(markets, observed_value, direction):
 
     if direction == "HIGH":
         directional = [entry for entry in ladder if entry[0] > observed]
+        crossed_or_equal = [entry for entry in ladder if entry[0] <= observed]
         if directional:
             directional.sort(key=lambda entry: entry[0])
-            return [entry[1] for entry in directional[:window_size]]
+            selected = directional[:window_size]
+            if crossed_or_equal:
+                selected.append(max(crossed_or_equal, key=lambda entry: entry[0]))
+            return [entry[1] for entry in selected]
         return [max(ladder, key=lambda entry: entry[0])[1]]
 
     if direction == "LOW":
         directional = [entry for entry in ladder if entry[0] < observed]
+        crossed_or_equal = [entry for entry in ladder if entry[0] >= observed]
         if directional:
             directional.sort(key=lambda entry: entry[0], reverse=True)
-            return [entry[1] for entry in directional[:window_size]]
+            selected = directional[:window_size]
+            if crossed_or_equal:
+                selected.append(min(crossed_or_equal, key=lambda entry: entry[0]))
+            return [entry[1] for entry in selected]
         return [min(ladder, key=lambda entry: entry[0])[1]]
 
     return [entry[1] for entry in ladder]
