@@ -140,6 +140,8 @@ def _directional_strike_window(markets, observed_value, direction):
         return []
 
     if direction == "HIGH":
+        # Keep the directional side plus the nearest crossed/equal boundary for context;
+        # this is not a generic ladder reducer.
         directional = [entry for entry in ladder if entry[0] > observed]
         crossed_or_equal = [entry for entry in ladder if entry[0] <= observed]
         if directional:
@@ -176,6 +178,8 @@ def _observed_temperature_f(normalized_station):
 
 
 def _assemble_structured_snapshot_markets(filtered_markets, normalized_station, selected_types):
+    # Keep live-fetch shaping and cache-snapshot shaping identical here; this shared
+    # helper is an anti-drift seam and should remain the common path.
     markets = []
 
     for market in filtered_markets:
