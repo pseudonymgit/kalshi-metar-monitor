@@ -44,6 +44,7 @@ from core.metar_monitor import (
     _simulate_temperature_for_testing,
     get_recent_alerts,
     get_transition_history,
+    get_persisted_transition_history,
     get_alert_review_diagnostics,
     get_station_ingestion_runtime,
     get_station_ingestion_window_runtime,
@@ -2384,6 +2385,24 @@ def observability_transitions():
         limit = 50
 
     transitions = get_transition_history(station=station, limit=limit)
+    return jsonify({
+        "ok": True,
+        "count": len(transitions),
+        "transitions": transitions,
+    }), 200
+
+
+@app.route("/observability/transitions/persisted", methods=["GET"])
+def observability_persisted_transitions():
+    station = (request.args.get("station") or "").strip().upper() or None
+    day = (request.args.get("day") or "").strip() or None
+    raw_limit = request.args.get("limit", "50")
+    try:
+        limit = int(raw_limit)
+    except (TypeError, ValueError):
+        limit = 50
+
+    transitions = get_persisted_transition_history(station=station, day=day, limit=limit)
     return jsonify({
         "ok": True,
         "count": len(transitions),
