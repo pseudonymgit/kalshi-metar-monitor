@@ -119,7 +119,7 @@ LOW + HIGH Symmetric Market Enablement + City Optimization
 - [ ] Replace static ICAO→Kalshi mapping with formulaic resolver
 - [~] Auto-detect newly listed Kalshi temperature markets *(partially complete via series discovery; validate failure modes)*
 - [ ] Emit alert when unknown market detected
-- [ ] Remove stale `NO_DIRECTIONAL_LADDER_MATCH` cleanup remnant from market-eligibility observability docs/runtime expectations
+- [x] Remove stale `NO_DIRECTIONAL_LADDER_MATCH` cleanup remnant from market-eligibility observability docs/runtime expectations *(completed: route/docs/tests now normalize stale remnant to `NO_ELIGIBLE_MARKET` / `filtered_to_zero`)*
 - [ ] Optimize city selection for diversified weather regimes
 - [ ] Expand ingestion simultaneously with LOW activation
 

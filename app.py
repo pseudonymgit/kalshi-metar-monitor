@@ -1449,6 +1449,10 @@ def observability_market_eligibility_runtime():
     cache_snapshot = build_structured_snapshot_from_cache(station, enabled_market_types)
     cache_rejection_breakdown = cache_snapshot.get("rejection_counts") or {}
 
+    normalized_empty_reason = cache_snapshot.get("empty_reason")
+    if normalized_empty_reason == "no_directional_ladder_match":
+        normalized_empty_reason = "filtered_to_zero"
+
     current_cache_probe = {
         "station": station,
         "series_ticker": cache_snapshot.get("series_ticker"),
@@ -1456,7 +1460,7 @@ def observability_market_eligibility_runtime():
         "filtered_market_count": int(cache_snapshot.get("filtered_market_count") or 0),
         "pre_directional_market_count": int(cache_snapshot.get("pre_directional_market_count") or 0),
         "post_directional_market_count": int(cache_snapshot.get("post_directional_market_count") or 0),
-        "empty_reason": cache_snapshot.get("empty_reason"),
+        "empty_reason": normalized_empty_reason,
         "rejection_breakdown": {
             "directional_strike_rejected": max(
                 int(cache_snapshot.get("filtered_market_count") or 0)
@@ -1490,7 +1494,6 @@ def observability_market_eligibility_runtime():
 
     markets_considered_count = int(current_cache_probe.get("raw_market_count") or 0)
     eligible_markets_count = int(current_cache_probe.get("post_directional_market_count") or 0)
-    final_ladders_count = int(current_cache_probe.get("post_directional_market_count") or 0)
 
     if markets_considered_count == 0:
         live_evaluation_outcome = "NO_MARKETS_CACHED"
@@ -1498,9 +1501,6 @@ def observability_market_eligibility_runtime():
     elif eligible_markets_count == 0:
         live_evaluation_outcome = "NO_ELIGIBLE_MARKET"
         live_suppression_reason = "filtered_to_zero"
-    elif final_ladders_count == 0:
-        live_evaluation_outcome = "NO_DIRECTIONAL_LADDER_MATCH"
-        live_suppression_reason = "no_directional_ladder_match"
     else:
         live_evaluation_outcome = "ELIGIBLE_MARKET_PRESENT"
         live_suppression_reason = None

@@ -207,7 +207,7 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         "filtered_market_count": 2,
         "pre_directional_market_count": 2,
         "post_directional_market_count": 0,
-        "empty_reason": "filtered_to_zero",
+        "empty_reason": "no_directional_ladder_match",
         "rejection_counts": {},
     })
     @patch("app.get_latest_station_market_evaluation_context", return_value={
@@ -234,6 +234,7 @@ class MarketEligibilityRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["current_cache_probe"]["empty_reason"], "filtered_to_zero")
         self.assertEqual(payload["latest_evaluation_outcome"], "NO_ELIGIBLE_MARKET")
         self.assertEqual(payload["latest_suppression_reason"], "filtered_to_zero")
+        self.assertEqual(payload["latest_persisted_evaluation"]["latest_evaluation_outcome"], "ELIGIBLE_MARKET_PRESENT")
 
 
 
