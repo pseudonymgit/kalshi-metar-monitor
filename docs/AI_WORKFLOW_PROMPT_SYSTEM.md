@@ -269,6 +269,7 @@ SUCCESS CRITERIA
 - Overview and roadmap guide execution without expanding scope.
 
 OUTPUT CONTRACT
+- When a reviewable operator-facing return packet is requested, use `/docs/CODE_CHANGE_RETURN_PACKET.md`.
 - Return only operational status blocks.
 - Do not replay project lore.
 - Do not reopen solved work without new contradictory evidence.
@@ -398,6 +399,7 @@ SUCCESS CRITERIA
 - REVISE includes a narrow revision prompt tied only to blocker IDs.
 
 OUTPUT CONTRACT
+- When a reviewable operator-facing return packet is requested, use `/docs/CODE_CHANGE_RETURN_PACKET.md`.
 - Return structured review only.
 - Do not patch code.
 - Do not generate unified diff.
@@ -573,6 +575,7 @@ SUCCESS CRITERIA
 - Next best task is singular and actionable.
 
 OUTPUT CONTRACT
+- When a reviewable operator-facing return packet is requested, use `/docs/CODE_CHANGE_RETURN_PACKET.md`.
 - Return findings only.
 - No code changes.
 - No patch text.
