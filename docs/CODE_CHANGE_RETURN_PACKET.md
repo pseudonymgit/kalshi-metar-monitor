@@ -13,6 +13,7 @@ This packet does not replace mutation-task `UNIFIED DIFF ONLY` output rules from
 - Raw URLs must be verified before return when possible.
 - Unchecked local branch-name raw refs must not be used.
 - If a required raw URL cannot be produced or verified, return `UNAVAILABLE` with the reason.
+- The packet is incomplete unless every required changed file and report artifact has a verified commit-pinned raw URL, a verified public-branch raw URL, or `UNAVAILABLE` with reason.
 - Large pasted diffs are fallback only.
 - `UNIFIED_DIFF` is required only when `RAW_URLS` are unavailable.
 
