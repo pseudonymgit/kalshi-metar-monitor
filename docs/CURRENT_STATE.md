@@ -15,7 +15,7 @@
 ## 3. CONFIRMED OPEN ITEMS
 - `/observability/pipeline-truth` is non-authoritative and logic-stubbed.
 - `tests/test_pipeline_truth_endpoint.py` is red because the `client` fixture is missing.
-- Hydration observability semantics remain mixed between persisted and live state.
+- Hydration observability semantics were recently cleaned up so retained snapshots, live probes, queue telemetry, and route-derived assessments are labeled separately; verify the current branch commit before relying on this note.
 
 ## 4. CONFIRMED DEFERRED ITEMS
 - `runtime-authority-snapshot` adoption is still being completed in practice.
@@ -32,9 +32,9 @@
 
 ## 6. NON-AUTHORITATIVE OR RISKY SURFACES
 - `/observability/pipeline-truth` should not be treated as authoritative.
-- `hydration-prerequisite-runtime` still mixes persisted and live semantics in one payload.
+- `hydration-prerequisite-runtime` now separates retained prerequisite snapshot, live cache probe, derived runtime assessment, and live queue snapshot.
 
 ## 7. NEXT RECOMMENDED ACTIONS
 - Make `runtime-authority-snapshot` the primary operator diagnosis surface everywhere.
 - Fix or remove the red `pipeline-truth` endpoint test by adding the missing fixture or converting it to the active test harness.
-- Reconcile hydration observability payloads so persisted vs live authority is explicit per field.
+- Continue migrating operator runbooks toward `runtime-authority-snapshot` as the primary diagnosis surface and keep hydration authority labels aligned if new observability fields are added.

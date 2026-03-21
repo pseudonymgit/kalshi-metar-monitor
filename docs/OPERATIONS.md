@@ -75,7 +75,7 @@ Do not duplicate endpoint inventories in operational runbooks.
 
 | Symptom | Diagnostic Endpoint | Fields to Inspect | Interpretation |
 |---|---|---|---|
-| `ladder_not_hydrated` | `GET /observability/hydration-prerequisite-runtime?station=...` | `hydration_state.cache_valid`, `hydration_state.series_discovered`, `hydration_state.markets_cached` | Hydration prerequisites are not usable for market evaluation yet. |
+| `ladder_not_hydrated` | `GET /observability/hydration-prerequisite-runtime?station=...` | `derived_runtime_assessment.cache_valid`, `retained_prerequisite_snapshot.value.series_discovered`, `derived_runtime_assessment.markets_cached` | Hydration prerequisites are not usable for market evaluation yet; check source blocks before concluding cause. |
 | `SUPPRESSED_NO_TRANSITION` | `GET /observability/internal-alert-runtime?station=...` | `latest_market_outcome`, `latest_transition`, `diagnostic_class` | Alert path evaluated, but no qualifying runtime transition reached emission criteria. |
 | `no eligible markets` | `GET /observability/market-eligibility-runtime?station=...` | `eligible_markets_count`, `rejected_markets_count`, `rejection_breakdown` | Market evaluation ran but deterministic filters left zero eligible ladders. Route output normalizes any stale `no_directional_ladder_match` cache remnant to `NO_ELIGIBLE_MARKET` / `filtered_to_zero`. |
 | `missing_webhook` | `GET /observability/alert-decision-trace?station=...` | `terminal_state`, `decision_chain`, `execution_mode` | Alert decision path is blocked before delivery because webhook configuration is absent. |
@@ -84,7 +84,7 @@ Do not duplicate endpoint inventories in operational runbooks.
 ## Signal-layer troubleshooting
 
 ### near_boundary_momentum_up
-- Confirm `hydration_state.cache_valid=true` and `eligible_markets_count>0`.
+- Confirm `derived_runtime_assessment.cache_valid=true`, then compare `retained_prerequisite_snapshot.value` against `live_cache_probe.value` before concluding the station is fully hydrated.
 - Check `/observability/internal-alert-runtime` for `signal_type`, `suppression_reason`, and `cooldown_state`.
 - Common suppressions: `NO_ELIGIBLE_MARKETS`, `STATION_COOLDOWN_ACTIVE`, `HYDRATION_CACHE_INVALID`.
 
