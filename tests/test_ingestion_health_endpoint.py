@@ -48,7 +48,7 @@ class IngestionHealthEndpointTests(unittest.TestCase):
         self.assertEqual(stations["KLAX"]["status"], "stale")
         self.assertEqual(stations["KLAX"]["freshness_lag_seconds"], 1320)
 
-    @patch("app.ensure_series_discovery_loaded", return_value={"KDEN": "KXHIGHDEN", "KMIA": "KXHIGHMIA"})
+    @patch("app.get_series_discovery_cache_snapshot", return_value={"KDEN": "KXHIGHDEN", "KMIA": "KXHIGHMIA"})
     @patch("app.get_watchlist", return_value={"watchlist": ["KDEN"], "count": 1})
     @patch("app.is_scheduler_running", return_value=True)
     @patch("app.get_default_config", return_value={"stations": ["KDEN"], "poll_seconds": 60})

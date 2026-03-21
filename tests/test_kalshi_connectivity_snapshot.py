@@ -33,7 +33,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
             discovered = kalshi_monitor.ensure_series_discovery_loaded()
 
         snapshot = kalshi_monitor.get_kalshi_connectivity_snapshot()
-        self.assertEqual(discovered, {"KDEN": "KXHIGHDEN"})
+        self.assertEqual(discovered, {"KDEN": ["KXHIGHDEN"]})
         self.assertTrue(snapshot["series_discovery_attempted"])
         self.assertIsNotNone(snapshot["last_series_discovery_success_utc"])
         self.assertIsNone(snapshot["last_series_discovery_error"])
