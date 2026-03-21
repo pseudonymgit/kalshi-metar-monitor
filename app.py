@@ -148,9 +148,13 @@ def _canonical_live_station_universe(station_filter=None):
         return {
             "stations": live_stations,
             "configured_stations": set(),
+            "state_stations": set(),
             "discovered_stations": set(),
+            "discovered_series_station_keys": set(),
             "watchlist_stations": set(),
             "market_polling_stations": set(live_stations),
+            "market_polling_stations_present": True,
+            "fallback_branch_used": False,
         }
 
     cfg = get_default_config()
@@ -161,11 +165,11 @@ def _canonical_live_station_universe(station_filter=None):
         for station in (cfg.get("stations") or [])
         if station and station.strip()
     }
-    configured_stations.update(
+    state_stations = {
         station.strip().upper()
         for station in (state.get("stations") or [])
         if station and station.strip()
-    )
+    }
 
     try:
         discovered_series = (
@@ -176,11 +180,12 @@ def _canonical_live_station_universe(station_filter=None):
     except Exception:
         discovered_series = {}
 
-    discovered_stations = {
+    discovered_series_station_keys = {
         station.strip().upper()
         for station in discovered_series.keys()
         if station and station.strip()
     }
+    discovered_stations = set(discovered_series_station_keys)
 
     try:
         watchlist_payload = get_watchlist() or {}
@@ -193,16 +198,25 @@ def _canonical_live_station_universe(station_filter=None):
         if station and station.strip()
     }
 
-    live_stations = sorted(configured_stations.union(discovered_stations).union(watchlist_stations))
+    live_stations = sorted(
+        configured_stations
+        .union(state_stations)
+        .union(discovered_stations)
+        .union(watchlist_stations)
+    )
     if station_filter:
         live_stations = [station for station in live_stations if station == station_filter]
 
     return {
         "stations": live_stations,
         "configured_stations": configured_stations,
+        "state_stations": state_stations,
         "discovered_stations": discovered_stations,
+        "discovered_series_station_keys": discovered_series_station_keys,
         "watchlist_stations": watchlist_stations,
         "market_polling_stations": set(),
+        "market_polling_stations_present": False,
+        "fallback_branch_used": True,
     }
 
 
@@ -3387,6 +3401,16 @@ def observability_runtime_authority_snapshot():
     station = (request.args.get("station") or "").strip().upper() or None
     station_universe = _canonical_live_station_universe(station_filter=station)
     stations = station_universe.get("stations") or []
+    runtime_authority = {
+        "market_polling_stations_present": bool(station_universe.get("market_polling_stations_present")),
+        "fallback_branch_used": bool(station_universe.get("fallback_branch_used")),
+        "configured_stations": sorted(station_universe.get("configured_stations") or []),
+        "state_stations": sorted(station_universe.get("state_stations") or []),
+        "discovered_series_station_keys": sorted(station_universe.get("discovered_series_station_keys") or []),
+        "watchlist_stations": sorted(station_universe.get("watchlist_stations") or []),
+        "market_polling_stations": sorted(station_universe.get("market_polling_stations") or []),
+        "final_resolved_stations": stations,
+    }
 
     scheduler_snapshot = _build_ingestion_health_rows(station_filter=station)
     hydration_snapshot = _build_runtime_authority_hydration_snapshot(stations=stations)
@@ -3428,6 +3452,7 @@ def observability_runtime_authority_snapshot():
             "execution_mode": "observability",
             "station": station,
             "scheduler_health_snapshot": scheduler_snapshot,
+            "runtime_authority": runtime_authority,
             "hydration_snapshot": hydration_snapshot,
             "kalshi_connectivity": get_kalshi_connectivity_snapshot(),
             "hydration_execution": hydration_execution,
