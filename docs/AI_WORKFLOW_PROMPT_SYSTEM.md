@@ -628,6 +628,57 @@ NEXT BEST TASK
 
 ---
 
+## 6. Repo-Report / Operator Diagnostics Prompt
+
+Use this when diagnostics findings must be returned as a reviewable operator-facing repo report rather than the legacy findings-only schema.
+
+```text
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
+
+TASK TYPE: DIAGNOSTICS ONLY
+OUTPUT MODE: REPO REPORT PACKET
+
+TARGET REALITY
+- Branch/commit or environment under diagnosis: <target>
+- Operator-facing repo-report question: <exact question>
+
+PROJECT-SPECIFIC CONTEXT
+- Repository: <repo name>
+- Relevant governance / architecture references:
+  - <doc/path>
+  - <doc/path>
+- Relevant invariants / operating assumptions:
+  - <rule>
+  - <rule>
+
+SCOPE
+- Diagnose only:
+  - <surface/question>
+  - <surface/question>
+- Do not implement:
+  - code changes
+  - config changes
+  - refactor plans
+
+SUCCESS CRITERIA
+- Findings are diagnostic-only and reviewable by an operator.
+- The return is formatted using `/docs/CODE_CHANGE_RETURN_PACKET.md`.
+- Raw-link verification requirements are satisfied or explicitly returned as `UNAVAILABLE`.
+- Existing findings-only diagnostics templates remain reserved for non-packet cases.
+
+OUTPUT CONTRACT
+- Use `/docs/CODE_CHANGE_RETURN_PACKET.md` as the concrete output contract.
+- Do not paste the full packet contents into the prompt.
+- Do not return the legacy findings-only schema for this template.
+- No code changes.
+- No patch text.
+- No pseudo-diff.
+```
+
+---
+
 ## Prompt Selection Rules
 
 Use:
