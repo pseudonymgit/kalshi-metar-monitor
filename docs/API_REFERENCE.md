@@ -1100,7 +1100,7 @@ Observability
 ### Purpose
 Returns station-scoped market eligibility runtime classification and rejection context.
 
-Operator note: current route output still contains a stale cleanup remnant. `NO_DIRECTIONAL_LADDER_MATCH` is effectively unreachable in current logic because `eligible_markets_count` and `final_ladders_count` derive from the same post-directional count. Treat zero-eligible outcomes as `NO_ELIGIBLE_MARKET` unless code reality changes.
+Operator note: this route normalizes any stale `no_directional_ladder_match` cache remnant to `NO_ELIGIBLE_MARKET` / `filtered_to_zero`. Zero post-directional ladders should be interpreted as no eligible market unless code reality changes.
 
 ### Method
 GET
