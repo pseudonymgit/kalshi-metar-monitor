@@ -50,11 +50,21 @@ class HydrationPrerequisiteRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["reason"], "cache_missing")
         self.assertFalse(payload["cache_valid"])
         self.assertFalse(payload["markets_cached"])
-        self.assertEqual(payload["hydration_state"], {"attempted": True, "cache_valid": True})
-        self.assertEqual(payload["persisted_hydration_state"], {"attempted": True, "cache_valid": True})
-        self.assertEqual(payload["current_cache_probe"]["raw_market_count"], 0)
+        self.assertNotIn("hydration_state", payload)
         self.assertEqual(
-            set(payload["current_cache_probe"].keys()),
+            payload["retained_prerequisite_snapshot"],
+            {
+                "source_authority": "retained_hydration_prerequisite_snapshot",
+                "value": {"attempted": True, "cache_valid": True},
+            },
+        )
+        self.assertEqual(
+            payload["live_cache_probe"]["source_authority"],
+            "live_station_hydration_cache_probe",
+        )
+        self.assertEqual(payload["live_cache_probe"]["value"]["raw_market_count"], 0)
+        self.assertEqual(
+            set(payload["live_cache_probe"]["value"].keys()),
             {
                 "station",
                 "series_ticker",
@@ -65,7 +75,20 @@ class HydrationPrerequisiteRuntimeEndpointTests(unittest.TestCase):
                 "hydrated_at_utc",
             },
         )
-        self.assertIn("hydration_queue", payload)
+        self.assertEqual(
+            payload["derived_runtime_assessment"],
+            {
+                "source_authority": "derived_from_live_cache_probe",
+                "status": "cache_missing",
+                "reason": "cache_missing",
+                "cache_valid": False,
+                "markets_cached": False,
+            },
+        )
+        self.assertEqual(
+            payload["live_queue_snapshot"]["source_authority"],
+            "live_hydration_queue_snapshot",
+        )
         self.assertTrue(payload["ok"])
 
     def test_no_cache_entry_maps_to_cache_missing(self):
@@ -96,7 +119,7 @@ class HydrationPrerequisiteRuntimeEndpointTests(unittest.TestCase):
         self.assertEqual(payload["reason"], "cache_missing")
         self.assertFalse(payload["cache_valid"])
         self.assertFalse(payload["markets_cached"])
-        self.assertEqual(payload["persisted_hydration_state"], {"attempted": True, "cache_valid": True})
+        self.assertEqual(payload["retained_prerequisite_snapshot"]["value"], {"attempted": True, "cache_valid": True})
 
     def test_empty_cache_entry_maps_to_cache_empty(self):
         with ExitStack() as stack:
@@ -127,8 +150,12 @@ class HydrationPrerequisiteRuntimeEndpointTests(unittest.TestCase):
         self.assertFalse(payload["cache_valid"])
         self.assertFalse(payload["markets_cached"])
         self.assertEqual(
-            payload["persisted_hydration_state"],
+            payload["retained_prerequisite_snapshot"]["value"],
             {"attempted": True, "cache_valid": True, "status": "cache_valid"},
+        )
+        self.assertEqual(
+            payload["derived_runtime_assessment"]["reason"],
+            "cache_empty",
         )
 
     def test_non_empty_cache_entry_maps_to_cache_valid(self):
@@ -160,7 +187,7 @@ class HydrationPrerequisiteRuntimeEndpointTests(unittest.TestCase):
         self.assertIsNone(payload["reason"])
         self.assertTrue(payload["cache_valid"])
         self.assertTrue(payload["markets_cached"])
-        self.assertEqual(payload["persisted_hydration_state"], persisted)
+        self.assertEqual(payload["retained_prerequisite_snapshot"]["value"], persisted)
 
 
 if __name__ == "__main__":

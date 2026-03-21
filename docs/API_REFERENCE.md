@@ -681,6 +681,9 @@ Runtime state + SQLite audit
 ### Trading Relevance
 Provides execution-truth evidence (scheduler health, hydration cache state, transitions, alerts, DB path/existence) without granting mutation authority.
 
+### Hydration Authority Metadata
+Hydration-related blocks include explicit `source_authority` metadata so operators can distinguish retained snapshots, live queue/cache telemetry, and route-derived assessments without inferring execution behavior.
+
 ### Safety Notes
 Read-only, bounded payload, and no execution mutation.
 
@@ -1084,10 +1087,22 @@ GET
 
 ### Key Response Fields
 - `station`
-- `hydration_state.cache_valid`
-- `hydration_state.series_discovered`
-- `hydration_state.markets_cached`
-- `hydration_queue`
+- `retained_prerequisite_snapshot.source_authority`
+- `retained_prerequisite_snapshot.value`
+- `live_cache_probe.source_authority`
+- `live_cache_probe.value`
+- `derived_runtime_assessment.source_authority`
+- `derived_runtime_assessment.cache_valid`
+- `derived_runtime_assessment.markets_cached`
+- `live_queue_snapshot.source_authority`
+- `live_queue_snapshot.value`
+
+### Authority Notes
+- `retained_prerequisite_snapshot` is the retained hydration prerequisite snapshot keyed by station.
+- `live_cache_probe` is the live in-memory cache probe for the current process.
+- `derived_runtime_assessment` is route-derived operator guidance computed from the live cache probe.
+- `live_queue_snapshot` is live queue telemetry aligned to the retained snapshot timestamp when available.
+- This route intentionally does not expose the old `hydration_state` alias because that alias blurred retained and live semantics.
 
 ---
 
