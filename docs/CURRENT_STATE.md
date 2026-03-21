@@ -10,11 +10,11 @@
 - Switched alert-path truth retrieval to persisted transition reads.
 - Aligned live station universe with market discovery.
 - Restored missing-ladder dedupe behavior.
+- Normalized stale `NO_DIRECTIONAL_LADDER_MATCH` observability output to `NO_ELIGIBLE_MARKET` / `filtered_to_zero` at the route surface.
 
 ## 3. CONFIRMED OPEN ITEMS
 - `/observability/pipeline-truth` is non-authoritative and logic-stubbed.
 - `tests/test_pipeline_truth_endpoint.py` is red because the `client` fixture is missing.
-- `/observability/market-eligibility-runtime` still documents an unreachable `NO_DIRECTIONAL_LADDER_MATCH` branch.
 - Hydration observability semantics remain mixed between persisted and live state.
 
 ## 4. CONFIRMED DEFERRED ITEMS
