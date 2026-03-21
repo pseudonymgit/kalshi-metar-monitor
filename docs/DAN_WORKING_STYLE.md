@@ -17,7 +17,7 @@ Use this alongside `/docs/CODEX_MASTER_TEMPLATE.md`.
 - Prefer the minimal surface that solves the problem. Avoid broad rewrites, speculative cleanup, or adjacent edits.
 - Treat runtime symptoms as first-class evidence. Errors, logs, failing behavior, and observable outcomes outrank theories.
 - Optimize handoffs for continuation, not storytelling. Preserve the current truth, active blocker, and exact next step.
-- Prefer short Codex chat summaries plus working raw links to files, diffs, or artifacts rather than long pasted context. Code-change and repo-report returns must include working raw links for every changed file and every referenced report artifact. Prompt headers should prefer commit-pinned raw links when they can be verified, and returns without required raw links are incomplete unless impossibility is stated explicitly.
+- Prefer short Codex chat summaries plus working raw links to files, diffs, or artifacts rather than long pasted context. Large pasted diffs are fallback only, not the preferred return. Code-change and repo-report returns must include working raw links for every changed file and every referenced report artifact. Prompt headers should prefer commit-pinned raw links when they can be verified, and returns without required raw links are incomplete unless impossibility is stated explicitly.
 
 ---
 
