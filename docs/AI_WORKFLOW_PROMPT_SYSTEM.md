@@ -33,7 +33,7 @@ You must follow:
 - https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 ```
 
-Replace `<owner>`, `<repo>`, and `<commit>` with the verified task-time repository reality. Repo-relative paths are still useful for human reference inside docs, but prompt headers should prefer working raw links when available. If a raw link cannot be verified, say that explicitly rather than guessing.
+Replace `<owner>`, `<repo>`, and `<commit>` with the verified task-time repository reality. Repo-relative paths are still useful for human reference inside docs, but prompt headers should prefer working raw links when available. If a raw link cannot be verified, say that explicitly rather than guessing. Code-change returns must include working raw links for every changed file and any repo report artifact; large pasted diffs are fallback only, and missing raw links make the return incomplete unless the reply explicitly says they could not be produced.
 
 The master template holds common rules that apply across all prompts.
 The Dan working style doc adds project-local collaboration defaults without changing the universal template.
@@ -331,6 +331,8 @@ SUCCESS CRITERIA
 OUTPUT CONTRACT
 - Return unified diff only.
 - No prose unless aborting.
+- The accompanying code-change return is incomplete unless it includes working raw links for all changed files and any repo report artifact, or explicitly states that those raw links could not be produced.
+- Prefer raw links over large pasted diffs; pasted diffs are fallback only.
 
 TASK INSTRUCTIONS
 - Make the minimum number of lines change necessary.
@@ -507,6 +509,8 @@ SUCCESS CRITERIA
 OUTPUT CONTRACT
 - Return unified diff only.
 - No prose unless aborting.
+- The accompanying code-change return is incomplete unless it includes working raw links for all changed files and any repo report artifact, or explicitly states that those raw links could not be produced.
+- Prefer raw links over large pasted diffs; pasted diffs are fallback only.
 
 REVISION RULES
 - Resolve only specified blocker findings ([B#]).
