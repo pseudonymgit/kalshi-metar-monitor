@@ -271,6 +271,7 @@ SUCCESS CRITERIA
 OUTPUT CONTRACT
 - When a reviewable operator-facing return packet is requested, use `/docs/CODE_CHANGE_RETURN_PACKET.md`.
 - Return only operational status blocks.
+- Format the return using `/docs/CODE_CHANGE_RETURN_PACKET.md` when the handoff must be reviewable/operator-facing.
 - Do not replay project lore.
 - Do not reopen solved work without new contradictory evidence.
 - Do not broaden scope.
@@ -401,6 +402,7 @@ SUCCESS CRITERIA
 OUTPUT CONTRACT
 - When a reviewable operator-facing return packet is requested, use `/docs/CODE_CHANGE_RETURN_PACKET.md`.
 - Return structured review only.
+- Use `/docs/CODE_CHANGE_RETURN_PACKET.md` when the review must be returned as a reviewable/operator-facing packet.
 - Do not patch code.
 - Do not generate unified diff.
 
@@ -577,6 +579,7 @@ SUCCESS CRITERIA
 OUTPUT CONTRACT
 - When a reviewable operator-facing return packet is requested, use `/docs/CODE_CHANGE_RETURN_PACKET.md`.
 - Return findings only.
+- Use `/docs/CODE_CHANGE_RETURN_PACKET.md` when the diagnostics return must be reviewable/operator-facing.
 - No code changes.
 - No patch text.
 - No pseudo-diff.
