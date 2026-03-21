@@ -2631,10 +2631,10 @@ def observability_hydration_prerequisite_runtime():
         return jsonify({"ok": False, "error": "station query param required"}), 400
 
     hydration_snapshot = get_hydration_prerequisite_state_snapshot() or {}
-    persisted_hydration_state = hydration_snapshot.get(station) or {}
-    current_cache_probe = get_station_hydration_cache_probe(station)
-    cache_present = bool(current_cache_probe.get("cache_present"))
-    raw_market_count = int(current_cache_probe.get("raw_market_count") or 0)
+    retained_prerequisite_snapshot = hydration_snapshot.get(station) or {}
+    live_cache_probe = get_station_hydration_cache_probe(station)
+    cache_present = bool(live_cache_probe.get("cache_present"))
+    raw_market_count = int(live_cache_probe.get("raw_market_count") or 0)
 
     if not cache_present:
         status = "cache_missing"
@@ -2652,6 +2652,21 @@ def observability_hydration_prerequisite_runtime():
         cache_valid = True
         markets_cached = True
 
+    derived_runtime_assessment = {
+        "source_authority": "derived_from_live_cache_probe",
+        "status": status,
+        "reason": reason,
+        "cache_valid": cache_valid,
+        "markets_cached": markets_cached,
+    }
+    live_queue_snapshot = hydration_queue_snapshot(
+        reference_ts=parse_iso_utc(
+            str((retained_prerequisite_snapshot or {}).get("evaluated_at_utc") or "")
+        ).timestamp()
+        if (retained_prerequisite_snapshot or {}).get("evaluated_at_utc")
+        else None
+    )
+
     return jsonify(
         {
             "station": station,
@@ -2661,16 +2676,19 @@ def observability_hydration_prerequisite_runtime():
             "reason": reason,
             "cache_valid": cache_valid,
             "markets_cached": markets_cached,
-            "persisted_hydration_state": persisted_hydration_state,
-            "hydration_state": persisted_hydration_state,
-            "current_cache_probe": current_cache_probe,
-            "hydration_queue": hydration_queue_snapshot(
-                reference_ts=parse_iso_utc(
-                    str((persisted_hydration_state or {}).get("evaluated_at_utc") or "")
-                ).timestamp()
-                if (persisted_hydration_state or {}).get("evaluated_at_utc")
-                else None
-            ),         
+            "retained_prerequisite_snapshot": {
+                "source_authority": "retained_hydration_prerequisite_snapshot",
+                "value": retained_prerequisite_snapshot,
+            },
+            "live_cache_probe": {
+                "source_authority": "live_station_hydration_cache_probe",
+                "value": live_cache_probe,
+            },
+            "derived_runtime_assessment": derived_runtime_assessment,
+            "live_queue_snapshot": {
+                "source_authority": "live_hydration_queue_snapshot",
+                "value": live_queue_snapshot,
+            },
             "ok": True,
         }
     ), 200
@@ -3413,14 +3431,25 @@ def observability_runtime_authority_snapshot():
     }
 
     scheduler_snapshot = _build_ingestion_health_rows(station_filter=station)
-    hydration_snapshot = _build_runtime_authority_hydration_snapshot(stations=stations)
+    hydration_snapshot = {
+        **(_build_runtime_authority_hydration_snapshot(stations=stations) or {}),
+        "source_authority": "runtime_authority_hydration_snapshot",
+    }
 
     transitions = get_transition_history(station=station, limit=50)
     alerts = get_recent_alerts(50)
     if station:
         alerts = [row for row in alerts if (row.get("station") or "").strip().upper() == station]
-    hydration_execution = get_last_hydration_execution_snapshot()
-    hydration_queue = hydration_queue_snapshot()
+    hydration_execution_snapshot = get_last_hydration_execution_snapshot()
+    hydration_execution = {
+        "source_authority": "retained_last_hydration_execution_snapshot",
+        "stations": hydration_execution_snapshot,
+    }
+    hydration_queue_snapshot_value = hydration_queue_snapshot()
+    hydration_queue = {
+        "source_authority": "live_hydration_queue_snapshot",
+        "value": hydration_queue_snapshot_value,
+    }
     transition_runtime = _get_transition_runtime_summary(station) if station else {"transitions_seen_today": 0}
     fire_audit = _build_alert_fire_audit_rows()
     alerts_sent_today = 0
@@ -3433,16 +3462,19 @@ def observability_runtime_authority_snapshot():
         station=station,
         ingestion_snapshot=scheduler_snapshot,
         hydration_snapshot=hydration_snapshot,
-        hydration_execution_snapshot=hydration_execution,
+        hydration_execution_snapshot=hydration_execution_snapshot,
         transitions=transitions,
         alerts=alerts,
     )
-    hydration_stall_signal = _build_hydration_stall_signal(
-        station=station,
-        hydration_reason=((system_health.get("hydration") or {}).get("reason")),
-        transitions_seen_today=int((transition_runtime or {}).get("transitions_seen_today") or 0),
-        alerts_sent_today=alerts_sent_today,
-    )
+    hydration_stall_signal = {
+        "source_authority": "derived_hydration_stall_signal",
+        "value": _build_hydration_stall_signal(
+            station=station,
+            hydration_reason=((system_health.get("hydration") or {}).get("reason")),
+            transitions_seen_today=int((transition_runtime or {}).get("transitions_seen_today") or 0),
+            alerts_sent_today=alerts_sent_today,
+        ),
+    }
 
     db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 

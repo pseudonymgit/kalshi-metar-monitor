@@ -8,14 +8,14 @@ health signals from `build_ladder_cache_snapshot()` output.
 Per station, classifier emits one `status`:
 
 - `DISCOVERY_MISSING`
-  - `hydration_state.series_discovered` is false.
+  - `hydration.series_discovered` is false.
 - `CACHE_MISSING`
   - discovery exists but `hydration.cache_present` is false.
 - `CACHE_STALE`
   - cache exists, but `ladder_cache_age_seconds` is missing or exceeds
     `HYDRATION_LADDER_CACHE_STALE_THRESHOLD_SECONDS` (default `1800`).
 - `PARTIAL_HYDRATION`
-  - cache exists and is fresh, but `hydration_state.cache_valid` is false.
+  - cache exists and is fresh, but `hydration.cache_valid` is false.
 - `HEALTHY`
   - discovery exists, cache exists, cache age is within threshold, and
     cache is valid.
@@ -66,7 +66,10 @@ Operational queue state is surfaced in existing observability payloads:
   - `hydration_stall_signal.transitions_seen_today`
   - `hydration_stall_signal.alerts_sent_today`
 - `/observability/hydration-prerequisite-runtime`
-  - `hydration_queue` snapshot for the same process epoch.
+  - `retained_prerequisite_snapshot` for retained gating state.
+  - `live_cache_probe` for current in-memory cache evidence.
+  - `derived_runtime_assessment` for route-derived operator guidance.
+  - `live_queue_snapshot` for queue telemetry from the same process epoch.
 - `/integrity/alert_pipeline`
   - `hydration_queue` snapshot including `stations_in_backoff` and `next_backoff_expiry`.
   - `hydration_stall_signal` snapshot and `HYDRATION_STALL_CONDITION` finding when the derived condition is true.
