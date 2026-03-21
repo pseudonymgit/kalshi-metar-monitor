@@ -18,6 +18,7 @@ Use this alongside `/docs/CODEX_MASTER_TEMPLATE.md`.
 - Treat runtime symptoms as first-class evidence. Errors, logs, failing behavior, and observable outcomes outrank theories.
 - Optimize handoffs for continuation, not storytelling. Preserve the current truth, active blocker, and exact next step.
 - Prefer short Codex chat summaries plus working raw links to files, diffs, or artifacts rather than long pasted context. Large pasted diffs are fallback only, not the preferred return. Before returning any code-change or repo-report result, resolve every changed file and referenced report artifact to a GitHub-visible commit-pinned raw URL when possible, verify each URL, and return `UNAVAILABLE` with the reason if any required verification fails. Never use unchecked local branch-name raw refs.
+- Use `/docs/CODE_CHANGE_RETURN_PACKET.md` as the standard operator-facing delivery/report format when a task contract asks for a reviewable return packet.
 
 ---
 
