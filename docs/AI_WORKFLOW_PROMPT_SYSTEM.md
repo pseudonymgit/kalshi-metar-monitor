@@ -33,7 +33,7 @@ You must follow:
 - https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 ```
 
-Replace `<owner>`, `<repo>`, and `<commit>` with the verified task-time repository reality. Repo-relative paths are still useful for human reference inside docs, but code-change tasks must return working raw links for every changed file and any referenced repo report artifact, and prompt headers should prefer them when available. Large pasted diffs are fallback only, not the preferred return. If a raw link cannot be verified or produced, say that explicitly rather than guessing, because missing required raw links makes a code-change return incomplete.
+Replace `<owner>`, `<repo>`, and `<commit>` with the verified task-time repository reality. Repo-relative paths are still useful for human reference inside docs, but code-change and repo-report tasks have a mandatory pre-return raw-link verification gate: resolve every changed file and any referenced repo report artifact to a GitHub-visible commit-pinned raw URL when possible, verify each URL before return, and explicitly return `UNAVAILABLE` with the reason if any required verification fails. Never emit raw links from unchecked local branch-name refs. Large pasted diffs are fallback only, not the preferred return. Missing required raw-link verification makes the return incomplete.
 
 The master template holds common rules that apply across all prompts.
 The Dan working style doc adds project-local collaboration defaults without changing the universal template.
