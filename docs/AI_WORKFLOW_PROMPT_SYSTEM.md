@@ -25,12 +25,15 @@ This repository also defines a project-specific collaboration doctrine at:
 
 `/docs/DAN_WORKING_STYLE.md`
 
-Every real prompt should begin with:
+Every real prompt should begin with a `You must follow:` section that prefers verified working raw links, ideally pinned to the actual checked-out commit at task time:
 
 ```text
-You must follow /docs/CODEX_MASTER_TEMPLATE.md.
-You must follow /docs/DAN_WORKING_STYLE.md.
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 ```
+
+Replace `<owner>`, `<repo>`, and `<commit>` with the verified task-time repository reality. Repo-relative paths are still useful for human reference inside docs, but prompt headers should prefer working raw links when available. If a raw link cannot be verified, say that explicitly rather than guessing.
 
 The master template holds common rules that apply across all prompts.
 The Dan working style doc adds project-local collaboration defaults without changing the universal template.
@@ -196,8 +199,9 @@ That keeps the master universal and the task prompt grounded.
 Use this when handing work to a new chat and you want continuity without replaying the entire project history.
 
 ```text
-You must follow /docs/CODEX_MASTER_TEMPLATE.md.
-You must follow /docs/DAN_WORKING_STYLE.md.
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 
 TASK TYPE: HANDOFF
 OUTPUT MODE: OPERATIONAL STATUS ONLY
@@ -277,7 +281,9 @@ OUTPUT CONTRACT
 Use this for a new scoped change on current reality.
 
 ```text
-You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 
 TASK TYPE: IMPLEMENTATION
 OUTPUT MODE: UNIFIED DIFF ONLY
@@ -351,7 +357,9 @@ EVIDENCE:
 Use this to judge whether an existing diff or branch is merge-ready.
 
 ```text
-You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 
 TASK TYPE: REVIEW
 OUTPUT MODE: STRUCTURED REVIEW ONLY
@@ -452,7 +460,9 @@ REVISION PROMPT
 Use this when review findings exist and you want only those blockers fixed.
 
 ```text
-You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 
 TASK TYPE: REVISION
 OUTPUT MODE: UNIFIED DIFF ONLY
@@ -525,7 +535,9 @@ EVIDENCE:
 Use this when truth is unclear and you need to understand what is happening before deciding whether code should change.
 
 ```text
-You must follow /docs/CODEX_MASTER_TEMPLATE.md.
+You must follow:
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/CODEX_MASTER_TEMPLATE.md
+- https://raw.githubusercontent.com/<owner>/<repo>/<commit>/docs/DAN_WORKING_STYLE.md
 
 TASK TYPE: DIAGNOSTICS ONLY
 OUTPUT MODE: FINDINGS ONLY
