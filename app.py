@@ -2494,6 +2494,37 @@ def diagnostics_alert_review_bundle():
     return jsonify(diagnostics_payload), 200
 
 
+@app.route("/admin/dead-letter", methods=["GET", "POST"])
+def admin_dead_letter():
+    """Manage alert delivery dead letter queue (L1-T2).
+    
+    GET: List all dead-lettered alerts
+    POST: Mark alerts as dead-lettered manually
+    """
+    if request.method == "GET":
+        # Return all dead-lettered alerts
+        failed = metar_monitor._get_failed_alerts()
+        return jsonify({
+            "count": len(failed),
+            "alerts": failed,
+        }), 200
+    
+    elif request.method == "POST":
+        data = request.get_json() or {}
+        alert_id = data.get("alert_id") or data.get("alertId")
+        reason = data.get("reason", "manually_marked_dead_letter")
+        
+        if not alert_id:
+            return jsonify({"error": "alert_id required"}), 400
+        
+        result = metar_monitor._mark_alert_delivery_queue_dead_letter(alert_id, reason)
+        return jsonify({
+            "success": True,
+            "alert_id": alert_id,
+            "reason": reason,
+        }), 200
+
+
 @app.route("/observability/transitions", methods=["GET"])
 def observability_transitions():
     station = (request.args.get("station") or "").strip().upper() or None
