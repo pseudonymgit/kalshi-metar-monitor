@@ -1378,6 +1378,9 @@ def ensure_series_discovery_loaded():
             _LOGGER.info("market_cache_hydration_start")
             hydrated = _hydrate_all_market_cache()
             _LOGGER.info("market_cache_hydration_complete hydrated=%d", hydrated)
+        except Exception as exc:
+            _LOGGER.warning("market_cache_hydration_failed (non-fatal, will use fresh API discovery): %s", exc)
+            hydrated = 0
             
             discovered = _discover_series_for_stations()
             if not discovered:
