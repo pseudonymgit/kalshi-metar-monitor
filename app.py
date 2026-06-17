@@ -1693,6 +1693,10 @@ else:
         # this early return intentionally preserves read-only observability behavior.
         if path.startswith("/observability/"):
             return None
+        # Health-check paths must not trigger blocking hydration;
+        # return immediately so Render's port scan succeeds.
+        if path in ("/", "/api/health", "/health"):
+            return None
         _autostart_fallback_done = True
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)

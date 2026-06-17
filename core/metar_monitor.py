@@ -407,13 +407,9 @@ def ensure_state_loaded():
                 instant_bucket=int(instant_bucket),
             )
     
-    # Layer 0: Hydrate signal state from SQLite on startup
-    _ALERT_LOGGER.info("signal_state_hydration_start")
-    try:
-        hydrated = _hydrate_all_signal_state()
-        _ALERT_LOGGER.info("signal_state_hydration_complete hydrated=%d", hydrated)
-    except Exception as exc:
-        _ALERT_LOGGER.warning("signal_state_hydration_failed (non-fatal, will repopulate from new observations): %s", exc)
+    # Layer 0: Signal state hydration is deferred to lazy-first-access
+    # to avoid blocking the health check during Render's port scan window.
+    # Signal state will be repopulated from new observations as they arrive.
 
 
 def get_state() -> Dict[str, Any]:
