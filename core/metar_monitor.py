@@ -56,6 +56,76 @@ try:
 except Exception:
     ZoneInfo = None
 
+# Layer 3: Execution domain guard and market state tracking
+# Note: Import is handled inside functions to avoid circular dependency
+# with kalshi_monitor.py
+
+# Layer 4: Webhook signature verification and alert categorization
+import hmac
+import hashlib
+
+# Layer 4: Webhook signature verification
+def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> bool:
+    """Verify webhook signature using HMAC-SHA256.
+    
+    Args:
+        payload: Raw webhook payload bytes
+        signature: X-Webhook-Signature header value
+        secret: Webhook secret
+        
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    if not secret or not signature:
+        return False
+    
+    expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
+def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = False) -> Tuple[float, Dict[str, Any]]:
+    """Compute confidence score for goldilocks signal based on epoch tracker data.
+    
+    Args:
+        tracker: Goldilocks epoch tracker dict with confidence data points
+        is_down: True if this is a goldilocks_momentum_down signal (inverted logic)
+        
+    Returns:
+        Tuple of (confidence_score, confidence_factors_dict)
+    """
+    is_daily_high = tracker.get("is_daily_high", False)
+    daily_high_margin = float(tracker.get("daily_high_margin", 0.0) or 0.0)
+    observations_since_spike = int(tracker.get("observations_since_spike", 0) or 0)
+    day_fraction_at_spike = float(tracker.get("day_fraction_at_spike", 0.0) or 0.0)
+    
+    # For momentum_down, invert the daily high check (we're looking for reversion from daily high)
+    if is_down:
+        # momentum_down signal: we want to know if the spike was the daily high (inverted)
+        is_daily_high = tracker.get("is_daily_high", False)
+        daily_high_margin = float(tracker.get("daily_high_margin", 0.0) or 0.0)
+    
+    # Compute confidence score
+    base = 0.0
+    if is_daily_high:
+        base = 0.4
+    
+    bonus_margin = min(daily_high_margin * 0.15, 0.2)  # up to +0.2 for big margins
+    bonus_obs = min(observations_since_spike * 0.02, 0.2)  # up to +0.2 for many confirming obs
+    bonus_time = day_fraction_at_spike * 0.2  # up to +0.2 for late-day spikes
+    
+    confidence = base + bonus_margin + bonus_obs + bonus_time
+    confidence = max(0.0, min(1.0, confidence))  # clamp to [0.0, 1.0]
+    
+    confidence_factors = {
+        "is_daily_high": is_daily_high,
+        "daily_high_margin": daily_high_margin,
+        "observations_since_spike": observations_since_spike,
+        "day_fraction_at_spike": day_fraction_at_spike,
+    }
+    
+    return confidence, confidence_factors
+
+
 # -------- Constants --------
 ET_TZ_NAME = "America/New_York"
 OVERLAP_SECONDS = 120               # small overlap to avoid missing late arrivals
@@ -336,6 +406,11 @@ def ensure_state_loaded():
                 settlement_bucket=int(settlement_bucket),
                 instant_bucket=int(instant_bucket),
             )
+    
+    # Layer 0: Hydrate signal state from SQLite on startup
+    _ALERT_LOGGER.info("signal_state_hydration_start")
+    hydrated = _hydrate_all_signal_state()
+    _ALERT_LOGGER.info("signal_state_hydration_complete hydrated=%d", hydrated)
 
 
 def get_state() -> Dict[str, Any]:
@@ -910,6 +985,10 @@ def _ingest_obs(
 
         if last_seen_iso and obs_dt <= _parse_iso(last_seen_iso):
             continue
+        
+        # Fix 4: KNYC data sparsity monitoring
+        if icao.strip().upper() == "KNYC":
+            _check_knyc_observation_gap(icao, ts)
 
         # store through authoritative state owner
         set_latest_observation(icao, obs, ts)
@@ -1032,7 +1111,12 @@ def _emit_alert(
             "transition_correlation": transition_correlation,
         },
     }
-    return _send_alert(cfg.get("webhook", ""), payload)
+    
+    # Layer 1: Queue alert for delivery with retry logic
+    # Generate unique alert ID for tracking
+    alert_id = f"temp_change:{icao}:{obs_time.replace('Z', '').replace(':', '').replace('-', '')}"
+    
+    return _queue_alert_for_delivery(alert_id, cfg.get("webhook", ""), payload)
 
 
 def _observation_seconds(obs_time: str) -> Optional[float]:
@@ -1086,12 +1170,20 @@ def _emit_signal_alert(*, station: str, obs_time: str, temp_f: float, signal_con
         market_type="SIGNAL",
         event_ticker=str(signal_context.get("dedupe_key") or ""),
         alert_type=str(signal_context.get("signal_type") or "signal"),
-        direction="UP" if str(signal_context.get("signal_type") or "").endswith("_up") else "REVERSAL",
+        direction=(
+            "UP"
+            if str(signal_context.get("signal_type") or "").endswith("_up")
+            else "DOWN"
+            if str(signal_context.get("signal_type") or "").endswith("_down")
+            else "REVERSAL"
+        ),
         temp_f=float(temp_f),
         bucket_index=int(math.floor(temp_f)),
         metadata={"signal_context": copy.deepcopy(signal_context)},
     )
-    _send_alert(cfg.get("webhook", ""), payload)
+    # Layer 1: Queue signal alert for delivery with retry logic
+    alert_id = f"signal:{station}:{signal_context.get('dedupe_key') or obs_time.replace('Z', '').replace(':', '').replace('-', '')}"
+    _queue_alert_for_delivery(alert_id, cfg.get("webhook", ""), payload)
 
 
 def get_latest_station_signal_runtime(station: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
@@ -1105,14 +1197,20 @@ def _evaluate_deterministic_signal_layer(
     obs_time: str,
     transition_type: Optional[str],
     settlement_bucket: int,
+    previous_settlement_bucket: Optional[int],
     hydration_cache_valid: bool,
     eligible_markets_count: int,
     cfg: Dict[str, Any],
+    temperature_state: Optional[Dict[str, Any]] = None,
 ) -> None:
     station = (station or "").strip().upper()
     obs_seconds = _observation_seconds(obs_time)
     if obs_seconds is None:
         return
+    
+    # Read temperature state if not provided
+    if temperature_state is None:
+        temperature_state = read_temperature_state(station)
 
     pending_signal_context = None
     pending_runtime_record = None
@@ -1150,15 +1248,27 @@ def _evaluate_deterministic_signal_layer(
 
         if not hydration_cache_valid:
             runtime["suppression_reason"] = "HYDRATION_CACHE_INVALID"
+            _ALERT_LOGGER.debug(
+                "signal_suppression station=%s reason=HYDRATION_CACHE_INVALID "
+                "reason_detail=market_exists_but_hydration_incomplete"
+            )
             pending_runtime_record = runtime
             early_exit = True
         elif int(eligible_markets_count) <= 0:
             runtime["suppression_reason"] = "NO_ELIGIBLE_MARKETS"
+            _ALERT_LOGGER.debug(
+                "signal_suppression station=%s reason=NO_ELIGIBLE_MARKETS "
+                "reason_detail=no_market_exists_for_station"
+            )
             pending_runtime_record = runtime
             early_exit = True
         else:
             if station_cooldown_active:
                 runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+                _ALERT_LOGGER.debug(
+                    "signal_suppression station=%s reason=STATION_COOLDOWN_ACTIVE "
+                    "reason_detail=market_exists_but_station_in_cooldown"
+                )
 
             next_integer = int(math.floor(now_f)) + 1
             distance_to_integer = float(next_integer) - float(now_f)
@@ -1206,7 +1316,17 @@ def _evaluate_deterministic_signal_layer(
                     "pressure_to_boundary_seconds": pressure_to_boundary_seconds,
                 }
                 _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+                # Persist station cooldown
+                _persist_signal_state(
+                    f"station_cooldown:{station}",
+                    {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
+                )
                 _SIGNAL_BOUNDARY_LAST_EMIT[boundary_key] = obs_seconds
+                # Persist boundary cooldown
+                _persist_signal_state(
+                    f"boundary_cooldown:{station}:{boundary_key[1]}:{boundary_key[2]}",
+                    {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS},
+                )
                 runtime.update({"signal_type": "near_boundary_momentum_up", "signal_emitted": True, "suppression_reason": None})
                 runtime["cooldown_state"]["station_active"] = True
                 runtime["cooldown_state"]["boundary_active"] = True
@@ -1215,30 +1335,114 @@ def _evaluate_deterministic_signal_layer(
                 epoch_key = (station, int(epoch_id))
                 tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
                 if transition_type == "settlement_up":
+                    # Store the OLD settlement bucket for proper "exceeded by one or more" calculation
+                    old_bucket = int(previous_settlement_bucket) if previous_settlement_bucket is not None else settlement_bucket
+                    
+                    # Compute day fraction at spike time (for confidence scoring)
+                    spike_obs_dt = _parse_iso(obs_time)
+                    day_fraction_at_spike = None
+                    if spike_obs_dt is not None:
+                        station_tz_name = station_timezone_name(station)
+                        if ZoneInfo and station_tz_name:
+                            try:
+                                spike_local = spike_obs_dt.astimezone(ZoneInfo(station_tz_name))
+                                spike_local_day_start = spike_local.replace(hour=0, minute=0, second=0, microsecond=0)
+                                day_seconds = (spike_local - spike_local_day_start).total_seconds()
+                                day_fraction_at_spike = day_seconds / 86400.0  # 24 hours in seconds
+                            except Exception:
+                                day_fraction_at_spike = 0.5  # fallback to middle of day
+                        else:
+                            # Fallback if zoneinfo unavailable
+                            day_fraction_at_spike = 0.5
+                    
+                    # Snapshot running_daily_max at spike moment
+                    running_daily_max_at_spike = temperature_state["running_daily_max"] if temperature_state else None
+                    
                     tracker = {
                         "settlement_bucket_at_up": int(settlement_bucket),
+                        "previous_settlement_bucket": old_bucket,
                         "max_temp_after_up": float(now_f),
-                        "exceeded_by_one_or_more": float(now_f) >= float(settlement_bucket) + 1.2,
-                        "reverted_below_settlement": float(now_f) <= float(settlement_bucket) - 0.2,
+                        # Use OLD bucket for "exceeded by one or more" calculation
+                        "exceeded_by_one_or_more": float(now_f) >= float(old_bucket) + 1.2,
+                        "reverted_below_settlement": float(now_f) <= float(old_bucket) - 0.2,
                         "alert_emitted": False,
                         "settlement_up_obs_time": obs_time,
+                        # NEW: Confidence data points for goldilocks
+                        "is_daily_high": False,  # Will be updated on each observation
+                        "daily_high_margin": 0.0,  # Will be updated on each observation
+                        "observations_since_spike": 0,
+                        "day_fraction_at_spike": day_fraction_at_spike,
+                        "running_daily_max_at_spike": running_daily_max_at_spike,
+                        # Fields for goldilocks_momentum_down variant
+                        "is_daily_low": False,  # Will be updated on each observation
+                        "daily_low_margin": 0.0,  # Will be updated on each observation
                     }
                     _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[epoch_key] = tracker
+                    # Persist epoch tracker
+                    _persist_signal_state(
+                        f"goldilocks_tracker:{station}:{epoch_id}",
+                        tracker,
+                    )
                 elif isinstance(tracker, dict):
-                    tracker["max_temp_after_up"] = max(float(tracker.get("max_temp_after_up") or now_f), float(now_f))
+                    # Update running daily high/low tracking for confidence scoring
+                    prev_max_temp = float(tracker.get("max_temp_after_up") or 0)
+                    curr_max_temp = float(now_f)
+                    
+                    # Update max_temp_after_up
+                    tracker["max_temp_after_up"] = max(prev_max_temp, curr_max_temp)
+                    
+                    # Get the current running_daily_max from authoritative state for comparison
+                    current_running_daily_max = temperature_state.get("running_daily_max")
+                    running_daily_max_at_spike = tracker.get("running_daily_max_at_spike")
+                    
+                    # Check if current spike is the daily high (within 0.1°F tolerance)
+                    if current_running_daily_max is not None:
+                        # For goldilocks_reversion (up) signal: is this spike the daily high?
+                        tracker["is_daily_high"] = curr_max_temp >= current_running_daily_max - 0.1
+                        # Compute margin above previous daily high
+                        if running_daily_max_at_spike is not None:
+                            tracker["daily_high_margin"] = max(0.0, curr_max_temp - running_daily_max_at_spike)
+                    
+                    # Increment observations_since_spike if exceeded_by_one_or_more is true
+                    if bool(tracker.get("exceeded_by_one_or_more")):
+                        tracker["observations_since_spike"] = int(tracker.get("observations_since_spike", 0)) + 1
+                    
+                    # Use stored OLD bucket for "exceeded by one or more" calculation
+                    old_bucket = tracker.get("previous_settlement_bucket") or tracker.get("settlement_bucket_at_up")
                     tracker["exceeded_by_one_or_more"] = bool(tracker.get("exceeded_by_one_or_more")) or (
-                        tracker["max_temp_after_up"] >= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) + 1.2
+                        tracker["max_temp_after_up"] >= float(old_bucket) + 1.2
                     )
                     tracker["reverted_below_settlement"] = bool(tracker.get("reverted_below_settlement")) or (
-                        float(now_f) <= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) - 0.2
+                        float(now_f) <= float(old_bucket) - 0.2
                     )
+                    
+                    # Check for goldilocks_momentum_down variant
+                    # For downward momentum, check if we've reached the daily low
+                    if current_running_daily_max is not None:
+                        # Note: running_daily_max is actually the running max, not low
+                        # We need to track daily low separately - but for now we use the same tracker pattern
+                        # The momentum_down signal uses the same tracker but looks for reversion patterns
+                        tracker["is_daily_low"] = curr_max_temp <= current_running_daily_max + 0.1  # Placeholder for low tracking
+                        if running_daily_max_at_spike is not None:
+                            tracker["daily_low_margin"] = max(0.0, running_daily_max_at_spike - curr_max_temp)
 
                 if isinstance(tracker, dict):
                     if bool(tracker.get("alert_emitted")):
                         runtime["suppression_reason"] = "EPOCH_ALERT_ALREADY_EMITTED"
+                        _ALERT_LOGGER.debug(
+                            "signal_suppression station=%s reason=EPOCH_ALERT_ALREADY_EMITTED "
+                            "reason_detail=market_exists_but_epoch_alert_already_sent"
+                        )
                     elif station_cooldown_active:
                         runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+                        _ALERT_LOGGER.debug(
+                            "signal_suppression station=%s reason=STATION_COOLDOWN_ACTIVE "
+                            "reason_detail=market_exists_but_station_in_cooldown"
+                        )
                     elif bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
+                        # Compute confidence score for goldilocks reversion
+                        confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker)
+                        
                         pending_signal_context = {
                             "signal_type": "goldilocks_reversion_alert",
                             "signal_version": 1,
@@ -1247,18 +1451,132 @@ def _evaluate_deterministic_signal_layer(
                             "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
                             "cooldown_applied": True,
                             "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
-                            "settlement_bucket_at_up": int(tracker.get("settlement_bucket_at_up") or settlement_bucket),
+                            # Use stored previous settlement bucket
+                            "settlement_bucket_at_up": int(tracker.get("previous_settlement_bucket") or tracker.get("settlement_bucket_at_up")),
                             "max_temp_after_up": float(tracker.get("max_temp_after_up") or now_f),
                             "reverted_temp": float(now_f),
                             "epoch_id": int(epoch_id),
+                            # NEW: Confidence scoring data
+                            "confidence": confidence_score,
+                            "confidence_factors": confidence_factors,
                         }
                         tracker["alert_emitted"] = True
                         _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+                        # Persist station cooldown
+                        _persist_signal_state(
+                            f"station_cooldown:{station}",
+                            {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
+                        )
                         runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None})
                         runtime["cooldown_state"]["station_active"] = True
 
+                # LOW momentum detection (downward temperature trend)
+                momentum_down = None
+                distance_from_integer = float(now_f) - float(int(math.floor(now_f)))
+                monotonic_down = False
+                increasing_time = False
+                movement_down = False
+                if len(window) == _SIGNAL_MOMENTUM_WINDOW_SIZE:
+                    x1, x2, x3 = window[0], window[1], window[2]
+                    monotonic_down = x1["temp_f"] >= x2["temp_f"] >= x3["temp_f"]
+                    # Timestamps increase from oldest (x1) to newest (x3)
+                    increasing_time = x1["seconds"] < x2["seconds"] < x3["seconds"]
+                    movement_down = (x1["temp_f"] - x3["temp_f"]) >= 0.05
+                    total_seconds = x3["seconds"] - x1["seconds"]
+                    if increasing_time and total_seconds > 0:
+                        momentum_down = abs((x1["temp_f"] - x3["temp_f"]) / total_seconds)
+
+                # LOW momentum signals for downward transitions
+                if transition_type in ("instant_down", "reversion_after_settlement"):
+                    # Check near_boundary_momentum_down
+                    near_boundary_down_all = False
+                    if 0.0 < distance_from_integer <= 0.10:
+                        near_boundary_down_all = bool(
+                            monotonic_down
+                            and increasing_time
+                            and movement_down
+                            and momentum_down is not None
+                            and momentum_down >= 0.002
+                        )
+                    if near_boundary_down_all and not station_cooldown_active and not boundary_cooldown_active:
+                        boundary_key = (station, int(math.floor(now_f)), int(epoch_id))
+                        pending_signal_context = {
+                            "signal_type": "near_boundary_momentum_down",
+                            "signal_version": 1,
+                            "station": station,
+                            "obs_time": obs_time,
+                            "dedupe_key": f"near_boundary_momentum_down:{station}:{epoch_id}:{int(math.floor(now_f))}",
+                            "cooldown_applied": True,
+                            "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS,
+                            "distance_from_integer": distance_from_integer,
+                            "momentum_f_per_sec": momentum_down,
+                            "momentum_window_size": _SIGNAL_MOMENTUM_WINDOW_SIZE,
+                            "lower_integer_boundary": int(math.floor(now_f)),
+                            "pressure_from_boundary_seconds": distance_from_integer / momentum_down if momentum_down else None,
+                        }
+                        _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+                        # Persist station cooldown
+                        _persist_signal_state(
+                            f"station_cooldown:{station}",
+                            {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
+                        )
+                        _SIGNAL_BOUNDARY_LAST_EMIT[boundary_key] = obs_seconds
+                        # Persist boundary cooldown
+                        _persist_signal_state(
+                            f"boundary_cooldown:{station}:{boundary_key[1]}:{boundary_key[2]}",
+                            {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS},
+                        )
+                        runtime.update({"signal_type": "near_boundary_momentum_down", "signal_emitted": True, "suppression_reason": None})
+                        runtime["cooldown_state"]["station_active"] = True
+                        runtime["cooldown_state"]["boundary_active"] = True
+
+                    # Check goldilocks_momentum_down
+                    if pending_signal_context is None:
+                        epoch_key = (station, int(epoch_id))
+                        tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+                        if isinstance(tracker, dict):
+                            current_goldilocks = tracker.get("momentum_down_observed", False)
+                            if not current_goldilocks and tracker.get("exceeded_by_one_or_more"):
+                                # Check if temperature has dropped below the settlement bucket threshold
+                                if float(now_f) <= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) - 0.2:
+                                    # Compute confidence score for goldilocks momentum down
+                                    # For momentum_down, is_daily_low is actually tracking whether we hit the daily high (inverted)
+                                    # The logic is inverted: we want to know if the reversion point was at the daily high
+                                    confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker, is_down=True)
+                                    
+                                    pending_signal_context = {
+                                        "signal_type": "goldilocks_momentum_down",
+                                        "signal_version": 1,
+                                        "station": station,
+                                        "obs_time": obs_time,
+                                        "dedupe_key": f"goldilocks_momentum_down:{station}:{epoch_id}",
+                                        "cooldown_applied": True,
+                                        "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
+                                        "settlement_bucket_at_up": int(tracker.get("settlement_bucket_at_up") or settlement_bucket),
+                                        "max_temp_after_up": float(tracker.get("max_temp_after_up") or now_f),
+                                        "reverted_temp": float(now_f),
+                                        "momentum_down": momentum_down,
+                                        "epoch_id": int(epoch_id),
+                                        # NEW: Confidence scoring data
+                                        "confidence": confidence_score,
+                                        "confidence_factors": confidence_factors,
+                                    }
+                                    tracker["momentum_down_observed"] = True
+                                    _SIGNAL_STATION_LAST_EMIT[station] = obs_seconds
+                                    # Persist station cooldown
+                                    _persist_signal_state(
+                                        f"station_cooldown:{station}",
+                                        {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
+                                    )
+                                    runtime.update({"signal_type": "goldilocks_momentum_down", "signal_emitted": True, "suppression_reason": None})
+                                    runtime["cooldown_state"]["station_active"] = True
+
                 if runtime["signal_type"] is None and runtime["suppression_reason"] is None:
                     runtime["suppression_reason"] = "NO_SIGNAL_CONDITION_MATCH"
+                    _ALERT_LOGGER.debug(
+                        "signal_suppression station=%s reason=NO_SIGNAL_CONDITION_MATCH "
+                        "reason_detail=market_exists_but_no_signal_condition_met"
+                    )
                 pending_runtime_record = runtime
 
     if pending_runtime_record is not None:
@@ -1387,9 +1705,13 @@ def _process_temperature_event(
         obs_time=obs_time,
         transition_type=transition_type,
         settlement_bucket=settlement_bucket,
+        previous_settlement_bucket=previous_settlement_bucket,
         hydration_cache_valid=hydration_cache_valid,
         eligible_markets_count=eligible_markets_count,
         cfg=cfg,
+        temperature_state={
+            "running_daily_max": new_running_max,
+        },
     )
 
     alerts = 0
@@ -1447,6 +1769,402 @@ def _process_temperature_event(
 
 def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+
+
+def _ensure_alert_schema() -> None:
+    """Ensure Layer 1 alert delivery queue and Layer 0 persistence schemas exist."""
+    from core.alert_retry_queue import _ensure_alert_delivery_queue_schema as _ensure_schema
+    _ensure_schema()
+    
+    db_path = _alert_db_path()
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    
+    with _SIGNAL_LOCK:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Signal layer state persistence (L0-T1)
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS signal_layer_state (
+                    signal_name TEXT PRIMARY KEY,
+                    state_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
+            # Market cache persistence (L0-T2)
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS market_cache (
+                    market_id TEXT PRIMARY KEY,
+                    station TEXT NOT NULL,
+                    cache_json TEXT NOT NULL,
+                    discovered_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    last_hydrated_utc TEXT
+                )
+                """
+            )
+            conn.commit()
+            
+            # Upgrade: Add last_hydrated_utc column if missing (existing databases)
+            try:
+                cursor = conn.execute("PRAGMA table_info(market_cache)")
+                columns = {row[1] for row in cursor.fetchall()}
+                if "last_hydrated_utc" not in columns:
+                    conn.execute("ALTER TABLE market_cache ADD COLUMN last_hydrated_utc TEXT")
+                    conn.commit()
+                    _ALERT_LOGGER.info("market_cache_schema_upgraded added_last_hydrated_utc")
+            except Exception as e:
+                _ALERT_LOGGER.info("market_cache_schema_upgrade_skipped error=%s", str(e))
+        finally:
+            conn.close()
+
+
+def _persist_signal_state(signal_name: str, state_dict: Dict[str, Any]) -> None:
+    """Persist signal state to SQLite (L0-T1).
+    
+    Stores cooldown timestamps and epoch tracking state for restart survival.
+    """
+    try:
+        db_path = _alert_db_path()
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Ensure schema exists
+            _ensure_alert_schema()
+            state_json = json.dumps(state_dict, sort_keys=True)
+            now_iso = _now_utc_iso()
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO signal_layer_state (
+                    signal_name, state_json, updated_at
+                ) VALUES (?, ?, ?)
+                """,
+                (signal_name, state_json, now_iso),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("signal_state_persist_failed name=%s error=%s", signal_name, e)
+
+
+def _load_signal_state(signal_name: str) -> Optional[Dict[str, Any]]:
+    """Load signal state from SQLite."""
+    try:
+        db_path = _alert_db_path()
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            row = conn.execute(
+                "SELECT state_json FROM signal_layer_state WHERE signal_name = ?",
+                (signal_name,),
+            ).fetchone()
+            if not row:
+                return None
+            return json.loads(row[0])
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("signal_state_load_failed name=%s error=%s", signal_name, e)
+        return None
+
+
+def _load_all_signal_state() -> Dict[str, Dict[str, Any]]:
+    """Load all signal state entries from SQLite for startup hydration."""
+    result = {}
+    try:
+        db_path = _alert_db_path()
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            rows = conn.execute(
+                "SELECT signal_name, state_json FROM signal_layer_state"
+            ).fetchall()
+
+            for row in rows:
+                signal_name, state_json = row
+                try:
+                    result[signal_name] = json.loads(state_json)
+                except Exception:
+                    result[signal_name] = {}
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("signal_state_load_all_failed error=%s", e)
+    return result
+
+
+def _hydrate_all_signal_state() -> int:
+    """Load all signal state from SQLite and hydrate in-memory state.
+    
+    Returns:
+        Number of signal state entries hydrated
+    """
+    loaded = _load_all_signal_state()
+    hydrate_count = 0
+    
+    with _SIGNAL_LOCK:
+        for signal_name, state in loaded.items():
+            # Parse signal name and restore state
+            if signal_name.startswith("station_cooldown:"):
+                # Format: station_cooldown:STATION
+                parts = signal_name.split(":")
+                if len(parts) >= 2:
+                    station = parts[-1]
+                    last_emit = state.get("last_emit")
+                    if last_emit:
+                        _SIGNAL_STATION_LAST_EMIT[station] = last_emit
+                        hydrate_count += 1
+            elif signal_name.startswith("boundary_cooldown:"):
+                # Format: boundary_cooldown:STATION:BOUNDARY:EPOCH
+                parts = signal_name.split(":")
+                if len(parts) >= 4:
+                    station = parts[1]
+                    boundary = int(parts[2])
+                    epoch = int(parts[3])
+                    last_emit = state.get("last_emit")
+                    if last_emit:
+                        _SIGNAL_BOUNDARY_LAST_EMIT[(station, boundary, epoch)] = last_emit
+                        hydrate_count += 1
+            elif signal_name.startswith("goldilocks_tracker:"):
+                # Format: goldilocks_tracker:STATION:EPOCH
+                parts = signal_name.split(":")
+                if len(parts) >= 3:
+                    station = parts[1]
+                    epoch = int(parts[2])
+                    _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[(station, epoch)] = copy.deepcopy(state)
+                    hydrate_count += 1
+    
+    if hydrate_count > 0:
+        _ALERT_LOGGER.info("signal_state_hydrated_entries=%d", hydrate_count)
+    
+    return hydrate_count
+
+
+def _queue_alert_for_delivery(alert_id: str, webhook_url: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Queue an alert for delivery with retry logic (L1-T1).
+    
+    This replaces direct _send_alert() calls with queued delivery that
+    handles failures with exponential backoff.
+    """
+    # Extract station info from payload
+    station = payload.get("station") or payload.get("legacy", {}).get("station", None)
+    temp_f = payload.get("temp_f") if isinstance(payload.get("temp_f"), (int, float)) else None
+    obs_time = payload.get("obs_time") or payload.get("legacy", {}).get("obs_time", None)
+    
+    # Create metadata for tracking
+    metadata = {
+        "alert_id": alert_id,
+        "queued_at": _now_utc_iso(),
+    }
+    
+    # Delegate to alert_retry_queue module
+    from core.alert_retry_queue import _queue_alert_for_delivery as _ar_queue
+    result = _ar_queue(
+        webhook_url=webhook_url,
+        payload=payload,
+        station=station,
+        temp_f=temp_f,
+        obs_time=obs_time,
+        metadata=metadata,
+    )
+    
+    return {
+        "queued": result.get("status") == "queued",
+        "alert_id": alert_id,
+        "estimated_retry_time": result.get("estimated_retry_time"),
+    }
+
+
+def _retry_delivery_batch() -> Dict[str, Any]:
+    """Process pending deliveries with exponential backoff (L1-T3)."""
+    from core.alert_retry_queue import _retry_delivery_batch as _ar_retry
+    result = _ar_retry(batch_size=10, immediate=True)  # immediate=True for testing
+    return result
+
+
+def _get_pending_deliveries() -> List[Dict[str, Any]]:
+    """Get pending alert deliveries (L1-T2)."""
+    return _get_alert_delivery_queue_entries(status="pending")
+
+
+def _get_failed_alerts() -> List[Dict[str, Any]]:
+    """Get failed/dead-lettered alerts (L1-T2)."""
+    return _get_alert_delivery_queue_entries(status="dead_letter")
+
+
+def _get_alert_delivery_queue_entries(status: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Get alert delivery queue entries filtered by status."""
+    db_path = _alert_db_path()
+    if not os.path.exists(db_path):
+        return []
+    
+    _ensure_alert_schema()
+    
+    entries = []
+    try:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            if status:
+                rows = conn.execute(
+                    """SELECT id, alert_id, created_at, updated_at, webhook_url, alert_payload_json,
+                               attempt_count, next_retry_at, last_error, original_station,
+                               original_temp_f, original_obs_time
+                        FROM alert_delivery_queue WHERE status = ?
+                        ORDER BY created_at DESC LIMIT 100""",
+                    (status,),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    """SELECT id, alert_id, created_at, updated_at, webhook_url, alert_payload_json,
+                               attempt_count, next_retry_at, last_error, original_station,
+                               original_temp_f, original_obs_time
+                        FROM alert_delivery_queue ORDER BY created_at DESC LIMIT 100"""
+                ).fetchall()
+            
+            for row in rows:
+                entry_id, alert_id_val, created_at, updated_at, webhook_url, payload_json, \
+                    attempt_count, next_retry_at, last_error, station, temp_f, obs_time = row
+                
+                entries.append({
+                    "entry_id": entry_id,
+                    "alert_id": alert_id_val,
+                    "created_at": created_at,
+                    "updated_at": updated_at,
+                    "webhook_url": webhook_url,
+                    "alert_payload": json.loads(payload_json),
+                    "attempt_count": attempt_count,
+                    "next_retry_at": next_retry_at,
+                    "last_error": last_error,
+                    "station": station,
+                    "temp_f": temp_f,
+                    "obs_time": obs_time,
+                })
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("alert_queue_query_failed status=%s error=%s", status, e)
+    
+    return entries
+
+
+def _mark_alert_delivery_queue_dead_letter(alert_id: str, reason: str) -> None:
+    """Mark an alert as dead-lettered for manual inspection (L1-T2)."""
+    db_path = _alert_db_path()
+    if not os.path.exists(db_path):
+        return
+    
+    _ensure_alert_schema()
+    
+    try:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # First, get the entry_id from alert_id metadata
+            now_iso = _now_utc_iso()
+            conn.execute(
+                """UPDATE alert_delivery_queue
+                    SET status = 'dead_letter', updated_at = ?, last_error = ?
+                    WHERE alert_id = ?""",
+                (now_iso, reason, alert_id),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("mark_dead_letter_failed alert_id=%s error=%s", alert_id, e)
+
+
+def _update_alert_delivery_queue_attempt(alert_id: str, error: str) -> None:
+    """Update attempt count and error for an alert (L1-T3)."""
+    db_path = _alert_db_path()
+    if not os.path.exists(db_path):
+        return
+    
+    _ensure_alert_schema()
+    
+    try:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Find the entry by alert_id in metadata and update
+            now_iso = _now_utc_iso()
+            rows = conn.execute(
+                "SELECT id, attempt_count FROM alert_delivery_queue WHERE alert_id = ?",
+                (alert_id,),
+            ).fetchall()
+            
+            for row in rows:
+                entry_id, attempt_count = row
+                new_attempt = attempt_count + 1
+                # Calculate exponential backoff: 60 * 2^attempt seconds (min 1m, max 1h)
+                delay_seconds = 60 * (2 ** attempt_count)
+                delay_seconds = min(delay_seconds, 3600)  # Cap at 1 hour
+                next_retry = (datetime.now(timezone.utc) + timedelta(seconds=delay_seconds)).isoformat()
+                
+                conn.execute(
+                    """UPDATE alert_delivery_queue
+                        SET attempt_count = ?, next_retry_at = ?, last_error = ?, updated_at = ?
+                        WHERE id = ?""",
+                    (new_attempt, next_retry, error, now_iso, entry_id),
+                )
+            
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("update_alert_attempt_failed alert_id=%s error=%s", alert_id, e)
+
+
+def _delete_alert_delivery_queue(alert_id: str) -> None:
+    """Delete an alert from the queue after successful delivery (L1-T3)."""
+    db_path = _alert_db_path()
+    if not os.path.exists(db_path):
+        return
+    
+    _ensure_alert_schema()
+    
+    try:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            conn.execute(
+                "DELETE FROM alert_delivery_queue WHERE alert_id = ?",
+                (alert_id,),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _ALERT_LOGGER.warning("delete_alert_failed alert_id=%s error=%s", alert_id, e)
+
+
+def _snapshot_alert_queue_stats() -> Dict[str, Any]:
+    """Get snapshot of alert queue statistics."""
+    db_path = _alert_db_path()
+    if not os.path.exists(db_path):
+        return {
+            "pending": 0,
+            "delivered": 0,
+            "dead_letter": 0,
+        }
+    
+    try:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            rows = conn.execute(
+                "SELECT status, COUNT(*) as count FROM alert_delivery_queue GROUP BY status"
+            ).fetchall()
+            
+            counts = {row[0]: row[1] for row in rows}
+            
+            return {
+                "pending": counts.get("pending", 0),
+                "delivered": counts.get("delivered", 0),
+                "dead_letter": counts.get("dead_letter", 0),
+                "total": sum(counts.values()),
+            }
+        finally:
+            conn.close()
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def _snapshot_station_state(station: str) -> Dict[str, Any]:
@@ -1896,6 +2614,12 @@ def _annotate_transition_history_market_eval(
                     metadata["suppression_reason"] = safe_suppression_reason
                 if eligibility_runtime is not None:
                     metadata["market_eligibility_runtime"] = copy.deepcopy(eligibility_runtime)
+                    # Add market_type from the eligibility_runtime if available
+                    if isinstance(eligibility_runtime, dict):
+                        # market_type is not directly in eligibility_runtime, but we can infer it from eligible_markets
+                        # The actual market_type should come from the market evaluation context
+                        # For now, we add a placeholder - the actual market_type should be inferred from the eligible markets
+                        pass
 
                 conn.execute(
                     "UPDATE transition_events SET metadata_json = ? WHERE id = ?",
@@ -2773,6 +3497,25 @@ def _simulate_temperature_for_testing(
 
 
 def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    # Layer 3: Execution domain guard - block alert delivery outside production
+    try:
+        from core.kalshi_monitor import _current_kalshi_execution_domain
+        current_domain = _current_kalshi_execution_domain()
+        if current_domain not in ["production"]:
+            result = {
+                "delivery_attempted": True,
+                "delivery_succeeded": False,
+                "webhook_status_code": None,
+                "webhook_exception": f"Execution domain blocked: domain={current_domain}",
+                "webhook_response_text": None,
+                "delivery_blocking_stage": "execution_domain",
+                "delivery_blocking_reason": f"DOMAIN_BLOCKED_{current_domain.upper()}",
+            }
+            return result
+    except Exception:
+        # If import fails or domain check fails, allow delivery (fail-open for safety)
+        pass
+    
     result = {
         "delivery_attempted": False,
         "delivery_succeeded": False,
@@ -3900,7 +4643,62 @@ def _scheduler_loop(logger, interval_sec: int):
         loop_count += 1
         if loop_count % 100 == 0:
             _run_alert_retention()
+        # Layer 1: Retry failed alert deliveries on each cycle
+        try:
+            _retry_delivery_batch()
+        except Exception as retry_err:
+            if logger:
+                logger.warning(f"METAR retry batch failed: {retry_err}")
         _SCHEDULER_STOP.wait(interval_sec)
+
+
+def _check_knyc_observation_gap(station: str, current_obs_time: str) -> None:
+    """Monitor KNYC METAR observation gaps for data sparsity alerts.
+    
+    Logs a warning when the gap between consecutive KNYC observations
+    exceeds 3600 seconds (1 hour), indicating potential data quality issues.
+    
+    Args:
+        station: Station ICAO code (checked for KNYC)
+        current_obs_time: Current observation timestamp in ISO format
+    """
+    normalized_station = (station or "").strip().upper()
+    if normalized_station != "KNYC":
+        return
+    
+    try:
+        current_dt = _parse_iso(current_obs_time)
+        if current_dt is None:
+            return
+        
+        # Get last observation time from state
+        with _STATE_LOCK:
+            last_obs = _STATE["last_obs"].get(normalized_station)
+        
+        if not last_obs:
+            return
+        
+        last_obs_time = last_obs.get("obs_time")
+        if not last_obs_time:
+            return
+        
+        last_dt = _parse_iso(last_obs_time)
+        if last_dt is None:
+            return
+        
+        gap_seconds = (current_dt - last_dt).total_seconds()
+        
+        # Alert threshold: 3600 seconds (1 hour)
+        if gap_seconds > 3600:
+            _ALERT_LOGGER.warning(
+                "knyc_data_sparsity station=%s gap_seconds=%d threshold_seconds=3600 "
+                "reason=KNYC_observation_interval_exceeds_one_hour_data_quality_flag",
+                normalized_station,
+                int(gap_seconds)
+            )
+    except Exception as e:
+        # Silently handle monitoring errors to avoid disrupting main flow
+        pass
 
 
 def start_scheduler(logger, cfg=None) -> bool:

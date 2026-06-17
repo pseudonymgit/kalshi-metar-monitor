@@ -20,6 +20,15 @@ _ACCEPTED_SUPPRESSION_REASON_TOKENS = {
     "MARKET_RULE",
 }
 
+# Valid suppression reasons for L3
+class ValidSuppressionReasons:
+    """Valid suppression reason tokens for L3 enforcement."""
+    DUPLICATE = "DUPLICATE"
+    COOLDOWN = "COOLDOWN"
+    RATE_LIMIT = "RATE_LIMIT"
+    DOMAIN_BLOCKED = "DOMAIN_BLOCKED"
+    UNKNOWN = "UNKNOWN"
+
 
 def _parse_iso_utc(raw_value: Optional[str]) -> Optional[datetime]:
     if not raw_value:
