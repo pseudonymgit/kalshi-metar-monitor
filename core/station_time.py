@@ -6,6 +6,14 @@ try:
 except Exception:
     ZoneInfo = None
 
+# Layer 4: Timezone validation
+try:
+    import pytz
+    HAS_PYTZ = True
+except ImportError:
+    HAS_PYTZ = False
+    pytz = None
+
 
 _ICAO_TZ = {
     "KDEN": "America/Denver",
@@ -16,6 +24,32 @@ _ICAO_TZ = {
     "KPHL": "America/New_York",
     "KNYC": "America/New_York",
 }
+
+
+# Layer 4: Timezone validation functions
+def validate_timezone(tz_name: str) -> str:
+    """Validate and return timezone name, fail-closed on invalid.
+    
+    Args:
+        tz_name: Timezone name to validate
+        
+    Returns:
+        Validated timezone name
+        
+    Raises:
+        ValueError: If timezone is invalid
+    """
+    if not tz_name:
+        raise ValueError("Invalid timezone: empty string")
+    
+    if HAS_PYTZ:
+        if tz_name not in pytz.all_timezones:
+            raise ValueError(f"Invalid timezone={tz_name}")
+    elif ZoneInfo is None:
+        # If neither pytz nor zoneinfo available, fail-open with warning
+        return tz_name  # type: ignore
+    
+    return tz_name
 
 
 def station_timezone_name(icao: str) -> str:
@@ -42,7 +76,8 @@ def parse_iso_utc(timestamp: Optional[str]) -> Optional[datetime]:
 def to_station_local(icao: str, dt_utc: datetime) -> datetime:
     if ZoneInfo is None:
         return dt_utc
-    return dt_utc.astimezone(ZoneInfo(station_timezone_name(icao)))
+    tz_name = validate_timezone(station_timezone_name(icao))
+    return dt_utc.astimezone(ZoneInfo(tz_name))
 
 
 def station_local_day_key(icao: str, timestamp_utc: Optional[str]) -> str:

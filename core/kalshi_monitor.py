@@ -18,19 +18,29 @@ This module MUST NOT
 import base64
 import copy
 import contextvars
+import json
 import logging
 import os
 import re
+
+# Layer 4: LOW market discovery regex
+LOW_TICKER_PATTERN = re.compile(r"^LOW-\d{6}$")
 import sqlite3
 import threading
 import time
-from datetime import datetime, timedelta, timezone
-
 import requests
+from datetime import datetime, timedelta, timezone
+from typing import Dict, Any, Optional
+
+import re
+
+# Layer 4: LOW market discovery regex
+LOW_TICKER_PATTERN = re.compile(r"^LOW-\d{6}$")
 from flask import has_request_context, request
 
 from core.authoritative_state import immutable_public_state_snapshot
 from core.station_time import parse_iso_utc, station_local_day_key, to_station_local
+from core.metar_monitor import _now_utc_iso
 from core.alert_schema import ALERT_SCHEMA_VERSION
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -277,6 +287,375 @@ _WEATHER_MARKET_TYPE_LABELS = {
 }
 
 
+# Constants
+ET_TZ_NAME = "America/New_York"
+
+
+def _now_utc_iso() -> str:
+    """Return current UTC time as ISO string."""
+    return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
+
+# =========================
+# Kalshi Rate Limiter (Layer 1 - HIGH-1)
+# =========================
+
+def _persist_rate_limit_entry(endpoint: str) -> None:
+    """Record a rate limit entry (L1-T4)."""
+    try:
+        db_path = _alert_db_path()
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Ensure schema exists
+            _ensure_alert_schema()
+            conn.execute(
+                """
+                INSERT INTO kalshi_rate_limit (endpoint, request_time)
+                VALUES (?, ?)
+                """,
+                (endpoint, _now_utc_iso()),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("rate_limit_entry_persist_failed endpoint=%s error=%s", endpoint, e)
+
+def _parse_retry_after(header_value: str) -> int:
+    """Parse Retry-After header value to seconds (L1-T5).
+    
+    Supports:
+    - Integer seconds: "120"
+    - HTTP-date: "Tue, 11 Jun 2026 16:30:00 GMT"
+    """
+    if not header_value:
+        return 60  # default fallback
+    
+    header_value = header_value.strip()
+    
+    try:
+        # Try parsing as integer seconds
+        return int(header_value)
+    except (ValueError, TypeError):
+        pass
+    
+    # Try parsing as HTTP-date
+    try:
+        # Parse HTTP-date format
+        from email.utils import parsedate_to_datetime
+        expires_dt = parsedate_to_datetime(header_value)
+        now_dt = datetime.now(timezone.utc)
+        delta = expires_dt - now_dt
+        return max(1, int(delta.total_seconds()))
+    except Exception:
+        pass
+    
+    return 60  # default fallback
+
+def _check_rate_limit(endpoint: str, max_requests: int = 10, window_seconds: int = 60) -> bool:
+    """Check if rate limit is exceeded for an endpoint (L1-T4)."""
+    try:
+        db_path = _alert_db_path()
+        _ensure_alert_schema()
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Count recent requests in the window
+            now_iso = _now_utc_iso()
+            rows = conn.execute(
+                """
+                SELECT COUNT(*) FROM kalshi_rate_limit
+                WHERE endpoint = ?
+                  AND request_time >= datetime(?, '-' || ? || ' seconds')
+                """,
+                (endpoint, now_iso, window_seconds),
+            ).fetchone()
+            count = rows[0] if rows else 0
+            return count < max_requests
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("rate_limit_check_failed endpoint=%s error=%s", endpoint, e)
+        return True  # allow by default on error
+
+def _kalshi_public_get_with_rate_limit(path: str) -> dict:
+    """Kalshi public GET with rate limiting and Retry-After handling (L1-T5)."""
+    execution_domain = _current_kalshi_execution_domain()
+    normalized_path = path if path.startswith("/") else f"/{path}"
+    
+    if execution_domain in _FORBIDDEN_KALSHI_DOMAINS:
+        request_path = str(request.path or "") if has_request_context() else None
+        _LOGGER.warning(
+            "kalshi_public_get_blocked domain=%s path=%s request_path=%s",
+            execution_domain,
+            normalized_path,
+            request_path,
+        )
+        raise RuntimeError(f"Live Kalshi call attempted in forbidden execution domain '{execution_domain}'")
+    if has_request_context() and str(request.path or "").startswith("/observability/"):
+        _LOGGER.warning(
+            "kalshi_public_get_blocked domain=%s path=%s request_path=%s",
+            execution_domain,
+            normalized_path,
+            str(request.path or ""),
+        )
+        raise RuntimeError("Live Kalshi call attempted in observability path")
+    
+    base_url = (
+        os.getenv("KALSHI_PUBLIC_BASE_URL")
+        or "https://api.elections.kalshi.com/trade-api/v2"
+    ).rstrip("/")
+    
+    # Check rate limit before making request
+    endpoint = normalized_path.split("?")[0]  # Use path without query for rate limit tracking
+    if not _check_rate_limit(endpoint):
+        _LOGGER.warning("rate_limit_exceeded endpoint=%s", endpoint)
+        raise requests.HTTPError("Rate limit exceeded", response=type("Response", (object,), {
+            "status_code": 429,
+            "headers": {"Retry-After": "60"},
+        })())
+    
+    # Record the request time
+    _persist_rate_limit_entry(endpoint)
+    
+    response = _KALSHI_PUBLIC_SESSION.get(f"{base_url}{normalized_path}", timeout=10)
+    response.raise_for_status()
+    
+    # Check for 429 with Retry-After
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After", "60")
+        wait_seconds = _parse_retry_after(retry_after)
+        _LOGGER.warning("rate_limit_429 endpoint=%s retry_after=%s", endpoint, wait_seconds)
+        raise requests.HTTPError(
+            f"Rate limit exceeded (Retry-After: {wait_seconds}s)",
+            response=type("Response", (object,), {
+                "status_code": 429,
+                "headers": {"Retry-After": retry_after},
+            })(),
+        )
+    
+    return response.json()
+
+
+def _persist_signal_state(signal_name: str, state_dict: Dict[str, Any]) -> None:
+    """Persist signal state to SQLite (L0-T1)."""
+    try:
+        db_path = _alert_db_path()
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Ensure schema exists
+            _ensure_alert_schema()
+            state_json = json.dumps(state_dict, sort_keys=True)
+            now_iso = _now_utc_iso()
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO signal_layer_state (
+                    signal_name, state_json, updated_at
+                ) VALUES (?, ?, ?)
+                """,
+                (signal_name, state_json, now_iso),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("signal_state_persist_failed name=%s error=%s", signal_name, e)
+
+def _load_signal_state(signal_name: str) -> Optional[Dict[str, Any]]:
+    """Load signal state from SQLite."""
+    try:
+        db_path = _alert_db_path()
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            row = conn.execute(
+                "SELECT state_json FROM signal_layer_state WHERE signal_name = ?",
+                (signal_name,),
+            ).fetchone()
+            if not row:
+                return None
+            return json.loads(row[0])
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("signal_state_load_failed name=%s error=%s", signal_name, e)
+        return None
+
+def _persist_market_cache(market_id: str, station: str, cache_dict: Dict[str, Any]) -> None:
+    """Persist market cache entry to SQLite (L0-T2).
+    
+    Updates market cache with hydration timestamp for restart survival.
+    """
+    try:
+        db_path = _alert_db_path()
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Ensure schema exists
+            _ensure_alert_schema()
+            cache_json = json.dumps(cache_dict, sort_keys=True)
+            now_iso = _now_utc_iso()
+            
+            # Update cache_dict with hydration timestamp
+            cache_dict_with_hydration = dict(cache_dict)
+            cache_dict_with_hydration["last_hydrated_utc"] = now_iso
+            cache_json = json.dumps(cache_dict_with_hydration, sort_keys=True)
+            
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO market_cache (
+                    market_id, station, cache_json, discovered_at, updated_at, last_hydrated_utc
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (market_id, station, cache_json, now_iso, now_iso, now_iso),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("market_cache_persist_failed market_id=%s error=%s", market_id, e)
+
+def _load_market_cache(market_id: str) -> Optional[Dict[str, Any]]:
+    """Load market cache entry from SQLite."""
+    try:
+        db_path = _alert_db_path()
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            row = conn.execute(
+                "SELECT station, cache_json FROM market_cache WHERE market_id = ?",
+                (market_id,),
+            ).fetchone()
+            if not row:
+                return None
+            station, cache_json = row
+            cache_data = json.loads(cache_json)
+            # Include station in returned dict for compatibility
+            cache_data["station"] = station
+            return cache_data
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("market_cache_load_failed market_id=%s error=%s", market_id, e)
+        return None
+
+def _load_all_market_cache() -> Dict[str, Dict[str, Any]]:
+    """Load all market cache entries from SQLite for startup hydration."""
+    result = {}
+    try:
+        db_path = _alert_db_path()
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            rows = conn.execute(
+                "SELECT market_id, station, cache_json, last_hydrated_utc FROM market_cache"
+            ).fetchall()
+            for market_id, station, cache_json, last_hydrated_utc in rows:
+                try:
+                    cache_data = json.loads(cache_json)
+                    # Merge last_hydrated_utc into cache if present
+                    if last_hydrated_utc and "last_hydrated_utc" not in cache_data:
+                        cache_data["last_hydrated_utc"] = last_hydrated_utc
+                    result[market_id] = {
+                        "station": station,
+                        "cache": cache_data,
+                    }
+                except Exception:
+                    continue
+        finally:
+            conn.close()
+    except Exception as e:
+        _LOGGER.warning("market_cache_load_all_failed error=%s", e)
+    return result
+
+
+def _hydrate_all_market_cache() -> int:
+    """Load all market cache from SQLite and hydrate in-memory state.
+    
+    Returns:
+        Number of cache entries hydrated
+    """
+    loaded = _load_all_market_cache()
+    hydrate_count = 0
+    
+    with _SERIES_LOCK:
+        for market_id, entry in loaded.items():
+            if not market_id.startswith("series:"):
+                continue
+            # Extract station and ticker from market_id format: "series:STATION:SERIES"
+            parts = market_id.split(":")
+            if len(parts) < 3:
+                continue
+            station = parts[1]
+            series_ticker = ":".join(parts[2:])
+            
+            cache_data = entry.get("cache", {})
+            if not cache_data.get("markets"):
+                continue
+            
+            # Hydrate in-memory cache
+            _SERIES_MARKETS_CACHE[series_ticker] = cache_data
+            hydrate_count += 1
+    
+    if hydrate_count > 0:
+        _LOGGER.info("market_cache_hydrated_entries=%d", hydrate_count)
+    
+    return hydrate_count
+
+
+def _ensure_alert_schema() -> None:
+    """Ensure Kalshi-specific schema tables exist (L1 - HIGH-1)."""
+    db_path = _alert_db_path()
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    with _SERIES_LOCK:
+        conn = sqlite3.connect(db_path, timeout=1)
+        try:
+            # Kalshi rate limit counter (L1-T4)
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS kalshi_rate_limit (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    endpoint TEXT NOT NULL,
+                    request_time TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            # Signal layer state persistence (L0-T1)
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS signal_layer_state (
+                    signal_name TEXT PRIMARY KEY,
+                    state_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
+            # Market cache persistence (L0-T2)
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS market_cache (
+                    market_id TEXT PRIMARY KEY,
+                    station TEXT NOT NULL,
+                    cache_json TEXT NOT NULL,
+                    discovered_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    last_hydrated_utc TEXT
+                )
+                """
+            )
+            conn.commit()
+            
+            # Upgrade: Add last_hydrated_utc column if missing (existing databases)
+            try:
+                cursor = conn.execute("PRAGMA table_info(market_cache)")
+                columns = {row[1] for row in cursor.fetchall()}
+                if "last_hydrated_utc" not in columns:
+                    conn.execute("ALTER TABLE market_cache ADD COLUMN last_hydrated_utc TEXT")
+                    conn.commit()
+                    _LOGGER.info("market_cache_schema_upgraded added_last_hydrated_utc")
+            except Exception as e:
+                _LOGGER.info("market_cache_schema_upgrade_skipped error=%s", str(e))
+            
+        finally:
+            conn.close()
+
 def _alert_db_path() -> str:
     return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
 
@@ -462,6 +841,20 @@ def _kalshi_public_get(path):
     ).rstrip("/")
     response = _KALSHI_PUBLIC_SESSION.get(f"{base_url}{normalized_path}", timeout=10)
     response.raise_for_status()
+    
+    # Check for 429 with Retry-After handling
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After", "60")
+        wait_seconds = _parse_retry_after(retry_after)
+        _LOGGER.warning("rate_limit_429 endpoint=%s retry_after=%s", normalized_path, wait_seconds)
+        raise requests.HTTPError(
+            f"Rate limit exceeded (Retry-After: {wait_seconds}s)",
+            response=type("Response", (object,), {
+                "status_code": 429,
+                "headers": {"Retry-After": retry_after},
+            })(),
+        )
+    
     return response.json()
 
 
@@ -570,6 +963,45 @@ def _extract_station_from_settlement_market_metadata(market: dict) -> str | None
     return match.group(0)
 
 
+def map_market_to_station(market: dict) -> str | None:
+    """Extract station ICAO from market metadata using multiple sources.
+    
+    This function extracts station codes from:
+    - settlement_metadata.station / station_code / icao
+    - market.settlement_station / station / station_code / icao
+    - ticker / series_ticker / settlement_source patterns
+    - settlement rule text parsing
+    
+    Returns normalized ICAO (4-letter code) or None if not found.
+    """
+    # Primary: Try direct metadata fields first
+    result = _extract_station_from_settlement_market_metadata(market)
+    if result:
+        return result
+    
+    # Secondary: Try ticker patterns (e.g., KXHIGHDEN, KXLOWLAX)
+    ticker = str(market.get("ticker") or "").strip().upper()
+    series_ticker = str(market.get("series_ticker") or "").strip().upper()
+    settlement_source = str(market.get("settlement_source") or "").strip().upper()
+    
+    ticker_source = ticker or series_ticker or settlement_source
+    if ticker_source:
+        # Look for 4-letter ICAO pattern in ticker
+        match = _SETTLEMENT_ICAO_PATTERN.search(ticker_source)
+        if match:
+            return match.group(0)
+        
+        # Try to match known city tokens
+        for city_token in ("DEN", "LAX", "NY", "PHIL", "CHI", "MIA", "AUS"):
+            if city_token in ticker_source:
+                # Reverse lookup from _STATION_CITY_TOKEN_MAP
+                for station, token in _STATION_CITY_TOKEN_MAP.items():
+                    if token == city_token:
+                        return station
+    
+    return None
+
+
 def _parse_market_expiration(market: dict):
     for key in (
         "expiration_time",
@@ -634,6 +1066,14 @@ def discover_kalshi_weather_markets(max_pages=5, page_limit=200):
             station: sorted(set(symbols))
             for station, symbols in discovered_by_station.items()
         }
+        # Persist discovered markets for restart survival
+        for station, symbols in discovered_by_station.items():
+            for symbol in symbols:
+                _persist_market_cache(
+                    f"discovered:{station}:{symbol}",
+                    station,
+                    {"symbol": symbol, "station": station, "discovered_at": datetime.now(timezone.utc).isoformat()},
+                )
 
     return list(discovered_markets)
 
@@ -682,6 +1122,22 @@ def resolve_settlement_station(token: str) -> str | None:
     if not normalized_token:
         return None
 
+    # Primary: Try market-derived mapping first (dynamic discovery)
+    # Build the mapping from market metadata
+    try:
+        from core.kalshi_monitor import _discover_series_for_stations
+        discovered = _discover_series_for_stations()
+        for station, city_tokens in discovered.items():
+            if isinstance(city_tokens, list):
+                for ct in city_tokens:
+                    if ct == normalized_token:
+                        return station
+            elif city_tokens == normalized_token:
+                return station
+    except Exception:
+        pass  # Fall back to hardcoded map
+
+    # Fallback: Use hardcoded _STATION_CITY_TOKEN_MAP
     for station, city_token in _STATION_CITY_TOKEN_MAP.items():
         if (city_token or "").strip().upper() == normalized_token:
             return station
@@ -918,6 +1374,11 @@ def ensure_series_discovery_loaded():
         if record_connectivity_state:
             _SERIES_DISCOVERY_ATTEMPT_COUNT += 1
         try:
+            # Layer 0: Hydrate market cache from SQLite on startup
+            _LOGGER.info("market_cache_hydration_start")
+            hydrated = _hydrate_all_market_cache()
+            _LOGGER.info("market_cache_hydration_complete hydrated=%d", hydrated)
+            
             discovered = _discover_series_for_stations()
             if not discovered:
                 raise RuntimeError("series discovery returned 0 station mappings")
@@ -1474,6 +1935,12 @@ def build_structured_snapshot(
                     "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
                 }
                 _MARKETS_CACHE_POPULATION_COUNT += 1
+            # Persist market cache for restart survival
+            _persist_market_cache(
+                f"series:{normalized_station}:{series_ticker_item}",
+                normalized_station,
+                _SERIES_MARKETS_CACHE[series_ticker_item],
+            )
             cache_written = True
             continue
 
@@ -1526,6 +1993,12 @@ def build_structured_snapshot(
                 "station_local_day": station_local_day_key(normalized_station, evaluated_at_utc),
             }
             _MARKETS_CACHE_POPULATION_COUNT += 1
+        # Persist market cache for restart survival
+        _persist_market_cache(
+            f"series:{normalized_station}:{series_ticker_item}",
+            normalized_station,
+            _SERIES_MARKETS_CACHE[series_ticker_item],
+        )
         cache_written = True
 
     rejection_counts = {}
