@@ -29,6 +29,7 @@ from core.station_time import station_local_day_key, to_station_local, parse_iso
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from core.metar_monitor import (
+    _ensure_alert_schema as _ensure_metar_alert_schema,
     ensure_scheduler_started,
     get_latest_metar,
     set_watchlist,
@@ -59,6 +60,7 @@ from core.metar_monitor import (
 from core.kalshi_monitor import (
     _configured_target_market_types,
     _current_kalshi_execution_domain,
+    _ensure_alert_schema as _ensure_kalshi_alert_schema,
     _infer_series_market_type,
     _kalshi_public_get,
     _parse_target_market_types,
@@ -1694,6 +1696,15 @@ else:
         _autostart_fallback_done = True
         if os.getenv("METAR_AUTOSTART", "true").lower() == "true":
             ensure_scheduler_started(log)
+        # Initialize DB schemas before any hydration reads
+        try:
+            _ensure_metar_alert_schema()
+        except Exception as exc:
+            log.error("metar alert schema init failed: %s", exc)
+        try:
+            _ensure_kalshi_alert_schema()
+        except Exception as exc:
+            log.error("kalshi alert schema init failed: %s", exc)
         try:
             ensure_series_discovery_loaded()
         except Exception as exc:

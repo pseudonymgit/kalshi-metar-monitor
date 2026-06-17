@@ -409,8 +409,11 @@ def ensure_state_loaded():
     
     # Layer 0: Hydrate signal state from SQLite on startup
     _ALERT_LOGGER.info("signal_state_hydration_start")
-    hydrated = _hydrate_all_signal_state()
-    _ALERT_LOGGER.info("signal_state_hydration_complete hydrated=%d", hydrated)
+    try:
+        hydrated = _hydrate_all_signal_state()
+        _ALERT_LOGGER.info("signal_state_hydration_complete hydrated=%d", hydrated)
+    except Exception as exc:
+        _ALERT_LOGGER.warning("signal_state_hydration_failed (non-fatal, will repopulate from new observations): %s", exc)
 
 
 def get_state() -> Dict[str, Any]:
