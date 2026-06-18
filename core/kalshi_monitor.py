@@ -76,15 +76,26 @@ _PROXIMITY_RANK = {
     "CRITICAL": 3,
 }
 
-_STATION_CITY_TOKEN_MAP = {
-    "KDEN": "DEN",
-    "KLAX": "LAX",
-    "KNYC": "NY",
-    "KPHL": "PHIL",
-    "KMDW": "CHI",
-    "KMIA": "MIA",
-    "KAUS": "AUS",
-}
+
+def _extract_station_from_settlement_source_url(settlement_source: str | None) -> str | None:
+    """Extract station ICAO from settlement source URL.
+    
+    Parses URLs like:
+    - https://api.kalshi.com/trustful/settlement/NWS/issuedby=KNYC
+    - https://api.kalshi.com/trustful/settlement/NWS/issuedby=KDEN
+    
+    Returns normalized ICAO (4-letter code) or None if not found.
+    """
+    if not settlement_source:
+        return None
+    
+    # Look for issuedby= pattern in URL (3 or 4 letter station codes)
+    match = re.search(r"issuedby=([A-Z]{3,4})", settlement_source)
+    if match:
+        return match.group(1).upper()
+    
+    return None
+
 
 _KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", default="production")
 # Replay/diagnostics safety: these domains are hard-blocked from live
@@ -991,13 +1002,10 @@ def map_market_to_station(market: dict) -> str | None:
         if match:
             return match.group(0)
         
-        # Try to match known city tokens
-        for city_token in ("DEN", "LAX", "NY", "PHIL", "CHI", "MIA", "AUS"):
-            if city_token in ticker_source:
-                # Reverse lookup from _STATION_CITY_TOKEN_MAP
-                for station, token in _STATION_CITY_TOKEN_MAP.items():
-                    if token == city_token:
-                        return station
+        # Try to extract station from ticker using the known patterns
+        extracted = _extract_station_from_ticker(ticker_source)
+        if extracted:
+            return extracted
     
     return None
 
@@ -1135,12 +1143,12 @@ def resolve_settlement_station(token: str) -> str | None:
             elif city_tokens == normalized_token:
                 return station
     except Exception:
-        pass  # Fall back to hardcoded map
+        pass  # Fall back to extraction
 
-    # Fallback: Use hardcoded _STATION_CITY_TOKEN_MAP
-    for station, city_token in _STATION_CITY_TOKEN_MAP.items():
-        if (city_token or "").strip().upper() == normalized_token:
-            return station
+    # Try to extract station from token
+    extracted = _extract_station_from_ticker(token)
+    if extracted:
+        return extracted
 
     return _EXPLICIT_SETTLEMENT_STATION_OVERRIDES.get(normalized_token)
 
@@ -1238,10 +1246,14 @@ def _configured_target_market_types():
     return configured or {"HIGH"}
 
 
-def _infer_series_market_type(*, ticker: str = "", title: str = ""):
+def _infer_series_market_type(*, ticker: str = "", title: str = "", source: str = ""):
     normalized_ticker = str(ticker or "").strip().upper()
     normalized_title = str(title or "").strip().upper()
     marker_blob = f"{normalized_ticker} {normalized_title}".strip()
+    
+    # Check source type first
+    if source.upper() == "HOURLY":
+        return "HOURLY"
 
     if any(token in marker_blob for token in ("KXHIGH", " HIGH", "HIGH ", "HIGHEST TEMPERATURE", "DAILY HIGH")):
         return "HIGH"
@@ -1269,90 +1281,132 @@ def _series_tickers_for_market_types(series_tickers, market_types: set[str] | No
 
 
 def _discover_series_for_stations():
+    """Discover weather markets and their settlement stations dynamically.
+    
+    Uses the /series API to get all daily temperature markets, then:
+    1. Extracts station ICAOs from settlement_source URLs (issuedby=)
+    2. Falls back to ticker pattern matching if URL parsing fails
+    3. Builds bidirectional mapping: station → series_tickers
+    
+    Returns dict of station_code → list of series_tickers.
+    """
     data = _kalshi_public_get("/series?tags=Daily%20temperature")
     series_items = data.get("series") or []
-
-    try:
-        configured_stations = set(discover_market_derived_station_codes())
-    except Exception:
-        configured_stations = set()
-
-    configured_stations.update((_get_active_stations() or set()))
-    configured_stations.update(_STATION_CITY_TOKEN_MAP.keys())
-
-    reverse_city_token_map = {
-        city_token: station
-        for station, city_token in _STATION_CITY_TOKEN_MAP.items()
-    }
-
+    
+    if not series_items:
+        return {}
+    
+    # Build station → series_tickers mapping from settlement sources
+    discovered = {}
+    
     for item in series_items:
         frequency = (item.get("frequency") or "").strip().lower()
-        title = (item.get("title") or "").strip().lower()
         ticker = (item.get("ticker") or "").strip().upper()
-
-        if frequency != "daily":
+        series_ticker = (item.get("series_ticker") or "").strip().upper()
+        settlement_source = item.get("settlement_source", "")
+        source_type = item.get("source", "")  # Could be "HOURLY" for NYC hourly markets
+        
+        # Infer market type from ticker and source
+        market_type = _infer_series_market_type(ticker=ticker, source=source_type)
+        if market_type not in {"HIGH", "LOW", "HOURLY"}:
             continue
-        market_type = _infer_series_market_type(ticker=ticker, title=title)
-        if market_type not in {"HIGH", "LOW"}:
+        
+        # Skip non-daily markets (for now, only include hourly if explicitly marked)
+        if frequency != "daily" and market_type != "HOURLY":
             continue
-        prefix = f"KX{market_type}"
-        if not ticker.startswith(prefix):
-            continue
-
-        discovered_token = ticker[len(prefix):]
-        discovered_station = reverse_city_token_map.get(discovered_token)
-        if discovered_station:
-            configured_stations.add(discovered_station)
-
-    discovered = {}
-
-    for station in sorted(configured_stations):
-        station_code = (station or "").strip().upper()
-        city_token = _STATION_CITY_TOKEN_MAP.get(station_code, "")
-        station_token = station_code[1:] if station_code.startswith("K") and len(station_code) == 4 else station_code
-
-        candidates = []
-        for item in series_items:
-            frequency = (item.get("frequency") or "").strip().lower()
-            title = (item.get("title") or "").strip()
-            ticker = (item.get("ticker") or "").strip().upper()
-
-            if frequency != "daily":
+        
+        # Try to extract station from settlement_source URL
+        station_from_url = _extract_station_from_settlement_source_url(settlement_source)
+        if station_from_url:
+            station_code = station_from_url
+        else:
+            # Fallback: try to extract from ticker (e.g., KXHIGHDEN, KXLOWLAX)
+            station_code = _extract_station_from_ticker(ticker)
+            if not station_code:
                 continue
-            market_type = _infer_series_market_type(ticker=ticker, title=title)
-            if market_type not in {"HIGH", "LOW"}:
-                continue
-            if not ticker:
-                continue
+        
+        # Normalize and add to discovered
+        station_code = station_code.upper()
+        if station_code not in discovered:
+            discovered[station_code] = set()
+        
+        if series_ticker:
+            discovered[station_code].add(series_ticker)
+        if ticker:
+            discovered[station_code].add(ticker)
+    
+    # Convert sets to lists for JSON serialization
+    result = {}
+    for station, tickers in discovered.items():
+        result[station] = sorted(list(tickers))
+    
+    return result
 
-            token_match = station_code in ticker or (city_token and city_token in ticker) or (station_token and station_token in ticker)
-            if token_match:
-                score = 0
-                if city_token:
-                    if ticker == f"KX{market_type}{city_token}":
-                        score = 5
-                    elif ticker == f"KX{city_token}{market_type}":
-                        score = 4
-                    elif ticker.startswith(f"KX{market_type}") and city_token in ticker:
-                        score = 3
-                    elif market_type in ticker and city_token in ticker:
-                        score = 2
-                    else:
-                        score = 1
-                elif station_token:
-                    if ticker == f"KX{market_type}{station_token}":
-                        score = 3
-                    elif ticker == f"KX{station_token}{market_type}":
-                        score = 2
-                    else:
-                        score = 1
-                candidates.append((score, ticker))
 
-        if candidates:
-            ranked_candidates = sorted(candidates, key=lambda candidate: (-candidate[0], candidate[1]))
-            discovered[station_code] = _normalize_series_tickers([candidate[1] for candidate in ranked_candidates])
-
-    return discovered
+def _extract_station_from_ticker(ticker: str) -> str | None:
+    """Extract station ICAO from ticker pattern.
+    
+    Handles various ticker formats:
+    - KXHIGHDEN, KXLOWLAX → DEN, LAX → KDEN, KLAX
+    - KXHIGHTATL, KXLOWTDC → ATL, DCA → KATL, KDCA
+    - KXHIGHNY, KXLOWTNYC → NYC → KNYC
+    - KXHIGHOU, KXLOWTOKC → OKC → KOKC
+    - KXHIGHTMIN, KXLOWTMIN → MSP → KMSP
+    - KXHIGHTSEA → SEA → KSEA
+    - KXHIGHTSFO → SFO → KSFO
+    
+    Returns normalized 4-letter ICAO or None.
+    """
+    if not ticker:
+        return None
+    
+    # Remove KX prefix and trailing patterns
+    # e.g., KXHIGHDEN → DEN, KXLOWTATL → TATL, KXHIGHNY → NY
+    cleaned = ticker
+    for prefix in ("KXHIGH", "KXLOW", "KXHIGHT", "KXLOWT"):
+        if cleaned.startswith(prefix):
+            cleaned = cleaned[len(prefix):]
+            break
+    
+    # Some patterns have a leading T (KXHIGHTDAL -> TDAL), strip it
+    if cleaned and cleaned[0] == 'T':
+        cleaned = cleaned[1:]
+    
+    # Common mappings (city token → ICAO)
+    city_to_icao = {
+        "ATL": "KATL",
+        "AUS": "KAUS",
+        "BOS": "KBOS",
+        "DC": "KDCA",
+        "DCA": "KDCA",
+        "DEN": "KDEN",
+        "DAL": "KDAL",  # Kalshi uses KXHIGHTDAL
+        "DFW": "KDAL",  # DFW airport code → DAL ticker token
+        "HOU": "KHOUS",
+        "LAS": "KLAS",
+        "LAX": "KLAX",
+        "CHI": "KMDW",
+        "CHICAGO": "KMDW",
+        "MIA": "KMIA",
+        "MIN": "KMSP",
+        "MINNEAPOLIS": "KMSP",
+        "NOLA": "KNEW",
+        "NEW ORLEANS": "KNEW",
+        "NY": "KNYC",
+        "NYC": "KNYC",
+        "OKC": "KOKC",
+        "PHIL": "KPHL",
+        "PHOENIX": "KPHX",
+        "SATX": "KSAT",
+        "SEA": "KSEA",
+        "SFO": "KSFO",
+        "PHL": "KPHL",
+        "MIA": "KMIA",
+        "MSY": "KMSY",
+    }
+    
+    cleaned_upper = cleaned.upper()
+    return city_to_icao.get(cleaned_upper)
 
 
 def ensure_series_discovery_loaded():
@@ -1750,12 +1804,63 @@ def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dic
     }
 
 def _build_weather_event_ticker(station: str, market_type: str, observation_time_utc: str | datetime | None = None):
-    city_token = _STATION_CITY_TOKEN_MAP.get(station)
+    # Extract city token from station ICAO (e.g., KDEN → DEN, KNYC → NYC)
+    city_token = _station_to_city_token(station)
     if not city_token:
         return None
 
     date_token = _station_local_kalshi_date_token(station, observation_time_utc=observation_time_utc)
     return f"KX{market_type}{city_token}-{date_token}"
+
+
+def _station_to_city_token(station: str) -> str | None:
+    """Convert station ICAO to city token for ticker construction.
+    
+    Handles special cases:
+    - KNYC → NYC (Central Park, not JFK/LGA)
+    - KMDW → CHI (Midway, not ORD)
+    - KDCA → DC (Reagan National)
+    
+    Returns uppercase city token or None if unknown station.
+    """
+    if not station:
+        return None
+    
+    # Strip K prefix and get 3-letter code
+    code = station
+    if code.startswith("K") and len(code) == 4:
+        code = code[1:]
+    
+    # Known mappings (station code → Kalshi ticker city token)
+    # Verified against actual Kalshi tickers from /series?tags=Daily temperature API
+    token_map = {
+        "ATL": "ATL",
+        "AUS": "AUS",
+        "BOS": "BOS",
+        "DCA": "DC",       # KXHIGHTDC / KXLOWTDC
+        "DEN": "DEN",
+        "DFW": "DAL",      # Kalshi uses DAL in ticker (KXHIGHTDAL), settlement is DFW
+        "DAL": "DAL",
+        "HOU": "HOU",
+        "LAS": "LV",       # KXHIGHTLV / KXLOWTLV
+        "LAX": "LAX",
+        "MDW": "CHI",      # KXHIGHCHI / KXLOWTCHI (Midway, not O'Hare)
+        "MIA": "MIA",
+        "MSP": "MIN",      # KXHIGHTMIN / KXLOWTMIN
+        "MSY": "NOLA",     # KXHIGHTNOLA / KXLOWTNOLA (Louis Armstrong)
+        "LGA": "NYC",
+        "JFK": "NYC",
+        "EWR": "NYC",
+        "NYC": "NYC",      # Central Park ASOS (KNYC) — NOT an airport
+        "OKC": "OKC",
+        "PHL": "PHIL",     # KXHIGHPHIL / KXLOWTPHIL
+        "PHX": "PHX",
+        "SAT": "SATX",     # KXHIGHTSATX / KXLOWTSATX
+        "SEA": "SEA",
+        "SFO": "SFO",
+    }
+    
+    return token_map.get(code.upper())
 
 
 def _filter_structured_markets(markets, station, market_types, rejection_counts=None, observation_time_utc: str | datetime | None = None):
@@ -1767,7 +1872,7 @@ def _filter_structured_markets(markets, station, market_types, rejection_counts=
         rejection_counts[reason] = int(rejection_counts.get(reason, 0)) + 1
 
     normalized_station = (station or "").strip().upper()
-    city_token = _STATION_CITY_TOKEN_MAP.get(normalized_station)
+    city_token = _station_to_city_token(normalized_station)
 
     if not city_token:
         return []
