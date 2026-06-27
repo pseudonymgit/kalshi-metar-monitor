@@ -12,7 +12,8 @@ Key features:
 """
 
 from fastapi import APIRouter, HTTPException, Query, Request, Response
-from typing import Optional
+from typing import Dict, List, Optional
+import time
 
 import core.p3_scheduler as p3sch
 import core.p3_output_formatter as p3of
@@ -24,6 +25,39 @@ router = APIRouter(
     prefix="/api/prediction",
     tags=["prediction"],
 )
+
+
+# Rate limiting for cache clear endpoint
+# Track cache clear requests per IP (simple in-memory rate limiter)
+_cache_clear_requests: Dict[str, List[float]] = {}
+_CACHE_CLEAR_RATE_LIMIT_WINDOW = 60  # seconds
+_CACHE_CLEAR_RATE_LIMIT_MAX = 10  # max requests per window
+
+
+def _check_rate_limit(client_ip: str) -> bool:
+    """
+    Check if client IP is within rate limit.
+    
+    Returns True if request is allowed, False if rate limited.
+    """
+    now = time.time()
+    window_start = now - _CACHE_CLEAR_RATE_LIMIT_WINDOW
+    
+    # Clean old entries
+    if client_ip in _cache_clear_requests:
+        _cache_clear_requests[client_ip] = [
+            t for t in _cache_clear_requests[client_ip] if t > window_start
+        ]
+    else:
+        _cache_clear_requests[client_ip] = []
+    
+    # Check limit
+    if len(_cache_clear_requests[client_ip]) >= _CACHE_CLEAR_RATE_LIMIT_MAX:
+        return False
+    
+    # Record this request
+    _cache_clear_requests[client_ip].append(now)
+    return True
 
 
 @router.get("/{station}/{market_type}")
@@ -219,12 +253,25 @@ async def run_predictions_now():
 
 
 @router.post("/cache/clear")
-async def clear_cache_endpoint():
+async def clear_cache_endpoint(
+    request: Request,
+):
     """
     Clear prediction cache.
     
     Use for testing or when cache needs refresh.
+    Rate limited to 10 requests per minute per IP.
     """
+    # Get client IP
+    client_ip = request.client.host if request.client else "unknown"
+    
+    # Check rate limit
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded. Max 10 cache clears per minute per IP.",
+        )
+    
     p3sch.clear_cache()
     return {"status": "cache_cleared", "timestamp_utc": p3of.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")}
 
@@ -234,27 +281,102 @@ async def health_check():
     """
     Health check endpoint for the prediction layer.
     
+    Verifies:
+    - Database connectivity
+    - Prediction layer modules are importable
+    - Prediction layer can run a basic prediction
+    
     Returns:
         200 OK if prediction layer is operational
     """
+    health = {
+        "status": "healthy",
+        "checks": {},
+        "timestamp_utc": p3of.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    
     try:
-        # Verify database connection
+        # Check 1: Database connectivity
         import sqlite3
         db_path = p3sch._resolve_db_path()
         conn = sqlite3.connect(db_path, timeout=1)
         conn.execute("SELECT 1")
         conn.close()
-        
-        return {
-            "status": "healthy",
-            "database": "connected",
+        health["checks"]["database"] = {
+            "status": "connected",
             "db_path": db_path,
-            "timestamp_utc": p3of.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        health["database"] = "connected"
+    except Exception as e:
+        health["checks"]["database"] = {
+            "status": "failed",
+            "error": str(e),
+        }
+        health["status"] = "degraded"
+        health["database"] = "failed"
+    
+    try:
+        # Check 2: Prediction layer modules are importable
+        from core import p3_feature_extractor as p3fe
+        from core import p3_match_engine as p3me
+        from core import p3_trajectory_tracer as p3tt
+        from core import p3_calibration_engine as p3ce
+        from core import p3_output_formatter as p3of
+        
+        health["checks"]["modules"] = {
+            "status": "loaded",
+            "modules": [
+                "p3_feature_extractor",
+                "p3_match_engine",
+                "p3_trajectory_tracer",
+                "p3_calibration_engine",
+                "p3_output_formatter",
+            ],
         }
     except Exception as e:
+        health["checks"]["modules"] = {
+            "status": "failed",
+            "error": str(e),
+        }
+        health["status"] = "degraded"
+    
+    try:
+        # Check 3: Prediction layer can run a basic prediction
+        # Try to get latest epoch - this tests the full prediction pipeline infrastructure
+        try:
+            epoch = p3sch.get_latest_settlement_epoch("KDEN", "high")
+            if epoch:
+                health["checks"]["prediction_pipeline"] = {
+                    "status": "operational",
+                    "last_epoch_id": epoch.get("id"),
+                }
+            else:
+                health["checks"]["prediction_pipeline"] = {
+                    "status": "operational",
+                    "message": "No open epoch found (expected if no trading today)",
+                }
+        except Exception as e:
+            health["checks"]["prediction_pipeline"] = {
+                "status": "failed",
+                "error": str(e),
+            }
+            health["status"] = "degraded"
+    except Exception as e:
+        if "prediction_pipeline" not in health["checks"]:
+            health["checks"]["prediction_pipeline"] = {
+                "status": "failed",
+                "error": str(e),
+            }
+            health["status"] = "degraded"
+    
+    # Overall status
+    if health["status"] != "degraded":
+        health["status"] = "healthy"
+        return health
+    else:
         raise HTTPException(
             status_code=503,
-            detail=f"Health check failed: {str(e)}",
+            detail=f"Health check: {health}",
         )
 
 

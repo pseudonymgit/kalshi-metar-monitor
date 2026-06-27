@@ -16,7 +16,7 @@ import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from core.settlement_epoch_logger import _alert_db_path as get_db_path
 import core.p3_feature_extractor as p3fe
@@ -47,8 +47,40 @@ try:
 except Exception:
     pass
 
-# Market types (hourly added for NYC)
-MARKET_TYPES = ["high", "low", "hourly"]
+# Market types (dynamic, loaded from station metadata)
+# Default to common types if Kalshi discovery is unavailable
+MARKET_TYPES = ["high", "low"]
+
+# Try to populate from Kalshi discovery (this will be updated at runtime)
+def _load_market_types_from_discovery() -> List[str]:
+    """
+    Load market types dynamically from station metadata or Kalshi discovery.
+    
+    Returns list of market types, defaulting to ["high", "low"] if discovery fails.
+    """
+    try:
+        from core.kalshi_monitor import _DISCOVERED_WEATHER_MARKETS_BY_STATION
+        
+        # Collect all market types from discovered markets
+        all_market_types = set()
+        for markets in _DISCOVERED_WEATHER_MARKETS_BY_STATION.values():
+            for market in markets:
+                # Market structure: {"ticker": "XXX", "market_type": "high", ...}
+                if isinstance(market, dict) and "market_type" in market:
+                    mt = market["market_type"]
+                    if isinstance(mt, str) and mt.lower() not in all_market_types:
+                        all_market_types.add(mt.lower())
+        
+        if all_market_types:
+            return sorted(list(all_market_types))
+    except Exception:
+        pass
+    
+    # Default fallback
+    return ["high", "low"]
+
+# Initialize MARKET_TYPES dynamically
+MARKET_TYPES = _load_market_types_from_discovery()
 
 # Prediction result cache
 _cache: Dict[str, Dict[str, Any]] = {}
@@ -300,13 +332,33 @@ def run_predictions_for_all_stations() -> Dict[str, PredictionResponse]:
     Run predictions for all active stations and market types.
     
     Returns dict of (station, market_type) -> PredictionResponse.
+    
+    Partial-failure handling: If any prediction fails, clears cache to avoid
+    inconsistent state. This provides transaction-like behavior for the cache.
     """
     results = {}
+    failed_keys = []
     
     for station in ACTIVE_STATIONS:
         for market_type in MARKET_TYPES:
             key = f"{station}:{market_type}"
-            results[key] = run_prediction_for_station(station, market_type)
+            try:
+                results[key] = run_prediction_for_station(station, market_type)
+                if not results[key].success:
+                    failed_keys.append(key)
+            except Exception as e:
+                failed_keys.append(key)
+                results[key] = PredictionResponse(
+                    success=False,
+                    message=f"Prediction crashed for {station}/{market_type}: {str(e)}",
+                    prediction=None,
+                    timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                )
+    
+    # If any failures occurred, clear cache to avoid inconsistent state
+    if failed_keys:
+        clear_cache()
+        print(f"[WARNING] {len(failed_keys)} prediction(s) failed, cache cleared to prevent inconsistent state")
     
     return results
 
