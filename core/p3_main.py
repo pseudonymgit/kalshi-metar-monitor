@@ -35,7 +35,7 @@ import sqlite3
 from datetime import datetime
 from typing import Any, Dict, Optional
 
-import p3_db_migration
+from . import p3_db_migration as p3db
 from core import p3_feature_extractor as p3fe
 from core import p3_match_engine as p3me
 from core import p3_trajectory_tracer as p3tt
@@ -221,7 +221,7 @@ def get_phase3_summary() -> Dict[str, Any]:
     
     core_dir = os.path.dirname(__file__)
     phase3_files = [
-        "p3_db_migration.py",
+        "p3db.py",
         "p3_feature_extractor.py",
         "p3_match_engine.py",
         "p3_trajectory_tracer.py",
@@ -235,11 +235,15 @@ def get_phase3_summary() -> Dict[str, Any]:
     missing = []
     
     for filename in phase3_files:
-        filepath = os.path.join(core_dir, filename)
+        # Handle the alias case
+        check_filename = filename
+        if filename == "p3db.py":
+            check_filename = "p3_db_migration.py"
+        filepath = os.path.join(core_dir, check_filename)
         if os.path.exists(filepath):
-            present.append(filename)
+            present.append("p3_db_migration.py")
         else:
-            missing.append(filename)
+            missing.append("p3_db_migration.py")
     
     return {
         "phase": "Phase 3",
