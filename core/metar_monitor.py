@@ -95,9 +95,20 @@ def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> boo
 def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = False) -> Tuple[float, Dict[str, Any]]:
     """Compute confidence score for goldilocks signal based on epoch tracker data.
     
+    R4-1.5: Asymmetric confidence split for up vs down reversion.
+    
+    Physical reasoning:
+    - Spike up → reversion down (is_down=False): transient solar insolation peaks,
+      warm-air advection pulses. Reversion is strong and reliable because the
+      forcing is ephemeral. Higher confidence base.
+    - Spike down → reversion up (is_down=True): transient cold-air drainage,
+      evaporative cooling from precipitation. Reversion is weaker and less
+      reliable — cold-air drainage can persist, evaporative cooling can be
+      sustained if ground remains wet. Lower confidence base + discount.
+    
     Args:
         tracker: Goldilocks epoch tracker dict with confidence data points
-        is_down: True if this is a goldilocks_momentum_down signal (inverted logic)
+        is_down: True if this is a goldilocks_momentum_down signal (downward reversion)
         
     Returns:
         Tuple of (confidence_score, confidence_factors_dict)
@@ -107,22 +118,31 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
     observations_since_spike = int(tracker.get("observations_since_spike", 0) or 0)
     day_fraction_at_spike = float(tracker.get("day_fraction_at_spike", 0.0) or 0.0)
     
-    # For momentum_down, invert the daily high check (we're looking for reversion from daily high)
-    if is_down:
-        # momentum_down signal: we want to know if the spike was the daily high (inverted)
-        is_daily_high = tracker.get("is_daily_high", False)
-        daily_high_margin = float(tracker.get("daily_high_margin", 0.0) or 0.0)
-    
     # Compute confidence score
-    base = 0.0
-    if is_daily_high:
-        base = 0.4
+    # R4-1.5: Asymmetric base confidence
+    # Up reversion (spike up → drop back): base 0.40 — more reliable
+    # Down reversion (spike down → bounce back): base 0.25 — less reliable
+    if is_down:
+        base = 0.25 if is_daily_high else 0.0
+        # Down reversion: discount on bonuses too (cold-air drainage can persist)
+        bonus_margin = min(daily_high_margin * 0.10, 0.15)  # reduced from 0.15/0.2
+        bonus_obs = min(observations_since_spike * 0.015, 0.15)  # reduced from 0.02/0.2
+        bonus_time = day_fraction_at_spike * 0.15  # reduced from 0.2
+        
+        confidence = base + bonus_margin + bonus_obs + bonus_time
+        # Additional discount factor for down-reversion uncertainty
+        confidence *= 0.85  # 15% discount for down-reversion signals
+    else:
+        # Up reversion: keep original calculation with slight boost
+        base = 0.40 if is_daily_high else 0.0
+        bonus_margin = min(daily_high_margin * 0.15, 0.20)  # up to +0.20
+        bonus_obs = min(observations_since_spike * 0.02, 0.20)  # up to +0.20
+        bonus_time = day_fraction_at_spike * 0.20  # up to +0.20
+        
+        confidence = base + bonus_margin + bonus_obs + bonus_time
+        # Slight boost for up-reversion reliability
+        confidence *= 1.05  # 5% boost for up-reversion signals
     
-    bonus_margin = min(daily_high_margin * 0.15, 0.2)  # up to +0.2 for big margins
-    bonus_obs = min(observations_since_spike * 0.02, 0.2)  # up to +0.2 for many confirming obs
-    bonus_time = day_fraction_at_spike * 0.2  # up to +0.2 for late-day spikes
-    
-    confidence = base + bonus_margin + bonus_obs + bonus_time
     confidence = max(0.0, min(1.0, confidence))  # clamp to [0.0, 1.0]
     
     confidence_factors = {
@@ -130,6 +150,8 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
         "daily_high_margin": daily_high_margin,
         "observations_since_spike": observations_since_spike,
         "day_fraction_at_spike": day_fraction_at_spike,
+        "reversion_direction": "down" if is_down else "up",
+        "asymmetric_base": base,
     }
     
     return confidence, confidence_factors
