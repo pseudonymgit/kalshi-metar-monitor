@@ -1,0 +1,335 @@
+
+============================================================
+Processing year: 2021
+============================================================
+  722190-13874 (KATL / Atlanta)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722540-13958 (KAUS / Austin)...
+    Fetched 0 observations
+  725090-14739 (KBOS / Boston)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  725340-14819 (KMDW / Chicago)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  722590-03927 (KDAL / Dallas)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  725650-03017 (KDEN / Denver)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  722430-12918 (KHOU / Houston)...
+    Fetched 0 observations
+  723860-23169 (KLAS / Las Vegas)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  722950-23174 (KLAX / Los Angeles)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  722020-12839 (KMIA / Miami)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  726580-14922 (KMSP / Minneapolis)...
+    Fetched 5119 observations
+    Processed 365 daily records
+  722310-12916 (KMSY / New Orleans)...
+    Fetched 8732 observations
+    Processed 365 daily records
+  725030-14732 (KNYC / New York)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  723530-13967 (KOKC / Oklahoma City)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  724080-13739 (KPHL / Philadelphia)...
+    Fetched 8755 observations
+    Processed 365 daily records
+  722780-23183 (KPHX / Phoenix)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722530-12921 (KSAT / San Antonio)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  724940-23234 (KSFO / San Francisco)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  727930-24233 (KSEA / Seattle)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  724050-13743 (KDCA / Washington DC)...
+    Fetched 8759 observations
+    Processed 365 daily records
+
+Year 2021 summary:
+  Stations processed: 18
+  Records inserted: 6570
+  Total so far: 6570
+
+============================================================
+Processing year: 2022
+============================================================
+  722190-13874 (KATL / Atlanta)...
+    Fetched 8698 observations
+    Processed 365 daily records
+  722540-13958 (KAUS / Austin)...
+    Fetched 0 observations
+  725090-14739 (KBOS / Boston)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  725340-14819 (KMDW / Chicago)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  722590-03927 (KDAL / Dallas)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  725650-03017 (KDEN / Denver)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  722430-12918 (KHOU / Houston)...
+    Fetched 0 observations
+  723860-23169 (KLAS / Las Vegas)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722950-23174 (KLAX / Los Angeles)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722020-12839 (KMIA / Miami)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  726580-14922 (KMSP / Minneapolis)...
+    Fetched 5155 observations
+    Processed 365 daily records
+  722310-12916 (KMSY / New Orleans)...
+    Fetched 8751 observations
+    Processed 365 daily records
+  725030-14732 (KNYC / New York)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  723530-13967 (KOKC / Oklahoma City)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  724080-13739 (KPHL / Philadelphia)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722780-23183 (KPHX / Phoenix)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722530-12921 (KSAT / San Antonio)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  724940-23234 (KSFO / San Francisco)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  727930-24233 (KSEA / Seattle)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  724050-13743 (KDCA / Washington DC)...
+    Fetched 8750 observations
+    Processed 365 daily records
+
+Year 2022 summary:
+  Stations processed: 18
+  Records inserted: 6570
+  Total so far: 13140
+
+============================================================
+Processing year: 2023
+============================================================
+  722190-13874 (KATL / Atlanta)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722540-13958 (KAUS / Austin)...
+    Fetched 0 observations
+  725090-14739 (KBOS / Boston)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  725340-14819 (KMDW / Chicago)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  722590-03927 (KDAL / Dallas)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  725650-03017 (KDEN / Denver)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722430-12918 (KHOU / Houston)...
+    Fetched 0 observations
+  723860-23169 (KLAS / Las Vegas)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  722950-23174 (KLAX / Los Angeles)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722020-12839 (KMIA / Miami)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  726580-14922 (KMSP / Minneapolis)...
+    Fetched 8756 observations
+    Processed 365 daily records
+  722310-12916 (KMSY / New Orleans)...
+    Fetched 8752 observations
+    Processed 365 daily records
+  725030-14732 (KNYC / New York)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  723530-13967 (KOKC / Oklahoma City)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  724080-13739 (KPHL / Philadelphia)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  722780-23183 (KPHX / Phoenix)...
+    Fetched 8760 observations
+    Processed 365 daily records
+  722530-12921 (KSAT / San Antonio)...
+    Fetched 8759 observations
+    Processed 365 daily records
+  724940-23234 (KSFO / San Francisco)...
+    Fetched 8758 observations
+    Processed 365 daily records
+  727930-24233 (KSEA / Seattle)...
+    Fetched 8757 observations
+    Processed 365 daily records
+  724050-13743 (KDCA / Washington DC)...
+    Fetched 8754 observations
+    Processed 365 daily records
+
+Year 2023 summary:
+  Stations processed: 18
+  Records inserted: 6570
+  Total so far: 19710
+
+============================================================
+Processing year: 2024
+============================================================
+  722190-13874 (KATL / Atlanta)...
+    Fetched 8780 observations
+    Processed 366 daily records
+  722540-13958 (KAUS / Austin)...
+    Fetched 0 observations
+  725090-14739 (KBOS / Boston)...
+    Fetched 8777 observations
+    Processed 366 daily records
+  725340-14819 (KMDW / Chicago)...
+    Fetched 8764 observations
+    Processed 366 daily records
+  722590-03927 (KDAL / Dallas)...
+    Fetched 8774 observations
+    Processed 366 daily records
+  725650-03017 (KDEN / Denver)...
+    Fetched 8775 observations
+    Processed 366 daily records
+  722430-12918 (KHOU / Houston)...
+    Fetched 0 observations
+  723860-23169 (KLAS / Las Vegas)...
+    Fetched 8741 observations
+    Processed 366 daily records
+  722950-23174 (KLAX / Los Angeles)...
+    Fetched 8769 observations
+    Processed 366 daily records
+  722020-12839 (KMIA / Miami)...
+    Fetched 8767 observations
+    Processed 366 daily records
+  726580-14922 (KMSP / Minneapolis)...
+    Fetched 8745 observations
+    Processed 366 daily records
+  722310-12916 (KMSY / New Orleans)...
+    Fetched 8762 observations
+    Processed 366 daily records
+  725030-14732 (KNYC / New York)...
+    Fetched 8774 observations
+    Processed 366 daily records
+  723530-13967 (KOKC / Oklahoma City)...
+    Fetched 8757 observations
+    Processed 366 daily records
+  724080-13739 (KPHL / Philadelphia)...
+    Fetched 8756 observations
+    Processed 366 daily records
+  722780-23183 (KPHX / Phoenix)...
+    Fetched 8770 observations
+    Processed 366 daily records
+  722530-12921 (KSAT / San Antonio)...
+    Fetched 8756 observations
+    Processed 366 daily records
+  724940-23234 (KSFO / San Francisco)...
+    Fetched 8741 observations
+    Processed 366 daily records
+  727930-24233 (KSEA / Seattle)...
+    Fetched 8746 observations
+    Processed 366 daily records
+  724050-13743 (KDCA / Washington DC)...
+    Fetched 8773 observations
+    Processed 366 daily records
+
+Year 2024 summary:
+  Stations processed: 18
+  Records inserted: 6588
+  Total so far: 26298
+
+============================================================
+Processing year: 2025
+============================================================
+  722190-13874 (KATL / Atlanta)...
+    Fetched 5711 observations
+    Processed 239 daily records
+  722540-13958 (KAUS / Austin)...
+    Fetched 0 observations
+  725090-14739 (KBOS / Boston)...
+    Fetched 5711 observations
+    Processed 239 daily records
+  725340-14819 (KMDW / Chicago)...
+    Fetched 5716 observations
+    Processed 239 daily records
+  722590-03927 (KDAL / Dallas)...
+    Fetched 5715 observations
+    Processed 239 daily records
+  725650-03017 (KDEN / Denver)...
+    Fetched 5719 observations
+    Processed 239 daily records
+  722430-12918 (KHOU / Houston)...
+    Fetched 0 observations
+  723860-23169 (KLAS / Las Vegas)...
+    Fetched 5720 observations
+    Processed 239 daily records
+  722950-23174 (KLAX / Los Angeles)...
+    Fetched 5718 observations
+    Processed 239 daily records
+  722020-12839 (KMIA / Miami)...
+    Fetched 5716 observations
+    Processed 239 daily records
+  726580-14922 (KMSP / Minneapolis)...
+    Fetched 5633 observations
+    Processed 237 daily records
+  722310-12916 (KMSY / New Orleans)...
+    Fetched 5661 observations
+    Processed 237 daily records
+  725030-14732 (KNYC / New York)...
+    Fetched 5717 observations
+    Processed 239 daily records
+  723530-13967 (KOKC / Oklahoma City)...
+    Fetched 5715 observations
+    Processed 239 daily records
+  724080-13739 (KPHL / Philadelphia)...
+    Fetched 5715 observations
+    Processed 239 daily records
+  722780-23183 (KPHX / Phoenix)...
+    Fetched 5676 observations
+    Processed 237 daily records
+  722530-12921 (KSAT / San Antonio)...
+    Fetched 5717 observations
+    Processed 239 daily records
+  724940-23234 (KSFO / San Francisco)...
+    Fetched 5715 observations
+    Processed 239 daily records
+  727930-24233 (KSEA / Seattle)...
+    Fetched 5718 observations
+    Processed 239 daily records
+  724050-13743 (KDCA / Washington DC)...
+    Fetched 5712 observations
+    Processed 239 daily records
+
+Year 2025 summary:
+  Stations processed: 18
+  Records inserted: 4296
+  Total so far: 30594

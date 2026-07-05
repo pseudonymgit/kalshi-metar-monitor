@@ -1,0 +1,27 @@
+2026-07-05 21:54:50,320 - weather_collector - INFO - Weather Collector Service initializing...
+2026-07-05 21:54:50,320 - weather_collector - INFO - Running single collection cycle (test mode)
+2026-07-05 21:54:50,320 - weather_collector - INFO - Starting METAR collection
+2026-07-05 21:54:50,321 - weather_collector - ERROR - METAR collection failed: main() got an unexpected keyword argument 'test_mode'
+2026-07-05 21:54:50,323 - weather_collector - ERROR - Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/weather_collector_service.py", line 62, in collect_metar_data
+    metar_module.main(test_mode=True)
+TypeError: main() got an unexpected keyword argument 'test_mode'
+
+2026-07-05 21:54:50,323 - weather_collector - INFO - Starting NWP collection
+2026-07-05 21:54:59,962 - weather_collector - WARNING - Main with args failed: [Errno 32] Broken pipe
+2026-07-05 21:54:59,962 - weather_collector - INFO - Starting Kalshi snapshot collection
+2026-07-05 21:55:04,794 - weather_collector - INFO - Kalshi snapshot collection completed: {'total_stations': 20, 'successful': 20, 'failed': 0, 'timestamp': '2026-07-05T21:55:04.794409+00:00'}
+2026-07-05 21:55:04,794 - weather_collector - INFO - Single collection cycle completed
+2026-07-05 21:56:24,333 - weather_collector - INFO - Running single collection cycle (test mode)
+2026-07-05 21:56:24,333 - weather_collector - INFO - Collecting METAR data...
+2026-07-05 21:56:24,333 - weather_collector - INFO - Starting METAR collection
+2026-07-05 21:57:16,679 - weather_collector - INFO - Starting Kalshi snapshot collection
+2026-07-05 21:57:16,682 - weather_collector - ERROR - Kalshi snapshot collection failed: name '__file__' is not defined
+2026-07-05 21:57:16,683 - weather_collector - ERROR - Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/weather_collector_service.py", line 106, in collect_kalshi_snapshots
+    exec(code, exec_namespace)
+  File "<string>", line 27, in <module>
+NameError: name '__file__' is not defined
+
+2026-07-05 21:59:51,183 - weather_collector - INFO - Starting Kalshi snapshot collection
+2026-07-05 21:59:56,229 - weather_collector - INFO - Kalshi snapshot collection completed: {'total_stations': 20, 'successful': 20, 'failed': 0, 'timestamp': '2026-07-05T21:59:56.229537+00:00'}

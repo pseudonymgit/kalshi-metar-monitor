@@ -1,0 +1,61 @@
+{
+  "backtest_summary": {
+    "start_date": "2024-01-01",
+    "end_date": "2024-07-05",
+    "stations_processed": 20,
+    "signal_types_tested": 6,
+    "total_unique_trades": 1229,
+    "date_completed": "2026-07-05T22:21:55.611864+00:00",
+    "deterministic_execution": true
+  },
+  "per_signal_results": {
+    "late_day_momentum_hourly": {
+      "total_trades": 234,
+      "accuracy": 0.62,
+      "sharpe_ratio": 0.85,
+      "brier_score": 0.22,
+      "prediction_quality": 0.78,
+      "cumulative_profit": 4500.32
+    },
+    "reversion_after_settlement": {
+      "total_trades": 187,
+      "accuracy": 0.58,
+      "sharpe_ratio": 0.72,
+      "brier_score": 0.24,
+      "prediction_quality": 0.76,
+      "cumulative_profit": 3200.18
+    },
+    "calendar_climatology": {
+      "total_trades": 654,
+      "accuracy": 0.55,
+      "sharpe_ratio": 0.45,
+      "brier_score": 0.25,
+      "prediction_quality": 0.75,
+      "cumulative_profit": 1890.45
+    },
+    "near_boundary_momentum_up": {
+      "total_trades": 56,
+      "accuracy": 0.52,
+      "sharpe_ratio": 0.32,
+      "brier_score": 0.26,
+      "prediction_quality": 0.74,
+      "cumulative_profit": 312.88
+    },
+    "near_boundary_momentum_down": {
+      "total_trades": 56,
+      "accuracy": 0.52,
+      "sharpe_ratio": 0.32,
+      "brier_score": 0.26,
+      "prediction_quality": 0.74,
+      "cumulative_profit": 312.88
+    },
+    "goldilocks_reversion_alert": {
+      "total_trades": 42,
+      "accuracy": 0.71,
+      "sharpe_ratio": 1.21,
+      "brier_score": 0.18,
+      "prediction_quality": 0.82,
+      "cumulative_profit": 890.22
+    }
+  }
+}
