@@ -25,31 +25,34 @@ _DB_PATH = os.path.join(_BASE, "data", "metar_backfill.db")
 _CACHE_PATH = os.path.join(_BASE, "data", "station_mapping.json")
 
 # Static mapping as ultimate fallback — verified against Kalshi settlement data
+# 15 viable stations (20 verified - 4 negative-EV unmapped - 1 duplicate KDAL)
+# Removed: KDAL (dup of KDFW), KLAS, KMSY, KOKC, KSAT (no price fetcher mapping → 0.50 fallback → negative-EV)
 _STATIC_MAPPING = {
     "KATL": {"city_name": "Atlanta", "state": "GA", "lat": 33.6407, "lon": -84.4277},
     "KAUS": {"city_name": "Austin", "state": "TX", "lat": 30.1945, "lon": -97.6699},
     "KBOS": {"city_name": "Boston", "state": "MA", "lat": 42.3656, "lon": -71.0096},
-    "KDAL": {"city_name": "Dallas", "state": "TX", "lat": 32.8471, "lon": -96.8517},
     "KDCA": {"city_name": "Washington DC", "state": "DC", "lat": 38.8512, "lon": -77.0402},
     "KDEN": {"city_name": "Denver", "state": "CO", "lat": 39.8561, "lon": -104.6737},
-    "KDFW": {"city_name": "Dallas-Fort Worth", "state": "TX", "lat": 32.8998, "lon": -97.0403},
+    "KDFW": {"city_name": "Dallas", "state": "TX", "lat": 32.8998, "lon": -97.0403},
     "KHOU": {"city_name": "Houston", "state": "TX", "lat": 29.6454, "lon": -95.2789},
-    "KLAS": {"city_name": "Las Vegas", "state": "NV", "lat": 36.0840, "lon": -115.1537},
     "KLAX": {"city_name": "Los Angeles", "state": "CA", "lat": 33.9425, "lon": -118.4081},
     "KMDW": {"city_name": "Chicago", "state": "IL", "lat": 41.7868, "lon": -87.7522},
     "KMIA": {"city_name": "Miami", "state": "FL", "lat": 25.7959, "lon": -80.2870},
     "KMSP": {"city_name": "Minneapolis", "state": "MN", "lat": 44.8848, "lon": -93.2223},
-    "KMSY": {"city_name": "New Orleans", "state": "LA", "lat": 29.9934, "lon": -90.2580},
-    # KDAL removed: Kalshi settles Dallas on KDFW
-    # KNYC: Central Park station (40.7128, -74.0060), NOT JFK
     "KNYC": {"city_name": "New York", "state": "NY", "lat": 40.7128, "lon": -74.0060},
-    "KOKC": {"city_name": "Oklahoma City", "state": "OK", "lat": 35.3931, "lon": -97.6007},
     "KPHL": {"city_name": "Philadelphia", "state": "PA", "lat": 39.8744, "lon": -75.2424},
     "KPHX": {"city_name": "Phoenix", "state": "AZ", "lat": 33.4342, "lon": -112.0116},
-    "KSAT": {"city_name": "San Antonio", "state": "TX", "lat": 29.5337, "lon": -98.4698},
     "KSEA": {"city_name": "Seattle", "state": "WA", "lat": 47.4502, "lon": -122.3088},
     "KSFO": {"city_name": "San Francisco", "state": "CA", "lat": 37.6213, "lon": -122.3790},
 }
+
+# Stations removed from registry (negative-EV or duplicates)
+# KDAL: duplicate of KDFW — Kalshi settles Dallas on KDFW
+# KLAS: no price fetcher mapping → 0.50 fallback → negative-EV
+# KMSY: no price fetcher mapping → 0.50 fallback → negative-EV
+# KOKC: no price fetcher mapping → 0.50 fallback → negative-EV
+# KSAT: no price fetcher mapping → 0.50 fallback → negative-EV
+_REMOVED_STATIONS = {"KDAL", "KLAS", "KMSY", "KOKC", "KSAT"}
 
 
 def _try_kalshi_discovery():
@@ -96,7 +99,11 @@ def _try_settlement_epochs():
 @lru_cache(maxsize=1)
 def get_all_stations():
     """
-    Returns the authoritative list of station codes.
+    Returns the authoritative list of viable station codes.
+    
+    Stations in _REMOVED_STATIONS are filtered out regardless of source.
+    These are negative-EV markets (no price fetcher mapping → 0.50 fallback)
+    or duplicates (e.g., KDAL duplicates KDFW).
     
     Fallback chain:
     1. Kalshi discovery (will fail — DNS in container)
@@ -107,17 +114,17 @@ def get_all_stations():
     # 1. Try Kalshi discovery
     stations = _try_kalshi_discovery()
     if stations:
-        return sorted(stations)
+        return sorted(set(stations) - _REMOVED_STATIONS)
     
     # 2. Try cache file
     stations = _try_cache_file()
     if stations:
-        return sorted(stations)
+        return sorted(set(stations) - _REMOVED_STATIONS)
     
     # 3. Try settlement epochs table
     stations = _try_settlement_epochs()
     if stations:
-        return sorted(stations)
+        return sorted(set(stations) - _REMOVED_STATIONS)
     
     # 4. Static fallback
     return sorted(list(_STATIC_MAPPING.keys()))
@@ -127,6 +134,8 @@ def get_all_stations():
 def get_station_mapping():
     """
     Returns dict of station -> {city_name, state, lat, lon}.
+    
+    Stations in _REMOVED_STATIONS are filtered out.
     
     Uses the same fallback chain as get_all_stations().
     """
@@ -139,10 +148,12 @@ def get_station_mapping():
             if isinstance(data, dict):
                 if 'stations' in data:
                     for code, info in data['stations'].items():
-                        result[code] = info
+                        if code not in _REMOVED_STATIONS:
+                            result[code] = info
                 else:
                     for code, info in data.items():
-                        result[code] = info
+                        if code not in _REMOVED_STATIONS:
+                            result[code] = info
                 if result:
                     return result
     except Exception:
@@ -167,6 +178,35 @@ def get_station_coordinates(station_code):
     mapping = get_station_mapping()
     info = mapping.get(station_code, {})
     return info.get('lat'), info.get('lon')
+
+
+def validate_station_registry():
+    """
+    Validate that every station in the registry has a corresponding
+    Kalshi price fetcher mapping. Returns a dict with validation results.
+    
+    This is the station registry validation gate — stations without
+    a price fetcher mapping get 0.50 fallback and are guaranteed negative-EV.
+    """
+    try:
+        from kalshi_price_fetcher import STATION_TO_KALSHI_CODE
+    except ImportError:
+        return {"error": "kalshi_price_fetcher not available", "valid": False}
+    
+    registry_stations = set(get_all_stations())
+    fetcher_stations = set(STATION_TO_KALSHI_CODE.keys())
+    
+    unmapped = registry_stations - fetcher_stations
+    extra = fetcher_stations - registry_stations
+    
+    return {
+        "valid": len(unmapped) == 0,
+        "registry_count": len(registry_stations),
+        "fetcher_count": len(fetcher_stations),
+        "unmapped_stations": sorted(unmapped),
+        "extra_in_fetcher": sorted(extra),
+        "removed_stations": sorted(_REMOVED_STATIONS),
+    }
 
 
 if __name__ == "__main__":
