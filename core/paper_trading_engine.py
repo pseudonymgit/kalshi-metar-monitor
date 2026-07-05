@@ -56,6 +56,14 @@ from kalshi_price_fetcher import (
     get_cache_stats as _get_cache_stats,
 )
 from station_time import is_within_entry_window as _is_within_entry_window
+from station_registry import (
+    get_all_stations as _get_all_stations,
+    get_station_mapping as _get_station_mapping,
+    validate_station_registry as _validate_station_registry,
+    get_cluster_for_station as _get_cluster_for_station,
+    CLUSTER_BUDGET_USD as _CLUSTER_BUDGET_USD,
+    CITY_PAIR_CAP_USD as _CITY_PAIR_CAP_USD,
+)
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
@@ -880,6 +888,59 @@ class PaperTrader:
                 'sizing_metadata': sizing_meta,
             }
         
+        # R4-1.6: Cluster budget caps + same-city pair hedging
+        # Adjust position size based on cluster exposure and city pair net exposure
+        cluster_name = _get_cluster_for_station(station)
+        cluster_adjusted_size = position_size
+        cluster_exposure = 0.0
+        city_pair_exposure = 0.0
+        
+        if cluster_name:
+            # Check current cluster exposure from open positions
+            cluster_exposure = self._get_cluster_exposure(cluster_name, date)
+            remaining_cluster_budget = _CLUSTER_BUDGET_USD - cluster_exposure
+            if remaining_cluster_budget <= 0:
+                return {
+                    'status': 'skipped',
+                    'reason': f'Cluster {cluster_name} budget exhausted (${cluster_exposure:.2f} >= ${_CLUSTER_BUDGET_USD:.2f})',
+                    'market_price': market_price,
+                    'analytical_prob': analytical_prob,
+                    'confidence': confidence,
+                    'metadata': metadata,
+                    'sizing_metadata': sizing_meta,
+                    'cluster': cluster_name,
+                    'cluster_exposure': cluster_exposure,
+                }
+            # Cap position size to remaining cluster budget
+            cluster_adjusted_size = min(cluster_adjusted_size, remaining_cluster_budget)
+        
+        # Check same-city pair net exposure (HIGH + LOW for same station)
+        city_pair_exposure = self._get_city_pair_exposure(station, date)
+        remaining_city_budget = _CITY_PAIR_CAP_USD - city_pair_exposure
+        if remaining_city_budget <= 0:
+            return {
+                'status': 'skipped',
+                'reason': f'City pair {station} net exposure cap reached (${city_pair_exposure:.2f} >= ${_CITY_PAIR_CAP_USD:.2f})',
+                'market_price': market_price,
+                'analytical_prob': analytical_prob,
+                'confidence': confidence,
+                'metadata': metadata,
+                'sizing_metadata': sizing_meta,
+                'station': station,
+                'city_pair_exposure': city_pair_exposure,
+            }
+        # Cap position size to remaining city pair budget
+        cluster_adjusted_size = min(cluster_adjusted_size, remaining_city_budget)
+        
+        # Apply the adjusted size
+        position_size = cluster_adjusted_size
+        sizing_meta['cluster'] = cluster_name
+        sizing_meta['cluster_exposure_before'] = round(cluster_exposure, 2)
+        sizing_meta['cluster_budget_cap'] = _CLUSTER_BUDGET_USD
+        sizing_meta['city_pair_exposure_before'] = round(city_pair_exposure, 2)
+        sizing_meta['city_pair_budget_cap'] = _CITY_PAIR_CAP_USD
+        sizing_meta['adjusted_size'] = round(position_size, 2)
+        
         confidence_factor = 0.5 + (confidence * 0.3)  # Legacy factor retained for compatibility
         
         # Actually fill the trade at market price (add fee impact)
@@ -1093,6 +1154,53 @@ class PaperTrader:
         
         # Fallback: heuristic price (for offline/backtest use)
         return self._get_market_price(station, date, market_type)
+    
+    def _get_cluster_exposure(self, cluster_name: str, as_of_date: str) -> float:
+        """R4-1.6: Get total USD exposure for a correlation cluster.
+        
+        Sums position_size_usd from all open trades for stations in the cluster.
+        """
+        from station_registry import get_cluster_stations
+        cluster_stations = get_cluster_stations(cluster_name)
+        if not cluster_stations:
+            return 0.0
+        
+        placeholders = ','.join('?' * len(cluster_stations))
+        conn = sqlite3.connect(self.paper_db)
+        c = conn.cursor()
+        try:
+            c.execute(f"""
+                SELECT COALESCE(SUM(position_size_usd), 0.0)
+                FROM trades
+                WHERE station IN ({placeholders})
+                  AND trade_date_utc = ?
+                  AND status = 'open'
+            """, (*cluster_stations, as_of_date))
+            result = c.fetchone()
+            return float(result[0]) if result else 0.0
+        finally:
+            conn.close()
+    
+    def _get_city_pair_exposure(self, station: str, as_of_date: str) -> float:
+        """R4-1.6: Get net USD exposure for a city's HIGH+LOW pair.
+        
+        Sums position_size_usd from all open trades for this station
+        (both HIGH and LOW markets) to check the city pair cap.
+        """
+        conn = sqlite3.connect(self.paper_db)
+        c = conn.cursor()
+        try:
+            c.execute("""
+                SELECT COALESCE(SUM(position_size_usd), 0.0)
+                FROM trades
+                WHERE station = ?
+                  AND trade_date_utc = ?
+                  AND status = 'open'
+            """, (station, as_of_date))
+            result = c.fetchone()
+            return float(result[0]) if result else 0.0
+        finally:
+            conn.close()
     
     def mark_positions_to_market(self, as_of_date: Optional[str] = None) -> Dict[str, Any]:
         """
