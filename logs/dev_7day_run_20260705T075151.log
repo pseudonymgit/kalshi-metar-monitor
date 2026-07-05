@@ -1,0 +1,3063 @@
+[2026-07-05 07:51:51 UTC] ======================================================================
+[2026-07-05 07:51:51 UTC] 7-DAY DEV PAPER TRADING VALIDATION RUN
+[2026-07-05 07:51:51 UTC] Run dates: 2025-08-21 to 2025-08-27
+[2026-07-05 07:51:51 UTC] Instance: DEV
+[2026-07-05 07:51:51 UTC] Stations: 19
+[2026-07-05 07:51:51 UTC] DEV DB: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/paper_trading_dev.db
+[2026-07-05 07:51:51 UTC] METAR DB: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db
+[2026-07-05 07:51:51 UTC] ======================================================================
+[2026-07-05 07:51:51 UTC] Restoring DEV DB from snapshot: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/snapshots/paper_trading_dev_001.db.gz
+[2026-07-05 07:51:51 UTC] DEV DB restored (86016 bytes)
+[2026-07-05 07:51:51 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:51 UTC] DAY 1/7 — 2025-08-21
+[2026-07-05 07:51:51 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.75
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.75 | Size: $79.30
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.63
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.63 | Size: $79.29
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.92
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.92 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.32
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.86
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.86 | Size: $79.32
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.32
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.86
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.86 | Size: $79.32
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.90
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.90 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.90
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.90 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.90
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.90 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.44
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.71
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.71 | Size: $79.44
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.71
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.71 | Size: $79.28
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC]   ⏭️ SKIPPED: ? ? — Insufficient edge (5.3% < 8.0%)
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.54
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.56
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.56 | Size: $79.54
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:52 UTC]     📍 Station: ?
+[2026-07-05 07:51:52 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:52 UTC]     📈 Direction: UP
+[2026-07-05 07:51:52 UTC]     💰 Size: $79.38
+[2026-07-05 07:51:52 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:52 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:52 UTC]     📉 Market odds: 0.56
+[2026-07-05 07:51:52 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:52 UTC]     📊 Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]     💵 Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:52 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:52 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:52 UTC]      Market odds: 0.56 | Size: $79.38
+[2026-07-05 07:51:52 UTC]      Sharpe: 10.7 | Coverage: 19/19
+[2026-07-05 07:51:52 UTC]      Running P&L: $+525.01
+[2026-07-05 07:51:52 UTC] 
+  Daily Summary: 23 executed, 1 skipped
+[2026-07-05 07:51:52 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:52 UTC] DAY 2/7 — 2025-08-22
+[2026-07-05 07:51:52 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.74
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.74 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC]   ⏭️ SKIPPED: ? ? — Insufficient edge (7.7% < 8.0%)
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.94 | Size: $79.29
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.31
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.64
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.64 | Size: $79.29
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.90
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.90 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.86
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.86 | Size: $79.33
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.86
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.86 | Size: $79.33
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.83
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.83 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.94 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.44
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.73
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.73 | Size: $79.44
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.73
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.73 | Size: $79.28
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.59
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.55
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.55 | Size: $79.59
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.43
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.55
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.55 | Size: $79.43
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:53 UTC]     📍 Station: ?
+[2026-07-05 07:51:53 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:53 UTC]     📈 Direction: UP
+[2026-07-05 07:51:53 UTC]     💰 Size: $79.59
+[2026-07-05 07:51:53 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:53 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:53 UTC]     📉 Market odds: 0.55
+[2026-07-05 07:51:53 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:53 UTC]     📊 Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]     💵 Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:53 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:53 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:53 UTC]      Market odds: 0.55 | Size: $79.59
+[2026-07-05 07:51:53 UTC]      Sharpe: 9.5 | Coverage: 19/19
+[2026-07-05 07:51:53 UTC]      Running P&L: $+804.04
+[2026-07-05 07:51:53 UTC] 
+  Daily Summary: 22 executed, 1 skipped
+[2026-07-05 07:51:53 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:53 UTC] DAY 3/7 — 2025-08-23
+[2026-07-05 07:51:53 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.31
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.75
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.75 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.94 | Size: $79.29
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.94 | Size: $79.29
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.65
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.65 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.89
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.89 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.89
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.89 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.85
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.85 | Size: $79.33
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.85
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.85 | Size: $79.33
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.89
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.89 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.44
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.75
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.75 | Size: $79.44
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.75
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.75 | Size: $79.28
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:54 UTC]     📍 Station: ?
+[2026-07-05 07:51:54 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:54 UTC]     📈 Direction: UP
+[2026-07-05 07:51:54 UTC]     💰 Size: $79.45
+[2026-07-05 07:51:54 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:54 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:54 UTC]     📉 Market odds: 0.54
+[2026-07-05 07:51:54 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:54 UTC]     📊 Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]     💵 Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:54 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:54 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:54 UTC]      Market odds: 0.54 | Size: $79.45
+[2026-07-05 07:51:54 UTC]      Sharpe: 10.4 | Coverage: 19/19
+[2026-07-05 07:51:54 UTC]      Running P&L: $+1,116.37
+[2026-07-05 07:51:54 UTC] 
+  Daily Summary: 22 executed, 0 skipped
+[2026-07-05 07:51:54 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:54 UTC] DAY 4/7 — 2025-08-24
+[2026-07-05 07:51:54 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.76
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.76 | Size: $79.30
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.76
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.76 | Size: $79.30
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.94 | Size: $79.30
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.94 | Size: $79.30
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.67
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.67 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.87
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.87 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.87
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.87 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.31
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.82
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.82 | Size: $79.33
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.82
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.82 | Size: $79.33
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.89
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.89 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.89
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.89 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC]   ⏭️ SKIPPED: ? ? — Insufficient edge (2.4% < 8.0%)
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.77
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.77 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.45
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.54
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.54 | Size: $79.45
+[2026-07-05 07:51:55 UTC]      Sharpe: 10.8 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,416.57
+[2026-07-05 07:51:55 UTC] 
+  Daily Summary: 23 executed, 1 skipped
+[2026-07-05 07:51:55 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:55 UTC] DAY 5/7 — 2025-08-25
+[2026-07-05 07:51:55 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.77
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.77 | Size: $79.31
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.32
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.94 | Size: $79.32
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.68
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.68 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.84
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.84 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.31
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.79
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.79 | Size: $79.33
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.83
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.83 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.83
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.83 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.88
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.88 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.88
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.88 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.95 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.44
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.78
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.78 | Size: $79.44
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.78
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.78 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.78
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.78 | Size: $79.28
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:55 UTC]     📍 Station: ?
+[2026-07-05 07:51:55 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:55 UTC]     📈 Direction: UP
+[2026-07-05 07:51:55 UTC]     💰 Size: $79.40
+[2026-07-05 07:51:55 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:55 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:55 UTC]     📉 Market odds: 0.53
+[2026-07-05 07:51:55 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:55 UTC]     📊 Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]     💵 Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:55 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:55 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:55 UTC]      Market odds: 0.53 | Size: $79.40
+[2026-07-05 07:51:55 UTC]      Sharpe: 11.2 | Coverage: 19/19
+[2026-07-05 07:51:55 UTC]      Running P&L: $+1,722.91
+[2026-07-05 07:51:55 UTC] 
+  Daily Summary: 21 executed, 0 skipped
+[2026-07-05 07:51:55 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:55 UTC] DAY 6/7 — 2025-08-26
+[2026-07-05 07:51:55 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.76
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.76 | Size: $79.31
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.76
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.76 | Size: $79.31
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.33
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.33
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.33
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.29
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.68
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.68 | Size: $79.28
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.81
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.81 | Size: $79.28
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.81
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.81 | Size: $79.28
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $48.11
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.78
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: MEDIUM (0.68)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.68)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: MEDIUM (0.68)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.78 | Size: $48.11
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC]   ⏭️ SKIPPED: ? ? — Insufficient edge (3.6% < 8.0%)
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.82
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.82 | Size: $79.28
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.87
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.87 | Size: $79.28
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $48.07
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: MEDIUM (0.67)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.67)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: MEDIUM (0.67)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $48.07
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $48.07
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: MEDIUM (0.67)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.67)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: MEDIUM (0.67)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.95 | Size: $48.07
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC]   ⏭️ SKIPPED: ? ? — Insufficient edge (2.5% < 8.0%)
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.79
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.79 | Size: $79.28
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.54
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.54
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.54 | Size: $79.54
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:56 UTC]     📍 Station: ?
+[2026-07-05 07:51:56 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:56 UTC]     📈 Direction: UP
+[2026-07-05 07:51:56 UTC]     💰 Size: $79.38
+[2026-07-05 07:51:56 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:56 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:56 UTC]     📉 Market odds: 0.54
+[2026-07-05 07:51:56 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:56 UTC]     📊 Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]     💵 Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:56 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:56 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:56 UTC]      Market odds: 0.54 | Size: $79.38
+[2026-07-05 07:51:56 UTC]      Sharpe: 11.3 | Coverage: 19/19
+[2026-07-05 07:51:56 UTC]      Running P&L: $+2,023.52
+[2026-07-05 07:51:56 UTC] 
+  Daily Summary: 21 executed, 2 skipped
+[2026-07-05 07:51:56 UTC] 
+────────────────────────────────────────────────────────────
+[2026-07-05 07:51:56 UTC] DAY 7/7 — 2025-08-27
+[2026-07-05 07:51:56 UTC] ────────────────────────────────────────────────────────────
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.94 | Size: $79.30
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.31
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.94 | Size: $79.31
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.74
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.74 | Size: $79.30
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.74
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.74 | Size: $79.30
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.34
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.93
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.93 | Size: $79.34
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.94 | Size: $79.29
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.94
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.94 | Size: $79.29
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.68
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.68 | Size: $79.28
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.29
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.78
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.78 | Size: $79.29
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.30
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.95
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.95 | Size: $79.30
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC]   ⏭️ SKIPPED: ? ? — Insufficient edge (2.9% < 8.0%)
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.81
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.81 | Size: $79.28
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.86
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.86 | Size: $79.28
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.79
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.79 | Size: $79.28
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.28
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.79
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.73)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.73)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.79 | Size: $79.28
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  📡 DISCORD ALERT (not sent — no webhook configured):
+[2026-07-05 07:51:57 UTC]     📍 Station: ?
+[2026-07-05 07:51:57 UTC]     📊 Market: HIGH
+[2026-07-05 07:51:57 UTC]     📈 Direction: UP
+[2026-07-05 07:51:57 UTC]     💰 Size: $79.36
+[2026-07-05 07:51:57 UTC]     🌡️ Current bucket: 0
+[2026-07-05 07:51:57 UTC]     🎯 Trading bucket: 0
+[2026-07-05 07:51:57 UTC]     📉 Market odds: 0.55
+[2026-07-05 07:51:57 UTC]     ✅ Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]     🔝 Top signals: ? (conf=0.74)
+[2026-07-05 07:51:57 UTC]     📊 Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]     💵 Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  ✅ EXECUTED: ? ? UP
+[2026-07-05 07:51:57 UTC]      Trade Conf: HIGH (0.74)
+[2026-07-05 07:51:57 UTC]      Current bucket: 0 | Trading bucket: 0
+[2026-07-05 07:51:57 UTC]      Market odds: 0.55 | Size: $79.36
+[2026-07-05 07:51:57 UTC]      Sharpe: 11.0 | Coverage: 19/19
+[2026-07-05 07:51:57 UTC]      Running P&L: $+2,205.53
+[2026-07-05 07:51:57 UTC] 
+  Daily Summary: 16 executed, 1 skipped
+[2026-07-05 07:51:57 UTC] 
+======================================================================
+[2026-07-05 07:51:57 UTC] GENERATING 7-DAY SUMMARY REPORT
+[2026-07-05 07:51:57 UTC] ======================================================================
+[2026-07-05 07:51:57 UTC] Summary report saved: /home/node/.openclaw/workspace/prototypes/weather-engine-source/reports/dev_7day_summary_20260705T075151.json
+[2026-07-05 07:51:57 UTC] 
+  Total trades: 148
+[2026-07-05 07:51:57 UTC]   Executed: 148
+[2026-07-05 07:51:57 UTC]   Skipped: 6
+[2026-07-05 07:51:57 UTC]   Settled: 145
+[2026-07-05 07:51:57 UTC]   Win rate: 89.7%
+[2026-07-05 07:51:57 UTC]   Total P&L: $+1,990.86
+[2026-07-05 07:51:57 UTC]   Sharpe ratio: 10.97
+[2026-07-05 07:51:57 UTC]   Signals by type: {
+  "reversion_after_settlement": {
+    "count": 103,
+    "wins": 101,
+    "losses": 0,
+    "total_pnl": 1677.15,
+    "win_rate": "100.0%",
+    "avg_confidence": 0.734
+  },
+  "late_day_momentum_hourly": {
+    "count": 15,
+    "wins": 13,
+    "losses": 2,
+    "total_pnl": 329.36,
+    "win_rate": "86.7%",
+    "avg_confidence": 0.735
+  },
+  "calendar_climatology": {
+    "count": 30,
+    "wins": 16,
+    "losses": 13,
+    "total_pnl": -15.64,
+    "win_rate": "55.2%",
+    "avg_confidence": 0.733
+  }
+}
+[2026-07-05 07:51:57 UTC]   Promotion recommendation: ADVANCE to PROD
+[2026-07-05 07:51:57 UTC] Continuity artifact updated: /home/node/.openclaw/workspace/.meta/continuity/weather-engine/dev-7day-paper-trading.md
+[2026-07-05 07:51:57 UTC] 
+======================================================================
+[2026-07-05 07:51:57 UTC] 7-DAY DEV PAPER TRADING VALIDATION COMPLETE
+[2026-07-05 07:51:57 UTC] ======================================================================

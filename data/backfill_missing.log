@@ -1,0 +1,113 @@
+============================================================
+Processing KAUS (Austin) - Station ID: 722540-13958
+  Fetching 2021...
+    No data for 2021
+  Fetching 2022...
+    No data for 2022
+  Fetching 2023...
+    No data for 2023
+  Fetching 2024...
+    No data for 2024
+  Fetching 2025...
+    No data for 2025
+
+KAUS complete!
+============================================================
+Processing KDFW (Dallas DFW) - Station ID: 722590-03927
+  Fetching 2021...
+    Fetched 8758 observations for 2021
+    Processed 365 daily records
+  Fetching 2022...
+    Fetched 8759 observations for 2022
+    Processed 365 daily records
+  Fetching 2023...
+    Fetched 8760 observations for 2023
+    Processed 365 daily records
+  Fetching 2024...
+    Fetched 8774 observations for 2024
+    Processed 366 daily records
+  Fetching 2025...
+    Fetched 5715 observations for 2025
+    Processed 239 daily records
+
+KDFW complete!
+============================================================
+Processing KHOU (Houston) - Station ID: 722430-12918
+  Fetching 2021...
+    No data for 2021
+  Fetching 2022...
+    No data for 2022
+  Fetching 2023...
+    No data for 2023
+  Fetching 2024...
+    No data for 2024
+  Fetching 2025...
+    No data for 2025
+
+KHOU complete!
+  KAUS: 0 daily records, 0 total observations
+  KDFW: 1700 daily records, 40766 total observations
+  KHOU: 0 daily records, 0 total observations
+============================================================
+Processing KAUS (Austin) - Station ID: 722540-13904
+  FTP check error: name 'ftplib' is not defined
+  Fetching 2021...
+    Fetched 8747 observations for 2021
+    Processed 365 daily records
+  Fetching 2022...
+    Fetched 8745 observations for 2022
+    Processed 365 daily records
+  Fetching 2023...
+    Fetched 8757 observations for 2023
+    Processed 365 daily records
+  Fetching 2024...
+    Fetched 8781 observations for 2024
+    Processed 366 daily records
+  Fetching 2025...
+    Fetched 5714 observations for 2025
+    Processed 239 daily records
+
+KAUS complete!
+============================================================
+Processing KDFW (Dallas DFW) - Station ID: 722590-03927
+  FTP check error: name 'ftplib' is not defined
+  Fetching 2021...
+    Fetched 8758 observations for 2021
+    Processed 365 daily records
+  Fetching 2022...
+    Fetched 8759 observations for 2022
+    Processed 365 daily records
+  Fetching 2023...
+    Fetched 8760 observations for 2023
+    Processed 365 daily records
+  Fetching 2024...
+    Fetched 8774 observations for 2024
+    Processed 366 daily records
+  Fetching 2025...
+    Fetched 5715 observations for 2025
+    Processed 239 daily records
+
+KDFW complete!
+============================================================
+Processing KHOU (Houston) - Station ID: 722430-12960
+  FTP check error: name 'ftplib' is not defined
+  Fetching 2021...
+    Fetched 8759 observations for 2021
+    Processed 365 daily records
+  Fetching 2022...
+    Fetched 8760 observations for 2022
+    Processed 365 daily records
+  Fetching 2023...
+    Fetched 8760 observations for 2023
+    Processed 365 daily records
+  Fetching 2024...
+    Fetched 8784 observations for 2024
+    Processed 366 daily records
+  Fetching 2025...
+    Fetched 5717 observations for 2025
+    Processed 239 daily records
+
+KHOU complete!
+  KAUS: 1700 daily records, 40744 total observations
+  KDFW: 1700 daily records, 40766 total observations
+  KHOU: 1700 daily records, 40780 total observations

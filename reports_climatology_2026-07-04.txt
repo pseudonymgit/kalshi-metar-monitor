@@ -1,0 +1,39 @@
+ENHANCED CLIMATOLOGY REPORT — 2026-07-04
+====================================================================================================
+Analysis for 2026-07-04 (Month-Day: 07-04)
+
+Station Sample  Base↑    Roll7↑   Analytics↑ Conf   Regime         
+--------------------------------------------------------------------------------
+KATL   10      69.61%   69.61%   69.61%     40.0%  ne/ne          
+KBOS   10      30.39%   30.39%   30.39%     40.0%  ne/ne          
+KLAX   10      50.00%   50.00%   50.00%     40.0%  ne/ne          
+KJFK   1       50.00%   50.00%   50.00%     40.0%  ne/ne          
+
+Detailed Breakdown for KATL:
+  Base Climo Stats:
+    Sample Size: 10 instances of date 07-04
+    Historic Up Rate: 69.61%
+    Avg Temp: 82.3F
+    Seasonal Index: 0.249
+    Volatility: 1.4
+  7-Day Rolling Trends (most recent):
+    Samples: 0
+    Recent Up Rate: 50.00%
+    Avg Temp: NoneF
+    Avg Change: +0.0F
+    Volatility: 0.00
+  Regime Conditions:
+    ENSO: neutral
+    AO: neutral
+    NAO: neutral
+  ANALYTICAL SUMMARY:
+    Analytical UP Probability: 69.61%
+    Overall Confidence: 40.00%
+
+Methodology:
+ - Base calendar rates using temperature bucket frequencies
+ - 7/14/30-day rolling windows weighted to catch recent shifts
+ - ENSO/AO/NAO regime adjustments where climate data available
+ - Confidence adjusted for data sample size and volatility
+
+Last updated: 2026-07-04T18:00:10.553781+00:00

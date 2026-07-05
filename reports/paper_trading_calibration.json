@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-07-04T18:20:36.120870+00:00",
+  "latest_metrics": {
+    "brier_score": 0.2,
+    "expected_calibration_error": 0.02,
+    "average_confidence": 0.7349738323724018,
+    "total_trades_analyzed": 24,
+    "resolved_trades": 24
+  }
+}

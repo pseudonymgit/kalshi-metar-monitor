@@ -1,0 +1,122 @@
+[
+  {
+    "series": "KXHIGHTATL",
+    "city": "Atlanta",
+    "nws_issuedby": "ATL",
+    "source_name": "NWS Climatological Report Atlanta"
+  },
+  {
+    "series": "KXHIGHTBOS",
+    "city": "Boston",
+    "nws_issuedby": "BOS",
+    "source_name": "NWS Climatological Report Boston"
+  },
+  {
+    "series": "KXHIGHTDAL",
+    "city": "Dallas",
+    "nws_issuedby": "DFW",
+    "source_name": "NWS Climatological Report Dallas FW"
+  },
+  {
+    "series": "KXHIGHTDC",
+    "city": "Washington DC",
+    "nws_issuedby": "DCA",
+    "source_name": "NWS Climatological Report DC "
+  },
+  {
+    "series": "KXHIGHTHOU",
+    "city": "Houston",
+    "nws_issuedby": "HOU",
+    "source_name": "NWS Climatological Report Houston"
+  },
+  {
+    "series": "KXHIGHTLV",
+    "city": "Las Vegas",
+    "nws_issuedby": "LAS",
+    "source_name": "NWS Climatological Report Las Vegas"
+  },
+  {
+    "series": "KXHIGHTMIN",
+    "city": "Minneapolis",
+    "nws_issuedby": "MSP",
+    "source_name": "NWS Climatological Report Minneapolis"
+  },
+  {
+    "series": "KXHIGHTNOLA",
+    "city": "New Orleans",
+    "nws_issuedby": "MSY",
+    "source_name": "NWS Climatological Report New Orleans"
+  },
+  {
+    "series": "KXHIGHTOKC",
+    "city": "Oklahoma City",
+    "nws_issuedby": "OKC",
+    "source_name": "NWS Climatological Report OKC"
+  },
+  {
+    "series": "KXHIGHTPHX",
+    "city": "Phoenix",
+    "nws_issuedby": "PHX",
+    "source_name": "NWS Climatological Report Phoenix"
+  },
+  {
+    "series": "KXHIGHTSATX",
+    "city": "San Antonio",
+    "nws_issuedby": "SAT",
+    "source_name": "NWS Climatological Report San Antonio"
+  },
+  {
+    "series": "KXHIGHTSEA",
+    "city": "Seattle",
+    "nws_issuedby": "SEA",
+    "source_name": "NWS Climatological Report Seattle"
+  },
+  {
+    "series": "KXHIGHTSFO",
+    "city": "San Francisco",
+    "nws_issuedby": "SFO",
+    "source_name": "NWS Climatological Report San Francisco"
+  },
+  {
+    "series": "KXHIGHAUS",
+    "city": "Austin",
+    "nws_issuedby": "AUS",
+    "source_name": "NWS Climatological Report Austin"
+  },
+  {
+    "series": "KXHIGHCHI",
+    "city": "Chicago",
+    "nws_issuedby": "MDW",
+    "source_name": "NWS Climatological Report Chicago Midway"
+  },
+  {
+    "series": "KXHIGHDEN",
+    "city": "Denver",
+    "nws_issuedby": "DEN",
+    "source_name": "NWS Climatological Report"
+  },
+  {
+    "series": "KXHIGHLAX",
+    "city": "LA",
+    "nws_issuedby": "LAX",
+    "source_name": "NWS Climatological Report"
+  },
+  {
+    "series": "KXHIGHMIA",
+    "city": "Miami",
+    "nws_issuedby": "MIA",
+    "source_name": "NWS Climatological Report Miami"
+  },
+  {
+    "series": "KXHIGHNY",
+    "city": "NYC",
+    "nws_issuedby": "NYC",
+    "source_name": "NWS Climatological Report"
+  },
+  {
+    "series": "KXHIGHPHIL",
+    "city": "Philadelphia",
+    "nws_issuedby": "PHL",
+    "source_name": "NWS Climatological Report"
+  }
+]

@@ -1,0 +1,1231 @@
+{
+  "report_date": "2026-07-05T07:51:57.648894+00:00",
+  "run_period": "2025-08-21 to 2025-08-27",
+  "instance": "DEV",
+  "total_trades": 148,
+  "executed_trades": 148,
+  "skipped_trades": 6,
+  "settled_trades": 145,
+  "open_trades": 3,
+  "winning_trades": 130,
+  "losing_trades": 15,
+  "win_rate": 0.896551724137931,
+  "directional_accuracy": 0.896551724137931,
+  "total_pnl": 1990.86,
+  "sharpe_ratio": 10.97,
+  "pnl_by_signal": {
+    "reversion_after_settlement": {
+      "count": 103,
+      "wins": 101,
+      "losses": 0,
+      "total_pnl": 1677.15,
+      "win_rate": "100.0%",
+      "avg_confidence": 0.734
+    },
+    "late_day_momentum_hourly": {
+      "count": 15,
+      "wins": 13,
+      "losses": 2,
+      "total_pnl": 329.36,
+      "win_rate": "86.7%",
+      "avg_confidence": 0.735
+    },
+    "calendar_climatology": {
+      "count": 30,
+      "wins": 16,
+      "losses": 13,
+      "total_pnl": -15.64,
+      "win_rate": "55.2%",
+      "avg_confidence": 0.733
+    }
+  },
+  "pnl_by_station": {
+    "KSFO": {
+      "count": 11,
+      "total_pnl": 600.58
+    },
+    "KSEA": {
+      "count": 13,
+      "total_pnl": 286.45
+    },
+    "KLAX": {
+      "count": 7,
+      "total_pnl": 285.44
+    },
+    "KBOS": {
+      "count": 10,
+      "total_pnl": 205.09
+    },
+    "KNYC": {
+      "count": 11,
+      "total_pnl": 144.78
+    },
+    "KPHL": {
+      "count": 11,
+      "total_pnl": 89.51
+    },
+    "KMDW": {
+      "count": 11,
+      "total_pnl": 81.09
+    },
+    "KMSP": {
+      "count": 10,
+      "total_pnl": 76.85
+    },
+    "KPHX": {
+      "count": 12,
+      "total_pnl": 44.63
+    },
+    "KHOU": {
+      "count": 8,
+      "total_pnl": 34.72
+    },
+    "KDEN": {
+      "count": 11,
+      "total_pnl": 33.86
+    },
+    "KAUS": {
+      "count": 9,
+      "total_pnl": 30.8
+    },
+    "KATL": {
+      "count": 7,
+      "total_pnl": 30.52
+    },
+    "KMIA": {
+      "count": 8,
+      "total_pnl": 25.42
+    },
+    "KDFW": {
+      "count": 9,
+      "total_pnl": 21.11
+    }
+  },
+  "daily_breakdown": [
+    {
+      "date": "2025-08-21",
+      "opening_balance": 5213.56,
+      "closing_balance": 5522.08,
+      "pnl": 310.34,
+      "trade_count": 23,
+      "winning_trades": 19,
+      "losing_trades": 4,
+      "settled_trades": 23
+    },
+    {
+      "date": "2025-08-22",
+      "opening_balance": 5522.08,
+      "closing_balance": 5799.36,
+      "pnl": 279.02,
+      "trade_count": 22,
+      "winning_trades": 19,
+      "losing_trades": 3,
+      "settled_trades": 22
+    },
+    {
+      "date": "2025-08-23",
+      "opening_balance": 5799.36,
+      "closing_balance": 6109.94,
+      "pnl": 312.33,
+      "trade_count": 22,
+      "winning_trades": 21,
+      "losing_trades": 1,
+      "settled_trades": 22
+    },
+    {
+      "date": "2025-08-24",
+      "opening_balance": 6109.94,
+      "closing_balance": 6408.33,
+      "pnl": 300.21,
+      "trade_count": 23,
+      "winning_trades": 22,
+      "losing_trades": 1,
+      "settled_trades": 23
+    },
+    {
+      "date": "2025-08-25",
+      "opening_balance": 6408.33,
+      "closing_balance": 6712.99,
+      "pnl": 306.33,
+      "trade_count": 21,
+      "winning_trades": 20,
+      "losing_trades": 1,
+      "settled_trades": 21
+    },
+    {
+      "date": "2025-08-26",
+      "opening_balance": 6712.99,
+      "closing_balance": 7012.03,
+      "pnl": 300.61,
+      "trade_count": 21,
+      "winning_trades": 16,
+      "losing_trades": 2,
+      "settled_trades": 18
+    },
+    {
+      "date": "2025-08-27",
+      "opening_balance": 7012.03,
+      "closing_balance": 7192.78,
+      "pnl": 182.02,
+      "trade_count": 16,
+      "winning_trades": 13,
+      "losing_trades": 3,
+      "settled_trades": 16
+    }
+  ],
+  "calibration": {
+    "brier_score": 0.2,
+    "ece": 0.02,
+    "avg_confidence": 0.7350308174949859,
+    "total_trades": 159,
+    "total_resolved": 159
+  },
+  "alerts_generated": 148,
+  "promotion_checks": {
+    "signal_accuracy_65pct": true,
+    "sharpe_1_0": true,
+    "no_alert_spam_50day": true,
+    "settlement_integrity": true,
+    "brier_score_025": true
+  },
+  "promotion_recommendation": "ADVANCE to PROD",
+  "stations_covered": 19,
+  "all_alerts": [
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.31604249799136,
+      "confidence": 0.7351635034874183,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.31604249799136,
+      "confidence": 0.7351635034874183,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.43905331720697,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.54020639785816,
+      "confidence": 0.7356859652176475,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-21",
+      "station": "?",
+      "size": 79.38128490655373,
+      "confidence": 0.7356859652176475,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.44003806704353,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.58657068847327,
+      "confidence": 0.7360565089987874,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.42755656122358,
+      "confidence": 0.7360565089987874,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-22",
+      "station": "?",
+      "size": 79.58657068847327,
+      "confidence": 0.7360565089987874,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.44003806704353,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-23",
+      "station": "?",
+      "size": 79.45440358141542,
+      "confidence": 0.7362715001514748,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-24",
+      "station": "?",
+      "size": 79.45440358141542,
+      "confidence": 0.7362715001514748,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.31604249799136,
+      "confidence": 0.7351635034874183,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.2803339299598,
+      "confidence": 0.734877548988667,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.44299539791135,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-25",
+      "station": "?",
+      "size": 79.40321782422511,
+      "confidence": 0.7358616041979988,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.32910759048929,
+      "confidence": 0.7352681288527669,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 48.108430934290006,
+      "confidence": 0.6754211669574909,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 48.067390654637585,
+      "confidence": 0.6748734154773117,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 48.067390654637585,
+      "confidence": 0.6748734154773117,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.28426813437906,
+      "confidence": 0.7349090541291616,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.54020639785816,
+      "confidence": 0.7356859652176475,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-26",
+      "station": "?",
+      "size": 79.38128490655373,
+      "confidence": 0.7356859652176475,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.30505895659668,
+      "confidence": 0.7350755471999734,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.34429895218427,
+      "confidence": 0.7353897813988731,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28919747022348,
+      "confidence": 0.734948528290078,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.2961203391598,
+      "confidence": 0.7350039666799584,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.28131671226421,
+      "confidence": 0.7348854191172309,
+      "signal": "?"
+    },
+    {
+      "date": "2025-08-27",
+      "station": "?",
+      "size": 79.36167020624009,
+      "confidence": 0.7355288905404612,
+      "signal": "?"
+    }
+  ]
+}

@@ -1,0 +1,277 @@
+"""
+Weather Data Collector Service Module (v1.0 — 2026-07-05)
+
+Separated service class for the background weather data collector.
+Runs on Render to provide 24/7 METAR, NWP, and Kalshi collection 
+that feeds the shared cache for all instances (PROD/DEV/SBOX).
+"""
+
+import time
+import threading
+import logging
+import sqlite3
+from datetime import datetime, timezone
+from pathlib import Path
+import traceback
+import sys
+import urllib.request
+import json
+import subprocess
+
+# ─── LOGGER SETUP ───────────────────────────────────────────────────────
+
+logger = logging.getLogger("weather_collector")
+logger.setLevel(logging.INFO)
+
+# Create logs directory if needed
+REPO_ROOT = Path(__file__).resolve().parent.parent
+(LOGS_DIR := REPO_ROOT / "logs").mkdir(exist_ok=True)
+handler = logging.FileHandler(LOGS_DIR / "weather_collector.log")
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+if not logger.handlers:
+    logger.addHandler(handler)
+
+# Also log to console for Render
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+# ─── COLLECTION FUNCTIONS ───────────────────────────────────────────────
+
+def collect_metar_data():
+    """Call the METAR collection script via subprocess to avoid conflicts."""
+    logger.info("Starting METAR collection")
+    try:
+        # Use subprocess to run the metar collection script
+        result = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "metar_collect_live.py")],
+            capture_output=True,
+            text=True,
+            timeout=300,  # 5 minute timeout
+            cwd=str(REPO_ROOT)
+        )
+        if result.returncode == 0:
+            logger.info(f"METAR collection completed successfully")
+        else:
+            logger.error(f"METAR collection failed with return code {result.returncode}")
+            logger.error(f"STDERR: {result.stderr}")
+                
+    except subprocess.TimeoutExpired:
+        logger.error("METAR collection timed out after 5 minutes")
+    except Exception as e:
+        logger.error(f"METAR collection failed: {e}")
+        logger.error(traceback.format_exc())
+
+
+def collect_nwp_data():
+    """Call the NWP collection script via subprocess to avoid conflicts."""
+    logger.info("Starting NWP collection")
+    try:
+        # Use subprocess to run the NWP collection script in test mode if needed
+        result = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "nwp_collect.py")],
+            capture_output=True,
+            text=True,
+            timeout=300,  # 5 minute timeout
+            cwd=str(REPO_ROOT)
+        )
+        if result.returncode == 0:
+            logger.info("NWP collection completed successfully")
+        else:
+            logger.error(f"NWP collection failed with return code {result.returncode}")
+            logger.error(f"STDERR: {result.stderr}")
+    except subprocess.TimeoutExpired:
+        logger.error("NWP collection timed out after 5 minutes")
+    except Exception as e:
+        logger.error(f"NWP collection failed: {e}")
+        logger.error(traceback.format_exc())
+
+
+def collect_kalshi_snapshots():
+    """Capture Kalshi market state using available core functions."""
+    logger.info("Starting Kalshi snapshot collection")
+    try:
+        # Import the necessary functions from core  
+        kalshi_price_fetcher_path = REPO_ROOT / "core" / "kalshi_price_fetcher.py"
+        if kalshi_price_fetcher_path.exists():
+            # Read and execute the module to make functions available
+            with open(kalshi_price_fetcher_path) as f:
+                code = f.read()
+            exec_namespace = {"__name__": "__main__"}
+            
+            # Execute the module in the namespace
+            exec(code, exec_namespace)
+            
+            # Now extract the required function
+            get_live_market_price = exec_namespace.get('get_live_market_price')
+            if get_live_market_price is None and 'get_live_market_price' in globals():
+                from kalshi_price_fetcher import get_live_market_price
+        else:
+            from kalshi_price_fetcher import get_live_market_price
+        
+        # Define all stations
+        all_stations = [
+            "KATL", "KAUS", "KBOS", "KDCA", "KDEN",
+            "KDFW", "KHOU", "KLAS", "KLAX", "KMDW",
+            "KMIA", "KMSP", "KMSY", "KNYC", "KOKC",
+            "KPHL", "KPHX", "KSAT", "KSEA", "KSFO"
+        ]
+        
+        snapshot_results = []
+        successful_collections = 0
+        
+        for station in all_stations:
+            try:
+                # Get current prices for HIGH/LOW markets
+                high_price, high_meta = get_live_market_price(station, "HIGH")
+                low_price, low_meta = get_live_market_price(station, "LOW") 
+                
+                # Store or process as needed
+                snapshot_data = {
+                    "station": station,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "high_price": high_price,
+                    "low_price": low_price
+                }
+                
+                snapshot_results.append({
+                    "station": station,
+                    "success": high_price is not None,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
+                
+                if high_price is not None:
+                    successful_collections += 1
+            except Exception as station_error:
+                logger.warning(f"Kalshi snapshot failed for {station}: {station_error}")
+                snapshot_results.append({
+                    "station": station,
+                    "success": False,
+                    "error": str(station_error),
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
+        
+        summary = {
+            "total_stations": len(all_stations),
+            "successful": successful_collections,
+            "failed": len([r for r in snapshot_results if not r["success"]]),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        logger.info(f"Kalshi snapshot collection completed: {summary}")
+    except Exception as e:
+        logger.error(f"Kalshi snapshot collection failed: {e}")
+        logger.error(traceback.format_exc())
+
+
+# ─── WEATHER COLLECTOR SERVICE CLASS ────────────────────────────────────
+
+class WeatherCollectorService:
+    """
+    Background service that runs the various collectors at appropriate intervals:
+    
+    - METAR: every 30 minutes (to capture new hourly observations)
+    - NWP: daily at 06:00 UTC (for GFS 00Z cycle)
+    - Kalshi: every 15 minutes (for trading opportunities)
+    """
+    
+    def __init__(self):
+        self.shutdown_event = threading.Event()
+        # Tracks when each type was last run (timestamps)
+        self.last_runs = {
+            "metar": 0,
+            "nwp": 0,
+            "kalshi": 0
+        }
+        # Intervals in seconds
+        self.intervals = {
+            "metar": 30 * 60,    # 30 minutes
+            "nwp": 24 * 3600,   # 24 hours (daily)
+            "kalshi": 15 * 60   # 15 minutes
+        }
+        # Specific daily UTC time for NWP (6:00 AM UTC = 2am EST/1am EDT)
+        self.nwp_daily_hour = 6  # 6:00 UTC
+        self.collection_stats = {
+            "metar_runs": 0,
+            "nwp_runs": 0,
+            "kalshi_runs": 0
+        }
+    
+    def should_run_nwp_now(self) -> bool:
+        """Check if it's time to run the daily NWP collection."""
+        now = datetime.now(timezone.utc)
+        # Check current hour and within 5 minutes of that hour
+        if now.hour == self.nwp_daily_hour and now.minute < 5:
+            last_run_date = datetime.fromtimestamp(self.last_runs["nwp"], tz=timezone.utc).date()
+            if last_run_date != now.date():
+                return True
+        return False
+    
+    def run_collection_cycle(self):
+        """Execute collection jobs based on scheduling policy."""
+        current_time = time.time()
+        current_datetime = datetime.now(timezone.utc)
+        
+        # Run METAR every interval
+        if current_time - self.last_runs["metar"] >= self.intervals["metar"]:
+            collect_metar_data()
+            self.last_runs["metar"] = current_time
+            self.collection_stats["metar_runs"] += 1
+        
+        # Run NWP at specific times (once per day around 6:00 UTC)
+        if self.should_run_nwp_now():
+            collect_nwp_data()
+            self.last_runs["nwp"] = current_time
+            self.collection_stats["nwp_runs"] += 1
+            
+        # Run Kalshi every interval
+        if current_time - self.last_runs["kalshi"] >= self.intervals["kalshi"]:
+            collect_kalshi_snapshots()
+            self.last_runs["kalshi"] = current_time
+            self.collection_stats["kalshi_runs"] += 1
+        
+        # Log stats occasionally
+        if int(current_time) % 3600 == 0:  # Every hour
+            logger.info(f"Collector Stats: METAR({self.collection_stats['metar_runs']}), "
+                       f"NWP({self.collection_stats['nwp_runs']}), "
+                       f"Kalshi({self.collection_stats['kalshi_runs']}) "
+                       f"at {current_datetime.isoformat()}")
+                        
+        logger.debug(f"Collection cycle completed at {current_datetime.isoformat()}")
+    
+    def start_background_service(self):
+        """Start the perpetual collection service."""
+        logger.info("=" * 60)
+        logger.info("Weather Collector Service Starting on Render Server")
+        logger.info("- METAR collects every 30 minutes") 
+        logger.info("- NWP collects daily at 06:00 UTC")
+        logger.info("- Kalshi collects every 15 minutes")
+        logger.info("- All data feeds into shared cache for PROD/DEV/SBOX")
+        logger.info("=" * 60)
+        
+        # Initial collection run on startup
+        logger.info("Performing initial collection cycle...")
+        self.run_collection_cycle()
+        
+        # Main service loop
+        while not self.shutdown_event.is_set():
+            try:
+                self.run_collection_cycle()
+                # Check every 30 seconds but collect according to schedules
+                if self.shutdown_event.wait(timeout=30):
+                    break  # Exit if shutdown event is set
+            except Exception as e:
+                logger.error(f"Unexpected error in collection service: {e}")
+                logger.error(traceback.format_exc())
+                time.sleep(60)  # Wait 1 minute before continuing
+        
+        logger.info("Weather Collector Service stopped.")
+    
+    def stop(self):
+        """Signal the background service to stop."""
+        logger.info("Stopping Weather Collector Service...")
+        self.shutdown_event.set()
+        logger.info("Shutdown signal sent.")

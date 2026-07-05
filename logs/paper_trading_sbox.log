@@ -1,0 +1,19 @@
+2026-07-05 19:43:45,151 [paper_trading.sbox] INFO: Starting daily run for 2024-07-01
+2026-07-05 19:43:55,796 [paper_trading.sbox] INFO: Run complete: 15 executed, 7 skipped, 0 alerts
+2026-07-05 19:45:35,981 [paper_trading.sbox] INFO: Starting daily run for 2024-07-15
+2026-07-05 19:45:40,553 [paper_trading.sbox] ERROR: Run failed: float division by zero
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 159, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 291, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 902, in place_paper_trade
+    self._update_position_after_trade(trade_uuid, trade_type, fill_price, quantity,
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 972, in _update_position_after_trade
+    new_avg_cost = (avg_cost * old_qty + fill_price * quantity) / new_quantity
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-07-05 19:46:13,366 [paper_trading.sbox] INFO: Starting daily run for 2024-07-15
+2026-07-05 19:46:30,747 [paper_trading.sbox] INFO: Run complete: 18 executed, 5 skipped, 23 alerts

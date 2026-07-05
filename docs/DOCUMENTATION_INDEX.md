@@ -11,12 +11,16 @@ This index defines the canonical documentation structure for the repository.
 ## Runtime Surfaces
 - `docs/API_REFERENCE.md` — Runtime endpoint and interface reference.
 - `docs/OPERATIONS.md` — Operational runbook and day-2 procedures.
-- `docs/ALERT_SCHEMA.md` — Alert payload schema and field definitions.
+- `docs/ALERT-SCHEMA-V1.0.md` — Alert payload schema and field definitions.
 - `docs/ALERT_INTEGRITY_MONITOR.md` — Alert integrity monitoring surface and checks.
 - `docs/HYDRATION_HEALTH.md` — Hydration health endpoint semantics.
 - `docs/LADDER_CACHE_OBSERVABILITY.md` — Ladder cache observability behavior and diagnostics.
 - `docs/REPLAY_PARITY_VALIDATION.md` — Replay parity validation workflow and checks.
 - `docs/env_vars.md` — Environment variable catalog and runtime configuration notes.
+- `docs/FUNCTIONALITY_SPEC.md` — Complete system behavior, signal catalog, data flow, and alert rules.
+- `docs/PROMOTION-RULES.md` — Checklist, 5-step process, and rollback rules for PROD promotion from DEV/SBOX.
+- `docs/DEPLOYMENT.md` — Deployment documentation with 3-lane parallelism, environment setup, and promotion procedures.
+- `docs/CODE-REVIEW-2026-07-05.md` — Full code review packet (5 critical, 8 moderate, 6 minor findings). Pre-PROD gate.
 
 ## Engineering Workflow
 - `docs/WORKFLOW.md` — Single source-of-truth workflow: task identity rules, packet-first review protocol, canonical state machine, and operator shortcut prompts.
