@@ -19,6 +19,7 @@ import json
 import os
 import sqlite3
 from functools import lru_cache
+from typing import Optional
 
 _BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _DB_PATH = os.path.join(_BASE, "data", "metar_backfill.db")
@@ -178,6 +179,42 @@ def get_station_coordinates(station_code):
     mapping = get_station_mapping()
     info = mapping.get(station_code, {})
     return info.get('lat'), info.get('lon')
+
+
+# ─── R4-1.6: Correlation Clusters for Budget Caps ───────────────────────
+#
+# Stations grouped by shared weather system geography.
+# Temperature correlation within clusters is high (ρ ≈ 0.5-0.7) because
+# the same frontal systems affect all stations in the cluster.
+# Cluster budget cap prevents over-concentration in one weather event.
+
+STATION_CLUSTERS = {
+    "northeast":     ["KNYC", "KPHL", "KBOS", "KDCA"],
+    "gulf_south":    ["KHOU", "KMIA", "KATL", "KDFW", "KAUS"],
+    "plains_midwest": ["KDEN", "KMSP", "KMDW"],
+    "southwest":     ["KPHX"],
+    "west_coast":    ["KLAX", "KSEA", "KSFO"],
+}
+
+# Reverse mapping: station → cluster name
+_STATION_TO_CLUSTER = {
+    station: cluster for cluster, stations in STATION_CLUSTERS.items()
+    for station in stations
+}
+
+# Budget caps
+CLUSTER_BUDGET_USD = 30.0   # max total exposure per cluster
+CITY_PAIR_CAP_USD = 12.0     # max net exposure per city (HIGH+LOW pair)
+
+
+def get_cluster_for_station(station: str) -> Optional[str]:
+    """Returns the cluster name for a station, or None if unclustered."""
+    return _STATION_TO_CLUSTER.get(station.upper())
+
+
+def get_cluster_stations(cluster_name: str) -> list:
+    """Returns all stations in a cluster."""
+    return STATION_CLUSTERS.get(cluster_name, [])
 
 
 def validate_station_registry():
