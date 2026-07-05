@@ -32,29 +32,35 @@ _LOGGER = logging.getLogger(__name__)
 # ─── Station → Kalshi Series Ticker Mapping ─────────────────────────────
 
 # Kalshi series tickers follow the pattern KXHIGH<CODE> or KXLOW<CODE>
-# where <CODE> is a station-specific code that differs from ICAO in some cases.
+# where <CODE> is a station-specific code. The code suffixes are NOT
+# predictable — some have a T prefix (TBOS, TDAL, THOU, TMIN, TPHX, TSEA, TSFO, TATL, TDC)
+# and some don't (AUS, DEN, LAX, CHI, MIA, NY, PHIL).
+# This mapping was verified against live Kalshi API on 2026-07-02.
+#
+# Removed stations (negative-EV or duplicates):
+# - KJFK: duplicate of KNYC (both map to NY series)
+# - KORD: duplicate of KMDW (both map to CHI series)
+# - KCLT: not in verified 20-station set
+# - KDTW: not in verified 20-station set
+# - KLAS, KMSY, KOKC, KSAT: in verified set but no profitable signal — removed from registry
 
 STATION_TO_KALSHI_CODE = {
-    "KDEN": "DEN",
-    "KLAX": "LAX",
-    "KNYC": "NY",
-    "KJFK": "NY",
-    "KPHL": "PHL",
-    "KMDW": "CHI",
-    "KORD": "CHI",
-    "KMIA": "MIA",
+    "KATL": "TATL",
     "KAUS": "AUS",
-    "KATL": "ATL",
-    "KBOS": "BOS",
-    "KSEA": "SEA",
-    "KSFO": "SFO",
-    "KHOU": "HOU",
-    "KPHX": "PHX",
-    "KDFW": "DFW",
-    "KMSP": "MIN",
-    "KDTW": "DET",
-    "KCLT": "CLT",
-    "KDCA": "DCA",
+    "KBOS": "TBOS",
+    "KDCA": "TDC",
+    "KDEN": "DEN",
+    "KDFW": "TDAL",
+    "KHOU": "THOU",
+    "KLAX": "LAX",
+    "KMDW": "CHI",
+    "KMIA": "MIA",
+    "KMSP": "TMIN",
+    "KNYC": "NY",
+    "KPHL": "PHIL",
+    "KPHX": "TPHX",
+    "KSEA": "TSEA",
+    "KSFO": "TSFO",
 }
 
 # Reverse mapping for discovery
