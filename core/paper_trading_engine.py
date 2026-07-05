@@ -55,6 +55,7 @@ from kalshi_price_fetcher import (
     clear_price_cache as _clear_price_cache,
     get_cache_stats as _get_cache_stats,
 )
+from station_time import is_within_entry_window as _is_within_entry_window
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
@@ -756,6 +757,20 @@ class PaperTrader:
         """
         if date is None:
             date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        
+        # R4-1.3: Settlement-window entry timing gate
+        # Only enter trades within T-18h to T-2h before settlement
+        # Same-day METARs are ~10x more predictive than prior-day observations
+        within_window, window_reason = _is_within_entry_window(station, date)
+        if not within_window:
+            return {
+                'status': 'skipped',
+                'reason': f'Entry window: {window_reason}',
+                'market_price': None,
+                'analytical_prob': None,
+                'confidence': None,
+                'metadata': {'entry_window_rejection': window_reason}
+            }
         
         # Get market price - in real world this comes from API
         market_price = self._get_market_price(station, date, market_type)
