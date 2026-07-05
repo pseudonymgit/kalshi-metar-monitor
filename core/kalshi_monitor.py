@@ -76,6 +76,23 @@ _PROXIMITY_RANK = {
     "CRITICAL": 3,
 }
 
+# ─── Station city token map (compatibility shim) ───
+# This is now derived from core.station_registry. Kept here for backward compatibility
+# with app.py and other modules that import it directly.
+# Do NOT hardcode station lists elsewhere — use station_registry.get_all_stations() instead.
+try:
+    from core.station_registry import get_station_mapping as _registry_get_mapping
+    _STATION_CITY_TOKEN_MAP = {
+        icao: info.get("kalshi_token", "")
+        for icao, info in _registry_get_mapping().items()
+    }
+except Exception:
+    # Fallback if station_registry import fails (shouldn't happen in normal operation)
+    _STATION_CITY_TOKEN_MAP = {
+        "KDEN": "DEN", "KLAX": "LAX", "KNYC": "NYC", "KPHL": "PHIL",
+        "KMDW": "CHI", "KMIA": "MIA", "KAUS": "AUS",
+    }
+
 
 def _extract_station_from_settlement_source_url(settlement_source: str | None) -> str | None:
     """Extract station ICAO from settlement source URL.
@@ -1382,7 +1399,7 @@ def _extract_station_from_ticker(ticker: str) -> str | None:
         "DEN": "KDEN",
         "DAL": "KDAL",  # Kalshi uses KXHIGHTDAL
         "DFW": "KDAL",  # DFW airport code → DAL ticker token
-        "HOU": "KHOUS",
+        "HOU": "KHOU",  # Houston Hobby
         "LAS": "KLAS",
         "LAX": "KLAX",
         "CHI": "KMDW",
@@ -1390,8 +1407,8 @@ def _extract_station_from_ticker(ticker: str) -> str | None:
         "MIA": "KMIA",
         "MIN": "KMSP",
         "MINNEAPOLIS": "KMSP",
-        "NOLA": "KNEW",
-        "NEW ORLEANS": "KNEW",
+        "NOLA": "KMSY",  # New Orleans (Louis Armstrong International)
+        "NEW ORLEANS": "KMSY",
         "NY": "KNYC",
         "NYC": "KNYC",
         "OKC": "KOKC",

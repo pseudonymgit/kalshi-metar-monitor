@@ -1,0 +1,9 @@
+
+======================================================================
+MULTI-INSTANCE PAPER TRADING RUN — 2026-07-05
+Instances: DEV
+Stations: 20
+======================================================================
+
+  ⚠️ DEV: already running (lock held), skipping
+[2026-07-05T19:48:11.467824+00:00] DEV: complete — 0 executed, 0 skipped, 0 alerts

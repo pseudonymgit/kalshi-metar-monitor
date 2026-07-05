@@ -1,0 +1,46 @@
+2026-07-05 15:21:48,221 [paper_trading.dev] INFO: Starting daily run for 2024-06-15
+2026-07-05 15:21:51,832 [paper_trading.dev] ERROR: Run failed: UNIQUE constraint failed: daily_balances.date_utc
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 159, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 315, in _run_instance
+    trader.daily_reconciliation(run_date)
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1191, in daily_reconciliation
+    c.execute("""
+sqlite3.IntegrityError: UNIQUE constraint failed: daily_balances.date_utc
+2026-07-05 15:22:01,436 [paper_trading.dev] INFO: Starting daily run for 2024-07-01
+2026-07-05 15:22:03,614 [paper_trading.dev] INFO: Run complete: 14 executed, 8 skipped, 0 alerts
+2026-07-05 15:24:48,660 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 15:24:48,751 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-05 15:24:58,290 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 15:24:58,386 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-05 19:43:31,840 [paper_trading.dev] INFO: Starting daily run for 2024-07-01
+2026-07-05 19:43:45,150 [paper_trading.dev] ERROR: Run failed: UNIQUE constraint failed: daily_balances.date_utc
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 159, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 316, in _run_instance
+    trader.daily_reconciliation(run_date)
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1191, in daily_reconciliation
+    c.execute("""
+sqlite3.IntegrityError: UNIQUE constraint failed: daily_balances.date_utc
+2026-07-05 19:45:18,932 [paper_trading.dev] INFO: Starting daily run for 2024-07-15
+2026-07-05 19:45:35,981 [paper_trading.dev] INFO: Run complete: 18 executed, 5 skipped, 23 alerts
+2026-07-05 19:46:55,915 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 19:46:56,010 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-05 19:47:09,760 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 19:47:09,854 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-05 19:48:01,030 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 19:48:01,125 [paper_trading.dev] INFO: Starting daily run for 2026-07-05
+2026-07-05 19:48:04,904 [paper_trading.dev] INFO: Run complete: 5 executed, 1 skipped, 6 alerts
+2026-07-05 19:48:04,905 [paper_trading.dev] INFO: Cron complete: 5 executed, 1 skipped, 6 alerts
+2026-07-05 19:48:11,320 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 19:48:11,321 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-05 19:48:11,463 [paper_trading.dev] INFO: Starting daily run for 2026-07-05
+2026-07-05 19:48:11,463 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-05 19:48:15,005 [paper_trading.dev] INFO: Run complete: 5 executed, 1 skipped, 6 alerts
+2026-07-05 19:48:15,006 [paper_trading.dev] INFO: Cron complete: 5 executed, 1 skipped, 6 alerts
+2026-07-05 21:42:24,619 [paper_trading.dev] INFO: Starting daily run for 2024-08-01
+2026-07-05 21:42:39,496 [paper_trading.dev] INFO: Run complete: 14 executed, 7 skipped, 21 alerts

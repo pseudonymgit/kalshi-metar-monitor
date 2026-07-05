@@ -48,7 +48,16 @@ from core.transition_emitter import emit_transition_if_changed
 from core.replay_engine import execute_ordered_replay_stream
 from core.security_boundaries import enforce_execution_domain_guard
 from core.station_time import station_local_day_key, station_timezone_name, to_station_local
-from core.alert_schema import ALERT_SCHEMA_VERSION
+from core.alert_schema import (
+    ALERT_SCHEMA_VERSION,
+    ALERT_TYPE_DIRECTION,
+    TIER_1_PROTECTED_TYPES,
+    OUTCOME_ELIGIBLE_NOT_ALERTABLE,
+    OUTCOME_NO_ELIGIBLE_MARKET,
+    OUTCOME_ALERT_SENT,
+    OUTCOME_HYDRATION_BLOCKED,
+    OUTCOME_NO_SIGNAL_CONDITION_MATCH,
+)
 
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
@@ -1169,12 +1178,8 @@ def _emit_signal_alert(*, station: str, obs_time: str, temp_f: float, signal_con
         market_type="SIGNAL",
         event_ticker=str(signal_context.get("dedupe_key") or ""),
         alert_type=str(signal_context.get("signal_type") or "signal"),
-        direction=(
-            "UP"
-            if str(signal_context.get("signal_type") or "").endswith("_up")
-            else "DOWN"
-            if str(signal_context.get("signal_type") or "").endswith("_down")
-            else "REVERSAL"
+        direction=ALERT_TYPE_DIRECTION.get(
+            str(signal_context.get("signal_type") or "signal"), "REVERSAL"
         ),
         temp_f=float(temp_f),
         bucket_index=int(math.floor(temp_f)),
@@ -1247,6 +1252,7 @@ def _evaluate_deterministic_signal_layer(
 
         if not hydration_cache_valid:
             runtime["suppression_reason"] = "HYDRATION_CACHE_INVALID"
+            runtime["outcome_classification"] = OUTCOME_HYDRATION_BLOCKED
             _ALERT_LOGGER.debug(
                 "signal_suppression station=%s reason=HYDRATION_CACHE_INVALID "
                 "reason_detail=market_exists_but_hydration_incomplete"
@@ -1254,16 +1260,52 @@ def _evaluate_deterministic_signal_layer(
             pending_runtime_record = runtime
             early_exit = True
         elif int(eligible_markets_count) <= 0:
-            runtime["suppression_reason"] = "NO_ELIGIBLE_MARKETS"
-            _ALERT_LOGGER.debug(
-                "signal_suppression station=%s reason=NO_ELIGIBLE_MARKETS "
-                "reason_detail=no_market_exists_for_station"
-            )
-            pending_runtime_record = runtime
-            early_exit = True
+            # Tier 1 bypass: goldilocks/reversion alerts are protected side features
+            # that fire regardless of market eligibility. Check them before early-exit.
+            epoch_key = (station, int(epoch_id))
+            tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+            if isinstance(tracker, dict) and not bool(tracker.get("alert_emitted")):
+                old_bucket = tracker.get("previous_settlement_bucket") or tracker.get("settlement_bucket_at_up")
+                if bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
+                    confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker)
+                    pending_signal_context = {
+                        "signal_type": "goldilocks_reversion_alert",
+                        "signal_version": 1,
+                        "station": station,
+                        "obs_time": obs_time,
+                        "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
+                        "cooldown_applied": False,
+                        "cooldown_seconds": 0,
+                        "settlement_bucket_at_up": int(tracker.get("previous_settlement_bucket") or tracker.get("settlement_bucket_at_up") or settlement_bucket),
+                        "max_temp_after_up": float(tracker.get("max_temp_after_up") or now_f),
+                        "reverted_temp": float(now_f),
+                        "epoch_id": int(epoch_id),
+                        "confidence": confidence_score,
+                        "confidence_factors": confidence_factors,
+                        "tier_1_bypass": True,
+                    }
+                    tracker["alert_emitted"] = True
+                    runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
+                    _ALERT_LOGGER.info(
+                        "tier_1_bypass station=%s signal=goldilocks_reversion_alert "
+                        "reason=no_eligible_market_but_tier_1_protected"
+                    )
+            if pending_signal_context is None and runtime.get("signal_type") is None:
+                runtime["suppression_reason"] = "NO_ELIGIBLE_MARKETS"
+                runtime["outcome_classification"] = OUTCOME_NO_ELIGIBLE_MARKET
+                _ALERT_LOGGER.debug(
+                    "signal_suppression station=%s reason=NO_ELIGIBLE_MARKETS "
+                    "reason_detail=no_market_exists_for_station"
+                )
+                pending_runtime_record = runtime
+                early_exit = True
+            else:
+                # Tier 1 signal fired despite no eligible market
+                pending_runtime_record = runtime
         else:
             if station_cooldown_active:
                 runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+                runtime["outcome_classification"] = OUTCOME_ELIGIBLE_NOT_ALERTABLE
                 _ALERT_LOGGER.debug(
                     "signal_suppression station=%s reason=STATION_COOLDOWN_ACTIVE "
                     "reason_detail=market_exists_but_station_in_cooldown"
@@ -1326,7 +1368,7 @@ def _evaluate_deterministic_signal_layer(
                     f"boundary_cooldown:{station}:{boundary_key[1]}:{boundary_key[2]}",
                     {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS},
                 )
-                runtime.update({"signal_type": "near_boundary_momentum_up", "signal_emitted": True, "suppression_reason": None})
+                runtime.update({"signal_type": "near_boundary_momentum_up", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                 runtime["cooldown_state"]["station_active"] = True
                 runtime["cooldown_state"]["boundary_active"] = True
 
@@ -1428,12 +1470,14 @@ def _evaluate_deterministic_signal_layer(
                 if isinstance(tracker, dict):
                     if bool(tracker.get("alert_emitted")):
                         runtime["suppression_reason"] = "EPOCH_ALERT_ALREADY_EMITTED"
+                        runtime["outcome_classification"] = OUTCOME_ELIGIBLE_NOT_ALERTABLE
                         _ALERT_LOGGER.debug(
                             "signal_suppression station=%s reason=EPOCH_ALERT_ALREADY_EMITTED "
                             "reason_detail=market_exists_but_epoch_alert_already_sent"
                         )
                     elif station_cooldown_active:
                         runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
+                        runtime["outcome_classification"] = OUTCOME_ELIGIBLE_NOT_ALERTABLE
                         _ALERT_LOGGER.debug(
                             "signal_suppression station=%s reason=STATION_COOLDOWN_ACTIVE "
                             "reason_detail=market_exists_but_station_in_cooldown"
@@ -1466,7 +1510,7 @@ def _evaluate_deterministic_signal_layer(
                             f"station_cooldown:{station}",
                             {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
                         )
-                        runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None})
+                        runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                         runtime["cooldown_state"]["station_active"] = True
 
                 # LOW momentum detection (downward temperature trend)
@@ -1525,7 +1569,7 @@ def _evaluate_deterministic_signal_layer(
                             f"boundary_cooldown:{station}:{boundary_key[1]}:{boundary_key[2]}",
                             {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_BOUNDARY_COOLDOWN_SECONDS},
                         )
-                        runtime.update({"signal_type": "near_boundary_momentum_down", "signal_emitted": True, "suppression_reason": None})
+                        runtime.update({"signal_type": "near_boundary_momentum_down", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                         runtime["cooldown_state"]["station_active"] = True
                         runtime["cooldown_state"]["boundary_active"] = True
 
@@ -1567,11 +1611,12 @@ def _evaluate_deterministic_signal_layer(
                                         f"station_cooldown:{station}",
                                         {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
                                     )
-                                    runtime.update({"signal_type": "goldilocks_momentum_down", "signal_emitted": True, "suppression_reason": None})
+                                    runtime.update({"signal_type": "goldilocks_momentum_down", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                                     runtime["cooldown_state"]["station_active"] = True
 
                 if runtime["signal_type"] is None and runtime["suppression_reason"] is None:
                     runtime["suppression_reason"] = "NO_SIGNAL_CONDITION_MATCH"
+                    runtime["outcome_classification"] = OUTCOME_NO_SIGNAL_CONDITION_MATCH
                     _ALERT_LOGGER.debug(
                         "signal_suppression station=%s reason=NO_SIGNAL_CONDITION_MATCH "
                         "reason_detail=market_exists_but_no_signal_condition_met"
@@ -2508,6 +2553,7 @@ def _annotate_transition_history_market_eval(
     evaluation_outcome: str,
     suppression_reason: Optional[str] = None,
     market_eligibility_runtime: Optional[Dict[str, Any]] = None,
+    evaluated_market_types: Optional[list] = None,
 ) -> None:
     normalized_station = (station or "").strip().upper()
     correlated_transition = _find_correlated_transition_entry(
@@ -2561,6 +2607,12 @@ def _annotate_transition_history_market_eval(
                 entry["suppression_reason"] = safe_suppression_reason
             if eligibility_runtime is not None:
                 entry["market_eligibility_runtime"] = copy.deepcopy(eligibility_runtime)
+            # Add market_type from evaluated market types
+            if evaluated_market_types and isinstance(evaluated_market_types, list):
+                if len(evaluated_market_types) == 1:
+                    entry["market_type"] = evaluated_market_types[0]
+                else:
+                    entry["market_type"] = evaluated_market_types[0] if evaluated_market_types else None
             break
 
     try:
@@ -2613,18 +2665,37 @@ def _annotate_transition_history_market_eval(
                     metadata["suppression_reason"] = safe_suppression_reason
                 if eligibility_runtime is not None:
                     metadata["market_eligibility_runtime"] = copy.deepcopy(eligibility_runtime)
-                    # Add market_type from the eligibility_runtime if available
-                    if isinstance(eligibility_runtime, dict):
-                        # market_type is not directly in eligibility_runtime, but we can infer it from eligible_markets
-                        # The actual market_type should come from the market evaluation context
-                        # For now, we add a placeholder - the actual market_type should be inferred from the eligible markets
-                        pass
+                # Add market_type from the evaluated market types
+                if evaluated_market_types and isinstance(evaluated_market_types, list):
+                    # Store the first market type that had eligible markets
+                    # If multiple market types were evaluated, store them all
+                    if len(evaluated_market_types) == 1:
+                        metadata["market_type"] = evaluated_market_types[0]
+                    else:
+                        metadata["market_type"] = evaluated_market_types[0] if evaluated_market_types else None
 
                 conn.execute(
                     "UPDATE transition_events SET metadata_json = ? WHERE id = ?",
                     (json.dumps(metadata, sort_keys=True), row[0]),
                 )
                 conn.commit()
+
+                # Also update the settlement_epochs table with market_type
+                # The settlement epoch was created by log_transition_for_settlement_epoch
+                # with NULL market_type because the metadata didn't have it yet.
+                # Now that we know the market_type, backfill it.
+                if evaluated_market_types and isinstance(evaluated_market_types, list) and len(evaluated_market_types) > 0:
+                    market_type_value = evaluated_market_types[0]
+                    conn.execute(
+                        """
+                        UPDATE settlement_epochs
+                        SET market_type = ?
+                        WHERE settlement_transition_event_id = ?
+                        AND market_type IS NULL
+                        """,
+                        (market_type_value, row[0]),
+                    )
+                    conn.commit()
             finally:
                 conn.close()
     except Exception as e:
@@ -3630,6 +3701,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                 alerts_sent=0,
                 evaluation_outcome="SUPPRESSED_NO_TRANSITION",
                 suppression_reason="NO_TRANSITION",
+                evaluated_market_types=[],
             )
             result["delivery_blocking_stage"] = "transition_gate"
             result["delivery_blocking_reason"] = "NO_TRANSITION"
@@ -3707,6 +3779,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             eligible_markets_count = 0
             hydrated_any = False
             market_context_seeded = bool(market_context.get("event_ticker"))
+            evaluated_market_types = []  # Track market types that had eligible markets
             rejection_breakdown = {
                 "directional_strike_rejections": 0,
                 "wrong_series": 0,
@@ -3763,6 +3836,9 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                         market_type_token,
                         len(markets),
                     )
+
+                    # Track which market types were evaluated (for settlement epoch annotation)
+                    evaluated_market_types.append(market_type_token)
 
                     if not markets:
                         no_eligible_market_count += 1
@@ -3973,6 +4049,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                                     "alert_context": send_result.get("alert_context"),
                                 },
                             )
+                            # Track market type that had eligible markets
+                            evaluated_market_types.append(market_type_token)
                     else:
                         if transition.get("terminal_state_blocked"):
                             saw_terminal_state = True
@@ -4052,6 +4130,7 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
                         "rejected_markets_count": max(markets_considered_count - eligible_markets_count, 0),
                         "rejection_breakdown": rejection_breakdown,
                     },
+                    evaluated_market_types=evaluated_market_types,
                 )
 
                 payload["schema_version"] = ALERT_SCHEMA_VERSION

@@ -1,0 +1,269 @@
+# Weather Engine Deployment Guide (v1.0 — 2026-07-05)
+
+## Overview
+
+Three-lane paper trading architecture:
+
+| Instance | Purpose | Balance | Webhook | DB |
+|----------|---------|---------|---------|-----|
+| **DEV** | Active development, testing new signals | $5,000 | DEV webhook | `data/paper_trading_dev.db` |
+| **SBOX** | Calibration/staging copy of PROD | $1,000 | SBOX webhook | `data/paper_trading_sbox.db` |
+| **PROD** | Production paper trading | $10,000 | PROD webhook | `data/paper_trading_prod.db` |
+
+All instances share the same codebase but run with isolated configs, DBs, webhooks, locks, and logs. However, **data collection runs on Render only**, creating a shared cache that all instances read from (METAR/NWP on Render feeds shared DB, Kalshi snapshots via shared API calls).
+
+**Data Collection Architecture:**
+
+- **Render (PROD service):** Central data collector runs `scripts/collect_all.py`
+  - METAR: Every 30 minutes, loads to shared `data/metar_backfill.db`
+  - NWP: Daily at 06:00 UTC, loads to shared `data/nwp_forecasts.db`
+  - Kalshi: Every 15 minutes, real-time market pricing via API
+- **DEV (local instance):** Reads from shared cache + API calls
+- **SBOX (local instance):** Reads from shared cache + API calls
+
+This ensures 24/7 reliable collection regardless of laptop state.
+
+## 
+
+## Prerequisites
+
+```bash
+# Python 3.10+
+python3 --version
+
+# Required Python modules (all stdlib — no pip install needed)
+python3 -c "import sqlite3, json, urllib.request, fcntl, logging, statistics"
+
+# METAR database must exist
+ls data/metar_backfill.db
+
+# Logs directory
+
+# Render Data Collector Setup
+The data collection process runs on Render and creates the shared cache that all instances read from:
+
+```
+# On Render server - starts the background collection service
+python3 scripts/collect_all.py
+```
+
+This service collects:
+- METAR observations every 30 minutes into `data/metar_backfill.db`
+- NWP forecasts daily at 06:00 UTC into `data/nwp_forecasts.db` 
+- Kalshi market snapshots every 15 minutes for real-time pricing
+
+## Quick Start: Launch DEV + SBOX Locally
+```bash
+cd /home/node/.openclaw/workspace/prototypes/weather-engine-source
+
+# Launch DEV and SBOX instances (default)
+./scripts/launch_weather_instances.sh DEV SBOX
+
+# Or launch all three
+./scripts/launch_weather_instances.sh DEV SBOX PROD
+```
+
+This starts each instance as a background process with:
+- Its own PID file (`data/.dev.pid`, `data/.sbox.pid`, `data/.prod.pid`)
+- Its own scheduler lock (`data/.dev.lock`, `data/.sbox.lock`, `data/.prod.lock`)
+- Its own log (`logs/paper_trading_dev.log`, `logs/paper_trading_sbox.log`, etc.)
+- Its own health file (`data/dev_health.json`, `data/sbox_health.json`, etc.)
+- Its own Discord webhook (sends alerts with `[DEV]`, `[SBOX]`, `[PROD]` tags)
+
+## Manual Single-Instance Run
+
+```bash
+# Run DEV for a specific date
+python3 scripts/multi_instance_paper_trader.py --instances DEV --date 2024-07-01 --write-completion-artifact
+
+# Run SBOX for today
+python3 scripts/multi_instance_paper_trader.py --instances SBOX
+
+# Run all three
+python3 scripts/multi_instance_paper_trader.py --instances DEV SBOX PROD
+```
+
+## Checking Instance Status
+
+```bash
+# View all instance configs and health
+python3 core/instance_config.py
+
+# Check a specific health file
+cat data/dev_health.json
+
+# Check logs
+tail -20 logs/paper_trading_dev.log
+tail -20 logs/paper_trading_sbox.log
+
+# Check if processes are running
+cat data/.dev.pid data/.sbox.pid data/.prod.pid 2>/dev/null
+```
+
+## Stopping Instances
+
+```bash
+# Stop all
+kill $(cat data/.*.pid 2>/dev/null)
+
+# Stop specific instance
+kill $(cat data/.dev.pid)
+```
+
+## Cron Setup (DEV validation at 20:00 UTC)
+
+The `dev_paper_trading_cron.py` wrapper is a self-contained deterministic script:
+
+```bash
+# In OpenClaw cron system:
+# Schedule: daily at 20:00 UTC
+# Command:
+cd /home/node/.openclaw/workspace/prototypes/weather-engine-source && python3 scripts/dev_paper_trading_cron.py
+```
+
+The wrapper:
+1. Acquires a file lock (prevents concurrent runs)
+2. Writes health status ("running")
+3. Runs the multi-instance trader for DEV
+4. Writes a completion artifact to `.meta/continuity/weather-engine/`
+5. Writes health status ("healthy" or "error")
+6. Releases lock
+
+## Promotion: DEV → SBOX → PROD
+
+### Step 1: DEV → SBOX
+
+DEV is the active development lane. When code is ready for staging:
+
+1. **Run SBOX with the same code:**
+   ```bash
+   # Clear SBOX DB for a clean run
+   rm -f data/paper_trading_sbox.db
+   
+   # Run SBOX for a test date
+   python3 scripts/multi_instance_paper_trader.py --instances SBOX --date 2024-07-01 --write-completion-artifact
+   ```
+
+2. **Verify SBOX alerts arrive in SBOX Discord channel** with `[SBOX]` tag.
+
+3. **Check SBOX health:**
+   ```bash
+   cat data/sbox_health.json
+   ```
+
+4. **If SBOX passes**: proceed to PROD promotion.
+
+### Step 2: SBOX → PROD
+
+1. **Snapshot PROD DB before deploy:**
+   ```bash
+   python3 scripts/snapshot_db.py
+   ```
+
+2. **Deploy to Render (PROD):**
+   - Render auto-deploys from `main` branch of the GitHub repo
+   - Push changes: `git push origin main`
+   - Monitor: https://kalshi-metar-monitor.onrender.com/health
+
+3. **Or run PROD locally:**
+   ```bash
+   ./scripts/launch_weather_instances.sh PROD
+   ```
+
+4. **Verify PROD alerts** arrive in PROD Discord channel with `[PROD]` tag.
+
+5. **Monitor PROD health for 24 hours** before declaring stable.
+
+### Rollback
+
+```bash
+# Restore from DB snapshot
+cp data/backups/paper_trading_prod_1.db data/paper_trading_prod.db
+
+# Or git revert the last deploy
+git revert HEAD~1 && git push origin main
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PAPER_TRADING_INSTANCE` | `DEV` | Active instance |
+| `DISCORD_WEBHOOK_PROD` | (locked URL) | PROD Discord webhook |
+| `DISCORD_WEBHOOK_DEV` | (locked URL) | DEV Discord webhook |
+| `DISCORD_WEBHOOK_SBOX` | (locked URL) | SBOX Discord webhook |
+| `DISCORD_ENABLED_PROD` | `true` | Enable PROD Discord alerts |
+| `DISCORD_ENABLED_DEV` | `true` | Enable DEV Discord alerts |
+| `DISCORD_ENABLED_SBOX` | `true` | Enable SBOX Discord alerts |
+| `KALSHI_PUBLIC_BASE_URL` | `https://api.elections.kalshi.com/trade-api/v2` | Kalshi API base URL |
+| `KALSHI_KEY_ID` | (from secrets) | Kalshi API key ID |
+| `KALSHI_PRIVATE_KEY_PEM` | (from secrets) | Kalshi RSA private key |
+
+### Instance Config File
+
+All instance configuration is in `core/instance_config.py`. The locked webhook URLs are defaults — env vars override them if set.
+
+## Alert Format (Frozen — Schema v1.0)
+
+Every alert sent to Discord follows this exact format:
+
+```
+[DEV] 📍 Station: KDEN
+📊 Market: HIGH
+📈 Direction: UP
+💰 Size: $46.25
+🌡️ Current bucket: 87
+🎯 Trading bucket: 88
+📉 Market odds: 0.55
+✅ Trade Conf: HIGH (0.85)
+🔝 Top signals: near_boundary_momentum_up (conf=0.85), ...
+📊 Sharpe: 1.2 | Coverage: 12/20 stations
+💵 Running P&L: +$127.50
+```
+
+The instance tag (`[DEV]`, `[SBOX]`, `[PROD]`) is prepended to the first line.
+
+## Deterministic Constraint
+
+**No AI/ML/LLM calls inside the paper trading or alert loop.** All execution is pure Python scripts. This is enforced by design — the `multi_instance_paper_trader.py` and `dev_paper_trading_cron.py` scripts make zero API calls to any AI service.
+
+## File Layout
+
+```
+weather-engine-source/
+├── core/
+│   ├── instance_config.py      # Instance configs, locks, health, logging
+│   ├── kalshi_price_fetcher.py # Live Kalshi API price fetcher
+│   ├── paper_trading_engine.py # Paper trading engine (uses live prices)
+│   ├── position_sizing.py      # Confidence-weighted position sizing
+│   ├── alert_schema.py          # Alert Schema v1.0 (frozen)
+│   └── metar_monitor.py         # METAR monitor + signal engine
+├── scripts/
+│   ├── launch_weather_instances.sh  # Launch local instances
+│   ├── multi_instance_paper_trader.py # Multi-instance runner
+│   ├── dev_paper_trading_cron.py     # Cron wrapper for DEV
+│   └── snapshot_db.py               # DB snapshot tool
+├── data/
+│   ├── paper_trading_dev.db
+│   ├── paper_trading_prod.db
+│   ├── paper_trading_sbox.db
+│   ├── dev_health.json
+│   ├── sbox_health.json
+│   ├── prod_health.json
+│   ├── .dev.lock, .sbox.lock, .prod.lock
+│   └── .dev.pid, .sbox.pid, .prod.pid
+├── logs/
+│   ├── paper_trading_dev.log
+│   ├── paper_trading_sbox.log
+│   ├── paper_trading_prod.log
+│   ├── alerts_dev.jsonl
+│   ├── alerts_sbox.jsonl
+│   └── alerts_prod.jsonl
+├── docs/
+│   ├── DEPLOYMENT.md           # This file
+│   ├── ALERT-SCHEMA-V1.0.md    # Frozen alert schema
+│   └── PROMOTION-RULES.md       # Promotion checklist
+└── ROADMAP.md
+```

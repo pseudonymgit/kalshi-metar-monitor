@@ -4,6 +4,7 @@ Phase 3 Scheduler
 Event-driven scheduler for Phase 3 prediction layer.
 
 Key features:
+- Daily Kalshi market discovery (calls discover_market_derived_station_codes)
 - Post-settlement hook trigger (event-driven, not cron)
 - Runs AFTER daily ingestion/settlement pipeline completes
 - Trigger on L4 commit for all active stations
@@ -15,7 +16,7 @@ import os
 import threading
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from core.settlement_epoch_logger import _alert_db_path as get_db_path
@@ -39,12 +40,65 @@ ACTIVE_STATIONS = [
 
 # Try to populate from Kalshi discovery (this will be updated at runtime)
 try:
-    from core.kalshi_monitor import get_discovered_weather_market_station_mapping
+    from core.kalshi_monitor import (
+        get_discovered_weather_market_station_mapping,
+        discover_market_derived_station_codes
+    )
+    
+    # Daily Kalshi market discovery task
+    def refresh_kalshi_station_mapping():
+        """
+        Daily task to refresh the Kalshi station mapping by discovering new market codes.
+        This replaces previous static mapping with dynamic discovery.
+        """
+        try:
+            discovered_stations = discover_market_derived_station_codes(max_pages=5, page_limit=200)
+            if discovered_stations:
+                print(f"[INFO] Discovered {len(discovered_stations)} Kalshi station codes: {discovered_stations[:10]}...{(len(discovered_stations)>10) and '...' or ''}")
+                
+                # Update global active stations immediately
+                global ACTIVE_STATIONS
+                ACTIVE_STATIONS = sorted(list(set(discovered_stations)))
+                
+                # Update market types based on discovered markets
+                global MARKET_TYPES
+                from core.kalshi_monitor import _DISCOVERED_WEATHER_MARKETS_BY_STATION
+                all_market_types = set()
+                for markets in _DISCOVERED_WEATHER_MARKETS_BY_STATION.values():
+                    for market in markets:
+                        if isinstance(market, dict) and "market_type" in market:
+                            mt = market["market_type"]
+                            if isinstance(mt, str):
+                                all_market_types.add(mt.lower())
+                
+                if all_market_types:
+                    MARKET_TYPES = sorted(list(all_market_types))
+                    print(f"[INFO] Updated market types: {MARKET_TYPES}")
+                else:
+                    MARKET_TYPES = ["high", "low"]  # Default fallback
+                    
+                return discovered_stations
+            else:
+                print("[WARNING] Kalshi discovery returned empty")
+                return []
+        except Exception as e:
+            print(f"[ERROR] Kalshi discovery failed: {e}")
+            return []
+
+    # Refresh at initialization
     _discovered_stations = get_discovered_weather_market_station_mapping()
     if _discovered_stations:
         # Use discovered stations as the primary list
         ACTIVE_STATIONS = sorted(list(_discovered_stations.keys()))
-except Exception:
+    else:
+        # Refresh the discovery mapping if empty
+        refresh_kalshi_station_mapping()
+        # Try to load again
+        _discovered_stations = get_discovered_weather_market_station_mapping()
+        if _discovered_stations:
+            ACTIVE_STATIONS = sorted(list(_discovered_stations.keys()))
+except Exception as e:
+    print(f"Kalshi discovery initialization error: {e}")
     pass
 
 # Market types (dynamic, loaded from station metadata)
@@ -416,8 +470,8 @@ def start_prediction_worker():
     """
     Start background worker thread for prediction runs.
     
-    The worker runs post-settlement hooks periodically to ensure
-    predictions are up-to-date.
+    The worker runs daily Kalshi discovery to update station mapping,
+    and runs post-settlement hooks periodically to ensure predictions are up-to-date.
     """
     global _worker_thread, _worker_running
     
@@ -428,8 +482,28 @@ def start_prediction_worker():
     
     def worker_loop():
         """Background worker loop."""
+        last_daily_task = datetime.now()  # Track when daily task was run
+        daily_task_cooldown = timedelta(hours=24)  # Run daily task once per day
+        
         while _worker_running:
             try:
+                # Run daily Kalshi discovery task approximately once per day
+                now = datetime.now()
+                if now - last_daily_task > daily_task_cooldown:
+                    print(f"[{now.strftime('%Y-%m-%dT%H:%M:%SZ')}] RUNNING DAILY KALSHI DISCOVERY")
+                    refresh_kalshi_station_mapping()
+                    last_daily_task = now  # Reset cooldown
+                    
+                    # Update ACTIVE_STATIONS with current discovery
+                    try:
+                        newly_discovered = discover_market_derived_station_codes(max_pages=3, page_limit=100)
+                        if newly_discovered:
+                            global ACTIVE_STATIONS
+                            ACTIVE_STATIONS = sorted(list(set(newly_discovered)))  # Update stations
+                            print(f"[{now.strftime('%Y-%m-%dT%H:%M:%SZ')}] Updated active stations count: {len(ACTIVE_STATIONS)}")
+                    except Exception as e:
+                        print(f"[ERROR] Updating ACTIVE_STATIONS failed: {e}")
+                
                 # Run predictions
                 run_predictions_for_all_stations()
                 
@@ -442,6 +516,12 @@ def start_prediction_worker():
     _worker_thread = threading.Thread(target=worker_loop, daemon=True)
     _worker_thread.start()
     print("Phase 3 prediction worker started")
+    
+    # Run the daily discovery immediately on startup
+    try:
+        refresh_kalshi_station_mapping()
+    except Exception as e:
+        print(f"Initial Kalshi discovery failed: {e}")
 
 
 def stop_prediction_worker():

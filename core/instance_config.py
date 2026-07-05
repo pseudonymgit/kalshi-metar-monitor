@@ -1,0 +1,292 @@
+#!/usr/bin/env python3
+"""
+Instance Configuration for Three-Lane Parallelism (v1.1 — 2026-07-05)
+
+Defines per-instance configuration for PROD/DEV/SBOX parallelism:
+  - Separate DB paths, webhooks, sizing configs
+  - Scheduler guard (prevents concurrent runs of same instance)
+  - Health endpoint paths
+  - Log paths
+  - Lock files
+  - Instance tags in alert format ([PROD], [DEV], [SBOX])
+
+Webhook URLs are locked as defaults — env vars can still override.
+
+All script/config work — no AI in the loop.
+"""
+
+import os
+import json
+import fcntl
+import logging
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# ─── Locked Webhook URLs (authorized by Dan, 2026-07-05) ──────────────
+# Env vars override these defaults if set.
+_DEFAULT_WEBHOOKS = {
+    "PROD": "https://discord.com/api/webhooks/1467939512884793424/OajR6g4e3l-hR6cwMsypBT7B3bHzb1m0ybZp7PCBzTU9lkZgSDAsoX6tUy9S4IgIgVZ8",
+    "DEV":  "https://discord.com/api/webhooks/1523412321358184521/U-ZgAJut0QQTEh-AWgeTKyJI0xg2CrxPPQ3sY88uNRLfM3d9SKKHscoDsTX8zeRdAWkY",
+    "SBOX": "https://discord.com/api/webhooks/1523404594502172804/Iairq0RUXnDMyJIxa-jHr4_5Lj4pLKsB0VSMEEGAIH8Gld0LbQvY8iRepbMasK6u-nFW",
+}
+
+
+@dataclass
+class InstanceConfig:
+    """Complete configuration for a paper trading instance."""
+    name: str
+    db_path: str
+    metar_db_path: str
+    initial_balance: float
+    fee_rate: float
+    discord_webhook_url: str
+    discord_enabled: bool
+    sizing_instance: str  # PROD, DEV, SBOX for position sizing
+    
+    # Three-lane additions
+    log_path: str = ""
+    lock_file: str = ""
+    health_file: str = ""
+    alert_log_path: str = ""
+    
+    def __post_init__(self):
+        if not self.log_path:
+            self.log_path = str(REPO_ROOT / "logs" / f"paper_trading_{self.name.lower()}.log")
+        if not self.lock_file:
+            self.lock_file = str(REPO_ROOT / "data" / f".{self.name.lower()}.lock")
+        if not self.health_file:
+            self.health_file = str(REPO_ROOT / "data" / f"{self.name.lower()}_health.json")
+        if not self.alert_log_path:
+            self.alert_log_path = str(REPO_ROOT / "logs" / f"alerts_{self.name.lower()}.jsonl")
+    
+    @property
+    def instance_tag(self) -> str:
+        """Tag used in alert messages, e.g. [DEV], [PROD], [SBOX]."""
+        return f"[{self.name}]"
+
+
+# ─── Instance Definitions ───────────────────────────────────────────────
+
+INSTANCE_CONFIGS = {
+    "PROD": InstanceConfig(
+        name="PROD",
+        db_path=str(REPO_ROOT / "data" / "paper_trading_prod.db"),
+        metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
+        initial_balance=10000.0,
+        fee_rate=0.001,
+        discord_webhook_url=os.getenv("DISCORD_WEBHOOK_PROD", _DEFAULT_WEBHOOKS["PROD"]),
+        discord_enabled=os.getenv("DISCORD_ENABLED_PROD", "true").lower() in ("1", "true", "yes"),
+        sizing_instance="PROD",
+    ),
+    "DEV": InstanceConfig(
+        name="DEV",
+        db_path=str(REPO_ROOT / "data" / "paper_trading_dev.db"),
+        metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
+        initial_balance=5000.0,
+        fee_rate=0.001,
+        discord_webhook_url=os.getenv("DISCORD_WEBHOOK_DEV", _DEFAULT_WEBHOOKS["DEV"]),
+        discord_enabled=os.getenv("DISCORD_ENABLED_DEV", "true").lower() in ("1", "true", "yes"),
+        sizing_instance="DEV",
+    ),
+    "SBOX": InstanceConfig(
+        name="SBOX",
+        db_path=str(REPO_ROOT / "data" / "paper_trading_sbox.db"),
+        metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
+        initial_balance=1000.0,
+        fee_rate=0.002,
+        discord_webhook_url=os.getenv("DISCORD_WEBHOOK_SBOX", _DEFAULT_WEBHOOKS["SBOX"]),
+        discord_enabled=os.getenv("DISCORD_ENABLED_SBOX", "true").lower() in ("1", "true", "yes"),
+        sizing_instance="SBOX",
+    ),
+}
+
+
+# ─── Scheduler Guard ────────────────────────────────────────────────────
+
+class InstanceLock:
+    """
+    File-based lock to prevent concurrent runs of the same instance.
+    Uses fcntl.flock for process-level mutual exclusion.
+    """
+    
+    def __init__(self, lock_file: str):
+        self.lock_file = lock_file
+        self._fd = None
+    
+    def acquire(self) -> bool:
+        """Try to acquire the lock. Returns True if acquired, False if already held."""
+        os.makedirs(os.path.dirname(self.lock_file), exist_ok=True)
+        self._fd = open(self.lock_file, 'w')
+        try:
+            fcntl.flock(self._fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self._fd.write(str(os.getpid()))
+            self._fd.flush()
+            return True
+        except (IOError, OSError):
+            # Lock is held by another process
+            self._fd.close()
+            self._fd = None
+            return False
+    
+    def release(self):
+        """Release the lock."""
+        if self._fd is not None:
+            try:
+                fcntl.flock(self._fd.fileno(), fcntl.LOCK_UN)
+            except (IOError, OSError):
+                pass
+            self._fd.close()
+            self._fd = None
+            try:
+                os.unlink(self.lock_file)
+            except OSError:
+                pass
+    
+    def __enter__(self):
+        if not self.acquire():
+            raise RuntimeError(f"Instance lock already held: {self.lock_file}")
+        return self
+    
+    def __exit__(self, *args):
+        self.release()
+
+
+# ─── Health Check ───────────────────────────────────────────────────────
+
+def write_health_status(instance_name: str, status: str, details: dict = None):
+    """
+    Write health status to a JSON file for monitoring.
+    
+    Args:
+        instance_name: PROD, DEV, or SBOX
+        status: "healthy", "running", "error", "idle"
+        details: Optional dict with additional info
+    """
+    cfg = INSTANCE_CONFIGS.get(instance_name.upper())
+    if cfg is None:
+        return
+    
+    from datetime import datetime, timezone
+    health = {
+        "instance": instance_name.upper(),
+        "status": status,
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "details": details or {},
+    }
+    
+    os.makedirs(os.path.dirname(cfg.health_file), exist_ok=True)
+    with open(cfg.health_file, 'w') as f:
+        json.dump(health, f, indent=2)
+
+
+def read_health_status(instance_name: str) -> Optional[dict]:
+    """Read health status for an instance."""
+    cfg = INSTANCE_CONFIGS.get(instance_name.upper())
+    if cfg is None:
+        return None
+    
+    try:
+        with open(cfg.health_file, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
+def get_all_health() -> dict:
+    """Get health status for all instances."""
+    result = {}
+    for name in INSTANCE_CONFIGS:
+        result[name] = read_health_status(name) or {
+            "instance": name,
+            "status": "unknown",
+        }
+    return result
+
+
+# ─── Alert Logging ──────────────────────────────────────────────────────
+
+def log_alert(instance_name: str, alert_payload: dict):
+    """
+    Log an alert to the instance's JSONL alert log.
+    Each line is a JSON object.
+    """
+    cfg = INSTANCE_CONFIGS.get(instance_name.upper())
+    if cfg is None:
+        return
+    
+    from datetime import datetime, timezone
+    entry = {
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "instance": instance_name.upper(),
+        **alert_payload,
+    }
+    
+    os.makedirs(os.path.dirname(cfg.alert_log_path), exist_ok=True)
+    with open(cfg.alert_log_path, 'a') as f:
+        f.write(json.dumps(entry, sort_keys=True) + "\n")
+
+
+# ─── Logger Setup ───────────────────────────────────────────────────────
+
+def setup_instance_logger(instance_name: str) -> logging.Logger:
+    """Set up a logger for a specific instance that writes to its log file."""
+    cfg = INSTANCE_CONFIGS.get(instance_name.upper())
+    if cfg is None:
+        return logging.getLogger("paper_trading")
+    
+    logger = logging.getLogger(f"paper_trading.{instance_name.lower()}")
+    logger.setLevel(logging.INFO)
+    
+    # Avoid duplicate handlers
+    if logger.handlers:
+        return logger
+    
+    # File handler
+    os.makedirs(os.path.dirname(cfg.log_path), exist_ok=True)
+    file_handler = logging.FileHandler(cfg.log_path)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+    ))
+    logger.addHandler(file_handler)
+    
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.WARNING)
+    logger.addHandler(console_handler)
+    
+    return logger
+
+
+# ─── CLI ────────────────────────────────────────────────────────────────
+
+def main():
+    """Print instance configuration and health status."""
+    print("\nWeather Engine — Instance Configuration (v1.1)")
+    print("=" * 70)
+    
+    for name, cfg in INSTANCE_CONFIGS.items():
+        health = read_health_status(name) or {}
+        print(f"\n{name}:")
+        print(f"  DB: {cfg.db_path}")
+        print(f"  Balance: ${cfg.initial_balance:,.2f}")
+        print(f"  Fee rate: {cfg.fee_rate}")
+        print(f"  Discord: {'enabled' if cfg.discord_enabled else 'disabled'}")
+        print(f"  Webhook: {'configured' if cfg.discord_webhook_url else 'not set'}")
+        print(f"  Instance tag: {cfg.instance_tag}")
+        print(f"  Sizing: {cfg.sizing_instance}")
+        print(f"  Log: {cfg.log_path}")
+        print(f"  Lock: {cfg.lock_file}")
+        print(f"  Health: {cfg.health_file}")
+        print(f"  Alert log: {cfg.alert_log_path}")
+        print(f"  Status: {health.get('status', 'unknown')}")
+    
+    print("\nAll Health:")
+    print(json.dumps(get_all_health(), indent=2))
+
+
+if __name__ == "__main__":
+    main()

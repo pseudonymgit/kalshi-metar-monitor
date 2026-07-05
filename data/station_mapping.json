@@ -1,0 +1,31 @@
+{
+  "version": "2.0",
+  "last_verified": "2026-07-02T17:25:00Z",
+  "source": "Live Kalshi API (api.elections.kalshi.com/trade-api/v2) — settlement_sources from KXHIGHT* events",
+  "verification_method": "Fetched live events for all 20 daily HIGH temperature series. Extracted NWS issuedby codes from settlement_source URLs (forecast.weather.gov/product.php?site=XXX&product=CLI&issuedby=YYY).",
+  "kalshi_api_endpoint": "https://api.elections.kalshi.com/trade-api/v2",
+  "station_count": 20,
+  "notes": "KDAL removed — Kalshi settles Dallas on KDFW (Dallas/Fort Worth International). KDAL was a duplicate with identical settlement buckets. San Antonio uses KSAT (NWS issuedby=SAT, not SATX). NYC uses KNYC (Central Park, not JFK/LGA).",
+  "stations": {
+    "KATL": {"city_name": "Atlanta", "state": "GA", "lat": 33.6407, "lon": -84.4277, "kalshi_series": "KXHIGHTATL", "nws_issuedby": "ATL", "nws_site": "FFC"},
+    "KAUS": {"city_name": "Austin", "state": "TX", "lat": 30.1945, "lon": -97.6699, "kalshi_series": "KXHIGHAUS", "nws_issuedby": "AUS", "nws_site": "EWX"},
+    "KBOS": {"city_name": "Boston", "state": "MA", "lat": 42.3656, "lon": -71.0096, "kalshi_series": "KXHIGHTBOS", "nws_issuedby": "BOS", "nws_site": "BOX"},
+    "KDCA": {"city_name": "Washington DC", "state": "DC", "lat": 38.8512, "lon": -77.0402, "kalshi_series": "KXHIGHTDC", "nws_issuedby": "DCA", "nws_site": "LWX"},
+    "KDEN": {"city_name": "Denver", "state": "CO", "lat": 39.8561, "lon": -104.6737, "kalshi_series": "KXHIGHDEN", "nws_issuedby": "DEN", "nws_site": "BOU"},
+    "KDFW": {"city_name": "Dallas", "state": "TX", "lat": 32.8998, "lon": -97.0403, "kalshi_series": "KXHIGHTDAL", "nws_issuedby": "DFW", "nws_site": "FWD"},
+    "KHOU": {"city_name": "Houston", "state": "TX", "lat": 29.6454, "lon": -95.2789, "kalshi_series": "KXHIGHTHOU", "nws_issuedby": "HOU", "nws_site": "HGX"},
+    "KLAS": {"city_name": "Las Vegas", "state": "NV", "lat": 36.0840, "lon": -115.1537, "kalshi_series": "KXHIGHTLV", "nws_issuedby": "LAS", "nws_site": "VEF"},
+    "KLAX": {"city_name": "Los Angeles", "state": "CA", "lat": 33.9425, "lon": -118.4081, "kalshi_series": "KXHIGHLAX", "nws_issuedby": "LAX", "nws_site": "LOX"},
+    "KMDW": {"city_name": "Chicago", "state": "IL", "lat": 41.7868, "lon": -87.7522, "kalshi_series": "KXHIGHCHI", "nws_issuedby": "MDW", "nws_site": "LOT"},
+    "KMIA": {"city_name": "Miami", "state": "FL", "lat": 25.7959, "lon": -80.2870, "kalshi_series": "KXHIGHMIA", "nws_issuedby": "MIA", "nws_site": "MFL"},
+    "KMSP": {"city_name": "Minneapolis", "state": "MN", "lat": 44.8848, "lon": -93.2223, "kalshi_series": "KXHIGHTMIN", "nws_issuedby": "MSP", "nws_site": "MPX"},
+    "KMSY": {"city_name": "New Orleans", "state": "LA", "lat": 29.9934, "lon": -90.2580, "kalshi_series": "KXHIGHTNOLA", "nws_issuedby": "MSY", "nws_site": "LIX"},
+    "KNYC": {"city_name": "New York", "state": "NY", "lat": 40.6413, "lon": -73.7781, "kalshi_series": "KXHIGHNY", "nws_issuedby": "NYC", "nws_site": "OKX"},
+    "KOKC": {"city_name": "Oklahoma City", "state": "OK", "lat": 35.3931, "lon": -97.6007, "kalshi_series": "KXHIGHTOKC", "nws_issuedby": "OKC", "nws_site": "OUN"},
+    "KPHL": {"city_name": "Philadelphia", "state": "PA", "lat": 39.8744, "lon": -75.2424, "kalshi_series": "KXHIGHPHIL", "nws_issuedby": "PHL", "nws_site": "PHI"},
+    "KPHX": {"city_name": "Phoenix", "state": "AZ", "lat": 33.4342, "lon": -112.0116, "kalshi_series": "KXHIGHTPHX", "nws_issuedby": "PHX", "nws_site": "PSR"},
+    "KSAT": {"city_name": "San Antonio", "state": "TX", "lat": 29.5337, "lon": -98.4698, "kalshi_series": "KXHIGHTSATX", "nws_issuedby": "SAT", "nws_site": "EWX"},
+    "KSEA": {"city_name": "Seattle", "state": "WA", "lat": 47.4502, "lon": -122.3088, "kalshi_series": "KXHIGHTSEA", "nws_issuedby": "SEA", "nws_site": "SEW"},
+    "KSFO": {"city_name": "San Francisco", "state": "CA", "lat": 37.6213, "lon": -122.3790, "kalshi_series": "KXHIGHTSFO", "nws_issuedby": "SFO", "nws_site": "MTR"}
+  }
+}

@@ -3788,6 +3788,39 @@ def integrity_replay_parity():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Start collector daemon service on Render startup
+try:
+    # Run weather data collection in background thread
+    # Don't run collector during tests or when specified
+    import os
+    if os.environ.get("SKIP_WEATHER_COLLECTOR") != "1":
+        import sys
+        import threading
+        from pathlib import Path
+        
+        # Add core directory to path
+        current_file = Path(__file__)
+        core_path = current_file.parent / "core"
+        sys.path.insert(0, str(core_path))
+        
+        from weather_collector_service import WeatherCollectorService
+        
+        collector = WeatherCollectorService()
+        collector_thread = threading.Thread(target=collector.start_background_service, daemon=True)
+        collector_thread.start()
+        print("Weather data collector started in background")
+        print("  - METAR: every 30 minutes")
+        print("  - NWP: daily at 06:00 UTC")
+        print("  - Kalshi: every 15 minutes")
+    else:
+        print("Weather data collector skipped via SKIP_WEATHER_COLLECTOR=1")
+except ImportError as e:
+    print(f"Could not start weather collector: {e}")
+except Exception as e:
+    print(f"Error starting weather collector: {e}")
+    import traceback
+    traceback.print_exc()
+
 # Render entry
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "10000"))
