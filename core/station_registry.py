@@ -27,7 +27,7 @@ _CACHE_PATH = os.path.join(_BASE, "data", "station_mapping.json")
 
 # Static mapping as ultimate fallback — verified against Kalshi settlement data
 # 15 viable stations (20 verified - 4 negative-EV unmapped - 1 duplicate KDAL)
-# Removed: KDAL (dup of KDFW), KLAS, KMSY, KOKC, KSAT (no price fetcher mapping → 0.50 fallback → negative-EV)
+# Removed: KDAL only (dup of KDFW). KLAS/KMSY/KOKC/KSAT restored 2026-07-06 (price fetcher mappings added).
 _STATIC_MAPPING = {
     "KATL": {"city_name": "Atlanta", "state": "GA", "lat": 33.6407, "lon": -84.4277},
     "KAUS": {"city_name": "Austin", "state": "TX", "lat": 30.1945, "lon": -97.6699},
@@ -36,24 +36,24 @@ _STATIC_MAPPING = {
     "KDEN": {"city_name": "Denver", "state": "CO", "lat": 39.8561, "lon": -104.6737},
     "KDFW": {"city_name": "Dallas", "state": "TX", "lat": 32.8998, "lon": -97.0403},
     "KHOU": {"city_name": "Houston", "state": "TX", "lat": 29.6454, "lon": -95.2789},
+    "KLAS": {"city_name": "Las Vegas", "state": "NV", "lat": 36.0840, "lon": -115.1537},
     "KLAX": {"city_name": "Los Angeles", "state": "CA", "lat": 33.9425, "lon": -118.4081},
     "KMDW": {"city_name": "Chicago", "state": "IL", "lat": 41.7868, "lon": -87.7522},
     "KMIA": {"city_name": "Miami", "state": "FL", "lat": 25.7959, "lon": -80.2870},
     "KMSP": {"city_name": "Minneapolis", "state": "MN", "lat": 44.8848, "lon": -93.2223},
+    "KMSY": {"city_name": "New Orleans", "state": "LA", "lat": 29.9934, "lon": -90.2580},
     "KNYC": {"city_name": "New York", "state": "NY", "lat": 40.7128, "lon": -74.0060},
+    "KOKC": {"city_name": "Oklahoma City", "state": "OK", "lat": 35.3931, "lon": -97.6007},
     "KPHL": {"city_name": "Philadelphia", "state": "PA", "lat": 39.8744, "lon": -75.2424},
     "KPHX": {"city_name": "Phoenix", "state": "AZ", "lat": 33.4342, "lon": -112.0116},
+    "KSAT": {"city_name": "San Antonio", "state": "TX", "lat": 29.5337, "lon": -98.4698},
     "KSEA": {"city_name": "Seattle", "state": "WA", "lat": 47.4502, "lon": -122.3088},
     "KSFO": {"city_name": "San Francisco", "state": "CA", "lat": 37.6213, "lon": -122.3790},
 }
 
-# Stations removed from registry (negative-EV or duplicates)
+# Stations removed from registry (duplicates only)
 # KDAL: duplicate of KDFW — Kalshi settles Dallas on KDFW
-# KLAS: no price fetcher mapping → 0.50 fallback → negative-EV
-# KMSY: no price fetcher mapping → 0.50 fallback → negative-EV
-# KOKC: no price fetcher mapping → 0.50 fallback → negative-EV
-# KSAT: no price fetcher mapping → 0.50 fallback → negative-EV
-_REMOVED_STATIONS = {"KDAL", "KLAS", "KMSY", "KOKC", "KSAT"}
+_REMOVED_STATIONS = {"KDAL"}
 
 
 def _try_kalshi_discovery():
@@ -190,10 +190,11 @@ def get_station_coordinates(station_code):
 
 STATION_CLUSTERS = {
     "northeast":     ["KNYC", "KPHL", "KBOS", "KDCA"],
-    "gulf_south":    ["KHOU", "KMIA", "KATL", "KDFW", "KAUS"],
-    "plains_midwest": ["KDEN", "KMSP", "KMDW"],
-    "southwest":     ["KPHX"],
+    "gulf_south":    ["KHOU", "KMIA", "KATL", "KDFW", "KAUS", "KMSY"],
+    "plains_midwest": ["KDEN", "KMSP", "KMDW", "KOKC"],
+    "southwest":     ["KPHX", "KLAS"],
     "west_coast":    ["KLAX", "KSEA", "KSFO"],
+    "texas":         ["KSAT"],  # San Antonio — inland TX, distinct from Gulf coast
 }
 
 # Reverse mapping: station → cluster name
