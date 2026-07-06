@@ -64,6 +64,7 @@ from station_registry import (
     CLUSTER_BUDGET_USD as _CLUSTER_BUDGET_USD,
     CITY_PAIR_CAP_USD as _CITY_PAIR_CAP_USD,
 )
+from signal_fusion import SignalFusionEngine
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
@@ -99,6 +100,12 @@ class PaperTrader:
         self.position_size = 100  # Min position size in dollars
         self.max_position_value = 1000  # Max exposure per trade
         self.fee_rate = fee_rate  # Trading fee as proportion of fill
+        
+        # Conviction score integration: fusion engine for ensemble metrics
+        # Initialized lazily to avoid import-time issues; only used when
+        # conviction-score gating is enabled via self.use_conviction_gating
+        self.fusion_engine = None
+        self.use_conviction_gating = False  # Opt-in flag; enables conviction-score path
         
         # Initialize databases
         self._init_paper_db()
@@ -242,7 +249,20 @@ class PaperTrader:
             )
         """)
         
+        # Add conviction_score and agreement_score columns to trades table if they don't exist
+        try:
+            c.execute("ALTER TABLE trades ADD COLUMN agreement_score REAL")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        try:
+            c.execute("ALTER TABLE trades ADD COLUMN conviction_score REAL")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
         c.execute("CREATE INDEX IF NOT EXISTS idx_decisions_station_date ON decision_output_log(station, decision_date_utc)")
+        
+        # Add index on conviction_score for filtering
+        c.execute("CREATE INDEX IF NOT EXISTS idx_trades_conviction ON trades(conviction_score) WHERE conviction_score IS NOT NULL")
         
         conn.commit()
         conn.close()
@@ -686,6 +706,29 @@ class PaperTrader:
         
         return result[0] if result and result[0] is not None else None
     
+    def enable_conviction_gating(self, signal_names=None, city_codes=None):
+        """
+        Enable conviction-score-based trade gating.
+        
+        Initializes the SignalFusionEngine and enables the conviction score
+        path in place_paper_trade. When enabled, trades must pass both the
+        conviction score threshold (>= 0.20) AND the edge threshold.
+        
+        Args:
+            signal_names: list of signal names for fusion engine
+            city_codes: list of station codes for fusion engine
+        """
+        if signal_names is None:
+            signal_names = ['reversion', 'gaussian_v2', 'regime', 'pressure',
+                           'climatology', 'goldilocks', 'late_day_momentum_hourly']
+        if city_codes is None:
+            city_codes = [s[0] for s in _get_all_stations()]
+        
+        self.fusion_engine = SignalFusionEngine(signal_names, city_codes)
+        self.use_conviction_gating = True
+        _LOGGER.info("conviction_gating_enabled signals=%s cities=%d",
+                     signal_names, len(city_codes))
+    
     def place_paper_trade(self, station, market_type, signal_direction, 
                          trade_version, functionality, date=None, notes=""):
         """
@@ -751,19 +794,92 @@ class PaperTrader:
             notes=notes
         )
         
-        # Decide whether to take the trade based on price vs probability advantage
-        fair_price_advantage = analytical_prob - market_price
-        price_advantage_threshold = 0.08  # 8% edge requirement for HIGH type markets
+        # Decide whether to take the trade
+        # ── CONVICTION SCORE PATH (when enabled) ──
+        # Uses the SignalFusionEngine to compute SAS + conviction score.
+        # Replaces the flat price_advantage_threshold = 0.08 with conviction-score gating.
+        agreement_score = None
+        conviction_score = None
         
-        if abs(fair_price_advantage) < price_advantage_threshold:
-            return {
-                'status': 'skipped',
-                'reason': f'Insufficient edge ({abs(fair_price_advantage):.1%} < {price_advantage_threshold:.1%})',
-                'market_price': market_price,
-                'analytical_prob': analytical_prob,
-                'confidence': confidence,
-                'metadata': metadata
-            }
+        if self.use_conviction_gating and self.fusion_engine is not None:
+            # Build ensemble signals list for fusion engine
+            # Map the current signal into the (signal_name, direction, raw_confidence) format
+            ensemble_signals = []
+            direction_str = 'up' if signal_direction == MarketSide.UP else 'down'
+            ensemble_signals.append((functionality, direction_str, confidence))
+            
+            # Run enhanced fusion: SAS + conviction score
+            fused_direction, fused_prob, agreement_score, conviction_score, raw_llop_prob = \
+                self.fusion_engine.enhance_with_agreement_and_conviction(
+                    ensemble_signals, station
+                )
+            
+            # Log individual signal votes, fused result, SAS, conviction score
+            _LOGGER.info(
+                "ensemble_log station=%s signals=%s fused_dir=%s fused_prob=%.3f "
+                "SAS=%.3f conviction=%s DS_conflict_handled=True",
+                station, [(s[0], s[1], f"{s[2]:.3f}") for s in ensemble_signals],
+                fused_direction, fused_prob, agreement_score,
+                f"{conviction_score:.3f}" if conviction_score is not None else "None"
+            )
+            
+            if fused_direction is None:
+                # DS conflict rejected the trade
+                return {
+                    'status': 'skipped',
+                    'reason': 'Ensemble disagreement (DS conflict)',
+                    'market_price': market_price,
+                    'analytical_prob': analytical_prob,
+                    'confidence': confidence,
+                    'agreement_score': agreement_score,
+                    'conviction_score': conviction_score,
+                    'metadata': metadata
+                }
+            
+            if conviction_score is None or conviction_score < 0.20:
+                # Conviction score below threshold — reject trade
+                return {
+                    'status': 'skipped',
+                    'reason': f'Insufficient conviction ({conviction_score:.3f} < 0.20)' if conviction_score is not None else 'Conviction rejected (None)',
+                    'market_price': market_price,
+                    'analytical_prob': analytical_prob,
+                    'confidence': confidence,
+                    'agreement_score': agreement_score,
+                    'conviction_score': conviction_score,
+                    'metadata': metadata
+                }
+            
+            # Also check minimum edge threshold
+            min_edge = 0.05
+            if abs(fused_prob - 0.5) < min_edge:
+                return {
+                    'status': 'skipped',
+                    'reason': f'Insufficient edge ({abs(fused_prob - 0.5):.3f} < {min_edge})',
+                    'market_price': market_price,
+                    'analytical_prob': analytical_prob,
+                    'confidence': confidence,
+                    'agreement_score': agreement_score,
+                    'conviction_score': conviction_score,
+                    'metadata': metadata
+                }
+            
+            # Use fused probability as analytical probability for downstream logic
+            analytical_prob = fused_prob
+            
+        else:
+            # ── LEGACY PATH: flat price advantage threshold ──
+            fair_price_advantage = analytical_prob - market_price
+            price_advantage_threshold = 0.08  # 8% edge requirement for HIGH type markets
+            
+            if abs(fair_price_advantage) < price_advantage_threshold:
+                return {
+                    'status': 'skipped',
+                    'reason': f'Insufficient edge ({abs(fair_price_advantage):.1%} < {price_advantage_threshold:.1%})',
+                    'market_price': market_price,
+                    'analytical_prob': analytical_prob,
+                    'confidence': confidence,
+                    'metadata': metadata
+                }
         
         # Determine trade type based on signal direction vs price discrepancy
         if signal_direction == MarketSide.UP:
@@ -810,6 +926,24 @@ class PaperTrader:
             config=sizing_config,
             market_price=market_price,
         )
+        
+        # Conviction-based position sizing adjustment
+        # Higher conviction = larger position (capped by Kelly)
+        if conviction_score is not None and self.use_conviction_gating:
+            if conviction_score >= 0.50:
+                # High conviction = up to 2x position size
+                sizing_adjustment = min(2.0, conviction_score / 0.25)
+            elif conviction_score >= 0.30:
+                # Medium conviction = normal position size
+                sizing_adjustment = 1.0
+            else:
+                # Low conviction = reduced position size
+                sizing_adjustment = max(0.3, conviction_score / 0.3)
+            
+            position_size = position_size * sizing_adjustment
+            sizing_meta['conviction_sizing_adjustment'] = round(sizing_adjustment, 3)
+            sizing_meta['conviction_score'] = round(conviction_score, 4)
+            sizing_meta['agreement_score'] = round(agreement_score, 4) if agreement_score is not None else None
         
         # If position size is 0, skip
         if position_size <= 0:
@@ -897,9 +1031,10 @@ class PaperTrader:
                 forecast_prob, market_price, trade_type, quantity, position_size_usd, trade_price, trade_cost,
                 trade_version, functionality, notes,
                 implied_prob, analytical_prob, confidence_indicator,
-                calibration_error
+                calibration_error,
+                agreement_score, conviction_score
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             trade_uuid, date, station, market_type, signal_direction.value,
             analytical_prob, market_price, trade_type.value, quantity, position_size,
@@ -907,7 +1042,9 @@ class PaperTrader:
             market_price,  # Implied prob  
             analytical_prob,  # Analytical prob
             confidence,  # Confidence indicator
-            abs(market_price - analytical_prob)  # Calibration error
+            abs(market_price - analytical_prob),  # Calibration error
+            agreement_score,  # Signal Agreement Score
+            conviction_score   # Conviction Score
         ))
         
         conn.commit()
@@ -944,6 +1081,8 @@ class PaperTrader:
             'confidence': confidence,
             'cost': net_cost,
             'fee_cost': fee_cost,
+            'agreement_score': agreement_score,
+            'conviction_score': conviction_score,
             'metadata': metadata
         }
     
