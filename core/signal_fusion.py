@@ -326,6 +326,482 @@ class SignalFusionEngine:
         # Statistics about calibration for fallback
         self.signal_accuracies = {name: 0.6 for name in signal_names}  # Default estimates
 
+    # ===================================================================
+    # CONFIDENCE & AGREEMENT SPEC IMPLEMENTATION (2026-07-06)
+    # ===================================================================
+
+    def compute_signal_agreement_score(self, calibrated_signals, fused_direction, mi_weights=None):
+        """
+        Compute Signal Agreement Score (SAS).
+
+        Formula: SAS = Σ(wᵢ × aᵢ × cᵢ) / Σ(wᵢ)
+
+        where:
+          wᵢ = mutual-information-based weight
+          aᵢ = agreement indicator (1.0 if signal i agrees with ensemble direction, 0.0 otherwise)
+          cᵢ = calibrated confidence quality (clamped to [0.5, 1.0])
+
+        Handles "5 strong agree + 2 weak disagree" vs "5 weak agree + 2 strong disagree"
+        correctly because strong-agree signals contribute w×1×high_conf while weak-disagree
+        signals contribute w×0×conf = 0, and weak-agree signals contribute w×1×low_conf.
+
+        Range: [0, 1] where 0=full disagreement, 1=full agreement.
+        Runs in parallel with LLOP — does NOT replace it.
+
+        Args:
+            calibrated_signals: list of (direction, prob_direction, calibrated_prob)
+            fused_direction: 'up' or 'down' from LLOP calculation
+            mi_weights: optional list of weights; defaults to equal weights
+
+        Returns:
+            Signal Agreement Score (0.0 to 1.0)
+        """
+        n_signals = len(calibrated_signals)
+        if n_signals == 0:
+            return 0.0
+
+        if mi_weights is None:
+            mi_weights = [1.0 / n_signals] * n_signals
+
+        # Pad/truncate weights to match signal count
+        if len(mi_weights) < n_signals:
+            mi_weights = list(mi_weights) + [1.0 / n_signals] * (n_signals - len(mi_weights))
+
+        total_agreement = 0.0
+        total_weight = 0.0
+
+        for i, (direction, prob_direction, calibrated_prob) in enumerate(calibrated_signals):
+            # Agreement indicator: 1.0 if signal direction matches fused direction
+            agrees = 1.0 if direction == fused_direction else 0.0
+
+            # Confidence quality: clamp calibrated prob to [0.5, 1.0]
+            # For 'up' signals, prob_direction is the calibrated probability of up
+            # For 'down' signals, prob_direction is 1 - calibrated_prob
+            conf_quality = max(0.5, min(1.0, calibrated_prob))
+
+            weight = mi_weights[i]
+
+            contribution = weight * agrees * conf_quality
+            total_agreement += contribution
+            total_weight += weight
+
+        return total_agreement / total_weight if total_weight > 0 else 0.0
+
+    def compute_local_ece(self, station_code, signal_history, n_bins=10):
+        """
+        Compute Expected Calibration Error (ECE) for a station's signal history.
+
+        Uses 10-bin equal-width decomposition. ECE = Σ(Nk/N × |mk - uk|)
+        where mk is observed frequency in bin k, uk is bin center forecast.
+
+        Args:
+            station_code: station/city code
+            signal_history: list of dicts with 'forecast_prob' and 'was_correct' keys,
+                           or list of (forecast_prob, was_correct) tuples
+            n_bins: number of equal-width bins (default 10)
+
+        Returns:
+            ECE score (0.0 = perfect calibration, 1.0 = worst)
+        """
+        if not signal_history:
+            return 1.0  # Maximum ECE if no data — conservative
+
+        # Normalize input to (forecast_prob, was_correct) tuples
+        pairs = []
+        for entry in signal_history:
+            if isinstance(entry, dict):
+                fp = entry.get('forecast_prob', entry.get('prob', 0.5))
+                wc = entry.get('was_correct', entry.get('correct', False))
+            elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
+                fp, wc = entry[0], entry[1]
+            else:
+                continue
+            pairs.append((float(fp), bool(wc)))
+
+        if not pairs:
+            return 1.0
+
+        total = len(pairs)
+        ece = 0.0
+        bin_edges = [i / n_bins for i in range(n_bins + 1)]
+
+        for i in range(n_bins):
+            lo = bin_edges[i]
+            hi = bin_edges[i + 1]
+            bin_pairs = [(fp, wc) for fp, wc in pairs if lo <= fp < hi]
+
+            if not bin_pairs:
+                continue
+
+            n_k = len(bin_pairs)
+            bin_center = (lo + hi) / 2.0
+            observed_freq = sum(1.0 for _, wc in bin_pairs if wc) / n_k
+
+            ece += (n_k / total) * abs(observed_freq - bin_center)
+
+        return ece
+
+    def compute_conviction_score(self, llop_prob, signal_agreement_score,
+                                 calibration_data, signal_history, station_code):
+        """
+        Compute conviction score that gates trade entry.
+
+        Formula: Conviction = |LLOP_prob - 0.5| × 2 × (0.3 + SAS) × (1 - ECE) × tanh(n/50)
+
+        Components:
+          - LLOP_prob_offset = |LLOP_fused_prob - 0.5| * 2.0  (edge magnitude, 0-1 scale)
+          - Agreement_factor = 0.3 + SAS  (biased upward: even low agreement gives 0.3)
+          - Calibration_quality = max(0.5, min(1.0, 1.0 - ECE))
+          - Sample_size_factor = min(1.1, tanh(recent_samples / 50.0))
+
+        Threshold: below 0.20 = reject trade (returns None)
+
+        Args:
+            llop_prob: fused probability from LLOP
+            signal_agreement_score: SAS value
+            calibration_data: unused (reserved for future)
+            signal_history: list of historical observations
+            station_code: station for ECE lookup
+
+        Returns:
+            conviction_score (float 0.0-1.0) or None if trade should be rejected
+        """
+        # Get ECE for this signal on this station
+        ece_score = self.compute_local_ece(station_code, signal_history)
+
+        # LLOP probability offset (edge strength)
+        llop_offset = abs(llop_prob - 0.5) * 2.0  # Now 0.0-1.0 scale
+
+        # Agreement factor (bias upward for stability)
+        agreement_factor = 0.3 + (signal_agreement_score * 1.0)
+
+        # Calibration quality
+        calibration_quality = max(0.5, min(1.0, 1.0 - ece_score))
+
+        # Recent sample size (last 30 days minimum 20 obs for stability)
+        recent_samples = len(signal_history) if signal_history else 0
+        sample_factor = min(1.1, math.tanh(recent_samples / 50.0))
+
+        conviction_score = llop_offset * agreement_factor * calibration_quality * sample_factor
+
+        # Minimum threshold for trade entry
+        if conviction_score < 0.20:
+            return None  # Reject trade
+
+        return conviction_score
+
+    def should_take_trade(self, llop_prob, signal_agreement_score,
+                         calibration_data, signal_history, station_code):
+        """
+        Decision function: should we trade based on conviction score?
+
+        Args:
+            llop_prob: fused probability from LLOP
+            signal_agreement_score: SAS value
+            calibration_data: reserved for future
+            signal_history: list of historical observations
+            station_code: station for ECE lookup
+
+        Returns:
+            (should_trade: bool, reason: str, conviction_score: float or None)
+        """
+        conviction = self.compute_conviction_score(
+            llop_prob, signal_agreement_score,
+            calibration_data, signal_history, station_code
+        )
+
+        if conviction is None:
+            return False, "Low Conviction Score", None
+
+        # Additional check: minimum edge threshold
+        min_edge_threshold = 0.05  # 5% edge required
+        if abs(llop_prob - 0.5) < min_edge_threshold:
+            return False, "Insufficient Edge", conviction
+
+        return True, "Approved by Conviction Score", conviction
+
+    def decompose_brier_score(self, forecasts, outcomes):
+        """
+        Decompose Brier Score into Reliability, Resolution, and Uncertainty.
+
+        Brier Score = Reliability - Resolution + Uncertainty
+
+        where:
+          - Reliability = Σ[Nk/N × (mk - uk)²] — how far forecasts deviate from observed frequency
+          - Resolution = Σ[Nk/N × (uk - mean_o)²] — distinguishability of outcomes
+          - Uncertainty = mean_o × (1 - mean_o) — inherent uncertainty in outcomes
+
+        Uses 10-bin equal-width decomposition as specified.
+
+        Args:
+            forecasts: list of forecast probabilities (0.0-1.0)
+            outcomes: list of actual outcomes (0 or 1)
+
+        Returns:
+            (brier, reliability, resolution, uncertainty)
+        """
+        if not forecasts or not outcomes:
+            return 1.0, 0.0, 0.0, 0.0
+
+        n = len(forecasts)
+        if n != len(outcomes):
+            raise ValueError(f"forecasts ({n}) and outcomes ({len(outcomes)}) must have same length")
+
+        mean_outcome = sum(outcomes) / n
+        uncertainty = mean_outcome * (1.0 - mean_outcome)
+
+        reliability = 0.0
+        resolution = 0.0
+
+        bins = [(i * 0.1, (i + 1) * 0.1) for i in range(10)]
+
+        for bin_start, bin_end in bins:
+            bin_forecasts = []
+            bin_outcomes = []
+            for i, f in enumerate(forecasts):
+                if bin_start <= f < bin_end:
+                    bin_forecasts.append(f)
+                    bin_outcomes.append(outcomes[i])
+
+            if bin_forecasts:
+                n_k = len(bin_forecasts)
+                mk_hat = sum(bin_outcomes) / n_k if bin_outcomes else mean_outcome
+                uk = (bin_start + bin_end) / 2.0  # bin center forecast
+
+                reliability += (n_k / n) * ((mk_hat - uk) ** 2)
+                resolution += (n_k / n) * ((uk - mean_outcome) ** 2)
+
+        brier = reliability - resolution + uncertainty
+
+        return brier, reliability, resolution, uncertainty
+
+    def adjust_confidence_by_regime(self, raw_confidence, regime_characteristics):
+        """
+        Adjust confidence based on current regime conditions.
+
+        Regime factors:
+          - temperature_volatility: float (0-1+), >0.8 = high volatility
+          - season_transition_period: bool, True if spring/fall
+          - weather_pattern: str, 'frontal_instability' reduces confidence
+
+        Args:
+            raw_confidence: confidence value to adjust
+            regime_characteristics: dict with regime data
+
+        Returns:
+            Adjusted confidence (may be higher or lower than raw)
+        """
+        adjustment_factor = 1.0
+
+        # Volatility adjustment
+        temp_vol = regime_characteristics.get('temperature_volatility', 0.5)
+        if temp_vol > 0.8:
+            adjustment_factor *= 0.8  # Downgrade confidence during highly variable periods
+        elif temp_vol < 0.2:
+            adjustment_factor *= 1.1  # Boost confidence during stable periods
+
+        # Seasonal adjustment
+        if regime_characteristics.get('season_transition_period', False):  # Spring/Fall
+            adjustment_factor *= 0.9  # Reduce during unstable transition seasons
+
+        # Atmospheric patterns
+        if regime_characteristics.get('weather_pattern') == 'frontal_instability':
+            adjustment_factor *= 0.85
+
+        return raw_confidence * adjustment_factor
+
+    def update_signal_weights_bayesian(self, historical_performance, recent_days=30):
+        """
+        Bayesian updating of signal weights based on recent relative performance.
+
+        Uses Beta-binomial posterior: posterior_mean = (successes + 2) / (successes + failures + 3)
+        with prior Beta(2, 1) — assumes some inherent predictive ability.
+
+        Scales MI-based weights by Bayesian quality relative to average.
+        Preserves rank-order structure from MI.
+
+        Args:
+            historical_performance: dict {signal_name: [(date, was_correct), ...]}
+            recent_days: window for recent performance lookup
+
+        Returns:
+            List of renormalized weights
+        """
+        bayesian_qualities = {}
+
+        # Compute cutoff date for recent window
+        from datetime import datetime, timedelta, timezone
+        cutoff = datetime.now(timezone.utc) - timedelta(days=recent_days)
+
+        for signal_name in self.signal_names:
+            perf_data = historical_performance.get(signal_name, [])
+
+            # Filter to recent window
+            recent_data = []
+            for entry in perf_data:
+                if isinstance(entry, dict):
+                    d = entry.get('date')
+                    wc = entry.get('was_correct', False)
+                elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
+                    d, wc = entry[0], entry[1]
+                else:
+                    continue
+
+                # Check if within recent window
+                try:
+                    if isinstance(d, str):
+                        entry_date = datetime.fromisoformat(d.replace('Z', '+00:00'))
+                    else:
+                        entry_date = d
+                    if entry_date >= cutoff:
+                        recent_data.append(wc)
+                except (ValueError, TypeError):
+                    # If date parsing fails, include anyway
+                    recent_data.append(wc)
+
+            if len(recent_data) >= 10:  # Minimum samples for meaningful update
+                successes = sum(1 for wc in recent_data if wc)
+                failures = len(recent_data) - successes
+
+                # Beta-binomial posterior mean with Beta(2,1) prior
+                posterior_mean = (successes + 2) / (successes + failures + 3)
+                bayesian_qualities[signal_name] = posterior_mean
+            else:
+                # Not enough recent data, keep default
+                bayesian_qualities[signal_name] = 0.6  # assumed baseline
+
+        # Get current MI-based weights (or equal if not computed yet)
+        base_weights = self.current_weights if self.current_weights else \
+                       [1.0 / len(self.signal_names)] * len(self.signal_names)
+
+        # Compute average quality for scaling
+        avg_quality = (sum(bayesian_qualities.values()) / len(bayesian_qualities)
+                       if bayesian_qualities else 0.6)
+
+        # Scale weights by quality relative to average
+        scaled_weights = []
+        for i, signal_name in enumerate(self.signal_names):
+            bayes_q = bayesian_qualities.get(signal_name, 0.6)
+            if avg_quality > 0:
+                scaling_factor = bayes_q / avg_quality
+            else:
+                scaling_factor = 1.0
+            new_weight = base_weights[i] * scaling_factor
+            scaled_weights.append(new_weight)
+
+        # Renormalize
+        total = sum(scaled_weights) if scaled_weights else 1.0
+        if total > 0:
+            renorm_weights = [w / total for w in scaled_weights]
+        else:
+            n = len(self.signal_names) if self.signal_names else 1
+            renorm_weights = [1.0 / n] * n
+
+        # Update current weights
+        self.current_weights = renorm_weights
+        return renorm_weights
+
+    def enhance_with_agreement_and_conviction(self, signals, city_code):
+        """
+        Main pathway adding all new metrics (SAS + Conviction).
+
+        Steps:
+          1. Original LLOP fusion (existing fuse_signals method)
+          2. Collect calibrated signals for agreement analysis
+          3. Compute MI-based weights
+          4. Compute Signal Agreement Score
+          5. Get recent history for calibration quality metrics
+          6. Compute Conviction Score
+
+        Args:
+            signals: List of (signal_name, direction, raw_confidence)
+            city_code: City code for calibration lookup
+
+        Returns:
+            (fused_direction, fused_prob, signal_agreement, conviction_score, raw_llop_prob)
+            or (None, 0.0, 0.0, 0.0, 0.0) if DS conflict rejects
+        """
+        # Step 1: Original LLOP fusion
+        fused_direction, fused_prob, _ = self.fuse_signals(signals, city_code, use_ds_conflict=True)
+
+        if fused_direction is None:  # DS conflict rejected trade
+            return None, 0.0, 0.0, 0.0, 0.0
+
+        # Step 2: Collect calibrated signals for agreement analysis
+        calibrated_signals = []
+        for signal_name, direction, raw_conf in signals:
+            calibrated_prob = self.calibration_pipeline.calibrate(signal_name, city_code, raw_conf)
+            if direction == 'up':
+                prob_direction = calibrated_prob
+            else:  # direction == 'down'
+                prob_direction = 1.0 - calibrated_prob
+            calibrated_signals.append((direction, prob_direction, calibrated_prob))
+
+        # Step 3: Compute MI-based weights (use current_weights or equal)
+        n_signals = len(calibrated_signals)
+        if self.current_weights and len(self.current_weights) == len(self.signal_names):
+            # Map weights from signal_names to the provided signals
+            mi_weights = []
+            for signal_name, _, _ in signals:
+                if signal_name in self.signal_names:
+                    idx = self.signal_names.index(signal_name)
+                    mi_weights.append(self.current_weights[idx])
+                else:
+                    mi_weights.append(1.0 / n_signals)
+        else:
+            mi_weights = [1.0 / n_signals] * n_signals
+
+        # Step 4: Compute Signal Agreement Score
+        signal_agreement = self.compute_signal_agreement_score(
+            calibrated_signals, fused_direction, mi_weights
+        )
+
+        # Step 5: Get recent history for calibration quality metrics
+        recent_history = self.get_recent_calibration_performance(signals, city_code)
+
+        # Step 6: Compute Conviction Score
+        conviction_score = self.compute_conviction_score(
+            fused_prob, signal_agreement,
+            None,  # calibration_data not fully implemented yet but planned
+            recent_history,
+            city_code
+        )
+
+        return fused_direction, fused_prob, signal_agreement, conviction_score, fused_prob
+
+    def get_recent_calibration_performance(self, signals, city_code, window_days=30):
+        """
+        Retrieve recent signal vs. outcome data for calibration quality assessment.
+
+        Returns a list of (forecast_prob, was_correct) pairs from the calibration
+        pipeline's history for this city.
+
+        Args:
+            signals: list of (signal_name, direction, raw_confidence) tuples
+            city_code: city code
+            window_days: how far back to look
+
+        Returns:
+            list of (forecast_prob, was_correct) tuples
+        """
+        result = []
+        from datetime import datetime, timedelta, timezone
+        cutoff = datetime.now(timezone.utc) - timedelta(days=window_days)
+
+        for signal_name, _, raw_conf in signals:
+            key = (signal_name, city_code)
+            history = self.calibration_pipeline.history.get(key, [])
+            for raw_c, was_correct in history:
+                # Get calibrated probability for this forecast
+                cal_prob = self.calibration_pipeline.calibrate(signal_name, city_code, raw_c)
+                result.append((cal_prob, was_correct))
+
+        return result
+
+    # ===================================================================
+    # END CONFIDENCE & AGREEMENT SPEC IMPLEMENTATION
+    # ===================================================================
+
     def fit_calibration(self, all_station_signal_history):
         """
         Train the calibration pipeline on historical data.
@@ -447,6 +923,122 @@ class SignalFusionEngine:
             return adjusted_direction, adjusted_prob, adjusted_confidence
         else:
             return final_direction, final_prob, confidence
+
+
+class TimeDecaySignalManager:
+    """
+    P1.5: Time-Decay Weighted Signal Reliability Manager
+    
+    Tracks per-signal per-city performance with exponential forgetting.
+    Adjusts signal confidence based on recent reliability.
+    
+    Key formulas:
+    - reliability = exponentially weighted recent accuracy (decay_factor=0.9, window=30 days)
+    - adjusted_conf = sqrt(raw_conf * reliability)
+    - LOP weights modified by reliability
+    """
+    def __init__(self, signal_names, city_codes, decay_factor=0.9, window=30):
+        self.signal_names = signal_names
+        self.city_codes = city_codes
+        self.decay_factor = decay_factor
+        self.window = window
+        
+        # Per-signal per-city history: {(signal, city): [(date, correct_bool), ...]}
+        self.history = defaultdict(list)
+        
+        # Cached reliability scores: {(signal, city): reliability_score}
+        self.reliability_cache = {}
+        
+        # Per-signal per-city weighted accuracy for LOP
+        self.signal_weights = defaultdict(lambda: defaultdict(float))
+    
+    def update(self, signal_name, city_code, date, correct):
+        """Record a prediction outcome."""
+        self.history[(signal_name, city_code)].append((date, correct))
+        # Invalidate cache for this pair
+        self.reliability_cache.pop((signal_name, city_code), None)
+    
+    def compute_reliability(self, signal_name, city_code, current_date=None):
+        """
+        Compute exponentially weighted recent accuracy.
+        
+        reliability = sum(decay^(t-i) * correct_i) / sum(decay^(t-i))
+        where t is the current date index and i ranges over the window.
+        """
+        key = (signal_name, city_code)
+        if key in self.reliability_cache:
+            return self.reliability_cache[key]
+        
+        history = self.history.get(key, [])
+        if not history:
+            self.reliability_cache[key] = 0.5  # Default: no information
+            return 0.5
+        
+        # Sort by date and take last `window` entries
+        history_sorted = sorted(history, key=lambda x: x[0])
+        recent = history_sorted[-self.window:]
+        
+        if not recent:
+            self.reliability_cache[key] = 0.5
+            return 0.5
+        
+        # Exponential weighting: most recent = highest weight
+        n = len(recent)
+        weighted_sum = 0.0
+        weight_sum = 0.0
+        for i, (date, correct) in enumerate(recent):
+            # Weight = decay_factor^(n-1-i), so most recent (i=n-1) gets weight=1
+            w = self.decay_factor ** (n - 1 - i)
+            weighted_sum += w * (1.0 if correct else 0.0)
+            weight_sum += w
+        
+        reliability = weighted_sum / weight_sum if weight_sum > 0 else 0.5
+        
+        # Clamp to reasonable range
+        reliability = max(0.1, min(1.0, reliability))
+        
+        self.reliability_cache[key] = reliability
+        return reliability
+    
+    def adjust_confidence(self, signal_name, city_code, raw_conf):
+        """
+        Adjust signal confidence based on reliability.
+        
+        adjusted_conf = sqrt(raw_conf * reliability)
+        
+        This geometric mean penalizes overconfident signals with poor track records
+        while preserving well-calibrated signals.
+        """
+        reliability = self.compute_reliability(signal_name, city_code)
+        adjusted = math.sqrt(max(0.0, raw_conf) * reliability)
+        return adjusted
+    
+    def get_lop_weight(self, signal_name, city_code):
+        """
+        Get reliability-weighted LOP weight for a signal.
+        
+        Signals with higher recent reliability get proportionally more weight
+        in the log-odds linear opinion pool.
+        """
+        reliability = self.compute_reliability(signal_name, city_code)
+        # Convert reliability to weight: log-odds of reliability
+        # This ensures that 50% reliability → 0 weight, >50% → positive weight
+        if reliability <= 0.01:
+            return 0.0
+        return math.log(reliability / (1.0 - reliability)) if reliability < 0.99 else 4.6  # log(99)
+    
+    def get_all_reliabilities(self, city_code):
+        """Get reliability scores for all signals at a city."""
+        return {sig: self.compute_reliability(sig, city_code) for sig in self.signal_names}
+    
+    def get_reliability_report(self, city_code):
+        """Generate a human-readable reliability report for a city."""
+        report = []
+        for sig in self.signal_names:
+            r = self.compute_reliability(sig, city_code)
+            n = len(self.history.get((sig, city_code), []))
+            report.append(f"  {sig}: reliability={r:.3f} ({n} observations)")
+        return "\n".join(report)
 
 
 def demonstrate_fusion_stack():
