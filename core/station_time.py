@@ -1,5 +1,24 @@
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Tuple
+import sys
+import os
+
+# Add core directory to path for kalshi_calendar import
+CORE_DIR = os.path.dirname(os.path.abspath(__file__))
+if CORE_DIR not in sys.path:
+    sys.path.insert(0, CORE_DIR)
+
+try:
+    from kalshi_calendar import is_trading_day, get_prev_trading_day
+except ImportError:
+    # Fallback if kalshi_calendar is not available
+    def is_trading_day(d):
+        return d.weekday() < 5  # Mon-Fri only
+    def get_prev_trading_day(d):
+        prev = d - timedelta(days=1)
+        while not is_trading_day(prev):
+            prev = prev - timedelta(days=1)
+        return prev
 
 try:
     from zoneinfo import ZoneInfo  # type: ignore
@@ -153,6 +172,7 @@ def is_within_entry_window(
     Entry window: T-18h to T-2h before settlement.
     - Before T-18h: too early, signals not reliable enough
     - After T-2h: too late, market about to settle
+    - Skips weekends and holidays (no trading on those days)
     
     Args:
         icao: Station code
@@ -174,8 +194,21 @@ def is_within_entry_window(
     if hours_until_settlement < 0:
         return False, f"market_already_settled ({hours_until_settlement:.1f}h ago)"
     
+    # Check if we're too close to settlement (before adjusting for trading days)
     if hours_until_settlement < ENTRY_WINDOW_HOURS_BEFORE_CLOSE:
-        return False, f"too_close_to_settlement ({hours_until_settlement:.1f}h < {ENTRY_WINDOW_HOURS_BEFORE_CLOSE}h)"
+        # Check if the previous trading day is a weekend/holiday
+        current_date = now_utc.date()
+        if not is_trading_day(current_date):
+            return False, f"current_date_not_trading ({current_date})"
+        
+        # Get the previous trading day
+        prev_trading = get_prev_trading_day(current_date)
+        
+        # Check if we're still too close to settlement on the previous trading day
+        # This handles cases where T-2h falls on a weekend/holiday
+        hours_prev = hours_until_settlement + 24  # Add 24h to account for previous day
+        if hours_prev < ENTRY_WINDOW_HOURS_BEFORE_CLOSE:
+            return False, f"too_close_to_settlement ({hours_until_settlement:.1f}h < {ENTRY_WINDOW_HOURS_BEFORE_CLOSE}h)"
     
     if hours_until_settlement > ENTRY_WINDOW_HOURS_BEFORE_SETTLEMENT:
         return False, f"too_far_from_settlement ({hours_until_settlement:.1f}h > {ENTRY_WINDOW_HOURS_BEFORE_SETTLEMENT}h)"
