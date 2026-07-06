@@ -113,7 +113,14 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
     Returns:
         Tuple of (confidence_score, confidence_factors_dict)
     """
-    is_daily_high = tracker.get("is_daily_high", False)
+    # Use appropriate daily field based on reversion direction
+    # is_down=False: spike up → reversion down, check is_daily_high
+    # is_down=True: spike down → reversion up, check is_daily_low
+    if is_down:
+        is_daily_extreme = tracker.get("is_daily_low", False)
+    else:
+        is_daily_extreme = tracker.get("is_daily_high", False)
+        
     daily_high_margin = float(tracker.get("daily_high_margin", 0.0) or 0.0)
     observations_since_spike = int(tracker.get("observations_since_spike", 0) or 0)
     day_fraction_at_spike = float(tracker.get("day_fraction_at_spike", 0.0) or 0.0)
@@ -123,7 +130,7 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
     # Up reversion (spike up → drop back): base 0.40 — more reliable
     # Down reversion (spike down → bounce back): base 0.25 — less reliable
     if is_down:
-        base = 0.25 if is_daily_high else 0.0
+        base = 0.25 if is_daily_extreme else 0.0
         # Down reversion: discount on bonuses too (cold-air drainage can persist)
         bonus_margin = min(daily_high_margin * 0.10, 0.15)  # reduced from 0.15/0.2
         bonus_obs = min(observations_since_spike * 0.015, 0.15)  # reduced from 0.02/0.2
@@ -134,7 +141,7 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
         confidence *= 0.85  # 15% discount for down-reversion signals
     else:
         # Up reversion: keep original calculation with slight boost
-        base = 0.40 if is_daily_high else 0.0
+        base = 0.40 if is_daily_extreme else 0.0
         bonus_margin = min(daily_high_margin * 0.15, 0.20)  # up to +0.20
         bonus_obs = min(observations_since_spike * 0.02, 0.20)  # up to +0.20
         bonus_time = day_fraction_at_spike * 0.20  # up to +0.20
@@ -146,7 +153,9 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
     confidence = max(0.0, min(1.0, confidence))  # clamp to [0.0, 1.0]
     
     confidence_factors = {
-        "is_daily_high": is_daily_high,
+        "is_daily_extreme": is_daily_extreme,  # is_daily_high or is_daily_low depending on is_down
+        "is_daily_high": tracker.get("is_daily_high", False),  # for backward compat
+        "is_daily_low": tracker.get("is_daily_low", False),  # for backward compat
         "daily_high_margin": daily_high_margin,
         "observations_since_spike": observations_since_spike,
         "day_fraction_at_spike": day_fraction_at_spike,
