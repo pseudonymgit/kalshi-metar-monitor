@@ -7,3 +7,4 @@ data/*.db
 logs/
 .pytest_cache/
 *.egg-info/
+data/isd_lite_raw.db
