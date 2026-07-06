@@ -119,7 +119,7 @@ class MultiInstancePaperTrader:
             stations = [
                 'KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA',
                 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN', 'KAUS',
-                'KPHL', 'KMDW', 'KNYC', 'KDFW', 'K MSP', 'KMSP',
+                'KPHL', 'KMDW', 'KNYC', 'KDFW', 'KMSP',
                 'KDTW', 'KCLT',
             ]
             stations = sorted(set(stations))
