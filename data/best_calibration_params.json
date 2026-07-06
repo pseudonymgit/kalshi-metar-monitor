@@ -1,0 +1,16 @@
+{
+  "decay_factor": 1.0,
+  "time_window": 30,
+  "conf_adjust_mode": "(raw + reliability) / 2",
+  "isotonic_enabled": true,
+  "regime_cal_enabled": false,
+  "signal_weights": {
+    "Reversion": 1.5237637230731318,
+    "Gaussian(48d)": 1.0763570435942036,
+    "Regime": 0.4436256244477731,
+    "Gaussian v2(30d)": 1.4842491874268138,
+    "Pressure": 1.4916324673186903,
+    "Calendar climatology": 0.6990882196830598,
+    "Goldilocks": 1.3683635624083672
+  }
+}

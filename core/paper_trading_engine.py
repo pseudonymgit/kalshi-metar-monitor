@@ -706,6 +706,23 @@ class PaperTrader:
         
         return result[0] if result and result[0] is not None else None
     
+    # Full ensemble signal list (Phase 2: 11 signals including new Phase 2 additions)
+    # This list is used across paper trading, backtest scripts, and signal fusion
+    # to ensure cross-file consistency.
+    FULL_ENSEMBLE_SIGNALS = [
+        'reversion',
+        'gaussian_v2',
+        'regime',
+        'pressure',
+        'climatology',
+        'goldilocks',
+        'late_day_momentum_hourly',
+        'pressure_regime_interaction',  # Phase 2 new
+        'dtr_trend',                   # Phase 2 new
+        'wind_direction_shift',        # Phase 2 new
+        'rdae_mos',                    # Phase 2 new
+    ]
+
     def enable_conviction_gating(self, signal_names=None, city_codes=None):
         """
         Enable conviction-score-based trade gating.
@@ -714,13 +731,16 @@ class PaperTrader:
         path in place_paper_trade. When enabled, trades must pass both the
         conviction score threshold (>= 0.20) AND the edge threshold.
         
+        Uses the full 11-signal ensemble by default, including Phase 2
+        additions (pressure_regime_interaction, dtr_trend, wind_direction_shift,
+        rdae_mos). This ensures consistency between backtesting and live trading.
+        
         Args:
-            signal_names: list of signal names for fusion engine
+            signal_names: list of signal names for fusion engine (defaults to FULL_ENSEMBLE_SIGNALS)
             city_codes: list of station codes for fusion engine
         """
         if signal_names is None:
-            signal_names = ['reversion', 'gaussian_v2', 'regime', 'pressure',
-                           'climatology', 'goldilocks', 'late_day_momentum_hourly']
+            signal_names = self.FULL_ENSEMBLE_SIGNALS
         if city_codes is None:
             city_codes = [s[0] for s in _get_all_stations()]
         
@@ -798,6 +818,8 @@ class PaperTrader:
         # ── CONVICTION SCORE PATH (when enabled) ──
         # Uses the SignalFusionEngine to compute SAS + conviction score.
         # Replaces the flat price_advantage_threshold = 0.08 with conviction-score gating.
+        # When conviction gating is enabled, the legacy threshold path is NOT used
+        # (removes dual-threshold inconsistency).
         agreement_score = None
         conviction_score = None
         
@@ -867,9 +889,11 @@ class PaperTrader:
             analytical_prob = fused_prob
             
         else:
-            # ── LEGACY PATH: flat price advantage threshold ──
+            # ── LEGACY PATH (only used when conviction gating is NOT enabled) ──
+            # Flat price advantage threshold. When conviction gating is enabled,
+            # this path is bypassed entirely to avoid dual-threshold conflicts.
             fair_price_advantage = analytical_prob - market_price
-            price_advantage_threshold = 0.08  # 8% edge requirement for HIGH type markets
+            price_advantage_threshold = 0.08  # 8% edge requirement
             
             if abs(fair_price_advantage) < price_advantage_threshold:
                 return {

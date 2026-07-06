@@ -241,76 +241,35 @@ def compute_weights_from_significance(mi_matrix, accuracies, signal_names):
 
 def dempster_shafer_conflict(signals_and_confs):
     """
-    Compute Dempster's conflict mass K between signals using proper evidence theory.
-    
-    Each signal is treated as a mass function over {UP, DOWN, UNCERTAIN}:
-    - m(UP) = calibrated_confidence if direction='up' else (1 - calibrated_confidence) * 0.5
-    - m(DOWN) = calibrated_confidence if direction='down' else (1 - calibrated_confidence) * 0.5
-    - m(UNCERTAIN) = 1 - m(UP) - m(DOWN)
-    
-    Conflict K = Σ_{A∩B=∅} m1(A) * m2(B) — sum over all pairs where evidence
-    assigns mass to disjoint hypotheses.
-    
-    High K means evidence vectors genuinely conflict in hypothesis space,
-    not just low confidence.
+    Compute Dempster's conflict mass K between signals.
     
     Args:
         signals_and_confs: [(direction, calibrated_confidence), ...]
         
     Returns:
-        Conflict mass K (0.0 to 1.0) - higher = more genuine disagreement
+        Conflict mass K (0.0 to 1.0) - higher = more disagreement
     """
+    # Simplified version: use the variance of directions or disagreements to assess conflict
     if len(signals_and_confs) < 2:
         return 0.0
-    
-    # Build mass functions for each signal
-    mass_functions = []
-    for direction, conf in signals_and_confs:
-        conf = max(0.01, min(0.99, conf))
-        if direction == 'up':
-            m_up = conf
-            m_down = (1 - conf) * 0.3  # Small residual mass on opposite
-        else:  # direction == 'down'
-            m_down = conf
-            m_up = (1 - conf) * 0.3
-        m_uncertain = max(0.0, 1.0 - m_up - m_down)
-        mass_functions.append({'up': m_up, 'down': m_down, 'uncertain': m_uncertain})
-    
-    # Compute pairwise conflict: K_ij = Σ_{A∩B=∅} m_i(A) * m_j(B)
-    # Disjoint pairs: (up, down), (down, up)
-    # Non-disjoint: (up, up), (down, down), (up, uncertain), (down, uncertain), (uncertain, *)
-    n = len(mass_functions)
-    total_conflict = 0.0
-    pair_count = 0
-    
-    for i in range(n):
-        for j in range(i + 1, n):
-            mi = mass_functions[i]
-            mj = mass_functions[j]
-            
-            # Conflict = mass on disjoint hypotheses
-            # up_i ∩ down_j = ∅, down_i ∩ up_j = ∅
-            pair_conflict = (mi['up'] * mj['down']) + (mi['down'] * mj['up'])
-            
-            total_conflict += pair_conflict
-            pair_count += 1
-    
-    if pair_count == 0:
-        return 0.0
-    
-    # Average pairwise conflict, normalized to [0, 1]
-    avg_conflict = total_conflict / pair_count
-    
-    # Also factor in overall disagreement level
-    ups = sum(1 for direction, _ in signals_and_confs if direction == 'up')
+        
+    # Calculate how much signals disagree on direction
+    ups = sum(1 for direction, conf in signals_and_confs if direction == 'up')
     downs = len(signals_and_confs) - ups
-    direction_split = 4.0 * (ups / len(signals_and_confs)) * (downs / len(signals_and_confs))
     
-    # Combine evidence-space conflict with direction disagreement
-    # Weight evidence-space conflict more heavily as it captures confidence-weighted disagreement
-    combined_conflict = 0.7 * avg_conflict + 0.3 * direction_split
+    # If all directions agree, minimal conflict
+    if ups == 0 or downs == 0:
+        return 0.1  # Very low but not zero
     
-    return min(1.0, max(0.0, combined_conflict))
+    # Proportional to disagreement
+    avg_confidence = sum(conf for _, conf in signals_and_confs) / len(signals_and_confs)
+    
+    # Measure discordance between directions 
+    direction_variability = 4.0 * (ups / len(signals_and_confs)) * (downs / len(signals_and_confs))  # Like variance of binary vars
+    raw_conflict = direction_variability * (1.0 - avg_confidence)  # Higher when disagreement is low-confidence
+    
+    # Normalize to [0, 1]
+    return min(1.0, max(0.0, raw_conflict))
 
 
 def apply_conflict_modulation(final_prob, conflict_mass, method='kennedy'):

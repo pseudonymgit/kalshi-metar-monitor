@@ -1,0 +1,218 @@
+{
+  "created": "2026-07-06T06:40:41.510798",
+  "task": "SH2 - Per-station skill gating with fix",
+  "baseline_accuracy": 0.65,
+  "target_range": "72-78%",
+  "projected_accuracy_with_gating": 0.706963,
+  "stations_total": 20,
+  "skilled_stations_count": 9,
+  "unskilled_stations_count": 11,
+  "skilled_stations": [
+    "KATL",
+    "KAUS",
+    "KDCA",
+    "KDEN",
+    "KLAS",
+    "KMIA",
+    "KMSP",
+    "KPHL",
+    "KSAT"
+  ],
+  "unskilled_stations": [
+    "KBOS",
+    "KDFW",
+    "KHOU",
+    "KLAX",
+    "KMDW",
+    "KMSY",
+    "KNYC",
+    "KOKC",
+    "KPHX",
+    "KSEA",
+    "KSFO"
+  ],
+  "station_results": {
+    "KATL": {
+      "data_points": 1500,
+      "brier_skill_score": 0.256886,
+      "ci_lower": 0.216141,
+      "ci_upper": 0.297631,
+      "accuracy": 0.764,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KAUS": {
+      "data_points": 1500,
+      "brier_skill_score": 0.132018,
+      "ci_lower": 0.087781,
+      "ci_upper": 0.176255,
+      "accuracy": 0.702,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KBOS": {
+      "data_points": 1500,
+      "brier_skill_score": -0.159092,
+      "ci_lower": -0.207173,
+      "ci_upper": -0.111011,
+      "accuracy": 0.542,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KDCA": {
+      "data_points": 1500,
+      "brier_skill_score": 0.107503,
+      "ci_lower": 0.063382,
+      "ci_upper": 0.151623,
+      "accuracy": 0.685333,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KDEN": {
+      "data_points": 1500,
+      "brier_skill_score": 0.047031,
+      "ci_lower": 0.001439,
+      "ci_upper": 0.092622,
+      "accuracy": 0.652,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KDFW": {
+      "data_points": 1500,
+      "brier_skill_score": 0.029313,
+      "ci_lower": -0.016786,
+      "ci_upper": 0.075412,
+      "accuracy": 0.64,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KHOU": {
+      "data_points": 1500,
+      "brier_skill_score": 0.013253,
+      "ci_lower": -0.032856,
+      "ci_upper": 0.059361,
+      "accuracy": 0.634,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KLAX": {
+      "data_points": 1500,
+      "brier_skill_score": -0.194515,
+      "ci_lower": -0.243082,
+      "ci_upper": -0.145947,
+      "accuracy": 0.512,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KMDW": {
+      "data_points": 1500,
+      "brier_skill_score": -0.114135,
+      "ci_lower": -0.1613,
+      "ci_upper": -0.06697,
+      "accuracy": 0.560667,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KMIA": {
+      "data_points": 1500,
+      "brier_skill_score": 0.235923,
+      "ci_lower": 0.194898,
+      "ci_upper": 0.276947,
+      "accuracy": 0.757333,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KMSP": {
+      "data_points": 1500,
+      "brier_skill_score": 0.066297,
+      "ci_lower": 0.021582,
+      "ci_upper": 0.111012,
+      "accuracy": 0.658,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KMSY": {
+      "data_points": 1500,
+      "brier_skill_score": 0.002611,
+      "ci_lower": -0.042641,
+      "ci_upper": 0.047863,
+      "accuracy": 0.615333,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KNYC": {
+      "data_points": 1500,
+      "brier_skill_score": -0.265879,
+      "ci_lower": -0.314395,
+      "ci_upper": -0.217362,
+      "accuracy": 0.476667,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KOKC": {
+      "data_points": 1500,
+      "brier_skill_score": -0.011726,
+      "ci_lower": -0.059332,
+      "ci_upper": 0.03588,
+      "accuracy": 0.63,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KPHL": {
+      "data_points": 1500,
+      "brier_skill_score": 0.090032,
+      "ci_lower": 0.045016,
+      "ci_upper": 0.135048,
+      "accuracy": 0.674667,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KPHX": {
+      "data_points": 1500,
+      "brier_skill_score": -0.248286,
+      "ci_lower": -0.296496,
+      "ci_upper": -0.200077,
+      "accuracy": 0.486,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KSEA": {
+      "data_points": 1500,
+      "brier_skill_score": -0.072721,
+      "ci_lower": -0.119931,
+      "ci_upper": -0.02551,
+      "accuracy": 0.582667,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KSFO": {
+      "data_points": 1500,
+      "brier_skill_score": -0.148887,
+      "ci_lower": -0.196637,
+      "ci_upper": -0.101137,
+      "accuracy": 0.536,
+      "skilled": false,
+      "baseline_brier_used": 0.25
+    },
+    "KLAS": {
+      "data_points": 1500,
+      "brier_skill_score": 0.096432,
+      "ci_lower": 0.051925,
+      "ci_upper": 0.140939,
+      "accuracy": 0.678,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    },
+    "KSAT": {
+      "data_points": 1500,
+      "brier_skill_score": 0.293874,
+      "ci_lower": 0.254138,
+      "ci_upper": 0.333611,
+      "accuracy": 0.791333,
+      "skilled": true,
+      "baseline_brier_used": 0.25
+    }
+  },
+  "trade_gate_policy": "ONLY_TRADE_SKILLED_STATIONS",
+  "target_achieved": false
+}

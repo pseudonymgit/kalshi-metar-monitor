@@ -60,7 +60,9 @@ STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU',
 def load_nwp_features(conn_nwp):
     """Load all NWP features, organized by (station, target_date).
     Returns dict: {station: {target_date: {variable: value}}}
-    Averaged across 4 models."""
+    Averaged across forecast models only (gfs, ecmwf, icon, gem).
+    era5 (historical reanalysis) is explicitly excluded to avoid
+    mixing reanalysis data with forecast data."""
     cur = conn_nwp.cursor()
     
     # First, determine which variables actually exist
@@ -77,13 +79,18 @@ def load_nwp_features(conn_nwp):
     
     print(f"  Using {len(resolved_vars)} NWP variables: {resolved_vars}")
     
-    # Load all data
+    # Load all data — STRICTLY filter to forecast models only.
+    # MODELS = ["gfs", "ecmwf", "icon", "gem"]
+    # era5 is a reanalysis product, NOT a forecast, and must never be
+    # included in analog search or trading decisions.
+    model_placeholders = ','.join('?' * len(MODELS))
     cur.execute(f"""
         SELECT station, target_date, variable, AVG(value) as avg_val
         FROM nwp_forecasts
         WHERE variable IN ({','.join('?' * len(resolved_vars))})
+          AND model IN ({model_placeholders})
         GROUP BY station, target_date, variable
-    """, resolved_vars)
+    """, resolved_vars + MODELS)
     
     data = defaultdict(lambda: defaultdict(dict))
     for station, target_date, variable, avg_val in cur.fetchall():
@@ -251,62 +258,66 @@ def run_backtest():
             target_data = station_nwp[target_date]
             target_fv = build_feature_vector(target_data, variables)
             
-            if target_fv is None:
-                # Can't use this day — add to library for future use if we have outcome
-                actual = station_dir.get(target_date)
-                if actual is not None:
-                    library_dates.append(target_date)
-                    library_outcomes.append(actual)
-                    # We don't have features, so skip adding to library_features
-                continue
-            
-            # Check if we have the actual outcome for this date
+            # Look up actual outcome for this date
             actual = station_dir.get(target_date)
-            if actual is None:
-                # No ground truth — add to library for future
+            
+            # ─── STRICT WALK-FORWARD: prediction BEFORE library addition ──
+            # The current day's features and outcome must NOT be in the library
+            # when making the prediction for this day. They are added AFTER.
+            
+            if target_fv is not None and actual is not None:
+                # ─── PREDICTION (before library addition) ────────────────────
+                if len(library_features) >= 5:
+                    lib_arr = np.array(library_features)
+                    
+                    # Normalize using library stats (no look-ahead)
+                    means = lib_arr.mean(axis=0)
+                    stds = lib_arr.std(axis=0)
+                    stds[stds == 0] = 1.0
+                    
+                    lib_norm = (lib_arr - means) / stds
+                    target_norm = (target_fv - means) / stds
+                    
+                    # Find analogs among library entries that have known outcomes
+                    # Since library_features and library_outcomes are kept in sync,
+                    # indices are valid for both arrays
+                    valid_indices = [i for i, o in enumerate(library_outcomes) if o is not None]
+                    if len(valid_indices) >= 5:
+                        valid_lib = lib_norm[valid_indices]
+                        valid_dates = [library_dates[i] for i in valid_indices]
+                        valid_outcomes = [library_outcomes[i] for i in valid_indices]
+                        
+                        # Compute distances
+                        diffs = valid_lib - target_norm
+                        distances = np.sqrt(np.sum(diffs ** 2, axis=1))
+                        
+                        k_actual = min(K_ANALOGS, len(distances))
+                        nearest = np.argsort(distances)[:k_actual]
+                        
+                        up_count = sum(1 for i in nearest if valid_outcomes[i] == 'up')
+                        total = len(nearest)
+                        prob_up = up_count / total
+                        confidence = abs(prob_up - 0.5) * 2
+                        predicted = 'up' if prob_up > 0.5 else 'down'
+                        
+                        results.append((predicted, actual, confidence))
+                
+                # ─── ADD TO LIBRARY AFTER PREDICTION ──────────────────────
+                # Strict walk-forward: current day enters library only after
+                # prediction is made, preventing lookahead bias.
+                library_dates.append(target_date)
+                library_features.append(target_fv)
+                library_outcomes.append(actual)
+            
+            elif target_fv is not None and actual is None:
+                # Have features but no outcome — add to library for future use.
+                # Outcome is None so it won't be used in analog matching.
                 library_dates.append(target_date)
                 library_features.append(target_fv)
                 library_outcomes.append(actual)  # None
-                continue
             
-            # ─── PREDICTION ────────────────────────────────────────────────
-            if len(library_features) >= 5:
-                lib_arr = np.array(library_features)
-                
-                # Normalize using library stats (no look-ahead)
-                means = lib_arr.mean(axis=0)
-                stds = lib_arr.std(axis=0)
-                stds[stds == 0] = 1.0
-                
-                lib_norm = (lib_arr - means) / stds
-                target_norm = (target_fv - means) / stds
-                
-                # Find analogs among library entries that have known outcomes
-                valid_indices = [i for i, o in enumerate(library_outcomes) if o is not None]
-                if len(valid_indices) >= 5:
-                    valid_lib = lib_norm[valid_indices]
-                    valid_dates = [library_dates[i] for i in valid_indices]
-                    valid_outcomes = [library_outcomes[i] for i in valid_indices]
-                    
-                    # Compute distances
-                    diffs = valid_lib - target_norm
-                    distances = np.sqrt(np.sum(diffs ** 2, axis=1))
-                    
-                    k_actual = min(K_ANALOGS, len(distances))
-                    nearest = np.argsort(distances)[:k_actual]
-                    
-                    up_count = sum(1 for i in nearest if valid_outcomes[i] == 'up')
-                    total = len(nearest)
-                    prob_up = up_count / total
-                    confidence = abs(prob_up - 0.5) * 2
-                    predicted = 'up' if prob_up > 0.5 else 'down'
-                    
-                    results.append((predicted, actual, confidence))
-            
-            # Add current day to library (for future predictions)
-            library_dates.append(target_date)
-            library_features.append(target_fv)
-            library_outcomes.append(actual)
+            # If target_fv is None, skip entirely — can't use for prediction or library
+            # This keeps all three library lists synchronized
         
         if results:
             station_results[station] = results
