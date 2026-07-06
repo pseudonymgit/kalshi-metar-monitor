@@ -16,7 +16,6 @@ This is a standalone module imported by split_backtest_hourly.py.
 
 import sqlite3
 import math
-import numpy as np
 from datetime import datetime, timezone
 from typing import Optional, Tuple, Dict
 from pathlib import Path
@@ -69,16 +68,29 @@ def _load_hourly_obs(station: str, date_str: str, conn: sqlite3.Connection):
 
 
 def _compute_slope(hours: list, temps: list) -> float:
-    """Linear-regression slope of temp vs. hour."""
+    """Linear-regression slope of temp vs. hour.
+    
+    Pure Python implementation - no numpy required.
+    Uses the formula: slope = (n*sum_xy - sum_x*sum_y) / (n*sum_x_sq - sum_x^2)
+    """
     n = len(hours)
     if n < 2:
         return 0.0
-    X = np.array(hours, dtype=float)
-    Y = np.array(temps, dtype=float)
-    sum_x = X.sum()
-    sum_y = Y.sum()
-    sum_xy = (X * Y).sum()
-    sum_x_sq = (X ** 2).sum()
+    
+    # Compute sums using pure Python
+    sum_x = 0.0
+    sum_y = 0.0
+    sum_xy = 0.0
+    sum_x_sq = 0.0
+    
+    for h, t in zip(hours, temps):
+        x = float(h)
+        y = float(t)
+        sum_x += x
+        sum_y += y
+        sum_xy += x * y
+        sum_x_sq += x * x
+    
     denom = n * sum_x_sq - sum_x ** 2
     if denom == 0:
         return 0.0
