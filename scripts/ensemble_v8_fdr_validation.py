@@ -24,9 +24,12 @@ from scipy.stats import binomtest
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
 FEE_RATE = 0.05
 
-ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
-                'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',
-                'KSAT','KSEA','KSFO']
+# 15 viable stations after R4-1.2 purge
+# Removed: KLAS, KMSY, KOKC, KSAT (negative-EV, no price mapping)
+# Removed: KDAL (duplicate of KDFW)
+ALL_STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU',
+                'KLAX','KMDW','KMIA','KMSP','KNYC','KPHL','KPHX',
+                'KSEA','KSFO']
 
 FDR_STATIONS = ['KNYC','KMIA','KDEN','KMDW','KLAX','KPHX','KATL','KBOS']
 
@@ -100,18 +103,44 @@ def approach_regime(idx, days):
     if idx < 15: return None, 0.0
     window = days[idx-15:idx-1]
     highs = [d['high'] for d in window]
+    lows = [d['low'] for d in window]
     mean = sum(highs) / len(highs)
     var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
     vol = math.sqrt(var)
     slope = (highs[-1] - highs[0]) / len(highs) if len(highs) >= 2 else 0
-    if vol < 1.0 and abs(slope) < 0.5:
+    
+    # R4-1.4: DTR-scaled regime-adaptive threshold
+    # Use DTR from the previous day to determine regime
+    if idx >= 1:
+        dtr = days[idx-1]['high'] - days[idx-1]['low']
+    else:
+        dtr = 10.0  # default moderate
+    
+    # High DTR (>15°F): scale threshold up; Low DTR (<8°F): scale down with reduced confidence
+    if dtr > 15.0:
+        threshold = 1.0  # stricter on high-DTR days (strong radiative cooling)
+    elif dtr < 8.0:
+        threshold = 0.4  # lower bar on low-DTR days
+        confidence_scale = 0.6  # but less confidence
+    else:
+        threshold = 0.8  # moderate DTR baseline
+    
+    if vol < 1.0 and abs(slope) < threshold:
         if idx >= 31:
             w30 = days[idx-31:idx-1]
             h30 = [d['high'] for d in w30]
             m30 = sum(h30) / len(h30)
             dist = days[idx-1]['high'] - m30
-            if dist > 1.0: return 'down', min(dist/3.0, 0.8)
-            elif dist < -1.0: return 'up', min(abs(dist)/3.0, 0.8)
+            if dist > 1.0:
+                conf = min(dist/3.0, 0.8)
+                if dtr < 8.0:
+                    conf *= 0.6  # R4-1.4: reduce confidence for low-DTR
+                return 'down', conf
+            elif dist < -1.0:
+                conf = min(abs(dist)/3.0, 0.8)
+                if dtr < 8.0:
+                    conf *= 0.6
+                return 'up', conf
     return None, 0.0
 
 def approach_gaussian_v2(idx, days):
@@ -188,6 +217,45 @@ def compute_sharpe(returns, fee_rate=0.05):
     var = np.var(vals, ddof=1) if n > 1 else 0.01
     std = math.sqrt(var) if var > 0 else 0.01
     return mean / std if std > 0 else 0.0
+
+def compute_brier(results):
+    """Compute Brier score from prediction results.
+    Each result is (predicted, actual, confidence).
+    Brier = mean((prob_up - outcome)^2) where outcome=1 if up, 0 if down."""
+    if not results: return 0.0
+    total = 0.0
+    for pred, actual, conf in results:
+        # Convert to probability of 'up'
+        if pred == 'up':
+            prob_up = conf
+        else:
+            prob_up = 1.0 - conf
+        outcome = 1.0 if actual == 'up' else 0.0
+        total += (prob_up - outcome) ** 2
+    return total / len(results)
+
+def compute_ece(results, n_bins=10):
+    """Compute Expected Calibration Error.
+    Groups predictions into confidence bins, measures |accuracy - confidence| per bin."""
+    if not results: return 0.0
+    bins = [[] for _ in range(n_bins)]
+    for pred, actual, conf in results:
+        bin_idx = min(int(conf * n_bins), n_bins - 1)
+        ok = (pred == actual)
+        bins[bin_idx].append((conf, ok))
+    ece = 0.0
+    n = len(results)
+    for b in bins:
+        if not b: continue
+        acc = sum(1 for _, ok in b if ok) / len(b)
+        avg_conf = sum(c for c, _ in b) / len(b)
+        ece += (len(b) / n) * abs(acc - avg_conf)
+    return ece
+
+def compute_win_rate(results):
+    if not results: return 0.0
+    wins = sum(1 for p, a, c in results if p == a)
+    return wins / len(results)
 
 def max_drawdown(results, initial=250.0, bet=10.0):
     bankroll = initial
@@ -285,9 +353,60 @@ def main():
     dd = max_drawdown(all_results)
     binom_p = binomial_test_p(correct, total)
     ci = bootstrap_ci([(p, a) for p, a, c in all_results])
+    brier = compute_brier(all_results)
+    ece = compute_ece(all_results)
+    win_rate = compute_win_rate(all_results)
     
     print(f"\n{'AGGREGATE':<8} {total:>8} {correct:>8} {accuracy:>10.2%} {sharpe:>8.3f} {dd:>8.2%} {binom_p:>10.4f}")
     print(f"  95% CI: [{ci[0]:.2%}, {ci[1]:.2%}]")
+    print(f"  Brier score: {brier:.4f}")
+    print(f"  ECE: {ece:.4f}")
+    print(f"  Win rate: {win_rate:.2%}")
+    
+    # ─── WRITE P0 BACKTEST REPORT (Part 1: metrics + per-station) ──────
+    report_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'reports')
+    os.makedirs(report_dir, exist_ok=True)
+    report_path = os.path.join(report_dir, 'p0-backtest-results-2026-07-06.md')
+    with open(report_path, 'w') as f:
+        f.write("# P0.2-P0.3 — Full Backtest Results (Phase 1 Fixes Applied)\n\n")
+        f.write(f"**Date:** 2026-07-06\n")
+        f.write(f"**Branch:** main (post-R4-1.1 through R4-1.6 merge)\n")
+        f.write(f"**Database:** {DB_PATH}\n")
+        f.write(f"**Stations:** {len(ALL_STATIONS)} (after R4-1.2 purge of KLAS, KMSY, KOKC, KSAT, KDAL)\n")
+        f.write(f"**Walk-forward:** 180-day train / 30-day test\n")
+        f.write(f"**Fee rate:** {FEE_RATE:.0%}\n\n")
+        f.write("## Aggregate Metrics\n\n")
+        f.write(f"| Metric | Value |\n")
+        f.write(f"|--------|-------|\n")
+        f.write(f"| Directional accuracy | {accuracy:.2%} |\n")
+        f.write(f"| Win rate | {win_rate:.2%} |\n")
+        f.write(f"| Sharpe ratio (with fees) | {sharpe:.3f} |\n")
+        f.write(f"| Brier score | {brier:.4f} |\n")
+        f.write(f"| ECE | {ece:.4f} |\n")
+        f.write(f"| Max drawdown | {dd:.2%} |\n")
+        f.write(f"| Trade count | {total} |\n")
+        f.write(f"| Binomial p-value | {binom_p:.4f} |\n")
+        f.write(f"| 95% CI | [{ci[0]:.2%}, {ci[1]:.2%}] |\n\n")
+        f.write("## Per-Station Accuracy Breakdown\n\n")
+        f.write(f"| Station | Trades | Correct | Accuracy | Sharpe | MaxDD | Binom p |\n")
+        f.write(f"|---------|--------|---------|----------|--------|-------|---------|\n")
+        for station, results in sorted(station_results.items()):
+            st_total = len(results)
+            st_correct = sum(1 for p, a, c in results if p == a)
+            st_acc = st_correct / st_total if st_total > 0 else 0
+            st_sharpe = compute_sharpe([(c, p==a) for p, a, c in results])
+            st_dd = max_drawdown(results)
+            st_binom = binomial_test_p(st_correct, st_total)
+            f.write(f"| {station} | {st_total} | {st_correct} | {st_acc:.2%} | {st_sharpe:.3f} | {st_dd:.2%} | {st_binom:.4f} |\n")
+        f.write("\n## Phase 1 Fixes Applied\n\n")
+        f.write("1. **R4-1.1:** P&L mark-to-market fix (thread-safe price cache)\n")
+        f.write("2. **R4-1.2:** Purged negative-EV markets (KLAS, KMSY, KOKC, KSAT, KDAL)\n")
+        f.write("3. **R4-1.3:** Settlement-window entry timing (T-18h to T-2h)\n")
+        f.write("4. **R4-1.4:** Signal 4 regime-adaptive threshold (DTR-scaled)\n")
+        f.write("5. **R4-1.5:** Goldilocks confidence split (up/down directional)\n")
+        f.write("6. **R4-1.6:** Cluster budget caps + same-city pair hedging\n\n")
+        # Regime section will be appended after Part 4 computes those values
+    print(f"\n  📝 Report written to {report_path} (regime section appended after Part 4)")
     
     # ─── PART 2: FDR correction on 8 key stations × 2 signals ──────────────
     print()
@@ -460,6 +579,15 @@ def main():
     print(f"    Original claim: 97.5% — {'✓ HOLDS' if su_acc >= 0.90 else '✗ FAILS'}")
     print(f"  Stable + Reversion=1 (bet DOWN): {sd_acc:.2%} ({stable_down_c}/{stable_down_t} trades)")
     print(f"    Original claim: 69.8% — {'✓ HOLDS' if sd_acc >= 0.60 else '✗ FAILS'}")
+    
+    # Append regime section to P0 report
+    with open(report_path, 'a') as f:
+        f.write("## Regime Strategy (Edge 14)\n\n")
+        f.write(f"| Regime | Trades | Accuracy | Original Claim | Status |\n")
+        f.write(f"|--------|--------|----------|----------------|--------|\n")
+        f.write(f"| Stable + Reversion=0 (UP) | {stable_up_t} | {su_acc:.2%} | 97.5% | {'HOLDS' if su_acc >= 0.90 else 'FAILS'} |\n")
+        f.write(f"| Stable + Reversion=1 (DOWN) | {stable_down_t} | {sd_acc:.2%} | 69.8% | {'HOLDS' if sd_acc >= 0.60 else 'FAILS'} |\n")
+    print(f"  📝 Regime section appended to {report_path}")
     
     # ─── VERDICT ───────────────────────────────────────────────────────────
     print()
