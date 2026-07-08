@@ -9,3 +9,5 @@ logs/
 *.egg-info/
 data/isd_lite_raw.db
 core/__pycache__/
+data/isd_lite_raw.db
+data/*.db-journal
