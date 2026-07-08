@@ -294,8 +294,8 @@ def demonstrate_calibration_workflow():
     print("DEMONSTRATION: CalibrationPipeline")
     print("=" * 60)
     
-    # Example from Expert 6 report
-    signal_names = ['reversion', 'gaussian_v2', 'regime']
+    # Example from Expert 6 report (dead signals removed: reversion, regime, dtr_trend, pressure_regime_interaction)
+    signal_names = ['gaussian_v2', 'pressure', 'calendar_climatology']
     city_codes = ['KNYC', 'KLAX', 'KATL']
     
     # Create pipeline
@@ -303,13 +303,12 @@ def demonstrate_calibration_workflow():
     
     # Simulated training data - (signal, city, raw_confidence, correct_bool, date)
     training_data = [
-        ('reversion', 'KNYC', 0.8, True, '2024-01-01'),
-        ('reversion', 'KNYC', 0.9, True, '2024-01-02'),  
-        ('reversion', 'KNYC', 0.6, False, '2024-01-03'),
-        ('reversion', 'KNYC', 0.7, True, '2024-01-04'),
-        ('reversion', 'KATL', 0.85, True, '2024-01-05'),
         ('gaussian_v2', 'KNYC', 0.75, True, '2024-01-01'),
         ('gaussian_v2', 'KNYC', 0.8, False, '2024-01-02'),
+        ('gaussian_v2', 'KLAX', 0.78, True, '2024-01-03'),
+        ('pressure', 'KNYC', 0.72, True, '2024-01-01'),
+        ('pressure', 'KATL', 0.68, True, '2024-01-02'),
+        ('calendar_climatology', 'KNYC', 0.70, True, '2024-01-03'),
         # Add more to meet MIN_SAMPLES requirement for some cells 
     ]
     
@@ -333,8 +332,9 @@ def demonstrate_calibration_workflow():
     
     # Test the calibration on a few samples
     test_samples = [
-        ('reversion', 'KNYC', 0.75),
-        ('reversion', 'KATL', 0.75),
+        ('gaussian_v2', 'KNYC', 0.75),
+        ('pressure', 'KATL', 0.70),
+        ('calendar_climatology', 'KLAX', 0.68),
         ('nonexistent', 'KATL', 0.75),  # Should use fallback
     ]
     

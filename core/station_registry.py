@@ -36,24 +36,26 @@ _STATIC_MAPPING = {
     "KDEN": {"city_name": "Denver", "state": "CO", "lat": 39.8561, "lon": -104.6737},
     "KDFW": {"city_name": "Dallas", "state": "TX", "lat": 32.8998, "lon": -97.0403},
     "KHOU": {"city_name": "Houston", "state": "TX", "lat": 29.6454, "lon": -95.2789},
+    "KJFK": {"city_name": "New York", "state": "NY", "lat": 40.6413, "lon": -73.7781},
     "KLAX": {"city_name": "Los Angeles", "state": "CA", "lat": 33.9425, "lon": -118.4081},
-    "KMDW": {"city_name": "Chicago", "state": "IL", "lat": 41.7868, "lon": -87.7522},
     "KMIA": {"city_name": "Miami", "state": "FL", "lat": 25.7959, "lon": -80.2870},
     "KMSP": {"city_name": "Minneapolis", "state": "MN", "lat": 44.8848, "lon": -93.2223},
-    "KNYC": {"city_name": "New York", "state": "NY", "lat": 40.7128, "lon": -74.0060},
+    "KORD": {"city_name": "Chicago", "state": "IL", "lat": 41.9804, "lon": -87.9082},
     "KPHL": {"city_name": "Philadelphia", "state": "PA", "lat": 39.8744, "lon": -75.2424},
     "KPHX": {"city_name": "Phoenix", "state": "AZ", "lat": 33.4342, "lon": -112.0116},
     "KSEA": {"city_name": "Seattle", "state": "WA", "lat": 47.4502, "lon": -122.3088},
     "KSFO": {"city_name": "San Francisco", "state": "CA", "lat": 37.6213, "lon": -122.3790},
 }
 
-# Stations removed from registry (negative-EV or duplicates)
+# Stations removed from registry (negative-EV, duplicates, or no price fetcher mapping)
 # KDAL: duplicate of KDFW — Kalshi settles Dallas on KDFW
 # KLAS: no price fetcher mapping → 0.50 fallback → negative-EV
 # KMSY: no price fetcher mapping → 0.50 fallback → negative-EV
 # KOKC: no price fetcher mapping → 0.50 fallback → negative-EV
 # KSAT: no price fetcher mapping → 0.50 fallback → negative-EV
-_REMOVED_STATIONS = {"KDAL", "KLAS", "KMSY", "KOKC", "KSAT"}
+# KNYC: duplicate of KJFK — same New York market, METAR uses KJFK
+# KMDW: duplicate of KORD — same Chicago market, METAR uses KORD
+_REMOVED_STATIONS = {"KDAL", "KLAS", "KMSY", "KOKC", "KSAT", "KNYC", "KMDW"}
 
 
 def _try_kalshi_discovery():
@@ -189,9 +191,9 @@ def get_station_coordinates(station_code):
 # Cluster budget cap prevents over-concentration in one weather event.
 
 STATION_CLUSTERS = {
-    "northeast":     ["KNYC", "KPHL", "KBOS", "KDCA"],
+    "northeast":     ["KJFK", "KPHL", "KBOS", "KDCA"],
     "gulf_south":    ["KHOU", "KMIA", "KATL", "KDFW", "KAUS"],
-    "plains_midwest": ["KDEN", "KMSP", "KMDW"],
+    "plains_midwest": ["KDEN", "KMSP", "KORD"],
     "southwest":     ["KPHX"],
     "west_coast":    ["KLAX", "KSEA", "KSFO"],
 }

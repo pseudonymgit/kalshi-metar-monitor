@@ -596,15 +596,9 @@ class PaperTrader:
         metar_conn = sqlite3.connect(self.metar_db, timeout=10)
         
         for station in available_stations:
-            # Signal 1: Temperature reversion from historical patterns
-            prior_movement = self._get_prior_day_reversion(station, date)
-            
-            if prior_movement is not None:
-                if abs(prior_movement) > 2:  # Significant movement (more than 2 points)
-                    if prior_movement > 0:
-                        signals.append((station, "HIGH", MarketSide.DOWN, "large_positive_reversion"))
-                    else:
-                        signals.append((station, "HIGH", MarketSide.UP, "large_negative_reversion"))
+            # NOTE: reversion signal (Signal 1) REMOVED from ensemble per Phase 1 fix.
+            # Reversion proved unreliable — it used stale fill_price for P&L and had
+            # negative directional accuracy on out-of-sample data.
             
             # Signal 2: Calendar day pattern (climatology-based)
             climatology_direction = self._get_calendar_climatology_direction(station, date)
@@ -943,9 +937,15 @@ class PaperTrader:
         
         confidence_factor = 0.5 + (confidence * 0.3)  # Legacy factor retained for compatibility
         
-        # Actually fill the trade at market price (add fee impact)
+        # Fill the trade at market price (add fee impact)
         fill_price = market_price
-        quantity = round(position_size / market_price) if market_price > 0.001 else 0
+        # Fetch current market price for mark-to-market immediately after fill
+        # to avoid using stale fill_price for P&L calculations
+        current_market_price = self._fetch_current_market_price(station, market_type, date)
+        # Use current_market_price for quantity if it provides better sizing;
+        # fall back to fill_price (which equals market_price) only when API fails
+        effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
+        quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
         
         fee_cost = abs(position_size * self.fee_rate)
         net_cost = position_size + fee_cost * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
@@ -1016,8 +1016,10 @@ class PaperTrader:
                                    trade_version, functionality, date):
         """Update positions table after a trade execution.
         
-        Uses current market price (via Kalshi API) for mark-to-market valuation,
-        NOT the fill price. The fill price is only used for cost basis calculation.
+        CRITICAL: Uses current_market_price (via Kalshi API) for unrealized P&L
+        and mark-to-market valuation, NOT the fill_price.  The fill_price is ONLY
+        used for cost basis (average_cost) calculation.  This ensures unrealized
+        P&L always reflects current market reality, not stale execution prices.
         """
         conn = sqlite3.connect(self.paper_db)
         c = conn.cursor()

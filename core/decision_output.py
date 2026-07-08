@@ -214,32 +214,23 @@ class DecisionOutputGenerator:
         signal_correction = 0.0
         total_signal_conf = 0.0
         
-        # Simple reversion signal (equivalent to what's in split_backtest)
-        rev_direction, rev_conf, rev_prob = get_reversion_signal(station, date, max_temp, settlement, prior)
-        if rev_direction is not None:
-            if rev_direction == 'up':
-                signal_correction = rev_prob
-            elif rev_direction == 'down':
-                signal_correction = 1 - rev_prob  # Flip because down means less probability of up
-            total_signal_conf = rev_conf
-        
-        # Weighted average combining climatology with signal
-        # In production, we would use more sophisticated weighting from ensemble models
-        weighted_prob = (clim_prob * 0.6) + (signal_correction * 0.25) + (0.5 * 0.15)  # Add neutral base
-        total_conf = min(0.90, max(0.10, clim_conf * 0.6 + total_signal_conf * 0.25 + 0.15))  # Factor in neutral base confidence
+        # NOTE: reversion_signal removed from ensemble per Phase 1 fixes.
+        # The 7 active signals are: gaussian_v2, pressure, calendar_climatology,
+        # goldilocks, late_day_momentum_hourly, cloud_cover_modulation, forecast_disagreement
+        # Only climatology_analysis + neutral_base remain in this simplified estimator.
+        weighted_prob = (clim_prob * 0.75) + (0.5 * 0.25)  # Climatology 75%, neutral base 25%
+        total_conf = min(0.90, max(0.10, clim_conf * 0.75 + 0.10))  # Reduced signal confidence weight
 
         # Generate reasoning
         components = [
-            ("climatology_analysis", 0.6), 
-            ("reversion_signal", 0.25), 
-            ("neutral_base", 0.15)
+            ("climatology_analysis", 0.75), 
+            ("neutral_base", 0.25)
         ]
         
         reasoning = [
             f"Historical frequency for this date & location suggests {weighted_prob:.2%} odds",
-            f"Week's recent pattern contributes based on settlement at {settlement} vs prior {prior}",
             f"Climatology data contributes base estimate of {clim_prob:.2%} with {clim_conf:.1%} confidence",
-            f"Reversion signal adjusted estimate by {(signal_correction - clim_prob):+.2%}"
+            f"Reversion signal removed from ensemble (Phase 1 fix — unreliable signal)",
         ]
         
         risk_factors = [

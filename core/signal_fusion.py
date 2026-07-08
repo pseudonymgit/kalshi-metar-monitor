@@ -457,7 +457,7 @@ def demonstrate_fusion_stack():
     print("=" * 60)
     
     # Example from Expert 2 report
-    signal_names = ['reversion', 'gaussian_v2', 'regime', 'pressure']  
+    signal_names = ['gaussian_v2', 'pressure', 'calendar_climatology', 'goldilocks']  
     city_codes = ['KNYC', 'KLAX', 'KATL']
     
     # Create fusion engine
@@ -465,11 +465,12 @@ def demonstrate_fusion_stack():
     
     # Simulated history to train calibration
     history = {
-        ('reversion', 'KNYC'): [(0.75, True), (0.82, True), (0.68, False), (0.77, True)],
-        ('reversion', 'KLAX'): [(0.65, False), (0.78, True), (0.85, True), (0.72, True)],
         ('gaussian_v2', 'KNYC'): [(0.70, True), (0.80, True), (0.60, False), (0.75, True)],
         ('gaussian_v2', 'KLAX'): [(0.68, True), (0.75, False), (0.82, True), (0.65, True)],
-        # ... add more entries per city-signal combination...
+        ('pressure', 'KNYC'): [(0.65, True), (0.72, True), (0.58, False), (0.70, True)],
+        ('pressure', 'KLAX'): [(0.60, False), (0.73, True), (0.80, True), (0.68, True)],
+        ('calendar_climatology', 'KNYC'): [(0.66, True), (0.78, True), (0.62, False), (0.74, True)],
+        ('goldilocks', 'KLAX'): [(0.69, True), (0.76, False), (0.83, True), (0.67, True)],
     }
     
     # Add many more to meet MIN_SAMPLES requirement
@@ -488,10 +489,11 @@ def demonstrate_fusion_stack():
     fusion.fit_calibration(history)
     
     # Test fusion on example signals
+    # Test fusion on example signals (dead signals removed: reversion, regime, pressure_regime_interaction, dtr_trend)
     test_signals = [
-        ('reversion', 'up', 0.75),
         ('gaussian_v2', 'up', 0.68),
-        ('regime', 'down', 0.80)
+        ('pressure', 'up', 0.70),
+        ('calendar_climatology', 'down', 0.72)
     ]
     
     print(f"\nTest Fusion Input:")
