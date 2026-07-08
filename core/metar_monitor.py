@@ -3602,7 +3602,8 @@ def _send_alert(webhook: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     try:
         from core.kalshi_monitor import _current_kalshi_execution_domain
         current_domain = _current_kalshi_execution_domain()
-        if current_domain not in ["production"]:
+        allowed_domains = {"prod", "sbox", "dev"}
+        if current_domain not in allowed_domains:
             result = {
                 "delivery_attempted": True,
                 "delivery_succeeded": False,
