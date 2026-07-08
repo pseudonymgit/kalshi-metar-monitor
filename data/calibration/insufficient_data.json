@@ -1,0 +1,112 @@
+[
+  {
+    "station": "KATL",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KAUS",
+    "signal": "regime",
+    "reason": "Only 1 prediction-outcome pairs"
+  },
+  {
+    "station": "KBOS",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KDCA",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KDEN",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KDFW",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KHOU",
+    "signal": "regime",
+    "reason": "Only 4 prediction-outcome pairs"
+  },
+  {
+    "station": "KLAS",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KLAX",
+    "signal": "regime",
+    "reason": "Only 14 prediction-outcome pairs"
+  },
+  {
+    "station": "KMDW",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KMIA",
+    "signal": "regime",
+    "reason": "Only 18 prediction-outcome pairs"
+  },
+  {
+    "station": "KMIA",
+    "signal": "wind_direction_shift",
+    "reason": "Only 29 prediction-outcome pairs"
+  },
+  {
+    "station": "KMSP",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KMSY",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KNYC",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KOKC",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KPHL",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KPHX",
+    "signal": "regime",
+    "reason": "Only 1 prediction-outcome pairs"
+  },
+  {
+    "station": "KPHX",
+    "signal": "wind_direction_shift",
+    "reason": "Only 23 prediction-outcome pairs"
+  },
+  {
+    "station": "KSAT",
+    "signal": "regime",
+    "reason": "Only 7 prediction-outcome pairs"
+  },
+  {
+    "station": "KSEA",
+    "signal": "regime",
+    "reason": "Only 0 prediction-outcome pairs"
+  },
+  {
+    "station": "KSFO",
+    "signal": "regime",
+    "reason": "Only 2 prediction-outcome pairs"
+  }
+]

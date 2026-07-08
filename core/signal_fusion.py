@@ -489,7 +489,6 @@ def demonstrate_fusion_stack():
     fusion.fit_calibration(history)
     
     # Test fusion on example signals
-    # Test fusion on example signals (dead signals removed: reversion, regime, pressure_regime_interaction, dtr_trend)
     test_signals = [
         ('gaussian_v2', 'up', 0.68),
         ('pressure', 'up', 0.70),

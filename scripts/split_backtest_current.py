@@ -27,19 +27,12 @@ DB_PATH = REPO_ROOT / "data" / "metar_backfill.db"
 
 SIGNAL_TYPES = [
     "late_day_momentum_hourly",
-    "reversion_after_settlement", 
     "calendar_climatology",
     "near_boundary_momentum_up",
     "near_boundary_momentum_down", 
-    "goldilocks_reversion_alert"
 ]
 
-ALL_STATIONS = [
-    "KATL", "KAUS", "KBOS", "KDCA", "KDEN",
-    "KDFW", "KHOU", "KLAS", "KLAX", "KMDW", 
-    "KMIA", "KMSP", "KMSY", "KNYC", "KOKC",
-    "KPHL", "KPHX", "KSAT", "KSEA", "KSFO"
-]
+ALL_STATIONS = ['KNYC', 'KLAX', 'KMDW', 'KBOS', 'KATL', 'KSFO', 'KSEA']
 
 START_DATE = "2024-01-01"
 END_DATE = "2024-07-05"
@@ -79,7 +72,6 @@ def simulate_signal_performance_all_stations():
             avg_sharpe = 0.85
             avg_brier = 0.22
             profit = 4500.32
-        elif sig_type == "reversion_after_settlement":
             trades = 187
             avg_accuracy = 0.58
             avg_sharpe = 0.72
@@ -97,7 +89,6 @@ def simulate_signal_performance_all_stations():
             avg_sharpe = 0.92
             avg_brier = 0.21
             profit = 1230.77
-        elif sig_type == "goldilocks_reversion_alert":
             trades = 42
             avg_accuracy = 0.71
             avg_sharpe = 1.21

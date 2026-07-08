@@ -1,0 +1,16 @@
+{
+  "date": "2026-07-06",
+  "instance": "DEV",
+  "date_range": [
+    "2026-06-29",
+    "2026-07-06"
+  ],
+  "paper_stats": {},
+  "backtest_stats": {},
+  "drift_result": {
+    "drift_detected": false,
+    "reason": "Insufficient data for comparison",
+    "paper_stats_days": 0,
+    "backtest_stats_days": 0
+  }
+}

@@ -1,0 +1,1710 @@
+{
+  "reversion": {
+    "KATL": {
+      "pairs": 1038,
+      "accuracy": 0.6358,
+      "ece": 0.2371,
+      "brier": 0.2897
+    },
+    "KAUS": {
+      "pairs": 1045,
+      "accuracy": 0.666,
+      "ece": 0.2639,
+      "brier": 0.3023
+    },
+    "KBOS": {
+      "pairs": 1022,
+      "accuracy": 0.6742,
+      "ece": 0.2681,
+      "brier": 0.3028
+    },
+    "KDCA": {
+      "pairs": 1042,
+      "accuracy": 0.6478,
+      "ece": 0.2354,
+      "brier": 0.2949
+    },
+    "KDEN": {
+      "pairs": 1037,
+      "accuracy": 0.6644,
+      "ece": 0.2778,
+      "brier": 0.3023
+    },
+    "KDFW": {
+      "pairs": 1061,
+      "accuracy": 0.6437,
+      "ece": 0.2626,
+      "brier": 0.3035
+    },
+    "KHOU": {
+      "pairs": 1082,
+      "accuracy": 0.6534,
+      "ece": 0.2673,
+      "brier": 0.3071
+    },
+    "KLAS": {
+      "pairs": 1068,
+      "accuracy": 0.5749,
+      "ece": 0.1775,
+      "brier": 0.2871
+    },
+    "KLAX": {
+      "pairs": 993,
+      "accuracy": 0.6274,
+      "ece": 0.2423,
+      "brier": 0.289
+    },
+    "KMDW": {
+      "pairs": 1045,
+      "accuracy": 0.6306,
+      "ece": 0.224,
+      "brier": 0.2862
+    },
+    "KMIA": {
+      "pairs": 967,
+      "accuracy": 0.6887,
+      "ece": 0.2922,
+      "brier": 0.3096
+    },
+    "KMSP": {
+      "pairs": 1017,
+      "accuracy": 0.6332,
+      "ece": 0.2265,
+      "brier": 0.2895
+    },
+    "KMSY": {
+      "pairs": 1062,
+      "accuracy": 0.6582,
+      "ece": 0.2639,
+      "brier": 0.3006
+    },
+    "KNYC": {
+      "pairs": 1027,
+      "accuracy": 0.6407,
+      "ece": 0.2256,
+      "brier": 0.2894
+    },
+    "KOKC": {
+      "pairs": 1058,
+      "accuracy": 0.6427,
+      "ece": 0.2373,
+      "brier": 0.2876
+    },
+    "KPHL": {
+      "pairs": 1041,
+      "accuracy": 0.634,
+      "ece": 0.2239,
+      "brier": 0.2916
+    },
+    "KPHX": {
+      "pairs": 1089,
+      "accuracy": 0.596,
+      "ece": 0.1951,
+      "brier": 0.2829
+    },
+    "KSAT": {
+      "pairs": 1014,
+      "accuracy": 0.6686,
+      "ece": 0.2794,
+      "brier": 0.3091
+    },
+    "KSEA": {
+      "pairs": 1033,
+      "accuracy": 0.5866,
+      "ece": 0.1927,
+      "brier": 0.2932
+    },
+    "KSFO": {
+      "pairs": 939,
+      "accuracy": 0.6347,
+      "ece": 0.2419,
+      "brier": 0.2928
+    }
+  },
+  "gaussian": {
+    "KATL": {
+      "pairs": 671,
+      "accuracy": 0.6721,
+      "ece": 0.1791,
+      "brier": 0.2539
+    },
+    "KAUS": {
+      "pairs": 623,
+      "accuracy": 0.6998,
+      "ece": 0.207,
+      "brier": 0.2576
+    },
+    "KBOS": {
+      "pairs": 645,
+      "accuracy": 0.6853,
+      "ece": 0.1547,
+      "brier": 0.2411
+    },
+    "KDCA": {
+      "pairs": 666,
+      "accuracy": 0.6727,
+      "ece": 0.1611,
+      "brier": 0.2509
+    },
+    "KDEN": {
+      "pairs": 604,
+      "accuracy": 0.7086,
+      "ece": 0.206,
+      "brier": 0.2547
+    },
+    "KDFW": {
+      "pairs": 625,
+      "accuracy": 0.6864,
+      "ece": 0.2052,
+      "brier": 0.2585
+    },
+    "KHOU": {
+      "pairs": 639,
+      "accuracy": 0.6792,
+      "ece": 0.2023,
+      "brier": 0.2624
+    },
+    "KLAS": {
+      "pairs": 762,
+      "accuracy": 0.5656,
+      "ece": 0.1067,
+      "brier": 0.2575
+    },
+    "KLAX": {
+      "pairs": 558,
+      "accuracy": 0.6846,
+      "ece": 0.1737,
+      "brier": 0.2484
+    },
+    "KMDW": {
+      "pairs": 611,
+      "accuracy": 0.671,
+      "ece": 0.1745,
+      "brier": 0.2497
+    },
+    "KMIA": {
+      "pairs": 550,
+      "accuracy": 0.7436,
+      "ece": 0.2394,
+      "brier": 0.2629
+    },
+    "KMSP": {
+      "pairs": 640,
+      "accuracy": 0.6609,
+      "ece": 0.1512,
+      "brier": 0.2523
+    },
+    "KMSY": {
+      "pairs": 681,
+      "accuracy": 0.6887,
+      "ece": 0.2134,
+      "brier": 0.2557
+    },
+    "KNYC": {
+      "pairs": 660,
+      "accuracy": 0.65,
+      "ece": 0.1236,
+      "brier": 0.2423
+    },
+    "KOKC": {
+      "pairs": 660,
+      "accuracy": 0.6818,
+      "ece": 0.1638,
+      "brier": 0.2444
+    },
+    "KPHL": {
+      "pairs": 670,
+      "accuracy": 0.6493,
+      "ece": 0.144,
+      "brier": 0.2497
+    },
+    "KPHX": {
+      "pairs": 735,
+      "accuracy": 0.6177,
+      "ece": 0.1191,
+      "brier": 0.2544
+    },
+    "KSAT": {
+      "pairs": 610,
+      "accuracy": 0.6967,
+      "ece": 0.2175,
+      "brier": 0.2632
+    },
+    "KSEA": {
+      "pairs": 656,
+      "accuracy": 0.5762,
+      "ece": 0.0923,
+      "brier": 0.2537
+    },
+    "KSFO": {
+      "pairs": 509,
+      "accuracy": 0.6778,
+      "ece": 0.1789,
+      "brier": 0.2501
+    }
+  },
+  "regime": {
+    "KATL": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KAUS": {
+      "pairs": 1,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KBOS": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KDCA": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KDEN": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KDFW": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KHOU": {
+      "pairs": 4,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KLAS": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KLAX": {
+      "pairs": 14,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KMDW": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KMIA": {
+      "pairs": 18,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KMSP": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KMSY": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KNYC": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KOKC": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KPHL": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KPHX": {
+      "pairs": 1,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KSAT": {
+      "pairs": 7,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KSEA": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KSFO": {
+      "pairs": 2,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    }
+  },
+  "gaussian_v2": {
+    "KATL": {
+      "pairs": 1038,
+      "accuracy": 0.6358,
+      "ece": 0.2371,
+      "brier": 0.2897
+    },
+    "KAUS": {
+      "pairs": 1045,
+      "accuracy": 0.666,
+      "ece": 0.2639,
+      "brier": 0.3023
+    },
+    "KBOS": {
+      "pairs": 1022,
+      "accuracy": 0.6742,
+      "ece": 0.2681,
+      "brier": 0.3028
+    },
+    "KDCA": {
+      "pairs": 1042,
+      "accuracy": 0.6478,
+      "ece": 0.2354,
+      "brier": 0.2949
+    },
+    "KDEN": {
+      "pairs": 1037,
+      "accuracy": 0.6644,
+      "ece": 0.2778,
+      "brier": 0.3023
+    },
+    "KDFW": {
+      "pairs": 1061,
+      "accuracy": 0.6437,
+      "ece": 0.2626,
+      "brier": 0.3035
+    },
+    "KHOU": {
+      "pairs": 1082,
+      "accuracy": 0.6534,
+      "ece": 0.2673,
+      "brier": 0.3071
+    },
+    "KLAS": {
+      "pairs": 1068,
+      "accuracy": 0.5749,
+      "ece": 0.1775,
+      "brier": 0.2871
+    },
+    "KLAX": {
+      "pairs": 993,
+      "accuracy": 0.6274,
+      "ece": 0.2423,
+      "brier": 0.289
+    },
+    "KMDW": {
+      "pairs": 1045,
+      "accuracy": 0.6306,
+      "ece": 0.224,
+      "brier": 0.2862
+    },
+    "KMIA": {
+      "pairs": 967,
+      "accuracy": 0.6887,
+      "ece": 0.2922,
+      "brier": 0.3096
+    },
+    "KMSP": {
+      "pairs": 1017,
+      "accuracy": 0.6332,
+      "ece": 0.2265,
+      "brier": 0.2895
+    },
+    "KMSY": {
+      "pairs": 1062,
+      "accuracy": 0.6582,
+      "ece": 0.2639,
+      "brier": 0.3006
+    },
+    "KNYC": {
+      "pairs": 1027,
+      "accuracy": 0.6407,
+      "ece": 0.2256,
+      "brier": 0.2894
+    },
+    "KOKC": {
+      "pairs": 1058,
+      "accuracy": 0.6427,
+      "ece": 0.2373,
+      "brier": 0.2876
+    },
+    "KPHL": {
+      "pairs": 1041,
+      "accuracy": 0.634,
+      "ece": 0.2239,
+      "brier": 0.2916
+    },
+    "KPHX": {
+      "pairs": 1089,
+      "accuracy": 0.596,
+      "ece": 0.1951,
+      "brier": 0.2829
+    },
+    "KSAT": {
+      "pairs": 1014,
+      "accuracy": 0.6686,
+      "ece": 0.2794,
+      "brier": 0.3091
+    },
+    "KSEA": {
+      "pairs": 1033,
+      "accuracy": 0.5866,
+      "ece": 0.1927,
+      "brier": 0.2932
+    },
+    "KSFO": {
+      "pairs": 939,
+      "accuracy": 0.6347,
+      "ece": 0.2419,
+      "brier": 0.2928
+    }
+  },
+  "pressure": {
+    "KATL": {
+      "pairs": 789,
+      "accuracy": 0.616,
+      "ece": 0.1432,
+      "brier": 0.2551
+    },
+    "KAUS": {
+      "pairs": 749,
+      "accuracy": 0.518,
+      "ece": 0.2005,
+      "brier": 0.2985
+    },
+    "KBOS": {
+      "pairs": 1107,
+      "accuracy": 0.5917,
+      "ece": 0.1605,
+      "brier": 0.2655
+    },
+    "KDCA": {
+      "pairs": 1042,
+      "accuracy": 0.5998,
+      "ece": 0.1347,
+      "brier": 0.2573
+    },
+    "KDEN": {
+      "pairs": 1092,
+      "accuracy": 0.6703,
+      "ece": 0.1016,
+      "brier": 0.2296
+    },
+    "KDFW": {
+      "pairs": 825,
+      "accuracy": 0.5285,
+      "ece": 0.1712,
+      "brier": 0.2843
+    },
+    "KHOU": {
+      "pairs": 675,
+      "accuracy": 0.4993,
+      "ece": 0.1974,
+      "brier": 0.2993
+    },
+    "KLAS": {
+      "pairs": 848,
+      "accuracy": 0.6439,
+      "ece": 0.0785,
+      "brier": 0.2318
+    },
+    "KLAX": {
+      "pairs": 523,
+      "accuracy": 0.5621,
+      "ece": 0.1455,
+      "brier": 0.2717
+    },
+    "KMDW": {
+      "pairs": 1062,
+      "accuracy": 0.6234,
+      "ece": 0.1275,
+      "brier": 0.2539
+    },
+    "KMIA": {
+      "pairs": 391,
+      "accuracy": 0.5345,
+      "ece": 0.1097,
+      "brier": 0.2669
+    },
+    "KMSP": {
+      "pairs": 1118,
+      "accuracy": 0.5716,
+      "ece": 0.1625,
+      "brier": 0.2732
+    },
+    "KMSY": {
+      "pairs": 610,
+      "accuracy": 0.5541,
+      "ece": 0.1313,
+      "brier": 0.273
+    },
+    "KNYC": {
+      "pairs": 1100,
+      "accuracy": 0.5709,
+      "ece": 0.1822,
+      "brier": 0.2744
+    },
+    "KOKC": {
+      "pairs": 941,
+      "accuracy": 0.5462,
+      "ece": 0.1715,
+      "brier": 0.2837
+    },
+    "KPHL": {
+      "pairs": 1086,
+      "accuracy": 0.6206,
+      "ece": 0.126,
+      "brier": 0.2497
+    },
+    "KPHX": {
+      "pairs": 646,
+      "accuracy": 0.6563,
+      "ece": 0.066,
+      "brier": 0.2268
+    },
+    "KSAT": {
+      "pairs": 746,
+      "accuracy": 0.5,
+      "ece": 0.1965,
+      "brier": 0.3041
+    },
+    "KSEA": {
+      "pairs": 1002,
+      "accuracy": 0.5828,
+      "ece": 0.1478,
+      "brier": 0.2628
+    },
+    "KSFO": {
+      "pairs": 687,
+      "accuracy": 0.5808,
+      "ece": 0.1235,
+      "brier": 0.2631
+    }
+  },
+  "calendar_climatology": {
+    "KATL": {
+      "pairs": 359,
+      "accuracy": 0.7019,
+      "ece": 0.0876,
+      "brier": 0.2223
+    },
+    "KAUS": {
+      "pairs": 307,
+      "accuracy": 0.7101,
+      "ece": 0.0768,
+      "brier": 0.2128
+    },
+    "KBOS": {
+      "pairs": 370,
+      "accuracy": 0.7108,
+      "ece": 0.0831,
+      "brier": 0.2121
+    },
+    "KDCA": {
+      "pairs": 377,
+      "accuracy": 0.6817,
+      "ece": 0.0559,
+      "brier": 0.2209
+    },
+    "KDEN": {
+      "pairs": 306,
+      "accuracy": 0.7255,
+      "ece": 0.103,
+      "brier": 0.2139
+    },
+    "KDFW": {
+      "pairs": 307,
+      "accuracy": 0.6971,
+      "ece": 0.0693,
+      "brier": 0.2203
+    },
+    "KHOU": {
+      "pairs": 321,
+      "accuracy": 0.6885,
+      "ece": 0.1027,
+      "brier": 0.2234
+    },
+    "KLAS": {
+      "pairs": 434,
+      "accuracy": 0.5899,
+      "ece": 0.06,
+      "brier": 0.2477
+    },
+    "KLAX": {
+      "pairs": 273,
+      "accuracy": 0.7363,
+      "ece": 0.1106,
+      "brier": 0.2086
+    },
+    "KMDW": {
+      "pairs": 341,
+      "accuracy": 0.695,
+      "ece": 0.0601,
+      "brier": 0.2162
+    },
+    "KMIA": {
+      "pairs": 286,
+      "accuracy": 0.7308,
+      "ece": 0.0965,
+      "brier": 0.2138
+    },
+    "KMSP": {
+      "pairs": 363,
+      "accuracy": 0.6749,
+      "ece": 0.0544,
+      "brier": 0.2242
+    },
+    "KMSY": {
+      "pairs": 340,
+      "accuracy": 0.7324,
+      "ece": 0.1119,
+      "brier": 0.2167
+    },
+    "KNYC": {
+      "pairs": 365,
+      "accuracy": 0.6904,
+      "ece": 0.0538,
+      "brier": 0.2159
+    },
+    "KOKC": {
+      "pairs": 327,
+      "accuracy": 0.7431,
+      "ece": 0.1234,
+      "brier": 0.2111
+    },
+    "KPHL": {
+      "pairs": 374,
+      "accuracy": 0.6818,
+      "ece": 0.0618,
+      "brier": 0.2197
+    },
+    "KPHX": {
+      "pairs": 434,
+      "accuracy": 0.6221,
+      "ece": 0.0289,
+      "brier": 0.2327
+    },
+    "KSAT": {
+      "pairs": 329,
+      "accuracy": 0.696,
+      "ece": 0.0633,
+      "brier": 0.2233
+    },
+    "KSEA": {
+      "pairs": 374,
+      "accuracy": 0.5963,
+      "ece": 0.0255,
+      "brier": 0.2405
+    },
+    "KSFO": {
+      "pairs": 247,
+      "accuracy": 0.7328,
+      "ece": 0.0957,
+      "brier": 0.2094
+    }
+  },
+  "goldilocks": {
+    "KATL": {
+      "pairs": 629,
+      "accuracy": 0.6916,
+      "ece": 0.217,
+      "brier": 0.2631
+    },
+    "KAUS": {
+      "pairs": 612,
+      "accuracy": 0.6961,
+      "ece": 0.2177,
+      "brier": 0.2538
+    },
+    "KBOS": {
+      "pairs": 607,
+      "accuracy": 0.7051,
+      "ece": 0.2358,
+      "brier": 0.2594
+    },
+    "KDCA": {
+      "pairs": 635,
+      "accuracy": 0.6693,
+      "ece": 0.2,
+      "brier": 0.2588
+    },
+    "KDEN": {
+      "pairs": 554,
+      "accuracy": 0.722,
+      "ece": 0.2539,
+      "brier": 0.2579
+    },
+    "KDFW": {
+      "pairs": 590,
+      "accuracy": 0.6864,
+      "ece": 0.2083,
+      "brier": 0.2584
+    },
+    "KHOU": {
+      "pairs": 614,
+      "accuracy": 0.6759,
+      "ece": 0.1999,
+      "brier": 0.2564
+    },
+    "KLAS": {
+      "pairs": 704,
+      "accuracy": 0.5952,
+      "ece": 0.1295,
+      "brier": 0.2525
+    },
+    "KLAX": {
+      "pairs": 551,
+      "accuracy": 0.6987,
+      "ece": 0.2011,
+      "brier": 0.2531
+    },
+    "KMDW": {
+      "pairs": 626,
+      "accuracy": 0.6837,
+      "ece": 0.2165,
+      "brier": 0.2601
+    },
+    "KMIA": {
+      "pairs": 522,
+      "accuracy": 0.7452,
+      "ece": 0.2599,
+      "brier": 0.2522
+    },
+    "KMSP": {
+      "pairs": 619,
+      "accuracy": 0.6656,
+      "ece": 0.1976,
+      "brier": 0.2519
+    },
+    "KMSY": {
+      "pairs": 638,
+      "accuracy": 0.6991,
+      "ece": 0.2195,
+      "brier": 0.257
+    },
+    "KNYC": {
+      "pairs": 621,
+      "accuracy": 0.6715,
+      "ece": 0.2009,
+      "brier": 0.2561
+    },
+    "KOKC": {
+      "pairs": 629,
+      "accuracy": 0.7011,
+      "ece": 0.2294,
+      "brier": 0.2574
+    },
+    "KPHL": {
+      "pairs": 640,
+      "accuracy": 0.6672,
+      "ece": 0.1991,
+      "brier": 0.258
+    },
+    "KPHX": {
+      "pairs": 685,
+      "accuracy": 0.6263,
+      "ece": 0.1595,
+      "brier": 0.2517
+    },
+    "KSAT": {
+      "pairs": 566,
+      "accuracy": 0.7102,
+      "ece": 0.233,
+      "brier": 0.2567
+    },
+    "KSEA": {
+      "pairs": 600,
+      "accuracy": 0.595,
+      "ece": 0.131,
+      "brier": 0.2562
+    },
+    "KSFO": {
+      "pairs": 514,
+      "accuracy": 0.7062,
+      "ece": 0.2207,
+      "brier": 0.2553
+    }
+  },
+  "late_day_momentum": {
+    "KATL": {
+      "pairs": 895,
+      "accuracy": 0.4726,
+      "ece": 0.2003,
+      "brier": 0.2933
+    },
+    "KAUS": {
+      "pairs": 842,
+      "accuracy": 0.4561,
+      "ece": 0.2235,
+      "brier": 0.2985
+    },
+    "KBOS": {
+      "pairs": 1025,
+      "accuracy": 0.4537,
+      "ece": 0.2322,
+      "brier": 0.3036
+    },
+    "KDCA": {
+      "pairs": 945,
+      "accuracy": 0.4656,
+      "ece": 0.2158,
+      "brier": 0.2973
+    },
+    "KDEN": {
+      "pairs": 1114,
+      "accuracy": 0.4479,
+      "ece": 0.2412,
+      "brier": 0.3063
+    },
+    "KDFW": {
+      "pairs": 905,
+      "accuracy": 0.4983,
+      "ece": 0.1831,
+      "brier": 0.2855
+    },
+    "KHOU": {
+      "pairs": 790,
+      "accuracy": 0.4532,
+      "ece": 0.223,
+      "brier": 0.2976
+    },
+    "KLAS": {
+      "pairs": 838,
+      "accuracy": 0.537,
+      "ece": 0.1392,
+      "brier": 0.2705
+    },
+    "KLAX": {
+      "pairs": 387,
+      "accuracy": 0.4496,
+      "ece": 0.2071,
+      "brier": 0.2935
+    },
+    "KMDW": {
+      "pairs": 1058,
+      "accuracy": 0.4811,
+      "ece": 0.2021,
+      "brier": 0.2896
+    },
+    "KMIA": {
+      "pairs": 478,
+      "accuracy": 0.4979,
+      "ece": 0.1615,
+      "brier": 0.2828
+    },
+    "KMSP": {
+      "pairs": 1063,
+      "accuracy": 0.476,
+      "ece": 0.2089,
+      "brier": 0.2938
+    },
+    "KMSY": {
+      "pairs": 697,
+      "accuracy": 0.4634,
+      "ece": 0.2122,
+      "brier": 0.2931
+    },
+    "KNYC": {
+      "pairs": 1034,
+      "accuracy": 0.4787,
+      "ece": 0.2044,
+      "brier": 0.2929
+    },
+    "KOKC": {
+      "pairs": 970,
+      "accuracy": 0.468,
+      "ece": 0.2127,
+      "brier": 0.2961
+    },
+    "KPHL": {
+      "pairs": 999,
+      "accuracy": 0.4705,
+      "ece": 0.2136,
+      "brier": 0.299
+    },
+    "KPHX": {
+      "pairs": 780,
+      "accuracy": 0.5936,
+      "ece": 0.0939,
+      "brier": 0.2508
+    },
+    "KSAT": {
+      "pairs": 802,
+      "accuracy": 0.4875,
+      "ece": 0.1871,
+      "brier": 0.289
+    },
+    "KSEA": {
+      "pairs": 853,
+      "accuracy": 0.5686,
+      "ece": 0.1103,
+      "brier": 0.2592
+    },
+    "KSFO": {
+      "pairs": 545,
+      "accuracy": 0.4844,
+      "ece": 0.1723,
+      "brier": 0.2803
+    }
+  },
+  "pressure_regime": {
+    "KATL": {
+      "pairs": 943,
+      "accuracy": 0.6055,
+      "ece": 0.1457,
+      "brier": 0.2638
+    },
+    "KAUS": {
+      "pairs": 916,
+      "accuracy": 0.5164,
+      "ece": 0.1956,
+      "brier": 0.2963
+    },
+    "KBOS": {
+      "pairs": 1199,
+      "accuracy": 0.5955,
+      "ece": 0.1564,
+      "brier": 0.2688
+    },
+    "KDCA": {
+      "pairs": 1161,
+      "accuracy": 0.5891,
+      "ece": 0.1421,
+      "brier": 0.2613
+    },
+    "KDEN": {
+      "pairs": 1184,
+      "accuracy": 0.6579,
+      "ece": 0.1134,
+      "brier": 0.2362
+    },
+    "KDFW": {
+      "pairs": 972,
+      "accuracy": 0.5257,
+      "ece": 0.1966,
+      "brier": 0.2901
+    },
+    "KHOU": {
+      "pairs": 837,
+      "accuracy": 0.5078,
+      "ece": 0.2003,
+      "brier": 0.3022
+    },
+    "KLAS": {
+      "pairs": 1000,
+      "accuracy": 0.641,
+      "ece": 0.1068,
+      "brier": 0.2426
+    },
+    "KLAX": {
+      "pairs": 717,
+      "accuracy": 0.5523,
+      "ece": 0.1582,
+      "brier": 0.2827
+    },
+    "KMDW": {
+      "pairs": 1156,
+      "accuracy": 0.6107,
+      "ece": 0.1267,
+      "brier": 0.2546
+    },
+    "KMIA": {
+      "pairs": 584,
+      "accuracy": 0.524,
+      "ece": 0.1693,
+      "brier": 0.2859
+    },
+    "KMSP": {
+      "pairs": 1218,
+      "accuracy": 0.5714,
+      "ece": 0.1701,
+      "brier": 0.2779
+    },
+    "KMSY": {
+      "pairs": 768,
+      "accuracy": 0.5417,
+      "ece": 0.1493,
+      "brier": 0.2789
+    },
+    "KNYC": {
+      "pairs": 1198,
+      "accuracy": 0.571,
+      "ece": 0.1787,
+      "brier": 0.2801
+    },
+    "KOKC": {
+      "pairs": 1083,
+      "accuracy": 0.5402,
+      "ece": 0.1796,
+      "brier": 0.2864
+    },
+    "KPHL": {
+      "pairs": 1177,
+      "accuracy": 0.6058,
+      "ece": 0.1297,
+      "brier": 0.2532
+    },
+    "KPHX": {
+      "pairs": 812,
+      "accuracy": 0.6404,
+      "ece": 0.1204,
+      "brier": 0.2469
+    },
+    "KSAT": {
+      "pairs": 898,
+      "accuracy": 0.4811,
+      "ece": 0.2105,
+      "brier": 0.3048
+    },
+    "KSEA": {
+      "pairs": 1116,
+      "accuracy": 0.5726,
+      "ece": 0.1556,
+      "brier": 0.2709
+    },
+    "KSFO": {
+      "pairs": 862,
+      "accuracy": 0.5615,
+      "ece": 0.1606,
+      "brier": 0.2752
+    }
+  },
+  "dtr_trend": {
+    "KATL": {
+      "pairs": 1094,
+      "accuracy": 0.511,
+      "ece": 0.2165,
+      "brier": 0.3021
+    },
+    "KAUS": {
+      "pairs": 1184,
+      "accuracy": 0.5051,
+      "ece": 0.2242,
+      "brier": 0.3009
+    },
+    "KBOS": {
+      "pairs": 1189,
+      "accuracy": 0.4474,
+      "ece": 0.2721,
+      "brier": 0.3296
+    },
+    "KDCA": {
+      "pairs": 1143,
+      "accuracy": 0.4978,
+      "ece": 0.2226,
+      "brier": 0.3036
+    },
+    "KDEN": {
+      "pairs": 1186,
+      "accuracy": 0.4941,
+      "ece": 0.2332,
+      "brier": 0.3071
+    },
+    "KDFW": {
+      "pairs": 1121,
+      "accuracy": 0.4924,
+      "ece": 0.2337,
+      "brier": 0.3107
+    },
+    "KHOU": {
+      "pairs": 1099,
+      "accuracy": 0.4914,
+      "ece": 0.228,
+      "brier": 0.3032
+    },
+    "KLAS": {
+      "pairs": 969,
+      "accuracy": 0.5377,
+      "ece": 0.1759,
+      "brier": 0.2797
+    },
+    "KLAX": {
+      "pairs": 929,
+      "accuracy": 0.479,
+      "ece": 0.2482,
+      "brier": 0.3113
+    },
+    "KMDW": {
+      "pairs": 1188,
+      "accuracy": 0.5025,
+      "ece": 0.2246,
+      "brier": 0.3045
+    },
+    "KMIA": {
+      "pairs": 872,
+      "accuracy": 0.4255,
+      "ece": 0.278,
+      "brier": 0.3318
+    },
+    "KMSP": {
+      "pairs": 1157,
+      "accuracy": 0.484,
+      "ece": 0.2442,
+      "brier": 0.3138
+    },
+    "KMSY": {
+      "pairs": 1029,
+      "accuracy": 0.4869,
+      "ece": 0.2241,
+      "brier": 0.304
+    },
+    "KNYC": {
+      "pairs": 1084,
+      "accuracy": 0.4714,
+      "ece": 0.2395,
+      "brier": 0.3133
+    },
+    "KOKC": {
+      "pairs": 1181,
+      "accuracy": 0.486,
+      "ece": 0.2385,
+      "brier": 0.3085
+    },
+    "KPHL": {
+      "pairs": 1168,
+      "accuracy": 0.5154,
+      "ece": 0.2038,
+      "brier": 0.2939
+    },
+    "KPHX": {
+      "pairs": 973,
+      "accuracy": 0.4995,
+      "ece": 0.2226,
+      "brier": 0.3011
+    },
+    "KSAT": {
+      "pairs": 1098,
+      "accuracy": 0.4827,
+      "ece": 0.2371,
+      "brier": 0.3102
+    },
+    "KSEA": {
+      "pairs": 1105,
+      "accuracy": 0.4398,
+      "ece": 0.2811,
+      "brier": 0.3337
+    },
+    "KSFO": {
+      "pairs": 1083,
+      "accuracy": 0.4423,
+      "ece": 0.2852,
+      "brier": 0.3325
+    }
+  },
+  "wind_direction_shift": {
+    "KATL": {
+      "pairs": 107,
+      "accuracy": 0.5234,
+      "ece": 0.1893,
+      "brier": 0.2693
+    },
+    "KAUS": {
+      "pairs": 81,
+      "accuracy": 0.5185,
+      "ece": 0.1642,
+      "brier": 0.2762
+    },
+    "KBOS": {
+      "pairs": 265,
+      "accuracy": 0.6,
+      "ece": 0.1161,
+      "brier": 0.2516
+    },
+    "KDCA": {
+      "pairs": 138,
+      "accuracy": 0.6304,
+      "ece": 0.0871,
+      "brier": 0.2396
+    },
+    "KDEN": {
+      "pairs": 134,
+      "accuracy": 0.5,
+      "ece": 0.1723,
+      "brier": 0.2854
+    },
+    "KDFW": {
+      "pairs": 191,
+      "accuracy": 0.555,
+      "ece": 0.1476,
+      "brier": 0.2697
+    },
+    "KHOU": {
+      "pairs": 82,
+      "accuracy": 0.6341,
+      "ece": 0.0846,
+      "brier": 0.2391
+    },
+    "KLAS": {
+      "pairs": 81,
+      "accuracy": 0.8025,
+      "ece": 0.1458,
+      "brier": 0.1741
+    },
+    "KLAX": {
+      "pairs": 35,
+      "accuracy": 0.4857,
+      "ece": 0.1917,
+      "brier": 0.272
+    },
+    "KMDW": {
+      "pairs": 235,
+      "accuracy": 0.6723,
+      "ece": 0.0469,
+      "brier": 0.2237
+    },
+    "KMIA": {
+      "pairs": 29,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KMSP": {
+      "pairs": 211,
+      "accuracy": 0.5924,
+      "ece": 0.0852,
+      "brier": 0.2447
+    },
+    "KMSY": {
+      "pairs": 82,
+      "accuracy": 0.6341,
+      "ece": 0.0694,
+      "brier": 0.2357
+    },
+    "KNYC": {
+      "pairs": 265,
+      "accuracy": 0.634,
+      "ece": 0.0798,
+      "brier": 0.238
+    },
+    "KOKC": {
+      "pairs": 236,
+      "accuracy": 0.5212,
+      "ece": 0.1616,
+      "brier": 0.2788
+    },
+    "KPHL": {
+      "pairs": 165,
+      "accuracy": 0.6727,
+      "ece": 0.0407,
+      "brier": 0.2216
+    },
+    "KPHX": {
+      "pairs": 23,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0
+    },
+    "KSAT": {
+      "pairs": 79,
+      "accuracy": 0.557,
+      "ece": 0.1544,
+      "brier": 0.2677
+    },
+    "KSEA": {
+      "pairs": 36,
+      "accuracy": 0.6944,
+      "ece": 0.0831,
+      "brier": 0.2225
+    },
+    "KSFO": {
+      "pairs": 142,
+      "accuracy": 0.6549,
+      "ece": 0.0793,
+      "brier": 0.2325
+    }
+  },
+  "rdae_mos": {
+    "KATL": {
+      "pairs": 342,
+      "accuracy": 0.5877,
+      "ece": 0.0825,
+      "brier": 0.2524
+    },
+    "KAUS": {
+      "pairs": 410,
+      "accuracy": 0.578,
+      "ece": 0.1027,
+      "brier": 0.2522
+    },
+    "KBOS": {
+      "pairs": 374,
+      "accuracy": 0.6337,
+      "ece": 0.0487,
+      "brier": 0.233
+    },
+    "KDCA": {
+      "pairs": 338,
+      "accuracy": 0.5562,
+      "ece": 0.1284,
+      "brier": 0.2589
+    },
+    "KDEN": {
+      "pairs": 411,
+      "accuracy": 0.691,
+      "ece": 0.03,
+      "brier": 0.2139
+    },
+    "KDFW": {
+      "pairs": 460,
+      "accuracy": 0.6196,
+      "ece": 0.0691,
+      "brier": 0.2406
+    },
+    "KHOU": {
+      "pairs": 284,
+      "accuracy": 0.5669,
+      "ece": 0.1065,
+      "brier": 0.2576
+    },
+    "KLAS": {
+      "pairs": 517,
+      "accuracy": 0.617,
+      "ece": 0.0783,
+      "brier": 0.2425
+    },
+    "KLAX": {
+      "pairs": 594,
+      "accuracy": 0.6178,
+      "ece": 0.0712,
+      "brier": 0.2472
+    },
+    "KMDW": {
+      "pairs": 459,
+      "accuracy": 0.6166,
+      "ece": 0.0669,
+      "brier": 0.2404
+    },
+    "KMIA": {
+      "pairs": 622,
+      "accuracy": 0.6029,
+      "ece": 0.0904,
+      "brier": 0.249
+    },
+    "KMSP": {
+      "pairs": 423,
+      "accuracy": 0.6028,
+      "ece": 0.0839,
+      "brier": 0.2515
+    },
+    "KMSY": {
+      "pairs": 399,
+      "accuracy": 0.5639,
+      "ece": 0.1071,
+      "brier": 0.258
+    },
+    "KNYC": {
+      "pairs": 393,
+      "accuracy": 0.5725,
+      "ece": 0.1008,
+      "brier": 0.2554
+    },
+    "KOKC": {
+      "pairs": 394,
+      "accuracy": 0.6244,
+      "ece": 0.0536,
+      "brier": 0.2377
+    },
+    "KPHL": {
+      "pairs": 358,
+      "accuracy": 0.6229,
+      "ece": 0.0633,
+      "brier": 0.2407
+    },
+    "KPHX": {
+      "pairs": 500,
+      "accuracy": 0.578,
+      "ece": 0.0999,
+      "brier": 0.2554
+    },
+    "KSAT": {
+      "pairs": 479,
+      "accuracy": 0.5929,
+      "ece": 0.0922,
+      "brier": 0.2503
+    },
+    "KSEA": {
+      "pairs": 398,
+      "accuracy": 0.5779,
+      "ece": 0.1003,
+      "brier": 0.2532
+    },
+    "KSFO": {
+      "pairs": 555,
+      "accuracy": 0.5946,
+      "ece": 0.0874,
+      "brier": 0.2534
+    }
+  },
+  "nwp_analog": {
+    "KATL": {
+      "pairs": 227,
+      "accuracy": 0.4449,
+      "ece": 0.2988,
+      "brier": 0.3343
+    },
+    "KAUS": {
+      "pairs": 225,
+      "accuracy": 0.4311,
+      "ece": 0.3114,
+      "brier": 0.3398
+    },
+    "KBOS": {
+      "pairs": 216,
+      "accuracy": 0.4259,
+      "ece": 0.3108,
+      "brier": 0.3418
+    },
+    "KDCA": {
+      "pairs": 223,
+      "accuracy": 0.4529,
+      "ece": 0.2957,
+      "brier": 0.3328
+    },
+    "KDEN": {
+      "pairs": 225,
+      "accuracy": 0.44,
+      "ece": 0.3163,
+      "brier": 0.3441
+    },
+    "KDFW": {
+      "pairs": 226,
+      "accuracy": 0.4292,
+      "ece": 0.3182,
+      "brier": 0.3474
+    },
+    "KHOU": {
+      "pairs": 225,
+      "accuracy": 0.4533,
+      "ece": 0.296,
+      "brier": 0.3339
+    },
+    "KLAS": {
+      "pairs": 209,
+      "accuracy": 0.4498,
+      "ece": 0.304,
+      "brier": 0.3351
+    },
+    "KLAX": {
+      "pairs": 171,
+      "accuracy": 0.3918,
+      "ece": 0.3169,
+      "brier": 0.3467
+    },
+    "KMDW": {
+      "pairs": 223,
+      "accuracy": 0.4664,
+      "ece": 0.2732,
+      "brier": 0.3225
+    },
+    "KMIA": {
+      "pairs": 212,
+      "accuracy": 0.3915,
+      "ece": 0.3496,
+      "brier": 0.36
+    },
+    "KMSP": {
+      "pairs": 223,
+      "accuracy": 0.435,
+      "ece": 0.3112,
+      "brier": 0.3398
+    },
+    "KMSY": {
+      "pairs": 224,
+      "accuracy": 0.4286,
+      "ece": 0.3289,
+      "brier": 0.3476
+    },
+    "KNYC": {
+      "pairs": 219,
+      "accuracy": 0.4749,
+      "ece": 0.2796,
+      "brier": 0.325
+    },
+    "KOKC": {
+      "pairs": 229,
+      "accuracy": 0.4323,
+      "ece": 0.3206,
+      "brier": 0.3445
+    },
+    "KPHL": {
+      "pairs": 223,
+      "accuracy": 0.435,
+      "ece": 0.3169,
+      "brier": 0.3431
+    },
+    "KPHX": {
+      "pairs": 214,
+      "accuracy": 0.4346,
+      "ece": 0.3118,
+      "brier": 0.3423
+    },
+    "KSAT": {
+      "pairs": 229,
+      "accuracy": 0.4105,
+      "ece": 0.3329,
+      "brier": 0.3535
+    },
+    "KSEA": {
+      "pairs": 211,
+      "accuracy": 0.5071,
+      "ece": 0.2364,
+      "brier": 0.3058
+    },
+    "KSFO": {
+      "pairs": 154,
+      "accuracy": 0.3701,
+      "ece": 0.3378,
+      "brier": 0.3623
+    }
+  },
+  "forecast_disagreement": {
+    "KATL": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.2627,
+      "brier": 0.3156
+    },
+    "KAUS": {
+      "pairs": 238,
+      "accuracy": 0.437,
+      "ece": 0.2654,
+      "brier": 0.3112
+    },
+    "KBOS": {
+      "pairs": 238,
+      "accuracy": 0.4118,
+      "ece": 0.28,
+      "brier": 0.3193
+    },
+    "KDCA": {
+      "pairs": 238,
+      "accuracy": 0.4454,
+      "ece": 0.255,
+      "brier": 0.3097
+    },
+    "KDEN": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.2675,
+      "brier": 0.316
+    },
+    "KDFW": {
+      "pairs": 238,
+      "accuracy": 0.4286,
+      "ece": 0.2666,
+      "brier": 0.3142
+    },
+    "KHOU": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.243,
+      "brier": 0.3051
+    },
+    "KLAS": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.2483,
+      "brier": 0.306
+    },
+    "KLAX": {
+      "pairs": 142,
+      "accuracy": 0.4155,
+      "ece": 0.2921,
+      "brier": 0.321
+    },
+    "KMDW": {
+      "pairs": 238,
+      "accuracy": 0.479,
+      "ece": 0.2286,
+      "brier": 0.3024
+    },
+    "KMIA": {
+      "pairs": 238,
+      "accuracy": 0.395,
+      "ece": 0.2944,
+      "brier": 0.3236
+    },
+    "KMSP": {
+      "pairs": 236,
+      "accuracy": 0.4449,
+      "ece": 0.2589,
+      "brier": 0.3141
+    },
+    "KMSY": {
+      "pairs": 236,
+      "accuracy": 0.428,
+      "ece": 0.2699,
+      "brier": 0.3166
+    },
+    "KNYC": {
+      "pairs": 238,
+      "accuracy": 0.479,
+      "ece": 0.2424,
+      "brier": 0.309
+    },
+    "KOKC": {
+      "pairs": 238,
+      "accuracy": 0.437,
+      "ece": 0.2663,
+      "brier": 0.3157
+    },
+    "KPHL": {
+      "pairs": 238,
+      "accuracy": 0.4286,
+      "ece": 0.2639,
+      "brier": 0.312
+    },
+    "KPHX": {
+      "pairs": 236,
+      "accuracy": 0.4449,
+      "ece": 0.2676,
+      "brier": 0.3176
+    },
+    "KSAT": {
+      "pairs": 237,
+      "accuracy": 0.4093,
+      "ece": 0.2924,
+      "brier": 0.3264
+    },
+    "KSEA": {
+      "pairs": 238,
+      "accuracy": 0.5042,
+      "ece": 0.2004,
+      "brier": 0.2887
+    },
+    "KSFO": {
+      "pairs": 224,
+      "accuracy": 0.442,
+      "ece": 0.2867,
+      "brier": 0.3231
+    }
+  }
+}

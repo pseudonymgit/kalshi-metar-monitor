@@ -1,0 +1,2002 @@
+{
+  "KATL": {
+    "reversion": {
+      "pairs": 1038,
+      "accuracy": 0.6358,
+      "ece": 0.2371,
+      "brier": 0.2897,
+      "pit": 0.0306
+    },
+    "gaussian": {
+      "pairs": 671,
+      "accuracy": 0.6721,
+      "ece": 0.1791,
+      "brier": 0.2539,
+      "pit": 0.0927
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1038,
+      "accuracy": 0.6358,
+      "ece": 0.2371,
+      "brier": 0.2897,
+      "pit": 0.0306
+    },
+    "pressure": {
+      "pairs": 789,
+      "accuracy": 0.616,
+      "ece": 0.1432,
+      "brier": 0.2551,
+      "pit": 0.0849
+    },
+    "calendar_climatology": {
+      "pairs": 359,
+      "accuracy": 0.7019,
+      "ece": 0.0876,
+      "brier": 0.2223,
+      "pit": 0.1372
+    },
+    "goldilocks": {
+      "pairs": 629,
+      "accuracy": 0.6916,
+      "ece": 0.217,
+      "brier": 0.2631,
+      "pit": 0.2014
+    },
+    "late_day_momentum": {
+      "pairs": 895,
+      "accuracy": 0.4726,
+      "ece": 0.2003,
+      "brier": 0.2933,
+      "pit": 0.2638
+    },
+    "pressure_regime": {
+      "pairs": 943,
+      "accuracy": 0.6055,
+      "ece": 0.1457,
+      "brier": 0.2638,
+      "pit": 0.0571
+    },
+    "dtr_trend": {
+      "pairs": 1094,
+      "accuracy": 0.511,
+      "ece": 0.2165,
+      "brier": 0.3021,
+      "pit": 0.2746
+    },
+    "wind_direction_shift": {
+      "pairs": 107,
+      "accuracy": 0.5234,
+      "ece": 0.1893,
+      "brier": 0.2693,
+      "pit": 0.3022
+    },
+    "rdae_mos": {
+      "pairs": 342,
+      "accuracy": 0.5877,
+      "ece": 0.0825,
+      "brier": 0.2524,
+      "pit": 0.2766
+    },
+    "nwp_analog": {
+      "pairs": 227,
+      "accuracy": 0.4449,
+      "ece": 0.2988,
+      "brier": 0.3343,
+      "pit": 0.3939
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.2627,
+      "brier": 0.3156,
+      "pit": 0.4276
+    }
+  },
+  "KAUS": {
+    "reversion": {
+      "pairs": 1045,
+      "accuracy": 0.666,
+      "ece": 0.2639,
+      "brier": 0.3023,
+      "pit": 0.0312
+    },
+    "gaussian": {
+      "pairs": 623,
+      "accuracy": 0.6998,
+      "ece": 0.207,
+      "brier": 0.2576,
+      "pit": 0.0876
+    },
+    "regime": {
+      "pairs": 1,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1045,
+      "accuracy": 0.666,
+      "ece": 0.2639,
+      "brier": 0.3023,
+      "pit": 0.0312
+    },
+    "pressure": {
+      "pairs": 749,
+      "accuracy": 0.518,
+      "ece": 0.2005,
+      "brier": 0.2985,
+      "pit": 0.0929
+    },
+    "calendar_climatology": {
+      "pairs": 307,
+      "accuracy": 0.7101,
+      "ece": 0.0768,
+      "brier": 0.2128,
+      "pit": 0.1331
+    },
+    "goldilocks": {
+      "pairs": 612,
+      "accuracy": 0.6961,
+      "ece": 0.2177,
+      "brier": 0.2538,
+      "pit": 0.2031
+    },
+    "late_day_momentum": {
+      "pairs": 842,
+      "accuracy": 0.4561,
+      "ece": 0.2235,
+      "brier": 0.2985,
+      "pit": 0.3061
+    },
+    "pressure_regime": {
+      "pairs": 916,
+      "accuracy": 0.5164,
+      "ece": 0.1956,
+      "brier": 0.2963,
+      "pit": 0.0684
+    },
+    "dtr_trend": {
+      "pairs": 1184,
+      "accuracy": 0.5051,
+      "ece": 0.2242,
+      "brier": 0.3009,
+      "pit": 0.3084
+    },
+    "wind_direction_shift": {
+      "pairs": 81,
+      "accuracy": 0.5185,
+      "ece": 0.1642,
+      "brier": 0.2762,
+      "pit": 0.3114
+    },
+    "rdae_mos": {
+      "pairs": 410,
+      "accuracy": 0.578,
+      "ece": 0.1027,
+      "brier": 0.2522,
+      "pit": 0.2131
+    },
+    "nwp_analog": {
+      "pairs": 225,
+      "accuracy": 0.4311,
+      "ece": 0.3114,
+      "brier": 0.3398,
+      "pit": 0.4038
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.437,
+      "ece": 0.2654,
+      "brier": 0.3112,
+      "pit": 0.4309
+    }
+  },
+  "KBOS": {
+    "reversion": {
+      "pairs": 1022,
+      "accuracy": 0.6742,
+      "ece": 0.2681,
+      "brier": 0.3028,
+      "pit": 0.0337
+    },
+    "gaussian": {
+      "pairs": 645,
+      "accuracy": 0.6853,
+      "ece": 0.1547,
+      "brier": 0.2411,
+      "pit": 0.0938
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1022,
+      "accuracy": 0.6742,
+      "ece": 0.2681,
+      "brier": 0.3028,
+      "pit": 0.0337
+    },
+    "pressure": {
+      "pairs": 1107,
+      "accuracy": 0.5917,
+      "ece": 0.1605,
+      "brier": 0.2655,
+      "pit": 0.2011
+    },
+    "calendar_climatology": {
+      "pairs": 370,
+      "accuracy": 0.7108,
+      "ece": 0.0831,
+      "brier": 0.2121,
+      "pit": 0.1291
+    },
+    "goldilocks": {
+      "pairs": 607,
+      "accuracy": 0.7051,
+      "ece": 0.2358,
+      "brier": 0.2594,
+      "pit": 0.1713
+    },
+    "late_day_momentum": {
+      "pairs": 1025,
+      "accuracy": 0.4537,
+      "ece": 0.2322,
+      "brier": 0.3036,
+      "pit": 0.3485
+    },
+    "pressure_regime": {
+      "pairs": 1199,
+      "accuracy": 0.5955,
+      "ece": 0.1564,
+      "brier": 0.2688,
+      "pit": 0.1444
+    },
+    "dtr_trend": {
+      "pairs": 1189,
+      "accuracy": 0.4474,
+      "ece": 0.2721,
+      "brier": 0.3296,
+      "pit": 0.2947
+    },
+    "wind_direction_shift": {
+      "pairs": 265,
+      "accuracy": 0.6,
+      "ece": 0.1161,
+      "brier": 0.2516,
+      "pit": 0.2858
+    },
+    "rdae_mos": {
+      "pairs": 374,
+      "accuracy": 0.6337,
+      "ece": 0.0487,
+      "brier": 0.233,
+      "pit": 0.2056
+    },
+    "nwp_analog": {
+      "pairs": 216,
+      "accuracy": 0.4259,
+      "ece": 0.3108,
+      "brier": 0.3418,
+      "pit": 0.3632
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4118,
+      "ece": 0.28,
+      "brier": 0.3193,
+      "pit": 0.4222
+    }
+  },
+  "KDCA": {
+    "reversion": {
+      "pairs": 1042,
+      "accuracy": 0.6478,
+      "ece": 0.2354,
+      "brier": 0.2949,
+      "pit": 0.033
+    },
+    "gaussian": {
+      "pairs": 666,
+      "accuracy": 0.6727,
+      "ece": 0.1611,
+      "brier": 0.2509,
+      "pit": 0.0951
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1042,
+      "accuracy": 0.6478,
+      "ece": 0.2354,
+      "brier": 0.2949,
+      "pit": 0.033
+    },
+    "pressure": {
+      "pairs": 1042,
+      "accuracy": 0.5998,
+      "ece": 0.1347,
+      "brier": 0.2573,
+      "pit": 0.1682
+    },
+    "calendar_climatology": {
+      "pairs": 377,
+      "accuracy": 0.6817,
+      "ece": 0.0559,
+      "brier": 0.2209,
+      "pit": 0.122
+    },
+    "goldilocks": {
+      "pairs": 635,
+      "accuracy": 0.6693,
+      "ece": 0.2,
+      "brier": 0.2588,
+      "pit": 0.1661
+    },
+    "late_day_momentum": {
+      "pairs": 945,
+      "accuracy": 0.4656,
+      "ece": 0.2158,
+      "brier": 0.2973,
+      "pit": 0.3174
+    },
+    "pressure_regime": {
+      "pairs": 1161,
+      "accuracy": 0.5891,
+      "ece": 0.1421,
+      "brier": 0.2613,
+      "pit": 0.1287
+    },
+    "dtr_trend": {
+      "pairs": 1143,
+      "accuracy": 0.4978,
+      "ece": 0.2226,
+      "brier": 0.3036,
+      "pit": 0.2765
+    },
+    "wind_direction_shift": {
+      "pairs": 138,
+      "accuracy": 0.6304,
+      "ece": 0.0871,
+      "brier": 0.2396,
+      "pit": 0.37
+    },
+    "rdae_mos": {
+      "pairs": 338,
+      "accuracy": 0.5562,
+      "ece": 0.1284,
+      "brier": 0.2589,
+      "pit": 0.2357
+    },
+    "nwp_analog": {
+      "pairs": 223,
+      "accuracy": 0.4529,
+      "ece": 0.2957,
+      "brier": 0.3328,
+      "pit": 0.3833
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4454,
+      "ece": 0.255,
+      "brier": 0.3097,
+      "pit": 0.4418
+    }
+  },
+  "KDEN": {
+    "reversion": {
+      "pairs": 1037,
+      "accuracy": 0.6644,
+      "ece": 0.2778,
+      "brier": 0.3023,
+      "pit": 0.0311
+    },
+    "gaussian": {
+      "pairs": 604,
+      "accuracy": 0.7086,
+      "ece": 0.206,
+      "brier": 0.2547,
+      "pit": 0.1005
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1037,
+      "accuracy": 0.6644,
+      "ece": 0.2778,
+      "brier": 0.3023,
+      "pit": 0.0311
+    },
+    "pressure": {
+      "pairs": 1092,
+      "accuracy": 0.6703,
+      "ece": 0.1016,
+      "brier": 0.2296,
+      "pit": 0.2069
+    },
+    "calendar_climatology": {
+      "pairs": 306,
+      "accuracy": 0.7255,
+      "ece": 0.103,
+      "brier": 0.2139,
+      "pit": 0.1312
+    },
+    "goldilocks": {
+      "pairs": 554,
+      "accuracy": 0.722,
+      "ece": 0.2539,
+      "brier": 0.2579,
+      "pit": 0.2091
+    },
+    "late_day_momentum": {
+      "pairs": 1114,
+      "accuracy": 0.4479,
+      "ece": 0.2412,
+      "brier": 0.3063,
+      "pit": 0.3727
+    },
+    "pressure_regime": {
+      "pairs": 1184,
+      "accuracy": 0.6579,
+      "ece": 0.1134,
+      "brier": 0.2362,
+      "pit": 0.146
+    },
+    "dtr_trend": {
+      "pairs": 1186,
+      "accuracy": 0.4941,
+      "ece": 0.2332,
+      "brier": 0.3071,
+      "pit": 0.3018
+    },
+    "wind_direction_shift": {
+      "pairs": 134,
+      "accuracy": 0.5,
+      "ece": 0.1723,
+      "brier": 0.2854,
+      "pit": 0.1813
+    },
+    "rdae_mos": {
+      "pairs": 411,
+      "accuracy": 0.691,
+      "ece": 0.03,
+      "brier": 0.2139,
+      "pit": 0.2491
+    },
+    "nwp_analog": {
+      "pairs": 225,
+      "accuracy": 0.44,
+      "ece": 0.3163,
+      "brier": 0.3441,
+      "pit": 0.4166
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.2675,
+      "brier": 0.316,
+      "pit": 0.4247
+    }
+  },
+  "KDFW": {
+    "reversion": {
+      "pairs": 1061,
+      "accuracy": 0.6437,
+      "ece": 0.2626,
+      "brier": 0.3035,
+      "pit": 0.0278
+    },
+    "gaussian": {
+      "pairs": 625,
+      "accuracy": 0.6864,
+      "ece": 0.2052,
+      "brier": 0.2585,
+      "pit": 0.0917
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1061,
+      "accuracy": 0.6437,
+      "ece": 0.2626,
+      "brier": 0.3035,
+      "pit": 0.0278
+    },
+    "pressure": {
+      "pairs": 825,
+      "accuracy": 0.5285,
+      "ece": 0.1712,
+      "brier": 0.2843,
+      "pit": 0.0997
+    },
+    "calendar_climatology": {
+      "pairs": 307,
+      "accuracy": 0.6971,
+      "ece": 0.0693,
+      "brier": 0.2203,
+      "pit": 0.1357
+    },
+    "goldilocks": {
+      "pairs": 590,
+      "accuracy": 0.6864,
+      "ece": 0.2083,
+      "brier": 0.2584,
+      "pit": 0.205
+    },
+    "late_day_momentum": {
+      "pairs": 905,
+      "accuracy": 0.4983,
+      "ece": 0.1831,
+      "brier": 0.2855,
+      "pit": 0.3136
+    },
+    "pressure_regime": {
+      "pairs": 972,
+      "accuracy": 0.5257,
+      "ece": 0.1966,
+      "brier": 0.2901,
+      "pit": 0.0726
+    },
+    "dtr_trend": {
+      "pairs": 1121,
+      "accuracy": 0.4924,
+      "ece": 0.2337,
+      "brier": 0.3107,
+      "pit": 0.2701
+    },
+    "wind_direction_shift": {
+      "pairs": 191,
+      "accuracy": 0.555,
+      "ece": 0.1476,
+      "brier": 0.2697,
+      "pit": 0.2455
+    },
+    "rdae_mos": {
+      "pairs": 460,
+      "accuracy": 0.6196,
+      "ece": 0.0691,
+      "brier": 0.2406,
+      "pit": 0.179
+    },
+    "nwp_analog": {
+      "pairs": 226,
+      "accuracy": 0.4292,
+      "ece": 0.3182,
+      "brier": 0.3474,
+      "pit": 0.4188
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4286,
+      "ece": 0.2666,
+      "brier": 0.3142,
+      "pit": 0.4492
+    }
+  },
+  "KHOU": {
+    "reversion": {
+      "pairs": 1082,
+      "accuracy": 0.6534,
+      "ece": 0.2673,
+      "brier": 0.3071,
+      "pit": 0.0311
+    },
+    "gaussian": {
+      "pairs": 639,
+      "accuracy": 0.6792,
+      "ece": 0.2023,
+      "brier": 0.2624,
+      "pit": 0.1021
+    },
+    "regime": {
+      "pairs": 4,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1082,
+      "accuracy": 0.6534,
+      "ece": 0.2673,
+      "brier": 0.3071,
+      "pit": 0.0311
+    },
+    "pressure": {
+      "pairs": 675,
+      "accuracy": 0.4993,
+      "ece": 0.1974,
+      "brier": 0.2993,
+      "pit": 0.0859
+    },
+    "calendar_climatology": {
+      "pairs": 321,
+      "accuracy": 0.6885,
+      "ece": 0.1027,
+      "brier": 0.2234,
+      "pit": 0.128
+    },
+    "goldilocks": {
+      "pairs": 614,
+      "accuracy": 0.6759,
+      "ece": 0.1999,
+      "brier": 0.2564,
+      "pit": 0.2086
+    },
+    "late_day_momentum": {
+      "pairs": 790,
+      "accuracy": 0.4532,
+      "ece": 0.223,
+      "brier": 0.2976,
+      "pit": 0.2887
+    },
+    "pressure_regime": {
+      "pairs": 837,
+      "accuracy": 0.5078,
+      "ece": 0.2003,
+      "brier": 0.3022,
+      "pit": 0.0567
+    },
+    "dtr_trend": {
+      "pairs": 1099,
+      "accuracy": 0.4914,
+      "ece": 0.228,
+      "brier": 0.3032,
+      "pit": 0.2858
+    },
+    "wind_direction_shift": {
+      "pairs": 82,
+      "accuracy": 0.6341,
+      "ece": 0.0846,
+      "brier": 0.2391,
+      "pit": 0.2488
+    },
+    "rdae_mos": {
+      "pairs": 284,
+      "accuracy": 0.5669,
+      "ece": 0.1065,
+      "brier": 0.2576,
+      "pit": 0.2501
+    },
+    "nwp_analog": {
+      "pairs": 225,
+      "accuracy": 0.4533,
+      "ece": 0.296,
+      "brier": 0.3339,
+      "pit": 0.4151
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.243,
+      "brier": 0.3051,
+      "pit": 0.4384
+    }
+  },
+  "KLAS": {
+    "reversion": {
+      "pairs": 1068,
+      "accuracy": 0.5749,
+      "ece": 0.1775,
+      "brier": 0.2871,
+      "pit": 0.0322
+    },
+    "gaussian": {
+      "pairs": 762,
+      "accuracy": 0.5656,
+      "ece": 0.1067,
+      "brier": 0.2575,
+      "pit": 0.0904
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1068,
+      "accuracy": 0.5749,
+      "ece": 0.1775,
+      "brier": 0.2871,
+      "pit": 0.0322
+    },
+    "pressure": {
+      "pairs": 848,
+      "accuracy": 0.6439,
+      "ece": 0.0785,
+      "brier": 0.2318,
+      "pit": 0.1066
+    },
+    "calendar_climatology": {
+      "pairs": 434,
+      "accuracy": 0.5899,
+      "ece": 0.06,
+      "brier": 0.2477,
+      "pit": 0.1172
+    },
+    "goldilocks": {
+      "pairs": 704,
+      "accuracy": 0.5952,
+      "ece": 0.1295,
+      "brier": 0.2525,
+      "pit": 0.1699
+    },
+    "late_day_momentum": {
+      "pairs": 838,
+      "accuracy": 0.537,
+      "ece": 0.1392,
+      "brier": 0.2705,
+      "pit": 0.2505
+    },
+    "pressure_regime": {
+      "pairs": 1000,
+      "accuracy": 0.641,
+      "ece": 0.1068,
+      "brier": 0.2426,
+      "pit": 0.1023
+    },
+    "dtr_trend": {
+      "pairs": 969,
+      "accuracy": 0.5377,
+      "ece": 0.1759,
+      "brier": 0.2797,
+      "pit": 0.2215
+    },
+    "wind_direction_shift": {
+      "pairs": 81,
+      "accuracy": 0.8025,
+      "ece": 0.1458,
+      "brier": 0.1741,
+      "pit": 0.2941
+    },
+    "rdae_mos": {
+      "pairs": 517,
+      "accuracy": 0.617,
+      "ece": 0.0783,
+      "brier": 0.2425,
+      "pit": 0.1672
+    },
+    "nwp_analog": {
+      "pairs": 209,
+      "accuracy": 0.4498,
+      "ece": 0.304,
+      "brier": 0.3351,
+      "pit": 0.3862
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4538,
+      "ece": 0.2483,
+      "brier": 0.306,
+      "pit": 0.4218
+    }
+  },
+  "KLAX": {
+    "reversion": {
+      "pairs": 993,
+      "accuracy": 0.6274,
+      "ece": 0.2423,
+      "brier": 0.289,
+      "pit": 0.025
+    },
+    "gaussian": {
+      "pairs": 558,
+      "accuracy": 0.6846,
+      "ece": 0.1737,
+      "brier": 0.2484,
+      "pit": 0.0846
+    },
+    "regime": {
+      "pairs": 14,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 993,
+      "accuracy": 0.6274,
+      "ece": 0.2423,
+      "brier": 0.289,
+      "pit": 0.025
+    },
+    "pressure": {
+      "pairs": 523,
+      "accuracy": 0.5621,
+      "ece": 0.1455,
+      "brier": 0.2717,
+      "pit": 0.0772
+    },
+    "calendar_climatology": {
+      "pairs": 273,
+      "accuracy": 0.7363,
+      "ece": 0.1106,
+      "brier": 0.2086,
+      "pit": 0.1361
+    },
+    "goldilocks": {
+      "pairs": 551,
+      "accuracy": 0.6987,
+      "ece": 0.2011,
+      "brier": 0.2531,
+      "pit": 0.1416
+    },
+    "late_day_momentum": {
+      "pairs": 387,
+      "accuracy": 0.4496,
+      "ece": 0.2071,
+      "brier": 0.2935,
+      "pit": 0.2121
+    },
+    "pressure_regime": {
+      "pairs": 717,
+      "accuracy": 0.5523,
+      "ece": 0.1582,
+      "brier": 0.2827,
+      "pit": 0.046
+    },
+    "dtr_trend": {
+      "pairs": 929,
+      "accuracy": 0.479,
+      "ece": 0.2482,
+      "brier": 0.3113,
+      "pit": 0.2521
+    },
+    "wind_direction_shift": {
+      "pairs": 35,
+      "accuracy": 0.4857,
+      "ece": 0.1917,
+      "brier": 0.272,
+      "pit": 0.3143
+    },
+    "rdae_mos": {
+      "pairs": 594,
+      "accuracy": 0.6178,
+      "ece": 0.0712,
+      "brier": 0.2472,
+      "pit": 0.183
+    },
+    "nwp_analog": {
+      "pairs": 171,
+      "accuracy": 0.3918,
+      "ece": 0.3169,
+      "brier": 0.3467,
+      "pit": 0.2227
+    },
+    "forecast_disagreement": {
+      "pairs": 142,
+      "accuracy": 0.4155,
+      "ece": 0.2921,
+      "brier": 0.321,
+      "pit": 0.361
+    }
+  },
+  "KMDW": {
+    "reversion": {
+      "pairs": 1045,
+      "accuracy": 0.6306,
+      "ece": 0.224,
+      "brier": 0.2862,
+      "pit": 0.0327
+    },
+    "gaussian": {
+      "pairs": 611,
+      "accuracy": 0.671,
+      "ece": 0.1745,
+      "brier": 0.2497,
+      "pit": 0.0843
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1045,
+      "accuracy": 0.6306,
+      "ece": 0.224,
+      "brier": 0.2862,
+      "pit": 0.0327
+    },
+    "pressure": {
+      "pairs": 1062,
+      "accuracy": 0.6234,
+      "ece": 0.1275,
+      "brier": 0.2539,
+      "pit": 0.1646
+    },
+    "calendar_climatology": {
+      "pairs": 341,
+      "accuracy": 0.695,
+      "ece": 0.0601,
+      "brier": 0.2162,
+      "pit": 0.1271
+    },
+    "goldilocks": {
+      "pairs": 626,
+      "accuracy": 0.6837,
+      "ece": 0.2165,
+      "brier": 0.2601,
+      "pit": 0.1782
+    },
+    "late_day_momentum": {
+      "pairs": 1058,
+      "accuracy": 0.4811,
+      "ece": 0.2021,
+      "brier": 0.2896,
+      "pit": 0.3232
+    },
+    "pressure_regime": {
+      "pairs": 1156,
+      "accuracy": 0.6107,
+      "ece": 0.1267,
+      "brier": 0.2546,
+      "pit": 0.1155
+    },
+    "dtr_trend": {
+      "pairs": 1188,
+      "accuracy": 0.5025,
+      "ece": 0.2246,
+      "brier": 0.3045,
+      "pit": 0.2961
+    },
+    "wind_direction_shift": {
+      "pairs": 235,
+      "accuracy": 0.6723,
+      "ece": 0.0469,
+      "brier": 0.2237,
+      "pit": 0.2815
+    },
+    "rdae_mos": {
+      "pairs": 459,
+      "accuracy": 0.6166,
+      "ece": 0.0669,
+      "brier": 0.2404,
+      "pit": 0.2048
+    },
+    "nwp_analog": {
+      "pairs": 223,
+      "accuracy": 0.4664,
+      "ece": 0.2732,
+      "brier": 0.3225,
+      "pit": 0.384
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.479,
+      "ece": 0.2286,
+      "brier": 0.3024,
+      "pit": 0.4232
+    }
+  },
+  "KMIA": {
+    "reversion": {
+      "pairs": 967,
+      "accuracy": 0.6887,
+      "ece": 0.2922,
+      "brier": 0.3096,
+      "pit": 0.0278
+    },
+    "gaussian": {
+      "pairs": 550,
+      "accuracy": 0.7436,
+      "ece": 0.2394,
+      "brier": 0.2629,
+      "pit": 0.0847
+    },
+    "regime": {
+      "pairs": 18,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 967,
+      "accuracy": 0.6887,
+      "ece": 0.2922,
+      "brier": 0.3096,
+      "pit": 0.0278
+    },
+    "pressure": {
+      "pairs": 391,
+      "accuracy": 0.5345,
+      "ece": 0.1097,
+      "brier": 0.2669,
+      "pit": 0.1113
+    },
+    "calendar_climatology": {
+      "pairs": 286,
+      "accuracy": 0.7308,
+      "ece": 0.0965,
+      "brier": 0.2138,
+      "pit": 0.1445
+    },
+    "goldilocks": {
+      "pairs": 522,
+      "accuracy": 0.7452,
+      "ece": 0.2599,
+      "brier": 0.2522,
+      "pit": 0.2074
+    },
+    "late_day_momentum": {
+      "pairs": 478,
+      "accuracy": 0.4979,
+      "ece": 0.1615,
+      "brier": 0.2828,
+      "pit": 0.213
+    },
+    "pressure_regime": {
+      "pairs": 584,
+      "accuracy": 0.524,
+      "ece": 0.1693,
+      "brier": 0.2859,
+      "pit": 0.0449
+    },
+    "dtr_trend": {
+      "pairs": 872,
+      "accuracy": 0.4255,
+      "ece": 0.278,
+      "brier": 0.3318,
+      "pit": 0.2217
+    },
+    "wind_direction_shift": {
+      "pairs": 29,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "rdae_mos": {
+      "pairs": 622,
+      "accuracy": 0.6029,
+      "ece": 0.0904,
+      "brier": 0.249,
+      "pit": 0.1735
+    },
+    "nwp_analog": {
+      "pairs": 212,
+      "accuracy": 0.3915,
+      "ece": 0.3496,
+      "brier": 0.36,
+      "pit": 0.375
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.395,
+      "ece": 0.2944,
+      "brier": 0.3236,
+      "pit": 0.4323
+    }
+  },
+  "KMSP": {
+    "reversion": {
+      "pairs": 1017,
+      "accuracy": 0.6332,
+      "ece": 0.2265,
+      "brier": 0.2895,
+      "pit": 0.0305
+    },
+    "gaussian": {
+      "pairs": 640,
+      "accuracy": 0.6609,
+      "ece": 0.1512,
+      "brier": 0.2523,
+      "pit": 0.0875
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1017,
+      "accuracy": 0.6332,
+      "ece": 0.2265,
+      "brier": 0.2895,
+      "pit": 0.0305
+    },
+    "pressure": {
+      "pairs": 1118,
+      "accuracy": 0.5716,
+      "ece": 0.1625,
+      "brier": 0.2732,
+      "pit": 0.1769
+    },
+    "calendar_climatology": {
+      "pairs": 363,
+      "accuracy": 0.6749,
+      "ece": 0.0544,
+      "brier": 0.2242,
+      "pit": 0.1266
+    },
+    "goldilocks": {
+      "pairs": 619,
+      "accuracy": 0.6656,
+      "ece": 0.1976,
+      "brier": 0.2519,
+      "pit": 0.1796
+    },
+    "late_day_momentum": {
+      "pairs": 1063,
+      "accuracy": 0.476,
+      "ece": 0.2089,
+      "brier": 0.2938,
+      "pit": 0.3306
+    },
+    "pressure_regime": {
+      "pairs": 1218,
+      "accuracy": 0.5714,
+      "ece": 0.1701,
+      "brier": 0.2779,
+      "pit": 0.1263
+    },
+    "dtr_trend": {
+      "pairs": 1157,
+      "accuracy": 0.484,
+      "ece": 0.2442,
+      "brier": 0.3138,
+      "pit": 0.2812
+    },
+    "wind_direction_shift": {
+      "pairs": 211,
+      "accuracy": 0.5924,
+      "ece": 0.0852,
+      "brier": 0.2447,
+      "pit": 0.3082
+    },
+    "rdae_mos": {
+      "pairs": 423,
+      "accuracy": 0.6028,
+      "ece": 0.0839,
+      "brier": 0.2515,
+      "pit": 0.1872
+    },
+    "nwp_analog": {
+      "pairs": 223,
+      "accuracy": 0.435,
+      "ece": 0.3112,
+      "brier": 0.3398,
+      "pit": 0.3966
+    },
+    "forecast_disagreement": {
+      "pairs": 236,
+      "accuracy": 0.4449,
+      "ece": 0.2589,
+      "brier": 0.3141,
+      "pit": 0.4419
+    }
+  },
+  "KMSY": {
+    "reversion": {
+      "pairs": 1062,
+      "accuracy": 0.6582,
+      "ece": 0.2639,
+      "brier": 0.3006,
+      "pit": 0.0294
+    },
+    "gaussian": {
+      "pairs": 681,
+      "accuracy": 0.6887,
+      "ece": 0.2134,
+      "brier": 0.2557,
+      "pit": 0.0948
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1062,
+      "accuracy": 0.6582,
+      "ece": 0.2639,
+      "brier": 0.3006,
+      "pit": 0.0294
+    },
+    "pressure": {
+      "pairs": 610,
+      "accuracy": 0.5541,
+      "ece": 0.1313,
+      "brier": 0.273,
+      "pit": 0.0733
+    },
+    "calendar_climatology": {
+      "pairs": 340,
+      "accuracy": 0.7324,
+      "ece": 0.1119,
+      "brier": 0.2167,
+      "pit": 0.1333
+    },
+    "goldilocks": {
+      "pairs": 638,
+      "accuracy": 0.6991,
+      "ece": 0.2195,
+      "brier": 0.257,
+      "pit": 0.2081
+    },
+    "late_day_momentum": {
+      "pairs": 697,
+      "accuracy": 0.4634,
+      "ece": 0.2122,
+      "brier": 0.2931,
+      "pit": 0.2904
+    },
+    "pressure_regime": {
+      "pairs": 768,
+      "accuracy": 0.5417,
+      "ece": 0.1493,
+      "brier": 0.2789,
+      "pit": 0.0575
+    },
+    "dtr_trend": {
+      "pairs": 1029,
+      "accuracy": 0.4869,
+      "ece": 0.2241,
+      "brier": 0.304,
+      "pit": 0.2358
+    },
+    "wind_direction_shift": {
+      "pairs": 82,
+      "accuracy": 0.6341,
+      "ece": 0.0694,
+      "brier": 0.2357,
+      "pit": 0.3721
+    },
+    "rdae_mos": {
+      "pairs": 399,
+      "accuracy": 0.5639,
+      "ece": 0.1071,
+      "brier": 0.258,
+      "pit": 0.2657
+    },
+    "nwp_analog": {
+      "pairs": 224,
+      "accuracy": 0.4286,
+      "ece": 0.3289,
+      "brier": 0.3476,
+      "pit": 0.4163
+    },
+    "forecast_disagreement": {
+      "pairs": 236,
+      "accuracy": 0.428,
+      "ece": 0.2699,
+      "brier": 0.3166,
+      "pit": 0.4547
+    }
+  },
+  "KNYC": {
+    "reversion": {
+      "pairs": 1027,
+      "accuracy": 0.6407,
+      "ece": 0.2256,
+      "brier": 0.2894,
+      "pit": 0.0316
+    },
+    "gaussian": {
+      "pairs": 660,
+      "accuracy": 0.65,
+      "ece": 0.1236,
+      "brier": 0.2423,
+      "pit": 0.0873
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1027,
+      "accuracy": 0.6407,
+      "ece": 0.2256,
+      "brier": 0.2894,
+      "pit": 0.0316
+    },
+    "pressure": {
+      "pairs": 1100,
+      "accuracy": 0.5709,
+      "ece": 0.1822,
+      "brier": 0.2744,
+      "pit": 0.1827
+    },
+    "calendar_climatology": {
+      "pairs": 365,
+      "accuracy": 0.6904,
+      "ece": 0.0538,
+      "brier": 0.2159,
+      "pit": 0.1326
+    },
+    "goldilocks": {
+      "pairs": 621,
+      "accuracy": 0.6715,
+      "ece": 0.2009,
+      "brier": 0.2561,
+      "pit": 0.1653
+    },
+    "late_day_momentum": {
+      "pairs": 1034,
+      "accuracy": 0.4787,
+      "ece": 0.2044,
+      "brier": 0.2929,
+      "pit": 0.3234
+    },
+    "pressure_regime": {
+      "pairs": 1198,
+      "accuracy": 0.571,
+      "ece": 0.1787,
+      "brier": 0.2801,
+      "pit": 0.1331
+    },
+    "dtr_trend": {
+      "pairs": 1084,
+      "accuracy": 0.4714,
+      "ece": 0.2395,
+      "brier": 0.3133,
+      "pit": 0.2462
+    },
+    "wind_direction_shift": {
+      "pairs": 265,
+      "accuracy": 0.634,
+      "ece": 0.0798,
+      "brier": 0.238,
+      "pit": 0.3464
+    },
+    "rdae_mos": {
+      "pairs": 393,
+      "accuracy": 0.5725,
+      "ece": 0.1008,
+      "brier": 0.2554,
+      "pit": 0.2485
+    },
+    "nwp_analog": {
+      "pairs": 219,
+      "accuracy": 0.4749,
+      "ece": 0.2796,
+      "brier": 0.325,
+      "pit": 0.3705
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.479,
+      "ece": 0.2424,
+      "brier": 0.309,
+      "pit": 0.4195
+    }
+  },
+  "KOKC": {
+    "reversion": {
+      "pairs": 1058,
+      "accuracy": 0.6427,
+      "ece": 0.2373,
+      "brier": 0.2876,
+      "pit": 0.0327
+    },
+    "gaussian": {
+      "pairs": 660,
+      "accuracy": 0.6818,
+      "ece": 0.1638,
+      "brier": 0.2444,
+      "pit": 0.1025
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1058,
+      "accuracy": 0.6427,
+      "ece": 0.2373,
+      "brier": 0.2876,
+      "pit": 0.0327
+    },
+    "pressure": {
+      "pairs": 941,
+      "accuracy": 0.5462,
+      "ece": 0.1715,
+      "brier": 0.2837,
+      "pit": 0.1406
+    },
+    "calendar_climatology": {
+      "pairs": 327,
+      "accuracy": 0.7431,
+      "ece": 0.1234,
+      "brier": 0.2111,
+      "pit": 0.1458
+    },
+    "goldilocks": {
+      "pairs": 629,
+      "accuracy": 0.7011,
+      "ece": 0.2294,
+      "brier": 0.2574,
+      "pit": 0.1966
+    },
+    "late_day_momentum": {
+      "pairs": 970,
+      "accuracy": 0.468,
+      "ece": 0.2127,
+      "brier": 0.2961,
+      "pit": 0.3168
+    },
+    "pressure_regime": {
+      "pairs": 1083,
+      "accuracy": 0.5402,
+      "ece": 0.1796,
+      "brier": 0.2864,
+      "pit": 0.0944
+    },
+    "dtr_trend": {
+      "pairs": 1181,
+      "accuracy": 0.486,
+      "ece": 0.2385,
+      "brier": 0.3085,
+      "pit": 0.3057
+    },
+    "wind_direction_shift": {
+      "pairs": 236,
+      "accuracy": 0.5212,
+      "ece": 0.1616,
+      "brier": 0.2788,
+      "pit": 0.2866
+    },
+    "rdae_mos": {
+      "pairs": 394,
+      "accuracy": 0.6244,
+      "ece": 0.0536,
+      "brier": 0.2377,
+      "pit": 0.2302
+    },
+    "nwp_analog": {
+      "pairs": 229,
+      "accuracy": 0.4323,
+      "ece": 0.3206,
+      "brier": 0.3445,
+      "pit": 0.3994
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.437,
+      "ece": 0.2663,
+      "brier": 0.3157,
+      "pit": 0.4492
+    }
+  },
+  "KPHL": {
+    "reversion": {
+      "pairs": 1041,
+      "accuracy": 0.634,
+      "ece": 0.2239,
+      "brier": 0.2916,
+      "pit": 0.0317
+    },
+    "gaussian": {
+      "pairs": 670,
+      "accuracy": 0.6493,
+      "ece": 0.144,
+      "brier": 0.2497,
+      "pit": 0.0831
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1041,
+      "accuracy": 0.634,
+      "ece": 0.2239,
+      "brier": 0.2916,
+      "pit": 0.0317
+    },
+    "pressure": {
+      "pairs": 1086,
+      "accuracy": 0.6206,
+      "ece": 0.126,
+      "brier": 0.2497,
+      "pit": 0.1705
+    },
+    "calendar_climatology": {
+      "pairs": 374,
+      "accuracy": 0.6818,
+      "ece": 0.0618,
+      "brier": 0.2197,
+      "pit": 0.1321
+    },
+    "goldilocks": {
+      "pairs": 640,
+      "accuracy": 0.6672,
+      "ece": 0.1991,
+      "brier": 0.258,
+      "pit": 0.1728
+    },
+    "late_day_momentum": {
+      "pairs": 999,
+      "accuracy": 0.4705,
+      "ece": 0.2136,
+      "brier": 0.299,
+      "pit": 0.3197
+    },
+    "pressure_regime": {
+      "pairs": 1177,
+      "accuracy": 0.6058,
+      "ece": 0.1297,
+      "brier": 0.2532,
+      "pit": 0.1423
+    },
+    "dtr_trend": {
+      "pairs": 1168,
+      "accuracy": 0.5154,
+      "ece": 0.2038,
+      "brier": 0.2939,
+      "pit": 0.2851
+    },
+    "wind_direction_shift": {
+      "pairs": 165,
+      "accuracy": 0.6727,
+      "ece": 0.0407,
+      "brier": 0.2216,
+      "pit": 0.3512
+    },
+    "rdae_mos": {
+      "pairs": 358,
+      "accuracy": 0.6229,
+      "ece": 0.0633,
+      "brier": 0.2407,
+      "pit": 0.2
+    },
+    "nwp_analog": {
+      "pairs": 223,
+      "accuracy": 0.435,
+      "ece": 0.3169,
+      "brier": 0.3431,
+      "pit": 0.3802
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.4286,
+      "ece": 0.2639,
+      "brier": 0.312,
+      "pit": 0.4388
+    }
+  },
+  "KPHX": {
+    "reversion": {
+      "pairs": 1089,
+      "accuracy": 0.596,
+      "ece": 0.1951,
+      "brier": 0.2829,
+      "pit": 0.0333
+    },
+    "gaussian": {
+      "pairs": 735,
+      "accuracy": 0.6177,
+      "ece": 0.1191,
+      "brier": 0.2544,
+      "pit": 0.0955
+    },
+    "regime": {
+      "pairs": 1,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1089,
+      "accuracy": 0.596,
+      "ece": 0.1951,
+      "brier": 0.2829,
+      "pit": 0.0333
+    },
+    "pressure": {
+      "pairs": 646,
+      "accuracy": 0.6563,
+      "ece": 0.066,
+      "brier": 0.2268,
+      "pit": 0.0884
+    },
+    "calendar_climatology": {
+      "pairs": 434,
+      "accuracy": 0.6221,
+      "ece": 0.0289,
+      "brier": 0.2327,
+      "pit": 0.1133
+    },
+    "goldilocks": {
+      "pairs": 685,
+      "accuracy": 0.6263,
+      "ece": 0.1595,
+      "brier": 0.2517,
+      "pit": 0.177
+    },
+    "late_day_momentum": {
+      "pairs": 780,
+      "accuracy": 0.5936,
+      "ece": 0.0939,
+      "brier": 0.2508,
+      "pit": 0.2485
+    },
+    "pressure_regime": {
+      "pairs": 812,
+      "accuracy": 0.6404,
+      "ece": 0.1204,
+      "brier": 0.2469,
+      "pit": 0.0651
+    },
+    "dtr_trend": {
+      "pairs": 973,
+      "accuracy": 0.4995,
+      "ece": 0.2226,
+      "brier": 0.3011,
+      "pit": 0.2278
+    },
+    "wind_direction_shift": {
+      "pairs": 23,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "rdae_mos": {
+      "pairs": 500,
+      "accuracy": 0.578,
+      "ece": 0.0999,
+      "brier": 0.2554,
+      "pit": 0.2269
+    },
+    "nwp_analog": {
+      "pairs": 214,
+      "accuracy": 0.4346,
+      "ece": 0.3118,
+      "brier": 0.3423,
+      "pit": 0.369
+    },
+    "forecast_disagreement": {
+      "pairs": 236,
+      "accuracy": 0.4449,
+      "ece": 0.2676,
+      "brier": 0.3176,
+      "pit": 0.4309
+    }
+  },
+  "KSAT": {
+    "reversion": {
+      "pairs": 1014,
+      "accuracy": 0.6686,
+      "ece": 0.2794,
+      "brier": 0.3091,
+      "pit": 0.0299
+    },
+    "gaussian": {
+      "pairs": 610,
+      "accuracy": 0.6967,
+      "ece": 0.2175,
+      "brier": 0.2632,
+      "pit": 0.0755
+    },
+    "regime": {
+      "pairs": 7,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1014,
+      "accuracy": 0.6686,
+      "ece": 0.2794,
+      "brier": 0.3091,
+      "pit": 0.0299
+    },
+    "pressure": {
+      "pairs": 746,
+      "accuracy": 0.5,
+      "ece": 0.1965,
+      "brier": 0.3041,
+      "pit": 0.0867
+    },
+    "calendar_climatology": {
+      "pairs": 329,
+      "accuracy": 0.696,
+      "ece": 0.0633,
+      "brier": 0.2233,
+      "pit": 0.1409
+    },
+    "goldilocks": {
+      "pairs": 566,
+      "accuracy": 0.7102,
+      "ece": 0.233,
+      "brier": 0.2567,
+      "pit": 0.2053
+    },
+    "late_day_momentum": {
+      "pairs": 802,
+      "accuracy": 0.4875,
+      "ece": 0.1871,
+      "brier": 0.289,
+      "pit": 0.2761
+    },
+    "pressure_regime": {
+      "pairs": 898,
+      "accuracy": 0.4811,
+      "ece": 0.2105,
+      "brier": 0.3048,
+      "pit": 0.0719
+    },
+    "dtr_trend": {
+      "pairs": 1098,
+      "accuracy": 0.4827,
+      "ece": 0.2371,
+      "brier": 0.3102,
+      "pit": 0.2659
+    },
+    "wind_direction_shift": {
+      "pairs": 79,
+      "accuracy": 0.557,
+      "ece": 0.1544,
+      "brier": 0.2677,
+      "pit": 0.1946
+    },
+    "rdae_mos": {
+      "pairs": 479,
+      "accuracy": 0.5929,
+      "ece": 0.0922,
+      "brier": 0.2503,
+      "pit": 0.195
+    },
+    "nwp_analog": {
+      "pairs": 229,
+      "accuracy": 0.4105,
+      "ece": 0.3329,
+      "brier": 0.3535,
+      "pit": 0.423
+    },
+    "forecast_disagreement": {
+      "pairs": 237,
+      "accuracy": 0.4093,
+      "ece": 0.2924,
+      "brier": 0.3264,
+      "pit": 0.4497
+    }
+  },
+  "KSEA": {
+    "reversion": {
+      "pairs": 1033,
+      "accuracy": 0.5866,
+      "ece": 0.1927,
+      "brier": 0.2932,
+      "pit": 0.0315
+    },
+    "gaussian": {
+      "pairs": 656,
+      "accuracy": 0.5762,
+      "ece": 0.0923,
+      "brier": 0.2537,
+      "pit": 0.0926
+    },
+    "regime": {
+      "pairs": 0,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 1033,
+      "accuracy": 0.5866,
+      "ece": 0.1927,
+      "brier": 0.2932,
+      "pit": 0.0315
+    },
+    "pressure": {
+      "pairs": 1002,
+      "accuracy": 0.5828,
+      "ece": 0.1478,
+      "brier": 0.2628,
+      "pit": 0.1361
+    },
+    "calendar_climatology": {
+      "pairs": 374,
+      "accuracy": 0.5963,
+      "ece": 0.0255,
+      "brier": 0.2405,
+      "pit": 0.1163
+    },
+    "goldilocks": {
+      "pairs": 600,
+      "accuracy": 0.595,
+      "ece": 0.131,
+      "brier": 0.2562,
+      "pit": 0.1532
+    },
+    "late_day_momentum": {
+      "pairs": 853,
+      "accuracy": 0.5686,
+      "ece": 0.1103,
+      "brier": 0.2592,
+      "pit": 0.2605
+    },
+    "pressure_regime": {
+      "pairs": 1116,
+      "accuracy": 0.5726,
+      "ece": 0.1556,
+      "brier": 0.2709,
+      "pit": 0.1171
+    },
+    "dtr_trend": {
+      "pairs": 1105,
+      "accuracy": 0.4398,
+      "ece": 0.2811,
+      "brier": 0.3337,
+      "pit": 0.2817
+    },
+    "wind_direction_shift": {
+      "pairs": 36,
+      "accuracy": 0.6944,
+      "ece": 0.0831,
+      "brier": 0.2225,
+      "pit": 0.1855
+    },
+    "rdae_mos": {
+      "pairs": 398,
+      "accuracy": 0.5779,
+      "ece": 0.1003,
+      "brier": 0.2532,
+      "pit": 0.2308
+    },
+    "nwp_analog": {
+      "pairs": 211,
+      "accuracy": 0.5071,
+      "ece": 0.2364,
+      "brier": 0.3058,
+      "pit": 0.3121
+    },
+    "forecast_disagreement": {
+      "pairs": 238,
+      "accuracy": 0.5042,
+      "ece": 0.2004,
+      "brier": 0.2887,
+      "pit": 0.4125
+    }
+  },
+  "KSFO": {
+    "reversion": {
+      "pairs": 939,
+      "accuracy": 0.6347,
+      "ece": 0.2419,
+      "brier": 0.2928,
+      "pit": 0.028
+    },
+    "gaussian": {
+      "pairs": 509,
+      "accuracy": 0.6778,
+      "ece": 0.1789,
+      "brier": 0.2501,
+      "pit": 0.0782
+    },
+    "regime": {
+      "pairs": 2,
+      "accuracy": 0,
+      "ece": 1.0,
+      "brier": 1.0,
+      "pit": 1.0
+    },
+    "gaussian_v2": {
+      "pairs": 939,
+      "accuracy": 0.6347,
+      "ece": 0.2419,
+      "brier": 0.2928,
+      "pit": 0.028
+    },
+    "pressure": {
+      "pairs": 687,
+      "accuracy": 0.5808,
+      "ece": 0.1235,
+      "brier": 0.2631,
+      "pit": 0.0698
+    },
+    "calendar_climatology": {
+      "pairs": 247,
+      "accuracy": 0.7328,
+      "ece": 0.0957,
+      "brier": 0.2094,
+      "pit": 0.1598
+    },
+    "goldilocks": {
+      "pairs": 514,
+      "accuracy": 0.7062,
+      "ece": 0.2207,
+      "brier": 0.2553,
+      "pit": 0.154
+    },
+    "late_day_momentum": {
+      "pairs": 545,
+      "accuracy": 0.4844,
+      "ece": 0.1723,
+      "brier": 0.2803,
+      "pit": 0.2042
+    },
+    "pressure_regime": {
+      "pairs": 862,
+      "accuracy": 0.5615,
+      "ece": 0.1606,
+      "brier": 0.2752,
+      "pit": 0.0767
+    },
+    "dtr_trend": {
+      "pairs": 1083,
+      "accuracy": 0.4423,
+      "ece": 0.2852,
+      "brier": 0.3325,
+      "pit": 0.2681
+    },
+    "wind_direction_shift": {
+      "pairs": 142,
+      "accuracy": 0.6549,
+      "ece": 0.0793,
+      "brier": 0.2325,
+      "pit": 0.1645
+    },
+    "rdae_mos": {
+      "pairs": 555,
+      "accuracy": 0.5946,
+      "ece": 0.0874,
+      "brier": 0.2534,
+      "pit": 0.2088
+    },
+    "nwp_analog": {
+      "pairs": 154,
+      "accuracy": 0.3701,
+      "ece": 0.3378,
+      "brier": 0.3623,
+      "pit": 0.1854
+    },
+    "forecast_disagreement": {
+      "pairs": 224,
+      "accuracy": 0.442,
+      "ece": 0.2867,
+      "brier": 0.3231,
+      "pit": 0.3534
+    }
+  }
+}
