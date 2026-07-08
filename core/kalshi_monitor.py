@@ -284,11 +284,31 @@ class kalshi_execution_domain:
 
 
 def _current_kalshi_execution_domain() -> str:
-    return str(_KALSHI_EXECUTION_DOMAIN.get() or "production").strip().lower() or "production"
+    domain = str(_KALSHI_EXECUTION_DOMAIN.get() or "production").strip().lower() or "production"
+    # Ensure domain is normalized to canonical form
+    return {
+        "production": "prod",
+        "prod": "prod",
+        "sandbox": "sbox",
+        "sbox": "sbox",
+        "sbx": "sbox",
+        "development": "dev",
+        "dev": "dev",
+    }.get(domain, domain)
 
 
 def set_kalshi_execution_domain(domain: str):
-    normalized = (domain or "production").strip().lower() or "production"
+    domain_val = (domain or "production").strip().lower() or "production"
+    # Normalize long-form domain names to canonical short names
+    normalized = {
+        "production": "prod",
+        "prod": "prod",
+        "sandbox": "sbox",
+        "sbox": "sbox",
+        "sbx": "sbox",
+        "dev": "development",
+        "development": "development",
+    }.get(domain_val, domain_val)  
     return _KALSHI_EXECUTION_DOMAIN.set(normalized)
 
 
