@@ -64,10 +64,24 @@ from station_registry import (
     CLUSTER_BUDGET_USD as _CLUSTER_BUDGET_USD,
     CITY_PAIR_CAP_USD as _CITY_PAIR_CAP_USD,
 )
+from risk_controls import (
+    RiskMetrics,
+    RiskState,
+    RiskConfig,
+    DEFAULT_RISK_CONFIG,
+    is_station_approved,
+    get_approved_stations,
+    evaluate_risk_state,
+    risk_report,
+    format_risk_alert,
+)
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
 _LOGGER = logging.getLogger(__name__)
+
+# Risk controls configuration (Marty's Phase 1 B1.5)
+RISK_CONFIG = DEFAULT_RISK_CONFIG
 
 # Trade types
 class TradeType(Enum):
@@ -86,6 +100,12 @@ class PaperTrader:
     """
     Paper trading engine implementing deterministic-only signals with version tracking.
     All trade decisions and positions are logged with mandatory trade_version + functionality fields.
+    
+    Includes Marty's Phase 1 B1.5 risk guardrails:
+    - Configurable max daily loss (default: $300)
+    - Configurable max drawdown % (default: 10%)
+    - Kill switch triggers: consecutive losses, correlation, signal conflict
+    - Station gating: only approved stations (KNYC, KLAX, KMDW, KBOS, KATL, KSFO, KSEA)
     """
     
     def __init__(self, 
@@ -99,6 +119,20 @@ class PaperTrader:
         self.position_size = 100  # Min position size in dollars
         self.max_position_value = 1000  # Max exposure per trade
         self.fee_rate = fee_rate  # Trading fee as proportion of fill
+        
+        # Marty's Phase 1 B1.5: Risk controls
+        self._risk_config = RISK_CONFIG
+        self._risk_metrics = RiskMetrics(
+            daily_pnl=0.0,
+            max_drawdown_pct=0.0,
+            consecutive_losses=0,
+            peak_balance=initial_balance,
+            current_balance=initial_balance,
+            risk_state=RiskState.OK,
+        )
+        self._last_daily_settlement_date = None
+        self._daily_trade_count = 0
+        self._daily_loss_count = 0
         
         # Initialize databases
         self._init_paper_db()
@@ -756,9 +790,22 @@ class PaperTrader:
         All trades must have:
         - trade_version: Version tag for the algorithm used (e.g., "v1.0_mean_regression")
         - functionality: Description of why this trade happened (e.g., "mean_reversion_daily_pattern")
+        
+        Marty's Phase 1 B1.5: Station gating - only trade approved stations.
         """
         if date is None:
             date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        
+        # B1.5.2: Station approval gate - only trade approved stations
+        if not self.is_station_approved(station):
+            return {
+                'status': 'skipped',
+                'reason': f'Station {station} not in approved list: {self.get_approved_stations()}',
+                'market_price': None,
+                'analytical_prob': None,
+                'confidence': None,
+                'metadata': {'station_approval_rejected': True}
+            }
         
         # R4-1.3: Settlement-window entry timing gate
         # Only enter trades within T-18h to T-2h before settlement
@@ -997,6 +1044,9 @@ class PaperTrader:
             notes=f"Trade generated: {trade_type.value} with edge of {abs(fair_price_advantage):.2%}"
         )
         
+        # Update risk metrics for successful trades
+        self.update_risk_metrics_on_trade(net_cost, 'loss' if net_cost < 0 else 'win')
+        
         return {
             'status': 'executed',
             'trade_id': trade_id,
@@ -1009,7 +1059,9 @@ class PaperTrader:
             'confidence': confidence,
             'cost': net_cost,
             'fee_cost': fee_cost,
-            'metadata': metadata
+            'metadata': metadata,
+            'risk_state': self._risk_metrics.risk_state.value,
+            'risk_reasons': self._risk_metrics.kill_switch_reasons
         }
     
     def _update_position_after_trade(self, trade_uuid, trade_type, fill_price, quantity,
@@ -1619,6 +1671,81 @@ class PaperTrader:
             print("No calibration data available yet")
             return {}
 
+    # ─── Marty's Phase 1 B1.5: Risk Report ──────────────────────────────
+    
+    def risk_report(self) -> dict:
+        """
+        Generate a risk report with current exposure, daily P&L, and kill switch status.
+        
+        Returns a dict suitable for logging, alerting, or dashboard display.
+        This is the main public interface for risk status checking.
+        """
+        return risk_report(self._risk_metrics, self._risk_config)
+    
+    def format_risk_alert(self) -> str:
+        """Format risk metrics as a human-readable alert string."""
+        return format_risk_alert(self._risk_metrics)
+    
+    def check_kill_switches(self) -> Tuple[bool, List[str]]:
+        """
+        Evaluate all kill switch conditions.
+        
+        Returns (should_halt, list_of_reasons).
+        """
+        reasons = []
+        
+        # Check max daily loss
+        if self._risk_config.max_daily_loss and self._risk_metrics.daily_pnl < -self._risk_config.max_daily_loss:
+            reasons.append(f"Daily loss (${abs(self._risk_metrics.daily_pnl):.2f}) exceeds limit (${self._risk_config.max_daily_loss:.2f})")
+        
+        # Check max drawdown
+        if self._risk_config.max_drawdown_pct and self._risk_metrics.max_drawdown_pct >= self._risk_config.max_drawdown_pct:
+            reasons.append(f"Drawdown ({self._risk_metrics.max_drawdown_pct:.1%}) exceeds limit ({self._risk_config.max_drawdown_pct:.1%})")
+        
+        # Check consecutive losses (from risk_metrics)
+        if self._risk_metrics.consecutive_losses >= self._risk_config.consecutive_loss_limit:
+            reasons.append(f"Consecutive losses ({self._risk_metrics.consecutive_losses}) >= limit ({self._risk_config.consecutive_loss_limit})")
+        
+        return len(reasons) > 0, reasons
+    
+    def update_risk_metrics_on_trade(self, trade_pnl: float, trade_result: str):
+        """
+        Update risk metrics after a trade.
+        
+        Args:
+            trade_pnl: Profit/loss from this trade (positive = profit, negative = loss)
+            trade_result: 'win' or 'loss' for tracking consecutive losses
+        """
+        self._risk_metrics.daily_pnl += trade_pnl
+        
+        # Track daily loss count for consecutive loss tracking
+        if trade_pnl < 0:
+            self._risk_metrics.consecutive_losses += 1
+        else:
+            self._risk_metrics.consecutive_losses = 0
+        
+        # Track peak balance and drawdown
+        if self._risk_metrics.current_balance > self._risk_metrics.peak_balance:
+            self._risk_metrics.peak_balance = self._risk_metrics.current_balance
+        
+        drawdown_pct = 0.0
+        if self._risk_metrics.peak_balance > 0:
+            drawdown_pct = (self._risk_metrics.peak_balance - self._risk_metrics.current_balance) / self._risk_metrics.peak_balance * 100
+        
+        if drawdown_pct > self._risk_metrics.max_drawdown_pct:
+            self._risk_metrics.max_drawdown_pct = drawdown_pct
+        
+        # Re-evaluate risk state
+        self._risk_metrics = evaluate_risk_state(self._risk_metrics, self._risk_config)
+    
+    def is_station_approved(self, station: str) -> bool:
+        """Check if a station is in the approved list (B1.5.2)."""
+        return is_station_approved(station, self._risk_config)
+    
+    def get_approved_stations(self) -> List[str]:
+        """Return list of approved station codes."""
+        return get_approved_stations(self._risk_config)
+
 
 def daily_paper_run(run_date=None):
     """Execute paper trading for the given date."""
@@ -1630,6 +1757,18 @@ def daily_paper_run(run_date=None):
     
     # Increased initial balance for more realistic trading
     trader = PaperTrader(initial_balance=10000.0, fee_rate=0.001)  # 0.1% fee
+    
+    # Marty's Phase 1 B1.5: Check kill switches before trading
+    should_halt, kill_reasons = trader.check_kill_switches()
+    if should_halt:
+        print("\n=== RISK GUARDRAILS KILL SWITCH TRIGGERED ===")
+        print(trader.format_risk_alert())
+        print("\nTrading halted. Resolve issues before resuming.")
+        return {
+            'status': 'halted',
+            'reasons': kill_reasons,
+            'date': run_date
+        }
     
     # Generate signals for all stations with available data
     print(f"Generating signals for {run_date}...")
@@ -1692,6 +1831,28 @@ def daily_paper_run(run_date=None):
     print(f"  Opening:            ${reconciled['opening_balance']:.2f}")
     print(f"  Closing:            ${reconciled['closing_balance']:.2f}")
     print(f"  Daily Change:       ${reconciled['daily_pnl']:.2f}")
+    
+    # Update risk metrics with reconciliation results
+    trader._risk_metrics.current_balance = reconciled['closing_balance']
+    trader._risk_metrics.daily_pnl = reconciled['daily_pnl']
+    trader._risk_metrics.max_drawdown_pct = (reconciled['opening_balance'] - reconciled['closing_balance']) / reconciled['opening_balance'] * 100 if reconciled['opening_balance'] > 0 else 0
+    
+    # Re-evaluate risk state after reconciliation
+    trader._risk_metrics = evaluate_risk_state(trader._risk_metrics, trader._risk_config)
+    
+    print(f"\n=== RISK GUARDRAILS STATUS ===")
+    risk_report = trader.risk_report()
+    print(f"  Risk State: {risk_report['risk_state'].upper()}")
+    print(f"  Current Balance: ${risk_report['current_balance_usd']:,.2f}")
+    print(f"  Daily P&L: ${risk_report['daily_pnl_usd']:,.2f}")
+    print(f"  Max Drawdown: {risk_report['max_drawdown_pct']:.1%}")
+    print(f"  Consecutive Losses: {risk_report['consecutive_losses']}")
+    if risk_report['kill_switch_reasons']:
+        print("  Kill Switch Triggers:")
+        for reason in risk_report['kill_switch_reasons']:
+            print(f"    - {reason}")
+    else:
+        print("  Kill Switch Status: OK (no triggers)")
     
     # Generate enhanced calibration report for P1.5
     print(f"\nGenerating calibration report...")
