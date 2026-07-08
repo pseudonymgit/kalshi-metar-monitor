@@ -28,6 +28,50 @@ from core.station_time import station_local_day_key, to_station_local, parse_iso
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+# === Render Disk + Auto-Refresh (Phase 1) ===
+import os
+import subprocess
+import threading
+import time
+
+DATA_DIR = "/opt/render/project/src/data"
+METAR_DB = os.path.join(DATA_DIR, "metar_backfill.db")
+
+def _refresh_metar_if_stale(max_age_hours: int = 2) -> None:
+    if not os.path.exists(METAR_DB):
+        print("[startup] metar_backfill.db missing → running live collection")
+    else:
+        age_h = (time.time() - os.path.getmtime(METAR_DB)) / 3600
+        if age_h < max_age_hours:
+            print(f"[startup] metar_backfill.db is {age_h:.1f}h old → fresh enough")
+            return
+        print(f"[startup] metar_backfill.db is {age_h:.1f}h old → refreshing")
+
+    try:
+        subprocess.run(
+            ["python3", "scripts/metar_collect_live.py"],
+            cwd="/opt/render/project/src",
+            check=True,
+            timeout=300
+        )
+        print("[startup] METAR refresh complete")
+    except Exception as e:
+        print(f"[startup] METAR refresh failed: {e}")
+
+def _start_periodic_refresh():
+    def loop():
+        while True:
+            time.sleep(45 * 60)
+            _refresh_metar_if_stale(max_age_hours=1)
+    t = threading.Thread(target=loop, daemon=True)
+    t.start()
+
+if os.getenv("RENDER") == "true":
+    _refresh_metar_if_stale(max_age_hours=2)
+    _start_periodic_refresh()
+# === End Render Disk + Auto-Refresh ===
+
+
 from core.metar_monitor import (
     _ensure_alert_schema as _ensure_metar_alert_schema,
     ensure_scheduler_started,
