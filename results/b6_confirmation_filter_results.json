@@ -1,0 +1,15 @@
+{
+  "experiment_name": "B6 Confirmation Filter Optimization",
+  "best_parameters": {
+    "threshold": 0.6,
+    "metric": "confidence_score",
+    "method": "fixed_threshold"
+  },
+  "default_threshold": 0.6,
+  "filters_applied": [
+    "minimum_confidence_gate",
+    "signal_strength_validator"
+  ],
+  "status": "active",
+  "last_updated": "2026-06-30"
+}
