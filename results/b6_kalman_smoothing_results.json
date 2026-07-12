@@ -1,0 +1,13 @@
+{
+  "experiment_name": "B6 Kalman Smoothing Optimization",
+  "best_parameters": {
+    "process_noise": 0.1,
+    "measurement_noise": 0.2,
+    "initial_uncertainty": 1.0
+  },
+  "process_noise": 0.1,
+  "measurement_noise": 0.2,
+  "initial_uncertainty": 1.0,
+  "status": "active",
+  "last_updated": "2026-06-30"
+}
