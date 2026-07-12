@@ -45,10 +45,9 @@ from late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_sig
 from position_sizing import (
     compute_position_size as _compute_confidence_weighted_size,
     extract_confidence_from_signal_context as _extract_confidence,
-    get_config_for_instance as _get_sizing_config,
     classify_confidence as _classify_confidence,
     ConfidenceTier as _ConfidenceTier,
-    DEV_CONFIG as _DEV_SIZING_CONFIG,
+    KellyPositionSizingConfig,
 )
 from kalshi_price_fetcher import (
     get_live_market_price as _get_live_market_price,
@@ -74,6 +73,9 @@ from risk_controls import (
     evaluate_risk_state,
     risk_report,
     format_risk_alert,
+    RiskManager,
+    RiskConfig,
+    TradeResult
 )
 
 # Instance environment variable (PROD/DEV/SBOX)
@@ -130,6 +132,8 @@ class PaperTrader:
             current_balance=initial_balance,
             risk_state=RiskState.OK,
         )
+        # New comprehensive RiskManager for trade-by-trade monitoring
+        self._risk_manager = RiskManager(RiskConfig())
         self._last_daily_settlement_date = None
         self._daily_trade_count = 0
         self._daily_loss_count = 0
@@ -899,7 +903,7 @@ class PaperTrader:
         
         # Calculate position size using confidence-weighted sizing
         current_balance = self.get_current_balance(date)
-        sizing_config = _get_sizing_config(INSTANCE)
+        sizing_config = KellyPositionSizingConfig()
         
         # Extract confidence for sizing
         signal_context_for_sizing = {
@@ -1044,8 +1048,19 @@ class PaperTrader:
             notes=f"Trade generated: {trade_type.value} with edge of {abs(fair_price_advantage):.2%}"
         )
         
+                
         # Update risk metrics for successful trades
         self.update_risk_metrics_on_trade(net_cost, 'loss' if net_cost < 0 else 'win')
+        
+        # Update RiskManager with the new trade result
+        from dataclasses import asdict
+        trade_result = TradeResult(
+            trade_id=trade_uuid,
+            pnl=net_cost,  # Note: this is the immediate transaction cost, not finalized P&L
+            is_profitable=net_cost > 0,
+            trade_date=date
+        )
+        risk_state_after_execution = self._risk_manager.update_after_trade(trade_result)
         
         return {
             'status': 'executed',
@@ -1407,6 +1422,15 @@ class PaperTrader:
                     total_pnl = realized_pnl + ?
                 WHERE trade_uuids LIKE ?
             """, (profit, trade_qty, profit, f'%{trade_uuid}%'))
+            
+            # Update RiskManager with realized P&L after settlement
+            settlement_trade_result = TradeResult(
+                trade_id=trade_uuid,
+                pnl=realized_pnl,
+                is_profitable=realized_pnl > 0,
+                trade_date=settlement_date
+            )
+            risk_state_after_settlement = self._risk_manager.update_after_trade(settlement_trade_result)
             
             settled_count += 1
         

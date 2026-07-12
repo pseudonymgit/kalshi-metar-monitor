@@ -155,6 +155,58 @@ class KellyPositionSizer:
         return max(-0.1, min(0.5, fractional_kelly))  # Limit to reasonable ranges
 
 
+def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
+    """
+    Factory function to return position sizing config for a given instance.
+    
+    Args:
+        instance_name: One of "PROD", "DEV", or "SBOX"
+        
+    Returns:
+        PositionSizingConfig with instance-appropriate sizing parameters
+        
+    Raises:
+        ValueError: If instance_name is not recognized
+    """
+    instance_name = instance_name.upper().strip()
+    
+    if instance_name == "PROD":
+        # PROD: Production-like, conservative sizing, higher fee rate
+        return KellyPositionSizingConfig(
+            base_size_usd=100.0,
+            max_size_usd=500.0,
+            min_size_usd=25.0,
+            fee_rate=0.001,
+            fraction_kelly=0.5,
+            max_position_fraction=0.25,
+            window_days=30,
+        )
+    elif instance_name == "DEV":
+        # DEV: Development, smaller sizing
+        return KellyPositionSizingConfig(
+            base_size_usd=50.0,
+            max_size_usd=250.0,
+            min_size_usd=10.0,
+            fee_rate=0.001,
+            fraction_kelly=0.5,
+            max_position_fraction=0.25,
+            window_days=30,
+        )
+    elif instance_name == "SBOX":
+        # SBOX: Sandbox, tiny sizing for testing
+        return KellyPositionSizingConfig(
+            base_size_usd=10.0,
+            max_size_usd=50.0,
+            min_size_usd=5.0,
+            fee_rate=0.002,
+            fraction_kelly=0.5,
+            max_position_fraction=0.25,
+            window_days=30,
+        )
+    else:
+        raise ValueError(f"Unknown instance: {instance_name}. Expected PROD, DEV, or SBOX.")
+
+
 def classify_confidence(confidence: float, config: PositionSizingConfig = None) -> ConfidenceTier:
     """Classify a confidence score into a tier."""
     if config is None:

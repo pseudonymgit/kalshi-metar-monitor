@@ -1,26 +1,8 @@
-
-======================================================================
-MULTI-INSTANCE PAPER TRADING RUN — 2026-07-05
-Instances: DEV
-Stations: 20
-======================================================================
-
-
-──────────────────────────────────────────────────
-Instance: DEV
-DB: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/paper_trading_dev.db
-Balance: $5,000.00
-Discord: enabled
-Log: /home/node/.openclaw/workspace/prototypes/weather-engine-source/logs/paper_trading_dev.log
-──────────────────────────────────────────────────
-  ↓ KBOS calendar_climatology UP size=$38.75 conf=0.55 tier=medium [ALERT SENT]
-  ✓ KDEN calendar_climatology DOWN size=$38.75 conf=0.55 tier=medium [ALERT SENT]
-  ✓ KMSP calendar_climatology DOWN size=$38.75 conf=0.55 tier=medium [ALERT SENT]
-  ✓ KNYC calendar_climatology UP size=$38.75 conf=0.55 tier=medium [ALERT SENT]
-  ✓ KPHL calendar_climatology UP size=$38.75 conf=0.55 tier=medium [ALERT SENT]
-  ✓ KPHX calendar_climatology UP size=$38.75 conf=0.55 tier=medium [ALERT SENT]
-Processed 0 trade settlements for date 2026-07-05
-
-  Summary: 5 executed, 1 skipped, 6 alerts sent
-  Running P&L: $+0.00
-[2026-07-05T19:48:15.006360+00:00] DEV: complete — 5 executed, 1 skipped, 6 alerts
+Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+[2026-07-10T02:13:09.223150+00:00] DEV: FAILED — cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)

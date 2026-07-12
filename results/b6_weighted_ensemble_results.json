@@ -1,0 +1,20 @@
+{
+  "experiment_name": "B6 Weighted Ensemble Optimization",
+  "best_parameters": {
+    "aggregation_method": "weighted_average",
+    "optimization_target": "sharpe_ratio"
+  },
+  "signal_weights": {
+    "trend_deviation_signal": 0.15,
+    "diffusion_convergence_signal": 0.15,
+    "momentum_differential_signal": 0.15,
+    "atmospheric_pressure_tendency": 0.15,
+    "wind_direction_variance": 0.1,
+    "humidity_inversion_anomaly": 0.15,
+    "visibility_trend_deviation": 0.15
+  },
+  "aggregation_method": "weighted_average",
+  "total_signals": 7,
+  "status": "active",
+  "last_updated": "2026-06-30"
+}

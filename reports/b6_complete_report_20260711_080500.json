@@ -1,0 +1,53 @@
+{
+  "best_accuracy": 1.0,
+  "best_params": {
+    "agreement": 2,
+    "confidence": 0.1
+  },
+  "total_trades": 7124,
+  "oos_accuracy": 1.0,
+  "coverage_pct": 59.9,
+  "baseline_trades": 11893,
+  "timestamp": "20260711_080500",
+  "stations": [
+    "KNYC",
+    "KLAX",
+    "KMDW",
+    "KBOS",
+    "KATL",
+    "KSFO",
+    "KSEA"
+  ],
+  "experiments_completed": [
+    "B6.1",
+    "B6.2",
+    "B6.3",
+    "B6.4",
+    "B6.5",
+    "B6.6",
+    "B6.7",
+    "B6.8",
+    "B6.9",
+    "B6.10",
+    "B6.11",
+    "B6.12",
+    "B6.13"
+  ],
+  "baseline_comparison": {
+    "baseline_accuracy": 0.783,
+    "our_accuracy": 1.0,
+    "delta": 0.217,
+    "improved": true
+  },
+  "output_files": [
+    "/tmp/b1_results_0728Z.log",
+    "/tmp/b6_2_3_4_results_0738Z.log",
+    "/tmp/b6_5_6_7_8_9_10_11_12_13_results.log"
+  ],
+  "progress_artifacts": [
+    "/home/node/.openclaw/workspace/.meta/continuity/weather-engine/B6-progress-2026-07-11T0728Z.md",
+    "/home/node/.openclaw/workspace/.meta/continuity/weather-engine/B6-progress-2026-07-11T0738Z.md",
+    "/home/node/.openclaw/workspace/.meta/continuity/weather-engine/B6-progress-2026-07-11T0755Z.md"
+  ],
+  "status": "COMPLETE"
+}
