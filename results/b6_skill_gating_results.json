@@ -1,0 +1,12 @@
+{
+  "experiment_name": "B6 Skill Gating Optimization",
+  "best_parameters": {
+    "min_skill_score": 0.15,
+    "scoring_method": "brier_score",
+    "validation_period": "rolling_30day"
+  },
+  "default_min_skill_score": 0.15,
+  "skill_scoring_method": "brier_score",
+  "status": "active", 
+  "last_updated": "2026-06-30"
+}

@@ -44,3 +44,169 @@ sqlite3.IntegrityError: UNIQUE constraint failed: daily_balances.date_utc
 2026-07-05 19:48:15,006 [paper_trading.dev] INFO: Cron complete: 5 executed, 1 skipped, 6 alerts
 2026-07-05 21:42:24,619 [paper_trading.dev] INFO: Starting daily run for 2024-08-01
 2026-07-05 21:42:39,496 [paper_trading.dev] INFO: Run complete: 14 executed, 7 skipped, 21 alerts
+2026-07-09 22:12:51,396 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-09 22:12:51,398 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-09 22:12:51,414 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+2026-07-09 22:12:51,416 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+2026-07-09 22:12:57,420 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-09 22:12:57,424 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-09 22:12:57,437 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+2026-07-09 22:12:57,443 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+2026-07-09 22:13:09,205 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-09 22:13:09,205 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-09 22:13:09,222 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+2026-07-09 22:13:09,223 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+Traceback (most recent call last):
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
+    from position_sizing import (
+ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
+2026-07-10 02:17:16,295 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:17:16,320 [paper_trading.dev] ERROR: Cron failed: No module named 'requests'
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 59, in <module>
+    from paper_trading_engine import PaperTrader, MarketSide, TradeType
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 52, in <module>
+    from kalshi_price_fetcher import (
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/kalshi_price_fetcher.py", line 133, in <module>
+    import requests
+ModuleNotFoundError: No module named 'requests'
+2026-07-10 02:18:35,336 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:18:35,393 [paper_trading.dev] ERROR: Cron failed: cannot import name 'RiskMetrics' from 'risk_controls' (/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py)
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 59, in <module>
+    from paper_trading_engine import PaperTrader, MarketSide, TradeType
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 66, in <module>
+    from risk_controls import (
+ImportError: cannot import name 'RiskMetrics' from 'risk_controls' (/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py)
+2026-07-10 02:19:52,551 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:19:52,595 [paper_trading.dev] ERROR: Cron failed: type object 'RiskState' has no attribute 'OK'
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 54, in main
+    runner = MultiInstancePaperTrader(instances=[instance_name])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 97, in __init__
+    trader = PaperTrader(
+             ^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 133, in __init__
+    risk_state=RiskState.OK,
+               ^^^^^^^^^^^^
+AttributeError: type object 'RiskState' has no attribute 'OK'
+2026-07-10 02:20:13,942 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:20:13,988 [paper_trading.dev] ERROR: Cron failed: RiskMetrics.__init__() got an unexpected keyword argument 'peak_balance'
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 54, in main
+    runner = MultiInstancePaperTrader(instances=[instance_name])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 97, in __init__
+    trader = PaperTrader(
+             ^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 127, in __init__
+    self._risk_metrics = RiskMetrics(
+                         ^^^^^^^^^^^^
+TypeError: RiskMetrics.__init__() got an unexpected keyword argument 'peak_balance'
+2026-07-10 02:20:31,110 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:20:31,165 [paper_trading.dev] ERROR: Cron failed: RiskMetrics.__init__() got an unexpected keyword argument 'risk_state'
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 54, in main
+    runner = MultiInstancePaperTrader(instances=[instance_name])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 97, in __init__
+    trader = PaperTrader(
+             ^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 127, in __init__
+    self._risk_metrics = RiskMetrics(
+                         ^^^^^^^^^^^^
+TypeError: RiskMetrics.__init__() got an unexpected keyword argument 'risk_state'
+2026-07-10 02:20:53,889 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:20:53,933 [paper_trading.dev] ERROR: Cron failed: name 'RiskState' is not defined
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 59, in <module>
+    from paper_trading_engine import PaperTrader, MarketSide, TradeType
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 66, in <module>
+    from risk_controls import (
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py", line 45, in <module>
+    class RiskMetrics:
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py", line 57, in RiskMetrics
+    risk_state: RiskState = None  # Reference to risk state (optional)
+                ^^^^^^^^^
+NameError: name 'RiskState' is not defined
+2026-07-10 02:21:14,892 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-10 02:21:14,949 [paper_trading.dev] INFO: Starting daily run for 2026-07-10
+2026-07-10 02:21:15,390 [paper_trading.dev] ERROR: Run failed: argument of type 'RiskConfig' is not iterable
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 160, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 296, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 804, in place_paper_trade
+    if not self.is_station_approved(station):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1767, in is_station_approved
+    return is_station_approved(station, self._risk_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py", line 210, in is_station_approved
+    return station in approved_stations
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'RiskConfig' is not iterable
+2026-07-10 02:21:15,391 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-11 05:38:08,206 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-11 05:38:08,254 [paper_trading.dev] INFO: Starting daily run for 2026-07-11
+2026-07-11 05:38:08,848 [paper_trading.dev] ERROR: Run failed: argument of type 'RiskConfig' is not iterable
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 160, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 296, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 804, in place_paper_trade
+    if not self.is_station_approved(station):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1767, in is_station_approved
+    return is_station_approved(station, self._risk_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py", line 210, in is_station_approved
+    return station in approved_stations
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'RiskConfig' is not iterable
+2026-07-11 05:38:08,850 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts

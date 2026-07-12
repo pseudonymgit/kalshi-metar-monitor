@@ -12,6 +12,7 @@ S6 task: Includes new signals Pressure×Regime, DTR Trend, and Wind Direction Sh
 from .pressure_regime_interaction import PressureRegimeSignal
 from .dtr_trend import DTRTrendSignal  
 from .wind_direction_shift import WindDirectionShiftSignal
+from .nwp_analog_signal import NwpAnalogSignal
 
 # Import legacy signals if needed here (will be in core/ later)
 
@@ -25,6 +26,7 @@ class SignalRegistry:
             'pressure_regime': PressureRegimeSignal(db_path),
             'dtr_trend': DTRTrendSignal(db_path),
             'wind_direction_shift': WindDirectionShiftSignal(db_path),
+            'nwp_analog': NwpAnalogSignal(db_path),
             # Legacy signals will be added here as they're migrated
         }
     

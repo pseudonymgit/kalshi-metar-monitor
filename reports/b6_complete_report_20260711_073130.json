@@ -1,0 +1,36 @@
+{
+  "best_accuracy": 1.0,
+  "best_params": {
+    "agreement": 2,
+    "confidence": 0.1
+  },
+  "total_trades": 3424,
+  "oos_accuracy": 0,
+  "coverage_pct": 28.79004456402926,
+  "baseline_trades": 11893,
+  "timestamp": "20260711_073130",
+  "stations": [
+    "KNYC",
+    "KLAX",
+    "KMDW",
+    "KBOS",
+    "KATL",
+    "KSFO",
+    "KSEA"
+  ],
+  "experiments_completed": [
+    "B6.1",
+    "B6.2",
+    "B6.3",
+    "B6.4",
+    "B6.5",
+    "B6.6",
+    "B6.7",
+    "B6.8",
+    "B6.9",
+    "B6.10",
+    "B6.11",
+    "B6.12",
+    "B6.13"
+  ]
+}

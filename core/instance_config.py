@@ -10,7 +10,7 @@ Defines per-instance configuration for PROD/DEV/SBOX parallelism:
   - Lock files
   - Instance tags in alert format ([PROD], [DEV], [SBOX])
 
-Webhook URLs are locked as defaults — env vars can still override.
+Webhook URLs are now required via environment variables (no defaults).
 
 All script/config work — no AI in the loop.
 """
@@ -25,12 +25,12 @@ from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# ─── Locked Webhook URLs (authorized by Dan, 2026-07-05) ──────────────
-# Env vars override these defaults if set.
+# ─── Default Webhook URLs (empty by default) ──────────────
+# Production/DEV/SBOX webhooks must be set via environment variables.
 _DEFAULT_WEBHOOKS = {
-    "PROD": "https://discord.com/api/webhooks/1467939512884793424/OajR6g4e3l-hR6cwMsypBT7B3bHzb1m0ybZp7PCBzTU9lkZgSDAsoX6tUy9S4IgIgVZ8",
-    "DEV":  "https://discord.com/api/webhooks/1523412321358184521/U-ZgAJut0QQTEh-AWgeTKyJI0xg2CrxPPQ3sY88uNRLfM3d9SKKHscoDsTX8zeRdAWkY",
-    "SBOX": "https://discord.com/api/webhooks/1523404594502172804/Iairq0RUXnDMyJIxa-jHr4_5Lj4pLKsB0VSMEEGAIH8Gld0LbQvY8iRepbMasK6u-nFW",
+    "PROD": "",  # Required: set via DISCORD_WEBHOOK_PROD environment variable
+    "DEV":  "",  # Required: set via DISCORD_WEBHOOK_DEV environment variable
+    "SBOX": "",  # Required: set via DISCORD_WEBHOOK_SBOX environment variable
 }
 
 
@@ -68,40 +68,91 @@ class InstanceConfig:
         return f"[{self.name}]"
 
 
-# ─── Instance Definitions ───────────────────────────────────────────────
+# ─── Validation and Configuration ─────────────────────────────────────────
 
-INSTANCE_CONFIGS = {
-    "PROD": InstanceConfig(
-        name="PROD",
-        db_path=str(REPO_ROOT / "data" / "paper_trading_prod.db"),
-        metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
-        initial_balance=10000.0,
-        fee_rate=0.001,
-        discord_webhook_url=os.getenv("DISCORD_WEBHOOK_PROD", _DEFAULT_WEBHOOKS["PROD"]),
-        discord_enabled=os.getenv("DISCORD_ENABLED_PROD", "true").lower() in ("1", "true", "yes"),
-        sizing_instance="PROD",
-    ),
-    "DEV": InstanceConfig(
-        name="DEV",
-        db_path=str(REPO_ROOT / "data" / "paper_trading_dev.db"),
-        metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
-        initial_balance=5000.0,
-        fee_rate=0.001,
-        discord_webhook_url=os.getenv("DISCORD_WEBHOOK_DEV", _DEFAULT_WEBHOOKS["DEV"]),
-        discord_enabled=os.getenv("DISCORD_ENABLED_DEV", "true").lower() in ("1", "true", "yes"),
-        sizing_instance="DEV",
-    ),
-    "SBOX": InstanceConfig(
-        name="SBOX",
-        db_path=str(REPO_ROOT / "data" / "paper_trading_sbox.db"),
-        metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
-        initial_balance=1000.0,
-        fee_rate=0.002,
-        discord_webhook_url=os.getenv("DISCORD_WEBHOOK_SBOX", _DEFAULT_WEBHOOKS["SBOX"]),
-        discord_enabled=os.getenv("DISCORD_ENABLED_SBOX", "true").lower() in ("1", "true", "yes"),
-        sizing_instance="SBOX",
-    ),
-}
+def validate_webhook_configuration():
+    """Validate that webhook URLs are set via environment variables.
+    
+    Raises:
+        ValueError: If required webhooks are not configured
+    """
+    env_vars = {
+        "PROD": "DISCORD_WEBHOOK_PROD",
+        "DEV":  "DISCORD_WEBHOOK_DEV", 
+        "SBOX": "DISCORD_WEBHOOK_SBOX"
+    }
+    
+    missing_webhooks = []
+    
+    for instance, env_var in env_vars.items():
+        webhook_url = os.getenv(env_var)
+        if not webhook_url:
+            missing_webhooks.append(f"{env_var} (required for {instance})")
+    
+    if missing_webhooks:
+        raise ValueError(
+            f"Missing required Discord webhook environment variables: {', '.join(missing_webhooks)}. "
+            f"Please configure these before starting the application.\n"
+            f"Example: export {missing_webhooks[0].split(' ')[0]}='<webhook_url>'"
+        )
+
+    # Additionally validate that the webhook configurations don't use default placeholder values
+    for instance, default_webhook in _DEFAULT_WEBHOOKS.items():
+        env_var = env_vars[instance]
+        env_webhook = os.getenv(env_var)
+        if env_webhook == default_webhook and default_webhook == "":
+            # This means a new default was set but environment hasn't overridden it
+            missing_webhooks.append(f"{env_var} (required for {instance} and set to placeholder)")
+    
+    if missing_webhooks:
+        raise ValueError(
+            f"Discord webhook environment variables set to placeholder values: {', '.join(missing_webhooks)}. "
+            f"Please set them to actual webhook URLs."
+        )
+
+
+# Initialize INSTANCE_CONFIGS after validation
+def _initialize_with_validation():
+    """Initialize INSTANCE_CONFIGS after validating webhooks."""
+    # Validate configuration before creating instances
+    validate_webhook_configuration()
+    
+    return {
+        "PROD": InstanceConfig(
+            name="PROD",
+            db_path=str(REPO_ROOT / "data" / "paper_trading_prod.db"),
+            metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
+            initial_balance=10000.0,
+            fee_rate=0.001,
+            discord_webhook_url=os.getenv("DISCORD_WEBHOOK_PROD", _DEFAULT_WEBHOOKS["PROD"]),
+            discord_enabled=os.getenv("DISCORD_ENABLED_PROD", "true").lower() in ("1", "true", "yes"),
+            sizing_instance="PROD",
+        ),
+        "DEV": InstanceConfig(
+            name="DEV",
+            db_path=str(REPO_ROOT / "data" / "paper_trading_dev.db"),
+            metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
+            initial_balance=5000.0,
+            fee_rate=0.001,
+            discord_webhook_url=os.getenv("DISCORD_WEBHOOK_DEV", _DEFAULT_WEBHOOKS["DEV"]),
+            discord_enabled=os.getenv("DISCORD_ENABLED_DEV", "true").lower() in ("1", "true", "yes"),
+            sizing_instance="DEV",
+        ),
+        "SBOX": InstanceConfig(
+            name="SBOX",
+            db_path=str(REPO_ROOT / "data" / "paper_trading_sbox.db"),
+            metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
+            initial_balance=1000.0,
+            fee_rate=0.002,
+            discord_webhook_url=os.getenv("DISCORD_WEBHOOK_SBOX", _DEFAULT_WEBHOOKS["SBOX"]),
+            discord_enabled=os.getenv("DISCORD_ENABLED_SBOX", "true").lower() in ("1", "true", "yes"),
+            sizing_instance="SBOX",
+        ),
+    }
+
+
+# Initialize the actual config 
+INSTANCE_CONFIGS = _initialize_with_validation()
 
 
 # ─── Scheduler Guard ────────────────────────────────────────────────────

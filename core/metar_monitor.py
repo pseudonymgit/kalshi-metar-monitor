@@ -59,6 +59,28 @@ from core.alert_schema import (
     OUTCOME_NO_SIGNAL_CONDITION_MATCH,
 )
 
+# Near-Miss Audit Integration (2026-07-10)
+try:
+    from core.near_miss_audit import (
+        log_near_miss,
+        log_near_miss_if_cooldown,
+        log_near_miss_if_distance_to_boundary,
+        log_near_miss_if_no_eligible_market,
+        log_near_miss_if_epoch_alert_emitted,
+    )
+except ImportError:
+    # Graceful degradation if near_miss_audit module not available
+    def log_near_miss(*args, **kwargs):
+        pass
+    def log_near_miss_if_cooldown(*args, **kwargs):
+        pass
+    def log_near_miss_if_distance_to_boundary(*args, **kwargs):
+        pass
+    def log_near_miss_if_no_eligible_market(*args, **kwargs):
+        pass
+    def log_near_miss_if_epoch_alert_emitted(*args, **kwargs):
+        pass
+
 # zoneinfo (Python 3.9+). If unavailable, we'll no-op ET/local conversions.
 try:
     from zoneinfo import ZoneInfo  # type: ignore
@@ -1288,6 +1310,13 @@ def _evaluate_deterministic_signal_layer(
                 "signal_suppression station=%s reason=HYDRATION_CACHE_INVALID "
                 "reason_detail=market_exists_but_hydration_incomplete"
             )
+            # Near-miss audit: hydration blocked
+            log_near_miss_if_no_eligible_market(
+                station=station,
+                signal_detected=True,
+                discovered_markets_count=eligible_markets_count,
+                hydration_valid=False,
+            )
             pending_runtime_record = runtime
             early_exit = True
         elif int(eligible_markets_count) <= 0:
@@ -1341,6 +1370,16 @@ def _evaluate_deterministic_signal_layer(
                     "signal_suppression station=%s reason=STATION_COOLDOWN_ACTIVE "
                     "reason_detail=market_exists_but_station_in_cooldown"
                 )
+                # Near-miss audit: station cooldown
+                if station_last_emit is not None:
+                    remaining = _SIGNAL_STATION_COOLDOWN_SECONDS - (obs_seconds - station_last_emit)
+                    remaining = max(0, remaining)
+                    log_near_miss_if_cooldown(
+                        station=station,
+                        cooldown_type="STATION",
+                        remaining_seconds=remaining,
+                        total_seconds=_SIGNAL_STATION_COOLDOWN_SECONDS,
+                    )
 
             next_integer = int(math.floor(now_f)) + 1
             distance_to_integer = float(next_integer) - float(now_f)
@@ -1351,7 +1390,42 @@ def _evaluate_deterministic_signal_layer(
             boundary_last_emit = _SIGNAL_BOUNDARY_LAST_EMIT.get(boundary_key)
             if boundary_last_emit is not None and (obs_seconds - boundary_last_emit) < _SIGNAL_BOUNDARY_COOLDOWN_SECONDS:
                 boundary_cooldown_active = True
+                # Near-miss audit: boundary cooldown
+                remaining = _SIGNAL_BOUNDARY_COOLDOWN_SECONDS - (obs_seconds - boundary_last_emit)
+                remaining = max(0, remaining)
+                log_near_miss_if_cooldown(
+                    station=station,
+                    cooldown_type="BOUNDARY",
+                    remaining_seconds=remaining,
+                    total_seconds=_SIGNAL_BOUNDARY_COOLDOWN_SECONDS,
+                    boundary_level=next_integer,
+                    epoch_id=epoch_id,
+                )
             runtime["cooldown_state"]["boundary_active"] = boundary_cooldown_active
+
+            # Near-miss audit: distance to boundary conditions
+            if 0.0 < distance_to_integer <= 0.10:
+                # Check if we're near boundary but conditions not fully met
+                momentum_ok = momentum is not None and momentum >= 0.002
+                if not momentum_ok:
+                    log_near_miss_if_distance_to_boundary(
+                        station=station,
+                        distance=distance_to_integer,
+                        momentum=momentum,
+                        threshold_distance=0.10,
+                        threshold_momentum=0.002,
+                    )
+            elif distance_to_integer <= 0.10:
+                # Too far to be near-miss, log a low-severity event
+                log_near_miss(
+                    station=station,
+                    near_miss_type="TOO_FAR_FROM_BOUNDARY",
+                    severity="LOW",
+                    details={
+                        "distance_to_boundary": distance_to_integer,
+                        "max_allowed_distance": 0.10,
+                    },
+                )
 
             near_boundary_all_conditions = False
             if 0.0 < distance_to_integer <= 0.10 and len(window) == _SIGNAL_MOMENTUM_WINDOW_SIZE:
@@ -1506,6 +1580,12 @@ def _evaluate_deterministic_signal_layer(
                             "signal_suppression station=%s reason=EPOCH_ALERT_ALREADY_EMITTED "
                             "reason_detail=market_exists_but_epoch_alert_already_sent"
                         )
+                        # Near-miss audit: epoch alert already emitted
+                        log_near_miss_if_epoch_alert_emitted(
+                            station=station,
+                            epoch_id=epoch_id,
+                            signal_type="goldilocks_reversion_alert",
+                        )
                     elif station_cooldown_active:
                         runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
                         runtime["outcome_classification"] = OUTCOME_ELIGIBLE_NOT_ALERTABLE
@@ -1559,6 +1639,46 @@ def _evaluate_deterministic_signal_layer(
                     total_seconds = x3["seconds"] - x1["seconds"]
                     if increasing_time and total_seconds > 0:
                         momentum_down = abs((x1["temp_f"] - x3["temp_f"]) / total_seconds)
+
+                # Near-miss audit: distance from integer (downward)
+                if 0.0 < distance_from_integer <= 0.10:
+                    # Check if we're near boundary but conditions not fully met
+                    momentum_down_ok = momentum_down is not None and momentum_down >= 0.002
+                    if not momentum_down_ok:
+                        log_near_miss_if_distance_to_boundary(
+                            station=station,
+                            distance=distance_from_integer,
+                            momentum=momentum_down if momentum_down is not None else None,
+                            threshold_distance=0.10,
+                            threshold_momentum=0.002,
+                        )
+                        # Log specific near-miss for downward momentum
+                        if momentum_down is not None and momentum_down < 0.002:
+                            log_near_miss(
+                                station=station,
+                                near_miss_type="MOMENTUM_BELOW_THRESHOLD",
+                                severity="MEDIUM",
+                                details={
+                                    "momentum": momentum_down,
+                                    "momentum_threshold": 0.002,
+                                    "momentum_deficit": 0.002 - momentum_down,
+                                    "direction": "down",
+                                    "distance_from_integer": distance_from_integer,
+                                },
+                                suppressed_alert_type="near_boundary_momentum_down",
+                            )
+                elif distance_from_integer <= 0.10:
+                    # Too far from boundary
+                    log_near_miss(
+                        station=station,
+                        near_miss_type="TOO_FAR_FROM_BOUNDARY",
+                        severity="LOW",
+                        details={
+                            "distance_to_boundary": distance_from_integer,
+                            "max_allowed_distance": 0.10,
+                            "direction": "down",
+                        },
+                    )
 
                 # LOW momentum signals for downward transitions
                 if transition_type in ("instant_down", "reversion_after_settlement"):
@@ -1618,6 +1738,21 @@ def _evaluate_deterministic_signal_layer(
                                     # The logic is inverted: we want to know if the reversion point was at the daily high
                                     confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker, is_down=True)
                                     
+                                    # Near-miss audit: goldilocks confidence below threshold
+                                    if confidence_score < 0.30:  # Threshold for goldilocks
+                                        log_near_miss(
+                                            station=station,
+                                            near_miss_type="LOW_CONFIDENCE_GOLDILOCKS",
+                                            severity="MEDIUM",
+                                            details={
+                                                "confidence": confidence_score,
+                                                "confidence_threshold": 0.30,
+                                                "confidence_deficit": 0.30 - confidence_score,
+                                                "reversion_direction": "down",
+                                            },
+                                            suppressed_alert_type="goldilocks_momentum_down",
+                                        )
+                                    
                                     pending_signal_context = {
                                         "signal_type": "goldilocks_momentum_down",
                                         "signal_version": 1,
@@ -1651,6 +1786,18 @@ def _evaluate_deterministic_signal_layer(
                     _ALERT_LOGGER.debug(
                         "signal_suppression station=%s reason=NO_SIGNAL_CONDITION_MATCH "
                         "reason_detail=market_exists_but_no_signal_condition_met"
+                    )
+                    # Near-miss audit: no signal condition matched
+                    log_near_miss(
+                        station=station,
+                        near_miss_type="NO_SIGNAL_CONDITION_MATCH",
+                        severity="LOW",
+                        details={
+                            "observation_window_size": len(window),
+                            "required_window_size": _SIGNAL_MOMENTUM_WINDOW_SIZE,
+                            "momentum_down_available": momentum_down is not None,
+                            "distance_from_integer": distance_from_integer,
+                        },
                     )
                 pending_runtime_record = runtime
 

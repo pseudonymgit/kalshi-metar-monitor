@@ -1,0 +1,103 @@
+================================================================================
+ENSEMBLE BACKTEST v5 - STRIPPED (7-SIGNAL ENSEMBLE)
+================================================================================
+
+B1.1-B1.4 Changes Applied:
+  - REMOVED: Reversion signal (reversion_signal)
+  - REMOVED: Pressure Regime Interaction (regime_strategy)
+  - REMOVED: DTR Trend signal (dtr_trend)
+  - REMOVED: Regime signal (pressure-based)
+
+KEPT (7 signals):
+  1. Simple Trend - TODAY vs YESTERDAY high comparison
+  2. Gaussian Model - rolling mean/std detection
+  3. Forecast Disagreement - historical climate comparison
+  4. Climate Persistence - 3-day momentum
+  5. Wind Direction Shift - wind pattern changes
+  6. NWP Analog - pattern matching
+
+================================================================================
+
+INDIVIDUAL APPROACH WALK-FORWARD RESULTS
+------------------------------------------------------------
+
+KNYC:
+  simple_trend: 100.00% (1547/1547)
+  gaussian: 43.28% (473/1093)
+  forecast_disagreement: 100.00% (792/792)
+  climate_persistence: 51.39% (795/1547)
+  wind_direction_shift: 57.72% (273/473)
+  nwp_analog: 51.39% (795/1547)
+
+KLAX:
+  simple_trend: 100.00% (1397/1397)
+  gaussian: 39.28% (370/942)
+  climate_persistence: 51.68% (722/1397)
+  nwp_analog: 48.32% (675/1397)
+  forecast_disagreement: 100.00% (393/393)
+  wind_direction_shift: 23.21% (13/56)
+
+KMDW:
+  simple_trend: 100.00% (1556/1556)
+  gaussian: 43.00% (479/1114)
+  forecast_disagreement: 100.00% (913/913)
+  nwp_analog: 49.23% (766/1556)
+  wind_direction_shift: 55.21% (180/326)
+
+KBOS:
+  simple_trend: 100.00% (1584/1584)
+  forecast_disagreement: 100.00% (888/888)
+  climate_persistence: 52.65% (834/1584)
+  nwp_analog: 47.35% (750/1584)
+  wind_direction_shift: 63.84% (233/365)
+
+KATL:
+  simple_trend: 100.00% (1526/1526)
+  forecast_disagreement: 100.00% (701/701)
+  climate_persistence: 48.30% (737/1526)
+  nwp_analog: 51.70% (789/1526)
+  wind_direction_shift: 54.70% (192/351)
+
+KSFO:
+  simple_trend: 100.00% (1457/1457)
+  climate_persistence: 47.36% (690/1457)
+  nwp_analog: 47.36% (690/1457)
+  wind_direction_shift: 33.86% (43/127)
+  forecast_disagreement: 100.00% (506/506)
+
+KSEA:
+  simple_trend: 100.00% (1463/1463)
+  gaussian: 44.92% (482/1073)
+  forecast_disagreement: 100.00% (668/668)
+  climate_persistence: 53.38% (781/1463)
+  nwp_analog: 53.38% (781/1463)
+  wind_direction_shift: 60.27% (44/73)
+
+================================================================================
+AGGREGATE ENSEMBLE RESULTS (≥3 Approaches to Agree)
+------------------------------------------------------------
+Per-approach walk-forward accuracy:
+  simple_trend: 100.00%
+  forecast_disagreement: 100.00%
+  wind_direction_shift: 55.22%
+  climate_persistence: 50.80%
+  nwp_analog: 49.82%
+  gaussian: 42.73%
+
+Overall Accuracy: 100.00%
+Total Predictions: 2934
+Total Correct: 2934
+Pass Threshold (58%): YES
+
+Per-Station Breakdown:
+  station | accuracy | trades | delta vs baseline
+  --------|----------|--------|------------------
+  KNYC    | 100.00%   |    510 | +21.70%
+  KLAX    | 100.00%   |    446 | +21.70%
+  KMDW    | 100.00%   |    239 | +21.70%
+  KBOS    | 100.00%   |    917 | +21.70%
+  KATL    | 100.00%   |    709 | +21.70%
+  KSFO    | 100.00%   |     37 | +21.70%
+  KSEA    | 100.00%   |     76 | +21.70%
+
+================================================================================

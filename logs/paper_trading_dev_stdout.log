@@ -1,9 +1,35 @@
+Run failed: argument of type 'RiskConfig' is not iterable
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 160, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 296, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 804, in place_paper_trade
+    if not self.is_station_approved(station):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1767, in is_station_approved
+    return is_station_approved(station, self._risk_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py", line 210, in is_station_approved
+    return station in approved_stations
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'RiskConfig' is not iterable
 
 ======================================================================
-MULTI-INSTANCE PAPER TRADING RUN — 2026-07-05
+MULTI-INSTANCE PAPER TRADING RUN — 2026-07-11
 Instances: DEV
-Stations: 20
+Stations: 19
 ======================================================================
 
-  ⚠️ DEV: already running (lock held), skipping
-[2026-07-05T19:48:11.467824+00:00] DEV: complete — 0 executed, 0 skipped, 0 alerts
+
+──────────────────────────────────────────────────
+Instance: DEV
+DB: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/paper_trading_dev.db
+Balance: $5,000.00
+Discord: enabled
+Log: /home/node/.openclaw/workspace/prototypes/weather-engine-source/logs/paper_trading_dev.log
+──────────────────────────────────────────────────
+  ✗ DEV: run failed — argument of type 'RiskConfig' is not iterable
+[2026-07-11T05:38:08.850397+00:00] DEV: complete — 0 executed, 0 skipped, 0 alerts

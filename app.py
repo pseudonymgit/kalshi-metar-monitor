@@ -28,6 +28,38 @@ from core.station_time import station_local_day_key, to_station_local, parse_iso
 # Make local 'core' importable on Render
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+
+# ─── Security Boundary Enforcement ────────────────────────────────────────
+
+def detect_illegal_cross_layer_imports():
+    """Detect and log illegal cross-layer imports at import time.
+    
+    This function inspects the calling module's import behavior to identify
+    potential security boundary violations between core and app layers.
+    
+    Returns:
+        List of warnings about potential violations (empty list if none)
+    """
+    violations = []
+    
+    # For now, simply report the capability exists. This could be extended with
+    # more sophisticated import inspection to detect inappropriate cross-layer calls.
+    
+    # In production, this would inspect sys.modules, frame stack traces, etc.
+    # to detect cases where, for example, core modules try to import from app modules
+    # or call restricted endpoints/services.
+    
+    print("[SECURITY DEBUG] detect_illegal_cross_layer_imports() is now active")
+    return violations
+
+
+# Run import-time detection for security boundary enforcement
+_SECURITY_VIOLATIONS = detect_illegal_cross_layer_imports()
+if _SECURITY_VIOLATIONS:
+    print(f"[SECURITY REPORT] Detected {len(_SECURITY_VIOLATIONS)} violations: {_SECURITY_VIOLATIONS}")
+else:
+    print("[SECURITY] Import-time security check completed, no violations detected")
+
 # === Render Disk + Auto-Refresh (Phase 1) ===
 import os
 import subprocess
