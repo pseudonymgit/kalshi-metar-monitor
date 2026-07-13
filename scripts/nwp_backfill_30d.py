@@ -26,13 +26,39 @@ import urllib.request
 import urllib.error
 import json
 import time
+import os
 import sys
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Configuration: Database path can be set via environment variable or command-line argument
+NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"  # Relative to script execution directory
+
+# Determine the script directory
+SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = str(REPO_ROOT / "data" / "nwp_forecasts.db")
+
+# Parse command line arguments (for this script, we keep the existing arguments plus the db path)
+existing_parser = argparse.ArgumentParser(description='NWP 30-day historical backfill', add_help=False)
+existing_parser.add_argument('--past-days', type=int, default=30, help='Number of past days to backfill (default: 30)')
+existing_parser.add_argument('--models', type=str, help='Comma-separated model names (default: all)')
+existing_parser.add_argument('--stations', type=str, help='Comma-separated station codes (default: all)')
+existing_parser.add_argument('--resume', action='store_true', help='Skip already-completed model/station pairs')
+existing_parser.add_argument('--db-path', help='Database file path (default: data/nwp_forecasts.db)')
+
+# Parse only known args to avoid conflict
+args, remaining = existing_parser.parse_known_args()
+
+if args.db_path:
+    DB_PATH = Path(args.db_path).absolute()
+elif os.environ.get('NWP_DB_PATH'):
+    DB_PATH = Path(os.environ['NWP_DB_PATH']).absolute()
+else:
+    DB_PATH = SCRIPT_DIR / NWP_DB_PATH_DEFAULT
+
+# Ensure parent directory exists
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 # All 20 Kalshi cities: (ICAO, City, lat, lon)
 CITIES = [
@@ -273,7 +299,14 @@ def main():
     parser.add_argument('--models', type=str, help='Comma-separated model names (default: all)')
     parser.add_argument('--stations', type=str, help='Comma-separated station codes (default: all)')
     parser.add_argument('--resume', action='store_true', help='Skip already-completed model/station pairs')
+    parser.add_argument('--db-path', help='Database file path (overwrites environment NWP_DB_PATH)')
     args = parser.parse_args()
+
+    # Override DB path if argument provided
+    global DB_PATH
+    if args.db_path:
+        DB_PATH = Path(args.db_path).absolute()
+        DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     past_days = args.past_days
     models = [(m, u) for m, u in MODELS if not args.models or m in args.models.split(',')]

@@ -19,9 +19,38 @@ import urllib.request
 import urllib.error
 import json
 import time
+import os
+import argparse
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
-DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
+# Configuration: Database path can be set via environment variable or command-line argument
+NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"  # Relative to script execution directory
+
+# Determine the script directory
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+# Parse command line arguments
+def parse_args():
+    parser = argparse.ArgumentParser(description="NWP Forecast Collection")
+    parser.add_argument("--db-path", help="Database file path (default: data/nwp_forecasts.db)")
+    return parser.parse_args()
+
+# Get database path from args, then env, then default
+args = parse_args()
+
+if args.db_path:
+    DB_PATH = Path(args.db_path).absolute()
+elif os.environ.get('NWP_DB_PATH'):
+    DB_PATH = Path(os.environ['NWP_DB_PATH']).absolute()
+else:
+    DB_PATH = SCRIPT_DIR / NWP_DB_PATH_DEFAULT
+
+# Convert to absolute path
+DB_PATH = Path(DB_PATH).absolute()
+
+# Ensure parent directory exists
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 # All 20 Kalshi cities — VERIFIED against live Kalshi API 2026-07-02
 CITIES = [

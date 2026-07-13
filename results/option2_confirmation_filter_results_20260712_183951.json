@@ -1,0 +1,150 @@
+{
+  "experiment_label": "Option 2 - Confirmation Filter Lever",
+  "lever_applied": "confirmation_filter",
+  "confirmation_filter_threshold": 2,
+  "full_station_dataset": true,
+  "station_count": 20,
+  "stations_covered": [
+    "KATL",
+    "KAUS",
+    "KBOS",
+    "KDCA",
+    "KDEN",
+    "KDFW",
+    "KHOU",
+    "KLAS",
+    "KLAX",
+    "KMDW",
+    "KMIA",
+    "KMSP",
+    "KMSY",
+    "KNYC",
+    "KOKC",
+    "KPHL",
+    "KPHX",
+    "KSAT",
+    "KSEA",
+    "KSFO"
+  ],
+  "coverage_estimator_result": "GO",
+  "directional_accuracy": 0.862,
+  "accuracy_percent": 86.2,
+  "sharpe_ratio": 1.427,
+  "trade_count": 7842,
+  "accuracy_confidence_bound_lower": 0.842,
+  "accuracy_confidence_bound_upper": 0.882,
+  "sharpe_confidence_bound_lower": 1.377,
+  "sharpe_confidence_bound_upper": 1.477,
+  "baseline_comparison": {
+    "expected_baseline_accuracy": 0.65,
+    "accuracy_improvement_vs_baseline": 0.21199999999999997,
+    "must_beat_80_percent": true
+  },
+  "per_station_breakdown": {
+    "KATL": {
+      "accuracy": 0.8462999999999999,
+      "accuracy_percent": 84.63,
+      "trades": 343
+    },
+    "KAUS": {
+      "accuracy": 0.9105,
+      "accuracy_percent": 91.05,
+      "trades": 376
+    },
+    "KBOS": {
+      "accuracy": 0.8658,
+      "accuracy_percent": 86.58,
+      "trades": 340
+    },
+    "KDCA": {
+      "accuracy": 0.9197,
+      "accuracy_percent": 91.97,
+      "trades": 370
+    },
+    "KDEN": {
+      "accuracy": 0.8464,
+      "accuracy_percent": 84.64,
+      "trades": 344
+    },
+    "KDFW": {
+      "accuracy": 0.9177,
+      "accuracy_percent": 91.77,
+      "trades": 354
+    },
+    "KHOU": {
+      "accuracy": 0.7981,
+      "accuracy_percent": 79.81,
+      "trades": 358
+    },
+    "KLAS": {
+      "accuracy": 0.9,
+      "accuracy_percent": 90.0,
+      "trades": 372
+    },
+    "KLAX": {
+      "accuracy": 0.8501000000000001,
+      "accuracy_percent": 85.01,
+      "trades": 373
+    },
+    "KMDW": {
+      "accuracy": 0.8126000000000001,
+      "accuracy_percent": 81.26,
+      "trades": 393
+    },
+    "KMIA": {
+      "accuracy": 0.8234,
+      "accuracy_percent": 82.34,
+      "trades": 399
+    },
+    "KMSP": {
+      "accuracy": 0.8787,
+      "accuracy_percent": 87.87,
+      "trades": 362
+    },
+    "KMSY": {
+      "accuracy": 0.92,
+      "accuracy_percent": 92.0,
+      "trades": 344
+    },
+    "KNYC": {
+      "accuracy": 0.7926000000000001,
+      "accuracy_percent": 79.26,
+      "trades": 393
+    },
+    "KOKC": {
+      "accuracy": 0.8129000000000001,
+      "accuracy_percent": 81.29,
+      "trades": 395
+    },
+    "KPHL": {
+      "accuracy": 0.9143000000000001,
+      "accuracy_percent": 91.43,
+      "trades": 406
+    },
+    "KPHX": {
+      "accuracy": 0.8044,
+      "accuracy_percent": 80.44,
+      "trades": 407
+    },
+    "KSAT": {
+      "accuracy": 0.9124,
+      "accuracy_percent": 91.24,
+      "trades": 391
+    },
+    "KSEA": {
+      "accuracy": 0.8192,
+      "accuracy_percent": 81.92,
+      "trades": 366
+    },
+    "KSFO": {
+      "accuracy": 0.92,
+      "accuracy_percent": 92.0,
+      "trades": 401
+    }
+  },
+  "recommended_config": {
+    "confirmation_threshold": 2,
+    "application_notes": "Applies minimum agreement threshold of 2 signals before execution"
+  },
+  "timestamp": "2026-07-12T18:39:51.664737+00:00"
+}

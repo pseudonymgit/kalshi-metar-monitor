@@ -210,3 +210,89 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: argument of type 'RiskConfig' is not iterable
 2026-07-11 05:38:08,850 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-13 05:32:05,372 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-13 05:32:05,418 [paper_trading.dev] ERROR: Cron failed: cannot import name 'get_all_stations' from 'station_registry' (/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/station_registry.py)
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 59, in <module>
+    from paper_trading_engine import PaperTrader, MarketSide, TradeType
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 58, in <module>
+    from station_registry import (
+ImportError: cannot import name 'get_all_stations' from 'station_registry' (/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/station_registry.py)
+2026-07-13 05:33:49,717 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-13 05:33:49,762 [paper_trading.dev] INFO: Starting daily run for 2026-07-13
+2026-07-13 05:33:49,976 [paper_trading.dev] ERROR: Run failed: argument of type 'RiskConfig' is not iterable
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 160, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 296, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 804, in place_paper_trade
+    if not self.is_station_approved(station):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1767, in is_station_approved
+    return is_station_approved(station, self._risk_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/risk_controls.py", line 210, in is_station_approved
+    return station in approved_stations
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'RiskConfig' is not iterable
+2026-07-13 05:33:49,977 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-13 05:35:20,037 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-13 05:35:20,058 [paper_trading.dev] ERROR: Cron failed: '(' was never closed (paper_trading_engine.py, line 1732)
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
+    from multi_instance_paper_trader import MultiInstancePaperTrader
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 59, in <module>
+    from paper_trading_engine import PaperTrader, MarketSide, TradeType
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1732
+    reasons.append(f"Consecutive losses ({self._risk_metrics.consecutive_losses}) >= limit ({self._risk_config.max_consecutive_losses})"
+                  ^
+SyntaxError: '(' was never closed
+2026-07-13 05:35:29,153 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-13 05:35:29,203 [paper_trading.dev] INFO: Starting daily run for 2026-07-13
+2026-07-13 05:35:29,351 [paper_trading.dev] ERROR: Run failed: attempted relative import with no known parent package
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 160, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 296, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 804, in place_paper_trade
+    if not self.is_station_approved(station):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1768, in is_station_approved
+    approved_stations = self.get_approved_stations()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1775, in get_approved_stations
+    from .station_registry import get_all_stations
+ImportError: attempted relative import with no known parent package
+2026-07-13 05:35:29,352 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-13 05:35:44,004 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-13 05:35:44,051 [paper_trading.dev] INFO: Starting daily run for 2026-07-13
+2026-07-13 05:35:44,383 [paper_trading.dev] ERROR: Run failed: No module named 'core'
+Traceback (most recent call last):
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 160, in run_daily
+    results = self._run_instance(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 296, in _run_instance
+    result = trader.place_paper_trade(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 804, in place_paper_trade
+    if not self.is_station_approved(station):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1768, in is_station_approved
+    approved_stations = self.get_approved_stations()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/paper_trading_engine.py", line 1775, in get_approved_stations
+    from core.station_registry import get_all_stations
+ModuleNotFoundError: No module named 'core'
+2026-07-13 05:35:44,384 [paper_trading.dev] INFO: Cron complete: 0 executed, 0 skipped, 0 alerts
+2026-07-13 05:35:52,706 [paper_trading.dev] INFO: DEV paper trading cron started
+2026-07-13 05:35:52,755 [paper_trading.dev] INFO: Starting daily run for 2026-07-13
+2026-07-13 05:35:54,328 [paper_trading.dev] INFO: Run complete: 0 executed, 2 skipped, 0 alerts
+2026-07-13 05:35:54,328 [paper_trading.dev] INFO: Cron complete: 0 executed, 2 skipped, 0 alerts

@@ -17,12 +17,30 @@ import sys
 import math
 import json
 import numpy as np
+import argparse
+from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
 
-METAR_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
-NWP_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
-REPORT_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/reports/p1-nwp-analog-2026-07-06.md"
+# Configuration: Base paths can be set via environment variable
+BASE_PATH = str(Path(__file__).resolve().parent)
+METAR_DB_DEFAULT = "data/metar_backfill.db"
+NWP_DB_DEFAULT = "data/nwp_forecasts.db"
+REPORT_PATH_DEFAULT = "reports/p1-nwp-analog-2026-07-06.md"
+
+# Get paths from environment variables, fall back to defaults
+METAR_DB = os.environ.get('METAR_DB_PATH', Path(BASE_PATH) / METAR_DB_DEFAULT)
+NWP_DB = os.environ.get('NWP_DB_PATH', Path(BASE_PATH) / NWP_DB_DEFAULT)
+REPORT_PATH = os.environ.get('REPORT_PATH', Path(BASE_PATH) / REPORT_PATH_DEFAULT)
+
+# Convert to Path objects and ensure directories exist
+METAR_DB = Path(METAR_DB).resolve()
+NWP_DB = Path(NWP_DB).resolve()
+REPORT_PATH = Path(REPORT_PATH).resolve()
+
+METAR_DB.parent.mkdir(parents=True, exist_ok=True)
+NWP_DB.parent.mkdir(parents=True, exist_ok=True)
+REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 # 9 core NWP variables (use daily_mean where available, else the base variable)
 NWP_VARIABLES = [

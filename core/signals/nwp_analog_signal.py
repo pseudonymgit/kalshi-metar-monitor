@@ -16,12 +16,17 @@ import sqlite3
 import math
 import numpy as np
 import os
+import argparse
+from pathlib import Path
 from collections import defaultdict
 from typing import Optional, Tuple, Dict, List, Any
 from sklearn.neighbors import NearestNeighbors
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 
+# Configuration: Use environment variables or relative paths
+NWP_DB_DEFAULT = "data/nwp_forecasts.db"  # Relative to working directory
+METAR_DB_DEFAULT = "data/metar_backfill.db"  # Relative to working directory
 
 class NwpAnalogSignal:
     """
@@ -30,8 +35,24 @@ class NwpAnalogSignal:
     """
     
     def __init__(self, nwp_db_path: str = None, metar_db_path: str = None):
-        self.nwp_db_path = nwp_db_path or "/home/node/.openclaw/workspace/data/nwp_forecasts.db"
-        self.metar_db_path = metar_db_path or "/home/node/.openclaw/workspace/data/metar_backfill.db"
+        # Override from arguments, environment or default relative paths
+        if nwp_db_path:
+            self.nwp_db_path = Path(nwp_db_path).absolute()
+        elif os.environ.get('NWP_DB_PATH'):
+            self.nwp_db_path = Path(os.environ['NWP_DB_PATH']).absolute()
+        else:
+            self.nwp_db_path = Path(NWP_DB_DEFAULT).resolve()
+        
+        if metar_db_path:
+            self.metar_db_path = Path(metar_db_path).absolute()
+        elif os.environ.get('METAR_DB_PATH'):
+            self.metar_db_path = Path(os.environ['METAR_DB_PATH']).absolute()
+        else:
+            self.metar_db_path = Path(METAR_DB_DEFAULT).resolve()
+        
+        # Ensure parent directories exist
+        self.nwp_db_path.parent.mkdir(parents=True, exist_ok=True)
+        self.metar_db_path.parent.mkdir(parents=True, exist_ok=True)
         self.k_analogs = 50
         self.min_analogs = 10
         
