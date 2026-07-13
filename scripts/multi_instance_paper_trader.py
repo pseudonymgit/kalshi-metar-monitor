@@ -374,24 +374,54 @@ class MultiInstancePaperTrader:
         return signals
     
     def _get_current_bucket(self, station: str, date: str, conn: sqlite3.Connection) -> int:
-        """Get current temperature bucket for station."""
+        """Get current temperature bucket for station.
+        
+        Falls back to most recent available bucket if no data for exact date.
+        """
         c = conn.cursor()
+        # First try exact date match
         c.execute("""
             SELECT settlement_bucket FROM settlement_epochs
             WHERE station = ? AND local_trading_date = ? AND epoch_status = 'closed'
             LIMIT 1
         """, (station, date))
         row = c.fetchone()
+        if row:
+            return row[0]
+        
+        # Fall back to most recent available data
+        c.execute("""
+            SELECT settlement_bucket FROM settlement_epochs
+            WHERE station = ? AND epoch_status = 'closed'
+            ORDER BY local_trading_date DESC
+            LIMIT 1
+        """, (station,))
+        row = c.fetchone()
         return row[0] if row else 0
     
     def _get_trading_bucket(self, station: str, date: str, conn: sqlite3.Connection) -> int:
-        """Get the trading bucket (next settlement bucket)."""
+        """Get the trading bucket (next settlement bucket).
+        
+        Falls back to most recent available trading bucket if no data for exact date.
+        """
         c = conn.cursor()
+        # First try exact date match
         c.execute("""
             SELECT prior_settlement_bucket FROM settlement_epochs
             WHERE station = ? AND local_trading_date = ? AND epoch_status = 'closed'
             LIMIT 1
         """, (station, date))
+        row = c.fetchone()
+        if row:
+            return row[0]
+        
+        # Fall back to most recent available data
+        c.execute("""
+            SELECT prior_settlement_bucket FROM settlement_epochs
+            WHERE station = ? AND epoch_status = 'closed'
+            ORDER BY local_trading_date DESC
+            LIMIT 1
+        """, (station,))
         row = c.fetchone()
         return row[0] if row else 0
     

@@ -1075,7 +1075,7 @@ class PaperTrader:
             'cost': net_cost,
             'fee_cost': fee_cost,
             'metadata': metadata,
-            'risk_state': self._risk_metrics.risk_state.value,
+            'risk_state': self._risk_metrics.risk_state,
             'risk_reasons': self._risk_metrics.kill_switch_reasons
         }
     
@@ -1719,16 +1719,17 @@ class PaperTrader:
         reasons = []
         
         # Check max daily loss
-        if self._risk_config.max_daily_loss and self._risk_metrics.daily_pnl < -self._risk_config.max_daily_loss:
-            reasons.append(f"Daily loss (${abs(self._risk_metrics.daily_pnl):.2f}) exceeds limit (${self._risk_config.max_daily_loss:.2f})")
+        max_daily_loss_dollars = self._risk_config.max_daily_loss_percent * self._risk_config.initial_capital
+        if max_daily_loss_dollars > 0 and self._risk_metrics.daily_pnl < -max_daily_loss_dollars:
+            reasons.append(f"Daily loss (${abs(self._risk_metrics.daily_pnl):.2f}) exceeds limit (${max_daily_loss_dollars:.2f})")
         
         # Check max drawdown
         if self._risk_config.max_drawdown_pct and self._risk_metrics.max_drawdown_pct >= self._risk_config.max_drawdown_pct:
             reasons.append(f"Drawdown ({self._risk_metrics.max_drawdown_pct:.1%}) exceeds limit ({self._risk_config.max_drawdown_pct:.1%})")
         
         # Check consecutive losses (from risk_metrics)
-        if self._risk_metrics.consecutive_losses >= self._risk_config.consecutive_loss_limit:
-            reasons.append(f"Consecutive losses ({self._risk_metrics.consecutive_losses}) >= limit ({self._risk_config.consecutive_loss_limit})")
+        if self._risk_metrics.consecutive_losses >= self._risk_config.max_consecutive_losses:
+            reasons.append(f"Consecutive losses ({self._risk_metrics.consecutive_losses}) >= limit ({self._risk_config.max_consecutive_losses})")
         
         return len(reasons) > 0, reasons
     
@@ -1759,16 +1760,22 @@ class PaperTrader:
         if drawdown_pct > self._risk_metrics.max_drawdown_pct:
             self._risk_metrics.max_drawdown_pct = drawdown_pct
         
-        # Re-evaluate risk state
-        self._risk_metrics = evaluate_risk_state(self._risk_metrics, self._risk_config)
+                # Re-evaluate risk state
+        risk_state = evaluate_risk_state(self._risk_manager)
+        self._risk_metrics.risk_state = risk_state
     
     def is_station_approved(self, station: str) -> bool:
         """Check if a station is in the approved list (B1.5.2)."""
-        return is_station_approved(station, self._risk_config)
+        approved_stations = self.get_approved_stations()
+        if not approved_stations:
+            return True  # If no specific stations are approved, all are allowed
+        return is_station_approved(station, approved_stations)
     
     def get_approved_stations(self) -> List[str]:
         """Return list of approved station codes."""
-        return get_approved_stations(self._risk_config)
+        import station_registry
+        return station_registry.get_all_stations()
+        return get_all_stations()
 
 
 def daily_paper_run(run_date=None):
@@ -1862,7 +1869,7 @@ def daily_paper_run(run_date=None):
     trader._risk_metrics.max_drawdown_pct = (reconciled['opening_balance'] - reconciled['closing_balance']) / reconciled['opening_balance'] * 100 if reconciled['opening_balance'] > 0 else 0
     
     # Re-evaluate risk state after reconciliation
-    trader._risk_metrics = evaluate_risk_state(trader._risk_metrics, trader._risk_config)
+    trader._risk_metrics.risk_state = evaluate_risk_state(trader._risk_manager)
     
     print(f"\n=== RISK GUARDRAILS STATUS ===")
     risk_report = trader.risk_report()
