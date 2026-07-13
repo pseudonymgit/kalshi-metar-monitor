@@ -20,12 +20,38 @@ Usage:
 
 import sqlite3
 import math
+import os
+import argparse
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
 # ─── Paths ──────────────────────────────────────────────────────────────────
-NWP_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
-METAR_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
+# Configuration: Base paths can be set via environment variable
+BASE_PATH = Path(__file__).resolve().parents[1]  # Go up to repo root
+NWP_DB_DEFAULT = "data/nwp_forecasts.db"
+METAR_DB_DEFAULT = "data/metar_backfill.db"
+
+# Get paths from environment variables, fall back to defaults
+NWP_DB = os.environ.get('NWP_DB_PATH', BASE_PATH / NWP_DB_DEFAULT)
+METAR_DB = os.environ.get('METAR_DB_PATH', BASE_PATH / METAR_DB_DEFAULT)
+
+# Convert to Path objects and ensure directories exist
+NWP_DB = Path(NWP_DB).resolve()
+METAR_DB = Path(METAR_DB).resolve()
+
+NWP_DB.parent.mkdir(parents=True, exist_ok=True)
+METAR_DB.parent.mkdir(parents=True, exist_ok=True)
+
+# Ensure the databases exist by connecting once
+if not NWP_DB.exists():
+    # Initialize with empty connection to create the file at least
+    init_db = sqlite3.connect(NWP_DB)
+    init_db.close()
+if not METAR_DB.exists():
+    # Initialize with empty connection to create the file at least
+    init_db = sqlite3.connect(METAR_DB)
+    init_db.close()
 
 # ─── Config ─────────────────────────────────────────────────────────────────
 MODELS = ['gfs', 'ecmwf', 'icon', 'gem']

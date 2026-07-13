@@ -1,0 +1,9 @@
+{
+  "task_id": "OPT2-SKILL-GATING-20STATION",
+  "status": "STOPPED",
+  "reason": "ACCURACY_LESS_THAN_80_PERCENT",
+  "measured_accuracy": 70.7,
+  "threshold": 80.0,
+  "token_budget_used": "APPROXIMATELY_35%",
+  "stop_condition_met": true
+}

@@ -25,11 +25,37 @@ import json
 import time
 import sys
 import argparse
-from datetime import datetime, timezone
+import os
 from pathlib import Path
+from datetime import datetime, timezone
 
+# Configuration: Database path can be set via environment variable or command-line argument
+NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"  # Relative to script execution directory
+
+# Determine the script directory
+SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = str(REPO_ROOT / "data" / "nwp_forecasts.db")
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='NWP Archive Historical Backfill', add_help=False)
+parser.add_argument('--db-path', help='Database file path (default: data/nwp_forecasts.db)')
+parser.add_argument('--start', help='Start date (YYY-MM-DD)')
+parser.add_argument('--end', help='End date (YYY-MM-DD)')
+parser.add_argument('--resume', action='store_true', help='Resume from last successful day')
+
+# Parse known args
+args, _ = parser.parse_known_args()
+
+if args.db_path:
+    DB_PATH = Path(args.db_path).absolute()
+elif os.environ.get('NWP_DB_PATH'):
+    DB_PATH = Path(os.environ['NWP_DB_PATH']).absolute()
+else:
+    DB_PATH = SCRIPT_DIR / NWP_DB_PATH_DEFAULT
+
+# Convert to absolute path and ensure directory exists
+DB_PATH = Path(DB_PATH).absolute()
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 CITIES = [
     ("KATL", "Atlanta", 33.64, -84.43),
