@@ -42,6 +42,7 @@ CALIBRATION_REPORT_PATH = str(REPO_ROOT / "reports" / "paper_trading_calibration
 # Import the hourly late-day momentum signal
 sys.path.insert(0, str(REPO_ROOT / "core"))
 from late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_signal
+from station_skill_gate import StationSkillGate
 from position_sizing import (
     compute_position_size as _compute_confidence_weighted_size,
     extract_confidence_from_signal_context as _extract_confidence,
@@ -201,6 +202,14 @@ class PaperTrader:
                 self._calibrator = None
         else:
             self._calibrator = None
+
+        # Initialize station skill gate (T5 - per station skill gating)
+        try:
+            from core.station_skill_gate import StationSkillGate
+            self._skill_gate = StationSkillGate(self.metar_db)
+        except Exception as e:
+            print(f"Warning: Failed to initialize StationSkillGate: {e}, feature will be disabled")
+            self._skill_gate = None
 
     def _init_paper_db(self):
         """Create paper trading database schema."""
@@ -725,6 +734,18 @@ class PaperTrader:
 
         metar_conn.close()
 
+        # Filter signals based on station skill (T5 - per station skill gating)
+        if self._skill_gate is not None:
+            before_count = len(signals)
+            filtered_signals = []
+            for station, market_type, signal_direction, reason in signals:
+                if self._skill_gate.is_station_skilled(station, market_type):
+                    filtered_signals.append((station, market_type, signal_direction, reason))
+                else:
+                    _LOGGER.debug(f"Skipped unskilled station trade: {station} for {market_type} market")
+            signals = filtered_signals
+            _LOGGER.info(f"Applied skill gate filter: {len(signals)} skilled out of {before_count} total signals")
+
         # Also look for late-day METAR momentum patterns if date is today/tomorrow
         if self.is_recent_enough_for_late_day_analysis(date):
             signals.extend(self._analyze_late_day_momentum_signals(date))
@@ -895,6 +916,18 @@ class PaperTrader:
                 'confidence': None,
                 'metadata': {'entry_window_rejection': window_reason}
             }
+
+        # T5-B3.1: Skill-based station gate - only trade on skilled stations
+        if self._skill_gate is not None:
+            if not self._skill_gate.is_station_skilled(station, market_type):
+                return {
+                    'status': 'skipped',
+                    'reason': 'station_not_skilled',
+                    'market_price': None,
+                    'analytical_prob': None,
+                    'confidence': None,
+                    'metadata': {'station_skill_rejected': True, 'skill_check_applied': True}
+                }
 
         # Get market price - in real world this comes from API
         market_price = self._get_market_price(station, date, market_type)
@@ -1757,6 +1790,29 @@ class PaperTrader:
         # Calculate and store calibration metrics regularly
         self.calculate_calibration_metrics_for_date(reconcile_date)
 
+        # Add skill gate statistics if available (T5-B3.1)
+        skilled_stations_count = 0
+        total_stations_count = 0
+        if self._skill_gate is not None:
+            try:
+                all_stations = []
+                # Try to get all stations from various sources
+                try:
+                    from station_registry import get_all_stations
+                    all_stations = get_all_stations()
+                except ImportError:
+                    # Fallback to known stations if registry not available
+                    all_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']
+                
+                skilled_stations = self._skill_gate.get_skilled_stations('HIGH')
+                skilled_stations_count = len(skilled_stations)
+                total_stations_count = len(all_stations)
+                
+            except Exception as e:
+                _LOGGER.warning(f"Error getting skill gate statistics: {e}")
+                skilled_stations_count = 0
+                total_stations_count = 0
+
         return {
             'date': reconcile_date,
             'opening_balance': prev_balance,
@@ -1769,7 +1825,9 @@ class PaperTrader:
             'settled_trades': len(settled_records),
             'new_trades_today': total_new_trades,
             'total_fees': total_fees,
-            'max_drawdown': max_drawdown
+            'max_drawdown': max_drawdown,
+            'skilled_stations_count': skilled_stations_count,
+            'total_stations_count': total_stations_count
         }
 
     def calculate_calibration_metrics_for_date(self, for_date):
