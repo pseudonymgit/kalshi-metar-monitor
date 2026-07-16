@@ -141,50 +141,37 @@ def align_data(temps: List[dict], market: dict) -> List[dict]:
 
 def calculate_signal_edge(station: str, date: str, aligned_data: List[dict], current_index: int) -> Tuple[Optional[str], float, float]:
     """
-    Calculate the edge/signal strength - the predicted advantage vs market price.
-    This is a simplified version simulating the analysis done in the PaperTrader.
+    Calculate the edge/signal strength — NO look-ahead bias.
+    
+    CRITICAL: Uses ONLY prior-day data for signal generation.
+    today['high'] IS the settlement value — using it is 100% look-ahead bias.
     
     Returns (direction, confidence, edge_pct)
     """
-    if current_index < 1:
+    if current_index < 2:
         return None, 0.0, 0.0
     
-    today = aligned_data[current_index]
+    # Use ONLY prior-day data — never today['high'] which IS the settlement
     yesterday = aligned_data[current_index - 1]
+    day_before = aligned_data[current_index - 2]
     
-    # Use calendar climatology + late day momentum + other signals to estimate edge
-    # Get historical tendency for this date/station
-    target_month_day = date[5:10]
-    
-    # Simulate calculating a climatalogical tendency
-    if today['high'] is not None and yesterday['high'] is not None:
-        temp_change = today['high'] - yesterday['high']
+    # Prior-day trend: compare yesterday's high to day-before's high
+    if yesterday['high'] is not None and day_before['high'] is not None:
+        prior_trend = yesterday['high'] - day_before['high']
         
-        # Estimate market direction based on trend with confidence
-        trend_strength = abs(temp_change)
-        confidence = min(0.8, 0.3 + trend_strength * 0.1)  # Higher with stronger trends
+        # Only fire on meaningful prior-day movement
+        if abs(prior_trend) < 1.5:
+            return None, 0.0, 0.0
         
-        direction = 'up' if temp_change > 0 else 'down'
+        direction = 'up' if prior_trend > 0 else 'down'
+        trend_strength = abs(prior_trend)
+        confidence = min(0.6, 0.35 + trend_strength * 0.05)
         
-        # Now calculate edge estimate relative to where market prices would be expected to settle
-        # In absence of live market data, use historical data as proxy
+        # Edge estimate: conservative, based on prior-day trend strength
+        # Edge is the expected advantage over market friction
+        edge_pct = confidence * 0.08  # Conservative cap
         
-        # If market has been trending toward 'high' (75+ bucket range), then we expect 
-        # prices reflecting higher probabilities. Use the trend to estimate market bias
-        if yesterday['high'] is not None:
-            # Compare to recent avg settlement range to estimate 'fair value'
-            historical_avg = today.get('historical_avg', 65.0)
-            deviation_from_normal = today['high'] - historical_avg
-            
-            # Estimate edge based on how much this differs from expected
-            edge_pct = abs(deviation_from_normal) / historical_avg * confidence * 0.3  # Normalize and factor with confidence
-            
-            # Limit edge to reasonable bounds
-            edge_pct = min(0.15, edge_pct)  # Cap at 15% edge
-            
-            return direction, confidence, edge_pct
-        else:
-            return direction, confidence, confidence * 0.05  # Conservative 5% edge
+        return direction, confidence, edge_pct
     
     return None, 0.0, 0.0
 
