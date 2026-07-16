@@ -7,6 +7,7 @@ Updated to work with the NEW signal set (post T2 cleanup)
 
 import sqlite3
 import os
+import json
 from typing import Dict, List, Tuple, Optional
 from collections import defaultdict
 import math
@@ -116,76 +117,60 @@ def run_confirmation_filter_experiment():
             
             today = aligned[i]
             yesterday = aligned[i-1]
+            day_before = aligned[i-2] if i >= 2 else None
             
             actual = today['market_dir']
             if actual == 'flat':
                 continue
             
-            # Generate the new signal set (post T2 cleanup)
+            # Generate signals — NO look-ahead bias
+            # CRITICAL: No today['high'] usage. High IS the settlement value.
             raw_signals = []
             
-            # Signal 1: Calendar climatology
-            if today['high'] and yesterday['high']:
-                direction = 'up' if today['high'] > yesterday['high'] else 'down'
-                conf = 0.60
+            # Signal 1: Calendar climatology — prior-day trend
+            if yesterday['high'] and day_before and day_before['high']:
+                prior_trend = yesterday['high'] - day_before['high']
+                direction = 'up' if prior_trend > 0 else 'down'
+                conf = 0.40 if abs(prior_trend) >= 1.5 else 0.30
                 raw_signals.append({'dir': direction, 'conf': conf, 'name': 'calendar_climatology'})
             
-            # Signal 2: Late-day momentum hourly (now a first-class signal with fixed threshold)
-            if i >= 32 and today['high'] and aligned[i-3]['high']:
-                trend = today['high'] - aligned[i-3]['high']
+            # Signal 2: Late-day momentum — 3-day prior trend
+            if i >= 32 and yesterday['high'] and aligned[i-3]['high']:
+                trend = yesterday['high'] - aligned[i-3]['high']
                 direction = 'up' if trend > 0 else 'down'
-                conf = 0.70 if abs(trend) > 1.7 else 0.50  # Threshold = 1.7 as per paper_trading_engine
+                conf = 0.50 if abs(trend) > 1.7 else 0.35
                 raw_signals.append({'dir': direction, 'conf': conf, 'name': 'late_day_momentum_hourly'})
             
-            # Signal 3: Late-day analysis
-            if i >= 1:
-                # Check for late-day patterns and temperature plateaus/slopes
-                change = today['high'] - yesterday['high']
-                
-                # Define if there are clear late day patterns indicating momentum
-                if abs(change) > 1.0:  # Significant movement (either direction)
+            # Signal 3: Late-day analysis — prior-day pattern
+            if day_before and day_before['high'] and yesterday['high']:
+                change = yesterday['high'] - day_before['high']
+                if abs(change) > 1.0:
                     dir_ = 'up' if change > 0 else 'down'
-                    conf = 0.35  # Modest confidence for pattern continuation
+                    conf = 0.35
                 else:
-                    # Small change indicates potential plateau - could signal reversal
-                    dir_ = 'down' if change > 0 else 'up'  # Slightly favor reversal on stale moves
-                    conf = 0.35  # Modest confidence in plateau patterns
-                
+                    dir_ = 'down' if change > 0 else 'up'
+                    conf = 0.30
                 raw_signals.append({'dir': dir_, 'conf': conf, 'name': 'late_day_analysis'})
                 
-            # Signal 4: NWP analog (simulated data) 
-            # In real implementation, this would use the NWP analog signal from core/signals
-            if today['pressure'] and yesterday['pressure']:
-                pres_change = today['pressure'] - yesterday['pressure']
+            # Signal 4: NWP analog — prior-day pressure change
+            if yesterday['pressure'] and day_before and day_before['pressure']:
+                pres_change = yesterday['pressure'] - day_before['pressure']
                 nwp_direction = 'up' if pres_change > 0 else 'down'
-                nwp_conf = 0.55  # Base confidence for NWP
+                nwp_conf = 0.40
                 raw_signals.append({'dir': nwp_direction, 'conf': nwp_conf, 'name': 'nwp_analog'})
             
-            # Signal 5: Goldilocks (reversion signal now refined)
-            if i >= 2:
-                # Detect spike behavior with high confidence
-                yester_high = yesterday['high']
-                prev_high = aligned[i-2]['high']
-                today_high = today['high']
+            # Signal 5: Goldilocks — prior-day spike detection only
+            if day_before and i >= 3:
+                two_back = aligned[i-3]
+                prev_change = yesterday['high'] - day_before['high']
+                change_before = day_before['high'] - two_back['high']
                 
-                # Detect spikes and predict reversions
-                daily_change = today_high - yester_high
-                prev_change = yester_high - prev_high
-                
-                # Spike-up detection: large jump in positive direction
-                if daily_change > 2.0 and prev_change < daily_change * 0.5:
-                    # Spike up, expect reversion down
-                    gold_dir = 'down'
-                    gold_conf = 0.65  # High confidence in spike reversion pattern
-                # Spike-down detection: large drop in direction
-                elif daily_change < -2.0 and prev_change > daily_change * 0.5:
-                    # Spike down, expect reversion up  
-                    gold_dir = 'up'
-                    gold_conf = 0.60  # High confidence in this pattern too
+                if abs(prev_change) > 2.0 and abs(prev_change) > abs(change_before) * 1.5:
+                    gold_dir = 'down' if prev_change > 0 else 'up'
+                    gold_conf = 0.40
                 else:
-                    # No clear spike, use direction based on recent trend
-                    gold_dir = 'up' if daily_change > 0 else 'down' 
-                    gold_conf = 0.30  # Lower confidence for non-spike situations
+                    gold_dir = 'up' if prev_change > 0 else 'down'
+                    gold_conf = 0.25
                 
                 raw_signals.append({'dir': gold_dir, 'conf': gold_conf, 'name': 'goldilocks'})
             
