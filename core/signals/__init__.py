@@ -6,13 +6,13 @@ Each signal should implement the interface described by BaseSignal.
 
 The unified signal module imports all the specialized signal classes.
 
-S6 task: Includes new signals Pressure×Regime, DTR Trend, and Wind Direction Shift.
+S6 task: Updated to exclude dead signals (pressure_regime, dtr_trend, reversion, regime_signal), now includes Wind Direction Shift, NWP Analog, and Goldilocks.
 """
 
-from .pressure_regime_interaction import PressureRegimeSignal
-from .dtr_trend import DTRTrendSignal  
+  
 from .wind_direction_shift import WindDirectionShiftSignal
 from .nwp_analog_signal import NwpAnalogSignal
+from .goldilocks_signal import GoldilocksSignal
 
 # Import legacy signals if needed here (will be in core/ later)
 
@@ -23,10 +23,9 @@ class SignalRegistry:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.signals = {
-            'pressure_regime': PressureRegimeSignal(db_path),
-            'dtr_trend': DTRTrendSignal(db_path),
             'wind_direction_shift': WindDirectionShiftSignal(db_path),
             'nwp_analog': NwpAnalogSignal(db_path),
+            'goldilocks': GoldilocksSignal(db_path),
             # Legacy signals will be added here as they're migrated
         }
     

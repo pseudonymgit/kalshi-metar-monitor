@@ -66,17 +66,6 @@ def load_market_directions(station, conn, market_type='HIGH'):
 
 # ─── Signal approaches (same as ensemble) ─────────────────────────────────────
 
-def approach_reversion(idx, days):
-    if idx < 31: return None, 0.0
-    window = days[idx-31:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
-    std = math.sqrt(var) if var > 0 else 0.01
-    z = (days[idx-1]['high'] - mean) / std if std > 0 else 0
-    if z > 0.5: return 'down', abs(z)
-    elif z < -0.5: return 'up', abs(z)
-    return None, 0.0
 
 def approach_gaussian(idx, days):
     if idx < 48: return None, 0.0
@@ -90,36 +79,6 @@ def approach_gaussian(idx, days):
     elif z < -1.0: return 'up', abs(z)
     return None, 0.0
 
-def approach_regime(idx, days):
-    if idx < 15: return None, 0.0
-    window = days[idx-15:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
-    vol = math.sqrt(var)
-    slope = (highs[-1] - highs[0]) / len(highs) if len(highs) >= 2 else 0
-    if idx >= 1:
-        dtr = days[idx-1]['high'] - days[idx-1]['low']
-    else:
-        dtr = 10.0
-    if dtr > 15.0: threshold = 1.0
-    elif dtr < 8.0: threshold = 0.4
-    else: threshold = 0.8
-    if vol < 1.0 and abs(slope) < threshold:
-        if idx >= 31:
-            w30 = days[idx-31:idx-1]
-            h30 = [d['high'] for d in w30]
-            m30 = sum(h30) / len(h30)
-            dist = days[idx-1]['high'] - m30
-            if dist > 1.0:
-                conf = min(dist/3.0, 0.8)
-                if dtr < 8.0: conf *= 0.6
-                return 'down', conf
-            elif dist < -1.0:
-                conf = min(abs(dist)/3.0, 0.8)
-                if dtr < 8.0: conf *= 0.6
-                return 'up', conf
-    return None, 0.0
 
 def approach_gaussian_v2(idx, days):
     if idx < 31: return None, 0.0
@@ -140,8 +99,7 @@ def approach_pressure(idx, days):
         return ('up' if dp > 0 else 'down'), min(abs(dp)/5.0, 0.8)
     return None, 0.0
 
-APPROACHES = [approach_reversion, approach_gaussian, approach_regime,
-              approach_gaussian_v2, approach_pressure]
+APPROACHES = [approach_gaussian, approach_gaussian_v2, approach_pressure]
 
 
 # ─── Brier Skill Score ───────────────────────────────────────────────────────
