@@ -71,18 +71,6 @@ def load_station_data(station, conn):
 
 # ─── 8 Signal Approaches ─────────────────────────────────────────────────────
 
-def signal_reversion(idx, days):
-    """Signal 1: Reversion (30-day z-score)"""
-    if idx < 31: return None, 0.0
-    window = days[idx-31:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
-    std = math.sqrt(var) if var > 0 else 0.01
-    z = (days[idx-1]['high'] - mean) / std if std > 0 else 0
-    if z > 0.5: return 'down', abs(z)
-    elif z < -0.5: return 'up', abs(z)
-    return None, 0.0
 
 def signal_gaussian(idx, days):
     """Signal 2: Gaussian (48-day z-score)"""
@@ -208,7 +196,6 @@ def signal_goldilocks(idx, days):
 
 
 ALL_SIGNALS = [
-    signal_reversion,
     signal_gaussian,
     signal_regime,
     signal_gaussian_v2,
@@ -219,7 +206,7 @@ ALL_SIGNALS = [
 ]
 
 SIGNAL_NAMES = [
-    "Reversion (30d z-score)",
+    
     "Gaussian (48d z-score)",
     "Regime (DTR-scaled) [R4-1.4]",
     "Gaussian v2 (30d z-score)",
@@ -232,7 +219,7 @@ SIGNAL_NAMES = [
 # Phase 2 additions are modular classes in core/signals/ and core/rdae_mos.py.
 # See core/paper_trading_engine.py FULL_ENSEMBLE_SIGNALS for the canonical list.
 FULL_ENSEMBLE_SIGNAL_NAMES = [
-    "Reversion (30d z-score)",
+    
     "Gaussian (48d z-score)",
     "Regime (DTR-scaled) [R4-1.4]",
     "Gaussian v2 (30d z-score)",
@@ -240,8 +227,8 @@ FULL_ENSEMBLE_SIGNAL_NAMES = [
     "Late-day momentum",
     "Calendar climatology (60d)",
     "Goldilocks reversion [R4-1.5]",
-    "Pressure×Regime [Phase 2]",
-    "DTR Trend [Phase 2]",
+    
+    
     "Wind Direction Shift [Phase 2]",
     "RDAE-MOS [Phase 2]",
 ]

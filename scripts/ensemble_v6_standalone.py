@@ -86,32 +86,6 @@ def load_station_data(station, conn):
 
 # ─── 6 APPROACHES ───────────────────────────────────────────────────────────
 
-def approach_reversion(idx, days, market, station):
-    """
-    Reversion: Rolling z-score reversion (MOST PROMISING)
-    If temp is >0.5σ above 30-day mean, predict DOWN. Below → UP.
-    """
-    if idx < 31:  # Need 30-day window
-        return None
-    
-    window = days[idx-31:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    variance = sum((h - mean) ** 2 for h in highs) / len(highs)
-    std = math.sqrt(variance) if variance > 0 else 0.01
-    
-    current = days[idx-1]['high']
-    z_score = (current - mean) / std if std > 0 else 0
-    
-    # If current is significantly above mean, predict reversion (DOWN)
-    if z_score > 0.5:
-        return 'down'
-    elif z_score < -0.5:
-        return 'up'
-    else:
-        return None
-
-
 def approach_gaussian(idx, days, market, station):
     """
     Gaussian: Rolling mean + std from 48-hour window
@@ -152,51 +126,6 @@ def approach_persistence(idx, days, market, station):
     
     # Predict same direction tomorrow
     return prev_dir
-
-
-def approach_regime(idx, days, market, station):
-    """
-    Regime: Volatility-based regime classifier
-    Stable (vol<1.0, grad<0.5), Transient (vol<2.0, grad<1.0), Volatile (else)
-    """
-    if idx < 15:  # Need 15-day window for regime
-        return None
-    
-    window = days[idx-15:idx-1]
-    highs = [d['high'] for d in window]
-    
-    # Calculate volatility and gradient
-    mean = sum(highs) / len(highs)
-    variance = sum((h - mean) ** 2 for h in highs) / len(highs)
-    vol = math.sqrt(variance)
-    
-    # Calculate gradient (slope)
-    if len(highs) >= 2:
-        slope = (highs[-1] - highs[0]) / len(highs)
-    else:
-        slope = 0
-    
-    # Classify regime
-    if vol < 1.0 and abs(slope) < 0.5:
-        regime = 'stable'
-    elif vol < 2.0 and abs(slope) < 1.0:
-        regime = 'transient'
-    else:
-        regime = 'volatile'
-    
-    # Trading rule: stable + reversion
-    if regime == 'stable':
-        # Reversion signal within stable regime
-        if idx >= 31:
-            window30 = days[idx-31:idx-1]
-            highs30 = [d['high'] for d in window30]
-            mean30 = sum(highs30) / len(highs30)
-            if days[idx-1]['high'] > mean30 + 1.0:
-                return 'down'
-            elif days[idx-1]['high'] < mean30 - 1.0:
-                return 'up'
-    
-    return None
 
 
 def approach_gaussian_v2(idx, days, market, station):
@@ -413,19 +342,15 @@ def main():
     
     # 6 approaches with names
     approaches = [
-        approach_reversion,        # 1. Reversion (most promising)
-        approach_gaussian,         # 2. Gaussian model
-        approach_persistence,      # 3. Persistence
-        approach_regime,           # 4. Regime classifier
-        approach_gaussian_v2,      # 5. Gaussian v2 (30-day window)
-        approach_pressure_trend,   # 6. Pressure trend (non-circular)
+        approach_gaussian,         # 1. Gaussian model
+        approach_persistence,      # 2. Persistence
+        approach_gaussian_v2,      # 3. Gaussian v2 (30-day window)
+        approach_pressure_trend,   # 4. Pressure trend (non-circular)
     ]
     
     approach_names = [
-        "Reversion (30-day z-score)",
         "Gaussian (48-day window)",
         "Persistence (yesterday's direction)",
-        "Regime (volatility-based)",
         "Gaussian v2 (30-day z-score)",
         "Pressure trend (non-circular)"
     ]
@@ -482,7 +407,7 @@ def main():
     print("SUMMARY")
     print("=" * 90)
     
-    print(f"\n{'Station':<8} {'Reversion':>10} {'Gaussian':>10} {'Persistence':>12} {'Aggregate':>10} {'Coverage':>10}")
+    print(f"\n{'Station':<8} {'Gaussian':>10} {'Persistence':>10} {'Gaussian v2':>12} {'Aggregate':>10} {'Coverage':>10}")
     print("-" * 70)
     
     for station in stations:
@@ -492,11 +417,11 @@ def main():
         r = all_results[station]
         agg = r['aggregate']
         
-        reversion_acc = r['per_approach'].get('approach_1', {}).get('accuracy', 0)
-        gaussian_acc = r['per_approach'].get('approach_2', {}).get('accuracy', 0)
-        persistence_acc = r['per_approach'].get('approach_3', {}).get('accuracy', 0)
+        gaussian_acc = r['per_approach'].get('approach_1', {}).get('accuracy', 0)
+        persistence_acc = r['per_approach'].get('approach_2', {}).get('accuracy', 0)
+        gaussianv2_acc = r['per_approach'].get('approach_3', {}).get('accuracy', 0)
         
-        print(f"{station:<8} {reversion_acc:>10.2%} {gaussian_acc:>10.2%} {persistence_acc:>12.2%} {agg['accuracy']:>10.2%} {agg['coverage']:>10.1%}")
+        print(f"{station:<8} {gaussian_acc:>10.2%} {persistence_acc:>10.2%} {gaussianv2_acc:>12.2%} {agg['accuracy']:>10.2%} {agg['coverage']:>10.1%}")
     
     # Check thresholds
     print()

@@ -73,41 +73,33 @@ class InstanceConfig:
 def validate_webhook_configuration():
     """Validate that webhook URLs are set via environment variables.
     
+    Only enforce webhook requirements for instances where discord_enabled=True.
+    DEV and SBOX instances with Discord disabled are allowed to run without webhooks.
+    
     Raises:
-        ValueError: If required webhooks are not configured
+        ValueError: If any instance with discord_enabled=True has a missing webhook
     """
+    # Check environment variables - only enforce for enabled instances
     env_vars = {
-        "PROD": "DISCORD_WEBHOOK_PROD",
-        "DEV":  "DISCORD_WEBHOOK_DEV", 
-        "SBOX": "DISCORD_WEBHOOK_SBOX"
+        "PROD": ("DISCORD_WEBHOOK_PROD", os.getenv("DISCORD_ENABLED_PROD", "false").lower() in ("1", "true", "yes")),
+        "DEV":  ("DISCORD_WEBHOOK_DEV", os.getenv("DISCORD_ENABLED_DEV", "false").lower() in ("1", "true", "yes")),
+        "SBOX": ("DISCORD_WEBHOOK_SBOX", os.getenv("DISCORD_ENABLED_SBOX", "false").lower() in ("1", "true", "yes")),
     }
     
     missing_webhooks = []
     
-    for instance, env_var in env_vars.items():
-        webhook_url = os.getenv(env_var)
-        if not webhook_url:
-            missing_webhooks.append(f"{env_var} (required for {instance})")
+    for instance, (env_var, discord_enabled) in env_vars.items():
+        # Only enforce webhook requirement if Discord is enabled for this instance
+        if discord_enabled:
+            webhook_url = os.getenv(env_var)
+            if not webhook_url:
+                missing_webhooks.append(f"{env_var} (required for {instance})")
     
     if missing_webhooks:
         raise ValueError(
             f"Missing required Discord webhook environment variables: {', '.join(missing_webhooks)}. "
             f"Please configure these before starting the application.\n"
             f"Example: export {missing_webhooks[0].split(' ')[0]}='<webhook_url>'"
-        )
-
-    # Additionally validate that the webhook configurations don't use default placeholder values
-    for instance, default_webhook in _DEFAULT_WEBHOOKS.items():
-        env_var = env_vars[instance]
-        env_webhook = os.getenv(env_var)
-        if env_webhook == default_webhook and default_webhook == "":
-            # This means a new default was set but environment hasn't overridden it
-            missing_webhooks.append(f"{env_var} (required for {instance} and set to placeholder)")
-    
-    if missing_webhooks:
-        raise ValueError(
-            f"Discord webhook environment variables set to placeholder values: {', '.join(missing_webhooks)}. "
-            f"Please set them to actual webhook URLs."
         )
 
 
@@ -125,7 +117,7 @@ def _initialize_with_validation():
             initial_balance=10000.0,
             fee_rate=0.001,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_PROD", _DEFAULT_WEBHOOKS["PROD"]),
-            discord_enabled=os.getenv("DISCORD_ENABLED_PROD", "true").lower() in ("1", "true", "yes"),
+            discord_enabled=os.getenv("DISCORD_ENABLED_PROD", "false").lower() in ("1", "true", "yes"),
             sizing_instance="PROD",
         ),
         "DEV": InstanceConfig(
@@ -135,7 +127,7 @@ def _initialize_with_validation():
             initial_balance=5000.0,
             fee_rate=0.001,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_DEV", _DEFAULT_WEBHOOKS["DEV"]),
-            discord_enabled=os.getenv("DISCORD_ENABLED_DEV", "true").lower() in ("1", "true", "yes"),
+            discord_enabled=os.getenv("DISCORD_ENABLED_DEV", "false").lower() in ("1", "true", "yes"),
             sizing_instance="DEV",
         ),
         "SBOX": InstanceConfig(
