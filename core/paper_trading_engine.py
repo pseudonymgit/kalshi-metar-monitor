@@ -77,10 +77,35 @@ from risk_controls import (
     RiskConfig,
     TradeResult
 )
+from alert_builder import (
+    build_paper_trade_alert,
+    format_alert_for_discord,
+    OpportunityGrade,
+    LaneType,
+    PAPER_TRADE_ALERT_SCHEMA_VERSION,
+    build_paper_trade_alert_dev,
+)
+
+# Attempt to import NWP Analog Signal - wrap in try/except to prevent crashes if sklearn/xgboost not installed
+try:
+    from core.signals.nwp_analog_signal import NwpAnalogSignal
+    HAS_NWP_ANALOG = True
+except ImportError:
+    print("Warning: NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
+    NwpAnalogSignal = None
+    HAS_NWP_ANALOG = False
+
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
 _LOGGER = logging.getLogger(__name__)
+
+# Alert builder integration - export alert builder functions
+# Alert builder provides:
+# - build_paper_trade_alert(): Build slim alert with S/A/B/C/D/F grade + Edge
+# - compute_opportunity_grade(): Calculate grade from confidence, market_prob, Sharpe
+# - classify_lane(): Classify signal into Regular/Sure_Thing/Goldilocks
+# - format_alert_for_discord(): Format for Discord webhook
 
 # Risk controls configuration (Marty's Phase 1 B1.5)
 RISK_CONFIG = DEFAULT_RISK_CONFIG
@@ -141,6 +166,16 @@ class PaperTrader:
         # Initialize databases
         self._init_paper_db()
         self._init_metar_db_if_needed()
+        
+        # Initialize signal instances
+        if HAS_NWP_ANALOG:
+            try:
+                self._nwp_analog = NwpAnalogSignal()
+            except Exception:
+                print("Warning: Failed to initialize NWP Analog Signal instance")
+                self._nwp_analog = None
+        else:
+            self._nwp_analog = None
     
     def _init_paper_db(self):
         """Create paper trading database schema."""
@@ -651,6 +686,17 @@ class PaperTrader:
             if ldm_direction is not None:
                 market_side = MarketSide.UP if ldm_direction == "up" else MarketSide.DOWN
                 signals.append((station, "HIGH", market_side, "late_day_momentum_hourly"))
+            
+            # Signal 4: NWP Analog (first-class signal)
+            if HAS_NWP_ANALOG and self._nwp_analog:
+                try:
+                    result = self._nwp_analog.compute_signal(station, date)
+                    if result and result.get('direction') is not None and result.get('confidence', 0) > 0:
+                        direction = result['direction']
+                        market_side = MarketSide.UP if direction == 1 else MarketSide.DOWN
+                        signals.append((station, "HIGH", market_side, "nwp_analog"))
+                except Exception as e:
+                    _LOGGER.warning(f"Failed to compute NWP analog signal for {station} on {date}: {e}")
         
         metar_conn.close()
         
@@ -1062,6 +1108,12 @@ class PaperTrader:
         )
         risk_state_after_execution = self._risk_manager.update_after_trade(trade_result)
         
+        # Compute Sharpe ratio for this trade result
+        Sharpe = self.compute_sharpe()
+        
+        # Get hit rate from BSS matrix (historical directional accuracy)
+        hit_rate, hit_rate_n = self._get_hit_rate(station, signal_direction.value)
+        
         return {
             'status': 'executed',
             'trade_id': trade_id,
@@ -1075,8 +1127,11 @@ class PaperTrader:
             'cost': net_cost,
             'fee_cost': fee_cost,
             'metadata': metadata,
+            'sharpe': Sharpe,  # Sharpe ratio for alert grading
+            'hit_rate': hit_rate,  # Directional accuracy from BSS matrix
+            'hit_rate_n': hit_rate_n,  # Sample count for hit rate
             'risk_state': self._risk_metrics.risk_state,
-            'risk_reasons': self._risk_metrics.kill_switch_reasons
+            'risk_reasons': []  # risk_report provides checks, not kill_switch_reasons
         }
     
     def _update_position_after_trade(self, trade_uuid, trade_type, fill_price, quantity,
@@ -1710,6 +1765,128 @@ class PaperTrader:
         """Format risk metrics as a human-readable alert string."""
         return format_risk_alert(self._risk_metrics)
     
+    def build_paper_trade_alert(self, trade_result: Dict[str, Any], station: str,
+                                market_type: str, direction: str) -> Dict[str, Any]:
+        """
+        Build a slim paper-trade alert with S/A/B/C/D/F Opportunity Grade + Edge.
+        
+        Uses the alert_builder module to:
+        - Compute Opportunity Grade (S/A/B/C/D/F) based on trade confidence, market probability, and Sharpe
+        - Calculate Edge (Trade Conf - Market prob)
+        - Classify lane (Regular, Sure_Thing, Goldilocks)
+        - Build slim Discord message format with real Kalshi URLs
+        - Include hit rate from historical BSS matrix
+        """
+        hit_rate = trade_result.get('hit_rate')
+        hit_rate_n = trade_result.get('hit_rate_n')
+        return build_paper_trade_alert(trade_result, station, market_type, direction, INSTANCE, hit_rate, hit_rate_n)
+    
+    def build_paper_trade_alert_dev(self, trade_result: Dict[str, Any], station: str,
+                                   market_type: str, direction: str) -> Dict[str, Any]:
+        """
+        DEV variant: Build paper-trade alert with Enhanced Opportunity Grade.
+        """
+        hit_rate = trade_result.get('hit_rate')
+        hit_rate_n = trade_result.get('hit_rate_n')
+        return build_paper_trade_alert_dev(trade_result, station, market_type, direction, INSTANCE, hit_rate, hit_rate_n)
+    
+    def compute_sharpe(self, trades: List[Dict[str, Any]] = None) -> float:
+        """
+        Compute Sharpe ratio from historical trades.
+        
+        Args:
+            trades: Optional list of trade results with pnl fields. If None, uses daily trades.
+            
+        Returns:
+            Sharpe ratio (0 if insufficient data)
+        """
+        if trades is None:
+            # Get trades from today
+            trades = self._get_daily_trades()
+        
+        if len(trades) < 2:
+            return 1.0  # Default to 1.0 for insufficient data
+        
+        # Calculate returns
+        returns = [t.get('pnl', 0) / max(abs(t.get('position_size_usd', 100)), 1) for t in trades]
+        
+        # Calculate mean return and standard deviation
+        mean_return = statistics.mean(returns)
+        std_return = statistics.stdev(returns) if len(returns) > 1 else 0.01
+        
+        # Calculate Sharpe ratio (assuming risk-free rate = 0)
+        if std_return > 0:
+            sharpe = mean_return / std_return
+        else:
+            sharpe = float('inf') if mean_return > 0 else 0.0
+        
+        return sharpe
+    
+    def _get_daily_trades(self) -> List[Dict[str, Any]]:
+        """Get trades from today for Sharpe calculation."""
+        conn = sqlite3.connect(self.paper_db)
+        c = conn.cursor()
+        
+        today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        
+        c.execute("""
+            SELECT trade_uuid, position_size_usd, trade_cost as pnl, status
+            FROM trades
+            WHERE trade_date_utc = ?
+        """, (today,))
+        
+        trades = []
+        for row in c.fetchall():
+            trades.append({
+                'trade_uuid': row[0],
+                'position_size_usd': row[1],
+                'pnl': row[2],
+                'status': row[3]
+            })
+        
+        conn.close()
+        return trades
+    
+    def _get_hit_rate(self, station: str, direction: str) -> Tuple[float, int]:
+        """
+        Get historical hit rate for a station+direction combination.
+        
+        Looks up the directional accuracy from the per-station BSS matrix / B7 backtests.
+        
+        Args:
+            station: Station ICAO code
+            direction: 'UP' or 'DOWN'
+            
+        Returns:
+            Tuple of (hit_rate as 0.0-1.0, sample count)
+        """
+        # Default: 50% hit rate (neutral) with minimal confidence
+        default_hit_rate = 0.50
+        default_n = 0
+        
+        try:
+            conn = sqlite3.connect(self.paper_db)
+            c = conn.cursor()
+            
+            # Look up hit rate from historical directional accuracy table
+            c.execute("""
+                SELECT hit_rate, sample_count
+                FROM station_hit_rates
+                WHERE station = ? AND direction = ?
+            """, (station, direction))
+            
+            row = c.fetchone()
+            conn.close()
+            
+            if row:
+                return row[0], row[1]
+            
+            return default_hit_rate, default_n
+            
+        except sqlite3.Error:
+            # Table doesn't exist yet, return default
+            return default_hit_rate, default_n
+    
     def check_kill_switches(self) -> Tuple[bool, List[str]]:
         """
         Evaluate all kill switch conditions.
@@ -1832,15 +2009,35 @@ def daily_paper_run(run_date=None):
         )
         
         if result['status'] == 'executed':
-            print(f"  ✓ {station}:{market_type} {result['trade_type'].value.upper()} "
-                  f"(edge: {result['analytical_prob'] - result['market_price']:+.2%} | "
-                  f"prob: {result['analytical_prob']:.1%} | "
-                  f"conf: {result['confidence']:.0%} | "
-                  f"amount: ${result['cost']:.2f})")
+            # Build alert with S/A/B/C/D/F Opportunity Grade + Edge
+            alert_data = trader.build_paper_trade_alert(
+                trade_result=result,
+                station=station,
+                market_type=market_type,
+                direction=signal_direction,
+            )
+            
+            # Format for Discord
+            discord_payload = format_alert_for_discord(alert_data)
+            
+            # Print alert to console (skip if alert was filtered by hard filters)
+            if alert_data.get('skip_reason'):
+                print(f"  [FILTERED] {station}:{market_type} {result['trade_type'].value.upper()} - {alert_data['skip_reason']}")
+                skipped += 1
+            else:
+                print(f"  [ALERT] {station}:{market_type} {result['trade_type'].value.upper()} ")
+                print(f"         Grade: {alert_data['grade']} | Lane: {alert_data['lane_label']}")
+                print(f"         Edge: {alert_data['edge_pct']} | Sharpe: {alert_data['Sharpe']:.1f}")
+                print(f"         Conf: {alert_data['trade_confidence']:.0%} | Market prob: {alert_data['market_prob']:.2%}")
+                print(f"         Market URL: {alert_data['market_url']}")
+                print(f"         Amount: ${result['cost']:.2f}")
+            
+            # Store alert data in result for tracking
+            result['alert_data'] = alert_data
             executed += 1
             trade_results.append(result)
         else:
-            print(f"  ↓ {station}:{signal_direction.value} {result['reason']}")
+            print(f"  [SKIP] {station}:{signal_direction.value} {result['reason']}")
             skipped += 1
     
     print(f"\nTrade execution: {executed} executed, {skipped} skipped")
