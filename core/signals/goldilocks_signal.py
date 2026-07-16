@@ -33,9 +33,15 @@ class GoldilocksSignal(BaseSignal):
     
     def __init__(self, db_path: str = None):
         super().__init__(db_path)
-        self.name = "goldilocks"
-        self.min_lookback = 1  # Requires at least 1 prior day
         self._load_signal_state(db_path)
+
+    @property
+    def name(self) -> str:
+        return "goldilocks"
+
+    @property
+    def min_lookback(self) -> int:
+        return 1  # Requires at least 1 prior day
     
     def _load_signal_state(self, db_path: str) -> None:
         """Load signal state for epoch tracking."""

@@ -32,6 +32,14 @@ class WindDirectionShiftSignal:
         self.wind_speed_threshold = 10.0  # knots
         self.lookback_days = 3  # days to look for wind pattern changes
 
+    @property
+    def name(self) -> str:
+        return "wind_direction_shift"
+
+    @property
+    def min_lookback(self) -> int:
+        return self.lookback_days
+
 
     def _calculate_circular_difference(self, angle1: float, angle2: float) -> float:
         """

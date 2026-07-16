@@ -13,6 +13,11 @@ S6 task: Updated to exclude dead signals (pressure_regime, dtr_trend, reversion,
 from .wind_direction_shift import WindDirectionShiftSignal
 from .nwp_analog_signal import NwpAnalogSignal
 from .goldilocks_signal import GoldilocksSignal
+from .persistence_signal import PersistenceSignal
+from .simple_trend_signal import SimpleTrendSignal
+from .gaussian_signal import GaussianSignal
+from .gaussian_v2_signal import GaussianV2Signal
+from .pressure_delta_signal import PressureDeltaSignal
 
 # Import legacy signals if needed here (will be in core/ later)
 
@@ -26,6 +31,11 @@ class SignalRegistry:
             'wind_direction_shift': WindDirectionShiftSignal(db_path),
             'nwp_analog': NwpAnalogSignal(db_path),
             'goldilocks': GoldilocksSignal(db_path),
+            'persistence': PersistenceSignal(db_path),
+            'simple_trend': SimpleTrendSignal(db_path),
+            'gaussian': GaussianSignal(db_path),
+            'gaussian_v2': GaussianV2Signal(db_path),
+            'pressure_delta': PressureDeltaSignal(db_path),
             # Legacy signals will be added here as they're migrated
         }
     
