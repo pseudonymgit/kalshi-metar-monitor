@@ -139,7 +139,11 @@ class RiskManager:
             
         # Return comprehensive risk state
         risk_state = {
-            'passed': True,  # Currently stubbed to always pass
+            'passed': (
+            self.check_daily_loss() and 
+            self.check_drawdown() and 
+            self.check_consecutive_losses()
+        ),
             'capital': self.current_capital,
             'peak_capital': self.peak_capital,
             'drawdown_pct': self._calculate_drawdown_pct(),
