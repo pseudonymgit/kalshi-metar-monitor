@@ -95,6 +95,15 @@ except ImportError:
     NwpAnalogSignal = None
     HAS_NWP_ANALOG = False
 
+# Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
+try:
+    from core.calibration_pipeline import CalibrationPipeline
+    HAS_CALIBRATION_PIPELINE = True
+except ImportError:
+    print("Warning: CalibrationPipeline modules not available. Install sklearn and scipy for calibration features.")
+    CalibrationPipeline = None
+    HAS_CALIBRATION_PIPELINE = False
+
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
@@ -176,6 +185,22 @@ class PaperTrader:
                 self._nwp_analog = None
         else:
             self._nwp_analog = None
+        
+        # Initialize calibration pipeline
+        # Define the signal names and possible city codes for the calibration
+        self.signal_names = ["calendar_climatology", "late_day_momentum", "nwp_analog", "late_day_analysis"]
+        # Define common weather stations for initial available locations
+        self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']  # Common trade locations
+        
+        # Initialize calibration pipeline with common stations
+        if HAS_CALIBRATION_PIPELINE:
+            try:
+                self._calibrator = CalibrationPipeline(self.signal_names, self.available_stations)
+            except Exception as e:
+                print(f"Warning: Failed to initialize CalibrationPipeline: {e}")
+                self._calibrator = None
+        else:
+            self._calibrator = None
     
     def _init_paper_db(self):
         """Create paper trading database schema."""
@@ -893,6 +918,52 @@ class PaperTrader:
                 metadata['source'] = 'late_day_momentum_hourly'
                 metadata['rate_threshold'] = 1.7
         
+        # Apply calibration to confidence if available
+        calibrated_confidence = confidence  # Default to uncalibrated if no calibrator
+        if HAS_CALIBRATION_PIPELINE and self._calibrator:
+            try:
+                # Ensure station is added to available stations for calibration purposes
+                if station not in self._calibrator.city_codes:
+                    # Need to recreate calibrator with new station included
+                    new_cities = list(set(self._calibrator.city_codes + [station]))
+                    temp_calibrator = CalibrationPipeline(self._calibrator.signal_names, new_cities)
+                    
+                    # Copy over existing calibrator's learned data
+                    temp_calibrator.calibrators = self._calibrator.calibrators
+                    temp_calibrator.fallback_calibrators = self._calibrator.fallback_calibrators
+                    temp_calibrator.global_calibrator = self._calibrator.global_calibrator
+                    temp_calibrator.history = self._calibrator.history
+                    temp_calibrator.refitted = self._calibrator.refitted
+                    
+                    # Replace the old calibrator
+                    self._calibrator = temp_calibrator
+                
+                # Determine signal name based on functionality  
+                if "calendar" in functionality:
+                    signal_name = "calendar_climatology"
+                elif "momentum" in functionality or "late_day" in functionality:
+                    signal_name = "late_day_momentum"
+                elif "nwp" in functionality or "analog" in functionality:
+                    signal_name = "nwp_analog"
+                elif "analysis" in functionality:
+                    signal_name = "late_day_analysis"
+                else:
+                    signal_name = functionality
+                
+                # Apply calibration to the confidence
+                calibrated_confidence = self._calibrator.calibrate(signal_name, station, confidence)
+                
+                # Refit the calibrator periodically to incorporate new data
+                # This may happen multiple times as the same function gets called
+                # We should be careful not to refit too frequently
+            except Exception as e:
+                print(f"Calibration failed for {station}, signal: {functionality}: {e}")
+                # Fall back to original confidence
+                calibrated_confidence = confidence
+        else:
+            # Use uncalibrated confidence if calibration is not available
+            calibrated_confidence = confidence
+        
         # Record decision output - this is P1.4 requirement
         self.record_explicit_decision_output(
             station=station,
@@ -901,7 +972,7 @@ class PaperTrader:
             signal_direction=signal_direction,
             market_price=market_price,
             analytical_prob=analytical_prob,
-            confidence=confidence,
+            confidence=calibrated_confidence,
             reasons=functionality,
             trade_version=trade_version,
             notes=notes
@@ -917,7 +988,7 @@ class PaperTrader:
                 'reason': f'Insufficient edge ({abs(fair_price_advantage):.1%} < {price_advantage_threshold:.1%})',
                 'market_price': market_price,
                 'analytical_prob': analytical_prob,
-                'confidence': confidence,
+                'confidence': calibrated_confidence,
                 'metadata': metadata
             }
         
@@ -974,7 +1045,7 @@ class PaperTrader:
                 'reason': f'Position size is 0 (balance too low or confidence too low)',
                 'market_price': market_price,
                 'analytical_prob': analytical_prob,
-                'confidence': confidence,
+                'confidence': calibrated_confidence,
                 'metadata': metadata,
                 'sizing_metadata': sizing_meta,
             }
@@ -996,7 +1067,7 @@ class PaperTrader:
                     'reason': f'Cluster {cluster_name} budget exhausted (${cluster_exposure:.2f} >= ${_CLUSTER_BUDGET_USD:.2f})',
                     'market_price': market_price,
                     'analytical_prob': analytical_prob,
-                    'confidence': confidence,
+                    'confidence': calibrated_confidence,
                     'metadata': metadata,
                     'sizing_metadata': sizing_meta,
                     'cluster': cluster_name,
@@ -1014,7 +1085,7 @@ class PaperTrader:
                 'reason': f'City pair {station} net exposure cap reached (${city_pair_exposure:.2f} >= ${_CITY_PAIR_CAP_USD:.2f})',
                 'market_price': market_price,
                 'analytical_prob': analytical_prob,
-                'confidence': confidence,
+                'confidence': calibrated_confidence,
                 'metadata': metadata,
                 'sizing_metadata': sizing_meta,
                 'station': station,
@@ -1123,7 +1194,7 @@ class PaperTrader:
             'quantity': quantity,
             'market_price': market_price,
             'analytical_prob': analytical_prob,
-            'confidence': confidence,
+            'confidence': calibrated_confidence,
             'cost': net_cost,
             'fee_cost': fee_cost,
             'metadata': metadata,
@@ -1478,6 +1549,42 @@ class PaperTrader:
                 WHERE trade_uuids LIKE ?
             """, (profit, trade_qty, profit, f'%{trade_uuid}%'))
             
+            # Check if trade was directionally correct by comparing signal direction with actual settlement direction
+            # Query the original trade for the signal direction and functionality
+            c.execute("SELECT signal_direction, functionality, confidence_indicator, forecast_prob FROM trades WHERE trade_uuid = ?", (trade_uuid,))
+            trade_row = c.fetchone()
+            
+            if trade_row and HAS_CALIBRATION_PIPELINE and self._calibrator:
+                orig_signal_direction, functionality, raw_confidence, raw_forecast_prob = trade_row
+                
+                # Determine if the prediction was directionally correct
+                settlement_is_up = settlement_contract_value > 0.5  # Settlement goes UP if > $0.50 (over 50F)
+                predicted_is_up = orig_signal_direction == "UP"  # Signal was UP/DOWN
+                
+                # If signal was "UP" and settlement went UP, or signal was "DOWN" and settlement went DOWN, then correct
+                was_correct = (predicted_is_up == settlement_is_up)
+                
+                # Extract signal name based on functionality
+                if "calendar" in functionality:
+                    signal_name = "calendar_climatology"
+                elif "momentum" in functionality or "late_day" in functionality:
+                    signal_name = "late_day_momentum"  # Using appropriate name for the late-day momentum signal
+                elif "nwp" in functionality or "analog" in functionality:
+                    signal_name = "nwp_analog"
+                elif "analysis" in functionality:
+                    signal_name = "late_day_analysis"
+                else:
+                    # Default to the functionality field as signal name
+                    signal_name = functionality
+                
+                # Feed this result back to calibration pipeline
+                try:
+                    # Use raw_forecast_prob as primary confidence, fall back to raw_confidence if available
+                    conf_to_use = raw_forecast_prob if raw_forecast_prob is not None else (raw_confidence if raw_confidence is not None else 0.5)
+                    self._calibrator.update(signal_name, station, conf_to_use, was_correct)
+                except Exception as e:
+                    print(f"Error feeding trade to calibrator: {e}")
+
             # Update RiskManager with realized P&L after settlement
             settlement_trade_result = TradeResult(
                 trade_id=trade_uuid,
@@ -1725,6 +1832,7 @@ class PaperTrader:
         conn.close()
         
         if row:
+            # Prepare base report
             report = {
                 'generated_at': self._current_datetime(),
                 'latest_metrics': {
@@ -1735,6 +1843,44 @@ class PaperTrader:
                     'resolved_trades': row[4]
                 }
             }
+            
+            # Add calibration pipeline metrics if available
+            if HAS_CALIBRATION_PIPELINE and self._calibrator:
+                try:
+                    # Refit calibrators to get current stats
+                    self._calibrator.refit()  
+                    
+                    # Count various types of calibrators
+                    per_signal_per_city_count = len(self._calibrator.calibrators)
+                    per_signal_global_count = len(self._calibrator.fallback_calibrators)
+                    global_count = 1 if self._calibrator.global_calibrator is not None else 0
+                    
+                    calibration_info = {
+                        'calibration_pipeline_enabled': True,
+                        'calibrators_fitted': {
+                            'per_signal_per_city': per_signal_per_city_count,
+                            'per_signal_global': per_signal_global_count,
+                            'global': global_count,
+                        },
+                        'total_signal_city_combinations': len(self._calibrator.signal_names) * len(self._calibrator.city_codes),
+                        'signals_covered': self._calibrator.signal_names,
+                        'cities_covered': list(self._calibrator.city_codes),
+                        'data_points_total': sum(len(hist) for hist in self._calibrator.history.values()),
+                        'data_distribution': {str(k): len(v) for k, v in self._calibrator.history.items()}
+                    }
+                    
+                    report['calibration_pipeline_metrics'] = calibration_info
+                    
+                except Exception as e:
+                    print(f"Error generating calibration pipeline report: {e}")
+                    report['calibration_pipeline_metrics'] = {
+                        'calibration_pipeline_enabled': True,
+                        'error_generating_report': str(e)
+                    }
+            else:
+                report['calibration_pipeline_metrics'] = {
+                    'calibration_pipeline_enabled': False
+                }
             
             # Write to file
             report_dir = os.path.dirname(save_path)
