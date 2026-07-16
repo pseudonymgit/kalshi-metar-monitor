@@ -67,6 +67,13 @@ from instance_config import (
     log_alert,
     setup_instance_logger,
 )
+from alert_builder import (
+    build_paper_trade_alert,
+    compute_opportunity_grade,
+    classify_lane,
+    OpportunityGrade,
+    LaneType,
+)
 
 # ─── Instance Configuration ─────────────────────────────────────────────
 
@@ -265,7 +272,7 @@ class MultiInstancePaperTrader:
                 sharpe = self._compute_sharpe(trader)
                 coverage = f"{len(stations)}/{len(stations)}"
                 
-                # Build Discord alert
+                # Build Discord alert with hard filtering
                 alert = self._build_discord_alert(
                     station=station,
                     market=market_type,
@@ -283,6 +290,20 @@ class MultiInstancePaperTrader:
                     instance_tag=cfg.instance_tag,
                     market_url=market_url,
                 )
+                
+                # Check for filtered alerts (hard filter applied in alert_builder)
+                if alert.get('filtered') or alert.get('skip_reason'):
+                    results.append({
+                        'station': station,
+                        'signal_type': signal_type,
+                        'status': 'skipped',
+                        'reason': 'hard_filter',
+                        'skip_reason': alert.get('skip_reason'),
+                        'alert_sent': False,
+                    })
+                    print(f"  ↓ {station} {signal_type} {direction} "
+                          f"skipped (filter: {alert.get('skip_reason')})")
+                    continue
                 
                 # Send Discord alert if enabled
                 alert_sent = False
@@ -500,62 +521,62 @@ class MultiInstancePaperTrader:
         market_url: str = None,
     ) -> Dict[str, Any]:
         """
-        Build the Discord alert payload in the exact required format.
+        Build the Discord alert payload using the slim alert format from alert_builder.py.
         
-        Format:
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          [DEV] 📍 Station: KDEN
-          📊 Market: HIGH
-          📈 Direction: UP
-          💰 Size: $93.75
-          🌡️ Current bucket: 87
-          🎯 Trading bucket: 88
-          📉 Market odds: 0.55
-          ✅ Trade Conf: HIGH (0.85)
-          🔝 Top signals: near_boundary_momentum_up (conf=0.85), ...
-          📊 Sharpe: 1.2 | Coverage: 12/20 stations
-          💵 Running P&L: +$127.50
-          🔗 Market: https://kalshi.com/markets/KXHIGHDEN-...
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        Returns a dict with:
+        - content: Slim Discord message with Grade (S/A/B/C/D/F), Edge, and Lane tag
+        - username: Weather Engine tag
+        - embeds: Empty array
+        - full_alert_data: Full alert payload for debugging
         """
-        # Build the message content with instance tag and visual delimiters
-        content_lines = [
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-            f"{instance_tag} 📍 Station: {station}",
-            f"📊 Market: {market}",
-            f"📈 Direction: {direction}",
-            f"💰 Size: ${size:.2f}",
-            f"🌡️ Current bucket: {current_bucket}",
-            f"🎯 Trading bucket: {trading_bucket}",
-            f"📉 Market odds: {market_odds:.2f}",
-            f"✅ Trade Conf: {trade_conf.upper()} ({trade_conf_value:.2f})",
-            f"🔝 Top signals: {', '.join(top_signals)}",
-            f"📊 Sharpe: {sharpe:.1f} | Coverage: {coverage}",
-            f"💵 Running P&L: ${running_pnl:+,.2f}",
-        ]
+        # Build the trade_result dict for alert_builder
+        trade_result = {
+            'confidence': trade_conf_value,
+            'market_price': market_odds,
+            'position_size_usd': size,
+            'sharpe': sharpe,
+            'functionality': top_signals[0] if top_signals else 'unknown',
+            'trade_uuid': f'{station}_{market}_{direction}',
+            'trade_version': 'v3.0',
+        }
         
-        # Add market URL as clickable link
-        if market_url:
-            content_lines.append(f"🔗 Market: {market_url}")
-        
-        content_lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        
-        content = "\n".join(content_lines)
+        # Build the slim alert using alert_builder (B-MODE v2)
+        alert_data = build_paper_trade_alert(
+            trade_result=trade_result,
+            station=station,
+            market_type=market,
+            direction=direction,
+            current_bucket=current_bucket,
+            trading_bucket=trading_bucket,
+            instance=instance_tag.strip('[]'),
+            hit_rate=None,
+            hit_rate_n=0,
+        )
         
         return {
-            "content": content,
-            "username": f"Weather Engine {instance_tag}",
-            "embeds": [],
-            "market_url": market_url or "",
+            'content': alert_data.get('content'),
+            'username': f"Weather Engine {instance_tag}",
+            'embeds': alert_data.get('embeds', []),
+            'full_alert_data': alert_data,
         }
     
     def _send_discord_alert(self, webhook_url: str, alert: Dict[str, Any]) -> bool:
-        """Send alert to Discord webhook."""
+        """Send alert to Discord webhook (content and/or embeds)."""
         try:
-            payload = json.dumps(alert).encode('utf-8')
+            payload = {
+                "username": alert.get('username', 'Weather Engine'),
+            }
+            
+            if alert.get('content'):
+                payload["content"] = alert['content']
+            
+            if alert.get('embeds'):
+                payload["embeds"] = alert['embeds']
+            
+            json_payload = json.dumps(payload).encode('utf-8')
             req = urllib.request.Request(
                 webhook_url,
-                data=payload,
+                data=json_payload,
                 headers={
                     'Content-Type': 'application/json',
                     'User-Agent': 'WeatherEngine/1.0 (Paper Trading Bot)',

@@ -197,17 +197,6 @@ def parse_timestamp(ts_str):
 
 
 ### ORIGINAL V8 SIGNALS (same as ensemble_v8_fdr_validation.py)
-def approach_reversion(idx, days):
-    if idx < 31: return None, 0.0
-    window = days[idx-31:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
-    std = math.sqrt(var) if var > 0 else 0.01
-    z = (days[idx-1]['high'] - mean) / std if std > 0 else 0
-    if z > 0.5: return 'down', abs(z)
-    elif z < -0.5: return 'up', abs(z)
-    return None, 0.0
 
 def approach_gaussian(idx, days):
     if idx < 48: return None, 0.0
@@ -221,23 +210,6 @@ def approach_gaussian(idx, days):
     elif z < -1.0: return 'up', abs(z)
     return None, 0.0
 
-def approach_regime(idx, days):
-    if idx < 15: return None, 0.0
-    window = days[idx-15:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
-    vol = math.sqrt(var)
-    slope = (highs[-1] - highs[0]) / len(highs) if len(highs) >= 2 else 0
-    if vol < 1.0 and abs(slope) < 0.5:
-        if idx >= 31:
-            w30 = days[idx-31:idx-1]
-            h30 = [d['high'] for d in w30]
-            m30 = sum(h30) / len(h30)
-            dist = days[idx-1]['high'] - m30
-            if dist > 1.0: return 'down', min(dist/3.0, 0.8)
-            elif dist < -1.0: return 'up', min(abs(dist)/3.0, 0.8)
-    return None, 0.0
 
 def approach_gaussian_v2(idx, days):
     if idx < 31: return None, 0.0
@@ -327,14 +299,15 @@ def walk_forward_v12_ensemble(days, market, hourly_by_date, date_indices, conn, 
             actual = market.get(date)
             if actual is None: continue
             
-            # Original 5 signals from V8
+            # Remaining V8 signals (reversion and regime removed): gaussian v1, gaussian_v2 v2, pressure v3
             predictions = {}
-            for i, fn in enumerate([approach_reversion, approach_gaussian,
-                                    approach_regime, approach_gaussian_v2, approach_pressure]):
+            signal_names = ['v1', 'v2', 'v3']
+            for i, fn in enumerate([approach_gaussian, approach_gaussian_v2, approach_pressure]):
                 pred, conf = fn(idx, days)
                 if pred is not None and conf >= min_conf:
-                    if f'v{i+1}' not in predictions:
-                        predictions[f'v{i+1}'] = (pred, conf)
+                    label = signal_names[i]
+                    if f'{label}' not in predictions:
+                        predictions[f'{label}'] = (pred, conf)
             
             # LDTM (6th signal)
             if date in date_indices:
