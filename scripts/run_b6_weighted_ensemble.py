@@ -126,67 +126,61 @@ def run_weighted_ensemble_experiment():
             
             today = aligned[i]
             yesterday = aligned[i-1]
+            day_before = aligned[i-2] if i >= 2 else None
             
             actual = today['market_dir']
             if actual == 'flat':
                 continue
             
-            # Generate signals with confidence (simulating the new signal set)
+            # Generate signals with confidence
+            # CRITICAL: NO today['high'] usage — high IS the settlement value.
+            # Only prior-day data allowed for signal generation.
             signals_with_confidence = []
             
-            # Calendar climatology
-            if today['high'] and yesterday['high']:
-                direction = 'up' if today['high'] > yesterday['high'] else 'down'
-                conf = 0.55
+            # Calendar climatology — prior-day trend only
+            if yesterday['high'] and day_before and day_before['high']:
+                prior_trend = yesterday['high'] - day_before['high']
+                direction = 'up' if prior_trend > 0 else 'down'
+                conf = 0.40 if abs(prior_trend) >= 1.5 else 0.30
                 signals_with_confidence.append({'dir': direction, 'conf': conf, 'name': 'calendar_climatology'})
             
-            # Late-day momentum
-            if i >= 32 and today['high'] and aligned[i-3]['high']:
-                trend = today['high'] - aligned[i-3]['high']
+            # Late-day momentum — 3-day prior trend
+            if i >= 32 and yesterday['high'] and aligned[i-3]['high']:
+                trend = yesterday['high'] - aligned[i-3]['high']
                 direction = 'up' if trend > 0 else 'down'
-                conf = 0.60 if abs(trend) > 2.0 else 0.45
+                conf = 0.45 if abs(trend) > 2.0 else 0.35
                 signals_with_confidence.append({'dir': direction, 'conf': conf, 'name': 'late_day_momentum_hourly'})
             
-            # Late-day analysis 
-            if i >= 1 and today['high'] and yesterday['high']:
-                # Check for recent patterns
-                change = today['high'] - yesterday['high']
-                # If change is significant but recent change might mean reversal
+            # Late-day analysis — prior-day pattern
+            if day_before and day_before['high'] and yesterday['high']:
+                change = yesterday['high'] - day_before['high']
                 if abs(change) > 2.0:
-                    # Likely momentum continues (with 60% confidence)
                     direction = 'up' if change > 0 else 'down'
-                    conf = 0.60
+                    conf = 0.45
                 else:
-                    # Uncertain pattern
                     conf = 0.30
-                    direction = 'up'  # Default direction
+                    direction = 'up'
                 signals_with_confidence.append({'dir': direction, 'conf': conf, 'name': 'late_day_analysis'})
             
-            # NWP Analog simulation
-            nwp_dir = 'up' if today['pressure'] and today['pressure'] > yesterday['pressure'] else 'down'
-            nwp_conf = 0.50
-            signals_with_confidence.append({'dir': nwp_dir, 'conf': nwp_conf, 'name': 'nwp_analog'})
+            # NWP Analog — pressure change from prior day
+            if yesterday['pressure'] and day_before and day_before['pressure']:
+                nwp_dir = 'up' if yesterday['pressure'] > day_before['pressure'] else 'down'
+                nwp_conf = 0.40
+                signals_with_confidence.append({'dir': nwp_dir, 'conf': nwp_conf, 'name': 'nwp_analog'})
             
-            # Goldilocks simulation (spike/reversion)
-            if i >= 2:
-                prev_change = yesterday['high'] - aligned[i-2]['high']
-                current_change = today['high'] - yesterday['high']
+            # Goldilocks — prior-day spike detection only (can't use same-day data)
+            # Goldilocks is inherently a same-day signal; with prior-day-only data
+            # it becomes a weak momentum/reversion pattern on last known data.
+            if day_before and i >= 3:
+                two_back = aligned[i-3]
+                prev_change = yesterday['high'] - day_before['high']
+                change_before = day_before['high'] - two_back['high']
                 
-                # Is today a 'spike' compared to yesterday's movement?
-                if abs(current_change) > abs(prev_change) * 1.5:
-                    # If last day was up and today is more up (or less down), could be reversion to come
-                    if prev_change > 0 and current_change > prev_change:
-                        # Spike up scenario - expecting reversion down (goldilocks down)
-                        rev_direction = 'down'
-                    elif prev_change < 0 and current_change < prev_change:
-                        # Spike down scenario - expecting reversion up (goldilocks up)
-                        rev_direction = 'up' 
-                    else:
-                        rev_direction = 'up' if current_change > 0 else 'down'
-                    gold_conf = 0.5  # Base confidence
+                if abs(prev_change) > abs(change_before) * 1.5 and abs(prev_change) >= 2.0:
+                    rev_direction = 'down' if prev_change > 0 else 'up'
+                    gold_conf = 0.40  # Prior-day spike, expect reversion
                 else:
-                    # No spike detected
-                    rev_direction = 'up' if current_change > 0 else 'down'
+                    rev_direction = 'up' if yesterday['high'] > day_before['high'] else 'down'
                     gold_conf = 0.25
                 
                 signals_with_confidence.append({'dir': rev_direction, 'conf': gold_conf, 'name': 'goldilocks'})

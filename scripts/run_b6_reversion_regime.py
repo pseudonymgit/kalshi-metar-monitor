@@ -162,6 +162,7 @@ def run_reversion_regime_experiment():
                 
             today = aligned[i]
             yesterday = aligned[i-1]
+            day_before = aligned[i-2] if i >= 2 else None
             
             actual = today['market_dir']
             if actual == 'flat':
@@ -175,31 +176,25 @@ def run_reversion_regime_experiment():
                 if not is_regime_change:
                     continue  # Only trade during detected regime changes for KNYC
                 
-                # Now run the Goldilocks signal - the NEW equivalent to reversion
-                # Detect spike scenarios in the data
+                # Goldilocks signal — prior-day spike detection only (NO today['high'])
                 goldilocks_direction, goldilocks_confidence = None, 0.0
                 
-                if i >= 2:  # Need at least 3 data points
-                    # Get recent 3 days to detect potential spike/reversion pattern
-                    day_before_yesterday = aligned[i-2]
+                if day_before and i >= 3:
+                    two_back = aligned[i-3]
                     
-                    # Calculate changes and identify spike behavior
-                    yesterday_change = yesterday['high'] - day_before_yesterday['high']
-                    today_change = today['high'] - yesterday['high']
+                    # Prior-day spike: did yesterday spike relative to day-before?
+                    yesterday_change = yesterday['high'] - day_before['high']
+                    change_before = day_before['high'] - two_back['high']
                     
-                    # Check for "spike up" scenario: yesterday moved significantly up
-                    if abs(yesterday_change) > 2.5 and abs(today_change) < abs(yesterday_change):  # Yesterday was spike
-                        # If yesterday was spike up, looking for reversion down (goldilocks down)
+                    # Spike up: yesterday moved significantly up vs prior trend
+                    if yesterday_change > 2.5 and abs(yesterday_change) > abs(change_before) * 1.5:
                         goldilocks_direction = 'down'
-                        # Confidence in up-reversion (from spike up): 40% baseline + some adjustment
-                        goldilocks_confidence = 0.40 + min(0.20, abs(yesterday_change)/10.0)
+                        goldilocks_confidence = 0.40 + min(0.20, yesterday_change / 10.0)
                         
-                    # Check for "spike down" scenario: yesterday moved significantly down  
-                    elif abs(yesterday_change) > -2.5 and abs(today_change) < abs(yesterday_change):  # Yesterday was negative spike
-                        # Today's movement after spike down - potentially reverting up (goldilocks up)
+                    # Spike down: yesterday moved significantly down vs prior trend
+                    elif yesterday_change < -2.5 and abs(yesterday_change) > abs(change_before) * 1.5:
                         goldilocks_direction = 'up'
-                        # Confidence in down-reversion (from spike down): 25% baseline + adjustment
-                        goldilocks_confidence = 0.25 + min(0.15, abs(yesterday_change)/10.0) * 0.85  # Discount factor for down-reversion
+                        goldilocks_confidence = 0.25 + min(0.15, abs(yesterday_change) / 10.0) * 0.85
                         
                     # For KNYC specifically, use additional local characteristics if available
                     # This simulates KNYC micro-climate effects
