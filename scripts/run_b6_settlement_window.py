@@ -96,15 +96,20 @@ def is_within_settlement_window(station: str, target_date: str, hours_before_set
 
 
 def get_station_data(station: str, db_path: str) -> Tuple[List[dict], dict]:
-    """Get temperature and market data"""
+    """Get temperature and market data
+    
+    CRITICAL: Only returns PRIOR-DAY data for signal generation.
+    No same-day METAR data is ever used to predict same-day settlement.
+    The settlement_bucket IS the METAR high of that day, so any same-day
+    METAR reading is look-ahead bias.
+    """
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     
     cur.execute("""
         SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low,
                AVG(dewpoint_f) as dewpoint, AVG(wind_direction_deg) as wind_dir,
-               AVG(pressure_mb) as pressure,
-               GROUP_CONCAT(timestamp_utc || ':' || temp_f) as hourly_temps
+               AVG(pressure_mb) as pressure
         FROM metar_observations
         WHERE station = ? AND temp_f IS NOT NULL
         GROUP BY date_utc
@@ -113,25 +118,12 @@ def get_station_data(station: str, db_path: str) -> Tuple[List[dict], dict]:
     
     temps = []
     for r in cur.fetchall():
-        hourly_data = []
-        if r[6]:  # Hourly temps
-            for entry in r[6].split(','):
-                if ':' in entry:
-                    ts, t = entry.split(':', 1)
-                    try:
-                        temp_val = float(t)
-                        dt = datetime.fromisoformat(ts.replace('Z', '+00:00'))
-                        hourly_data.append({'datetime': dt, 'temp': temp_val})
-                    except:
-                        continue
-        
         temps.append({
             'date': r[0], 'high': r[1], 'low': r[2],
             'dewpoint': r[3], 'wind_dir': r[4], 'pressure': r[5],
-            'hourly_temps': hourly_data
         })
     
-    # Get market data
+    # Get market data — ground truth, NOT used for signals
     cur.execute("""
         SELECT local_trading_date, settlement_bucket, prior_settlement_bucket
         FROM settlement_epochs
@@ -161,51 +153,23 @@ def align_data(temps: List[dict], market: dict) -> List[dict]:
     return aligned
 
 
-def analyze_same_day_momentum(high_low_series: List[Dict], lookback_hours: int = 6) -> Tuple[Optional[str], float]:
-    """
-    Analyze same-day METAR momentum using running high/low data.
-    This replaces the prior-day observation approach as mentioned in T5.
-    """
-    if len(high_low_series) < 2:
-        return None, 0.0
-    
-    # Get last few hours data for trend analysis
-    recent = high_low_series[-lookback_hours:] if len(high_low_series) >= lookback_hours else high_low_series
-    
-    if len(recent) < 2:
-        return None, 0.0
-    
-    # Calculate trend of most recent readings
-    start_temp = recent[0]['temp']
-    end_temp = recent[-1]['temp']
-    trend = end_temp - start_temp
-    
-    # Calculate volatility (more important in short-term readings)
-    avg_temp = sum(r['temp'] for r in recent) / len(recent)
-    variance = sum((r['temp'] - avg_temp)**2 for r in recent) / len(recent)
-    volatility = variance ** 0.5
-    
-    # Determine direction and confidence based on trend + volatility
-    if abs(trend) < 1.0:
-        return None, 0.0  # No significant movement
-    
-    direction = 'up' if trend > 0 else 'down'
-    
-    # Confidence calculation based on strength of movement and low volatility
-    trend_strength = min(1.0, abs(trend) / 3.0)  # Cap at 1 for 3 degree move in interval
-    stability_factor = max(0.3, 1.0 - (volatility / 2.0))  # Lower volatility = higher confidence
-    confidence = 0.4 + (trend_strength * 0.4) + (stability_factor * 0.2)
-    
-    return direction, min(1.0, confidence)
+
 
 
 def run_settlement_window_experiment():
-    """Run settlement window experiment with same-day METAR analysis"""
+    """Run settlement window experiment — NO look-ahead bias.
+    
+    Settlement window means: we can only enter trades during the window
+    T-18h to T-2h before settlement (01:00 UTC daily).
+    
+    CRITICAL: Signals use ONLY prior-day data. Same-day METAR high IS the
+    settlement value — using it is 100% look-ahead bias.
+    """
     print("=" * 80)
-    print("B6.10: Settlement Window Constraint with Same-Day METAR Analysis")
+    print("B6.10: Settlement Window Constraint (NO look-ahead bias)")
     print("=" * 80)
     print("Restricting entries to T-18h to T-2h before settlement")
-    print("Using same-day METAR running high/low data (post T5 implementation)")
+    print("Signals use PRIOR-DAY data only — no same-day METAR")
     
     db_path = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
     stations = ['KNYC', 'KLAX', 'KMDW', 'KBOS', 'KATL', 'KSFO', 'KSEA']
@@ -215,9 +179,7 @@ def run_settlement_window_experiment():
     trade_count = 0
     
     signal_stats = {
-        'calendar_climatology': {'trades': 0, 'accuracy': 0, 'correct': 0},
-        'same_day_momentum': {'trades': 0, 'accuracy': 0, 'correct': 0},
-        'combined': {'trades': 0, 'accuracy': 0, 'correct': 0}
+        'prior_day_trend': {'trades': 0, 'accuracy': 0, 'correct': 0},
     }
     
     for station in stations:
@@ -233,83 +195,51 @@ def run_settlement_window_experiment():
         print(f"\nProcessing {station} with settlement window constraints...")
         
         for i in range(29, len(aligned)):
-            # Check settlement window constraint - only trade if within window
+            # Settlement window: only enter trades during T-18h to T-2h window
+            # In backtest, this means we check the date is valid for entry
             in_window, window_msg = is_within_settlement_window(station, aligned[i]['date'])
             if not in_window:
-                continue  # Skip if outside settlement window per R4-1.3
+                continue
             
             if risk_mgr.risk_state == "LOCKDOWN":
                 risk_mgr.reset()
             
             today = aligned[i]
-            yesterday = aligned[i-1]
-            
             actual = today['market_dir']
             if actual == 'flat':
                 continue
             
-            # Apply settlement window + signals only during allowed period
-            # Generate signals that work with same-day METAR data during settlement windows
+            # SIGNAL: Prior-day trend only — NO today['high'] usage
+            # The settlement value IS today['high'], so using it is cheating
+            yesterday = aligned[i-1]
+            day_before = aligned[i-2]
             
-            # Signal 1: Calendar climatology (using historical patterns)
-            calendar_dir, calendar_conf = None, 0.0
-            if today['high'] is not None and yesterday['high'] is not None:
-                trend = today['high'] - yesterday['high']
-                calendar_dir = 'up' if trend > 0 else 'down'
-                calendar_conf = 0.55  # Base confidence
-            
-            # Signal 2: Same-day momentum analysis (using hourly data)
-            same_day_dir, same_day_conf = analyze_same_day_momentum(today.get('hourly_temps', []), lookback_hours=6)
-            
-            # Only proceed if both signals exist and agree somewhat
-            if calendar_dir and same_day_dir:
-                # Simple combination - if both signals agree, higher confidence
-                if calendar_dir == same_day_dir:
-                    final_direction = calendar_dir
-                    # Weighted combination based on signal strength
-                    combined_confidence = (calendar_conf + same_day_conf) / 2
-                    combined_confidence = min(0.85, combined_confidence * 1.2)  # Boost for agreement
-                else:
-                    # Mixed signals - take calendar if higher confidence, otherwise skip
-                    if calendar_conf > same_day_conf:
-                        final_direction = calendar_dir
-                        combined_confidence = calendar_conf * 0.7  # Reduce confidence for disagreement
-                    elif same_day_conf > calendar_conf:
-                        final_direction = same_day_dir
-                        combined_confidence = same_day_conf * 0.7  # Reduce confidence for disagreement
-                    else:
-                        # Close confidence levels and disagreeing directions - skip
-                        continue
-            elif calendar_dir:
-                final_direction = calendar_dir
-                combined_confidence = calendar_conf
-            elif same_day_dir:
-                final_direction = same_day_dir 
-                combined_confidence = same_day_conf
+            # Prior-day trend: compare yesterday's high to day-before's high
+            if yesterday['high'] is not None and day_before['high'] is not None:
+                prior_trend = yesterday['high'] - day_before['high']
+                
+                # Only trade if there's a meaningful prior-day trend
+                if abs(prior_trend) >= 1.5:
+                    direction = 'up' if prior_trend > 0 else 'down'
+                    confidence = min(0.6, 0.35 + abs(prior_trend) * 0.05)
+                    
+                    if confidence >= 0.40:
+                        ensemble_prediction = direction
+                        is_correct = ensemble_prediction == actual
+                        risk_status = risk_mgr.update_after_trade(is_correct)
+                        
+                        if risk_status == "STABLE":
+                            all_predictions.append(ensemble_prediction)
+                            all_actual.append(actual)
+                            trade_count += 1
+                            signal_stats['prior_day_trend']['trades'] += 1
+                            if is_correct:
+                                signal_stats['prior_day_trend']['correct'] += 1
+                            
+                            if trade_count % 100 == 0:
+                                print(f"  Processed {trade_count} trades using settlement window constraints...")
             else:
-                continue  # Neither signal fired
-            
-            # Use minimum confidence threshold before making prediction
-            if combined_confidence < 0.50:
                 continue
-            
-            # Execute trade
-            ensemble_prediction = final_direction
-            is_correct = ensemble_prediction == actual
-            risk_status = risk_mgr.update_after_trade(is_correct)
-            
-            if risk_status == "STABLE":
-                all_predictions.append(ensemble_prediction)
-                all_actual.append(actual)
-                trade_count += 1
-                
-                # Update signal statistics
-                signal_stats['combined']['trades'] += 1
-                if is_correct:
-                    signal_stats['combined']['correct'] += 1
-                
-                if trade_count % 100 == 0:
-                    print(f"  Processed {trade_count} trades using settlement window constraints...")
     
     # Calculate metrics
     if len(all_predictions) > 0:
@@ -325,7 +255,6 @@ def run_settlement_window_experiment():
         else:
             sharpe = 0.0
         
-        # Calculate signal statistics
         for sig_name, stats in signal_stats.items():
             if stats['trades'] > 0:
                 stats['accuracy'] = stats['correct'] / stats['trades']
@@ -337,8 +266,8 @@ def run_settlement_window_experiment():
         print(f"  Sharpe ratio: {sharpe:.3f}")
         print(f"  Trade count: {len(all_predictions)}")
         print(f"  Using settlement window: T-18h to T-2h before settlement")
-        print(f"  Same-day METAR analysis implemented")
-        print(f"  Signal combinations evaluated: {signal_stats['combined']['trades']} trades")
+        print(f"  Signal: prior-day trend only (no same-day METAR)")
+        print(f"  Signal breakdown: {signal_stats['prior_day_trend']}")
         print("=" * 80)
         
         result = {
@@ -347,13 +276,11 @@ def run_settlement_window_experiment():
             'trade_count': len(all_predictions),
             'total_trades_attempted': trade_count,
             'settlement_window_used': 'T-18h to T-2h',
-            'signals_implemented': ['calendar_climatology', 'same_day_momentum'],
-            'signal_breakdown': signal_stats,
-            'physical_reasoning': 'Same-day METAR provides 10x more signal than prior day obs',
-            'compliance_requirements': ['R4-1.3 settlement-window-entry-timing-gate']
+            'signals_used': ['prior_day_trend_only'],
+            'lookahead_bias_fixed': True,
+            'physical_reasoning': 'Settlement window restricts entry timing; signal from prior-day trends only',
         }
         
-        # Save results to JSON file
         output_dir = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/reports"
         os.makedirs(output_dir, exist_ok=True)
         
