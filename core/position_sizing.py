@@ -32,8 +32,8 @@ class KellyPositionSizingConfig:
     """Fee-aware Kelly configuration."""
     base_size_usd: float = 100.0       # Base position size
     max_position_fraction: float = 0.25  # 25% max of balance as per SH3
-    max_size_usd: float = 500.0        # Hard cap per trade
-    min_size_usd: float = 25.0         # Minimum position size
+    max_size_usd: float = 20.0         # DEV: Cap at $20
+    min_size_usd: float = 5.0          # DEV: Minimum $5
     fraction_kelly: float = 0.5        # 50% fractional Kelly (as per SH3)
     fee_rate: float = 0.05            # 5% Kalshi fee (as per SH3)
     window_days: int = 30             # 30-day rolling window for win rate (as per SH3)
@@ -53,9 +53,9 @@ class KellyPositionSizingConfig:
 @dataclass
 class PositionSizingConfig:
     """Configuration for confidence-weighted position sizing."""
-    base_size_usd: float = 100.0
-    max_size_usd: float = 500.0
-    min_size_usd: float = 25.0
+    base_size_usd: float = 10.0        # DEV: Small starter sizes
+    max_size_usd: float = 20.0         # DEV: Cap at $20
+    min_size_usd: float = 5.0          # DEV: Minimum $5
     high_confidence_threshold: float = 0.70
     medium_confidence_threshold: float = 0.50
     high_multiplier: float = 1.5

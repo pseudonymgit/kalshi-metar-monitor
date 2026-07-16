@@ -172,17 +172,6 @@ def load_station_data(station, conn, cloud_data):
 
 # ─── APPROACHES ─────────────────────────────────────────────────────────────
 
-def approach_reversion(idx, days):
-    if idx < 31: return None, 0.0
-    window = days[idx-31:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = sum((h-mean)**2 for h in highs) / len(highs)
-    std = math.sqrt(var) if var > 0 else 0.01
-    z = (days[idx-1]['high'] - mean) / std if std > 0 else 0
-    if z > 0.5: return 'down', abs(z)
-    elif z < -0.5: return 'up', abs(z)
-    return None, 0.0
 
 def approach_gaussian_cloud_adjusted(idx, days):
     """
@@ -216,23 +205,6 @@ def approach_persistence(idx, days):
     curr = days[idx-1]['high']
     return ('up' if curr > prev else 'down'), 0.3
 
-def approach_regime(idx, days):
-    if idx < 15: return None, 0.0
-    window = days[idx-15:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    var = sum((h-mean)**2 for h in highs) / len(highs)
-    vol = math.sqrt(var)
-    slope = (highs[-1] - highs[0]) / len(highs) if len(highs) >= 2 else 0
-    if vol < 1.0 and abs(slope) < 0.5:
-        if idx >= 31:
-            w30 = days[idx-31:idx-1]
-            h30 = [d['high'] for d in w30]
-            m30 = sum(h30) / len(h30)
-            dist = days[idx-1]['high'] - m30
-            if dist > 1.0: return 'down', min(dist/3.0, 0.8)
-            elif dist < -1.0: return 'up', min(abs(dist)/3.0, 0.8)
-    return None, 0.0
 
 def approach_gaussian_v2(idx, days):
     if idx < 31: return None, 0.0
@@ -254,13 +226,11 @@ def approach_pressure(idx, days):
     return None, 0.0
 
 APPROACHES = [
-    approach_reversion, 
     approach_gaussian_cloud_adjusted,  # Replaced gaussian with cloud-adjusted version
-    approach_regime, 
     approach_gaussian_v2, 
     approach_pressure
 ]
-APPROACH_NAMES = ["Reversion", "Gaussian(48d)+CC", "Regime", "Gaussian v2(30d)", "Pressure"]
+APPROACH_NAMES = ["Gaussian(48d)+CC", "Gaussian v2(30d)", "Pressure"]
 
 
 def normal_cdf(x):
@@ -544,10 +514,10 @@ def main():
     print(f"\n{'AGGREGATE':<8} {total:>8} {correct:>8} {accuracy:>10.2%} {sharpe:>8.3f} {dd:>8.2%} {binom_p:>10.4f}")
     print(f"  95% CI: [{ci[0]:.2%}, {ci[1]:.2%}]")
     
-    # ─── PART 2: FDR correction on 8 key stations (only reversion and gaussian standalones)
+    # ─── PART 2: FDR correction on 8 key stations (Cloud-adjusted Gaussian standalone only)
     print()
     print("=" * 90)
-    print("PART 2: FDR CORRECTION (8 stations × selected signals only)")
+    print("PART 2: FDR CORRECTION (8 stations × cloud-adjusted gaussian only)")
     print("=" * 90)
     
     p_values = []
@@ -557,28 +527,7 @@ def main():
         days, market = load_station_data(station, metar_conn, cloud_data)
         if len(days) < 210: continue
         
-        # Get just reversion and the cloud-adjusted gaussian standalone for FDR test
-        # Reversion standalone
-        rev_results = []
-        start = 180
-        while start + 30 <= len(days):
-            for idx in range(start, min(start + 30, len(days))):
-                date = days[idx]['date']
-                actual = market.get(date)
-                if actual is None: continue
-                pred, conf = approach_reversion(idx, days)
-                if pred:
-                    rev_results.append((pred, actual['direction']))
-            start += 30
-            if start > len(days): break
-        
-        if rev_results:
-            c = sum(1 for p, a in rev_results if p == a)
-            t = len(rev_results)
-            p_values.append(binomial_test_p(c, t))
-            labels.append(f"{station} Reversion")
-        
-        # Cloud-adjusted Gaussian standalone
+                # Cloud-adjusted Gaussian standalone
         gau_results = []
         start = 180
         while start + 30 <= len(days):

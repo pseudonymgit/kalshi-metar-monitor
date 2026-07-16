@@ -92,28 +92,6 @@ def load_station_data(station, conn):
 
 # ─── 6 APPROACHES ───────────────────────────────────────────────────────────
 
-def approach_reversion(idx, days, market, station):
-    """Reversion: Rolling z-score reversion."""
-    if idx < 31:
-        return None, 0.0
-    
-    window = days[idx-31:idx-1]
-    highs = [d['high'] for d in window]
-    mean = sum(highs) / len(highs)
-    variance = sum((h - mean) ** 2 for h in highs) / len(highs)
-    std = math.sqrt(variance) if variance > 0 else 0.01
-    
-    current = days[idx-1]['high']
-    z_score = (current - mean) / std if std > 0 else 0
-    
-    if z_score > 0.5:
-        return 'down', abs(z_score)
-    elif z_score < -0.5:
-        return 'up', abs(z_score)
-    else:
-        return None, 0.0
-
-
 def approach_gaussian(idx, days, market, station):
     """Gaussian: Rolling mean + std from 48-hour window."""
     if idx < 48:
@@ -146,44 +124,6 @@ def approach_persistence(idx, days, market, station):
     prev_dir = 'up' if today_high > prev_high else 'down'
     
     return prev_dir, 0.3  # Weak confidence for persistence
-
-
-def approach_regime(idx, days, market, station):
-    """Regime: Volatility-based regime classifier."""
-    if idx < 15:
-        return None, 0.0
-    
-    window = days[idx-15:idx-1]
-    highs = [d['high'] for d in window]
-    
-    mean = sum(highs) / len(highs)
-    variance = sum((h - mean) ** 2 for h in highs) / len(highs)
-    vol = math.sqrt(variance)
-    
-    if len(highs) >= 2:
-        slope = (highs[-1] - highs[0]) / len(highs)
-    else:
-        slope = 0
-    
-    if vol < 1.0 and abs(slope) < 0.5:
-        regime = 'stable'
-    elif vol < 2.0 and abs(slope) < 1.0:
-        regime = 'transient'
-    else:
-        regime = 'volatile'
-    
-    if regime == 'stable' and idx >= 31:
-        window30 = days[idx-31:idx-1]
-        highs30 = [d['high'] for d in window30]
-        mean30 = sum(highs30) / len(highs30)
-        current = days[idx-1]['high']
-        dist = current - mean30
-        if dist > 1.0:
-            return 'down', min(dist / 3.0, 0.8)
-        elif dist < -1.0:
-            return 'up', min(abs(dist) / 3.0, 0.8)
-    
-    return None, 0.0
 
 
 def approach_gaussian_v2(idx, days, market, station):
@@ -432,21 +372,17 @@ def main():
         print(f"ERROR: Database not found at {db_path}")
         return
     
-    # 6 approaches with names
+    # 4 approaches with names
     approaches = [
-        approach_reversion,
         approach_gaussian,
         approach_persistence,
-        approach_regime,
         approach_gaussian_v2,
         approach_pressure_trend,
     ]
     
     approach_names = [
-        "Reversion (30-day z-score)",
         "Gaussian (48-day window)",
         "Persistence",
-        "Regime (volatility)",
         "Gaussian v2 (30-day z-score)",
         "Pressure trend"
     ]
@@ -579,7 +515,7 @@ def main():
     print("PER-STATION BREAKDOWN")
     print("=" * 90)
     
-    print(f"\n{'Station':<8} {'Reversion':>10} {'Gaussian':>10} {'Gauss v2':>10} {'Accuracy':>10} {'Sharpe':>8} {'Status':>8}")
+    print(f"\n{'Station':<8} {'Gaussian':>10} {'Persistence':>10} {'Gauss v2':>10} {'Accuracy':>10} {'Sharpe':>8} {'Status':>8}")
     print("-" * 76)
     
     for station in sorted(all_stations):
@@ -590,13 +526,13 @@ def main():
         agg = r['aggregate']
         sharpe = r['sharpe']
         
-        rev_acc = r['per_approach'].get('approach_1', {}).get('accuracy', 0)
-        gauss_acc = r['per_approach'].get('approach_2', {}).get('accuracy', 0)
-        gauss2_acc = r['per_approach'].get('approach_5', {}).get('accuracy', 0)
+        gauss_acc = r['per_approach'].get('approach_1', {}).get('accuracy', 0)
+        pers_acc = r['per_approach'].get('approach_2', {}).get('accuracy', 0)
+        gauss2_acc = r['per_approach'].get('approach_3', {}).get('accuracy', 0)
         
         status = "✓ PASS" if agg['accuracy'] >= DIRECTIONAL_THRESHOLD else "✗ FAIL"
         
-        print(f"{station:<8} {rev_acc:>10.2%} {gauss_acc:>10.2%} {gauss2_acc:>10.2%} {agg['accuracy']:>10.2%} {sharpe:>8.3f} {status:>8}")
+        print(f"{station:<8} {gauss_acc:>10.2%} {pers_acc:>10.2%} {gauss2_acc:>10.2%} {agg['accuracy']:>10.2%} {sharpe:>8.3f} {status:>8}")
     
     # Circularity check
     print()
