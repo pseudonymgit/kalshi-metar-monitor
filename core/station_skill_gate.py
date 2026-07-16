@@ -2,22 +2,26 @@ import json
 import logging
 from typing import Dict, List, Optional
 import numpy as np
-import pandas as pd
 from datetime import datetime, timedelta
-import pickle
 import os
-from pathlib import Path
 import sqlite3
+import sys
+from pathlib import Path
+
+# Add repo root to path for imports
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 
 try:
-    from ..scripts.per_station_skill import (
+    from scripts.per_station_skill import (
         compute_rolling_bss,
         brier_skill_score,
         block_bootstrap_ci,
         load_market_directions,
         load_daily_highs_lows,
         brier_score,
-        APPROACHES  # Need the approaches for consistency
     )
 except ImportError as e:
     print(f"Warning: Could not import from per_station_skill: {e}")
