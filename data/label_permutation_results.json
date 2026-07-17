@@ -1,0 +1,448 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-16T22:37:25.623104",
+    "database": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/../data/metar_backfill.db",
+    "signals_tested": "goldilocks+gaussian",
+    "min_agreement": 2,
+    "walk_forward_params": {
+      "train_days": 180,
+      "test_days": 30,
+      "test_windows": 4
+    },
+    "num_shuffles": 10,
+    "num_stations": 20,
+    "reproducible_seed": 42
+  },
+  "per_station": {
+    "KATL": {
+      "real_accuracy": 0.75,
+      "real_trades": 24,
+      "shuffle_accuracies": [
+        0.541667,
+        0.416667,
+        0.458333,
+        0.5,
+        0.541667,
+        0.458333,
+        0.416667,
+        0.416667,
+        0.458333,
+        0.291667
+      ],
+      "mean_shuffle_accuracy": 0.45,
+      "std_shuffle_accuracy": 0.069222,
+      "best_shuffle_accuracy": 0.541667,
+      "shuffles_above_55pct": 0
+    },
+    "KAUS": {
+      "real_accuracy": 0.809524,
+      "real_trades": 21,
+      "shuffle_accuracies": [
+        0.619048,
+        0.619048,
+        0.428571,
+        0.380952,
+        0.47619,
+        0.619048,
+        0.47619,
+        0.380952,
+        0.428571,
+        0.47619
+      ],
+      "mean_shuffle_accuracy": 0.490476,
+      "std_shuffle_accuracy": 0.090476,
+      "best_shuffle_accuracy": 0.619048,
+      "shuffles_above_55pct": 3
+    },
+    "KBOS": {
+      "real_accuracy": 0.766667,
+      "real_trades": 30,
+      "shuffle_accuracies": [
+        0.366667,
+        0.5,
+        0.5,
+        0.5,
+        0.433333,
+        0.566667,
+        0.533333,
+        0.433333,
+        0.533333,
+        0.433333
+      ],
+      "mean_shuffle_accuracy": 0.48,
+      "std_shuffle_accuracy": 0.058119,
+      "best_shuffle_accuracy": 0.566667,
+      "shuffles_above_55pct": 1
+    },
+    "KDCA": {
+      "real_accuracy": 0.851852,
+      "real_trades": 27,
+      "shuffle_accuracies": [
+        0.37037,
+        0.592593,
+        0.703704,
+        0.518519,
+        0.666667,
+        0.555556,
+        0.481481,
+        0.592593,
+        0.37037,
+        0.407407
+      ],
+      "mean_shuffle_accuracy": 0.525926,
+      "std_shuffle_accuracy": 0.112094,
+      "best_shuffle_accuracy": 0.703704,
+      "shuffles_above_55pct": 5
+    },
+    "KDEN": {
+      "real_accuracy": 0.735294,
+      "real_trades": 34,
+      "shuffle_accuracies": [
+        0.558824,
+        0.529412,
+        0.441176,
+        0.558824,
+        0.529412,
+        0.323529,
+        0.382353,
+        0.617647,
+        0.529412,
+        0.5
+      ],
+      "mean_shuffle_accuracy": 0.497059,
+      "std_shuffle_accuracy": 0.084683,
+      "best_shuffle_accuracy": 0.617647,
+      "shuffles_above_55pct": 3
+    },
+    "KDFW": {
+      "real_accuracy": 0.866667,
+      "real_trades": 15,
+      "shuffle_accuracies": [
+        0.6,
+        0.6,
+        0.533333,
+        0.4,
+        0.533333,
+        0.266667,
+        0.666667,
+        0.533333,
+        0.533333,
+        0.533333
+      ],
+      "mean_shuffle_accuracy": 0.52,
+      "std_shuffle_accuracy": 0.106667,
+      "best_shuffle_accuracy": 0.666667,
+      "shuffles_above_55pct": 3
+    },
+    "KHOU": {
+      "real_accuracy": 0.789474,
+      "real_trades": 19,
+      "shuffle_accuracies": [
+        0.315789,
+        0.368421,
+        0.315789,
+        0.421053,
+        0.473684,
+        0.421053,
+        0.368421,
+        0.526316,
+        0.526316,
+        0.368421
+      ],
+      "mean_shuffle_accuracy": 0.410526,
+      "std_shuffle_accuracy": 0.073684,
+      "best_shuffle_accuracy": 0.526316,
+      "shuffles_above_55pct": 0
+    },
+    "KLAS": {
+      "real_accuracy": 0.666667,
+      "real_trades": 27,
+      "shuffle_accuracies": [
+        0.333333,
+        0.407407,
+        0.444444,
+        0.37037,
+        0.481481,
+        0.37037,
+        0.62963,
+        0.481481,
+        0.296296,
+        0.444444
+      ],
+      "mean_shuffle_accuracy": 0.425926,
+      "std_shuffle_accuracy": 0.089581,
+      "best_shuffle_accuracy": 0.62963,
+      "shuffles_above_55pct": 1
+    },
+    "KLAX": {
+      "real_accuracy": 0.821429,
+      "real_trades": 28,
+      "shuffle_accuracies": [
+        0.464286,
+        0.5,
+        0.678571,
+        0.464286,
+        0.5,
+        0.5,
+        0.642857,
+        0.714286,
+        0.607143,
+        0.357143
+      ],
+      "mean_shuffle_accuracy": 0.542857,
+      "std_shuffle_accuracy": 0.106904,
+      "best_shuffle_accuracy": 0.714286,
+      "shuffles_above_55pct": 4
+    },
+    "KMDW": {
+      "real_accuracy": 0.791667,
+      "real_trades": 24,
+      "shuffle_accuracies": [
+        0.25,
+        0.458333,
+        0.416667,
+        0.666667,
+        0.541667,
+        0.5,
+        0.541667,
+        0.333333,
+        0.333333,
+        0.375
+      ],
+      "mean_shuffle_accuracy": 0.441667,
+      "std_shuffle_accuracy": 0.118145,
+      "best_shuffle_accuracy": 0.666667,
+      "shuffles_above_55pct": 1
+    },
+    "KMIA": {
+      "real_accuracy": 0.857143,
+      "real_trades": 14,
+      "shuffle_accuracies": [
+        0.571429,
+        0.571429,
+        0.285714,
+        0.642857,
+        0.5,
+        0.642857,
+        0.5,
+        0.571429,
+        0.5,
+        0.285714
+      ],
+      "mean_shuffle_accuracy": 0.507143,
+      "std_shuffle_accuracy": 0.121429,
+      "best_shuffle_accuracy": 0.642857,
+      "shuffles_above_55pct": 5
+    },
+    "KMSP": {
+      "real_accuracy": 0.615385,
+      "real_trades": 26,
+      "shuffle_accuracies": [
+        0.423077,
+        0.461538,
+        0.384615,
+        0.576923,
+        0.615385,
+        0.576923,
+        0.576923,
+        0.5,
+        0.307692,
+        0.384615
+      ],
+      "mean_shuffle_accuracy": 0.480769,
+      "std_shuffle_accuracy": 0.099183,
+      "best_shuffle_accuracy": 0.615385,
+      "shuffles_above_55pct": 4
+    },
+    "KMSY": {
+      "real_accuracy": 0.714286,
+      "real_trades": 28,
+      "shuffle_accuracies": [
+        0.357143,
+        0.5,
+        0.357143,
+        0.535714,
+        0.571429,
+        0.357143,
+        0.428571,
+        0.571429,
+        0.535714,
+        0.392857
+      ],
+      "mean_shuffle_accuracy": 0.460714,
+      "std_shuffle_accuracy": 0.086676,
+      "best_shuffle_accuracy": 0.571429,
+      "shuffles_above_55pct": 2
+    },
+    "KNYC": {
+      "real_accuracy": 0.83871,
+      "real_trades": 31,
+      "shuffle_accuracies": [
+        0.612903,
+        0.258065,
+        0.516129,
+        0.516129,
+        0.451613,
+        0.322581,
+        0.354839,
+        0.516129,
+        0.516129,
+        0.548387
+      ],
+      "mean_shuffle_accuracy": 0.46129,
+      "std_shuffle_accuracy": 0.107037,
+      "best_shuffle_accuracy": 0.612903,
+      "shuffles_above_55pct": 1
+    },
+    "KOKC": {
+      "real_accuracy": 0.653846,
+      "real_trades": 26,
+      "shuffle_accuracies": [
+        0.423077,
+        0.461538,
+        0.307692,
+        0.384615,
+        0.384615,
+        0.461538,
+        0.461538,
+        0.5,
+        0.538462,
+        0.576923
+      ],
+      "mean_shuffle_accuracy": 0.45,
+      "std_shuffle_accuracy": 0.075074,
+      "best_shuffle_accuracy": 0.576923,
+      "shuffles_above_55pct": 1
+    },
+    "KPHL": {
+      "real_accuracy": 0.774194,
+      "real_trades": 31,
+      "shuffle_accuracies": [
+        0.483871,
+        0.516129,
+        0.354839,
+        0.451613,
+        0.548387,
+        0.516129,
+        0.548387,
+        0.612903,
+        0.483871,
+        0.516129
+      ],
+      "mean_shuffle_accuracy": 0.503226,
+      "std_shuffle_accuracy": 0.064838,
+      "best_shuffle_accuracy": 0.612903,
+      "shuffles_above_55pct": 1
+    },
+    "KPHX": {
+      "real_accuracy": 0.727273,
+      "real_trades": 22,
+      "shuffle_accuracies": [
+        0.409091,
+        0.545455,
+        0.590909,
+        0.590909,
+        0.454545,
+        0.318182,
+        0.590909,
+        0.5,
+        0.318182,
+        0.227273
+      ],
+      "mean_shuffle_accuracy": 0.454545,
+      "std_shuffle_accuracy": 0.12531,
+      "best_shuffle_accuracy": 0.590909,
+      "shuffles_above_55pct": 3
+    },
+    "KSAT": {
+      "real_accuracy": 0.789474,
+      "real_trades": 19,
+      "shuffle_accuracies": [
+        0.421053,
+        0.473684,
+        0.526316,
+        0.526316,
+        0.315789,
+        0.421053,
+        0.684211,
+        0.473684,
+        0.421053,
+        0.473684
+      ],
+      "mean_shuffle_accuracy": 0.473684,
+      "std_shuffle_accuracy": 0.091161,
+      "best_shuffle_accuracy": 0.684211,
+      "shuffles_above_55pct": 1
+    },
+    "KSEA": {
+      "real_accuracy": 0.727273,
+      "real_trades": 22,
+      "shuffle_accuracies": [
+        0.5,
+        0.363636,
+        0.409091,
+        0.454545,
+        0.409091,
+        0.681818,
+        0.318182,
+        0.590909,
+        0.5,
+        0.363636
+      ],
+      "mean_shuffle_accuracy": 0.459091,
+      "std_shuffle_accuracy": 0.106503,
+      "best_shuffle_accuracy": 0.681818,
+      "shuffles_above_55pct": 2
+    },
+    "KSFO": {
+      "real_accuracy": 0.85,
+      "real_trades": 20,
+      "shuffle_accuracies": [
+        0.6,
+        0.5,
+        0.55,
+        0.75,
+        0.4,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.4
+      ],
+      "mean_shuffle_accuracy": 0.51,
+      "std_shuffle_accuracy": 0.104403,
+      "best_shuffle_accuracy": 0.75,
+      "shuffles_above_55pct": 2
+    }
+  },
+  "aggregate": {
+    "real_labels": {
+      "accuracy": 0.764344,
+      "correct": 373,
+      "total": 488
+    },
+    "shuffled_labels": {
+      "mean_accuracy": 0.477254,
+      "std_deviation": 0.027606,
+      "best_accuracy": 0.522541,
+      "shuffles_above_55pct": 0,
+      "all_accuracies": [
+        0.456967,
+        0.477459,
+        0.463115,
+        0.508197,
+        0.495902,
+        0.461066,
+        0.497951,
+        0.522541,
+        0.465164,
+        0.42418
+      ]
+    },
+    "significance": {
+      "permutation_p_value": 0.090909,
+      "null_rejected": false,
+      "exceeds_2sigma": true
+    }
+  }
+}

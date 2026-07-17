@@ -1,0 +1,2997 @@
+{
+  "analysis_timestamp": "2026-07-17T15:47:07.649304+00:00",
+  "stations_analyzed": [
+    "KATL",
+    "KBOS",
+    "KDFW",
+    "KDEN",
+    "KLAX",
+    "KMIA",
+    "KSEA",
+    "KSFO",
+    "KHOU",
+    "KDCA",
+    "KMSP"
+  ],
+  "station_anchoring_analysis": {
+    "KATL": {
+      "station": "KATL",
+      "analysis_date": "2026-07-17T15:47:07.649373+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.17393412027049956,
+          "exceed_count": 7176,
+          "sample_size": 41257,
+          "avg_temp": 79.20096759337818,
+          "median_temp": 68.0,
+          "std_dev": 908.0909832456118,
+          "near_crossing_days": 3561
+        },
+        "85": {
+          "clim_prob": 0.06995176576096178,
+          "exceed_count": 2886,
+          "sample_size": 41257,
+          "avg_temp": 79.20096759337818,
+          "median_temp": 68.0,
+          "std_dev": 908.0909832456118,
+          "near_crossing_days": 1616
+        },
+        "90": {
+          "clim_prob": 0.02205686307778074,
+          "exceed_count": 910,
+          "sample_size": 41257,
+          "avg_temp": 79.20096759337818,
+          "median_temp": 68.0,
+          "std_dev": 908.0909832456118,
+          "near_crossing_days": 1166
+        },
+        "95": {
+          "clim_prob": 0.003999321327289914,
+          "exceed_count": 165,
+          "sample_size": 41257,
+          "avg_temp": 79.20096759337818,
+          "median_temp": 68.0,
+          "std_dev": 908.0909832456118,
+          "near_crossing_days": 385
+        },
+        "100": {
+          "clim_prob": 0.0002423831107448433,
+          "exceed_count": 10,
+          "sample_size": 41257,
+          "avg_temp": 79.20096759337818,
+          "median_temp": 68.0,
+          "std_dev": 908.0909832456118,
+          "near_crossing_days": 15
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.5558543561078905,
+          "actual_distance": 0.7990324066218193
+        },
+        "85": {
+          "proximity_score": 0.14707975196971623,
+          "actual_distance": 5.799032406621819
+        },
+        "90": {
+          "proximity_score": 0.08475271238671934,
+          "actual_distance": 10.79903240662182
+        },
+        "95": {
+          "proximity_score": 0.05952723798579145,
+          "actual_distance": 15.79903240662182
+        },
+        "100": {
+          "proximity_score": 0.04587359573336995,
+          "actual_distance": 20.79903240662182
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.6739341202704996,
+          "proximity_multiplier": 0.0863126257362387,
+          "combined_score": 0.05816902349378891,
+          "historical_probability": 0.17393412027049956,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.3260658797295004
+        },
+        "85": {
+          "baseline_strength": 0.5699517657609618,
+          "proximity_multiplier": 0.03916911069636668,
+          "combined_score": 0.022324503804680765,
+          "historical_probability": 0.06995176576096178,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4300482342390382
+        },
+        "90": {
+          "baseline_strength": 0.5220568630777808,
+          "proximity_multiplier": 0.02826187071284873,
+          "combined_score": 0.014754303569059612,
+          "historical_probability": 0.02205686307778074,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.47794313692221924
+        },
+        "95": {
+          "baseline_strength": 0.50399932132729,
+          "proximity_multiplier": 0.009331749763676468,
+          "combined_score": 0.0047031955476890385,
+          "historical_probability": 0.003999321327289914,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4960006786727101
+        },
+        "100": {
+          "baseline_strength": 0.5002423831107449,
+          "proximity_multiplier": 0.00036357466611726494,
+          "combined_score": 0.000181875457417194,
+          "historical_probability": 0.0002423831107448433,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49975761688925513
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 17.39,
+          "market_anchor": 80,
+          "probability_difference": 62.61,
+          "anchoring_strength": 0.058,
+          "opportunity_score": 3.642,
+          "sample_size": 41257,
+          "exceedance_count": 7176
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 7.0,
+          "market_anchor": 85,
+          "probability_difference": 78.0,
+          "anchoring_strength": 0.022,
+          "opportunity_score": 1.741,
+          "sample_size": 41257,
+          "exceedance_count": 2886
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 2.21,
+          "market_anchor": 90,
+          "probability_difference": 87.79,
+          "anchoring_strength": 0.015,
+          "opportunity_score": 1.295,
+          "sample_size": 41257,
+          "exceedance_count": 910
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.4,
+          "market_anchor": 95,
+          "probability_difference": 94.6,
+          "anchoring_strength": 0.005,
+          "opportunity_score": 0.445,
+          "sample_size": 41257,
+          "exceedance_count": 165
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.02,
+          "market_anchor": 100,
+          "probability_difference": 99.98,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.018,
+          "sample_size": 41257,
+          "exceedance_count": 10
+        }
+      ]
+    },
+    "KBOS": {
+      "station": "KBOS",
+      "analysis_date": "2026-07-17T15:47:07.731953+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.059476759692553886,
+          "exceed_count": 2453,
+          "sample_size": 41243,
+          "avg_temp": 79.82901971243562,
+          "median_temp": 53.96,
+          "std_dev": 1105.8091866573468,
+          "near_crossing_days": 1552
+        },
+        "85": {
+          "clim_prob": 0.020294352981111947,
+          "exceed_count": 837,
+          "sample_size": 41243,
+          "avg_temp": 79.82901971243562,
+          "median_temp": 53.96,
+          "std_dev": 1105.8091866573468,
+          "near_crossing_days": 565
+        },
+        "90": {
+          "clim_prob": 0.006813277404650486,
+          "exceed_count": 281,
+          "sample_size": 41243,
+          "avg_temp": 79.82901971243562,
+          "median_temp": 53.96,
+          "std_dev": 1105.8091866573468,
+          "near_crossing_days": 287
+        },
+        "95": {
+          "clim_prob": 0.002279174647819024,
+          "exceed_count": 94,
+          "sample_size": 41243,
+          "avg_temp": 79.82901971243562,
+          "median_temp": 53.96,
+          "std_dev": 1105.8091866573468,
+          "near_crossing_days": 117
+        },
+        "100": {
+          "clim_prob": 0.0006789030865843901,
+          "exceed_count": 28,
+          "sample_size": 41243,
+          "avg_temp": 79.82901971243562,
+          "median_temp": 53.96,
+          "std_dev": 1105.8091866573468,
+          "near_crossing_days": 19
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.8539853408463324,
+          "actual_distance": 0.170980287564376
+        },
+        "85": {
+          "proximity_score": 0.16204880803381888,
+          "actual_distance": 5.170980287564376
+        },
+        "90": {
+          "proximity_score": 0.08951765863495506,
+          "actual_distance": 10.170980287564376
+        },
+        "95": {
+          "proximity_score": 0.061839170057551095,
+          "actual_distance": 15.170980287564376
+        },
+        "100": {
+          "proximity_score": 0.047234468428813854,
+          "actual_distance": 20.170980287564376
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.5594767596925538,
+          "proximity_multiplier": 0.03763062822782048,
+          "combined_score": 0.021053461946096152,
+          "historical_probability": 0.059476759692553886,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4405232403074461
+        },
+        "85": {
+          "baseline_strength": 0.5202943529811119,
+          "proximity_multiplier": 0.013699294425720729,
+          "combined_score": 0.00712766552952812,
+          "historical_probability": 0.020294352981111947,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.47970564701888807
+        },
+        "90": {
+          "baseline_strength": 0.5068132774046505,
+          "proximity_multiplier": 0.006958756637489998,
+          "combined_score": 0.0035267902581076717,
+          "historical_probability": 0.006813277404650486,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4931867225953495
+        },
+        "95": {
+          "baseline_strength": 0.502279174647819,
+          "proximity_multiplier": 0.002836845040370487,
+          "combined_score": 0.001424888185481047,
+          "historical_probability": 0.002279174647819024,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.497720825352181
+        },
+        "100": {
+          "baseline_strength": 0.5006789030865844,
+          "proximity_multiplier": 0.00046068423732512184,
+          "combined_score": 0.0002306548786132217,
+          "historical_probability": 0.0006789030865843901,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4993210969134156
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 5.95,
+          "market_anchor": 80,
+          "probability_difference": 74.05,
+          "anchoring_strength": 0.021,
+          "opportunity_score": 1.559,
+          "sample_size": 41243,
+          "exceedance_count": 2453
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 2.03,
+          "market_anchor": 85,
+          "probability_difference": 82.97,
+          "anchoring_strength": 0.007,
+          "opportunity_score": 0.591,
+          "sample_size": 41243,
+          "exceedance_count": 837
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 0.68,
+          "market_anchor": 90,
+          "probability_difference": 89.32,
+          "anchoring_strength": 0.004,
+          "opportunity_score": 0.315,
+          "sample_size": 41243,
+          "exceedance_count": 281
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.23,
+          "market_anchor": 95,
+          "probability_difference": 94.77,
+          "anchoring_strength": 0.001,
+          "opportunity_score": 0.135,
+          "sample_size": 41243,
+          "exceedance_count": 94
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.07,
+          "market_anchor": 100,
+          "probability_difference": 99.93,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.023,
+          "sample_size": 41243,
+          "exceedance_count": 28
+        }
+      ]
+    },
+    "KDFW": {
+      "station": "KDFW",
+      "analysis_date": "2026-07-17T15:47:07.813381+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.31190528074380763,
+          "exceed_count": 12882,
+          "sample_size": 41301,
+          "avg_temp": 76.89073436478564,
+          "median_temp": 71.06,
+          "std_dev": 515.0923976599214,
+          "near_crossing_days": 4010
+        },
+        "85": {
+          "clim_prob": 0.18043146655044673,
+          "exceed_count": 7452,
+          "sample_size": 41301,
+          "avg_temp": 76.89073436478564,
+          "median_temp": 71.06,
+          "std_dev": 515.0923976599214,
+          "near_crossing_days": 2366
+        },
+        "90": {
+          "clim_prob": 0.09953754146388707,
+          "exceed_count": 4111,
+          "sample_size": 41301,
+          "avg_temp": 76.89073436478564,
+          "median_temp": 71.06,
+          "std_dev": 515.0923976599214,
+          "near_crossing_days": 2343
+        },
+        "95": {
+          "clim_prob": 0.04980508946514612,
+          "exceed_count": 2057,
+          "sample_size": 41301,
+          "avg_temp": 76.89073436478564,
+          "median_temp": 71.06,
+          "std_dev": 515.0923976599214,
+          "near_crossing_days": 2017
+        },
+        "100": {
+          "clim_prob": 0.01435800585942229,
+          "exceed_count": 593,
+          "sample_size": 41301,
+          "avg_temp": 76.89073436478564,
+          "median_temp": 71.06,
+          "std_dev": 515.0923976599214,
+          "near_crossing_days": 674
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.24335248406199367,
+          "actual_distance": 3.1092656352143564
+        },
+        "85": {
+          "proximity_score": 0.10977833340749518,
+          "actual_distance": 8.109265635214356
+        },
+        "90": {
+          "proximity_score": 0.07087541094301662,
+          "actual_distance": 13.109265635214356
+        },
+        "95": {
+          "proximity_score": 0.05233063473445104,
+          "actual_distance": 18.109265635214356
+        },
+        "100": {
+          "proximity_score": 0.04147782911062148,
+          "actual_distance": 23.109265635214356
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.8119052807438076,
+          "proximity_multiplier": 0.09709208009491295,
+          "combined_score": 0.07882957254746055,
+          "historical_probability": 0.31190528074380763,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.18809471925619237
+        },
+        "85": {
+          "baseline_strength": 0.6804314665504467,
+          "proximity_multiplier": 0.05728674850487882,
+          "combined_score": 0.038979706299081304,
+          "historical_probability": 0.18043146655044673,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.31956853344955327
+        },
+        "90": {
+          "baseline_strength": 0.599537541463887,
+          "proximity_multiplier": 0.05672986126243917,
+          "combined_score": 0.03401168154887018,
+          "historical_probability": 0.09953754146388707,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.40046245853611295
+        },
+        "95": {
+          "baseline_strength": 0.5498050894651461,
+          "proximity_multiplier": 0.04883658991307716,
+          "combined_score": 0.02685060568633204,
+          "historical_probability": 0.04980508946514612,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4501949105348539
+        },
+        "100": {
+          "baseline_strength": 0.5143580058594223,
+          "proximity_multiplier": 0.01631921745236193,
+          "combined_score": 0.008393920145983164,
+          "historical_probability": 0.01435800585942229,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.48564199414057774
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 31.19,
+          "market_anchor": 80,
+          "probability_difference": 48.81,
+          "anchoring_strength": 0.079,
+          "opportunity_score": 3.848,
+          "sample_size": 41301,
+          "exceedance_count": 12882
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 9.95,
+          "market_anchor": 90,
+          "probability_difference": 80.05,
+          "anchoring_strength": 0.034,
+          "opportunity_score": 2.723,
+          "sample_size": 41301,
+          "exceedance_count": 4111
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 18.04,
+          "market_anchor": 85,
+          "probability_difference": 66.96,
+          "anchoring_strength": 0.039,
+          "opportunity_score": 2.61,
+          "sample_size": 41301,
+          "exceedance_count": 7452
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 4.98,
+          "market_anchor": 95,
+          "probability_difference": 90.02,
+          "anchoring_strength": 0.027,
+          "opportunity_score": 2.417,
+          "sample_size": 41301,
+          "exceedance_count": 2057
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 1.44,
+          "market_anchor": 100,
+          "probability_difference": 98.56,
+          "anchoring_strength": 0.008,
+          "opportunity_score": 0.827,
+          "sample_size": 41301,
+          "exceedance_count": 593
+        }
+      ]
+    },
+    "KDEN": {
+      "station": "KDEN",
+      "analysis_date": "2026-07-17T15:47:07.894094+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.104090942356012,
+          "exceed_count": 4267,
+          "sample_size": 40993,
+          "avg_temp": 83.94576147147062,
+          "median_temp": 53.06,
+          "std_dev": 990.609092104076,
+          "near_crossing_days": 1482
+        },
+        "85": {
+          "clim_prob": 0.0570097333691118,
+          "exceed_count": 2337,
+          "sample_size": 40993,
+          "avg_temp": 83.94576147147062,
+          "median_temp": 53.06,
+          "std_dev": 990.609092104076,
+          "near_crossing_days": 859
+        },
+        "90": {
+          "clim_prob": 0.026711877637645452,
+          "exceed_count": 1095,
+          "sample_size": 40993,
+          "avg_temp": 83.94576147147062,
+          "median_temp": 53.06,
+          "std_dev": 990.609092104076,
+          "near_crossing_days": 851
+        },
+        "95": {
+          "clim_prob": 0.009928524382211597,
+          "exceed_count": 407,
+          "sample_size": 40993,
+          "avg_temp": 83.94576147147062,
+          "median_temp": 53.06,
+          "std_dev": 990.609092104076,
+          "near_crossing_days": 580
+        },
+        "100": {
+          "clim_prob": 0.0013904813016856537,
+          "exceed_count": 57,
+          "sample_size": 40993,
+          "avg_temp": 83.94576147147062,
+          "median_temp": 53.06,
+          "std_dev": 990.609092104076,
+          "near_crossing_days": 78
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.20219333378054133,
+          "actual_distance": 3.945761471470618
+        },
+        "85": {
+          "proximity_score": 0.4867983859283832,
+          "actual_distance": 1.0542385285293818
+        },
+        "90": {
+          "proximity_score": 0.1417587448958113,
+          "actual_distance": 6.054238528529382
+        },
+        "95": {
+          "proximity_score": 0.08295837166597035,
+          "actual_distance": 11.054238528529382
+        },
+        "100": {
+          "proximity_score": 0.058636449720527735,
+          "actual_distance": 16.054238528529382
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.604090942356012,
+          "proximity_multiplier": 0.03615251384382699,
+          "combined_score": 0.021839406156456218,
+          "historical_probability": 0.104090942356012,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.395909057643988
+        },
+        "85": {
+          "baseline_strength": 0.5570097333691117,
+          "proximity_multiplier": 0.020954797160490816,
+          "combined_score": 0.01167202597916881,
+          "historical_probability": 0.0570097333691118,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4429902666308882
+        },
+        "90": {
+          "baseline_strength": 0.5267118776376454,
+          "proximity_multiplier": 0.020759641890078794,
+          "combined_score": 0.01093434995900852,
+          "historical_probability": 0.026711877637645452,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.47328812236235457
+        },
+        "95": {
+          "baseline_strength": 0.5099285243822116,
+          "proximity_multiplier": 0.014148757104871564,
+          "combined_score": 0.007214854832329489,
+          "historical_probability": 0.009928524382211597,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4900714756177884
+        },
+        "100": {
+          "baseline_strength": 0.5013904813016856,
+          "proximity_multiplier": 0.0019027638865172104,
+          "combined_score": 0.00095402770086433,
+          "historical_probability": 0.0013904813016856537,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4986095186983143
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 10.41,
+          "market_anchor": 80,
+          "probability_difference": 69.59,
+          "anchoring_strength": 0.022,
+          "opportunity_score": 1.52,
+          "sample_size": 40993,
+          "exceedance_count": 4267
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 2.67,
+          "market_anchor": 90,
+          "probability_difference": 87.33,
+          "anchoring_strength": 0.011,
+          "opportunity_score": 0.955,
+          "sample_size": 40993,
+          "exceedance_count": 1095
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 5.7,
+          "market_anchor": 85,
+          "probability_difference": 79.3,
+          "anchoring_strength": 0.012,
+          "opportunity_score": 0.926,
+          "sample_size": 40993,
+          "exceedance_count": 2337
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.99,
+          "market_anchor": 95,
+          "probability_difference": 94.01,
+          "anchoring_strength": 0.007,
+          "opportunity_score": 0.678,
+          "sample_size": 40993,
+          "exceedance_count": 407
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.14,
+          "market_anchor": 100,
+          "probability_difference": 99.86,
+          "anchoring_strength": 0.001,
+          "opportunity_score": 0.095,
+          "sample_size": 40993,
+          "exceedance_count": 57
+        }
+      ]
+    },
+    "KLAX": {
+      "station": "KLAX",
+      "analysis_date": "2026-07-17T15:47:07.974989+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.01109093110546071,
+          "exceed_count": 458,
+          "sample_size": 41295,
+          "avg_temp": 62.4026908826726,
+          "median_temp": 62.059999999999995,
+          "std_dev": 7.173023628548396,
+          "near_crossing_days": 528
+        },
+        "85": {
+          "clim_prob": 0.0024458166848286716,
+          "exceed_count": 101,
+          "sample_size": 41295,
+          "avg_temp": 62.4026908826726,
+          "median_temp": 62.059999999999995,
+          "std_dev": 7.173023628548396,
+          "near_crossing_days": 104
+        },
+        "90": {
+          "clim_prob": 0.0007749122169754207,
+          "exceed_count": 32,
+          "sample_size": 41295,
+          "avg_temp": 62.4026908826726,
+          "median_temp": 62.059999999999995,
+          "std_dev": 7.173023628548396,
+          "near_crossing_days": 28
+        },
+        "95": {
+          "clim_prob": 0.000242160067804819,
+          "exceed_count": 10,
+          "sample_size": 41295,
+          "avg_temp": 62.4026908826726,
+          "median_temp": 62.059999999999995,
+          "std_dev": 7.173023628548396,
+          "near_crossing_days": 15
+        },
+        "100": {
+          "clim_prob": 4.8432013560963794e-05,
+          "exceed_count": 2,
+          "sample_size": 41295,
+          "avg_temp": 62.4026908826726,
+          "median_temp": 62.059999999999995,
+          "std_dev": 7.173023628548396,
+          "near_crossing_days": 4
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.053771220002375754,
+          "actual_distance": 17.5973091173274
+        },
+        "85": {
+          "proximity_score": 0.04237771328196504,
+          "actual_distance": 22.5973091173274
+        },
+        "90": {
+          "proximity_score": 0.03496832502307323,
+          "actual_distance": 27.5973091173274
+        },
+        "95": {
+          "proximity_score": 0.029764288458573675,
+          "actual_distance": 32.5973091173274
+        },
+        "100": {
+          "proximity_score": 0.025908541887213386,
+          "actual_distance": 37.5973091173274
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.5110909311054608,
+          "proximity_multiplier": 0.012786051580094443,
+          "combined_score": 0.006534835007232917,
+          "historical_probability": 0.01109093110546071,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4889090688945393
+        },
+        "85": {
+          "baseline_strength": 0.5024458166848287,
+          "proximity_multiplier": 0.0025184647051701174,
+          "combined_score": 0.0012653920555811158,
+          "historical_probability": 0.0024458166848286716,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4975541833151713
+        },
+        "90": {
+          "baseline_strength": 0.5007749122169753,
+          "proximity_multiplier": 0.0006780481898534932,
+          "combined_score": 0.00033954952275276206,
+          "historical_probability": 0.0007749122169754207,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4992250877830246
+        },
+        "95": {
+          "baseline_strength": 0.5002421600678049,
+          "proximity_multiplier": 0.0003632401017072285,
+          "combined_score": 0.00018170801310127312,
+          "historical_probability": 0.000242160067804819,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4997578399321952
+        },
+        "100": {
+          "baseline_strength": 0.500048432013561,
+          "proximity_multiplier": 9.686402712192759e-05,
+          "combined_score": 4.8436704880838934e-05,
+          "historical_probability": 4.8432013560963794e-05,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.499951567986439
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 1.11,
+          "market_anchor": 80,
+          "probability_difference": 78.89,
+          "anchoring_strength": 0.007,
+          "opportunity_score": 0.516,
+          "sample_size": 41295,
+          "exceedance_count": 458
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 0.24,
+          "market_anchor": 85,
+          "probability_difference": 84.76,
+          "anchoring_strength": 0.001,
+          "opportunity_score": 0.107,
+          "sample_size": 41295,
+          "exceedance_count": 101
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 0.08,
+          "market_anchor": 90,
+          "probability_difference": 89.92,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.031,
+          "sample_size": 41295,
+          "exceedance_count": 32
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.02,
+          "market_anchor": 95,
+          "probability_difference": 94.98,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.017,
+          "sample_size": 41295,
+          "exceedance_count": 10
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.0,
+          "market_anchor": 100,
+          "probability_difference": 100.0,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.005,
+          "sample_size": 41295,
+          "exceedance_count": 2
+        }
+      ]
+    },
+    "KMIA": {
+      "station": "KMIA",
+      "analysis_date": "2026-07-17T15:47:08.056518+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.4855585170826266,
+          "exceed_count": 20039,
+          "sample_size": 41270,
+          "avg_temp": 85.80115822631436,
+          "median_temp": 78.98,
+          "std_dev": 544.3531391175816,
+          "near_crossing_days": 9503
+        },
+        "85": {
+          "clim_prob": 0.15582747758662466,
+          "exceed_count": 6431,
+          "sample_size": 41270,
+          "avg_temp": 85.80115822631436,
+          "median_temp": 78.98,
+          "std_dev": 544.3531391175816,
+          "near_crossing_days": 5203
+        },
+        "90": {
+          "clim_prob": 0.026411436879088927,
+          "exceed_count": 1090,
+          "sample_size": 41270,
+          "avg_temp": 85.80115822631436,
+          "median_temp": 78.98,
+          "std_dev": 544.3531391175816,
+          "near_crossing_days": 2465
+        },
+        "95": {
+          "clim_prob": 0.0013569178580082385,
+          "exceed_count": 56,
+          "sample_size": 41270,
+          "avg_temp": 85.80115822631436,
+          "median_temp": 78.98,
+          "std_dev": 544.3531391175816,
+          "near_crossing_days": 275
+        },
+        "100": {
+          "clim_prob": 0.0001938454082868912,
+          "exceed_count": 8,
+          "sample_size": 41270,
+          "avg_temp": 85.80115822631436,
+          "median_temp": 78.98,
+          "std_dev": 544.3531391175816,
+          "near_crossing_days": 1
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.14703377964813416,
+          "actual_distance": 5.801158226314357
+        },
+        "85": {
+          "proximity_score": 0.5551983081721049,
+          "actual_distance": 0.8011582263143566
+        },
+        "90": {
+          "proximity_score": 0.19235053566384355,
+          "actual_distance": 4.198841773685643
+        },
+        "95": {
+          "proximity_score": 0.09805034946028203,
+          "actual_distance": 9.198841773685643
+        },
+        "100": {
+          "proximity_score": 0.06579448716489303,
+          "actual_distance": 14.198841773685643
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.9855585170826267,
+          "proximity_multiplier": 0.23026411436879088,
+          "combined_score": 0.2269387590946499,
+          "historical_probability": 0.4855585170826266,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.014441482917373405
+        },
+        "85": {
+          "baseline_strength": 0.6558274775866246,
+          "proximity_multiplier": 0.12607220741458686,
+          "combined_score": 0.08268161778248626,
+          "historical_probability": 0.15582747758662466,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.34417252241337537
+        },
+        "90": {
+          "baseline_strength": 0.5264114368790889,
+          "proximity_multiplier": 0.05972861642839835,
+          "combined_score": 0.03144182679687313,
+          "historical_probability": 0.026411436879088927,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4735885631209111
+        },
+        "95": {
+          "baseline_strength": 0.5013569178580082,
+          "proximity_multiplier": 0.006663435909861885,
+          "combined_score": 0.003340759690112727,
+          "historical_probability": 0.0013569178580082385,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49864308214199177
+        },
+        "100": {
+          "baseline_strength": 0.5001938454082868,
+          "proximity_multiplier": 2.42306760358614e-05,
+          "combined_score": 1.2120035023219936e-05,
+          "historical_probability": 0.0001938454082868912,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4998061545917131
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 48.56,
+          "market_anchor": 80,
+          "probability_difference": 31.44,
+          "anchoring_strength": 0.227,
+          "opportunity_score": 7.136,
+          "sample_size": 41270,
+          "exceedance_count": 20039
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 15.58,
+          "market_anchor": 85,
+          "probability_difference": 69.42,
+          "anchoring_strength": 0.083,
+          "opportunity_score": 5.74,
+          "sample_size": 41270,
+          "exceedance_count": 6431
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 2.64,
+          "market_anchor": 90,
+          "probability_difference": 87.36,
+          "anchoring_strength": 0.031,
+          "opportunity_score": 2.747,
+          "sample_size": 41270,
+          "exceedance_count": 1090
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.14,
+          "market_anchor": 95,
+          "probability_difference": 94.86,
+          "anchoring_strength": 0.003,
+          "opportunity_score": 0.317,
+          "sample_size": 41270,
+          "exceedance_count": 56
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.02,
+          "market_anchor": 100,
+          "probability_difference": 99.98,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.001,
+          "sample_size": 41270,
+          "exceedance_count": 8
+        }
+      ]
+    },
+    "KSEA": {
+      "station": "KSEA",
+      "analysis_date": "2026-07-17T15:47:08.136212+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.02774277960845125,
+          "exceed_count": 1145,
+          "sample_size": 41272,
+          "avg_temp": 54.2921486722231,
+          "median_temp": 51.98,
+          "std_dev": 213.15423090011708,
+          "near_crossing_days": 723
+        },
+        "85": {
+          "clim_prob": 0.009352587710796665,
+          "exceed_count": 386,
+          "sample_size": 41272,
+          "avg_temp": 54.2921486722231,
+          "median_temp": 51.98,
+          "std_dev": 213.15423090011708,
+          "near_crossing_days": 259
+        },
+        "90": {
+          "clim_prob": 0.002422950184144214,
+          "exceed_count": 100,
+          "sample_size": 41272,
+          "avg_temp": 54.2921486722231,
+          "median_temp": 51.98,
+          "std_dev": 213.15423090011708,
+          "near_crossing_days": 111
+        },
+        "95": {
+          "clim_prob": 0.0007753440589261484,
+          "exceed_count": 32,
+          "sample_size": 41272,
+          "avg_temp": 54.2921486722231,
+          "median_temp": 51.98,
+          "std_dev": 213.15423090011708,
+          "near_crossing_days": 35
+        },
+        "100": {
+          "clim_prob": 0.0003876720294630742,
+          "exceed_count": 16,
+          "sample_size": 41272,
+          "avg_temp": 54.2921486722231,
+          "median_temp": 51.98,
+          "std_dev": 213.15423090011708,
+          "near_crossing_days": 13
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.03744217337918054,
+          "actual_distance": 25.7078513277769
+        },
+        "85": {
+          "proximity_score": 0.031537930137952114,
+          "actual_distance": 30.7078513277769
+        },
+        "90": {
+          "proximity_score": 0.027242128422899494,
+          "actual_distance": 35.7078513277769
+        },
+        "95": {
+          "proximity_score": 0.02397630105998802,
+          "actual_distance": 40.7078513277769
+        },
+        "100": {
+          "proximity_score": 0.021409676779657504,
+          "actual_distance": 45.7078513277769
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.5277427796084513,
+          "proximity_multiplier": 0.017517929831362668,
+          "combined_score": 0.009244960982189143,
+          "historical_probability": 0.02774277960845125,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.47225722039154877
+        },
+        "85": {
+          "baseline_strength": 0.5093525877107967,
+          "proximity_multiplier": 0.006275440976933514,
+          "combined_score": 0.0031964121006274556,
+          "historical_probability": 0.009352587710796665,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49064741228920333
+        },
+        "90": {
+          "baseline_strength": 0.5024229501841442,
+          "proximity_multiplier": 0.0026894747044000776,
+          "combined_score": 0.0013512538154303161,
+          "historical_probability": 0.002422950184144214,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49757704981585577
+        },
+        "95": {
+          "baseline_strength": 0.5007753440589262,
+          "proximity_multiplier": 0.0008480325644504749,
+          "combined_score": 0.0004246737992358601,
+          "historical_probability": 0.0007753440589261484,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49922465594107385
+        },
+        "100": {
+          "baseline_strength": 0.5003876720294631,
+          "proximity_multiplier": 0.0003149835239387478,
+          "combined_score": 0.00015761387227134667,
+          "historical_probability": 0.0003876720294630742,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49961232797053695
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 2.77,
+          "market_anchor": 80,
+          "probability_difference": 77.23,
+          "anchoring_strength": 0.009,
+          "opportunity_score": 0.714,
+          "sample_size": 41272,
+          "exceedance_count": 1145
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 0.94,
+          "market_anchor": 85,
+          "probability_difference": 84.06,
+          "anchoring_strength": 0.003,
+          "opportunity_score": 0.269,
+          "sample_size": 41272,
+          "exceedance_count": 386
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 0.24,
+          "market_anchor": 90,
+          "probability_difference": 89.76,
+          "anchoring_strength": 0.001,
+          "opportunity_score": 0.121,
+          "sample_size": 41272,
+          "exceedance_count": 100
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.08,
+          "market_anchor": 95,
+          "probability_difference": 94.92,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.04,
+          "sample_size": 41272,
+          "exceedance_count": 32
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.04,
+          "market_anchor": 100,
+          "probability_difference": 99.96,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.016,
+          "sample_size": 41272,
+          "exceedance_count": 16
+        }
+      ]
+    },
+    "KSFO": {
+      "station": "KSFO",
+      "analysis_date": "2026-07-17T15:47:08.214868+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.006956563893736669,
+          "exceed_count": 287,
+          "sample_size": 41256,
+          "avg_temp": 103.15463787085484,
+          "median_temp": 57.02,
+          "std_dev": 1530.4698203552268,
+          "near_crossing_days": 200
+        },
+        "85": {
+          "clim_prob": 0.0026905177428737637,
+          "exceed_count": 111,
+          "sample_size": 41256,
+          "avg_temp": 103.15463787085484,
+          "median_temp": 57.02,
+          "std_dev": 1530.4698203552268,
+          "near_crossing_days": 50
+        },
+        "90": {
+          "clim_prob": 0.0013816172193135544,
+          "exceed_count": 57,
+          "sample_size": 41256,
+          "avg_temp": 103.15463787085484,
+          "median_temp": 57.02,
+          "std_dev": 1530.4698203552268,
+          "near_crossing_days": 25
+        },
+        "95": {
+          "clim_prob": 0.0009695559433779329,
+          "exceed_count": 40,
+          "sample_size": 41256,
+          "avg_temp": 103.15463787085484,
+          "median_temp": 57.02,
+          "std_dev": 1530.4698203552268,
+          "near_crossing_days": 12
+        },
+        "100": {
+          "clim_prob": 0.0008726003490401396,
+          "exceed_count": 36,
+          "sample_size": 41256,
+          "avg_temp": 103.15463787085484,
+          "median_temp": 57.02,
+          "std_dev": 1530.4698203552268,
+          "near_crossing_days": 2
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.04139991687503654,
+          "actual_distance": 23.15463787085484
+        },
+        "85": {
+          "proximity_score": 0.05220667739804008,
+          "actual_distance": 18.15463787085484
+        },
+        "90": {
+          "proximity_score": 0.070648222096805,
+          "actual_distance": 13.154637870854842
+        },
+        "95": {
+          "proximity_score": 0.10923424979852557,
+          "actual_distance": 8.154637870854842
+        },
+        "100": {
+          "proximity_score": 0.2406948646511625,
+          "actual_distance": 3.1546378708548417
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.5069565638937367,
+          "proximity_multiplier": 0.004847779716889665,
+          "combined_score": 0.002457613747788136,
+          "historical_probability": 0.006956563893736669,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49304343610626333
+        },
+        "85": {
+          "baseline_strength": 0.5026905177428738,
+          "proximity_multiplier": 0.0012119449292224162,
+          "combined_score": 0.0006092332239466669,
+          "historical_probability": 0.0026905177428737637,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49730948225712623
+        },
+        "90": {
+          "baseline_strength": 0.5013816172193135,
+          "proximity_multiplier": 0.0006059724646112081,
+          "combined_score": 0.00030382345429714075,
+          "historical_probability": 0.0013816172193135544,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49861838278068643
+        },
+        "95": {
+          "baseline_strength": 0.500969555943378,
+          "proximity_multiplier": 0.00029086678301337986,
+          "combined_score": 0.0001457154031248918,
+          "historical_probability": 0.0009695559433779329,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49903044405662206
+        },
+        "100": {
+          "baseline_strength": 0.5008726003490401,
+          "proximity_multiplier": 4.8477797168896646e-05,
+          "combined_score": 2.42812003271786e-05,
+          "historical_probability": 0.0008726003490401396,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49912739965095987
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 0.7,
+          "market_anchor": 80,
+          "probability_difference": 79.3,
+          "anchoring_strength": 0.002,
+          "opportunity_score": 0.195,
+          "sample_size": 41256,
+          "exceedance_count": 287
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 0.27,
+          "market_anchor": 85,
+          "probability_difference": 84.73,
+          "anchoring_strength": 0.001,
+          "opportunity_score": 0.052,
+          "sample_size": 41256,
+          "exceedance_count": 111
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 0.14,
+          "market_anchor": 90,
+          "probability_difference": 89.86,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.027,
+          "sample_size": 41256,
+          "exceedance_count": 57
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.1,
+          "market_anchor": 95,
+          "probability_difference": 94.9,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.014,
+          "sample_size": 41256,
+          "exceedance_count": 40
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.09,
+          "market_anchor": 100,
+          "probability_difference": 99.91,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.002,
+          "sample_size": 41256,
+          "exceedance_count": 36
+        }
+      ]
+    },
+    "KHOU": {
+      "station": "KHOU",
+      "analysis_date": "2026-07-17T15:47:08.293970+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.3363429512006197,
+          "exceed_count": 13895,
+          "sample_size": 41312,
+          "avg_temp": 81.40282823392721,
+          "median_temp": 75.02,
+          "std_dev": 583.0319389749559,
+          "near_crossing_days": 5360
+        },
+        "85": {
+          "clim_prob": 0.16370546088303642,
+          "exceed_count": 6763,
+          "sample_size": 41312,
+          "avg_temp": 81.40282823392721,
+          "median_temp": 75.02,
+          "std_dev": 583.0319389749559,
+          "near_crossing_days": 2663
+        },
+        "90": {
+          "clim_prob": 0.08060611928737413,
+          "exceed_count": 3330,
+          "sample_size": 41312,
+          "avg_temp": 81.40282823392721,
+          "median_temp": 75.02,
+          "std_dev": 583.0319389749559,
+          "near_crossing_days": 2313
+        },
+        "95": {
+          "clim_prob": 0.03294442292796282,
+          "exceed_count": 1361,
+          "sample_size": 41312,
+          "avg_temp": 81.40282823392721,
+          "median_temp": 75.02,
+          "std_dev": 583.0319389749559,
+          "near_crossing_days": 1818
+        },
+        "100": {
+          "clim_prob": 0.004284469403563129,
+          "exceed_count": 177,
+          "sample_size": 41312,
+          "avg_temp": 81.40282823392721,
+          "median_temp": 75.02,
+          "std_dev": 583.0319389749559,
+          "near_crossing_days": 366
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.4161762317756641,
+          "actual_distance": 1.4028282339272096
+        },
+        "85": {
+          "proximity_score": 0.2175250460250404,
+          "actual_distance": 3.5971717660727904
+        },
+        "90": {
+          "proximity_score": 0.10419736401250271,
+          "actual_distance": 8.59717176607279
+        },
+        "95": {
+          "proximity_score": 0.06850642138254698,
+          "actual_distance": 13.59717176607279
+        },
+        "100": {
+          "proximity_score": 0.05102777135072265,
+          "actual_distance": 18.59717176607279
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.8363429512006197,
+          "proximity_multiplier": 0.1297443841982959,
+          "combined_score": 0.10851080118210985,
+          "historical_probability": 0.3363429512006197,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.1636570487993803
+        },
+        "85": {
+          "baseline_strength": 0.6637054608830364,
+          "proximity_multiplier": 0.06446068938807126,
+          "combined_score": 0.04278291155914809,
+          "historical_probability": 0.16370546088303642,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.3362945391169636
+        },
+        "90": {
+          "baseline_strength": 0.5806061192873742,
+          "proximity_multiplier": 0.055988574748257164,
+          "combined_score": 0.03250730910901666,
+          "historical_probability": 0.08060611928737413,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.41939388071262584
+        },
+        "95": {
+          "baseline_strength": 0.5329444229279628,
+          "proximity_multiplier": 0.04400658404337723,
+          "combined_score": 0.023453063538028573,
+          "historical_probability": 0.03294442292796282,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.46705557707203715
+        },
+        "100": {
+          "baseline_strength": 0.5042844694035631,
+          "proximity_multiplier": 0.008859411309062742,
+          "combined_score": 0.004467663531218631,
+          "historical_probability": 0.004284469403563129,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49571553059643686
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 33.63,
+          "market_anchor": 80,
+          "probability_difference": 46.37,
+          "anchoring_strength": 0.109,
+          "opportunity_score": 5.031,
+          "sample_size": 41312,
+          "exceedance_count": 13895
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 16.37,
+          "market_anchor": 85,
+          "probability_difference": 68.63,
+          "anchoring_strength": 0.043,
+          "opportunity_score": 2.936,
+          "sample_size": 41312,
+          "exceedance_count": 6763
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 8.06,
+          "market_anchor": 90,
+          "probability_difference": 81.94,
+          "anchoring_strength": 0.033,
+          "opportunity_score": 2.664,
+          "sample_size": 41312,
+          "exceedance_count": 3330
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 3.29,
+          "market_anchor": 95,
+          "probability_difference": 91.71,
+          "anchoring_strength": 0.023,
+          "opportunity_score": 2.151,
+          "sample_size": 41312,
+          "exceedance_count": 1361
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.43,
+          "market_anchor": 100,
+          "probability_difference": 99.57,
+          "anchoring_strength": 0.004,
+          "opportunity_score": 0.445,
+          "sample_size": 41312,
+          "exceedance_count": 177
+        }
+      ]
+    },
+    "KDCA": {
+      "station": "KDCA",
+      "analysis_date": "2026-07-17T15:47:08.374275+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.14738218627403496,
+          "exceed_count": 6086,
+          "sample_size": 41294,
+          "avg_temp": 60.78429457063957,
+          "median_temp": 62.059999999999995,
+          "std_dev": 17.153700081296883,
+          "near_crossing_days": 3296
+        },
+        "85": {
+          "clim_prob": 0.05850728919455611,
+          "exceed_count": 2416,
+          "sample_size": 41294,
+          "avg_temp": 60.78429457063957,
+          "median_temp": 62.059999999999995,
+          "std_dev": 17.153700081296883,
+          "near_crossing_days": 1452
+        },
+        "90": {
+          "clim_prob": 0.018549910398605124,
+          "exceed_count": 766,
+          "sample_size": 41294,
+          "avg_temp": 60.78429457063957,
+          "median_temp": 62.059999999999995,
+          "std_dev": 17.153700081296883,
+          "near_crossing_days": 828
+        },
+        "95": {
+          "clim_prob": 0.004819102048723786,
+          "exceed_count": 199,
+          "sample_size": 41294,
+          "avg_temp": 60.78429457063957,
+          "median_temp": 62.059999999999995,
+          "std_dev": 17.153700081296883,
+          "near_crossing_days": 368
+        },
+        "100": {
+          "clim_prob": 0.00021794933888700537,
+          "exceed_count": 9,
+          "sample_size": 41294,
+          "avg_temp": 60.78429457063957,
+          "median_temp": 62.059999999999995,
+          "std_dev": 17.153700081296883,
+          "near_crossing_days": 37
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.04946649047169249,
+          "actual_distance": 19.215705429360433
+        },
+        "85": {
+          "proximity_score": 0.039657823684584655,
+          "actual_distance": 24.215705429360433
+        },
+        "90": {
+          "proximity_score": 0.03309537162181577,
+          "actual_distance": 29.215705429360433
+        },
+        "95": {
+          "proximity_score": 0.02839642107996135,
+          "actual_distance": 34.21570542936043
+        },
+        "100": {
+          "proximity_score": 0.024865907220165934,
+          "actual_distance": 39.21570542936043
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.647382186274035,
+          "proximity_multiplier": 0.0798178912190633,
+          "combined_score": 0.0516726809211803,
+          "historical_probability": 0.14738218627403496,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.352617813725965
+        },
+        "85": {
+          "baseline_strength": 0.5585072891945562,
+          "proximity_multiplier": 0.03516249334043687,
+          "combined_score": 0.01963850883688903,
+          "historical_probability": 0.05850728919455611,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4414927108054439
+        },
+        "90": {
+          "baseline_strength": 0.5185499103986051,
+          "proximity_multiplier": 0.020051339177604495,
+          "combined_score": 0.010397620133918851,
+          "historical_probability": 0.018549910398605124,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4814500896013949
+        },
+        "95": {
+          "baseline_strength": 0.5048191020487238,
+          "proximity_multiplier": 0.008911706301157554,
+          "combined_score": 0.00449879957267231,
+          "historical_probability": 0.004819102048723786,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.49518089795127623
+        },
+        "100": {
+          "baseline_strength": 0.500217949338887,
+          "proximity_multiplier": 0.0008960139487576888,
+          "combined_score": 0.00044820226002660965,
+          "historical_probability": 0.00021794933888700537,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.499782050661113
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 14.74,
+          "market_anchor": 80,
+          "probability_difference": 65.26,
+          "anchoring_strength": 0.052,
+          "opportunity_score": 3.372,
+          "sample_size": 41294,
+          "exceedance_count": 6086
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 5.85,
+          "market_anchor": 85,
+          "probability_difference": 79.15,
+          "anchoring_strength": 0.02,
+          "opportunity_score": 1.554,
+          "sample_size": 41294,
+          "exceedance_count": 2416
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 1.85,
+          "market_anchor": 90,
+          "probability_difference": 88.15,
+          "anchoring_strength": 0.01,
+          "opportunity_score": 0.916,
+          "sample_size": 41294,
+          "exceedance_count": 766
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.48,
+          "market_anchor": 95,
+          "probability_difference": 94.52,
+          "anchoring_strength": 0.004,
+          "opportunity_score": 0.425,
+          "sample_size": 41294,
+          "exceedance_count": 199
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.02,
+          "market_anchor": 100,
+          "probability_difference": 99.98,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.045,
+          "sample_size": 41294,
+          "exceedance_count": 9
+        }
+      ]
+    },
+    "KMSP": {
+      "station": "KMSP",
+      "analysis_date": "2026-07-17T15:47:08.457771+00:00",
+      "round_number_anchoring_v1.0": true,
+      "climatology_by_threshold": {
+        "80": {
+          "clim_prob": 0.08267971928996874,
+          "exceed_count": 2804,
+          "sample_size": 33914,
+          "avg_temp": 48.05931296809614,
+          "median_temp": 48.02,
+          "std_dev": 60.630708007028545,
+          "near_crossing_days": 1494
+        },
+        "85": {
+          "clim_prob": 0.026301822256295335,
+          "exceed_count": 892,
+          "sample_size": 33914,
+          "avg_temp": 48.05931296809614,
+          "median_temp": 48.02,
+          "std_dev": 60.630708007028545,
+          "near_crossing_days": 745
+        },
+        "90": {
+          "clim_prob": 0.006221619390222327,
+          "exceed_count": 211,
+          "sample_size": 33914,
+          "avg_temp": 48.05931296809614,
+          "median_temp": 48.02,
+          "std_dev": 60.630708007028545,
+          "near_crossing_days": 286
+        },
+        "95": {
+          "clim_prob": 0.0018576399127204104,
+          "exceed_count": 63,
+          "sample_size": 33914,
+          "avg_temp": 48.05931296809614,
+          "median_temp": 48.02,
+          "std_dev": 60.630708007028545,
+          "near_crossing_days": 100
+        },
+        "100": {
+          "clim_prob": 5.897269564191779e-05,
+          "exceed_count": 2,
+          "sample_size": 33914,
+          "avg_temp": 48.05931296809614,
+          "median_temp": 48.02,
+          "std_dev": 60.630708007028545,
+          "near_crossing_days": 10
+        }
+      },
+      "temp_proximity_scores": {
+        "80": {
+          "proximity_score": 0.030357593909060714,
+          "actual_distance": 31.940687031903863
+        },
+        "85": {
+          "proximity_score": 0.026356929149941647,
+          "actual_distance": 36.94068703190386
+        },
+        "90": {
+          "proximity_score": 0.02328793666615126,
+          "actual_distance": 41.94068703190386
+        },
+        "95": {
+          "proximity_score": 0.020859108659300477,
+          "actual_distance": 46.94068703190386
+        },
+        "100": {
+          "proximity_score": 0.018889063517391943,
+          "actual_distance": 51.94068703190386
+        }
+      },
+      "round_number_anchoring_strength": {
+        "80": {
+          "baseline_strength": 0.5826797192899688,
+          "proximity_multiplier": 0.04405260364451259,
+          "combined_score": 0.025668558725576853,
+          "historical_probability": 0.08267971928996874,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.41732028071003124
+        },
+        "85": {
+          "baseline_strength": 0.5263018222562954,
+          "proximity_multiplier": 0.021967329126614376,
+          "combined_score": 0.01156144534944094,
+          "historical_probability": 0.026301822256295335,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.47369817774370465
+        },
+        "90": {
+          "baseline_strength": 0.5062216193902223,
+          "proximity_multiplier": 0.008433095476794245,
+          "combined_score": 0.004269015248735141,
+          "historical_probability": 0.006221619390222327,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4937783806097777
+        },
+        "95": {
+          "baseline_strength": 0.5018576399127204,
+          "proximity_multiplier": 0.0029486347820958897,
+          "combined_score": 0.0014797948927072018,
+          "historical_probability": 0.0018576399127204104,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4981423600872796
+        },
+        "100": {
+          "baseline_strength": 0.5000589726956419,
+          "proximity_multiplier": 0.000294863478209589,
+          "combined_score": 0.00014744912799895087,
+          "historical_probability": 5.897269564191779e-05,
+          "is_probability_roundish": false,
+          "probability_distance_to_nearest_common": 0.4999410273043581
+        }
+      },
+      "anchoring_opportunities": [
+        {
+          "threshold": 80,
+          "historical_probability_percent": 8.27,
+          "market_anchor": 80,
+          "probability_difference": 71.73,
+          "anchoring_strength": 0.026,
+          "opportunity_score": 1.841,
+          "sample_size": 33914,
+          "exceedance_count": 2804
+        },
+        {
+          "threshold": 85,
+          "historical_probability_percent": 2.63,
+          "market_anchor": 85,
+          "probability_difference": 82.37,
+          "anchoring_strength": 0.012,
+          "opportunity_score": 0.952,
+          "sample_size": 33914,
+          "exceedance_count": 892
+        },
+        {
+          "threshold": 90,
+          "historical_probability_percent": 0.62,
+          "market_anchor": 90,
+          "probability_difference": 89.38,
+          "anchoring_strength": 0.004,
+          "opportunity_score": 0.382,
+          "sample_size": 33914,
+          "exceedance_count": 211
+        },
+        {
+          "threshold": 95,
+          "historical_probability_percent": 0.19,
+          "market_anchor": 95,
+          "probability_difference": 94.81,
+          "anchoring_strength": 0.001,
+          "opportunity_score": 0.14,
+          "sample_size": 33914,
+          "exceedance_count": 63
+        },
+        {
+          "threshold": 100,
+          "historical_probability_percent": 0.01,
+          "market_anchor": 100,
+          "probability_difference": 99.99,
+          "anchoring_strength": 0.0,
+          "opportunity_score": 0.015,
+          "sample_size": 33914,
+          "exceedance_count": 2
+        }
+      ]
+    }
+  },
+  "aggregate_opportunities": [
+    {
+      "threshold": 80,
+      "historical_probability_percent": 17.39,
+      "market_anchor": 80,
+      "probability_difference": 62.61,
+      "anchoring_strength": 0.058,
+      "opportunity_score": 3.642,
+      "sample_size": 41257,
+      "exceedance_count": 7176,
+      "station": "KATL"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 7.0,
+      "market_anchor": 85,
+      "probability_difference": 78.0,
+      "anchoring_strength": 0.022,
+      "opportunity_score": 1.741,
+      "sample_size": 41257,
+      "exceedance_count": 2886,
+      "station": "KATL"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 2.21,
+      "market_anchor": 90,
+      "probability_difference": 87.79,
+      "anchoring_strength": 0.015,
+      "opportunity_score": 1.295,
+      "sample_size": 41257,
+      "exceedance_count": 910,
+      "station": "KATL"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.4,
+      "market_anchor": 95,
+      "probability_difference": 94.6,
+      "anchoring_strength": 0.005,
+      "opportunity_score": 0.445,
+      "sample_size": 41257,
+      "exceedance_count": 165,
+      "station": "KATL"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.02,
+      "market_anchor": 100,
+      "probability_difference": 99.98,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.018,
+      "sample_size": 41257,
+      "exceedance_count": 10,
+      "station": "KATL"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 5.95,
+      "market_anchor": 80,
+      "probability_difference": 74.05,
+      "anchoring_strength": 0.021,
+      "opportunity_score": 1.559,
+      "sample_size": 41243,
+      "exceedance_count": 2453,
+      "station": "KBOS"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 2.03,
+      "market_anchor": 85,
+      "probability_difference": 82.97,
+      "anchoring_strength": 0.007,
+      "opportunity_score": 0.591,
+      "sample_size": 41243,
+      "exceedance_count": 837,
+      "station": "KBOS"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 0.68,
+      "market_anchor": 90,
+      "probability_difference": 89.32,
+      "anchoring_strength": 0.004,
+      "opportunity_score": 0.315,
+      "sample_size": 41243,
+      "exceedance_count": 281,
+      "station": "KBOS"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.23,
+      "market_anchor": 95,
+      "probability_difference": 94.77,
+      "anchoring_strength": 0.001,
+      "opportunity_score": 0.135,
+      "sample_size": 41243,
+      "exceedance_count": 94,
+      "station": "KBOS"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.07,
+      "market_anchor": 100,
+      "probability_difference": 99.93,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.023,
+      "sample_size": 41243,
+      "exceedance_count": 28,
+      "station": "KBOS"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 31.19,
+      "market_anchor": 80,
+      "probability_difference": 48.81,
+      "anchoring_strength": 0.079,
+      "opportunity_score": 3.848,
+      "sample_size": 41301,
+      "exceedance_count": 12882,
+      "station": "KDFW"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 9.95,
+      "market_anchor": 90,
+      "probability_difference": 80.05,
+      "anchoring_strength": 0.034,
+      "opportunity_score": 2.723,
+      "sample_size": 41301,
+      "exceedance_count": 4111,
+      "station": "KDFW"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 18.04,
+      "market_anchor": 85,
+      "probability_difference": 66.96,
+      "anchoring_strength": 0.039,
+      "opportunity_score": 2.61,
+      "sample_size": 41301,
+      "exceedance_count": 7452,
+      "station": "KDFW"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 4.98,
+      "market_anchor": 95,
+      "probability_difference": 90.02,
+      "anchoring_strength": 0.027,
+      "opportunity_score": 2.417,
+      "sample_size": 41301,
+      "exceedance_count": 2057,
+      "station": "KDFW"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 1.44,
+      "market_anchor": 100,
+      "probability_difference": 98.56,
+      "anchoring_strength": 0.008,
+      "opportunity_score": 0.827,
+      "sample_size": 41301,
+      "exceedance_count": 593,
+      "station": "KDFW"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 10.41,
+      "market_anchor": 80,
+      "probability_difference": 69.59,
+      "anchoring_strength": 0.022,
+      "opportunity_score": 1.52,
+      "sample_size": 40993,
+      "exceedance_count": 4267,
+      "station": "KDEN"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 2.67,
+      "market_anchor": 90,
+      "probability_difference": 87.33,
+      "anchoring_strength": 0.011,
+      "opportunity_score": 0.955,
+      "sample_size": 40993,
+      "exceedance_count": 1095,
+      "station": "KDEN"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 5.7,
+      "market_anchor": 85,
+      "probability_difference": 79.3,
+      "anchoring_strength": 0.012,
+      "opportunity_score": 0.926,
+      "sample_size": 40993,
+      "exceedance_count": 2337,
+      "station": "KDEN"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.99,
+      "market_anchor": 95,
+      "probability_difference": 94.01,
+      "anchoring_strength": 0.007,
+      "opportunity_score": 0.678,
+      "sample_size": 40993,
+      "exceedance_count": 407,
+      "station": "KDEN"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.14,
+      "market_anchor": 100,
+      "probability_difference": 99.86,
+      "anchoring_strength": 0.001,
+      "opportunity_score": 0.095,
+      "sample_size": 40993,
+      "exceedance_count": 57,
+      "station": "KDEN"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 1.11,
+      "market_anchor": 80,
+      "probability_difference": 78.89,
+      "anchoring_strength": 0.007,
+      "opportunity_score": 0.516,
+      "sample_size": 41295,
+      "exceedance_count": 458,
+      "station": "KLAX"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 0.24,
+      "market_anchor": 85,
+      "probability_difference": 84.76,
+      "anchoring_strength": 0.001,
+      "opportunity_score": 0.107,
+      "sample_size": 41295,
+      "exceedance_count": 101,
+      "station": "KLAX"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 0.08,
+      "market_anchor": 90,
+      "probability_difference": 89.92,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.031,
+      "sample_size": 41295,
+      "exceedance_count": 32,
+      "station": "KLAX"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.02,
+      "market_anchor": 95,
+      "probability_difference": 94.98,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.017,
+      "sample_size": 41295,
+      "exceedance_count": 10,
+      "station": "KLAX"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.0,
+      "market_anchor": 100,
+      "probability_difference": 100.0,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.005,
+      "sample_size": 41295,
+      "exceedance_count": 2,
+      "station": "KLAX"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 48.56,
+      "market_anchor": 80,
+      "probability_difference": 31.44,
+      "anchoring_strength": 0.227,
+      "opportunity_score": 7.136,
+      "sample_size": 41270,
+      "exceedance_count": 20039,
+      "station": "KMIA"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 15.58,
+      "market_anchor": 85,
+      "probability_difference": 69.42,
+      "anchoring_strength": 0.083,
+      "opportunity_score": 5.74,
+      "sample_size": 41270,
+      "exceedance_count": 6431,
+      "station": "KMIA"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 2.64,
+      "market_anchor": 90,
+      "probability_difference": 87.36,
+      "anchoring_strength": 0.031,
+      "opportunity_score": 2.747,
+      "sample_size": 41270,
+      "exceedance_count": 1090,
+      "station": "KMIA"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.14,
+      "market_anchor": 95,
+      "probability_difference": 94.86,
+      "anchoring_strength": 0.003,
+      "opportunity_score": 0.317,
+      "sample_size": 41270,
+      "exceedance_count": 56,
+      "station": "KMIA"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.02,
+      "market_anchor": 100,
+      "probability_difference": 99.98,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.001,
+      "sample_size": 41270,
+      "exceedance_count": 8,
+      "station": "KMIA"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 2.77,
+      "market_anchor": 80,
+      "probability_difference": 77.23,
+      "anchoring_strength": 0.009,
+      "opportunity_score": 0.714,
+      "sample_size": 41272,
+      "exceedance_count": 1145,
+      "station": "KSEA"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 0.94,
+      "market_anchor": 85,
+      "probability_difference": 84.06,
+      "anchoring_strength": 0.003,
+      "opportunity_score": 0.269,
+      "sample_size": 41272,
+      "exceedance_count": 386,
+      "station": "KSEA"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 0.24,
+      "market_anchor": 90,
+      "probability_difference": 89.76,
+      "anchoring_strength": 0.001,
+      "opportunity_score": 0.121,
+      "sample_size": 41272,
+      "exceedance_count": 100,
+      "station": "KSEA"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.08,
+      "market_anchor": 95,
+      "probability_difference": 94.92,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.04,
+      "sample_size": 41272,
+      "exceedance_count": 32,
+      "station": "KSEA"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.04,
+      "market_anchor": 100,
+      "probability_difference": 99.96,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.016,
+      "sample_size": 41272,
+      "exceedance_count": 16,
+      "station": "KSEA"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 0.7,
+      "market_anchor": 80,
+      "probability_difference": 79.3,
+      "anchoring_strength": 0.002,
+      "opportunity_score": 0.195,
+      "sample_size": 41256,
+      "exceedance_count": 287,
+      "station": "KSFO"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 0.27,
+      "market_anchor": 85,
+      "probability_difference": 84.73,
+      "anchoring_strength": 0.001,
+      "opportunity_score": 0.052,
+      "sample_size": 41256,
+      "exceedance_count": 111,
+      "station": "KSFO"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 0.14,
+      "market_anchor": 90,
+      "probability_difference": 89.86,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.027,
+      "sample_size": 41256,
+      "exceedance_count": 57,
+      "station": "KSFO"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.1,
+      "market_anchor": 95,
+      "probability_difference": 94.9,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.014,
+      "sample_size": 41256,
+      "exceedance_count": 40,
+      "station": "KSFO"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.09,
+      "market_anchor": 100,
+      "probability_difference": 99.91,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.002,
+      "sample_size": 41256,
+      "exceedance_count": 36,
+      "station": "KSFO"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 33.63,
+      "market_anchor": 80,
+      "probability_difference": 46.37,
+      "anchoring_strength": 0.109,
+      "opportunity_score": 5.031,
+      "sample_size": 41312,
+      "exceedance_count": 13895,
+      "station": "KHOU"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 16.37,
+      "market_anchor": 85,
+      "probability_difference": 68.63,
+      "anchoring_strength": 0.043,
+      "opportunity_score": 2.936,
+      "sample_size": 41312,
+      "exceedance_count": 6763,
+      "station": "KHOU"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 8.06,
+      "market_anchor": 90,
+      "probability_difference": 81.94,
+      "anchoring_strength": 0.033,
+      "opportunity_score": 2.664,
+      "sample_size": 41312,
+      "exceedance_count": 3330,
+      "station": "KHOU"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 3.29,
+      "market_anchor": 95,
+      "probability_difference": 91.71,
+      "anchoring_strength": 0.023,
+      "opportunity_score": 2.151,
+      "sample_size": 41312,
+      "exceedance_count": 1361,
+      "station": "KHOU"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.43,
+      "market_anchor": 100,
+      "probability_difference": 99.57,
+      "anchoring_strength": 0.004,
+      "opportunity_score": 0.445,
+      "sample_size": 41312,
+      "exceedance_count": 177,
+      "station": "KHOU"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 14.74,
+      "market_anchor": 80,
+      "probability_difference": 65.26,
+      "anchoring_strength": 0.052,
+      "opportunity_score": 3.372,
+      "sample_size": 41294,
+      "exceedance_count": 6086,
+      "station": "KDCA"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 5.85,
+      "market_anchor": 85,
+      "probability_difference": 79.15,
+      "anchoring_strength": 0.02,
+      "opportunity_score": 1.554,
+      "sample_size": 41294,
+      "exceedance_count": 2416,
+      "station": "KDCA"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 1.85,
+      "market_anchor": 90,
+      "probability_difference": 88.15,
+      "anchoring_strength": 0.01,
+      "opportunity_score": 0.916,
+      "sample_size": 41294,
+      "exceedance_count": 766,
+      "station": "KDCA"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.48,
+      "market_anchor": 95,
+      "probability_difference": 94.52,
+      "anchoring_strength": 0.004,
+      "opportunity_score": 0.425,
+      "sample_size": 41294,
+      "exceedance_count": 199,
+      "station": "KDCA"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.02,
+      "market_anchor": 100,
+      "probability_difference": 99.98,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.045,
+      "sample_size": 41294,
+      "exceedance_count": 9,
+      "station": "KDCA"
+    },
+    {
+      "threshold": 80,
+      "historical_probability_percent": 8.27,
+      "market_anchor": 80,
+      "probability_difference": 71.73,
+      "anchoring_strength": 0.026,
+      "opportunity_score": 1.841,
+      "sample_size": 33914,
+      "exceedance_count": 2804,
+      "station": "KMSP"
+    },
+    {
+      "threshold": 85,
+      "historical_probability_percent": 2.63,
+      "market_anchor": 85,
+      "probability_difference": 82.37,
+      "anchoring_strength": 0.012,
+      "opportunity_score": 0.952,
+      "sample_size": 33914,
+      "exceedance_count": 892,
+      "station": "KMSP"
+    },
+    {
+      "threshold": 90,
+      "historical_probability_percent": 0.62,
+      "market_anchor": 90,
+      "probability_difference": 89.38,
+      "anchoring_strength": 0.004,
+      "opportunity_score": 0.382,
+      "sample_size": 33914,
+      "exceedance_count": 211,
+      "station": "KMSP"
+    },
+    {
+      "threshold": 95,
+      "historical_probability_percent": 0.19,
+      "market_anchor": 95,
+      "probability_difference": 94.81,
+      "anchoring_strength": 0.001,
+      "opportunity_score": 0.14,
+      "sample_size": 33914,
+      "exceedance_count": 63,
+      "station": "KMSP"
+    },
+    {
+      "threshold": 100,
+      "historical_probability_percent": 0.01,
+      "market_anchor": 100,
+      "probability_difference": 99.99,
+      "anchoring_strength": 0.0,
+      "opportunity_score": 0.015,
+      "sample_size": 33914,
+      "exceedance_count": 2,
+      "station": "KMSP"
+    }
+  ],
+  "summary_statistics": {
+    "total_opportunities_identified": 55,
+    "average_opportunity_score": 1.224,
+    "high_quality_opportunities": 28,
+    "most_common_round_numbers": {
+      "80": 11,
+      "85": 11,
+      "90": 11,
+      "95": 11,
+      "100": 11
+    }
+  },
+  "signals": [
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KATL",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 17.39,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 62.61,
+      "opportunity_score": 3.642,
+      "sample_size": 41257,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523863+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KATL",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 7.0,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 78.0,
+      "opportunity_score": 1.741,
+      "sample_size": 41257,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523873+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KATL",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 2.21,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 87.79,
+      "opportunity_score": 1.295,
+      "sample_size": 41257,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523874+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KATL",
+      "signal_type": "round_number_anchoring",
+      "threshold": 95,
+      "historical_probability_percent": 0.4,
+      "market_anchor_percent": 95,
+      "probability_difference_percentage": 94.6,
+      "opportunity_score": 0.445,
+      "sample_size": 41257,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523876+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KBOS",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 5.95,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 74.05,
+      "opportunity_score": 1.559,
+      "sample_size": 41243,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523879+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KBOS",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 2.03,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 82.97,
+      "opportunity_score": 0.591,
+      "sample_size": 41243,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523881+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KBOS",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 0.68,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 89.32,
+      "opportunity_score": 0.315,
+      "sample_size": 41243,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523883+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDFW",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 31.19,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 48.81,
+      "opportunity_score": 3.848,
+      "sample_size": 41301,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523886+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDFW",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 9.95,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 80.05,
+      "opportunity_score": 2.723,
+      "sample_size": 41301,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523888+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDFW",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 18.04,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 66.96,
+      "opportunity_score": 2.61,
+      "sample_size": 41301,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523889+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDFW",
+      "signal_type": "round_number_anchoring",
+      "threshold": 95,
+      "historical_probability_percent": 4.98,
+      "market_anchor_percent": 95,
+      "probability_difference_percentage": 90.02,
+      "opportunity_score": 2.417,
+      "sample_size": 41301,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523890+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDFW",
+      "signal_type": "round_number_anchoring",
+      "threshold": 100,
+      "historical_probability_percent": 1.44,
+      "market_anchor_percent": 100,
+      "probability_difference_percentage": 98.56,
+      "opportunity_score": 0.827,
+      "sample_size": 41301,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523895+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDEN",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 10.41,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 69.59,
+      "opportunity_score": 1.52,
+      "sample_size": 40993,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523897+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDEN",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 2.67,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 87.33,
+      "opportunity_score": 0.955,
+      "sample_size": 40993,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523899+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDEN",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 5.7,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 79.3,
+      "opportunity_score": 0.926,
+      "sample_size": 40993,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523900+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDEN",
+      "signal_type": "round_number_anchoring",
+      "threshold": 95,
+      "historical_probability_percent": 0.99,
+      "market_anchor_percent": 95,
+      "probability_difference_percentage": 94.01,
+      "opportunity_score": 0.678,
+      "sample_size": 40993,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523901+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KLAX",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 1.11,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 78.89,
+      "opportunity_score": 0.516,
+      "sample_size": 41295,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523902+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMIA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 48.56,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 31.44,
+      "opportunity_score": 7.136,
+      "sample_size": 41270,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523904+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMIA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 15.58,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 69.42,
+      "opportunity_score": 5.74,
+      "sample_size": 41270,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523906+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMIA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 2.64,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 87.36,
+      "opportunity_score": 2.747,
+      "sample_size": 41270,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523907+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMIA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 95,
+      "historical_probability_percent": 0.14,
+      "market_anchor_percent": 95,
+      "probability_difference_percentage": 94.86,
+      "opportunity_score": 0.317,
+      "sample_size": 41270,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523908+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KSEA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 2.77,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 77.23,
+      "opportunity_score": 0.714,
+      "sample_size": 41272,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523910+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KHOU",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 33.63,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 46.37,
+      "opportunity_score": 5.031,
+      "sample_size": 41312,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523912+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KHOU",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 16.37,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 68.63,
+      "opportunity_score": 2.936,
+      "sample_size": 41312,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523914+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KHOU",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 8.06,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 81.94,
+      "opportunity_score": 2.664,
+      "sample_size": 41312,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523915+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KHOU",
+      "signal_type": "round_number_anchoring",
+      "threshold": 95,
+      "historical_probability_percent": 3.29,
+      "market_anchor_percent": 95,
+      "probability_difference_percentage": 91.71,
+      "opportunity_score": 2.151,
+      "sample_size": 41312,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523916+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KHOU",
+      "signal_type": "round_number_anchoring",
+      "threshold": 100,
+      "historical_probability_percent": 0.43,
+      "market_anchor_percent": 100,
+      "probability_difference_percentage": 99.57,
+      "opportunity_score": 0.445,
+      "sample_size": 41312,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523917+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDCA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 14.74,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 65.26,
+      "opportunity_score": 3.372,
+      "sample_size": 41294,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523919+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDCA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 5.85,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 79.15,
+      "opportunity_score": 1.554,
+      "sample_size": 41294,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523921+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDCA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 1.85,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 88.15,
+      "opportunity_score": 0.916,
+      "sample_size": 41294,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523923+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KDCA",
+      "signal_type": "round_number_anchoring",
+      "threshold": 95,
+      "historical_probability_percent": 0.48,
+      "market_anchor_percent": 95,
+      "probability_difference_percentage": 94.52,
+      "opportunity_score": 0.425,
+      "sample_size": 41294,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523924+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMSP",
+      "signal_type": "round_number_anchoring",
+      "threshold": 80,
+      "historical_probability_percent": 8.27,
+      "market_anchor_percent": 80,
+      "probability_difference_percentage": 71.73,
+      "opportunity_score": 1.841,
+      "sample_size": 33914,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523925+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMSP",
+      "signal_type": "round_number_anchoring",
+      "threshold": 85,
+      "historical_probability_percent": 2.63,
+      "market_anchor_percent": 85,
+      "probability_difference_percentage": 82.37,
+      "opportunity_score": 0.952,
+      "sample_size": 33914,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523926+00:00"
+    },
+    {
+      "trade_version": "round_number_anchoring_v1.0",
+      "functionality": "round_number_anchoring_signal",
+      "station": "KMSP",
+      "signal_type": "round_number_anchoring",
+      "threshold": 90,
+      "historical_probability_percent": 0.62,
+      "market_anchor_percent": 90,
+      "probability_difference_percentage": 89.38,
+      "opportunity_score": 0.382,
+      "sample_size": 33914,
+      "recommendation_direction": "MARKET_OVERPRICED",
+      "trading_implication": "Sell YES contracts if overpriced, Buy YES contracts if underpriced",
+      "timestamp_utc": "2026-07-17T15:47:08.523928+00:00"
+    }
+  ]
+}

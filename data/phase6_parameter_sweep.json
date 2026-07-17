@@ -1,0 +1,846 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-17T03:50:12.440086",
+    "db_path": "data/metar_backfill.db",
+    "stations_tested": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "combo_used": [
+      "gaussian",
+      "pressure_delta",
+      "forecast_disagreement"
+    ],
+    "parameter_space": {
+      "calendar_climatology_window": [
+        30,
+        45,
+        60,
+        90,
+        120
+      ],
+      "gaussian_window": [
+        30,
+        48,
+        60,
+        90
+      ],
+      "gaussian_z_threshold": [
+        0.5,
+        1.0,
+        1.5,
+        2.0
+      ],
+      "pressure_delta_window": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "pressure_delta_threshold": [
+        2.0,
+        3.0,
+        4.0
+      ],
+      "wind_direction_shift_threshold": [
+        30.0,
+        45.0,
+        60.0
+      ],
+      "regime_vol_window": [
+        10,
+        15,
+        20,
+        30
+      ],
+      "regime_slope_window": [
+        10,
+        15,
+        20,
+        30
+      ],
+      "forecast_disagreement_window": [
+        5,
+        7,
+        10,
+        14
+      ]
+    }
+  },
+  "stage1_global_sweep": {
+    "calendar_climatology_window": {
+      "best_value": 30,
+      "best_accuracy": 0.6734,
+      "all_results": [
+        {
+          "value": 30,
+          "accuracy": 0.6734,
+          "trades": 2134,
+          "stations": 20
+        },
+        {
+          "value": 45,
+          "accuracy": 0.6734,
+          "trades": 2134,
+          "stations": 20
+        },
+        {
+          "value": 60,
+          "accuracy": 0.6734,
+          "trades": 2134,
+          "stations": 20
+        },
+        {
+          "value": 90,
+          "accuracy": 0.6734,
+          "trades": 2134,
+          "stations": 20
+        },
+        {
+          "value": 120,
+          "accuracy": 0.6734,
+          "trades": 2134,
+          "stations": 20
+        }
+      ]
+    },
+    "gaussian_window": {
+      "best_value": 30,
+      "best_accuracy": 0.6801,
+      "all_results": [
+        {
+          "value": 30,
+          "accuracy": 0.6801,
+          "trades": 2079,
+          "stations": 20
+        },
+        {
+          "value": 48,
+          "accuracy": 0.6734,
+          "trades": 2134,
+          "stations": 20
+        },
+        {
+          "value": 60,
+          "accuracy": 0.6624,
+          "trades": 2180,
+          "stations": 20
+        },
+        {
+          "value": 90,
+          "accuracy": 0.6399,
+          "trades": 2294,
+          "stations": 20
+        }
+      ]
+    },
+    "gaussian_z_threshold": {
+      "best_value": 1.5,
+      "best_accuracy": 0.6869,
+      "all_results": [
+        {
+          "value": 0.5,
+          "accuracy": 0.6582,
+          "trades": 2586,
+          "stations": 20
+        },
+        {
+          "value": 1.0,
+          "accuracy": 0.6801,
+          "trades": 2079,
+          "stations": 20
+        },
+        {
+          "value": 1.5,
+          "accuracy": 0.6869,
+          "trades": 1808,
+          "stations": 20
+        },
+        {
+          "value": 2.0,
+          "accuracy": 0.6822,
+          "trades": 1693,
+          "stations": 20
+        }
+      ]
+    },
+    "pressure_delta_window": {
+      "best_value": 3,
+      "best_accuracy": 0.6869,
+      "all_results": [
+        {
+          "value": 2,
+          "accuracy": 0.6808,
+          "trades": 1604,
+          "stations": 20
+        },
+        {
+          "value": 3,
+          "accuracy": 0.6869,
+          "trades": 1808,
+          "stations": 20
+        },
+        {
+          "value": 4,
+          "accuracy": 0.6598,
+          "trades": 1949,
+          "stations": 20
+        },
+        {
+          "value": 5,
+          "accuracy": 0.6346,
+          "trades": 2009,
+          "stations": 20
+        }
+      ]
+    },
+    "pressure_delta_threshold": {
+      "best_value": 4.0,
+      "best_accuracy": 0.6875,
+      "all_results": [
+        {
+          "value": 2.0,
+          "accuracy": 0.6801,
+          "trades": 2085,
+          "stations": 20
+        },
+        {
+          "value": 3.0,
+          "accuracy": 0.6869,
+          "trades": 1808,
+          "stations": 20
+        },
+        {
+          "value": 4.0,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        }
+      ]
+    },
+    "wind_direction_shift_threshold": {
+      "best_value": 30.0,
+      "best_accuracy": 0.6875,
+      "all_results": [
+        {
+          "value": 30.0,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 45.0,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 60.0,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        }
+      ]
+    },
+    "regime_vol_window": {
+      "best_value": 10,
+      "best_accuracy": 0.6875,
+      "all_results": [
+        {
+          "value": 10,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 15,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 20,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 30,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        }
+      ]
+    },
+    "regime_slope_window": {
+      "best_value": 10,
+      "best_accuracy": 0.6875,
+      "all_results": [
+        {
+          "value": 10,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 15,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 20,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 30,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        }
+      ]
+    },
+    "forecast_disagreement_window": {
+      "best_value": 14,
+      "best_accuracy": 0.7235,
+      "all_results": [
+        {
+          "value": 5,
+          "accuracy": 0.6743,
+          "trades": 1692,
+          "stations": 20
+        },
+        {
+          "value": 7,
+          "accuracy": 0.6875,
+          "trades": 1667,
+          "stations": 20
+        },
+        {
+          "value": 10,
+          "accuracy": 0.7135,
+          "trades": 1630,
+          "stations": 20
+        },
+        {
+          "value": 14,
+          "accuracy": 0.7235,
+          "trades": 1606,
+          "stations": 20
+        }
+      ]
+    }
+  },
+  "stage1_best_params": {
+    "calendar_climatology_window": 30,
+    "gaussian_window": 30,
+    "gaussian_z_threshold": 1.5,
+    "pressure_delta_window": 3,
+    "pressure_delta_threshold": 4.0,
+    "wind_direction_shift_threshold": 30.0,
+    "regime_vol_window": 10,
+    "regime_slope_window": 10,
+    "forecast_disagreement_window": 14
+  },
+  "stage2_per_city_params": {
+    "KATL": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KAUS": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KBOS": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KDCA": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KDEN": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KDFW": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KHOU": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KLAS": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KLAX": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMDW": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMIA": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMSP": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMSY": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KNYC": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KOKC": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KPHL": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KPHX": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KSAT": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KSEA": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KSFO": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    }
+  },
+  "stage3_validation": {
+    "global_params": {
+      "params": {
+        "calendar_climatology_window": 30,
+        "gaussian_window": 30,
+        "gaussian_z_threshold": 1.5,
+        "pressure_delta_window": 3,
+        "pressure_delta_threshold": 4.0,
+        "wind_direction_shift_threshold": 30.0,
+        "regime_vol_window": 10,
+        "regime_slope_window": 10,
+        "forecast_disagreement_window": 14
+      },
+      "accuracy": 0.66377,
+      "correct": 306,
+      "total": 461,
+      "trades": 461
+    },
+    "refined_params": {
+      "accuracy": 0.66377,
+      "correct": 306,
+      "total": 461,
+      "trades": 461
+    },
+    "improvement_pp": 0.0
+  },
+  "final_params": {
+    "calendar_climatology_window": 30,
+    "gaussian_window": 30,
+    "gaussian_z_threshold": 1.5,
+    "pressure_delta_window": 3,
+    "pressure_delta_threshold": 4.0,
+    "wind_direction_shift_threshold": 30.0,
+    "regime_vol_window": 10,
+    "regime_slope_window": 10,
+    "forecast_disagreement_window": 14
+  },
+  "per_city_params_summary": {
+    "KATL": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KAUS": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KBOS": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KDCA": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KDEN": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KDFW": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KHOU": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KLAS": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KLAX": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMDW": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMIA": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMSP": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KMSY": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KNYC": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KOKC": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KPHL": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KPHX": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KSAT": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KSEA": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    },
+    "KSFO": {
+      "calendar_climatology_window": 30,
+      "gaussian_window": 30,
+      "gaussian_z_threshold": 1.5,
+      "pressure_delta_window": 3,
+      "pressure_delta_threshold": 4.0,
+      "wind_direction_shift_threshold": 30.0,
+      "regime_vol_window": 10,
+      "regime_slope_window": 10,
+      "forecast_disagreement_window": 14
+    }
+  }
+}

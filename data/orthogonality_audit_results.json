@@ -1,0 +1,265 @@
+{
+  "metadata": {
+    "database": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db",
+    "correlation_matrix_source": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/signal_correlation_matrix.json",
+    "walk_forward_train_days": 180,
+    "walk_forward_test_days": 30,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDAL",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "redundant_pairs_analyzed": 7,
+    "signals_audited": [
+      "calendar_climatology",
+      "forecast_disagreement",
+      "gaussian",
+      "gaussian_v2",
+      "persistence",
+      "simple_trend",
+      "wind_direction_shift"
+    ]
+  },
+  "per_signal_performance": {
+    "calendar_climatology": {
+      "total_accuracy": 0.6893,
+      "total_predictions": 14414,
+      "total_correct": 9936,
+      "stations_with_data": 21
+    },
+    "forecast_disagreement": {
+      "total_accuracy": 0.6463,
+      "total_predictions": 26861,
+      "total_correct": 17359,
+      "stations_with_data": 21
+    },
+    "gaussian": {
+      "total_accuracy": 0.665,
+      "total_predictions": 27270,
+      "total_correct": 18135,
+      "stations_with_data": 21
+    },
+    "gaussian_v2": {
+      "total_accuracy": 0.6395,
+      "total_predictions": 43706,
+      "total_correct": 27948,
+      "stations_with_data": 21
+    },
+    "persistence": {
+      "total_accuracy": 0.5103,
+      "total_predictions": 63600,
+      "total_correct": 32458,
+      "stations_with_data": 21
+    },
+    "simple_trend": {
+      "total_accuracy": 0.5103,
+      "total_predictions": 63600,
+      "total_correct": 32458,
+      "stations_with_data": 21
+    },
+    "wind_direction_shift": {
+      "total_accuracy": 0.602,
+      "total_predictions": 9672,
+      "total_correct": 5823,
+      "stations_with_data": 21
+    }
+  },
+  "redundant_pair_comparisons": [
+    {
+      "signal_a": "gaussian_v2",
+      "signal_b": "calendar_climatology",
+      "spearman_rho": 1.0,
+      "a_accuracy": 0.6395,
+      "b_accuracy": 0.6893,
+      "a_predictions": 43706,
+      "b_predictions": 14414,
+      "winner": "calendar_climatology",
+      "loser": "gaussian_v2",
+      "accuracy_difference": 0.0498,
+      "recommendation": "Keep calendar_climatology (accuracy: 0.6893 vs 0.6395)"
+    },
+    {
+      "signal_a": "forecast_disagreement",
+      "signal_b": "calendar_climatology",
+      "spearman_rho": 0.9981,
+      "a_accuracy": 0.6463,
+      "b_accuracy": 0.6893,
+      "a_predictions": 26861,
+      "b_predictions": 14414,
+      "winner": "calendar_climatology",
+      "loser": "forecast_disagreement",
+      "accuracy_difference": 0.043,
+      "recommendation": "Keep calendar_climatology (accuracy: 0.6893 vs 0.6463)"
+    },
+    {
+      "signal_a": "gaussian",
+      "signal_b": "gaussian_v2",
+      "spearman_rho": 1.0,
+      "a_accuracy": 0.665,
+      "b_accuracy": 0.6395,
+      "a_predictions": 27270,
+      "b_predictions": 43706,
+      "winner": "gaussian",
+      "loser": "gaussian_v2",
+      "accuracy_difference": 0.0255,
+      "recommendation": "Keep gaussian (accuracy: 0.6650 vs 0.6395)"
+    },
+    {
+      "signal_a": "gaussian",
+      "signal_b": "calendar_climatology",
+      "spearman_rho": 1.0,
+      "a_accuracy": 0.665,
+      "b_accuracy": 0.6893,
+      "a_predictions": 27270,
+      "b_predictions": 14414,
+      "winner": "calendar_climatology",
+      "loser": "gaussian",
+      "accuracy_difference": 0.0243,
+      "recommendation": "Keep calendar_climatology (accuracy: 0.6893 vs 0.6650)"
+    },
+    {
+      "signal_a": "gaussian",
+      "signal_b": "forecast_disagreement",
+      "spearman_rho": 0.9887,
+      "a_accuracy": 0.665,
+      "b_accuracy": 0.6463,
+      "a_predictions": 27270,
+      "b_predictions": 26861,
+      "winner": "gaussian",
+      "loser": "forecast_disagreement",
+      "accuracy_difference": 0.0187,
+      "recommendation": "Keep gaussian (accuracy: 0.6650 vs 0.6463)"
+    },
+    {
+      "signal_a": "gaussian_v2",
+      "signal_b": "forecast_disagreement",
+      "spearman_rho": 0.9722,
+      "a_accuracy": 0.6395,
+      "b_accuracy": 0.6463,
+      "a_predictions": 43706,
+      "b_predictions": 26861,
+      "winner": "forecast_disagreement",
+      "loser": "gaussian_v2",
+      "accuracy_difference": 0.0068,
+      "recommendation": "Keep forecast_disagreement (accuracy: 0.6463 vs 0.6395)"
+    },
+    {
+      "signal_a": "persistence",
+      "signal_b": "simple_trend",
+      "spearman_rho": 1.0,
+      "a_accuracy": 0.5103,
+      "b_accuracy": 0.5103,
+      "a_predictions": 63600,
+      "b_predictions": 63600,
+      "winner": "tie",
+      "loser": "tie",
+      "accuracy_difference": 0.0,
+      "recommendation": "Tie - keep simpler signal"
+    }
+  ],
+  "cluster_recommendations": [
+    {
+      "cluster_signals": [
+        "gaussian_v2",
+        "calendar_climatology"
+      ],
+      "best_signal": "calendar_climatology",
+      "best_accuracy": 0.6893,
+      "worst_accuracy": 0.6395,
+      "recommendation": "Keep calendar_climatology (accuracy: 0.6893 vs 0.6395)"
+    },
+    {
+      "cluster_signals": [
+        "forecast_disagreement",
+        "calendar_climatology"
+      ],
+      "best_signal": "calendar_climatology",
+      "best_accuracy": 0.6893,
+      "worst_accuracy": 0.6463,
+      "recommendation": "Keep calendar_climatology (accuracy: 0.6893 vs 0.6463)"
+    },
+    {
+      "cluster_signals": [
+        "gaussian",
+        "gaussian_v2"
+      ],
+      "best_signal": "gaussian",
+      "best_accuracy": 0.665,
+      "worst_accuracy": 0.6395,
+      "recommendation": "Keep gaussian (accuracy: 0.6650 vs 0.6395)"
+    },
+    {
+      "cluster_signals": [
+        "gaussian",
+        "calendar_climatology"
+      ],
+      "best_signal": "calendar_climatology",
+      "best_accuracy": 0.6893,
+      "worst_accuracy": 0.665,
+      "recommendation": "Keep calendar_climatology (accuracy: 0.6893 vs 0.6650)"
+    },
+    {
+      "cluster_signals": [
+        "gaussian",
+        "forecast_disagreement"
+      ],
+      "best_signal": "gaussian",
+      "best_accuracy": 0.665,
+      "worst_accuracy": 0.6463,
+      "recommendation": "Keep gaussian (accuracy: 0.6650 vs 0.6463)"
+    },
+    {
+      "cluster_signals": [
+        "gaussian_v2",
+        "forecast_disagreement"
+      ],
+      "best_signal": "forecast_disagreement",
+      "best_accuracy": 0.6463,
+      "worst_accuracy": 0.6395,
+      "recommendation": "Keep forecast_disagreement (accuracy: 0.6463 vs 0.6395)"
+    },
+    {
+      "cluster_signals": [
+        "persistence",
+        "simple_trend"
+      ],
+      "best_signal": "tie",
+      "best_accuracy": 0.5103,
+      "worst_accuracy": 0.5103,
+      "recommendation": "Tie - keep simpler signal"
+    }
+  ],
+  "wind_direction_shift_audit": {
+    "signal": "wind_direction_shift",
+    "total_accuracy": 0.602,
+    "total_predictions": 9672,
+    "stations_with_data": 21,
+    "evaluation_status": "OK (inherits BaseSignal, evaluate() method present)",
+    "independent": true,
+    "max_correlation_with_other_signals": 0.3166
+  },
+  "summary": {
+    "pairs_where_signal_a_wins": 2,
+    "pairs_where_signal_b_wins": 4,
+    "pairs_tie": 1,
+    "pairs_missing_data": 0
+  }
+}

@@ -1,0 +1,343 @@
+{
+  "analysis_timestamp": "2026-07-17T15:46:14.387435+00:00",
+  "stations_analyzed": 20,
+  "station_models": {
+    "KATL": {
+      "station": "KATL",
+      "total_observations": 41257,
+      "temperature_stats": {
+        "average": 79.20096759337818,
+        "min": 8.059999999999999,
+        "max": 63098.6,
+        "std_deviation": 908.0909832456105
+      },
+      "threshold_proximity": {
+        "75": 6407,
+        "80": 3561,
+        "85": 1616,
+        "90": 1166
+      },
+      "model_timestamp": "2026-07-17T15:46:14.432968+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.15,
+      "volatile_thresholds": [
+        75
+      ]
+    },
+    "KBOS": {
+      "station": "KBOS",
+      "total_observations": 41243,
+      "temperature_stats": {
+        "average": 79.82901971243562,
+        "min": -9.040000000000006,
+        "max": 61296.8,
+        "std_deviation": 1105.8091866573468
+      },
+      "threshold_proximity": {
+        "75": 3404,
+        "80": 1552,
+        "85": 565,
+        "90": 287
+      },
+      "model_timestamp": "2026-07-17T15:46:14.483814+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.0,
+      "volatile_thresholds": []
+    },
+    "KDFW": {
+      "station": "KDFW",
+      "total_observations": 41301,
+      "temperature_stats": {
+        "average": 76.89073436478564,
+        "min": -0.9400000000000048,
+        "max": 37891.4,
+        "std_deviation": 515.0923976599219
+      },
+      "threshold_proximity": {
+        "75": 4834,
+        "80": 4010,
+        "85": 2366,
+        "90": 2343
+      },
+      "model_timestamp": "2026-07-17T15:46:14.531294+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.15,
+      "volatile_thresholds": [
+        75
+      ]
+    },
+    "KDEN": {
+      "station": "KDEN",
+      "total_observations": 40993,
+      "temperature_stats": {
+        "average": 83.94576147147062,
+        "min": -22.0,
+        "max": 55905.8,
+        "std_deviation": 990.609092104076
+      },
+      "threshold_proximity": {
+        "75": 2421,
+        "80": 1482,
+        "85": 859,
+        "90": 851
+      },
+      "model_timestamp": "2026-07-17T15:46:14.579689+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.0,
+      "volatile_thresholds": []
+    },
+    "KLAX": {
+      "station": "KLAX",
+      "total_observations": 41295,
+      "temperature_stats": {
+        "average": 62.4026908826726,
+        "min": 33.8,
+        "max": 100.94,
+        "std_deviation": 7.173023628548418
+      },
+      "threshold_proximity": {
+        "75": 2572,
+        "80": 528,
+        "85": 104,
+        "90": 28
+      },
+      "model_timestamp": "2026-07-17T15:46:14.625596+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.0,
+      "volatile_thresholds": []
+    },
+    "KMIA": {
+      "station": "KMIA",
+      "total_observations": 41270,
+      "temperature_stats": {
+        "average": 85.80115822631436,
+        "min": 42.08,
+        "max": 43286.0,
+        "std_deviation": 544.3531391175807
+      },
+      "threshold_proximity": {
+        "75": 9304,
+        "80": 9503,
+        "85": 5203,
+        "90": 2465
+      },
+      "model_timestamp": "2026-07-17T15:46:14.672512+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.44999999999999996,
+      "volatile_thresholds": [
+        75,
+        80,
+        85
+      ]
+    },
+    "KSEA": {
+      "station": "KSEA",
+      "total_observations": 41272,
+      "temperature_stats": {
+        "average": 54.2921486722231,
+        "min": 15.079999999999998,
+        "max": 43284.2,
+        "std_deviation": 213.15423090011691
+      },
+      "threshold_proximity": {
+        "75": 1615,
+        "80": 723,
+        "85": 259,
+        "90": 111
+      },
+      "model_timestamp": "2026-07-17T15:46:14.723775+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.0,
+      "volatile_thresholds": []
+    },
+    "KSFO": {
+      "station": "KSFO",
+      "total_observations": 41256,
+      "temperature_stats": {
+        "average": 103.15463787085484,
+        "min": 35.96,
+        "max": 57678.8,
+        "std_deviation": 1530.4698203552264
+      },
+      "threshold_proximity": {
+        "75": 861,
+        "80": 200,
+        "85": 50,
+        "90": 25
+      },
+      "model_timestamp": "2026-07-17T15:46:14.776070+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.0,
+      "volatile_thresholds": []
+    },
+    "KHOU": {
+      "station": "KHOU",
+      "total_observations": 41312,
+      "temperature_stats": {
+        "average": 81.40282823392721,
+        "min": 12.920000000000002,
+        "max": 45080.6,
+        "std_deviation": 583.0319389749565
+      },
+      "threshold_proximity": {
+        "75": 6452,
+        "80": 5360,
+        "85": 2663,
+        "90": 2313
+      },
+      "model_timestamp": "2026-07-17T15:46:14.821739+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.3,
+      "volatile_thresholds": [
+        75,
+        80
+      ]
+    },
+    "KDCA": {
+      "station": "KDCA",
+      "total_observations": 41294,
+      "temperature_stats": {
+        "average": 60.78429457063957,
+        "min": 8.96,
+        "max": 102.91999999999999,
+        "std_deviation": 17.153700081297035
+      },
+      "threshold_proximity": {
+        "75": 4914,
+        "80": 3296,
+        "85": 1452,
+        "90": 828
+      },
+      "model_timestamp": "2026-07-17T15:46:14.864817+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.15,
+      "volatile_thresholds": [
+        75
+      ]
+    },
+    "KMSP": {
+      "station": "KMSP",
+      "total_observations": 33914,
+      "temperature_stats": {
+        "average": 48.05931296809614,
+        "min": -18.940000000000005,
+        "max": 7289.6,
+        "std_deviation": 60.630708007028716
+      },
+      "threshold_proximity": {
+        "75": 2543,
+        "80": 1494,
+        "85": 745,
+        "90": 286
+      },
+      "model_timestamp": "2026-07-17T15:46:14.905549+00:00",
+      "revision_predictor_v1": true,
+      "strategy": "analyze_temp_volatility_near_thresholds",
+      "estimated_flip_probability": 0.0,
+      "volatile_thresholds": []
+    }
+  },
+  "revision_signals": [
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KDFW",
+      "signal_type": "threshold_proximity_risk",
+      "threshold": 75,
+      "current_temp": 76.89073436478564,
+      "distance_to_threshold": 1.8907343647856436,
+      "risk_level": "MODERATE",
+      "trigger_condition": "Current temp 76.89073436478564\u00b0F approaching critical threshold 75\u00b0F where historical revisions caused flips",
+      "timestamp_utc": "2026-07-17T15:46:14.913966+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KMIA",
+      "signal_type": "potential_revision_flip",
+      "threshold": 75,
+      "estimated_probability": 0.44999999999999996,
+      "trigger_condition": "Temp volatility near 75\u00b0F level indicates potential for revision-triggered threshold crossing",
+      "timestamp_utc": "2026-07-17T15:46:14.913982+00:00",
+      "model_reference": "2026-07-17T15:46:14.672512+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KMIA",
+      "signal_type": "potential_revision_flip",
+      "threshold": 80,
+      "estimated_probability": 0.44999999999999996,
+      "trigger_condition": "Temp volatility near 80\u00b0F level indicates potential for revision-triggered threshold crossing",
+      "timestamp_utc": "2026-07-17T15:46:14.913985+00:00",
+      "model_reference": "2026-07-17T15:46:14.672512+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KMIA",
+      "signal_type": "potential_revision_flip",
+      "threshold": 85,
+      "estimated_probability": 0.44999999999999996,
+      "trigger_condition": "Temp volatility near 85\u00b0F level indicates potential for revision-triggered threshold crossing",
+      "timestamp_utc": "2026-07-17T15:46:14.913986+00:00",
+      "model_reference": "2026-07-17T15:46:14.672512+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KMIA",
+      "signal_type": "threshold_proximity_risk",
+      "threshold": 85,
+      "current_temp": 85.80115822631436,
+      "distance_to_threshold": 0.8011582263143566,
+      "risk_level": "HIGH",
+      "trigger_condition": "Current temp 85.80115822631436\u00b0F approaching critical threshold 85\u00b0F where historical revisions caused flips",
+      "timestamp_utc": "2026-07-17T15:46:14.913989+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KHOU",
+      "signal_type": "potential_revision_flip",
+      "threshold": 75,
+      "estimated_probability": 0.3,
+      "trigger_condition": "Temp volatility near 75\u00b0F level indicates potential for revision-triggered threshold crossing",
+      "timestamp_utc": "2026-07-17T15:46:14.913992+00:00",
+      "model_reference": "2026-07-17T15:46:14.821739+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KHOU",
+      "signal_type": "potential_revision_flip",
+      "threshold": 80,
+      "estimated_probability": 0.3,
+      "trigger_condition": "Temp volatility near 80\u00b0F level indicates potential for revision-triggered threshold crossing",
+      "timestamp_utc": "2026-07-17T15:46:14.913994+00:00",
+      "model_reference": "2026-07-17T15:46:14.821739+00:00"
+    },
+    {
+      "trade_version": "nws_revision_predictability_v1.0",
+      "functionality": "nws_revision_predictability_signal",
+      "station": "KHOU",
+      "signal_type": "threshold_proximity_risk",
+      "threshold": 80,
+      "current_temp": 81.40282823392721,
+      "distance_to_threshold": 1.4028282339272096,
+      "risk_level": "MODERATE",
+      "trigger_condition": "Current temp 81.40282823392721\u00b0F approaching critical threshold 80\u00b0F where historical revisions caused flips",
+      "timestamp_utc": "2026-07-17T15:46:14.913996+00:00"
+    }
+  ]
+}

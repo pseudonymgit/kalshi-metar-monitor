@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-16T22:42:13.476880",
+    "source_file": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/../data/combinatorial_search_10sig.json",
+    "total_combinations_tested": 1023,
+    "total_signals": 10,
+    "stations_tested": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ]
+  },
+  "best_metrics": {
+    "best_accuracy": 0.807229,
+    "best_accuracy_entry": {
+      "combo": "goldilocks+forecast_disagreement+calendar_climatology",
+      "agreement": 3,
+      "accuracy": 0.807229,
+      "sharpe": 1.515337,
+      "trades": 166
+    },
+    "best_sharpe": 3.318635,
+    "best_sharpe_entry": {
+      "combo": "wind_direction_shift+goldilocks+gaussian+gaussian_v2+pressure_delta+calendar_climatology",
+      "agreement": 4,
+      "accuracy": 0.741155,
+      "sharpe": 3.318635,
+      "trades": 537
+    }
+  },
+  "goldilocks_gaussian": {
+    "accuracy": 0.764344,
+    "sharpe": 3.272536,
+    "trades": 488
+  },
+  "deflated_sharpe": {
+    "num_trials": 1023,
+    "representative_t_obs": 1612,
+    "expected_max_sharpe_null": 0.084322,
+    "deflated_sharpe_threshold": 0.082121,
+    "combos_exceeding_threshold": 3362,
+    "total_active_combos": 3748,
+    "goldilocks_gaussian_survives": true
+  },
+  "bonferroni_correction": {
+    "significance_level": 0.05,
+    "adjusted_alpha": 4.887585532746823e-05,
+    "critical_z": 4.060948,
+    "min_trades_required": 30,
+    "accuracy_floor": 0.870712,
+    "combos_passing_65pct": 1215,
+    "combos_passing_bonferroni": 0,
+    "unique_combos_passing_65pct": 763,
+    "unique_combos_passing_bonferroni": 0,
+    "goldilocks_gaussian_survives": false
+  },
+  "combined_assessment": {
+    "combos_passing_both": 0,
+    "unique_combos_passing_both": 0,
+    "goldilocks_gaussian_survives_both": false,
+    "top_10_both": []
+  }
+}
