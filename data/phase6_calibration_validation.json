@@ -1,0 +1,1110 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-17T03:50:09.910390",
+    "db_path": "data/metar_backfill.db",
+    "calibration_file": "data/calibrated_pipeline_v3.pkl",
+    "num_combos_validated": 5
+  },
+  "validation_results": [
+    {
+      "combo": "calendar_climatology",
+      "signals": [
+        "calendar_climatology"
+      ],
+      "raw_accuracy": 70.28,
+      "raw_trades": 6131,
+      "raw_correct": 4309,
+      "calibrated_accuracy": 70.79,
+      "calibrated_trades": 6045,
+      "accuracy_delta_pp": 0.5,
+      "raw_brier": 0.29718,
+      "calibrated_brier": 0.29214,
+      "brier_improvement": 0.00504,
+      "per_station": {
+        "KATL": {
+          "raw": {
+            "correct": 231,
+            "total": 330
+          },
+          "cal": {
+            "correct": 231,
+            "total": 330
+          }
+        },
+        "KAUS": {
+          "raw": {
+            "correct": 201,
+            "total": 281
+          },
+          "cal": {
+            "correct": 200,
+            "total": 277
+          }
+        },
+        "KBOS": {
+          "raw": {
+            "correct": 254,
+            "total": 347
+          },
+          "cal": {
+            "correct": 253,
+            "total": 344
+          }
+        },
+        "KDCA": {
+          "raw": {
+            "correct": 245,
+            "total": 344
+          },
+          "cal": {
+            "correct": 245,
+            "total": 344
+          }
+        },
+        "KDEN": {
+          "raw": {
+            "correct": 208,
+            "total": 286
+          },
+          "cal": {
+            "correct": 207,
+            "total": 283
+          }
+        },
+        "KDFW": {
+          "raw": {
+            "correct": 206,
+            "total": 287
+          },
+          "cal": {
+            "correct": 206,
+            "total": 287
+          }
+        },
+        "KHOU": {
+          "raw": {
+            "correct": 195,
+            "total": 283
+          },
+          "cal": {
+            "correct": 195,
+            "total": 282
+          }
+        },
+        "KLAS": {
+          "raw": {
+            "correct": 215,
+            "total": 359
+          },
+          "cal": {
+            "correct": 215,
+            "total": 359
+          }
+        },
+        "KLAX": {
+          "raw": {
+            "correct": 176,
+            "total": 225
+          },
+          "cal": {
+            "correct": 176,
+            "total": 224
+          }
+        },
+        "KMDW": {
+          "raw": {
+            "correct": 224,
+            "total": 319
+          },
+          "cal": {
+            "correct": 224,
+            "total": 318
+          }
+        },
+        "KMIA": {
+          "raw": {
+            "correct": 184,
+            "total": 244
+          },
+          "cal": {
+            "correct": 184,
+            "total": 244
+          }
+        },
+        "KMSP": {
+          "raw": {
+            "correct": 234,
+            "total": 341
+          },
+          "cal": {
+            "correct": 222,
+            "total": 313
+          }
+        },
+        "KMSY": {
+          "raw": {
+            "correct": 206,
+            "total": 278
+          },
+          "cal": {
+            "correct": 206,
+            "total": 278
+          }
+        },
+        "KNYC": {
+          "raw": {
+            "correct": 243,
+            "total": 342
+          },
+          "cal": {
+            "correct": 242,
+            "total": 340
+          }
+        },
+        "KOKC": {
+          "raw": {
+            "correct": 237,
+            "total": 307
+          },
+          "cal": {
+            "correct": 237,
+            "total": 306
+          }
+        },
+        "KPHL": {
+          "raw": {
+            "correct": 250,
+            "total": 354
+          },
+          "cal": {
+            "correct": 250,
+            "total": 354
+          }
+        },
+        "KPHX": {
+          "raw": {
+            "correct": 233,
+            "total": 366
+          },
+          "cal": {
+            "correct": 229,
+            "total": 356
+          }
+        },
+        "KSAT": {
+          "raw": {
+            "correct": 206,
+            "total": 292
+          },
+          "cal": {
+            "correct": 205,
+            "total": 289
+          }
+        },
+        "KSEA": {
+          "raw": {
+            "correct": 194,
+            "total": 324
+          },
+          "cal": {
+            "correct": 186,
+            "total": 297
+          }
+        },
+        "KSFO": {
+          "raw": {
+            "correct": 167,
+            "total": 222
+          },
+          "cal": {
+            "correct": 166,
+            "total": 220
+          }
+        }
+      }
+    },
+    {
+      "combo": "calendar_climatology+regime",
+      "signals": [
+        "calendar_climatology",
+        "regime"
+      ],
+      "raw_accuracy": 70.3,
+      "raw_trades": 6154,
+      "raw_correct": 4326,
+      "calibrated_accuracy": 70.81,
+      "calibrated_trades": 6053,
+      "accuracy_delta_pp": 0.51,
+      "raw_brier": 0.29704,
+      "calibrated_brier": 0.29192,
+      "brier_improvement": 0.00512,
+      "per_station": {
+        "KATL": {
+          "raw": {
+            "correct": 231,
+            "total": 330
+          },
+          "cal": {
+            "correct": 231,
+            "total": 330
+          }
+        },
+        "KAUS": {
+          "raw": {
+            "correct": 202,
+            "total": 282
+          },
+          "cal": {
+            "correct": 201,
+            "total": 278
+          }
+        },
+        "KBOS": {
+          "raw": {
+            "correct": 254,
+            "total": 347
+          },
+          "cal": {
+            "correct": 253,
+            "total": 344
+          }
+        },
+        "KDCA": {
+          "raw": {
+            "correct": 245,
+            "total": 344
+          },
+          "cal": {
+            "correct": 245,
+            "total": 344
+          }
+        },
+        "KDEN": {
+          "raw": {
+            "correct": 208,
+            "total": 286
+          },
+          "cal": {
+            "correct": 207,
+            "total": 283
+          }
+        },
+        "KDFW": {
+          "raw": {
+            "correct": 206,
+            "total": 287
+          },
+          "cal": {
+            "correct": 206,
+            "total": 287
+          }
+        },
+        "KHOU": {
+          "raw": {
+            "correct": 196,
+            "total": 284
+          },
+          "cal": {
+            "correct": 195,
+            "total": 282
+          }
+        },
+        "KLAS": {
+          "raw": {
+            "correct": 215,
+            "total": 359
+          },
+          "cal": {
+            "correct": 215,
+            "total": 359
+          }
+        },
+        "KLAX": {
+          "raw": {
+            "correct": 179,
+            "total": 231
+          },
+          "cal": {
+            "correct": 177,
+            "total": 225
+          }
+        },
+        "KMDW": {
+          "raw": {
+            "correct": 224,
+            "total": 319
+          },
+          "cal": {
+            "correct": 224,
+            "total": 318
+          }
+        },
+        "KMIA": {
+          "raw": {
+            "correct": 192,
+            "total": 253
+          },
+          "cal": {
+            "correct": 187,
+            "total": 247
+          }
+        },
+        "KMSP": {
+          "raw": {
+            "correct": 234,
+            "total": 341
+          },
+          "cal": {
+            "correct": 222,
+            "total": 313
+          }
+        },
+        "KMSY": {
+          "raw": {
+            "correct": 206,
+            "total": 278
+          },
+          "cal": {
+            "correct": 206,
+            "total": 278
+          }
+        },
+        "KNYC": {
+          "raw": {
+            "correct": 243,
+            "total": 342
+          },
+          "cal": {
+            "correct": 242,
+            "total": 340
+          }
+        },
+        "KOKC": {
+          "raw": {
+            "correct": 237,
+            "total": 307
+          },
+          "cal": {
+            "correct": 237,
+            "total": 306
+          }
+        },
+        "KPHL": {
+          "raw": {
+            "correct": 250,
+            "total": 354
+          },
+          "cal": {
+            "correct": 250,
+            "total": 354
+          }
+        },
+        "KPHX": {
+          "raw": {
+            "correct": 233,
+            "total": 366
+          },
+          "cal": {
+            "correct": 229,
+            "total": 356
+          }
+        },
+        "KSAT": {
+          "raw": {
+            "correct": 208,
+            "total": 295
+          },
+          "cal": {
+            "correct": 205,
+            "total": 289
+          }
+        },
+        "KSEA": {
+          "raw": {
+            "correct": 194,
+            "total": 324
+          },
+          "cal": {
+            "correct": 186,
+            "total": 297
+          }
+        },
+        "KSFO": {
+          "raw": {
+            "correct": 169,
+            "total": 225
+          },
+          "cal": {
+            "correct": 168,
+            "total": 223
+          }
+        }
+      }
+    },
+    {
+      "combo": "gaussian",
+      "signals": [
+        "gaussian"
+      ],
+      "raw_accuracy": 67.24,
+      "raw_trades": 11495,
+      "raw_correct": 7729,
+      "calibrated_accuracy": 67.24,
+      "calibrated_trades": 11495,
+      "accuracy_delta_pp": 0.0,
+      "raw_brier": 0.32762,
+      "calibrated_brier": 0.32762,
+      "brier_improvement": 0.0,
+      "per_station": {
+        "KATL": {
+          "raw": {
+            "correct": 410,
+            "total": 617
+          },
+          "cal": {
+            "correct": 410,
+            "total": 617
+          }
+        },
+        "KAUS": {
+          "raw": {
+            "correct": 393,
+            "total": 564
+          },
+          "cal": {
+            "correct": 393,
+            "total": 564
+          }
+        },
+        "KBOS": {
+          "raw": {
+            "correct": 424,
+            "total": 607
+          },
+          "cal": {
+            "correct": 424,
+            "total": 607
+          }
+        },
+        "KDCA": {
+          "raw": {
+            "correct": 423,
+            "total": 612
+          },
+          "cal": {
+            "correct": 423,
+            "total": 612
+          }
+        },
+        "KDEN": {
+          "raw": {
+            "correct": 400,
+            "total": 568
+          },
+          "cal": {
+            "correct": 400,
+            "total": 568
+          }
+        },
+        "KDFW": {
+          "raw": {
+            "correct": 391,
+            "total": 573
+          },
+          "cal": {
+            "correct": 391,
+            "total": 573
+          }
+        },
+        "KHOU": {
+          "raw": {
+            "correct": 378,
+            "total": 565
+          },
+          "cal": {
+            "correct": 378,
+            "total": 565
+          }
+        },
+        "KLAS": {
+          "raw": {
+            "correct": 364,
+            "total": 635
+          },
+          "cal": {
+            "correct": 364,
+            "total": 635
+          }
+        },
+        "KLAX": {
+          "raw": {
+            "correct": 337,
+            "total": 471
+          },
+          "cal": {
+            "correct": 337,
+            "total": 471
+          }
+        },
+        "KMDW": {
+          "raw": {
+            "correct": 385,
+            "total": 566
+          },
+          "cal": {
+            "correct": 385,
+            "total": 566
+          }
+        },
+        "KMIA": {
+          "raw": {
+            "correct": 351,
+            "total": 467
+          },
+          "cal": {
+            "correct": 351,
+            "total": 467
+          }
+        },
+        "KMSP": {
+          "raw": {
+            "correct": 400,
+            "total": 597
+          },
+          "cal": {
+            "correct": 400,
+            "total": 597
+          }
+        },
+        "KMSY": {
+          "raw": {
+            "correct": 389,
+            "total": 580
+          },
+          "cal": {
+            "correct": 389,
+            "total": 580
+          }
+        },
+        "KNYC": {
+          "raw": {
+            "correct": 406,
+            "total": 616
+          },
+          "cal": {
+            "correct": 406,
+            "total": 616
+          }
+        },
+        "KOKC": {
+          "raw": {
+            "correct": 428,
+            "total": 621
+          },
+          "cal": {
+            "correct": 428,
+            "total": 621
+          }
+        },
+        "KPHL": {
+          "raw": {
+            "correct": 423,
+            "total": 642
+          },
+          "cal": {
+            "correct": 423,
+            "total": 642
+          }
+        },
+        "KPHX": {
+          "raw": {
+            "correct": 396,
+            "total": 639
+          },
+          "cal": {
+            "correct": 396,
+            "total": 639
+          }
+        },
+        "KSAT": {
+          "raw": {
+            "correct": 377,
+            "total": 541
+          },
+          "cal": {
+            "correct": 377,
+            "total": 541
+          }
+        },
+        "KSEA": {
+          "raw": {
+            "correct": 334,
+            "total": 569
+          },
+          "cal": {
+            "correct": 334,
+            "total": 569
+          }
+        },
+        "KSFO": {
+          "raw": {
+            "correct": 320,
+            "total": 445
+          },
+          "cal": {
+            "correct": 320,
+            "total": 445
+          }
+        }
+      }
+    },
+    {
+      "combo": "calendar_climatology+gaussian",
+      "signals": [
+        "calendar_climatology",
+        "gaussian"
+      ],
+      "raw_accuracy": 67.24,
+      "raw_trades": 11495,
+      "raw_correct": 7729,
+      "calibrated_accuracy": 67.24,
+      "calibrated_trades": 11495,
+      "accuracy_delta_pp": 0.0,
+      "raw_brier": 0.32762,
+      "calibrated_brier": 0.32762,
+      "brier_improvement": 0.0,
+      "per_station": {
+        "KATL": {
+          "raw": {
+            "correct": 410,
+            "total": 617
+          },
+          "cal": {
+            "correct": 410,
+            "total": 617
+          }
+        },
+        "KAUS": {
+          "raw": {
+            "correct": 393,
+            "total": 564
+          },
+          "cal": {
+            "correct": 393,
+            "total": 564
+          }
+        },
+        "KBOS": {
+          "raw": {
+            "correct": 424,
+            "total": 607
+          },
+          "cal": {
+            "correct": 424,
+            "total": 607
+          }
+        },
+        "KDCA": {
+          "raw": {
+            "correct": 423,
+            "total": 612
+          },
+          "cal": {
+            "correct": 423,
+            "total": 612
+          }
+        },
+        "KDEN": {
+          "raw": {
+            "correct": 400,
+            "total": 568
+          },
+          "cal": {
+            "correct": 400,
+            "total": 568
+          }
+        },
+        "KDFW": {
+          "raw": {
+            "correct": 391,
+            "total": 573
+          },
+          "cal": {
+            "correct": 391,
+            "total": 573
+          }
+        },
+        "KHOU": {
+          "raw": {
+            "correct": 378,
+            "total": 565
+          },
+          "cal": {
+            "correct": 378,
+            "total": 565
+          }
+        },
+        "KLAS": {
+          "raw": {
+            "correct": 364,
+            "total": 635
+          },
+          "cal": {
+            "correct": 364,
+            "total": 635
+          }
+        },
+        "KLAX": {
+          "raw": {
+            "correct": 337,
+            "total": 471
+          },
+          "cal": {
+            "correct": 337,
+            "total": 471
+          }
+        },
+        "KMDW": {
+          "raw": {
+            "correct": 385,
+            "total": 566
+          },
+          "cal": {
+            "correct": 385,
+            "total": 566
+          }
+        },
+        "KMIA": {
+          "raw": {
+            "correct": 351,
+            "total": 467
+          },
+          "cal": {
+            "correct": 351,
+            "total": 467
+          }
+        },
+        "KMSP": {
+          "raw": {
+            "correct": 400,
+            "total": 597
+          },
+          "cal": {
+            "correct": 400,
+            "total": 597
+          }
+        },
+        "KMSY": {
+          "raw": {
+            "correct": 389,
+            "total": 580
+          },
+          "cal": {
+            "correct": 389,
+            "total": 580
+          }
+        },
+        "KNYC": {
+          "raw": {
+            "correct": 406,
+            "total": 616
+          },
+          "cal": {
+            "correct": 406,
+            "total": 616
+          }
+        },
+        "KOKC": {
+          "raw": {
+            "correct": 428,
+            "total": 621
+          },
+          "cal": {
+            "correct": 428,
+            "total": 621
+          }
+        },
+        "KPHL": {
+          "raw": {
+            "correct": 423,
+            "total": 642
+          },
+          "cal": {
+            "correct": 423,
+            "total": 642
+          }
+        },
+        "KPHX": {
+          "raw": {
+            "correct": 396,
+            "total": 639
+          },
+          "cal": {
+            "correct": 396,
+            "total": 639
+          }
+        },
+        "KSAT": {
+          "raw": {
+            "correct": 377,
+            "total": 541
+          },
+          "cal": {
+            "correct": 377,
+            "total": 541
+          }
+        },
+        "KSEA": {
+          "raw": {
+            "correct": 334,
+            "total": 569
+          },
+          "cal": {
+            "correct": 334,
+            "total": 569
+          }
+        },
+        "KSFO": {
+          "raw": {
+            "correct": 320,
+            "total": 445
+          },
+          "cal": {
+            "correct": 320,
+            "total": 445
+          }
+        }
+      }
+    },
+    {
+      "combo": "gaussian+regime",
+      "signals": [
+        "gaussian",
+        "regime"
+      ],
+      "raw_accuracy": 67.26,
+      "raw_trades": 11509,
+      "raw_correct": 7741,
+      "calibrated_accuracy": 67.25,
+      "calibrated_trades": 11498,
+      "accuracy_delta_pp": -0.01,
+      "raw_brier": 0.3274,
+      "calibrated_brier": 0.32754,
+      "brier_improvement": -0.00014,
+      "per_station": {
+        "KATL": {
+          "raw": {
+            "correct": 410,
+            "total": 617
+          },
+          "cal": {
+            "correct": 410,
+            "total": 617
+          }
+        },
+        "KAUS": {
+          "raw": {
+            "correct": 394,
+            "total": 565
+          },
+          "cal": {
+            "correct": 394,
+            "total": 565
+          }
+        },
+        "KBOS": {
+          "raw": {
+            "correct": 424,
+            "total": 607
+          },
+          "cal": {
+            "correct": 424,
+            "total": 607
+          }
+        },
+        "KDCA": {
+          "raw": {
+            "correct": 423,
+            "total": 612
+          },
+          "cal": {
+            "correct": 423,
+            "total": 612
+          }
+        },
+        "KDEN": {
+          "raw": {
+            "correct": 400,
+            "total": 568
+          },
+          "cal": {
+            "correct": 400,
+            "total": 568
+          }
+        },
+        "KDFW": {
+          "raw": {
+            "correct": 391,
+            "total": 573
+          },
+          "cal": {
+            "correct": 391,
+            "total": 573
+          }
+        },
+        "KHOU": {
+          "raw": {
+            "correct": 379,
+            "total": 566
+          },
+          "cal": {
+            "correct": 378,
+            "total": 565
+          }
+        },
+        "KLAS": {
+          "raw": {
+            "correct": 364,
+            "total": 635
+          },
+          "cal": {
+            "correct": 364,
+            "total": 635
+          }
+        },
+        "KLAX": {
+          "raw": {
+            "correct": 339,
+            "total": 474
+          },
+          "cal": {
+            "correct": 338,
+            "total": 472
+          }
+        },
+        "KMDW": {
+          "raw": {
+            "correct": 385,
+            "total": 566
+          },
+          "cal": {
+            "correct": 385,
+            "total": 566
+          }
+        },
+        "KMIA": {
+          "raw": {
+            "correct": 356,
+            "total": 472
+          },
+          "cal": {
+            "correct": 351,
+            "total": 467
+          }
+        },
+        "KMSP": {
+          "raw": {
+            "correct": 400,
+            "total": 597
+          },
+          "cal": {
+            "correct": 400,
+            "total": 597
+          }
+        },
+        "KMSY": {
+          "raw": {
+            "correct": 389,
+            "total": 580
+          },
+          "cal": {
+            "correct": 389,
+            "total": 580
+          }
+        },
+        "KNYC": {
+          "raw": {
+            "correct": 406,
+            "total": 616
+          },
+          "cal": {
+            "correct": 406,
+            "total": 616
+          }
+        },
+        "KOKC": {
+          "raw": {
+            "correct": 428,
+            "total": 621
+          },
+          "cal": {
+            "correct": 428,
+            "total": 621
+          }
+        },
+        "KPHL": {
+          "raw": {
+            "correct": 423,
+            "total": 642
+          },
+          "cal": {
+            "correct": 423,
+            "total": 642
+          }
+        },
+        "KPHX": {
+          "raw": {
+            "correct": 396,
+            "total": 639
+          },
+          "cal": {
+            "correct": 396,
+            "total": 639
+          }
+        },
+        "KSAT": {
+          "raw": {
+            "correct": 379,
+            "total": 544
+          },
+          "cal": {
+            "correct": 377,
+            "total": 541
+          }
+        },
+        "KSEA": {
+          "raw": {
+            "correct": 334,
+            "total": 569
+          },
+          "cal": {
+            "correct": 334,
+            "total": 569
+          }
+        },
+        "KSFO": {
+          "raw": {
+            "correct": 321,
+            "total": 446
+          },
+          "cal": {
+            "correct": 321,
+            "total": 446
+          }
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "avg_raw_accuracy": 68.46,
+    "avg_cal_accuracy": 68.67,
+    "avg_accuracy_delta": 0.2,
+    "avg_raw_brier": 0.31537,
+    "avg_cal_brier": 0.31337,
+    "avg_brier_improvement": 0.002
+  },
+  "no_change_zone_check": {
+    "no_change_zone": 0.01,
+    "status": "Validated \u2014 reduced from 0.05 to 0.01 allows modest corrections without suppressing meaningful calibration"
+  }
+}

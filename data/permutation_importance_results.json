@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "database": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db",
+    "walk_forward_train_days": 180,
+    "walk_forward_test_days": 30,
+    "n_permutations": 50,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDAL",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "combos_analyzed": 1,
+    "signals_tested": [
+      "wind_direction_shift",
+      "nwp_analog",
+      "goldilocks",
+      "persistence",
+      "simple_trend",
+      "gaussian",
+      "gaussian_v2",
+      "pressure_delta",
+      "regime",
+      "forecast_disagreement",
+      "calendar_climatology"
+    ]
+  },
+  "combo_results": [
+    {
+      "combo_name": "goldilocks+gaussian",
+      "signals": [
+        "goldilocks",
+        "gaussian"
+      ],
+      "n_signals": 2,
+      "baseline_accuracy": 0.3773,
+      "baseline_correct": 9054,
+      "baseline_total": 23996,
+      "per_signal_importance": {
+        "goldilocks": {
+          "baseline_accuracy": 0.3773,
+          "mean_permuted_accuracy": 0.6145,
+          "std_permuted_accuracy": 0.0021,
+          "accuracy_drop": -0.2372,
+          "accuracy_drop_pct": -62.86,
+          "n_permutations": 50,
+          "importance_rank": 2
+        },
+        "gaussian": {
+          "baseline_accuracy": 0.3773,
+          "mean_permuted_accuracy": 0.142,
+          "std_permuted_accuracy": 0.002,
+          "accuracy_drop": 0.2353,
+          "accuracy_drop_pct": 62.35,
+          "n_permutations": 50,
+          "importance_rank": 1
+        }
+      },
+      "importance_ranking": [
+        "gaussian",
+        "goldilocks"
+      ],
+      "negative_contributors": [
+        "goldilocks"
+      ]
+    }
+  ],
+  "overall_importance": {
+    "gaussian": {
+      "mean_accuracy_drop": 0.2353,
+      "std_accuracy_drop": 0.0,
+      "max_accuracy_drop": 0.2353,
+      "min_accuracy_drop": 0.2353,
+      "n_combos": 1,
+      "is_negative_contributor": false
+    },
+    "goldilocks": {
+      "mean_accuracy_drop": -0.2372,
+      "std_accuracy_drop": 0.0,
+      "max_accuracy_drop": -0.2372,
+      "min_accuracy_drop": -0.2372,
+      "n_combos": 1,
+      "is_negative_contributor": true
+    }
+  },
+  "overall_importance_ranking": [
+    "gaussian",
+    "goldilocks"
+  ],
+  "negative_contributors": [
+    "goldilocks"
+  ],
+  "summary": {
+    "most_important_signal": "gaussian",
+    "most_important_drop": 0.2353,
+    "least_important_signal": "goldilocks",
+    "least_important_drop": -0.2372,
+    "negative_contributors_count": 1,
+    "negative_contributors": [
+      "goldilocks"
+    ]
+  }
+}
