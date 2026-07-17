@@ -1,0 +1,1412 @@
+{
+  "timestamp": "2026-07-17T15:43:49.810235+00:00",
+  "date": "2026-07-17",
+  "weather_markets": [],
+  "non_weather_markets": [
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268A0BB69F036-AF751208AB4",
+      "title": "yes Cruz Azul,yes Juarez,yes Leon,yes Los Angeles F,yes Nashville,yes Cleveland,yes Dallas,yes Detroit,yes Los Angeles C,yes Utah,yes Sacramento",
+      "status": "active",
+      "close_time": "2026-08-01T03:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262E47388F523-67E74187097",
+      "title": "no Over 8.5 runs scored,no Over 8.5 runs scored,no Over 7.5 runs scored,no Over 8.5 runs scored,no Over 8.5 runs scored,no Over 10.5 runs scored,no Over 8.5 runs scored,no Over 7.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260FD2A5657BD-BA9E862ED9C",
+      "title": "yes Collin Morikawa,yes Robert MacIntyre,yes Rory McIlroy,yes Shane Lowry,yes Tommy Fleetwood",
+      "status": "active",
+      "close_time": "2026-08-16T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266C74E0CAFDA-B8732BFC4C3",
+      "title": "yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Azzi Fudd: 10+",
+      "status": "active",
+      "close_time": "2026-07-31T01:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026E8E3BB70069-ABAFCFCACA0",
+      "title": "yes Cruz Azul,yes Juarez,yes Monterrey,yes Over 1.5 goals scored,yes Over 1.5 goals scored,yes France,yes 7+ corners,yes Reg Time: Over 0.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202691E763CCEA2-5F9E15021FE",
+      "title": "yes 9+ corners,yes 8+ corners,yes Harry Kane: 1+,yes Kylian Mbappe: 1+,yes Lionel Messi: 1+,yes Mikel Oyarzabal: 1+,no Goal Diff Reg Time: Spain wins by more than 1.5 goals,yes Reg Time: Over 3.5 goals scored,yes Reg Time: Over 2.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A0286D65F16-84A2DE97F4F",
+      "title": "yes Azzi Fudd: 10+,yes Jessica Shepard: 10+,yes Paige Bueckers: 15+,yes Breanna Stewart: 15+,yes Jonquel Jones: 10+,yes Sabrina Ionescu: 10+,yes Allisha Gray: 15+,yes Angel Reese: 10+,yes Alyssa Thomas: 10+,yes Kahleah Copper: 15+,yes Kamilla Cardoso: 10+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 10+,yes Aliyah Boston: 10+,yes Caitlin Clark: 10+,yes Awa Fam: 10+,yes Dominique Malonga: 10+,yes Flau'jae Johnson: 10+,yes Natisha Hiedeman: 10+",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266F8EC6839B5-49CB1A37AB1",
+      "title": "yes Alvin Hines,yes Tommy McMillen,yes Reg Time: Both Teams To Score,yes Reg Time: Argentina",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268DD1CBEF122-F19E9FEAF7F",
+      "title": "yes Daniel Merida,yes Alex Molcan,yes Stefanos Tsitsipas,yes Luciano Darderi,yes Boston,yes Cleveland,yes Qinwen Zheng",
+      "status": "active",
+      "close_time": "2026-08-01T09:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20267FAB1A1AF9B-80471E8EC0B",
+      "title": "yes Both Teams To Score,yes Cruz Azul,yes Over 2.5 goals scored,yes Both Teams To Score,yes Nashville",
+      "status": "active",
+      "close_time": "2026-08-01T02:25:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20265172E29BCDB-0D35B2CE609",
+      "title": "yes Spain,no France wins the 1H by more than 1.5 goals,no Spain wins the 1H by more than 1.5 goals,yes England,no Goal Diff Reg Time: France wins by more than 2.5 goals,no Goal Diff Reg Time: Spain wins by more than 2.5 goals,no Reg Time: Over 5.5 goals scored,no Reg Time: Over 4.5 goals scored",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202660BDCE8D763-6FEE407AB37",
+      "title": "yes Austin Bashi,yes Tommy McMillen,yes Reg Time: Both Teams To Score,yes Reg Time: Argentina,yes Kylian Mbappe: 1+,yes Lionel Messi: 1+",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20268C4275C031F-A97815B58AA",
+      "title": "yes Argentina,yes Boston,yes New York Y,yes Milwaukee",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20264DF02F74638-F9C753103C2",
+      "title": "yes Los Angeles D,yes Pittsburgh,yes Chicago WS,yes Milwaukee,yes Chicago C,yes Houston,yes Detroit,yes Over 4.5 runs scored,yes Over 6.5 runs scored,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score,yes Reg Time: France,yes Reg Time: Spain,yes Kylian Mbappe: 1+",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202643884EF949E-4B942BE5417",
+      "title": "yes Aleksandr Shevchenko,yes Spain,yes Christian Duncan,yes Alden Coria,yes Dricus Du Plessis,yes Chase Hooper,yes Seok Hyun Ko,yes Dione Barbosa,yes Fatima Kline,yes France,yes Atlanta,yes Indiana,yes Minnesota,yes Golden State,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026CDCB3C303C4-A29A6E64D80",
+      "title": "yes San Diego,yes Detroit,yes Seattle,yes Detroit",
+      "status": "active",
+      "close_time": "2026-07-22T02:07:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202663B3A592A12-06118E267B6",
+      "title": "no Jake Bennett: 6+,no Griffin Jax: 7+,no Anthony Kay: 6+,no Sandy Alcantara: 7+,no Peter Lambert: 7+",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20265877A529BE3-42FE9EE9656",
+      "title": "yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 3.5 runs scored,no Atlanta wins by over 9.5 points,yes Tereza Valentova",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D4A082DBD16-A90C63C72EB",
+      "title": "yes Gonzalo Villanueva,yes Daniel Merida,yes Stefanos Tsitsipas",
+      "status": "active",
+      "close_time": "2026-07-31T16:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260D6CEFF1849-815A2415154",
+      "title": "yes Chicago C,yes San Diego,yes Washington,yes Over 7.5 runs scored,yes Over 6.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A8B2B4CB0AC-2C2F852ACE8",
+      "title": "yes Luciano Darderi,yes Indiana,yes Tereza Valentova,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-08-01T09:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026B6FAABD920A-079402443E8",
+      "title": "yes France,yes 7+ corners,yes Jude Bellingham: 1+,no Reg Time: Over 5.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20267F795981018-D3E4FA4B068",
+      "title": "yes Toronto,yes Atlanta,yes Milwaukee,yes Jared Jones: 4+,yes Anthony Kay: 3+,yes Spencer Miles: 3+,yes Sandy Alcantara: 4+,yes Logan Henderson: 4+,yes Over 8.5 runs scored,yes Nneka Ogwumike: 15+,yes Rae Burrell: 15+",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026B4396D84C1D-0249C5EC1EB",
+      "title": "yes Ilya Ivashka,yes Hugo Dellien,yes Mark Lajal,yes Gonzalo Villanueva,yes Daniel Merida,yes Alex Molcan,yes Aleksandr Shevchenko,yes Stefanos Tsitsipas,yes Barbora Krejcikova,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T23:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D578441650E-F193C7D2005",
+      "title": "yes Charlotte,yes Dallas wins by over 1.5 points,yes Qinwen Zheng,yes Tereza Valentova",
+      "status": "active",
+      "close_time": "2026-07-31T22:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20268442789D050-D6620A622A6",
+      "title": "yes France wins 1st Half,yes 7+ corners,no Goal Diff Reg Time: France wins by more than 1.5 goals",
+      "status": "active",
+      "close_time": "2026-08-01T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260D88C1F54C3-09B59B8B0CF",
+      "title": "yes Tampa Bay,yes Los Angeles D,yes Atlanta,yes Milwaukee,yes Houston,yes San Diego,yes Detroit,yes Seattle,no Over 10.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026CA72ECCA754-2A9747022E3",
+      "title": "yes Cruz Azul,yes Juarez,yes Leon,yes Over 2.5 goals scored,yes Over 2.5 goals scored,yes Los Angeles F,yes Nashville",
+      "status": "active",
+      "close_time": "2026-08-01T03:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026A9F97FC4377-6FB74EFDA45",
+      "title": "yes France,yes 7+ corners,yes Jude Bellingham: 1+,yes Ousmane Dembele: 1+,no Reg Time: Over 5.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202626EFD0443E4-268359AEB5F",
+      "title": "yes Cruz Azul,yes Over 1.5 goals scored,yes Both Teams To Score",
+      "status": "active",
+      "close_time": "2026-08-01T02:25:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D90B6F92C8B-BBF3C6C0284",
+      "title": "yes Coleman Wong,yes Yordan Alvarez: 1+,yes Bobby Witt Jr.: 1+,yes James Wood: 1+,no Roki Sasaki: 7+,yes Jared Jones: 3+,yes Brady Singer: 2+,yes Over 2.5 goals scored,yes Caitlin Clark: 10+",
+      "status": "active",
+      "close_time": "2026-08-01T02:25:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262657A303F62-B4AC933029B",
+      "title": "yes Houston,yes Detroit,yes Junior Caminero: 2+",
+      "status": "active",
+      "close_time": "2026-07-21T01:38:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DB8C02FDB70-7E6BF167B6C",
+      "title": "yes Tampa Bay,yes Los Angeles D,yes Pittsburgh,yes Chicago WS,yes Atlanta,yes Miami,yes Chicago C,yes Baltimore,yes Kansas City",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A6100AB90DA-1CA51E5DFE0",
+      "title": "yes Azzi Fudd: 10+,yes Jessica Shepard: 10+,yes Paige Bueckers: 15+,yes Breanna Stewart: 15+,yes Jonquel Jones: 10+,yes Sabrina Ionescu: 10+,yes Allisha Gray: 15+,yes Angel Reese: 10+,yes Kahleah Copper: 15+,yes Kamilla Cardoso: 10+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 10+,yes Aliyah Boston: 10+,yes Caitlin Clark: 10+,yes Awa Fam: 10+,yes Dominique Malonga: 10+,yes Flau'jae Johnson: 10+,yes Natisha Hiedeman: 10+",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260862CB0700C-531ADDFECA3",
+      "title": "yes Tampa Bay,yes Martina Trevisan,yes Barbora Krejcikova,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T15:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026433598C214F-4270140C5C6",
+      "title": "yes France,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score,yes 8+ corners,yes 7+ corners,yes Michael Olise: 1+,yes Reg Time: Over 2.5 goals scored,yes Reg Time: Over 2.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20269E5402C1BE9-215756DA90B",
+      "title": "yes France,yes Atlanta,yes Barbora Krejcikova,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D048F260E3D-E5AADDDD75B",
+      "title": "yes Jared Cannonier,yes Stewart Nicoll,yes Kamaru Usman,yes Mitch Ramirez,yes Alberto Montes,yes Tabatha Ricci",
+      "status": "active",
+      "close_time": "2026-08-02T01:20:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202629DD1EF7D87-D52C2D1896F",
+      "title": "yes Boston,yes New York Y,yes Boston,yes Detroit,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026C9B433B7C2C-90F3A98F974",
+      "title": "no Target Price: $63,191.70,yes Target Price: $0.0718313,yes Target Price: $1,819.19,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 16.5 runs scored,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 14.5 runs scored,yes Target Price: $74.1750,yes Target Price: $1.0775",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260DB4C52023F-6E6EAB4EED5",
+      "title": "yes Junior Caminero: 1+,yes Vladimir Guerrero Jr.: 1+,yes Matt Olson: 1+,yes James Wood: 1+,yes Spencer Miles: 2+",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20269FA80547F0C-D38E2967203",
+      "title": "yes France,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score,yes 7+ corners,yes 7+ corners,yes Harry Kane: 1+,yes Lamine Yamal: 1+",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026069B95C5C11-61140F44047",
+      "title": "yes France,yes 8+ corners,yes Reg Time: Tie,yes Reg Time: Argentina",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20269BD4B738835-C8740236666",
+      "title": "yes Chicago C,yes Colorado,yes Detroit,yes Lucas Herbert",
+      "status": "active",
+      "close_time": "2026-08-02T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026C40A362653F-F6C427B4621",
+      "title": "yes Tampa Bay,yes Los Angeles D,yes Cleveland,yes Griffin Jax: 3+",
+      "status": "active",
+      "close_time": "2026-07-20T23:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202660993FF0543-E7E0E68F70E",
+      "title": "yes Austin Bashi,yes Reg Time: Both Teams To Score,yes Reg Time: Argentina,yes Kylian Mbappe: 1+,yes Lionel Messi: 1+",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202640956242D3C-CA57823917F",
+      "title": "yes Chicago WS,yes Atlanta,yes Matt Olson: 1+,yes Anthony Kay: 3+,yes Spencer Miles: 3+",
+      "status": "active",
+      "close_time": "2026-07-20T23:15:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20264DC15F8EB16-E2442115624",
+      "title": "yes Wilyer Abreu: 2+,yes Ryan Vilade: 2+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026423DCFA6773-79A53C41103",
+      "title": "yes Cleveland,yes Atlanta,yes Milwaukee,yes Over 7.5 runs scored,yes Over 9.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T00:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026B5EFCA0642A-3CA86CC689E",
+      "title": "no Over 2.5 1H goals scored,no Over 2.5 1H goals scored,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score,yes 7+ corners,yes 7+ corners,yes Kylian Mbappe: 1+,yes Julian Alvarez: 1+,no Reg Time: Over 4.5 goals scored,no Reg Time: Over 4.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026BE6FC253BFC-188E6BAF25D",
+      "title": "yes Jarren Duran: 1+,yes Cody Bellinger: 1+,yes Matt Olson: 1+,yes Pete Crow-Armstrong: 1+,yes Christian Walker: 1+,yes Yordan Alvarez: 1+,yes Bobby Witt Jr.: 1+",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20265232AE08643-48E48CEE6C0",
+      "title": "yes Atlanta,yes San Diego,yes Over 7.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026992D9587EF4-1D8B9924A11",
+      "title": "yes Atlanta,no Yes,no Yes",
+      "status": "active",
+      "close_time": "2026-07-20T23:15:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262B261F5CC75-32F6CEF22F6",
+      "title": "yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Over 2.5 runs scored,yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Over 2.5 runs scored,yes Over 3.5 runs scored,no Over 14.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T00:05:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F4A0EDCF805-546EDBFE29F",
+      "title": "yes Cleveland,yes Toronto,yes Atlanta,yes Milwaukee,yes Chicago C,yes Houston,yes San Diego,yes Detroit,yes St. Louis,yes Washington,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026E5CCB01E007-BBE6801AFCE",
+      "title": "yes Spain wins 1st Half,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score,yes Julian Alvarez: 1+,yes Mikel Oyarzabal: 1+",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DA9E9937544-21A47D1D9CB",
+      "title": "yes France,yes Reg Time: Tie,yes Kylian Mbappe: 1+,yes Julian Alvarez: 1+,yes Mikel Oyarzabal: 1+",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266AA8A5F1FF9-F86E1405F98",
+      "title": "yes Cruz Azul,yes Puebla,yes Toluca,yes Monterrey,yes Pachuca",
+      "status": "active",
+      "close_time": "2026-08-02T01:07:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026824BAD168F4-DAAB8ED36EC",
+      "title": "yes Ilya Ivashka,yes Hugo Dellien,yes Mark Lajal,yes Gonzalo Villanueva,yes Daniel Merida,yes Alex Molcan,yes Aleksandr Shevchenko,yes Stefanos Tsitsipas,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T23:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026ACC87695F2C-E2EB2F147AE",
+      "title": "yes Atlanta,yes Gerrit Cole: 3+,yes Chris Sale: 4+,yes Over 3.5 runs scored,yes Over 4.5 runs scored,yes Over 8.5 runs scored,yes Over 7.5 runs scored,yes Over 7.5 runs scored,yes Over 7.5 runs scored,yes 7+ corners,yes 7+ corners,yes Reg Time: Over 1.5 goals scored,yes Reg Time: Over 1.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260E31D12CC34-6D2A90CC3DC",
+      "title": "yes Gerrit Cole: 3+,yes Gavin Williams: 4+,yes Atlanta,yes Allisha Gray: 15+,yes Angel Reese: 10+,yes Brittney Griner: 10+,yes Leila Lacan: 10+,yes Kahleah Copper: 15+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 10+,yes Rae Burrell: 10+,yes Natisha Hiedeman: 10+,yes Alyssa Thomas: 4+,yes Flau'jae Johnson: 4+",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20263CACEAF7F22-648198B8D70",
+      "title": "yes Los Angeles D,yes Atlanta,yes Milwaukee,yes Chicago C,yes Jake Bennett: 3+,yes Roki Sasaki: 5+,yes Gerrit Cole: 3+,yes Chris Sale: 5+,yes Logan Henderson: 4+,yes Seth Lugo: 4+,yes Gabriel Hughes: 2+,yes Over 2.5 runs scored,yes France,yes Atlanta",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202644788CFCFAF-A91A09A1E0E",
+      "title": "yes Target Price: $63,191.70,yes Jake Bennett: 2+,yes Griffin Jax: 2+,yes Gerrit Cole: 3+,yes Jake Bennett: 2+,yes Griffin Jax: 2+,yes Anthony Kay: 2+,yes Spencer Miles: 2+,yes Dean Kremer: 2+,yes Michael King: 2+,yes Bryce Miller: 3+,yes Landen Roupp: 3+,yes Dallas,yes Azzi Fudd: 10+,yes Jessica Shepard: 10+,yes Jonquel Jones: 10+,yes Angel Reese: 10+,yes Kamilla Cardoso: 10+,yes Nneka Ogwumike: 10+,yes Caitlin Clark: 10+,yes Flau'jae Johnson: 10+,yes Natisha Hiedeman: 10+",
+      "status": "active",
+      "close_time": "2026-08-01T00:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026ECB0EDB7630-02625CA8BFD",
+      "title": "yes Boston,yes Los Angeles D,yes Boston,yes Toronto,yes Milwaukee,yes Minnesota,yes Houston,yes San Diego,yes Detroit,yes St. Louis,yes Washington,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262CD556A1303-D5FDF46D16D",
+      "title": "yes Houston,yes Junior Caminero: 2+",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026CE8CBF72DC4-98FCD7DA0E6",
+      "title": "no Target Price: $63,191.70,yes Target Price: $0.0718313,yes Target Price: $1,819.19,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 16.5 runs scored,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 14.5 runs scored,yes Target Price: $1.0775",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268A196570633-6997E546833",
+      "title": "yes Breanna Stewart: 1+,yes New York,yes Azzi Fudd: 10+,yes Arike Ogunbowale: 10+,yes Jessica Shepard: 10+,yes Paige Bueckers: 25+,yes Breanna Stewart: 15+,yes Jonquel Jones: 10+,yes Sabrina Ionescu: 15+,yes Over 177.5 points scored",
+      "status": "active",
+      "close_time": "2026-07-31T01:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202663DA8A088FD-7E03311E332",
+      "title": "yes Atlanta,yes Milwaukee,yes Arizona,yes Atlanta,yes Phoenix,yes Chicago,yes Indiana",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026416420E4041-F434EEDBD52",
+      "title": "yes Ilya Ivashka,yes Hugo Dellien,yes Arthur Gea,yes Bernard Tomic,yes August Holmgren,yes Mark Lajal,yes Gonzalo Villanueva,yes Chris Rodesch,yes Murphy Cassone,yes Daniel Merida,yes Alex Molcan,yes Aleksandr Shevchenko,yes Stefanos Tsitsipas,yes Luciano Darderi,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-08-01T09:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266E4A4C3B6F5-22D613EE094",
+      "title": "yes Angel Reese: 10+,yes Kamilla Cardoso: 10+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 10+,yes Aliyah Boston: 10+,yes Caitlin Clark: 10+,yes Natisha Hiedeman: 10+,yes Jordin Canada: 2+,yes Rhyne Howard: 2+,yes Nyara Sabally: 2+,yes Caitlin Clark: 2+,no Over 192.5 points scored,no Over 194.5 points scored,no Over 185.5 points scored",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20261FCFAF6E594-E2CB3DDECED",
+      "title": "yes Cruz Azul,yes Over 2.5 goals scored,yes Both Teams To Score,yes Nashville",
+      "status": "active",
+      "close_time": "2026-08-01T02:25:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026C373BE34193-CEBCA2FC7C9",
+      "title": "yes Griffin Jax: 4+,no Los Angeles D wins by over 3.5 runs,yes Seattle wins by over 1.5 runs,yes Yandy D\u00edaz: 2+",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026347C572E480-C084CF35BE1",
+      "title": "yes Jake Bennett: 3+,yes Griffin Jax: 4+,yes Roki Sasaki: 3+,yes Gerrit Cole: 4+,yes Gavin Williams: 5+,yes Jared Jones: 3+,yes Jake Bennett: 3+,yes Griffin Jax: 4+,yes Atlanta,yes Indiana",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202624BDC3624BD-8C5D81080BD",
+      "title": "yes Boston,yes Cleveland,yes Toronto,yes Atlanta,yes Milwaukee,yes Chicago C,yes Detroit,yes Seattle,yes Over 3.5 runs scored,yes Over 3.5 runs scored,no Seattle wins by over 6.5 points,yes Over 168.5 points scored",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20261E0EAF631D6-08DD13F5676",
+      "title": "yes Marina Mabrey: 2+,yes Nneka Ogwumike: 2+,yes Rae Burrell: 2+,yes Kelsey Mitchell: 2+,yes Nneka Ogwumike: 3+,yes Allisha Gray: 15+,yes Angel Reese: 15+,yes Brittney Griner: 10+,yes Leila Lacan: 10+,yes Kahleah Copper: 15+,yes Kamilla Cardoso: 10+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 15+,yes Rae Burrell: 15+,yes Aliyah Boston: 15+,yes Caitlin Clark: 10+,yes Kelsey Mitchell: 20+,yes Natisha Hiedeman: 10+,yes Allisha Gray: 2+,yes Jordin Canada: 2+,yes Rhyne Howard: 2+,yes Nyara Sabally: 2+,yes Alyssa Thomas: 4+,yes DeWanna Bonner: 4+,yes Ariel Atkins: 2+,yes Aliyah Boston: 6+",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DB380B98097-3AD29B45095",
+      "title": "yes Bryson DeChambeau,yes Brooks Koepka,yes Jason Day,no Goal Diff Reg Time: Spain wins by more than 2.5 goals,no Reg Time: Over 4.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-16T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260F4EE7F62BA-BBC55C041E9",
+      "title": "yes Hugo Dellien,yes Philip Sekulic,yes Daniel Merida,yes Alex Molcan,yes Kelsey Mitchell: 2+,yes Indiana,yes Angel Reese: 10+,yes Aliyah Boston: 10+,yes Angel Reese: 10+,yes Nneka Ogwumike: 6+,yes Aliyah Boston: 6+,no Toronto wins by over 6.5 points,yes Paula Badosa",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S202625F0984BD5F-8443BF0E71B",
+      "title": "yes Argentina,yes Christian Duncan,yes Dricus Du Plessis,yes Chase Hooper,yes Fatima Kline,yes Atlanta,yes Phoenix,yes Minnesota",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026E92EDA46439-622BD73EF68",
+      "title": "yes Boston,yes Cleveland,yes Toronto,yes Texas,yes Milwaukee,yes Houston,yes Detroit,yes Washington,yes Over 8.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202674AC606F0F5-3A1D29F01A8",
+      "title": "yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Over 2.5 runs scored,yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 4.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202639781D6D778-FB4437E41B0",
+      "title": "yes Tampa Bay,yes Jonathan Aranda: 1+,yes Over 4.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266D9357E7CB0-BF4510D57C3",
+      "title": "no Ceddanne Rafaela: 1+,no Romy Gonzalez: 1+,no Jonathan Aranda: 1+,no Ryan Vilade: 1+,no Cody Bellinger: 1+,no Jonathan Aranda: 1+,no Alex Bregman: 1+,no Christian Walker: 1+,no Yordan Alvarez: 1+,no Vinnie Pasquantino: 1+,no Fernando Tatis Jr.: 1+,no Jo Adell: 1+",
+      "status": "active",
+      "close_time": "2026-07-21T01:38:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026ABBFFF2093E-3D2BD40D1D8",
+      "title": "yes Cleveland,yes Toronto,yes Atlanta,yes Milwaukee,yes Chicago C,yes Washington,yes Seattle,no Jonathan Aranda: 2+,no Bobby Witt Jr.: 3+,no Cal Raleigh: 2+,no Randy Arozarena: 3+,yes Griffin Jax: 2+,yes Gerrit Cole: 3+,yes Gavin Williams: 4+,yes Spencer Miles: 2+,yes Dean Kremer: 2+,yes Troy Melton: 3+,yes Bryce Miller: 3+",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268817DECFBA7-CEA876A6476",
+      "title": "yes Milwaukee,yes San Diego,yes Los Angeles A,yes Over 8.5 runs scored,no Over 10.5 runs scored,yes Los Angeles,yes Allisha Gray: 15+,yes Marina Mabrey: 20+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 15+,yes Caitlin Clark: 10+,yes Dominique Malonga: 10+",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20265AE68257BFF-318E3123F20",
+      "title": "yes Cruz Azul,yes Juarez,yes Leon,yes Los Angeles F,yes Nashville,yes Cleveland,yes Dallas,yes Detroit,yes Utah,yes Sacramento",
+      "status": "active",
+      "close_time": "2026-08-01T03:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026614774F5B2F-31C936C90DB",
+      "title": "yes Jake Bennett: 4+,yes Griffin Jax: 5+,yes Gerrit Cole: 5+,yes Gavin Williams: 5+,yes Jared Jones: 4+,yes Anthony Kay: 3+,yes Chris Sale: 6+,yes Sandy Alcantara: 4+,yes Logan Henderson: 4+,yes Peter Lambert: 4+,yes Michael King: 3+",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026B4169FF11E2-43BC8723490",
+      "title": "yes Griffin Jax: 5+,yes Gerrit Cole: 5+,yes Chris Sale: 5+,yes Brady Singer: 4+,yes Troy Melton: 5+,yes Cade Cavalli: 4+",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262DE5FAF4351-C45CB0F1346",
+      "title": "yes Atlanta,yes Phoenix,yes Los Angeles,yes Indiana,yes Angel Reese: 10+,yes Alyssa Thomas: 10+,yes Nneka Ogwumike: 10+,yes Caitlin Clark: 10+,yes Brittney Griner: 4+",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202685BCF3F3C6B-9775444FE76",
+      "title": "yes Tampa Bay,yes Jarren Duran: 1+,yes Masataka Yoshida: 1+,yes Junior Caminero: 1+,yes Yandy D\u00edaz: 1+,yes Griffin Jax: 2+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026E5D63AD104D-2B43843D198",
+      "title": "yes Cleveland,yes Chicago WS,yes Atlanta,yes Miami,yes Chicago C,yes Houston,yes San Diego,yes Detroit,yes A's,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202644CD0E249C9-6ACBB947976",
+      "title": "yes Hugo Dellien,yes Arthur Gea,yes August Holmgren,yes Murphy Cassone,yes Lucia Bronzetti,yes Maria Sakkari,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T18:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S202638B7FEF5759-4FFC53B22E3",
+      "title": "no Over 13.5 runs scored,yes Over 1.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,no Over 14.5 runs scored,yes Over 2.5 runs scored,no Over 14.5 runs scored,no Over 16.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T00:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026707CCE6A5A3-02CB8F6EB7B",
+      "title": "yes Tampa Bay,yes Los Angeles D,yes Cleveland,yes Boston,yes Chicago C,yes Baltimore,yes Kansas City,yes Cincinnati,yes Detroit,yes St. Louis,yes Washington,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D0B32DA7987-F2D1E6343E8",
+      "title": "yes Lionel Messi: 1+,yes Mikel Oyarzabal: 1+,yes Argentina: 4+,no Reg Time: Over 5.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20267D0A2CAD38E-12DC2A93B53",
+      "title": "yes Spain,yes France,yes Kylian Mbappe: 1+,yes Lionel Messi: 1+,yes Atlanta",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026EF6FD418C3C-BDE91A245EA",
+      "title": "yes Qinwen Zheng,yes Sara Bejlek,yes Panna Udvardy,yes Alina Korneeva,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T17:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F671E3946B6-9632B36CD14",
+      "title": "yes Tampa Bay,yes Over 6.5 runs scored,no Atlanta wins by over 9.5 points",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20264AE5593970A-3EA9B0C309A",
+      "title": "yes Angel Reese: 15+,yes Ariel Atkins: 10+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 15+",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A3F710619F3-659F7B28994",
+      "title": "yes Tampa Bay,yes Pittsburgh,yes Toronto,yes Atlanta,yes Milwaukee,yes Chicago C,yes San Diego,yes Over 8.5 runs scored,yes Over 8.5 runs scored,yes Over 8.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F82F457A807-A275A49E992",
+      "title": "yes Alvin Hines,yes Tommy McMillen,yes Reg Time: Argentina",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20261469510FBC4-560EDB512A4",
+      "title": "yes Ceddanne Rafaela: 1+,yes Yandy D\u00edaz: 1+,yes Junior Caminero: 1+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202631E7B1C861B-CFD621BCDB8",
+      "title": "yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202678C8D85022A-AE5AF6A3E27",
+      "title": "yes Aldrich Potgieter,yes Ben Griffin,yes Brian Harman,yes Jason Day,yes Jordan Spieth,yes Tyrrell Hatton",
+      "status": "active",
+      "close_time": "2026-08-16T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202672F8C776F29-8E1D68FCF6A",
+      "title": "yes Anthony Seigler: 1+,yes Ceddanne Rafaela: 1+,yes Cody Bellinger: 1+,yes Junior Caminero: 1+,yes Pete Crow-Armstrong: 1+,yes Jackson Merrill: 1+,yes Jo Adell: 1+,yes Ketel Marte: 1+,yes CJ Abrams: 1+,yes Cal Raleigh: 1+,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20263C0BC85BC87-A64A5505119",
+      "title": "yes Boston,yes New York Y,yes Cleveland,yes Austin Eckroat,yes Cameron Young",
+      "status": "active",
+      "close_time": "2026-08-02T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202628F7CE5BAD0-160117D6EBA",
+      "title": "yes Boston,yes Boston,yes Maria Sakkari,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T14:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262B0275E7A8C-3728D00AD72",
+      "title": "yes Hugo Dellien,yes August Holmgren,yes Mark Lajal,yes Gonzalo Villanueva,yes Murphy Cassone,yes Aleksandar Vukic,yes Aleksandr Shevchenko,yes Over 2.5 runs scored,yes Over 3.5 runs scored,yes Over 1.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Barbora Krejcikova,yes Maria Sakkari,yes Sara Bejlek,yes Paula Badosa,yes Alina Korneeva,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T23:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026A1A9FB8FC70-BE7F3FE3E9D",
+      "title": "yes Spain,no 8+ corners",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026C520E260490-BEF6104DBF1",
+      "title": "yes Los Angeles D,yes Gage Jump: 5+",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262301FB97220-4C8FE4BEE46",
+      "title": "yes Griffin Jax: 4+,yes Seth Lugo: 3+,yes Gage Jump: 3+",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266D16B252743-FBBBE4AA518",
+      "title": "yes Cleveland,yes New York,yes Detroit,yes Charlotte,yes Atlanta,yes Phoenix,yes Los Angeles,yes Indiana",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20263024FD98A1C-90667CB6844",
+      "title": "yes Wilyer Abreu: 1+,yes Yandy D\u00edaz: 1+,yes Ceddanne Rafaela: 2+,yes Jonathan Aranda: 2+,yes Junior Caminero: 1+,yes Tampa Bay wins by over 1.5 runs,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S202683C86E6738F-1A0AADD6935",
+      "title": "no Target Price: $63,191.70,yes Target Price: $1,819.19,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 16.5 runs scored,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 14.5 runs scored,yes Target Price: $1.0775",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202658FA86FAC29-FF03D3D5152",
+      "title": "yes Tampa Bay,yes Jarren Duran: 1+,yes Junior Caminero: 1+,yes Yandy D\u00edaz: 1+,yes Griffin Jax: 2+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266AD8EC6E07C-8E2EF7595DF",
+      "title": "no Jonathan Aranda: 1+,no Freddie Freeman: 1+,no Cody Bellinger: 1+,no Junior Caminero: 1+,no Matt Olson: 1+,no Alex Bregman: 1+,no Pete Crow-Armstrong: 1+,no Fernando Tatis Jr.: 1+,yes Logan Henderson: 3+,yes Over 6.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 7.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T00:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026697B819E2D2-4FFCF410D56",
+      "title": "yes Jake Bennett: 3+,yes Griffin Jax: 4+,yes Roki Sasaki: 3+,yes Gerrit Cole: 4+,yes Gavin Williams: 5+,yes Jared Jones: 3+,yes Griffin Jax: 4+,yes Atlanta,yes Indiana",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F5B63A584C0-6B10662C952",
+      "title": "yes Hugo Dellien,yes Arthur Gea,yes Murphy Cassone,yes Lucia Bronzetti,yes Maria Sakkari,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T18:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20266D74D015FAF-7E281CADD8E",
+      "title": "yes Hugo Dellien,yes August Holmgren,yes Gonzalo Villanueva,yes Alex Molcan",
+      "status": "active",
+      "close_time": "2026-07-31T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268F7404310C3-DE77E19BB7C",
+      "title": "yes France,yes 7+ corners,yes 7+ corners,yes Kylian Mbappe: 1+,no Goal Diff Reg Time: England wins by more than 1.5 goals,no Goal Diff Reg Time: Spain wins by more than 1.5 goals,yes England: 4+,yes Argentina: 4+,yes Reg Time: Over 1.5 goals scored,yes Reg Time: Over 1.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20269D22BF59D0E-156847209CB",
+      "title": "yes Los Angeles D,yes Texas,yes Milwaukee,yes Houston,yes Cincinnati,yes Detroit,yes San Francisco",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DBB4840774C-09EEC331B5B",
+      "title": "yes Cruz Azul,yes Juarez,yes Monterrey,yes Over 1.5 goals scored,yes France,yes 7+ corners,yes Reg Time: Over 0.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20263B48E5F2432-3FC1A078FC9",
+      "title": "yes Cleveland,yes Cody Bellinger: 1+,yes Gerrit Cole: 5+,yes Gavin Williams: 6+,yes Spencer Miles: 4+",
+      "status": "active",
+      "close_time": "2026-07-20T23:15:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266AF918698A1-8AD3580EB05",
+      "title": "yes Toronto,yes Atlanta,yes Milwaukee,yes Jared Jones: 4+,yes Anthony Kay: 3+,yes Spencer Miles: 3+,yes Sandy Alcantara: 4+,yes Logan Henderson: 4+,yes Over 8.5 runs scored,yes Dearica Hamby: 15+,yes Nneka Ogwumike: 15+,yes Rae Burrell: 15+",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026398C5592692-17E4DA10576",
+      "title": "yes Argentina,yes Reg Time: Both Teams To Score,yes 9+ corners,yes Reg Time: Over 4.5 goals scored",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026C0D6A42195E-14221F927A6",
+      "title": "yes Daniel Merida,yes Maria Sakkari,yes Sara Bejlek",
+      "status": "active",
+      "close_time": "2026-07-31T17:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026A80384B397E-5FF27B77406",
+      "title": "yes Atlanta,yes Milwaukee,yes Chicago C,yes Seattle,yes Over 162.5 points scored",
+      "status": "active",
+      "close_time": "2026-07-31T01:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20268E803FFAF7C-846B36D0003",
+      "title": "yes Boston,yes Los Angeles D,yes Cleveland,yes Boston,yes Chicago WS,yes Atlanta,yes Milwaukee,yes Chicago C,yes Houston,yes San Diego,yes Detroit,yes St. Louis,yes Chicago WS,yes Philadelphia,yes Miami,yes Atlanta",
+      "status": "active",
+      "close_time": "2026-07-22T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266B6218457D4-463FD9B764C",
+      "title": "yes Stefanos Tsitsipas,yes Luciano Darderi,yes Alden Coria,yes Dione Barbosa,yes Reg Time: Both Teams To Score,yes Reg Time: Over 1.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20264F432A2A764-60783B89FBA",
+      "title": "yes Ilya Ivashka,yes Hugo Dellien,yes Arthur Gea,yes Bernard Tomic,yes August Holmgren,yes Mark Lajal,yes Gonzalo Villanueva,yes Chris Rodesch,yes Murphy Cassone,yes Daniel Merida,yes Alex Molcan,yes Aleksandr Shevchenko,yes Stefanos Tsitsipas,yes Luciano Darderi",
+      "status": "active",
+      "close_time": "2026-08-01T09:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202639986A87E73-EB6B1BFA233",
+      "title": "yes Over 3.5 runs scored,yes Over 4.5 runs scored,yes Over 3.5 runs scored,yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Over 3.5 runs scored,yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 4.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:38:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026A23D23084AE-E12BD95C5D0",
+      "title": "no Target Price: $63,191.70,yes Target Price: $1,819.19,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 16.5 runs scored,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 14.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202667E4E76539D-6D24E79EA93",
+      "title": "yes Hugo Dellien,yes Murphy Cassone,yes Lucia Bronzetti,yes Maria Sakkari,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T16:20:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20264145D85D59C-57F6A0F9FEB",
+      "title": "yes Seattle,no Boston wins by over 1.5 runs,no Over 8.5 runs scored,yes Over 182.5 points scored",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20269637A2BA8F5-759DA7E0AFA",
+      "title": "yes France,yes 7+ corners,yes Jude Bellingham: 1+,yes Kylian Mbappe: 1+,yes Ousmane Dembele: 1+,no Reg Time: Over 5.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20269FD07681F7B-B1DF27E5686",
+      "title": "yes Atlanta,yes Chicago C,yes San Diego,yes Washington,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026EC1DFF6360E-6EFA5CB72FE",
+      "title": "yes Detroit,yes St. Louis,yes Washington,yes Over 10.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20267A0007A88C4-D90517BF23E",
+      "title": "yes Nneka Ogwumike: 10+,no Over 186.5 points scored,yes Over 171.5 points scored,no Over 171.5 points scored,no Over 194.5 points scored,no Over 185.5 points scored",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260055024D8D4-7657DF449F6",
+      "title": "yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 6.5 runs scored,yes Over 6.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-20T23:15:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026D40A22FD3AD-58E7358A1E9",
+      "title": "yes Milwaukee,yes Chicago C,no Texas wins by over 2.5 runs",
+      "status": "active",
+      "close_time": "2026-07-21T00:05:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202691E763CCEA2-E619A492D58",
+      "title": "yes 9+ corners,yes 8+ corners,yes Harry Kane: 1+,yes Kylian Mbappe: 1+,yes Lionel Messi: 1+,yes Mikel Oyarzabal: 1+,yes Goal Diff Reg Time: Spain wins by more than 1.5 goals,yes Reg Time: Over 3.5 goals scored,yes Reg Time: Over 2.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20265FA02E6D979-F5BC886EF73",
+      "title": "yes Tampa Bay,yes Los Angeles D,yes Cleveland,yes Boston,yes Chicago C,yes Kansas City,yes Cincinnati,yes Detroit,yes St. Louis,yes Washington,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A93BF661043-E6323BE0413",
+      "title": "yes Qinwen Zheng,yes Panna Udvardy,yes Alina Korneeva,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T14:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026E5D948EFDCA-59C5296A304",
+      "title": "yes Milwaukee,yes San Diego,yes Los Angeles A,yes Over 8.5 runs scored,no Over 10.5 runs scored,yes Los Angeles,yes Allisha Gray: 15+,yes Marina Mabrey: 20+,yes Ariel Atkins: 10+,yes Dearica Hamby: 10+,yes Nneka Ogwumike: 15+,yes Caitlin Clark: 10+,yes Dominique Malonga: 10+",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20264E442A03612-0D66C49E418",
+      "title": "yes Boston,yes Los Angeles D,yes Pittsburgh,yes Atlanta,yes Milwaukee,yes Houston,yes Detroit,yes St. Louis,yes Philadelphia,yes Reg Time: France",
+      "status": "active",
+      "close_time": "2026-08-01T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DDAE27DAC39-6FC4B520699",
+      "title": "yes Wilyer Abreu: 2+,yes Junior Caminero: 2+,yes Ryan Vilade: 2+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202696DE4640DF9-76DFE5CACBE",
+      "title": "yes Boston,yes Los Angeles D,yes Boston,yes Toronto,yes Milwaukee,yes Minnesota,yes Houston,yes Detroit,yes St. Louis,yes Washington,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026623847CF5AB-AD7F3320297",
+      "title": "no Target Price: $63,191.70,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 16.5 runs scored,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 14.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268C3E6699EB6-7FB849BAA58",
+      "title": "yes Roman Andres Burruchaga,yes Stefanos Tsitsipas,yes Clara Tauson,yes Tamara Zidansek",
+      "status": "active",
+      "close_time": "2026-07-31T17:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026307CE31652E-6E9A7EE5C98",
+      "title": "yes Toluca,yes Santos Laguna,yes Pumas UNAM",
+      "status": "active",
+      "close_time": "2026-08-02T01:07:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026E648F5ADDD5-5901921109B",
+      "title": "yes Romy Gonzalez: 1+,yes Wilyer Abreu: 1+,yes Jonathan Aranda: 1+,yes Junior Caminero: 1+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026B5EFCA0642A-86BFE627CAC",
+      "title": "no Over 2.5 1H goals scored,no Over 2.5 1H goals scored,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score,yes 7+ corners,yes 7+ corners,yes Kylian Mbappe: 1+,yes Enzo Fernandez: 1+,no Reg Time: Over 4.5 goals scored,no Reg Time: Over 4.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260EBA9D95F9F-6156673D1F3",
+      "title": "yes Daniel Merida,yes Alex Molcan,yes Aleksandr Shevchenko,yes Argentina,yes France,yes Paula Badosa",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20267CAD2867E2E-3A7D3347E9F",
+      "title": "yes St. Louis,yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 3.5 runs scored,yes Over 4.5 runs scored,yes Over 2.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026740BB39F5A5-834E877399A",
+      "title": "yes Spain,yes France,yes Reg Time: Both Teams To Score,yes Argentina: 4+,no Reg Time: Over 5.5 goals scored",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20263D1DE58F09E-90065E323F6",
+      "title": "yes Argentina: 4+,yes Spain: 5+,no Reg Time: Over 1.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202686516024558-711833274AF",
+      "title": "yes Gonzalo Villanueva,yes Murphy Cassone,yes Daniel Merida,yes Barbora Krejcikova,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T16:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A9F008FF150-92631F14117",
+      "title": "yes France,yes 10+ corners,yes Reg Time: Over 2.5 goals scored,yes Reg Time: Over 2.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026FDA356A35B6-6790BF78413",
+      "title": "yes New York Y,yes Cleveland,yes Atlanta,yes Miami,yes Chicago C,yes Detroit",
+      "status": "active",
+      "close_time": "2026-07-21T01:38:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A29688160C5-AE97C3907BC",
+      "title": "yes San Luis,yes Puebla,yes Atlas,yes Toluca,yes Santos Laguna",
+      "status": "active",
+      "close_time": "2026-08-02T01:07:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S202634DB2637078-ADD9C6EB1F1",
+      "title": "yes Ilya Ivashka,yes Hugo Dellien,yes Gonzalo Villanueva,yes Murphy Cassone,yes Aleksandr Shevchenko,yes Elizara Yaneva,yes Barbora Krejcikova,yes Maria Sakkari,yes Paula Badosa,yes Alina Korneeva,yes Petra Marcinko",
+      "status": "active",
+      "close_time": "2026-07-31T17:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026885F49B0CCE-53820A196CD",
+      "title": "yes Atlanta,yes Over 4.5 runs scored,yes Over 3.5 runs scored,yes Over 3.5 runs scored,yes Atlanta,yes Phoenix,yes Minnesota,yes Angel Reese: 10+,yes Alyssa Thomas: 10+,yes Brittney Griner: 4+,yes Aliyah Boston: 6+,yes Over 159.5 points scored,yes Over 161.5 points scored,yes Over 162.5 points scored,yes Over 163.5 points scored,yes Over 148.5 points scored",
+      "status": "active",
+      "close_time": "2026-08-02T00:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026174AA1024B2-F94F756E51B",
+      "title": "yes Over 3.5 runs scored,yes Over 1.5 runs scored,yes Over 2.5 runs scored,yes Over 8.5 runs scored,yes Over 2.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-20T23:15:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202644B419D94F3-7322E7AB96F",
+      "title": "yes Aleksandr Shevchenko,yes Alejandro Del Rey,yes Scottie Scheffler",
+      "status": "active",
+      "close_time": "2026-08-02T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026359D0F35240-C1E3C7AFF5D",
+      "title": "yes 1st Half: Both Teams To Score,yes 9+ corners",
+      "status": "active",
+      "close_time": "2026-08-01T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026207E6B93A10-037FA643AFC",
+      "title": "yes Griffin Jax: 5+,yes Sandy Alcantara: 5+,yes Landen Roupp: 6+,yes James Wood: 2+,yes Nneka Ogwumike: 3+,yes Brittney Griner: 15+,yes Kahleah Copper: 15+,yes Kamilla Cardoso: 10+,yes Nneka Ogwumike: 15+,yes Rae Burrell: 15+,yes Aliyah Boston: 15+,yes Caitlin Clark: 10+,yes Dominique Malonga: 15+",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F46F9FDF714-F584996B634",
+      "title": "no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 11.5 runs scored,no Over 11.5 runs scored,no Over 11.5 runs scored,no Over 12.5 runs scored,no Over 12.5 runs scored,no Over 14.5 runs scored,no Over 12.5 runs scored,yes Over 4.5 runs scored,no Over 16.5 runs scored,no Over 12.5 runs scored,no Over 13.5 runs scored,no Over 14.5 runs scored,no Over 11.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20267CBE602C0CD-BE698636F2B",
+      "title": "yes Boston,yes New York Y,yes Austin Eckroat,yes Cameron Young",
+      "status": "active",
+      "close_time": "2026-08-02T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202601493E6BDA9-DD81B854502",
+      "title": "yes Junior Caminero: 1+,yes Yandy D\u00edaz: 1+,yes Freddie Freeman: 1+,yes Mookie Betts: 1+,yes Vladimir Guerrero Jr.: 1+,yes Jackson Merrill: 1+,no Boston wins by over 3.5 runs,no New York Y wins by over 2.5 runs,no Chicago WS wins by over 3.5 runs,no Texas wins by over 2.5 runs,no Miami wins by over 2.5 runs,no Baltimore wins by over 3.5 runs,no Kansas City wins by over 2.5 runs,no Los Angeles A wins by over 2.5 runs,yes Over 4.5 runs scored,no Over 11.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T01:38:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20264D506CE33AE-72C68734981",
+      "title": "yes Milwaukee,no Texas wins by over 2.5 runs",
+      "status": "active",
+      "close_time": "2026-07-20T23:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20262C2FFAF4563-4E9FA02B192",
+      "title": "yes Spain,yes France,yes Kylian Mbappe: 1+,yes Lionel Messi: 1+,yes Ferran Torres: 1+,no Reg Time: Over 2.5 goals scored",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202674D69E573DA-9F18CFC97CE",
+      "title": "yes Cleveland,yes Atlanta,yes Chicago C,yes Seattle,no Tampa Bay wins by over 1.5 runs,yes Over 8.5 runs scored,yes Phoenix,yes Chicago,yes Indiana",
+      "status": "active",
+      "close_time": "2026-08-01T02:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202616C69F4A706-AE4FA815087",
+      "title": "yes No Goal,yes No Goal,yes England: 4+",
+      "status": "active",
+      "close_time": "2026-08-02T19:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026EC82ADE2B74-AA7E12CE8B8",
+      "title": "yes Gonzalo Villanueva,yes Murphy Cassone,yes Daniel Merida,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T16:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F46F9FDF714-095C31E25F9",
+      "title": "yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026E83906C99BC-BC417292EDF",
+      "title": "yes Argentina,yes Christian Duncan,yes Dricus Du Plessis,yes Chase Hooper,yes Atlanta,yes Phoenix,yes Minnesota",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S20264C7E4CCF58F-E3279D5C804",
+      "title": "yes Boston,yes Los Angeles D,yes Cleveland,yes Boston,yes Chicago WS,yes Atlanta,yes Milwaukee,yes Chicago C,yes Houston,yes Detroit,yes St. Louis,yes Chicago WS,yes Philadelphia,yes Miami,yes Atlanta",
+      "status": "active",
+      "close_time": "2026-07-22T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260CBF58422DA-7DDD6E5E363",
+      "title": "yes Daniel Merida,yes Alex Molcan,yes Aleksandr Shevchenko,yes France,yes Paula Badosa",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026043BE4E455E-17C9DE791FC",
+      "title": "yes Spain,yes Boston,yes Los Angeles D,yes Cleveland,yes Tampa Bay,yes Toronto,yes Atlanta,yes Milwaukee,yes Chicago C,yes Reg Time: Both Teams To Score",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202660AB9E3AA92-09E1FA7A22F",
+      "title": "yes Boston,yes Los Angeles D,yes Boston,yes Toronto,yes Milwaukee,yes Baltimore,yes San Diego,yes Detroit,yes Washington",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026B57DFE6586D-D49731D6091",
+      "title": "yes 8+ corners,yes Goal Diff Reg Time: France wins by more than 1.5 goals,yes Reg Time: Over 1.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-01T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S2026EB876E65679-2DA8B614EEE",
+      "title": "yes Romy Gonzalez: 1+,yes Jonathan Aranda: 1+,yes Junior Caminero: 1+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266FC006833B1-426D9A5C65B",
+      "title": "yes Toluca,yes Los Angeles F,yes France,yes Reg Time: Both Teams To Score,yes Reg Time: Both Teams To Score",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026F51604CF872-F4A7B676280",
+      "title": "yes Argentina,yes France,yes 7+ corners,yes 8+ corners,yes Kylian Mbappe: 1+,yes Ousmane Dembele: 1+,yes Lionel Messi: 1+",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S202625229F88E34-61C7844E816",
+      "title": "yes Cruz Azul,yes Guadalajara,yes Monterrey,yes Pumas UNAM,yes America,yes Over 1.5 goals scored,yes Over 1.5 goals scored,yes Over 1.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-02T03:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202617CD8FB7E47-1BC356C9605",
+      "title": "no Anthony Seigler: 2+,no Junior Caminero: 2+,yes Over 2.5 runs scored,yes Over 1.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 2.5 runs scored,yes Over 1.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20268275D4B7669-EC152D848AD",
+      "title": "yes Boston,yes Cleveland,yes Toronto,yes Atlanta,yes Milwaukee,yes Houston,yes San Diego,yes Detroit,yes St. Louis,yes Washington,yes Seattle,yes Atlanta,yes Indiana",
+      "status": "active",
+      "close_time": "2026-07-31T23:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20269D22BF59D0E-4C8ECE3C5A6",
+      "title": "yes Los Angeles D,yes Texas,yes Milwaukee,yes Houston,yes Cincinnati,yes Detroit,yes Seattle",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A0B5E95F577-8A1DFA1F073",
+      "title": "yes Cleveland,yes Chicago C,yes Cincinnati,yes Atlanta wins by over 1.5 runs",
+      "status": "active",
+      "close_time": "2026-07-21T00:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202602C18796980-34F4644E7B9",
+      "title": "yes Over 4.5 runs scored,yes Over 4.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 6.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored,yes Over 5.5 runs scored",
+      "status": "active",
+      "close_time": "2026-07-21T02:10:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026C2A5F56F1C8-39CCE01439D",
+      "title": "yes Spain,yes Boston,yes Los Angeles D,yes Toronto,yes Atlanta,yes Milwaukee,yes Chicago C,yes Baltimore,yes San Diego,yes France,yes Reg Time: Over 2.5 goals scored",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A609D63951B-1714181A500",
+      "title": "yes Gonzalo Villanueva,yes Aleksandr Shevchenko,yes Qinwen Zheng,yes Paula Badosa,yes Alina Korneeva",
+      "status": "active",
+      "close_time": "2026-07-31T14:30:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026E98FDE3F383-EEDC436CA50",
+      "title": "yes Argentina,yes Cameron Young,yes France",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20263A65984829C-77500903B0A",
+      "title": "yes Cruz Azul,yes Juarez,yes Over 1.5 goals scored,yes France,yes 7+ corners,yes Reg Time: Over 0.5 goals scored",
+      "status": "active",
+      "close_time": "2026-08-15T21:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202694D39BC70B1-2233A50CF13",
+      "title": "yes Boston,yes Caleb Durbin: 1+,yes Jake Bennett: 4+",
+      "status": "active",
+      "close_time": "2026-07-20T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20266D2EE3E0835-5F2F1A894B6",
+      "title": "yes Cleveland,yes Chicago C,yes Cincinnati",
+      "status": "active",
+      "close_time": "2026-07-21T00:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026A0C265ADE0E-820D8DB01DA",
+      "title": "yes Aldrich Potgieter,yes Ben Griffin,yes Jason Day,yes Jordan Spieth,yes Tyrrell Hatton",
+      "status": "active",
+      "close_time": "2026-08-16T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026AF41C777854-5F4A06D2931",
+      "title": "yes Bryson DeChambeau,yes Ben Griffin,yes Brooks Koepka,yes Hennie Du Plessis,yes Hideki Matsuyama,yes Jordan Spieth,yes Kazuki Higa,yes Marcus Plunkett,yes Naoyuki Kataoka,yes Peter Uihlein,yes Tommy Fleetwood,yes Tyrrell Hatton,yes Si Woo Kim,yes Scottie Scheffler",
+      "status": "active",
+      "close_time": "2026-08-16T04:00:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVECROSSCATEGORY-S202643A3D6BBD4B-54E2AF75FC6",
+      "title": "yes Boston,yes Los Angeles D,yes Cleveland,yes Boston,yes Chicago WS,yes Atlanta,yes Milwaukee,yes Houston,yes Detroit,yes St. Louis,yes Chicago WS,yes Philadelphia,yes Miami,yes Atlanta",
+      "status": "active",
+      "close_time": "2026-07-22T17:35:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260329891E751-A986AA75C6C",
+      "title": "yes Junior Caminero: 1+,yes Shohei Ohtani: 1+,yes Vladimir Guerrero Jr.: 1+,yes Pete Crow-Armstrong: 1+,yes Yordan Alvarez: 1+,yes Manny Machado: 1+,yes James Wood: 1+,yes Griffin Jax: 2+,yes Gavin Williams: 4+,yes Bailey Ober: 2+,yes Troy Melton: 3+",
+      "status": "active",
+      "close_time": "2026-07-21T01:40:00Z",
+      "is_weather": false
+    },
+    {
+      "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202669A1D1CF381-4486976464F",
+      "title": "yes Spain,yes France,yes Argentina: 4+,no Reg Time: Over 5.5 goals scored",
+      "status": "active",
+      "close_time": "2028-07-18T14:00:00Z",
+      "is_weather": false
+    }
+  ],
+  "stats": {
+    "total_fetched": 200,
+    "weather_markets_found": 0,
+    "non_weather_markets": 200
+  }
+}

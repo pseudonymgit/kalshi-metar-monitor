@@ -1,0 +1,202 @@
+{
+  "KATL": {
+    "station": "KATL",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.272298+00:00"
+  },
+  "KBOS": {
+    "station": "KBOS",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.272547+00:00"
+  },
+  "KDFW": {
+    "station": "KDFW",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.272804+00:00"
+  },
+  "KDEN": {
+    "station": "KDEN",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.273044+00:00"
+  },
+  "KJFK": {
+    "station": "KJFK",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.273314+00:00"
+  },
+  "KLAX": {
+    "station": "KLAX",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.273519+00:00"
+  },
+  "KMIA": {
+    "station": "KMIA",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.273737+00:00"
+  },
+  "KORD": {
+    "station": "KORD",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.273945+00:00"
+  },
+  "KSEA": {
+    "station": "KSEA",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.274148+00:00"
+  },
+  "KSFO": {
+    "station": "KSFO",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.274352+00:00"
+  },
+  "KBNA": {
+    "station": "KBNA",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.274543+00:00"
+  },
+  "KHOU": {
+    "station": "KHOU",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.274741+00:00"
+  },
+  "KDCA": {
+    "station": "KDCA",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.274932+00:00"
+  },
+  "KPDX": {
+    "station": "KPDX",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.275110+00:00"
+  },
+  "KSLC": {
+    "station": "KSLC",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.275291+00:00"
+  },
+  "PHNL": {
+    "station": "PHNL",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.275476+00:00"
+  },
+  "KTPA": {
+    "station": "KTPA",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.275657+00:00"
+  },
+  "KDTW": {
+    "station": "KDTW",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.275864+00:00"
+  },
+  "KCLT": {
+    "station": "KCLT",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.276039+00:00"
+  },
+  "KMSP": {
+    "station": "KMSP",
+    "revision_frequency": 0.0,
+    "revision_timing": {},
+    "outcome_flip_probability": 0.0,
+    "bias_factors": {},
+    "threshold_crossings": [],
+    "historical_revision_data": {},
+    "build_timestamp": "2026-07-17T15:45:14.276216+00:00"
+  }
+}
