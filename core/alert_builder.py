@@ -8,12 +8,208 @@ Hard filtering applied before alert emission.
 from enum import Enum
 from typing import Dict, Any, Tuple, Optional
 import os
+import time
+import logging
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
 
 # ─── Alert Schema Version ────────────────────────────────────────────────
 PAPER_TRADE_ALERT_SCHEMA_VERSION = "2.1"  # B-MODE v2
+
+# ─── Cooldown Tracker ───────────────────────────────────────────────────
+# Per-station, per-lane frequency throttle to prevent alert spam.
+
+
+class AlertCooldown:
+    """
+    Per-station cooldown tracker for alert frequency throttling.
+
+    Prevents the same station/lane from re-alerting before the cooldown
+    period expires. Cooldown resets only on signal state transition
+    (active→inactive or inactive→active), not on repeated confirms.
+
+    Lane cooldown periods:
+      - regular:     4 hours
+      - sure_thing:  8 hours
+      - goldilocks: 12 hours
+    """
+
+    def __init__(self):
+        # station -> {lane -> {last_alert_time, signal_state}}
+        self._cooldowns: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        self._cooldown_periods = {
+            'regular': 4 * 3600,
+            'sure_thing': 8 * 3600,
+            'goldilocks': 12 * 3600,
+        }
+        self._logger = logging.getLogger(__name__)
+
+    def can_alert(self, station: str, lane: str,
+                  current_signal_state: bool = True) -> Tuple[bool, str]:
+        """
+        Check if an alert can be fired for this station/lane.
+
+        Args:
+            station: ICAO station code
+            lane: Lane type string ('regular', 'sure_thing', 'goldilocks')
+            current_signal_state: True if signal is active, False if inactive
+
+        Returns:
+            (can_alert: bool, reason: str)
+        """
+        now = time.time()
+        lane = lane.lower()
+
+        # Normalize lane to known keys
+        lane_key = lane
+        if lane_key not in self._cooldown_periods:
+            # Map LaneType enum values to keys
+            lane_map = {
+                'regular': 'regular',
+                'sure_thing': 'sure_thing',
+                'goldilocks': 'goldilocks',
+            }
+            lane_key = lane_map.get(lane_key, 'regular')
+
+        cooldown_sec = self._cooldown_periods.get(lane_key, 4 * 3600)
+
+        # Initialize station entry if needed
+        if station not in self._cooldowns:
+            self._cooldowns[station] = {}
+
+        # Initialize lane entry if needed
+        if lane_key not in self._cooldowns[station]:
+            self._cooldowns[station][lane_key] = {
+                'last_alert_time': 0.0,
+                'signal_state': current_signal_state,
+            }
+            self._logger.debug(
+                "AlertCooldown: new entry for %s/%s", station, lane_key
+            )
+            return True, "new_entry"
+
+        entry = self._cooldowns[station][lane_key]
+        last_alert = entry['last_alert_time']
+        last_state = entry['signal_state']
+        elapsed = now - last_alert
+
+        # Check if signal state has transitioned
+        state_changed = (last_state != current_signal_state)
+
+        if state_changed:
+            # State transition resets the cooldown — allow the alert
+            entry['signal_state'] = current_signal_state
+            self._logger.debug(
+                "AlertCooldown: state transition for %s/%s, allowing alert",
+                station, lane_key
+            )
+            return True, "state_transition_reset"
+
+        # Check cooldown period
+        if elapsed < cooldown_sec:
+            remaining = cooldown_sec - elapsed
+            self._logger.debug(
+                "AlertCooldown: %s/%s in cooldown (%.0fs remaining)",
+                station, lane_key, remaining
+            )
+            return False, f"cooldown_active_{int(remaining)}s_remaining"
+
+        # Cooldown expired — allow
+        return True, "cooldown_expired"
+
+    def record_alert(self, station: str, lane: str,
+                     signal_state: bool = True) -> None:
+        """
+        Record that an alert was fired for this station/lane.
+
+        Updates the last_alert_time to now, resetting the cooldown timer.
+
+        Args:
+            station: ICAO station code
+            lane: Lane type string
+            signal_state: Current signal state (active/inactive)
+        """
+        now = time.time()
+        lane_key = lane.lower()
+        if lane_key not in {'regular', 'sure_thing', 'goldilocks'}:
+            lane_key = 'regular'
+
+        if station not in self._cooldowns:
+            self._cooldowns[station] = {}
+
+        self._cooldowns[station][lane_key] = {
+            'last_alert_time': now,
+            'signal_state': signal_state,
+        }
+
+        self._logger.debug(
+            "AlertCooldown: recorded alert for %s/%s", station, lane_key
+        )
+
+    def get_cooldown_status(self, station: str,
+                            lane: str) -> Dict[str, Any]:
+        """Get current cooldown status for a station/lane."""
+        lane_key = lane.lower()
+        if lane_key not in {'regular', 'sure_thing', 'goldilocks'}:
+            lane_key = 'regular'
+
+        cooldown_sec = self._cooldown_periods.get(lane_key, 4 * 3600)
+
+        if station not in self._cooldowns:
+            return {
+                'station': station,
+                'lane': lane_key,
+                'in_cooldown': False,
+                'remaining_sec': 0,
+                'cooldown_period_sec': cooldown_sec,
+                'last_alert_time': None,
+                'signal_state': None,
+            }
+
+        entry = self._cooldowns[station].get(lane_key)
+        if entry is None:
+            return {
+                'station': station,
+                'lane': lane_key,
+                'in_cooldown': False,
+                'remaining_sec': 0,
+                'cooldown_period_sec': cooldown_sec,
+                'last_alert_time': None,
+                'signal_state': None,
+            }
+
+        now = time.time()
+        elapsed = now - entry['last_alert_time']
+        remaining = max(0, cooldown_sec - elapsed)
+
+        return {
+            'station': station,
+            'lane': lane_key,
+            'in_cooldown': remaining > 0,
+            'remaining_sec': int(remaining),
+            'cooldown_period_sec': cooldown_sec,
+            'last_alert_time': entry['last_alert_time'],
+            'signal_state': entry['signal_state'],
+        }
+
+    def reset_station(self, station: str) -> None:
+        """Clear all cooldown state for a station."""
+        self._cooldowns.pop(station, None)
+
+    def reset_all(self) -> None:
+        """Clear all cooldown state."""
+        self._cooldowns.clear()
+
+
+# Singleton instance for module-level access
+_ALERT_COOLDOWN = AlertCooldown()
+
+
+def get_alert_cooldown() -> AlertCooldown:
+    """Get the module-level AlertCooldown singleton."""
+    return _ALERT_COOLDOWN
+
 
 # ─── Lane Classification ────────────────────────────────────────────────
 # Lane variants for alert routing and formatting
@@ -105,9 +301,10 @@ def check_alert_filter(trade_confidence: float, market_prob: float,
     if edge < 0.10:
         return AlertFilterResult.SKIP, f"Edge too low ({edge:.2%} < 10%)"
     
-    # Filter 3: Trade Conf < 65%
-    if trade_confidence < 0.65:
-        return AlertFilterResult.SKIP, f"Conf too low ({trade_confidence:.0%} < 65%)"
+    # Filter 3: Trade Conf < 50% (aligned with REGULAR lane minimum)
+    # BUG FIX: Was 65% which excluded Regular lane signals (50-70% range)
+    if trade_confidence < 0.50:
+        return AlertFilterResult.SKIP, f"Conf too low ({trade_confidence:.0%} < 50%)"
     
     # Filter 4: Opportunity Grade is D or F
     grade, _ = compute_opportunity_grade(trade_confidence, market_prob, Sharpe)
@@ -226,6 +423,18 @@ def build_paper_trade_alert(trade_result: Dict[str, Any], station: str,
     lane = classify_lane(trade_confidence, signal_type)
     lane_config = LANE_CONFIG[lane]
 
+    # Check frequency throttle cooldown before hard filters
+    cooldown = get_alert_cooldown()
+    can_alert, cooldown_reason = cooldown.can_alert(station, lane.value)
+    if not can_alert:
+        return {
+            "content": None,
+            "skip_reason": f"Cooldown: {cooldown_reason}",
+            "filtered": True,
+            "cooldown_skip": True,
+            "cooldown_reason": cooldown_reason,
+        }
+
     # Apply hard filters - skip alert if any filter fails
     filter_result, filter_reason = check_alert_filter(
         trade_confidence, market_prob, Sharpe, signal_type
@@ -237,6 +446,9 @@ def build_paper_trade_alert(trade_result: Dict[str, Any], station: str,
             "skip_reason": filter_reason,
             "filtered": True,
         }
+
+    # Record the alert in the cooldown tracker (only after all checks pass)
+    cooldown.record_alert(station, lane.value)
 
     # Build Discord embed
     edge_pct = f"{edge:+.2%}"
