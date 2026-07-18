@@ -1,0 +1,463 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-18T16:55:57.682165",
+    "db_path": "data/metar_backfill.db",
+    "signals": [
+      "calendar_climatology",
+      "gaussian",
+      "goldilocks",
+      "pressure_delta",
+      "wind_direction_shift",
+      "regime",
+      "forecast_disagreement"
+    ],
+    "stations": [
+      "KATL"
+    ],
+    "num_combos": 20
+  },
+  "raw_results": {
+    "calendar_climatology": {
+      "correct": 231,
+      "total": 330
+    },
+    "calendar_climatology+regime": {
+      "correct": 231,
+      "total": 330
+    },
+    "gaussian": {
+      "correct": 410,
+      "total": 617
+    },
+    "calendar_climatology+gaussian": {
+      "correct": 410,
+      "total": 617
+    },
+    "gaussian+regime": {
+      "correct": 410,
+      "total": 617
+    },
+    "calendar_climatology+gaussian+regime": {
+      "correct": 410,
+      "total": 617
+    },
+    "calendar_climatology+wind_direction_shift": {
+      "correct": 303,
+      "total": 441
+    },
+    "calendar_climatology+wind_direction_shift+regime": {
+      "correct": 303,
+      "total": 441
+    },
+    "gaussian+wind_direction_shift": {
+      "correct": 455,
+      "total": 689
+    },
+    "calendar_climatology+gaussian+wind_direction_shift": {
+      "correct": 455,
+      "total": 689
+    },
+    "calendar_climatology+gaussian+pressure_delta+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "calendar_climatology+gaussian+pressure_delta+regime+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "gaussian+pressure_delta+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "gaussian+pressure_delta+regime+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "calendar_climatology+gaussian+pressure_delta": {
+      "correct": 646,
+      "total": 1037
+    },
+    "calendar_climatology+gaussian+pressure_delta+regime": {
+      "correct": 646,
+      "total": 1037
+    },
+    "gaussian+pressure_delta": {
+      "correct": 640,
+      "total": 1029
+    },
+    "gaussian+pressure_delta+regime": {
+      "correct": 640,
+      "total": 1029
+    },
+    "gaussian+pressure_delta+wind_direction_shift+forecast_disagreement": {
+      "correct": 714,
+      "total": 1143
+    },
+    "gaussian+pressure_delta+wind_direction_shift+regime+forecast_disagreement": {
+      "correct": 714,
+      "total": 1143
+    }
+  },
+  "calibrated_results": {
+    "calendar_climatology": {
+      "correct": 229,
+      "total": 328
+    },
+    "calendar_climatology+regime": {
+      "correct": 230,
+      "total": 329
+    },
+    "gaussian": {
+      "correct": 410,
+      "total": 617
+    },
+    "calendar_climatology+gaussian": {
+      "correct": 410,
+      "total": 617
+    },
+    "gaussian+regime": {
+      "correct": 410,
+      "total": 617
+    },
+    "calendar_climatology+gaussian+regime": {
+      "correct": 410,
+      "total": 617
+    },
+    "calendar_climatology+wind_direction_shift": {
+      "correct": 295,
+      "total": 432
+    },
+    "calendar_climatology+wind_direction_shift+regime": {
+      "correct": 305,
+      "total": 440
+    },
+    "gaussian+wind_direction_shift": {
+      "correct": 461,
+      "total": 689
+    },
+    "calendar_climatology+gaussian+wind_direction_shift": {
+      "correct": 458,
+      "total": 689
+    },
+    "calendar_climatology+gaussian+pressure_delta+forecast_disagreement": {
+      "correct": 699,
+      "total": 1128
+    },
+    "calendar_climatology+gaussian+pressure_delta+regime+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "gaussian+pressure_delta+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "gaussian+pressure_delta+regime+forecast_disagreement": {
+      "correct": 701,
+      "total": 1127
+    },
+    "calendar_climatology+gaussian+pressure_delta": {
+      "correct": 649,
+      "total": 1040
+    },
+    "calendar_climatology+gaussian+pressure_delta+regime": {
+      "correct": 649,
+      "total": 1040
+    },
+    "gaussian+pressure_delta": {
+      "correct": 649,
+      "total": 1040
+    },
+    "gaussian+pressure_delta+regime": {
+      "correct": 649,
+      "total": 1040
+    },
+    "gaussian+pressure_delta+wind_direction_shift+forecast_disagreement": {
+      "correct": 714,
+      "total": 1141
+    },
+    "gaussian+pressure_delta+wind_direction_shift+regime+forecast_disagreement": {
+      "correct": 714,
+      "total": 1141
+    }
+  },
+  "summary": [
+    {
+      "combo": "gaussian+wind_direction_shift",
+      "signals": [
+        "gaussian",
+        "wind_direction_shift"
+      ],
+      "raw_accuracy": 0.66038,
+      "raw_trades": 689,
+      "calibrated_accuracy": 0.66909,
+      "calibrated_trades": 689,
+      "delta": 0.00871,
+      "improvement_pct": 1.32
+    },
+    {
+      "combo": "calendar_climatology+wind_direction_shift+regime",
+      "signals": [
+        "calendar_climatology",
+        "wind_direction_shift",
+        "regime"
+      ],
+      "raw_accuracy": 0.68707,
+      "raw_trades": 441,
+      "calibrated_accuracy": 0.69318,
+      "calibrated_trades": 440,
+      "delta": 0.00611,
+      "improvement_pct": 0.89
+    },
+    {
+      "combo": "calendar_climatology+gaussian+wind_direction_shift",
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "wind_direction_shift"
+      ],
+      "raw_accuracy": 0.66038,
+      "raw_trades": 689,
+      "calibrated_accuracy": 0.66473,
+      "calibrated_trades": 689,
+      "delta": 0.00435,
+      "improvement_pct": 0.66
+    },
+    {
+      "combo": "gaussian+pressure_delta",
+      "signals": [
+        "gaussian",
+        "pressure_delta"
+      ],
+      "raw_accuracy": 0.62196,
+      "raw_trades": 1029,
+      "calibrated_accuracy": 0.62404,
+      "calibrated_trades": 1040,
+      "delta": 0.00208,
+      "improvement_pct": 0.33
+    },
+    {
+      "combo": "gaussian+pressure_delta+regime",
+      "signals": [
+        "gaussian",
+        "pressure_delta",
+        "regime"
+      ],
+      "raw_accuracy": 0.62196,
+      "raw_trades": 1029,
+      "calibrated_accuracy": 0.62404,
+      "calibrated_trades": 1040,
+      "delta": 0.00208,
+      "improvement_pct": 0.33
+    },
+    {
+      "combo": "calendar_climatology+gaussian+pressure_delta",
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "pressure_delta"
+      ],
+      "raw_accuracy": 0.62295,
+      "raw_trades": 1037,
+      "calibrated_accuracy": 0.62404,
+      "calibrated_trades": 1040,
+      "delta": 0.00109,
+      "improvement_pct": 0.17
+    },
+    {
+      "combo": "calendar_climatology+gaussian+pressure_delta+regime",
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "pressure_delta",
+        "regime"
+      ],
+      "raw_accuracy": 0.62295,
+      "raw_trades": 1037,
+      "calibrated_accuracy": 0.62404,
+      "calibrated_trades": 1040,
+      "delta": 0.00109,
+      "improvement_pct": 0.17
+    },
+    {
+      "combo": "gaussian+pressure_delta+wind_direction_shift+forecast_disagreement",
+      "signals": [
+        "gaussian",
+        "pressure_delta",
+        "wind_direction_shift",
+        "forecast_disagreement"
+      ],
+      "raw_accuracy": 0.62467,
+      "raw_trades": 1143,
+      "calibrated_accuracy": 0.62577,
+      "calibrated_trades": 1141,
+      "delta": 0.00109,
+      "improvement_pct": 0.18
+    },
+    {
+      "combo": "gaussian+pressure_delta+wind_direction_shift+regime+forecast_disagreement",
+      "signals": [
+        "gaussian",
+        "pressure_delta",
+        "wind_direction_shift",
+        "regime",
+        "forecast_disagreement"
+      ],
+      "raw_accuracy": 0.62467,
+      "raw_trades": 1143,
+      "calibrated_accuracy": 0.62577,
+      "calibrated_trades": 1141,
+      "delta": 0.00109,
+      "improvement_pct": 0.18
+    },
+    {
+      "combo": "gaussian",
+      "signals": [
+        "gaussian"
+      ],
+      "raw_accuracy": 0.66451,
+      "raw_trades": 617,
+      "calibrated_accuracy": 0.66451,
+      "calibrated_trades": 617,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "calendar_climatology+gaussian",
+      "signals": [
+        "calendar_climatology",
+        "gaussian"
+      ],
+      "raw_accuracy": 0.66451,
+      "raw_trades": 617,
+      "calibrated_accuracy": 0.66451,
+      "calibrated_trades": 617,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "gaussian+regime",
+      "signals": [
+        "gaussian",
+        "regime"
+      ],
+      "raw_accuracy": 0.66451,
+      "raw_trades": 617,
+      "calibrated_accuracy": 0.66451,
+      "calibrated_trades": 617,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "calendar_climatology+gaussian+regime",
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "regime"
+      ],
+      "raw_accuracy": 0.66451,
+      "raw_trades": 617,
+      "calibrated_accuracy": 0.66451,
+      "calibrated_trades": 617,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "calendar_climatology+gaussian+pressure_delta+regime+forecast_disagreement",
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "pressure_delta",
+        "regime",
+        "forecast_disagreement"
+      ],
+      "raw_accuracy": 0.62201,
+      "raw_trades": 1127,
+      "calibrated_accuracy": 0.62201,
+      "calibrated_trades": 1127,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "gaussian+pressure_delta+forecast_disagreement",
+      "signals": [
+        "gaussian",
+        "pressure_delta",
+        "forecast_disagreement"
+      ],
+      "raw_accuracy": 0.62201,
+      "raw_trades": 1127,
+      "calibrated_accuracy": 0.62201,
+      "calibrated_trades": 1127,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "gaussian+pressure_delta+regime+forecast_disagreement",
+      "signals": [
+        "gaussian",
+        "pressure_delta",
+        "regime",
+        "forecast_disagreement"
+      ],
+      "raw_accuracy": 0.62201,
+      "raw_trades": 1127,
+      "calibrated_accuracy": 0.62201,
+      "calibrated_trades": 1127,
+      "delta": 0.0,
+      "improvement_pct": 0.0
+    },
+    {
+      "combo": "calendar_climatology+regime",
+      "signals": [
+        "calendar_climatology",
+        "regime"
+      ],
+      "raw_accuracy": 0.7,
+      "raw_trades": 330,
+      "calibrated_accuracy": 0.69909,
+      "calibrated_trades": 329,
+      "delta": -0.00091,
+      "improvement_pct": -0.13
+    },
+    {
+      "combo": "calendar_climatology",
+      "signals": [
+        "calendar_climatology"
+      ],
+      "raw_accuracy": 0.7,
+      "raw_trades": 330,
+      "calibrated_accuracy": 0.69817,
+      "calibrated_trades": 328,
+      "delta": -0.00183,
+      "improvement_pct": -0.26
+    },
+    {
+      "combo": "calendar_climatology+gaussian+pressure_delta+forecast_disagreement",
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "pressure_delta",
+        "forecast_disagreement"
+      ],
+      "raw_accuracy": 0.62201,
+      "raw_trades": 1127,
+      "calibrated_accuracy": 0.61968,
+      "calibrated_trades": 1128,
+      "delta": -0.00232,
+      "improvement_pct": -0.37
+    },
+    {
+      "combo": "calendar_climatology+wind_direction_shift",
+      "signals": [
+        "calendar_climatology",
+        "wind_direction_shift"
+      ],
+      "raw_accuracy": 0.68707,
+      "raw_trades": 441,
+      "calibrated_accuracy": 0.68287,
+      "calibrated_trades": 432,
+      "delta": -0.0042,
+      "improvement_pct": -0.61
+    }
+  ]
+}
