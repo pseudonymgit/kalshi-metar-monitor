@@ -1,3 +1,4 @@
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 #!/usr/bin/env python3
 """
 PAPER TRADING ENGINE - Deterministic Implementation (v2.0)
@@ -20,18 +21,31 @@ Core Features:
 Version: v2.0 2026-07-03
 """
 
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import sqlite3
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import json
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import uuid
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import time
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import sys
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import threading
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from datetime import datetime, timedelta, timezone
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from typing import Dict, List, Optional, Tuple, Any
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from enum import Enum
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import os
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import statistics
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import logging
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -41,8 +55,11 @@ CALIBRATION_REPORT_PATH = str(REPO_ROOT / "reports" / "paper_trading_calibration
 
 # Import the hourly late-day momentum signal
 sys.path.insert(0, str(REPO_ROOT / "core"))
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_signal
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_skill_gate import StationSkillGate
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from position_sizing import (
     compute_position_size as _compute_confidence_weighted_size,
     extract_confidence_from_signal_context as _extract_confidence,
@@ -50,12 +67,15 @@ from position_sizing import (
     ConfidenceTier as _ConfidenceTier,
     KellyPositionSizingConfig,
 )
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from kalshi_price_fetcher import (
     get_live_market_price as _get_live_market_price,
     clear_price_cache as _clear_price_cache,
     get_cache_stats as _get_cache_stats,
 )
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_time import is_within_entry_window as _is_within_entry_window
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_registry import (
     get_all_stations as _get_all_stations,
     get_station_mapping as _get_station_mapping,
@@ -64,6 +84,7 @@ from station_registry import (
     CLUSTER_BUDGET_USD as _CLUSTER_BUDGET_USD,
     CITY_PAIR_CAP_USD as _CITY_PAIR_CAP_USD,
 )
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from risk_controls import (
     RiskMetrics,
     RiskState,
@@ -78,6 +99,7 @@ from risk_controls import (
     RiskConfig,
     TradeResult
 )
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from alert_builder import (
     build_paper_trade_alert,
     format_alert_for_discord,
@@ -86,11 +108,14 @@ from alert_builder import (
     PAPER_TRADE_ALERT_SCHEMA_VERSION,
     build_paper_trade_alert_dev,
 )
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from alert_dispatcher import dispatch_current_alert
 )
 
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Phase 3 Risk Modules - optional import guards
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.low_liquidity_traps import LowLiquidityTrapFilter
     HAS_LOW_LIQUIDITY_TRAP = True
 except ImportError:
@@ -99,6 +124,7 @@ except ImportError:
     HAS_LOW_LIQUIDITY_TRAP = False
 
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.kelly_position_sizer import KellyPositionSizer
     HAS_KELLY_SIZER = True
 except ImportError:
@@ -107,6 +133,7 @@ except ImportError:
     HAS_KELLY_SIZER = False
 
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.risk_budget import RiskBudgetAllocator
     HAS_RISK_BUDGET = True
 except ImportError:
@@ -115,6 +142,7 @@ except ImportError:
     HAS_RISK_BUDGET = False
 
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.scaling_ladder import ScalingLadder
     HAS_SCALING_LADDER = True
 except ImportError:
@@ -123,6 +151,7 @@ except ImportError:
     HAS_SCALING_LADDER = False
 
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.stop_loss import StopLossMonitor
     HAS_STOP_LOSS = True
 except ImportError:
@@ -130,8 +159,10 @@ except ImportError:
     StopLossMonitor = None
     HAS_STOP_LOSS = False
 
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import Multi-Model Ensemble Signal
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.multi_model_ensemble import multi_model_real_signal as multi_model_ensemble_signal
     HAS_MULTI_MODEL_ENSEMBLE = True
 except ImportError:
@@ -139,9 +170,11 @@ except ImportError:
     multi_model_ensemble_signal = None
     HAS_MULTI_MODEL_ENSEMBLE = False
 
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import NWP Analog Signal - wrap in try/except to prevent crashes if sklearn/xgboost not installed
 # Check the NWP_ANALOG_ENABLED flag — this signal is experimental and gated
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.signals.nwp_analog_signal import NwpAnalogSignal, NWP_ANALOG_ENABLED
 except ImportError:
     print("Warning: NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
@@ -153,8 +186,10 @@ if not NWP_ANALOG_ENABLED:
     print("WARNING: NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
 HAS_NWP_ANOG = NWP_ANALOG_ENABLED
 
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.calibration_pipeline import CalibrationPipeline
     HAS_CALIBRATION_PIPELINE = True
 except ImportError:
@@ -261,6 +296,7 @@ class PaperTrader:
 
         # Initialize station skill gate (T5 - per station skill gating)
         try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             from core.station_skill_gate import StationSkillGate
             self._skill_gate = StationSkillGate(self.metar_db)
         except Exception as e:
@@ -310,7 +346,10 @@ class PaperTrader:
 
     def _init_paper_db(self):
         """Create paper trading database schema."""
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
+        # Ensure proper concurrency handling
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         c = conn.cursor()
         c.execute("ATTACH DATABASE ? AS metar", (self.metar_db,))
 
@@ -520,7 +559,7 @@ class PaperTrader:
         """Initialize metar DB if it's not complete."""
         # Just ensure the DB is accessible - don't modify existing schema
         try:
-            conn = sqlite3.connect(self.metar_db)
+            conn = get_sqlite_connection(self.metar_db)
             c = conn.cursor()
             c.execute("SELECT COUNT(*) FROM settlement_epochs LIMIT 1")
             conn.close()
@@ -533,7 +572,7 @@ class PaperTrader:
 
     def _get_daily_metars(self, target_date):
         """Get daily METAR data for a target date from metar DB."""
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         c.execute("""
@@ -553,7 +592,7 @@ class PaperTrader:
         Get settlement data for a given station and trading date.
         Returns settlement price (0.0-1.0) or None if not available
         """
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         c.execute("""
@@ -579,7 +618,7 @@ class PaperTrader:
         """
         # Use historical data to calculate conditional probability
         # P(signal_direction | current conditions) based on historical frequency
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         # Get climatology - probability of temperature moving UP/DOWN on same date
@@ -691,7 +730,7 @@ class PaperTrader:
             )
 
         # Fallback: historical heuristic (for offline/backtest use)
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         c.execute("""
@@ -721,7 +760,7 @@ class PaperTrader:
         Record explicit decision output: market implied probability vs analytical fair value + confidence.
         This addresses P1.4 requirement: "Explicit decision output: 'market implied probability vs analytical fair value + confidence'"
         """
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         # For HIGH type market:
@@ -889,7 +928,7 @@ class PaperTrader:
 
         # This would involve checking late-day temperature patterns for plateaus/slopes
         # Simplified implementation for now
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         for station in ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA']:
@@ -935,7 +974,7 @@ class PaperTrader:
         """Get temperature difference between yesterday's settlement and day before."""
         # This is a simplified reversion estimator. Keep the connection open
         # through both fallback queries.
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
         try:
             # Get settlements for two consecutive days
@@ -973,7 +1012,7 @@ class PaperTrader:
 
     def _get_calendar_climatology_direction(self, station, date):
         """Get historical tendency for this station on this calendar day."""
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         target_month_day = date[5:10]  # MM-DD
@@ -1005,11 +1044,12 @@ class PaperTrader:
         
         Returns: float - previous day's high temperature or None if not available
         """
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         from datetime import datetime, timedelta
         current_dt = datetime.strptime(current_date, '%Y-%m-%d')
         prev_date = (current_dt - timedelta(days=1)).strftime('%Y-%m-%d')
         
-        conn = sqlite3.connect(self.metar_db)
+        conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
         try:
@@ -1448,7 +1488,7 @@ class PaperTrader:
         net_cost = position_size + fee_cost * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 
         # Record the trade in our log with enhanced analytics
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         trade_uuid = str(uuid.uuid4())
@@ -1499,6 +1539,7 @@ class PaperTrader:
         self.update_risk_metrics_on_trade(net_cost, 'loss' if net_cost < 0 else 'win')
 
         # Update RiskManager with the new trade result
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         from dataclasses import asdict
         trade_result = TradeResult(
             trade_id=trade_uuid,
@@ -1595,7 +1636,7 @@ class PaperTrader:
         used for cost basis (average_cost) calculation.  This ensures unrealized
         P&L always reflects current market reality, not stale execution prices.
         """
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         # Get the trade data to determine station/market_type
@@ -1778,13 +1819,14 @@ class PaperTrader:
 
         Sums position_size_usd from all open trades for stations in the cluster.
         """
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         from station_registry import get_cluster_stations
         cluster_stations = get_cluster_stations(cluster_name)
         if not cluster_stations:
             return 0.0
 
         placeholders = ','.join('?' * len(cluster_stations))
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
         try:
             c.execute(f"""
@@ -1805,7 +1847,7 @@ class PaperTrader:
         Sums position_size_usd from all open trades for this station
         (both HIGH and LOW markets) to check the city pair cap.
         """
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
         try:
             c.execute("""
@@ -1833,7 +1875,7 @@ class PaperTrader:
         if as_of_date is None:
             as_of_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
 
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         c.execute("""
@@ -1894,7 +1936,7 @@ class PaperTrader:
         Process settlements for a specific date. Updates trades with settlement results
         and calculates realized P/L.
         """
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
         c.execute("ATTACH DATABASE ? AS metar", (self.metar_db,))
 
@@ -2045,7 +2087,7 @@ class PaperTrader:
         prev_balance = self.get_current_balance(reconcile_date)
 
         # Count trades and other details for this date
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         # Today's trades
@@ -2137,6 +2179,7 @@ class PaperTrader:
                 all_stations = []
                 # Try to get all stations from various sources
                 try:
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
                     from station_registry import get_all_stations
                     all_stations = get_all_stations()
                 except ImportError:
@@ -2171,7 +2214,7 @@ class PaperTrader:
 
     def calculate_calibration_metrics_for_date(self, for_date):
         """Calculate and store calibration metrics for the dashboard."""
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         # Get resolved trades for calibration calculation
@@ -2220,7 +2263,7 @@ class PaperTrader:
         if for_date is None:
             for_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
 
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         c.execute("""
@@ -2236,7 +2279,7 @@ class PaperTrader:
 
     def get_version_performance(self, trade_version):
         """Query performance by specific trade version."""
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         c.execute("""
@@ -2264,7 +2307,7 @@ class PaperTrader:
 
     def generate_calibration_report(self, save_path=CALIBRATION_REPORT_PATH):
         """Generate a JSON report of calibration metrics for the dashboard."""
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         # Get latest calibration metrics
@@ -2418,7 +2461,7 @@ class PaperTrader:
 
     def _get_daily_trades(self) -> List[Dict[str, Any]]:
         """Get trades from today for Sharpe calculation."""
-        conn = sqlite3.connect(self.paper_db)
+        conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
         today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
@@ -2459,7 +2502,7 @@ class PaperTrader:
         default_n = 0
 
         try:
-            conn = sqlite3.connect(self.paper_db)
+            conn = get_sqlite_connection(self.paper_db)
             c = conn.cursor()
 
             # Look up hit rate from historical directional accuracy table
@@ -2548,6 +2591,7 @@ class PaperTrader:
 
     def get_approved_stations(self) -> List[str]:
         """Return list of approved station codes."""
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         import station_registry
         return station_registry.get_all_stations()
         return get_all_stations()
