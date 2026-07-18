@@ -18,8 +18,8 @@ from datetime import datetime, timedelta
 @dataclass
 class KellySizingConfig:
     """Configuration for fee-aware Kelly position sizing."""
-    fraction_kelly: float = 0.5            # 50% fractional Kelly (conservative)  
-    fee_rate: float = 0.05                # 5% fee per trade (Kalshi exchange fee)
+    fraction_kelly: float = 0.5            # 50% fractional Kelly (conservative)
+    fee_rate: float = 0.0                # 0% fee - Kalshi charges 0 commission (spread-only costs)
     max_position_pct: float = 0.25        # Max 25% of balance per trade
     window_days: int = 30                 # Rolling window for win rate calculation
     min_trades_for_kelly: int = 10        # Minimum trades to compute Kelly sizing
@@ -29,12 +29,12 @@ class KellyPositionSizer:
     """
     Implements fee-aware Kelly criterion with fractional Kelly sizing.
     
-    Kelly formula (adapted for binary outcomes like Kalshi):
-    - Edge = Win_probability - Loss_probability = 2*Win_rate - 1
+    Original Kelly formula (adapted for binary outcomes like Kalshi):
+    - No edge calculation since fees = 0%
     - Kelly fraction = Edge / (Win_payoff * Win_probability + Loss_size * Loss_probability)
-    - For Kalshi: Win_payoff = 0.95x (95c of $1), Loss_size = 1.0x (full stake)
-    - Simplified as: Kelly_fraction = edge / variance
-    - Where variance = Win_prob * Loss_prob * (Win_payoff + Loss_size)**2
+    
+    
+    
     """
     
     def __init__(self, config: KellySizingConfig = None):

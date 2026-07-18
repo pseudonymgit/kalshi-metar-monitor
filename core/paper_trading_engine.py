@@ -206,7 +206,7 @@ class PaperTrader:
                  paper_db=PAPER_DB_PATH,
                  metar_db=METAR_DB_PATH,
                  initial_balance=10000.0,
-                 fee_rate=0.001):  # Very low fee for now, adjustable
+                 fee_rate=0.0):  # Very low fee for now, adjustable
         self.paper_db = paper_db
         self.metar_db = metar_db
         self.initial_balance = initial_balance
@@ -2562,7 +2562,7 @@ def daily_paper_run(run_date=None):
     print("=" * 70)
 
     # Increased initial balance for more realistic trading
-    trader = PaperTrader(initial_balance=10000.0, fee_rate=0.001)  # 0.1% fee
+    trader = PaperTrader(initial_balance=10000.0, fee_rate=0.0)  # 0.1% fee
 
     # Marty's Phase 1 B1.5: Check kill switches before trading
     should_halt, kill_reasons = trader.check_kill_switches()

@@ -28,34 +28,18 @@ class ConfidenceTier(Enum):
 
 
 @dataclass
-class KellyPositionSizingConfig:
-    """Fee-aware Kelly configuration."""
-    base_size_usd: float = 100.0       # Base position size
-    max_position_fraction: float = 0.25  # 25% max of balance as per SH3
-    max_size_usd: float = 20.0         # DEV: Cap at $20
-    min_size_usd: float = 5.0          # DEV: Minimum $5
-    fraction_kelly: float = 0.5        # 50% fractional Kelly (as per SH3)
-    fee_rate: float = 0.05            # 5% Kalshi fee (as per SH3)
-    window_days: int = 30             # 30-day rolling window for win rate (as per SH3)
-    high_confidence_threshold: float = 0.70
-    medium_confidence_threshold: float = 0.50
-    high_multiplier: float = 1.5
-    medium_multiplier: float = 1.0
-    low_multiplier: float = 0.5
-    # Per-signal-type overrides (optional)
-    signal_overrides: Dict[str, Dict[str, float]] = None
-
-    def __post_init__(self):
-        if self.signal_overrides is None:
-            self.signal_overrides = {}
-
-
-@dataclass
 class PositionSizingConfig:
-    """Configuration for confidence-weighted position sizing."""
-    base_size_usd: float = 10.0        # DEV: Small starter sizes
-    max_size_usd: float = 20.0         # DEV: Cap at $20
-    min_size_usd: float = 5.0          # DEV: Minimum $5
+    """
+    Unified configuration for confidence-weighted position sizing,
+    with optional fee-aware Kelly criterion.
+
+    Set use_kelly=True to enable fee-aware Kelly sizing (SH3).
+    When use_kelly=False, uses simple confidence-weighted sizing.
+    """
+    base_size_usd: float = 10.0        # Base position size
+    max_size_usd: float = 20.0         # Cap per position
+    min_size_usd: float = 5.0          # Minimum position size
+    max_position_fraction: float = 0.25  # 25% max of balance (SH3)
     high_confidence_threshold: float = 0.70
     medium_confidence_threshold: float = 0.50
     high_multiplier: float = 1.5
@@ -63,10 +47,19 @@ class PositionSizingConfig:
     low_multiplier: float = 0.5
     # Per-signal-type overrides (optional)
     signal_overrides: Dict[str, Dict[str, float]] = None
+    # Kelly-specific fields (only used when use_kelly=True)
+    use_kelly: bool = False
+    fraction_kelly: float = 0.5        # 50% fractional Kelly (SH3)
+    fee_rate: float = 0.0            # 0% Kalshi commission - spread-only costs (SH3 update)
+    window_days: int = 30             # 30-day rolling win rate window (SH3)
 
     def __post_init__(self):
         if self.signal_overrides is None:
             self.signal_overrides = {}
+
+
+# Backward compatibility alias
+KellyPositionSizingConfig = PositionSizingConfig
 
 
 class KellyPositionSizer:
