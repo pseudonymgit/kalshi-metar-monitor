@@ -21,8 +21,8 @@ Usage:
 # ─── Configuration ──────────────────────────────────────────────────────────
 
 # Kalshi fee structure (approximate)
-FEE_RATE = 0.05          # 5% on profits (standard Kalshi contract)
-SPREAD_ASSUMPTION = 0.02  # 2 cents assumed bid-ask spread for liquid markets
+FEE_RATE = 0.0            # 0% commission charged by Kalshi (updated from 0.05)
+DEFAULT_SPREAD = 0.02     # 2 cents average bid-ask spread for liquid markets
 
 # Entry thresholds
 MIN_DOLLAR_EDGE = 0.50   # Minimum dollar profit after fees/spread to enter
@@ -39,7 +39,7 @@ class FeeAwareEntryFilter:
     or with prices in the penny-contract danger zone.
     """
 
-    def __init__(self, fee_rate=FEE_RATE, spread=SPREAD_ASSUMPTION,
+    def __init__(self, fee_rate=FEE_RATE, spread=DEFAULT_SPREAD,
                  min_edge=MIN_DOLLAR_EDGE, min_price=MIN_PRICE_FLOOR,
                  max_price=MAX_PRICE_CEILING):
         self.fee_rate = fee_rate
@@ -82,14 +82,16 @@ class FeeAwareEntryFilter:
                 model_prob, market_price, stake)
 
         # ─── Edge calculation ───
-        # Expected profit if we win: (1 - market_price) * stake - fees
-        # Expected loss if we lose: market_price * stake
+        # Expected profit if we win: (1 - market_price) * stake - costs
+        # Expected loss if we lose: market_price * stake + costs
+        # Since Kalshi charges 0 commission, only the bid-ask spread matters for trading cost
         # Edge = model_prob * expected_profit - (1 - model_prob) * expected_loss
 
         gross_profit = (1 - market_price) * stake
-        fee_amount = gross_profit * self.fee_rate
-        net_profit = gross_profit - fee_amount - (self.spread * stake)
-        net_loss = market_price * stake + (self.spread * stake)
+        # Updated: Kalshi charges 0% commission, only spread as cost
+        fee_amount = 0  # No commission charged by Kalshi
+        net_profit = gross_profit - (self.spread * stake)  # Only spread cost on profit
+        net_loss = market_price * stake + (self.spread * stake)  # Only spread cost on loss
 
         expected_value = model_prob * net_profit - (1 - model_prob) * net_loss
 
