@@ -11,7 +11,7 @@ Based on asymmetric confidence scoring from Gray Room Round 4-1.5:
 - Down reversion (spike down → bounce back): base 0.25, less reliable
 """
 
-from .base_signal import BaseSignal
+from .base_signal import BaseSignal, _safe_get, validate_signal
 from typing import Optional, Tuple, Dict, Any, List
 import sqlite3
 import math
@@ -41,7 +41,7 @@ class GoldilocksSignal(BaseSignal):
 
     @property
     def min_lookback(self) -> int:
-        return 1  # Requires at least 1 prior day
+        return 2  # Requires at least 2 prior days
     
     def _load_signal_state(self, db_path: str) -> None:
         """Load signal state for epoch tracking."""
@@ -75,6 +75,7 @@ class GoldilocksSignal(BaseSignal):
         except Exception:
             return {}
     
+    @validate_signal
     def evaluate(self, idx: int, days: List[dict]) -> Tuple[Optional[str], float]:
         """
         Evaluate Goldilocks signal at day index `idx`.
@@ -103,68 +104,54 @@ class GoldilocksSignal(BaseSignal):
         """
         if len(days) < self.min_lookback + 1:
             return None, 0.0
-        
-        if idx < 1:
+
+        if idx < 2:
             return None, 0.0
-        
-        # Get current and prior day data
-        today = days[idx]
-        yesterday = days[idx - 1]
-        
-        # Determine if today represents a "spike" relative to yesterday
-        # and if we're seeing reversion behavior
-        
-        # Calculate temperature change
-        temp_change = today['high'] - yesterday['high']
-        
+
+        # Get prior day data using _safe_get — no look-ahead
+        # Use days[idx-1] (yesterday's high) and days[idx-2] (day before)
+        # to detect a spike that has already completed
+        yesterday_high = _safe_get(days, idx - 1, 'high')
+        day_before_high = _safe_get(days, idx - 2, 'high')
+
+        if today_high is None or yesterday_high is None:
+            return None, 0.0
+
+        # Calculate temperature change using only prior-day data
+        temp_change = yesterday_high - day_before_high
+
         # Determine if we're seeing a spike (rapid deviation)
-        # Spike threshold: > 2°F change from prior day
         spike_threshold = 2.0
         is_spike = abs(temp_change) >= spike_threshold
-        
+
         if not is_spike:
             return None, 0.0
-        
-        # Determine spike direction and reversion status
+
         is_spike_up = temp_change > 0
         is_spike_down = temp_change < 0
-        
-        # For this signal, we're looking for reversion after a spike
-        # Current implementation checks for "spike then revert" pattern
-        # in a 2-day window
-        
+
         # Confidence scoring with asymmetric base values
         # Per Gray Room Round 4-1.5:
         # - Up reversion (spike up → drop): base 0.40
         # - Down reversion (spike down → bounce): base 0.25
-        
+
         if is_spike_up:
-            # Spike up → reversion down (is_down=False)
-            # Direction: 'down' (temperature dropping back)
             base = 0.40
             direction = 'down'
-            
-            # Additional confidence factors
-            daily_high_margin = max(0.0, (today['high'] - yesterday['high']) / 5.0)
+            daily_high_margin = max(0.0, temp_change / 5.0)
             confidence = base + daily_high_margin * 0.15
             confidence = min(1.0, confidence)
-            
             return direction, confidence
-            
+
         elif is_spike_down:
-            # Spike down → reversion up (is_down=True)
-            # Direction: 'up' (temperature bouncing back)
             base = 0.25
             direction = 'up'
-            
-            # Additional confidence factors (discounted for down-reversion uncertainty)
-            daily_low_margin = max(0.0, (yesterday['high'] - today['high']) / 5.0)
-            confidence = base + daily_low_margin * 0.10  # Reduced from 0.15
-            confidence *= 0.85  # 15% discount for down-reversion signals
+            daily_low_margin = max(0.0, abs(temp_change) / 5.0)
+            confidence = base + daily_low_margin * 0.10
+            confidence *= 0.85
             confidence = min(1.0, confidence)
-            
             return direction, confidence
-        
+
         return None, 0.0
     
     def evaluate_for_station(self, station: str, date: str, conn: sqlite3.Connection = None) -> Tuple[Optional[str], float]:
