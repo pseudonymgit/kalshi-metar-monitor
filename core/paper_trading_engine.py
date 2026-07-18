@@ -86,15 +86,72 @@ from alert_builder import (
     PAPER_TRADE_ALERT_SCHEMA_VERSION,
     build_paper_trade_alert_dev,
 )
+from alert_dispatcher import dispatch_current_alert
+)
+
+# Phase 3 Risk Modules - optional import guards
+try:
+    from core.low_liquidity_traps import LowLiquidityTrapFilter
+    HAS_LOW_LIQUIDITY_TRAP = True
+except ImportError:
+    print("Warning: Low Liquidity Trap Filter module not available. Illiquid market protection disabled.")
+    LowLiquidityTrapFilter = None
+    HAS_LOW_LIQUIDITY_TRAP = False
+
+try:
+    from core.kelly_position_sizer import KellyPositionSizer
+    HAS_KELLY_SIZER = True
+except ImportError:
+    print("Warning: Kelly Position Sizer module not available. Advanced position sizing disabled.")
+    KellyPositionSizer = None
+    HAS_KELLY_SIZER = False
+
+try:
+    from core.risk_budget import RiskBudgetAllocator
+    HAS_RISK_BUDGET = True
+except ImportError:
+    print("Warning: Risk Budget module not available. Risk budget controls disabled.")
+    RiskBudgetAllocator = None
+    HAS_RISK_BUDGET = False
+
+try:
+    from core.scaling_ladder import ScalingLadder
+    HAS_SCALING_LADDER = True
+except ImportError:
+    print("Warning: Scaling Ladder module not available. Tiered scaling controls disabled.")
+    ScalingLadder = None
+    HAS_SCALING_LADDER = False
+
+try:
+    from core.stop_loss import StopLossMonitor
+    HAS_STOP_LOSS = True
+except ImportError:
+    print("Warning: Stop Loss Monitor module not available. Stop loss controls disabled.")
+    StopLossMonitor = None
+    HAS_STOP_LOSS = False
+
+# Attempt to import Multi-Model Ensemble Signal
+try:
+    from core.multi_model_ensemble import multi_model_real_signal as multi_model_ensemble_signal
+    HAS_MULTI_MODEL_ENSEMBLE = True
+except ImportError:
+    print("Warning: Multi-Model Ensemble Signal not available.")
+    multi_model_ensemble_signal = None
+    HAS_MULTI_MODEL_ENSEMBLE = False
 
 # Attempt to import NWP Analog Signal - wrap in try/except to prevent crashes if sklearn/xgboost not installed
+# Check the NWP_ANALOG_ENABLED flag — this signal is experimental and gated
 try:
-    from core.signals.nwp_analog_signal import NwpAnalogSignal
-    HAS_NWP_ANALOG = True
+    from core.signals.nwp_analog_signal import NwpAnalogSignal, NWP_ANALOG_ENABLED
 except ImportError:
     print("Warning: NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
     NwpAnalogSignal = None
-    HAS_NWP_ANALOG = False
+    NWP_ANALOG_ENABLED = False
+
+# Determine if we should attempt to use the NWP analog signal
+if not NWP_ANALOG_ENABLED:
+    print("WARNING: NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
+HAS_NWP_ANOG = NWP_ANALOG_ENABLED
 
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
@@ -178,18 +235,17 @@ class PaperTrader:
         self._init_metar_db_if_needed()
 
         # Initialize signal instances
-        if HAS_NWP_ANALOG:
-            try:
-                self._nwp_analog = NwpAnalogSignal()
-            except Exception:
-                print("Warning: Failed to initialize NWP Analog Signal instance")
-                self._nwp_analog = None
-        else:
-            self._nwp_analog = None
+        # NWP Analog is NOT instantiated at init — lazy-loaded when first needed
+        self._nwp_analog = None
 
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
-        self.signal_names = ["calendar_climatology", "late_day_momentum", "nwp_analog", "late_day_analysis"]
+        self.signal_names = ["calendar_climatology", "late_day_momentum", "late_day_analysis"]
+        if NWP_ANALOG_ENABLED:
+            self.signal_names.append("nwp_analog")
+        # Add multi-model ensemble signal if available
+        if HAS_MULTI_MODEL_ENSEMBLE:
+            self.signal_names.append("multi_model_ensemble")
         # Define common weather stations for initial available locations
         self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']  # Common trade locations
 
@@ -210,6 +266,47 @@ class PaperTrader:
         except Exception as e:
             print(f"Warning: Failed to initialize StationSkillGate: {e}, feature will be disabled")
             self._skill_gate = None
+
+        # Initialize Phase 3 risk modules
+        self._kelly_sizer = None
+        if HAS_KELLY_SIZER:
+            try:
+                self._kelly_sizer = KellyPositionSizer(bankroll=self.initial_balance)
+            except Exception as e:
+                print(f"Warning: Failed to initialize KellyPositionSizer: {e}")
+                self._kelly_sizer = None
+        
+        self._risk_budget = None
+        if HAS_RISK_BUDGET:
+            try:
+                self._risk_budget = RiskBudgetAllocator(total_budget=250.0)  # Default $250 total budget
+            except Exception as e:
+                print(f"Warning: Failed to initialize RiskBudgetAllocator: {e}")
+                self._risk_budget = None
+
+        self._scaling_ladder = None        
+        if HAS_SCALING_LADDER:
+            try:
+                self._scaling_ladder = ScalingLadder()
+            except Exception as e:
+                print(f"Warning: Failed to initialize ScalingLadder: {e}")
+                self._scaling_ladder = None
+
+        self._low_liquidity_trap_filter = None
+        if HAS_LOW_LIQUIDITY_TRAP:
+            try:
+                self._low_liquidity_trap_filter = LowLiquidityTrapFilter()
+            except Exception as e:
+                print(f"Warning: Failed to initialize LowLiquidityTrapFilter: {e}")
+                self._low_liquidity_trap_filter = None
+        
+        self._stop_loss_monitor = None
+        if HAS_STOP_LOSS:
+            try:
+                self._stop_loss_monitor = StopLossMonitor(budget=250.0)  # Same budget as risk budget
+            except Exception as e:
+                print(f"Warning: Failed to initialize StopLossMonitor: {e}")
+                self._stop_loss_monitor = None
 
     def _init_paper_db(self):
         """Create paper trading database schema."""
@@ -721,16 +818,38 @@ class PaperTrader:
                 market_side = MarketSide.UP if ldm_direction == "up" else MarketSide.DOWN
                 signals.append((station, "HIGH", market_side, "late_day_momentum_hourly"))
 
-            # Signal 4: NWP Analog (first-class signal)
-            if HAS_NWP_ANALOG and self._nwp_analog:
+            # Signal 4: NWP Analog (experimental — gated behind NWP_ANALOG_ENABLED flag)
+            if NWP_ANALOG_ENABLED:
+                # Lazy-initialize the NWP analog signal on first use
+                if self._nwp_analog is None:
+                    try:
+                        self._nwp_analog = NwpAnalogSignal()
+                        _LOGGER.info("NWP analog signal initialized (lazy load)")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to initialize NWP Analog Signal: {e}")
+                if self._nwp_analog is not None:
+                    try:
+                        result = self._nwp_analog.compute_signal(station, date)
+                        if result and result.get('direction') is not None and result.get('confidence', 0) > 0:
+                            direction = result['direction']
+                            market_side = MarketSide.UP if direction == 1 else MarketSide.DOWN
+                            signals.append((station, "HIGH", market_side, "nwp_analog"))
+                            _LOGGER.info(f"NWP analog signal fired for {station} on {date}: direction={direction}, confidence={result.get('confidence', 0)}")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to compute NWP analog signal for {station} on {date}: {e}")
+
+            # Signal 5: Multi-Model Ensemble (using real NWP forecasts from database)
+            if HAS_MULTI_MODEL_ENSEMBLE:
                 try:
-                    result = self._nwp_analog.compute_signal(station, date)
-                    if result and result.get('direction') is not None and result.get('confidence', 0) > 0:
-                        direction = result['direction']
-                        market_side = MarketSide.UP if direction == 1 else MarketSide.DOWN
-                        signals.append((station, "HIGH", market_side, "nwp_analog"))
+                    # Need to get previous day high temperature for comparison
+                    prev_day_high = self._get_prev_day_high_temperature(station, date)
+                    direction, confidence = multi_model_ensemble_signal(station, date, prev_day_high)
+                    if direction is not None and confidence >= 0.7:  # Use same confidence threshold as other signals
+                        market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
+                        signals.append((station, "HIGH", market_side, "multi_model_ensemble"))
+                        _LOGGER.info(f"Multi-Model Ensemble signal fired for {station} on {date}: direction={direction}, confidence={confidence}")
                 except Exception as e:
-                    _LOGGER.warning(f"Failed to compute NWP analog signal for {station} on {date}: {e}")
+                    _LOGGER.warning(f"Failed to compute Multi-Model Ensemble signal for {station} on {date}: {e}")
 
         metar_conn.close()
 
@@ -875,6 +994,43 @@ class PaperTrader:
 
         return result[0] if result and result[0] is not None else None
 
+    def _get_prev_day_high_temperature(self, station, current_date):
+        """
+        Get the previous day's high temperature for a given station and current date.
+        This is needed for the multi-model ensemble signal which compares forecasts to prior actual.
+        
+        Args:
+            station: ICAO station code (e.g., 'KATL')
+            current_date: current date string (YYYY-MM-DD) to get yesterday's data for
+        
+        Returns: float - previous day's high temperature or None if not available
+        """
+        from datetime import datetime, timedelta
+        current_dt = datetime.strptime(current_date, '%Y-%m-%d')
+        prev_date = (current_dt - timedelta(days=1)).strftime('%Y-%m-%d')
+        
+        conn = sqlite3.connect(self.metar_db)
+        c = conn.cursor()
+
+        try:
+            c.execute("""
+                SELECT MAX(temp_f) as high_temp
+                FROM metar_observations
+                WHERE station = ?
+                AND date_utc = ?
+                AND temp_f IS NOT NULL
+                GROUP BY date_utc
+            """, (station, prev_date))
+
+            result = c.fetchone()
+            conn.close()
+
+            return result[0] if result and result[0] is not None else None
+        except Exception as e:
+            conn.close()
+            print(f"Error fetching previous day high temperature: {e}")
+            return None
+
     def place_paper_trade(self, station, market_type, signal_direction,
                          trade_version, functionality, date=None, notes=""):
         """
@@ -997,31 +1153,76 @@ class PaperTrader:
             # Use uncalibrated confidence if calibration is not available
             calibrated_confidence = confidence
 
-    def check_kill_switches(self) -> Tuple[bool, List[str]]:
-        """
-        Check all kill switches and return whether we should stop trading.
-        
-        Returns:
-            Tuple of (should_stop: bool, reasons: List[str])
-        """
-        reasons = []
-        
-        daily_loss_ok = self._risk_manager.check_daily_loss()
-        if not daily_loss_ok:
-            reasons.append("Daily loss limit exceeded")
-        
-        drawdown_ok = self._risk_manager.check_drawdown()
-        if not drawdown_ok:
-            reasons.append("Drawdown limit exceeded")
-        
-        consecutive_losses_ok = self._risk_manager.check_consecutive_losses()
-        if not consecutive_losses_ok:
-            reasons.append(f"Consecutive losses ({self._risk_manager.consecutive_losses}) exceeded limit")
-        
-        should_stop = len(reasons) > 0
-        return should_stop, reasons
-
         # Record decision output - this is P1.4 requirement
+        
+        # ─── PHASE 3 RISK MODULES: PRE-TRADE CHECKS ───────────────────────
+        # 1. Stop-loss pre-trade check - check if the stop-loss conditions are triggered
+        if self._stop_loss_monitor is not None:
+            try:
+                stopped, stop_reason, stop_details = self._stop_loss_monitor.check_stop_conditions()
+                if stopped:
+                    return {
+                        'status': 'skipped',
+                        'reason': f'Stop-loss triggered: {stop_reason}',
+                        'market_price': market_price,
+                        'analytical_prob': analytical_prob,
+                        'confidence': calibrated_confidence,
+                        'metadata': {**metadata, 'stop_loss_triggered': True, 'stop_details': stop_details}
+                    }
+                else:
+                    _LOGGER.info(f"Stop-loss conditions check: {stop_reason}")
+            except Exception as e:
+                # Log error but allow trade to proceed to maintain safety
+                _LOGGER.error(f"Stop-loss check failed: {e}")
+
+        # 2. Risk budget pre-allocation check
+        if self._risk_budget is not None:
+            try:
+                allowed, budget_reason = self._risk_budget.check_allocation(
+                    station=station,
+                    market_type=market_type,
+                    signal_type=functionality,
+                    position_size=0  # Initially, we want to check if we can allocate for this trade
+                )
+                if not allowed:
+                    return {
+                        'status': 'skipped',
+                        'reason': f'Risk budget rejected: {budget_reason}',
+                        'market_price': market_price,
+                        'analytical_prob': analytical_prob,
+                        'confidence': calibrated_confidence,
+                        'metadata': {**metadata, 'risk_budget_rejected': True}
+                    }
+                else:
+                    _LOGGER.info(f"Risk budget allocation check passed: {budget_reason}")
+            except Exception as e:
+                # Log error but allow trade to proceed
+                _LOGGER.error(f"Risk budget check failed: {e}")
+
+        # 3. Low liquidity pre-trade check - avoid markets that may have low volume conditions
+        if self._low_liquidity_trap_filter is not None:
+            try:
+                trapped, trap_reason, trap_details = self._low_liquidity_trap_filter.analyze_market_liquidity(
+                    station=station,
+                    market_type=market_type,
+                    date=date,
+                    price_metadata=self._last_market_price_meta if hasattr(self, '_last_market_price_meta') and self._last_market_price_meta is not None else {}
+                )
+                if trapped:
+                    return {
+                        'status': 'skipped',
+                        'reason': f'Low liquidity trap detected: {trap_reason}',
+                        'market_price': market_price,
+                        'analytical_prob': analytical_prob,
+                        'confidence': calibrated_confidence,
+                        'metadata': {**metadata, 'low_liquidity_trap_triggered': True, 'trap_details': trap_details}
+                    }
+                else:
+                    _LOGGER.info(f"Low liquidity check passed for {station}:{market_type}")
+            except Exception as e:
+                # Log error but allow trade to proceed - it's better to trade than lose due to check failure
+                _LOGGER.error(f"Low liquidity trap check failed, proceeding with trade: {e}")
+
         self.record_explicit_decision_output(
             station=station,
             date=date,
@@ -1047,6 +1248,28 @@ class PaperTrader:
                 'analytical_prob': analytical_prob,
                 'confidence': calibrated_confidence,
                 'metadata': metadata
+            }
+
+        # ─── Cost-Aware Trade Filter (Phase 3.5) ───────────────────────
+        # Check if edge exceeds 1.5x round-trip cost.
+        # Kalshi: spread=0.5¢, commission=0¢, slippage=0.5¢ → total 1.0¢ per contract
+        round_trip_cost = self._compute_round_trip_cost(market_price, position_size_estimate=100.0)
+        if fair_price_advantage >= 0:
+            edge_ratio = fair_price_advantage / round_trip_cost if round_trip_cost > 0 else float('inf')
+        else:
+            edge_ratio = abs(fair_price_advantage) / round_trip_cost if round_trip_cost > 0 else float('inf')
+
+        min_edge_ratio = 1.5  # Edge must be > 1.5x cost to pass
+        if edge_ratio < min_edge_ratio:
+            return {
+                'status': 'skipped',
+                'reason': f'Edge {abs(fair_price_advantage):.4f} insufficient vs cost {round_trip_cost:.4f} (ratio={edge_ratio:.2f}x < {min_edge_ratio:.1f}x)',
+                'market_price': market_price,
+                'analytical_prob': analytical_prob,
+                'confidence': calibrated_confidence,
+                'metadata': metadata,
+                'round_trip_cost': round_trip_cost,
+                'edge_ratio': edge_ratio,
             }
 
         # Determine trade type based on signal direction vs price discrepancy
@@ -1075,31 +1298,80 @@ class PaperTrader:
                 'metadata': metadata
             }
 
-        # Calculate position size using confidence-weighted sizing
+        # ── CONSOLIDATED POSITION SIZING PIPELINE ────────────────
+        # Single pipeline: Kelly (primary) → fallback (if Kelly unavailable) → ladder (modifier)
+        # Replaces 3 conflicting systems: Kelly sizer, confidence sizer, scaling ladder
+        #
+        # Rules:
+        # 1. Kelly sizer is primary (corrected formula: f* = (p - c) / (1 - c))
+        # 2. No min_size_usd floor — Kelly naturally produces 0 for no-edge trades
+        # 3. Single cap: 8% of bankroll (from Kelly sizer)
+        # 4. Scaling ladder is a downward modifier only (can reduce, never increase)
+        # 5. Edge must be positive to size > 0
+
         current_balance = self.get_current_balance(date)
-        sizing_config = KellyPositionSizingConfig()
+        sizing_meta = {}
 
-        # Extract confidence for sizing
-        signal_context_for_sizing = {
-            "signal_type": functionality,
-            "confidence": confidence,
-            "momentum_f_per_sec": metadata.get('late_day_momentum_confidence'),
-        }
-        extracted_confidence = _extract_confidence(signal_context_for_sizing)
+        # Compute edge and win rate
+        edge = abs(analytical_prob - market_price)
+        win_rate = analytical_prob
 
-        position_size, conf_tier, sizing_meta = _compute_confidence_weighted_size(
-            signal_type=functionality,
-            confidence=extracted_confidence,
-            current_balance=current_balance,
-            config=sizing_config,
-            market_price=market_price,
-        )
+        # ── Step 1: Primary sizing via Kelly (corrected formula) ──
+        if self._kelly_sizer is not None and HAS_KELLY_SIZER:
+            try:
+                position_size, kelly_details = self._kelly_sizer.compute_position_size(
+                    confidence=confidence,
+                    win_rate=win_rate,
+                    edge=edge
+                )
+                sizing_meta['kelly_computed'] = True
+                sizing_meta['kelly_details'] = kelly_details
+                _LOGGER.info(f"Kelly position computed: ${position_size:.2f}")
+            except Exception as e:
+                _LOGGER.error(f"Kelly sizer failed, falling back: {e}")
+                position_size = 0.0
+                sizing_meta['kelly_fallback'] = True
+        else:
+            # Without Kelly sizer, use simple edge-based sizing (no min_size_usd floor)
+            position_size = current_balance * edge * confidence * 0.08  # 8% bankroll cap
+            sizing_meta['kelly_unavailable'] = True
+            _LOGGER.warning("Kelly sizer unavailable, using fallback sizing")
 
-        # If position size is 0, skip
+        # ── Step 2: Apply scaling ladder as downward modifier ──
+        if self._scaling_ladder is not None and position_size > 0:
+            try:
+                ladder_limit = self._scaling_ladder.get_position_limit()
+                if position_size > ladder_limit:
+                    sizing_meta['scaling_ladder_applied'] = True
+                    sizing_meta['scaling_original_size'] = position_size
+                    sizing_meta['scaling_tier'] = self._scaling_ladder.get_current_tier()
+                    position_size = ladder_limit
+                    sizing_meta['scaling_adjusted_size'] = position_size
+                    _LOGGER.info(f"Position scaled down by ladder from ${sizing_meta['scaling_original_size']:.2f} to ${position_size:.2f}")
+                else:
+                    sizing_meta['scaling_ladder_applied'] = False
+            except Exception as e:
+                _LOGGER.error(f"Scaling ladder adjustment failed: {e}")
+
+        # ── Step 3: Record position in risk budget ──
+        if self._risk_budget is not None and position_size > 0:
+            try:
+                self._risk_budget.record_position(
+                    station=station,
+                    market_type=market_type,
+                    signal_type=functionality,
+                    position_size=position_size
+                )
+                sizing_meta['risk_budget_recorded'] = True
+                _LOGGER.info(f"Position recorded in risk budget: ${position_size:.2f}")
+            except Exception as e:
+                _LOGGER.error(f"Failed to record position in risk budget: {e}")
+
+        # If position size is 0 or below, skip
         if position_size <= 0:
             return {
                 'status': 'skipped',
-                'reason': f'Position size is 0 (balance too low or confidence too low)',
+                'reason': 'Position size is 0 (no edge or confidence too low)',
                 'market_price': market_price,
                 'analytical_prob': analytical_prob,
                 'confidence': calibrated_confidence,
@@ -1235,6 +1507,31 @@ class PaperTrader:
             trade_date=date
         )
         risk_state_after_execution = self._risk_manager.update_after_trade(trade_result)
+
+        # ─── PHASE 3 RISK MODULES: POST-TRADE RECORDING ───────────────────────
+        # Record trade result with Stop Loss Monitor 
+        if self._stop_loss_monitor is not None:
+            try:
+                self._stop_loss_monitor.record_trade(
+                    pnl=net_cost,
+                    is_profitable=(net_cost > 0),
+                    date_str=date
+                )
+                _LOGGER.info(f"Trade result recorded with Stop Loss Monitor: PnL=${net_cost:.2f}, Profitable={net_cost>0}")
+            except Exception as e:
+                _LOGGER.error(f"Failed to record trade in Stop Loss Monitor: {e}")
+
+        # Update scaling ladder for trade results
+        if self._scaling_ladder is not None:
+            try:
+                self._scaling_ladder.record_trade_result(
+                    pnl=net_cost,
+                    is_profitable=(net_cost > 0)
+                )
+                tier, limit, reason = self._scaling_ladder.evaluate()
+                _LOGGER.info(f"Scaling ladder updated: Tier={tier}, Limit=${limit}, Reason='{reason}'")
+            except Exception as e:
+                _LOGGER.error(f"Failed to update scaling ladder: {e}")
 
         # Check if any risk control has been violated after this trade
         if not risk_state_after_execution.get('passed', True):
@@ -1407,6 +1704,48 @@ class PaperTrader:
 
         conn.commit()
         conn.close()
+
+    def _compute_round_trip_cost(self, market_price: float, position_size_estimate: float = 100.0) -> float:
+        """
+        Compute the estimated round-trip cost for a trade on Kalshi.
+
+        Cost components (Kalshi):
+          - Spread:   0.5¢ per contract ($0.005)
+          - Commission: 0¢ (Kalshi has no commission on weather markets)
+          - Slippage: 0.5¢ per contract ($0.005)
+          - Total per contract: 1.0¢ ($0.01)
+
+        Round-trip cost = (spread/2 + commission * 2 + slippage) * contract_count
+        For a buy-and-hold-to-settlement, the cost is spread/2 + slippage
+        (no commission, no second leg unless we close early).
+
+        Args:
+            market_price: Current market price (0.0-1.0)
+            position_size_estimate: Estimated position size in USD for cost estimate
+
+        Returns:
+            Estimated round-trip cost as a fraction of notional (0.0-1.0 range)
+        """
+        # Kalshi cost structure per contract
+        spread_per_contract = 0.005       # 0.5¢
+        commission_per_contract = 0.0     # Kalshi: no commission
+        slippage_per_contract = 0.005     # 0.5¢
+
+        # Round-trip: buy + hold to settlement (one leg + slippage)
+        cost_per_contract = (spread_per_contract / 2) + commission_per_contract + slippage_per_contract
+
+        # Estimate contract count for this position
+        if market_price > 0.001:
+            contract_count = position_size_estimate / market_price
+        else:
+            contract_count = position_size_estimate / 0.5  # fallback
+
+        total_cost = cost_per_contract * contract_count
+
+        # Return cost as fraction of position size (for edge comparison)
+        if position_size_estimate > 0:
+            return total_cost / position_size_estimate
+        return cost_per_contract
 
     def _fetch_current_market_price(self, station: str, market_type: str, date: str) -> float:
         """
@@ -2014,11 +2353,11 @@ class PaperTrader:
         Returns a dict suitable for logging, alerting, or dashboard display.
         This is the main public interface for risk status checking.
         """
-        return risk_report(self._risk_metrics, self._risk_config)
+        return risk_report(self._risk_manager)
 
     def format_risk_alert(self) -> str:
         """Format risk metrics as a human-readable alert string."""
-        return format_risk_alert(self._risk_metrics)
+        return format_risk_alert(self._risk_manager)
 
     def build_paper_trade_alert(self, trade_result: Dict[str, Any], station: str,
                                 market_type: str, direction: str) -> Dict[str, Any]:
@@ -2144,24 +2483,28 @@ class PaperTrader:
 
     def check_kill_switches(self) -> Tuple[bool, List[str]]:
         """
-        Evaluate all kill switch conditions.
+        Evaluate all kill switch conditions (Phase 3.6).
+
+        Uses the RiskManager for all checks.
 
         Returns (should_halt, list_of_reasons).
         """
         reasons = []
 
         # Check max daily loss
-        max_daily_loss_dollars = self._risk_config.max_daily_loss_percent * self._risk_config.initial_capital
-        if max_daily_loss_dollars > 0 and self._risk_metrics.daily_pnl < -max_daily_loss_dollars:
-            reasons.append(f"Daily loss (${abs(self._risk_metrics.daily_pnl):.2f}) exceeds limit (${max_daily_loss_dollars:.2f})")
+        dl_pass, dl_reason = self._risk_manager.check_daily_loss()
+        if not dl_pass:
+            reasons.append(f"Daily loss: {dl_reason}")
 
         # Check max drawdown
-        if self._risk_config.max_drawdown_pct and self._risk_metrics.max_drawdown_pct >= self._risk_config.max_drawdown_pct:
-            reasons.append(f"Drawdown ({self._risk_metrics.max_drawdown_pct:.1%}) exceeds limit ({self._risk_config.max_drawdown_pct:.1%})")
+        dd_pass, dd_reason = self._risk_manager.check_drawdown()
+        if not dd_pass:
+            reasons.append(f"Drawdown: {dd_reason}")
 
-        # Check consecutive losses (from risk_metrics)
-        if self._risk_metrics.consecutive_losses >= self._risk_config.max_consecutive_losses:
-            reasons.append(f"Consecutive losses ({self._risk_metrics.consecutive_losses}) >= limit ({self._risk_config.max_consecutive_losses})")
+        # Check consecutive losses
+        cl_pass, cl_reason = self._risk_manager.check_consecutive_losses()
+        if not cl_pass:
+            reasons.append(f"Consecutive losses: {cl_reason}")
 
         return len(reasons) > 0, reasons
 
@@ -2275,7 +2618,12 @@ def daily_paper_run(run_date=None):
             # Format for Discord
             discord_payload = format_alert_for_discord(alert_data)
 
-            # Print alert to console (skip if alert was filtered by hard filters)
+            # Dispatch to Discord (skip if alert was filtered by hard filters)
+            dispatch_result = dispatch_current_alert(alert_data, discord_payload)
+            if dispatch_result.get('error'):
+                print(f"  [DISPATCH ERROR] {dispatch_result['error']}")
+
+            # Print alert to console
             if alert_data.get('skip_reason'):
                 print(f"  [FILTERED] {station}:{market_type} {result['trade_type'].value.upper()} - {alert_data['skip_reason']}")
                 skipped += 1
