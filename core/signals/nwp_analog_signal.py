@@ -8,7 +8,7 @@ Prediction (NWP) forecasts with ensemble averaging and directional bias.
 This signal:
 - Loads NWP forecast features (9 variables × 4 models, averaged) per station
 - Finds K=50 nearest analogs from prior dates using k-NN algorithm
-- Applies XGBoost transfer correction as a post-processing step
+- Applies deterministic consensus-weighted adjustment
 - Outputs directional prediction for daily temperature extreme (up/down)
 """
 
@@ -20,13 +20,46 @@ import argparse
 from pathlib import Path
 from collections import defaultdict
 from typing import Optional, Tuple, Dict, List, Any
-from sklearn.neighbors import NearestNeighbors
-import xgboost as xgb
-from sklearn.model_selection import train_test_split
+import warnings
+
+# Optional sklearn/xgboost imports — lazy-loaded to allow module import without them
+try:
+    from sklearn.neighbors import NearestNeighbors
+    _HAS_SKLEARN = True
+except ImportError:
+    NearestNeighbors = None
+    _HAS_SKLEARN = False
+
+try:
+    import xgboost as xgb
+    from sklearn.model_selection import train_test_split
+    _HAS_XGBOOST = True
+except ImportError:
+    xgb = None
+    train_test_split = None
+    _HAS_XGBOOST = False
 
 # Configuration: Use environment variables or relative paths
 NWP_DB_DEFAULT = "data/nwp_forecasts.db"  # Relative to working directory
 METAR_DB_DEFAULT = "data/metar_backfill.db"  # Relative to working directory
+
+# ===================================================================
+# EXPERIMENTAL FLAG (0.5.2): NWP Analog Signal
+# ===================================================================
+# XGBoost + k-NN is computationally expensive and requires sklearn/xgboost
+# packages which may not be available in all environments. Set this to True
+# only after explicit opt-in via configuration.
+#
+# To enable: os.environ['NWP_ANALOG_ENABLED'] = '1'
+# or: import core.signals.nwp_analog_signal; core.signals.nwp_analog_signal.NWP_ANALOG_ENABLED = True
+# ===================================================================
+# NWP_ANALOG_ENABLED = False  # Temporarily disabled - XGBoost removed in Bug 6 update
+# Uncomment next 2 lines to permanently disable
+NWP_ANALOG_ENABLED = False
+_nwp_analog_enabled_env = os.environ.get('NWP_ANALOG_ENABLED', '').lower()
+if _nwp_analog_enabled_env in ('1', 'true', 'yes', 'ENABLE_NWP_ANALOG_PERMANENTLY'):
+    NWP_ANALOG_ENABLED = True
+
 
 class NwpAnalogSignal:
     """
@@ -69,18 +102,16 @@ class NwpAnalogSignal:
             'geopotential_height_500hPa_daily_mean',
         ]
         
-        # Initialize XGBoost model for transfer correction
-        self.xgb_model = xgb.XGBRegressor(
-            n_estimators=100,
-            max_depth=6,
-            learning_rate=0.1,
-            random_state=42
-        )
+        # XGBoost model for transfer correction — LAZY INIT (only created when first needed)
+        self.xgb_model = None
         self.xgb_trained = False
         
         # Storage for training data and model coefficients
         self.analog_features_cache = {}
         self.feature_matrices = {}
+        
+        # Lazy-loaded NWP feature cache (loaded on first evaluate call)
+        self._features_cache = None
 
     def _load_nwp_features(self):
         """Load NWP features per station per target_date, averaged across models."""
@@ -218,6 +249,9 @@ class NwpAnalogSignal:
         Train XGBoost model to learn transfer corrections from analog matching.
         This adds the first-pass XGBoost transfer correction as specified.
         """
+        if not self._lazy_init_xgb():
+            self.xgb_trained = False
+            return
         if len(station_vectors) == 0 or len(direction_data) == 0:
             self.xgb_trained = False
             return
@@ -242,6 +276,27 @@ class NwpAnalogSignal:
             print(f"XGBoost training failed: {str(e)}")
             self.xgb_trained = False
 
+    def _lazy_init_xgb(self):
+        """Lazily initialize the XGBoost model when first needed."""
+        if self.xgb_model is not None:
+            return True
+        if not _HAS_XGBOOST:
+            return False
+        self.xgb_model = xgb.XGBRegressor(
+            n_estimators=100,
+            max_depth=6,
+            learning_rate=0.1,
+            random_state=42
+        )
+        return True
+
+    def _ensure_features_loaded(self):
+        """Lazily load NWP features on first use."""
+        if self._features_cache is not None:
+            return self._features_cache
+        self._features_cache = self._load_nwp_features()
+        return self._features_cache
+
     def evaluate_nwp_analog(self, station: str, target_date: str):
         """
         Main evaluation function for NWP analog matching.
@@ -257,6 +312,14 @@ class NwpAnalogSignal:
         If the METAR db file does not exist or cannot be opened, fall back to 
         a minimal mode (return neutral direction + low confidence 0.1).
         """
+        # Gate: NWP analog signal is experimental — return immediately if not enabled
+        if not NWP_ANALOG_ENABLED:
+            return None, 0.0
+        
+        # Gate: require sklearn and xgboost
+        if not _HAS_SKLEARN or not _HAS_XGBOOST:
+            return None, 0.0
+
         # Check if METAR database exists and is accessible
         if not os.path.exists(self.metar_db_path):
             # If METAR db doesn't exist, fall back to minimal mode
@@ -264,8 +327,8 @@ class NwpAnalogSignal:
         
         # Proceed with original functionality if METAR db is available
         try:
-            # Load all data for context
-            features, stations, target_dates = self._load_nwp_features()
+            # Load all data for context (lazy — cached after first load)
+            features, stations, target_dates = self._ensure_features_loaded()
             if station not in stations:
                 return None, 0.0
 
@@ -356,9 +419,10 @@ class NwpAnalogSignal:
                             direction = 'up' if curr_max > prev_max else 'down'
                             direction_data[(station, date)] = direction
 
-            # Train XGBoost if we have sufficient data
+            # Lazy init XGBoost and train if we have sufficient data
             if not self.xgb_trained and len(direction_data) > 10:
-                self.train_xgb_transfer_correction({station: current_vectors}, direction_data)
+                if self._lazy_init_xgb():
+                    self.train_xgb_transfer_correction({station: current_vectors}, direction_data)
 
             # Now implement analog matching with potential XGBoost post-processing
             if len(indices[0]) > 0:
@@ -382,25 +446,16 @@ class NwpAnalogSignal:
                     if prob_up == 0.5:  # Perfectly balanced
                         direction = None  # Neutral/unknown
 
-                    # Apply XGBoost correction if trained
-                    if self.xgb_trained and direction is not None:
-                        # Prepare features for XGBoost prediction
-                        consensus = prob_up if direction == 'up' else (1 - prob_up)
-                        avg_direction = np.mean(analog_directions)
-                        
-                        xgb_features = [[avg_direction, consensus, 1-consensus, 
-                                       sum(analog_directions), len(analog_directions), 
-                                       np.std(analog_directions) if len(analog_directions) > 1 else 0]]
-                        
-                        try:
-                            # Note: this is a conceptual implementation. The XGBoost model would need to be
-                            # properly trained on the same feature space we're providing here
-                            direction_adjust = self.xgb_model.predict(xgb_features)[0]
-                            
-                            # Adjust confidence based on XGBoost model prediction
-                            confidence = min(0.95, max(0.1, abs(direction_adjust) * confidence))
-                        except Exception as e:
-                            pass  # If XGBoost prediction fails, continue without adjustment
+                                        # Apply deterministic consensus-weighted adjustment
+                    # Apply deterministic consensus-weighted adjustment based on agreement level
+                    consensus = prob_up if direction == 'up' else (1 - prob_up)
+                    agreement_ratio = len(analog_directions) / len(history) if len(history) > 0 else 0
+                    
+                    # Boost confidence when analog agreement is high (>75% agreed)
+                    if consensus > 0.75:
+                        confidence = min(0.90, confidence * 1.2)  # Boost for high confidence
+                    elif consensus < 0.55:  # Reduce when agreement is marginal
+                        confidence = max(0.15, confidence * 0.8)  # Reduce for weak consensus
 
                     return direction, confidence
 
@@ -452,6 +507,8 @@ class NwpAnalogSignal:
         Returns:
             (direction, confidence) tuple
         """
+        if not NWP_ANALOG_ENABLED:
+            return None, 0.0
         return self.evaluate_nwp_analog(station, target_date)
 
     def compute_signal(self, station: str, target_date: Optional[str] = None) -> Optional[Dict[str, Any]]:
@@ -473,6 +530,10 @@ class NwpAnalogSignal:
         """
         from datetime import datetime
         
+        # Gate: NWP analog signal is experimental
+        if not NWP_ANALOG_ENABLED:
+            return None
+        
         # Set default target date to today if not provided
         if target_date is None:
             target_date = datetime.now().strftime('%Y-%m-%d')
@@ -481,7 +542,7 @@ class NwpAnalogSignal:
         direction, confidence = self.evaluate_nwp_analog(station, target_date)
         
         # Get the station details needed to calculate number of analogs
-        features, stations, target_dates = self._load_nwp_features()
+        features, stations, target_dates = self._ensure_features_loaded()
         if station not in stations:
             return None
         
