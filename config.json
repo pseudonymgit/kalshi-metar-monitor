@@ -1,0 +1,8 @@
+{
+  "kalshi": {
+    "public_base_url": "https://api.elections.kalshi.com/trade-api/v2",
+    "base_url": "https://api.elections.kalshi.com/trade-api/v2",
+    "key_id": "",
+    "has_private_key": false
+  }
+}

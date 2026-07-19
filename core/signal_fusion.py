@@ -12,29 +12,32 @@ Based on Expert 2 Signal Fusion & Information Theory Analysis (Gray Room Round 3
 """
 
 import os
+import logging
 import numpy as np
 import math
 from collections import defaultdict
 from scipy.special import expit, logit
-try:
-    from calibration_pipeline import CalibrationPipeline
-except ImportError:
-    try:
-        from core.calibration_pipeline import CalibrationPipeline
-    except ImportError:
-        import sys
-        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
-        from calibration_pipeline import CalibrationPipeline
+from core.calibration_pipeline import CalibrationPipeline
+
+_logger = logging.getLogger(__name__)
 
 
 def mutual_information_from_boolean_pairs(pairs_i, pairs_j, outcomes):
     """
     Compute mutual information I(X_i; X_j | outcomes) for binary predictions.
     
+    Uses outcomes (actual realized directions) to compute conditional mutual
+    information: I(X_i; X_j | Y) = sum_y P(Y=y) * I(X_i; X_j | Y=y).
+    
+    When outcomes are real ('up'/'down' strings or boolean 0/1), the function
+    partitions observations by outcome and computes conditional MI.
+    When outcomes are placeholder values (e.g., 'unknown'), falls back to
+    unconditional MI on prediction patterns.
+    
     Args:
         pairs_i: List of (direction_pred_i, confidence_i) 
-        pairs_j: List of (direction_pred_j, confidence_i)
-        outcomes: List of (actual_direction)
+        pairs_j: List of (direction_pred_j, confidence_j)
+        outcomes: List of outcomes (actual_direction strings or 'unknown' placeholders)
         
     Returns:
         Mutual information in bits
@@ -44,48 +47,82 @@ def mutual_information_from_boolean_pairs(pairs_i, pairs_j, outcomes):
         
     if len(pairs_i) != len(pairs_j) or len(pairs_i) != len(outcomes):
         raise ValueError("All arrays must have same length")
-        
-    # Create discretized agreement levels for both signals
-    # Convert (direction, conf) to a combined binary concept representing prediction
-    pred_i = []
-    pred_j = []
-    for (dir_i, conf_i), (dir_j, conf_j), (actual) in zip(pairs_i, pairs_j, outcomes):
-        # Create a combined prediction value: + if UP and conf>0.5, - if DOWN and conf>0.5, etc.
-        # Use high confidence and low confidence categories
-        i_strength = 'strong' if conf_i > 0.7 else 'weak'
-        i_pred = 1 if dir_i == 'up' else 0
-        pred_i.append((i_strength, i_pred))
-        
-        j_strength = 'strong' if conf_j > 0.7 else 'weak'
-        j_pred = 1 if dir_j == 'up' else 0
-        pred_j.append((j_strength, j_pred))
 
-    # Count occurrences
-    joint_counts = defaultdict(lambda: defaultdict(int))
-    i_counts = defaultdict(int)
-    j_counts = defaultdict(int)
-    total = len(pairs_i)
+    # Check if we have real outcomes (not placeholder 'unknown' values)
+    has_real_outcomes = any(o not in (None, 'unknown') for o in outcomes)
 
-    for pred_i_val, pred_j_val in zip(pred_i, pred_j):
-        joint_counts[pred_i_val][pred_j_val] += 1
-        i_counts[pred_i_val] += 1
-        j_counts[pred_j_val] += 1
+    def _compute_mi_from_preds(pred_i, pred_j):
+        """Internal helper: compute unconditional MI from two prediction lists."""
+        joint_counts = defaultdict(lambda: defaultdict(int))
+        i_counts = defaultdict(int)
+        j_counts = defaultdict(int)
+        total = len(pred_i)
 
-    # Calculate mutual information: I(X;Y) = Σ p(x,y) * log2(p(x,y)/(p(x)*p(y)))
-    mi = 0.0
-    for x in joint_counts:
-        for y in joint_counts[x]:
-            px = i_counts[x] / total
-            py = j_counts[y] / total
-            pxy = joint_counts[x][y] / total
-            
-            if px > 0 and py > 0 and pxy > 0:
-                mi += pxy * math.log2(pxy / (px * py))
-    
-    return max(0.0, mi)  # Return non-negative MI
+        for p_i, p_j in zip(pred_i, pred_j):
+            joint_counts[p_i][p_j] += 1
+            i_counts[p_i] += 1
+            j_counts[p_j] += 1
+
+        mi = 0.0
+        for x in joint_counts:
+            for y in joint_counts[x]:
+                px = i_counts[x] / total
+                py = j_counts[y] / total
+                pxy = joint_counts[x][y] / total
+                if px > 0 and py > 0 and pxy > 0:
+                    mi += pxy * math.log2(pxy / (px * py))
+        return max(0.0, mi)
+
+    def _discretize_pred(dir_val, conf_val):
+        """Convert (direction, confidence) to a discretized category."""
+        strength = 'strong' if conf_val > 0.7 else 'weak'
+        pred = 1 if dir_val == 'up' else 0
+        return (strength, pred)
+
+    if has_real_outcomes:
+        # Compute conditional mutual information I(X_i; X_j | Y)
+        # Partition observations by outcome value
+        outcome_groups = defaultdict(list)  # outcome -> [(pred_i, pred_j), ...]
+        for (dir_i, conf_i), (dir_j, conf_j), actual in zip(pairs_i, pairs_j, outcomes):
+            if actual in (None, 'unknown'):
+                continue
+            outcome_key = 'up' if actual == 'up' or actual == 1 else 'down'
+            p_i = _discretize_pred(dir_i, conf_i)
+            p_j = _discretize_pred(dir_j, conf_j)
+            outcome_groups[outcome_key].append((p_i, p_j))
+
+        if len(outcome_groups) < 2:
+            # Only one outcome class observed — fall back to unconditional MI
+            total = len(pairs_i)
+            pred_i_disc = [_discretize_pred(d, c) for d, c in pairs_i]
+            pred_j_disc = [_discretize_pred(d, c) for d, c in pairs_j]
+            return _compute_mi_from_preds(pred_i_disc, pred_j_disc)
+
+        conditional_mi = 0.0
+        total_obs = sum(len(v) for v in outcome_groups.values())
+        for outcome_key, obs_list in outcome_groups.items():
+            if len(obs_list) < 10:
+                continue
+            p_i_list = [item[0] for item in obs_list]
+            p_j_list = [item[1] for item in obs_list]
+            mi_given_y = _compute_mi_from_preds(p_i_list, p_j_list)
+            weight = len(obs_list) / total_obs
+            conditional_mi += weight * mi_given_y
+
+        return max(0.0, conditional_mi)
+
+    else:
+        # No real outcomes — unconditional MI on prediction patterns
+        pred_i_disc = []
+        pred_j_disc = []
+        for (dir_i, conf_i), (dir_j, conf_j) in zip(pairs_i, pairs_j):
+            pred_i_disc.append(_discretize_pred(dir_i, conf_i))
+            pred_j_disc.append(_discretize_pred(dir_j, conf_j))
+
+        return _compute_mi_from_preds(pred_i_disc, pred_j_disc)
 
 
-def mutual_information_matrix(signals_history, signal_names, n_bins=3):
+def mutual_information_matrix(signals_history, signal_names, n_bins=3, outcomes=None):
     """
     Compute symmetric mutual information matrix for all signal pairs.
     
@@ -93,22 +130,55 @@ def mutual_information_matrix(signals_history, signal_names, n_bins=3):
         signals_history: dict {signal_name: [(direction, conf, correct, date), ...]}
         signal_names: list of signal names
         n_bins: number of bins for discretization (to simplify MI calculation)
+        outcomes: optional dict {date: actual_direction} or list aligned with common_dates.
+                  If None, attempts to extract real outcomes from signals_history (the
+                  'correct' boolean in the 3rd position of each entry tuple).
         
     Returns:
-        2D array: MI matrix [n_signals x n_signals]
+        2D array: MI matrix [n_signals x n_signals] with elements > 0 indicating
+                  degraded quality when outcomes were unavailable
     """
+    # Logger already defined at module level
+
     n_signals = len(signal_names)
     if n_signals == 0:
         return []
         
     mi_matrix = [[0.0 for _ in range(n_signals)] for _ in range(n_signals)]
     
-    # For now, compute based on co-firing days across signal pairs
-    # A simplified MI computation comparing predictions across same days
+    # Collect data by date
     all_dates = set()
     signal_predictions = {}
     
-    # Collect data by date
+    # Extract outcome data from signals_history if needed
+    # signals_history entries: (direction, conf, correct, date)
+    # The 'correct' boolean (3rd element) is the outcome indicator
+    extracted_outcomes = {}
+    if outcomes is None:
+        for sig_name in signal_names:
+            if sig_name in signals_history:
+                for entry in signals_history[sig_name]:
+                    if len(entry) >= 4:
+                        date = entry[3]
+                        correct = entry[2]  # boolean: was prediction correct?
+                        if isinstance(correct, bool):
+                            # Convert boolean to 'up'/'down' based on prediction direction
+                            direction = entry[0]  # 'up' or 'down'
+                            if date not in extracted_outcomes:
+                                extracted_outcomes[date] = direction if correct else ('up' if direction == 'down' else 'down')
+        if extracted_outcomes:
+            outcomes = extracted_outcomes
+            _logger.info(
+                f"Extracted {len(outcomes)} real outcomes from signals_history "
+                f"for MI computation"
+            )
+        else:
+            outcomes = {}
+
+    # Check if we have real outcomes (not empty dict)
+    has_real_outcomes = len(outcomes) > 0
+
+    # Collect date-mapped predictions
     for sig_name in signal_names:
         if sig_name in signals_history:
             sig_hist = signals_history[sig_name]
@@ -118,10 +188,11 @@ def mutual_information_matrix(signals_history, signal_names, n_bins=3):
             all_dates.update(date_mappings.keys())
     
     # Only consider days where both signals predicted (co-fired)
+    degraded_flag = False
     for i, sig_i in enumerate(signal_names):
         for j, sig_j in enumerate(signal_names):
             if i == j:
-                mi_matrix[i][j] = 0  # MI with itself is 0 in this context
+                mi_matrix[i][j] = 0.0  # MI with itself is 0 in this context
                 continue
             
             predictions_i = signal_predictions.get(sig_i, {})
@@ -136,11 +207,32 @@ def mutual_information_matrix(signals_history, signal_names, n_bins=3):
             # Get paired predictions
             pairs_i = [predictions_i[date] for date in common_dates if date in predictions_i]
             pairs_j = [predictions_j[date] for date in common_dates if date in predictions_j]
-            outcomes = ['unknown'] * len(common_dates)  # dummy outcomes - could improve with actual results
-            
-            # Note: Simplified version - MI just based on prediction patterns
-            mi_matrix[i][j] = mutual_information_simple_correlation(pairs_i, pairs_j)
-            
+
+            if has_real_outcomes:
+                # Build outcomes list aligned with common_dates for this pair
+                outcome_list = []
+                for date in common_dates:
+                    if date in outcomes:
+                        outcome_list.append(outcomes[date])
+                    else:
+                        outcome_list.append('unknown')
+
+                # Compute MI using real outcomes (conditional MI)
+                mi_value = mutual_information_from_boolean_pairs(pairs_i, pairs_j, outcome_list)
+                mi_matrix[i][j] = mi_value
+            else:
+                # No real outcomes available — log warning once and fall back to pattern-only correlation
+                if not degraded_flag:
+                    _logger.warning(
+                        "mutual_information_matrix: no real outcomes available. "
+                        "Falling back to pattern-only correlation. MI matrix will be marked degraded."
+                    )
+                    degraded_flag = True
+
+                # Use pattern-only correlation (simplified, lower quality)
+                mi_value = mutual_information_simple_correlation(pairs_i, pairs_j)
+                mi_matrix[i][j] = mi_value
+
     return mi_matrix
 
 
@@ -850,22 +942,22 @@ class SignalFusionEngine:
         Args:
             all_station_signal_history: dict of {(signal_name, station): [(raw_conf, correct), ...]}
         """
-        print(f"Training calibration pipeline for {len(self.signal_names)} signals, {len(self.city_codes)} cities...")
+        _logger.info(f"Training calibration pipeline for {len(self.signal_names)} signals, {len(self.city_codes)} cities...")
         
         for (signal, station), history in all_station_signal_history.items():
             for raw_conf, was_correct in history:
                 self.calibration_pipeline.update(signal, station, raw_conf, was_correct)
         
-        print(f"Fitting calibration calibrators...")
+        _logger.info(f"Fitting calibration calibrators...")
         self.calibration_pipeline.refit()
-        print("Calibration training complete.")
+        _logger.info("Calibration training complete.")
 
     def compute_fusion_weights(self, mi_matrix=None, recalibrate_accuracies=False):
         """
         Compute mutual information matrix and final fusion weights.
         """
         if mi_matrix is None:
-            print("Computing mutual information matrix and fusion weights...")
+            _logger.info("Computing mutual information matrix and fusion weights...")
             # We'd need the signal history here, for now use default approach
             # This function assumes weights have been computed elsewhere or use defaults
         
@@ -946,13 +1038,34 @@ class SignalFusionEngine:
         
         conflict_k = dempster_shafer_conflict(ds_conflict_signals_input)
         
+        # Layer 3.5: Ensemble Diversity Score
+        # diversity = 1 - |2*max_vote_share - 1|
+        # If all 7 signals vote up: max_vote_share=1.0, diversity=0.0
+        # If 4 up, 3 down: max_vote_share=0.57, diversity=0.86
+        # Modifier: final_confidence *= (0.75 + 0.25*diversity)
+        # This penalizes unanimous votes (they don't add much information)
+        if n_signals >= 2:
+            up_count = sum(1 for d, _, _ in calibrated_signals if d == 'up')
+            down_count = n_signals - up_count
+            max_vote_share = max(up_count, down_count) / n_signals
+            diversity = 1.0 - abs(2.0 * max_vote_share - 1.0)
+            diversity_modifier = 0.75 + 0.25 * diversity
+            _logger = logging.getLogger(__name__)
+            _logger.debug(
+                f"EnsembleDiversity: up={up_count}, down={down_count}, "
+                f"max_vote_share={max_vote_share:.3f}, "
+                f"diversity={diversity:.3f}, modifier={diversity_modifier:.3f}"
+            )
+        else:
+            diversity_modifier = 1.0  # No diversity adjustment for single signals
+
         if use_ds_conflict:
             adjusted_prob = apply_conflict_modulation(final_prob, conflict_k)
-            
+
             # If conflict suppression sets probability to 0.5, we interpret as no trade signal
             if abs(adjusted_prob - 0.5) < 0.005:  # Very close to chance — raised threshold slightly
                 return None, 0.0, 0.0
-            
+
             # Recompute confidence after adjustment — use probability directly
             if adjusted_prob >= 0.5:
                 adjusted_direction = 'up'
@@ -960,9 +1073,14 @@ class SignalFusionEngine:
             else:
                 adjusted_direction = 'down'
                 adjusted_confidence = 1.0 - adjusted_prob
-                
+
+            # Apply diversity score modifier to confidence
+            adjusted_confidence = adjusted_confidence * diversity_modifier
+
             return adjusted_direction, adjusted_prob, adjusted_confidence
         else:
+            # Apply diversity score modifier to confidence
+            confidence = confidence * diversity_modifier
             return final_direction, final_prob, confidence
 
 

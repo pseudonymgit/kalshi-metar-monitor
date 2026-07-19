@@ -46,15 +46,21 @@ class StationSkillGate:
     based on Brier Skill Score (BSS) thresholds.
     """
     
-    def __init__(self, metar_db_path: str):
+    # Fixed cache location, decoupled from DB path (I4 fix)
+    DEFAULT_CACHE_PATH = "data/bss_cache.json"
+
+    def __init__(self, metar_db_path: str, cache_path: str = None):
         """
         Initialize the skill gate with METAR database path.
         
         Args:
             metar_db_path: Path to the METAR database file
+            cache_path: Optional path for BSS cache; defaults to data/bss_cache.json
         """
         self.metar_db_path = metar_db_path
-        self._cache_file = Path(metar_db_path).with_suffix('.bss_cache.json')
+        self._cache_file = Path(cache_path or self.DEFAULT_CACHE_PATH).resolve()
+        # Ensure parent directory exists
+        self._cache_file.parent.mkdir(parents=True, exist_ok=True)
         self._bss_matrix = None
         self._approved_station_cache = {}
         

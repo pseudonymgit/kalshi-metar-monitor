@@ -12,6 +12,9 @@ import threading
 import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional
+from pathlib import Path
+
+_REPO_ROOT = Path(__file__).resolve().parents[1]
 
 _ALERT_LOGGER = logging.getLogger(__name__)
 _RETRY_LOCK = threading.Lock()
@@ -22,7 +25,8 @@ def _now_utc_iso() -> str:
 
 
 def _alert_db_path() -> str:
-    return os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+    default_path = str(_REPO_ROOT / "data" / "alert_retry_queue.db")
+    return os.getenv("ALERT_DB_PATH", default_path)
 
 # Exponential backoff constants
 MIN_RETRY_DELAY_SECONDS = 60  # 1 minute

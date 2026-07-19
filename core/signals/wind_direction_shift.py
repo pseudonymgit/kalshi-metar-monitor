@@ -15,18 +15,20 @@ Implements:
 import sqlite3
 import math
 from datetime import datetime, timedelta
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict
 import os
 
+from .base_signal import BaseSignal, validate_signal
 
-class WindDirectionShiftSignal:
+
+class WindDirectionShiftSignal(BaseSignal):
     """
     Wind Direction Shift Signal
     Detects significant shifts in wind direction which can precede temperature changes.
     """
     
-    def __init__(self, db_path: str):
-        self.db_path = db_path
+    def __init__(self, db_path: str = None):
+        super().__init__(db_path)
         # Parameters for signal detection
         self.angle_threshold = 45.0  # Degrees
         self.wind_speed_threshold = 10.0  # knots
@@ -216,6 +218,48 @@ class WindDirectionShiftSignal:
             if start <= direction < end:
                 return sector
         return 'N'  # Default for boundary case
+
+
+    @validate_signal
+    def evaluate(self, idx: int, days: List[Dict]) -> Tuple[Optional[str], float]:
+        """
+        Evaluate signal using in-memory days list (standard interface).
+
+        Args:
+            idx: Current day index
+            days: List of daily weather dicts with wind_dir, wind_speed keys
+
+        Returns:
+            (direction, confidence) or (None, 0.0) if no signal
+        """
+        if idx < self.lookback_days + 1:
+            return None, 0.0
+
+        # Extract wind data from in-memory days list (reverse chronological)
+        wind_history = []
+        for i in range(idx, idx - self.lookback_days - 1, -1):
+            if i < 0:
+                break
+            d = days[i]
+            if d.get('wind_dir') is not None and d.get('wind_speed') is not None:
+                wind_history.append((d['date'], float(d['wind_dir']), float(d['wind_speed'])))
+
+        if len(wind_history) < 2:
+            return None, 0.0
+
+        shift_result = self.detect_wind_shift(wind_history)
+        if not shift_result:
+            return None, 0.0
+
+        angle_diff, avg_wind_speed, old_direction, new_direction = shift_result
+        direction, confidence = self.infer_temperature_implication(old_direction, new_direction, angle_diff)
+
+        speed_boost = min(0.2, (avg_wind_speed - self.wind_speed_threshold) / 20.0)
+        angle_boost = min(0.1, (angle_diff - self.angle_threshold) / 90.0)
+        total_confidence = min(0.85, confidence + speed_boost + angle_boost)
+        total_confidence = max(0.50, total_confidence)
+
+        return direction, total_confidence
 
 
     def generate_signal(self, station: str, date_str: str) -> Optional[Tuple[str, float]]:
