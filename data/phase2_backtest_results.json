@@ -1,0 +1,3587 @@
+{
+  "metadata": {
+    "script": "scripts/run_phase2_backtest.py",
+    "timestamp": "2026-07-19T04:37:03.038163+00:00",
+    "database": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db",
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "guardrails": {
+      "max_consecutive_losses": 8,
+      "max_daily_loss": 300.0,
+      "max_drawdown_pct": 10.0,
+      "initial_balance": 10000.0
+    }
+  },
+  "experiments": {
+    "temperature_advection_standalone": {
+      "description": "Temperature Advection Signal 6 standalone (limited to stored NWP data)",
+      "stations": {
+        "KATL": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KAUS": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KBOS": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KDCA": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KDEN": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KDFW": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KHOU": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KLAS": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KLAX": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KMDW": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KMIA": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KMSP": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1697
+        },
+        "KMSY": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1697
+        },
+        "KNYC": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KOKC": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KPHL": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KPHX": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1697
+        },
+        "KSAT": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KSEA": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        },
+        "KSFO": {
+          "accuracy": 0.0,
+          "sharpe": 0.0,
+          "total_trades": 0,
+          "correct": 0,
+          "coverage": 0.0,
+          "brier_score": 0.0,
+          "max_consecutive_losses": 0,
+          "total_days": 1699
+        }
+      },
+      "aggregate": {
+        "total_trades": 0,
+        "correct": 0,
+        "accuracy": 0,
+        "total_days": 33974,
+        "coverage": 0.0
+      },
+      "note": "Live-only signal \u2014 requires real-time GFS 850-mb forecast data. The evaluate() method is a stub for the BaseSignal interface. Backtesting requires stored NWP forecast data which is limited."
+    },
+    "all_signals_ensemble": {
+      "description": "Full SignalRegistry ensemble (all signals except temperature_advection)",
+      "signals_used": [
+        "wind_direction_shift",
+        "nwp_analog",
+        "goldilocks",
+        "persistence",
+        "simple_trend",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "regime",
+        "forecast_disagreement",
+        "calendar_climatology",
+        "frontal_detector"
+      ],
+      "stations": {
+        "KATL": {
+          "accuracy": 0.5526,
+          "sharpe": 3.233414,
+          "total_trades": 1692,
+          "correct": 935,
+          "coverage": 0.99588,
+          "brier_score": 0.317591,
+          "max_consecutive_losses": 5,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 27633.01,
+            "final_balance": 37633.01,
+            "sharpe_guarded": 3.445563,
+            "trades_executed": 1692,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KAUS": {
+          "accuracy": 0.556671,
+          "sharpe": 3.753795,
+          "total_trades": 1694,
+          "correct": 943,
+          "coverage": 0.997057,
+          "brier_score": 0.332612,
+          "max_consecutive_losses": 8,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 23884.31,
+            "final_balance": 33884.31,
+            "sharpe_guarded": 3.785888,
+            "trades_executed": 1337,
+            "guardrail_triggers": [
+              {
+                "date": "2024-09-05",
+                "reason": "consecutive_losses",
+                "value": 8,
+                "balance": 33884.31
+              }
+            ],
+            "lockdown_triggered": true
+          }
+        },
+        "KBOS": {
+          "accuracy": 0.612161,
+          "sharpe": 4.69585,
+          "total_trades": 1694,
+          "correct": 1037,
+          "coverage": 0.997057,
+          "brier_score": 0.266753,
+          "max_consecutive_losses": 5,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 38945.54,
+            "final_balance": 48945.54,
+            "sharpe_guarded": 5.037597,
+            "trades_executed": 1694,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KDCA": {
+          "accuracy": 0.582204,
+          "sharpe": 4.003215,
+          "total_trades": 1697,
+          "correct": 988,
+          "coverage": 0.998823,
+          "brier_score": 0.289196,
+          "max_consecutive_losses": 5,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 33890.28,
+            "final_balance": 43890.28,
+            "sharpe_guarded": 4.286735,
+            "trades_executed": 1697,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KDEN": {
+          "accuracy": 0.591258,
+          "sharpe": 4.033073,
+          "total_trades": 1693,
+          "correct": 1001,
+          "coverage": 0.996469,
+          "brier_score": 0.286371,
+          "max_consecutive_losses": 5,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 34427.61,
+            "final_balance": 44427.61,
+            "sharpe_guarded": 4.339798,
+            "trades_executed": 1693,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KDFW": {
+          "accuracy": 0.581615,
+          "sharpe": 4.335554,
+          "total_trades": 1697,
+          "correct": 987,
+          "coverage": 0.998823,
+          "brier_score": 0.302805,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 36071.3,
+            "final_balance": 46071.3,
+            "sharpe_guarded": 4.548062,
+            "trades_executed": 1697,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KHOU": {
+          "accuracy": 0.539505,
+          "sharpe": 3.320726,
+          "total_trades": 1696,
+          "correct": 915,
+          "coverage": 0.998234,
+          "brier_score": 0.345641,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 26387.68,
+            "final_balance": 36387.68,
+            "sharpe_guarded": 3.27957,
+            "trades_executed": 1696,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KLAS": {
+          "accuracy": 0.507383,
+          "sharpe": 3.252666,
+          "total_trades": 1693,
+          "correct": 859,
+          "coverage": 0.996469,
+          "brier_score": 0.348249,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 28182.68,
+            "final_balance": 38182.68,
+            "sharpe_guarded": 3.617089,
+            "trades_executed": 1693,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KLAX": {
+          "accuracy": 0.489374,
+          "sharpe": 2.475964,
+          "total_trades": 1694,
+          "correct": 829,
+          "coverage": 0.997057,
+          "brier_score": 0.381055,
+          "max_consecutive_losses": 5,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 19411.37,
+            "final_balance": 29411.37,
+            "sharpe_guarded": 2.441689,
+            "trades_executed": 1694,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KMDW": {
+          "accuracy": 0.591392,
+          "sharpe": 4.277282,
+          "total_trades": 1696,
+          "correct": 1003,
+          "coverage": 0.998234,
+          "brier_score": 0.273424,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 37179.53,
+            "final_balance": 47179.53,
+            "sharpe_guarded": 4.791976,
+            "trades_executed": 1696,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KMIA": {
+          "accuracy": 0.488509,
+          "sharpe": 3.348271,
+          "total_trades": 1697,
+          "correct": 829,
+          "coverage": 0.998823,
+          "brier_score": 0.405228,
+          "max_consecutive_losses": 5,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 25374.95,
+            "final_balance": 35374.95,
+            "sharpe_guarded": 3.236537,
+            "trades_executed": 1697,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KMSP": {
+          "accuracy": 0.569994,
+          "sharpe": 3.557922,
+          "total_trades": 1693,
+          "correct": 965,
+          "coverage": 0.997643,
+          "brier_score": 0.27874,
+          "max_consecutive_losses": 6,
+          "total_days": 1697,
+          "with_guardrails": {
+            "total_pnl": 32313.09,
+            "final_balance": 42313.09,
+            "sharpe_guarded": 4.135915,
+            "trades_executed": 1693,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KMSY": {
+          "accuracy": 0.524513,
+          "sharpe": 2.790746,
+          "total_trades": 1693,
+          "correct": 888,
+          "coverage": 0.997643,
+          "brier_score": 0.349069,
+          "max_consecutive_losses": 5,
+          "total_days": 1697,
+          "with_guardrails": {
+            "total_pnl": 23849.63,
+            "final_balance": 33849.63,
+            "sharpe_guarded": 2.935252,
+            "trades_executed": 1693,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KNYC": {
+          "accuracy": 0.575221,
+          "sharpe": 3.813195,
+          "total_trades": 1695,
+          "correct": 975,
+          "coverage": 0.997646,
+          "brier_score": 0.290019,
+          "max_consecutive_losses": 8,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": -562.71,
+            "final_balance": 9437.29,
+            "sharpe_guarded": -11.384392,
+            "trades_executed": 10,
+            "guardrail_triggers": [
+              {
+                "date": "2021-01-14",
+                "reason": "consecutive_losses",
+                "value": 8,
+                "balance": 9437.29
+              }
+            ],
+            "lockdown_triggered": true
+          }
+        },
+        "KOKC": {
+          "accuracy": 0.588791,
+          "sharpe": 4.19546,
+          "total_trades": 1695,
+          "correct": 998,
+          "coverage": 0.997646,
+          "brier_score": 0.288327,
+          "max_consecutive_losses": 7,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 35489.48,
+            "final_balance": 45489.48,
+            "sharpe_guarded": 4.501008,
+            "trades_executed": 1695,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KPHL": {
+          "accuracy": 0.586918,
+          "sharpe": 3.898747,
+          "total_trades": 1697,
+          "correct": 996,
+          "coverage": 0.998823,
+          "brier_score": 0.285156,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 33299.37,
+            "final_balance": 43299.37,
+            "sharpe_guarded": 4.236446,
+            "trades_executed": 1697,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KPHX": {
+          "accuracy": 0.543465,
+          "sharpe": 4.327979,
+          "total_trades": 1691,
+          "correct": 919,
+          "coverage": 0.996464,
+          "brier_score": 0.335577,
+          "max_consecutive_losses": 5,
+          "total_days": 1697,
+          "with_guardrails": {
+            "total_pnl": 37303.15,
+            "final_balance": 47303.15,
+            "sharpe_guarded": 4.713742,
+            "trades_executed": 1691,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KSAT": {
+          "accuracy": 0.540684,
+          "sharpe": 3.398578,
+          "total_trades": 1696,
+          "correct": 917,
+          "coverage": 0.998234,
+          "brier_score": 0.343838,
+          "max_consecutive_losses": 7,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 27840.79,
+            "final_balance": 37840.79,
+            "sharpe_guarded": 3.435671,
+            "trades_executed": 1696,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        },
+        "KSEA": {
+          "accuracy": 0.515957,
+          "sharpe": 2.72896,
+          "total_trades": 1692,
+          "correct": 873,
+          "coverage": 0.99588,
+          "brier_score": 0.325041,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 319.84,
+            "final_balance": 10319.84,
+            "sharpe_guarded": 0.498626,
+            "trades_executed": 176,
+            "guardrail_triggers": [
+              {
+                "date": "2021-06-29",
+                "reason": "max_drawdown",
+                "value": 10.58,
+                "balance": 10319.84
+              }
+            ],
+            "lockdown_triggered": true
+          }
+        },
+        "KSFO": {
+          "accuracy": 0.544595,
+          "sharpe": 3.774287,
+          "total_trades": 1693,
+          "correct": 922,
+          "coverage": 0.996469,
+          "brier_score": 0.317269,
+          "max_consecutive_losses": 6,
+          "total_days": 1699,
+          "with_guardrails": {
+            "total_pnl": 31810.25,
+            "final_balance": 41810.25,
+            "sharpe_guarded": 4.063809,
+            "trades_executed": 1693,
+            "guardrail_triggers": [],
+            "lockdown_triggered": false
+          }
+        }
+      },
+      "aggregate": {
+        "total_trades": 33888,
+        "correct": 18779,
+        "accuracy": 0.554149,
+        "avg_sharpe": 3.660784,
+        "avg_brier": 0.318098,
+        "total_days": 33974,
+        "coverage": 0.997469
+      }
+    },
+    "phase6_combo_with_adv": {
+      "description": "Best Phase 6 combo with Temperature Advection added",
+      "best_combo_signals": [
+        "calendar_climatology",
+        "gaussian",
+        "pressure_delta",
+        "forecast_disagreement"
+      ],
+      "combo_with_adv": [
+        "calendar_climatology",
+        "gaussian",
+        "pressure_delta",
+        "forecast_disagreement",
+        "temperature_advection"
+      ],
+      "stations": {
+        "KATL": {
+          "base_combo": {
+            "accuracy": 0.564815,
+            "sharpe": 3.663195,
+            "total_trades": 1404,
+            "correct": 793,
+            "coverage": 0.826368,
+            "brier_score": 0.391344,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 30183.46,
+              "final_balance": 40183.46,
+              "sharpe_guarded": 3.87932,
+              "trades_executed": 1404,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.564815,
+            "sharpe": 3.663195,
+            "total_trades": 1404,
+            "correct": 793,
+            "coverage": 0.826368,
+            "brier_score": 0.391344,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 30183.46,
+              "final_balance": 40183.46,
+              "sharpe_guarded": 3.87932,
+              "trades_executed": 1404,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KAUS": {
+          "base_combo": {
+            "accuracy": 0.579589,
+            "sharpe": 4.275345,
+            "total_trades": 1313,
+            "correct": 761,
+            "coverage": 0.772808,
+            "brier_score": 0.39156,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 32615.98,
+              "final_balance": 42615.98,
+              "sharpe_guarded": 4.432922,
+              "trades_executed": 1313,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.579589,
+            "sharpe": 4.275345,
+            "total_trades": 1313,
+            "correct": 761,
+            "coverage": 0.772808,
+            "brier_score": 0.39156,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 32615.98,
+              "final_balance": 42615.98,
+              "sharpe_guarded": 4.432922,
+              "trades_executed": 1313,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KBOS": {
+          "base_combo": {
+            "accuracy": 0.607984,
+            "sharpe": 4.564172,
+            "total_trades": 1528,
+            "correct": 929,
+            "coverage": 0.899353,
+            "brier_score": 0.337518,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 40608.96,
+              "final_balance": 50608.96,
+              "sharpe_guarded": 4.886494,
+              "trades_executed": 1528,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.607984,
+            "sharpe": 4.564172,
+            "total_trades": 1528,
+            "correct": 929,
+            "coverage": 0.899353,
+            "brier_score": 0.337518,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 40608.96,
+              "final_balance": 50608.96,
+              "sharpe_guarded": 4.886494,
+              "trades_executed": 1528,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KDCA": {
+          "base_combo": {
+            "accuracy": 0.598782,
+            "sharpe": 4.590593,
+            "total_trades": 1478,
+            "correct": 885,
+            "coverage": 0.869923,
+            "brier_score": 0.351857,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 39209.0,
+              "final_balance": 49209.0,
+              "sharpe_guarded": 4.856523,
+              "trades_executed": 1478,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.598782,
+            "sharpe": 4.590593,
+            "total_trades": 1478,
+            "correct": 885,
+            "coverage": 0.869923,
+            "brier_score": 0.351857,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 39209.0,
+              "final_balance": 49209.0,
+              "sharpe_guarded": 4.856523,
+              "trades_executed": 1478,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KDEN": {
+          "base_combo": {
+            "accuracy": 0.611368,
+            "sharpe": 4.784489,
+            "total_trades": 1513,
+            "correct": 925,
+            "coverage": 0.890524,
+            "brier_score": 0.345137,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 42856.63,
+              "final_balance": 52856.63,
+              "sharpe_guarded": 5.134278,
+              "trades_executed": 1513,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.611368,
+            "sharpe": 4.784489,
+            "total_trades": 1513,
+            "correct": 925,
+            "coverage": 0.890524,
+            "brier_score": 0.345137,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 42856.63,
+              "final_balance": 52856.63,
+              "sharpe_guarded": 5.134278,
+              "trades_executed": 1513,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KDFW": {
+          "base_combo": {
+            "accuracy": 0.584425,
+            "sharpe": 4.294639,
+            "total_trades": 1374,
+            "correct": 803,
+            "coverage": 0.808711,
+            "brier_score": 0.392601,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 33664.41,
+              "final_balance": 43664.41,
+              "sharpe_guarded": 4.345861,
+              "trades_executed": 1374,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.584425,
+            "sharpe": 4.294639,
+            "total_trades": 1374,
+            "correct": 803,
+            "coverage": 0.808711,
+            "brier_score": 0.392601,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 33664.41,
+              "final_balance": 43664.41,
+              "sharpe_guarded": 4.345861,
+              "trades_executed": 1374,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KHOU": {
+          "base_combo": {
+            "accuracy": 0.550192,
+            "sharpe": 3.59057,
+            "total_trades": 1305,
+            "correct": 718,
+            "coverage": 0.768099,
+            "brier_score": 0.419688,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 27003.3,
+              "final_balance": 37003.3,
+              "sharpe_guarded": 3.701418,
+              "trades_executed": 1305,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.550192,
+            "sharpe": 3.59057,
+            "total_trades": 1305,
+            "correct": 718,
+            "coverage": 0.768099,
+            "brier_score": 0.419688,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 27003.3,
+              "final_balance": 37003.3,
+              "sharpe_guarded": 3.701418,
+              "trades_executed": 1305,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KLAS": {
+          "base_combo": {
+            "accuracy": 0.516354,
+            "sharpe": 3.414067,
+            "total_trades": 1437,
+            "correct": 742,
+            "coverage": 0.845792,
+            "brier_score": 0.429297,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 28401.27,
+              "final_balance": 38401.27,
+              "sharpe_guarded": 3.717545,
+              "trades_executed": 1437,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.516354,
+            "sharpe": 3.414067,
+            "total_trades": 1437,
+            "correct": 742,
+            "coverage": 0.845792,
+            "brier_score": 0.429297,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 28401.27,
+              "final_balance": 38401.27,
+              "sharpe_guarded": 3.717545,
+              "trades_executed": 1437,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KLAX": {
+          "base_combo": {
+            "accuracy": 0.53321,
+            "sharpe": 3.665577,
+            "total_trades": 1084,
+            "correct": 578,
+            "coverage": 0.638022,
+            "brier_score": 0.438477,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 21441.7,
+              "final_balance": 31441.7,
+              "sharpe_guarded": 3.629711,
+              "trades_executed": 1084,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.53321,
+            "sharpe": 3.665577,
+            "total_trades": 1084,
+            "correct": 578,
+            "coverage": 0.638022,
+            "brier_score": 0.438477,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 21441.7,
+              "final_balance": 31441.7,
+              "sharpe_guarded": 3.629711,
+              "trades_executed": 1084,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KMDW": {
+          "base_combo": {
+            "accuracy": 0.601723,
+            "sharpe": 4.640965,
+            "total_trades": 1509,
+            "correct": 908,
+            "coverage": 0.88817,
+            "brier_score": 0.351076,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 40855.03,
+              "final_balance": 50855.03,
+              "sharpe_guarded": 4.940544,
+              "trades_executed": 1509,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.601723,
+            "sharpe": 4.640965,
+            "total_trades": 1509,
+            "correct": 908,
+            "coverage": 0.88817,
+            "brier_score": 0.351076,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 40855.03,
+              "final_balance": 50855.03,
+              "sharpe_guarded": 4.940544,
+              "trades_executed": 1509,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KMIA": {
+          "base_combo": {
+            "accuracy": 0.573589,
+            "sharpe": 5.725566,
+            "total_trades": 992,
+            "correct": 569,
+            "coverage": 0.583873,
+            "brier_score": 0.414821,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 29888.58,
+              "final_balance": 39888.58,
+              "sharpe_guarded": 5.68107,
+              "trades_executed": 992,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.573589,
+            "sharpe": 5.725566,
+            "total_trades": 992,
+            "correct": 569,
+            "coverage": 0.583873,
+            "brier_score": 0.414821,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 29888.58,
+              "final_balance": 39888.58,
+              "sharpe_guarded": 5.68107,
+              "trades_executed": 992,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KMSP": {
+          "base_combo": {
+            "accuracy": 0.573597,
+            "sharpe": 3.707095,
+            "total_trades": 1515,
+            "correct": 869,
+            "coverage": 0.892752,
+            "brier_score": 0.382749,
+            "max_consecutive_losses": 6,
+            "total_days": 1697,
+            "with_guardrails": {
+              "total_pnl": 32714.07,
+              "final_balance": 42714.07,
+              "sharpe_guarded": 3.887149,
+              "trades_executed": 1515,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.573597,
+            "sharpe": 3.707095,
+            "total_trades": 1515,
+            "correct": 869,
+            "coverage": 0.892752,
+            "brier_score": 0.382749,
+            "max_consecutive_losses": 6,
+            "total_days": 1697,
+            "with_guardrails": {
+              "total_pnl": 32714.07,
+              "final_balance": 42714.07,
+              "sharpe_guarded": 3.887149,
+              "trades_executed": 1515,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KMSY": {
+          "base_combo": {
+            "accuracy": 0.558442,
+            "sharpe": 4.123817,
+            "total_trades": 1309,
+            "correct": 731,
+            "coverage": 0.771361,
+            "brier_score": 0.422678,
+            "max_consecutive_losses": 4,
+            "total_days": 1697,
+            "with_guardrails": {
+              "total_pnl": 29550.03,
+              "final_balance": 39550.03,
+              "sharpe_guarded": 4.093886,
+              "trades_executed": 1309,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.558442,
+            "sharpe": 4.123817,
+            "total_trades": 1309,
+            "correct": 731,
+            "coverage": 0.771361,
+            "brier_score": 0.422678,
+            "max_consecutive_losses": 4,
+            "total_days": 1697,
+            "with_guardrails": {
+              "total_pnl": 29550.03,
+              "final_balance": 39550.03,
+              "sharpe_guarded": 4.093886,
+              "trades_executed": 1309,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KNYC": {
+          "base_combo": {
+            "accuracy": 0.574637,
+            "sharpe": 3.745157,
+            "total_trades": 1514,
+            "correct": 870,
+            "coverage": 0.891112,
+            "brier_score": 0.370923,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 33541.17,
+              "final_balance": 43541.17,
+              "sharpe_guarded": 4.028425,
+              "trades_executed": 1514,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.574637,
+            "sharpe": 3.745157,
+            "total_trades": 1514,
+            "correct": 870,
+            "coverage": 0.891112,
+            "brier_score": 0.370923,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 33541.17,
+              "final_balance": 43541.17,
+              "sharpe_guarded": 4.028425,
+              "trades_executed": 1514,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KOKC": {
+          "base_combo": {
+            "accuracy": 0.592951,
+            "sharpe": 4.277177,
+            "total_trades": 1447,
+            "correct": 858,
+            "coverage": 0.851677,
+            "brier_score": 0.376659,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 35226.07,
+              "final_balance": 45226.07,
+              "sharpe_guarded": 4.346058,
+              "trades_executed": 1447,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.592951,
+            "sharpe": 4.277177,
+            "total_trades": 1447,
+            "correct": 858,
+            "coverage": 0.851677,
+            "brier_score": 0.376659,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 35226.07,
+              "final_balance": 45226.07,
+              "sharpe_guarded": 4.346058,
+              "trades_executed": 1447,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KPHL": {
+          "base_combo": {
+            "accuracy": 0.597324,
+            "sharpe": 4.172746,
+            "total_trades": 1495,
+            "correct": 893,
+            "coverage": 0.879929,
+            "brier_score": 0.351317,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 36684.55,
+              "final_balance": 46684.55,
+              "sharpe_guarded": 4.455091,
+              "trades_executed": 1495,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.597324,
+            "sharpe": 4.172746,
+            "total_trades": 1495,
+            "correct": 893,
+            "coverage": 0.879929,
+            "brier_score": 0.351317,
+            "max_consecutive_losses": 5,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 36684.55,
+              "final_balance": 46684.55,
+              "sharpe_guarded": 4.455091,
+              "trades_executed": 1495,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KPHX": {
+          "base_combo": {
+            "accuracy": 0.543379,
+            "sharpe": 4.083447,
+            "total_trades": 1314,
+            "correct": 714,
+            "coverage": 0.774308,
+            "brier_score": 0.417689,
+            "max_consecutive_losses": 8,
+            "total_days": 1697,
+            "with_guardrails": {
+              "total_pnl": 23734.5,
+              "final_balance": 33734.5,
+              "sharpe_guarded": 4.083819,
+              "trades_executed": 1078,
+              "guardrail_triggers": [
+                {
+                  "date": "2024-10-19",
+                  "reason": "consecutive_losses",
+                  "value": 8,
+                  "balance": 33734.5
+                }
+              ],
+              "lockdown_triggered": true
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.543379,
+            "sharpe": 4.083447,
+            "total_trades": 1314,
+            "correct": 714,
+            "coverage": 0.774308,
+            "brier_score": 0.417689,
+            "max_consecutive_losses": 8,
+            "total_days": 1697,
+            "with_guardrails": {
+              "total_pnl": 23734.5,
+              "final_balance": 33734.5,
+              "sharpe_guarded": 4.083819,
+              "trades_executed": 1078,
+              "guardrail_triggers": [
+                {
+                  "date": "2024-10-19",
+                  "reason": "consecutive_losses",
+                  "value": 8,
+                  "balance": 33734.5
+                }
+              ],
+              "lockdown_triggered": true
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KSAT": {
+          "base_combo": {
+            "accuracy": 0.570878,
+            "sharpe": 4.315344,
+            "total_trades": 1298,
+            "correct": 741,
+            "coverage": 0.763979,
+            "brier_score": 0.407288,
+            "max_consecutive_losses": 7,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 31653.39,
+              "final_balance": 41653.39,
+              "sharpe_guarded": 4.373002,
+              "trades_executed": 1298,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.570878,
+            "sharpe": 4.315344,
+            "total_trades": 1298,
+            "correct": 741,
+            "coverage": 0.763979,
+            "brier_score": 0.407288,
+            "max_consecutive_losses": 7,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 31653.39,
+              "final_balance": 41653.39,
+              "sharpe_guarded": 4.373002,
+              "trades_executed": 1298,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KSEA": {
+          "base_combo": {
+            "accuracy": 0.518952,
+            "sharpe": 2.774782,
+            "total_trades": 1451,
+            "correct": 753,
+            "coverage": 0.854032,
+            "brier_score": 0.421458,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": -435.04,
+              "final_balance": 9564.96,
+              "sharpe_guarded": -0.44601,
+              "trades_executed": 144,
+              "guardrail_triggers": [
+                {
+                  "date": "2021-06-27",
+                  "reason": "max_drawdown",
+                  "value": 10.58,
+                  "balance": 9564.96
+                }
+              ],
+              "lockdown_triggered": true
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.518952,
+            "sharpe": 2.774782,
+            "total_trades": 1451,
+            "correct": 753,
+            "coverage": 0.854032,
+            "brier_score": 0.421458,
+            "max_consecutive_losses": 6,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": -435.04,
+              "final_balance": 9564.96,
+              "sharpe_guarded": -0.44601,
+              "trades_executed": 144,
+              "guardrail_triggers": [
+                {
+                  "date": "2021-06-27",
+                  "reason": "max_drawdown",
+                  "value": 10.58,
+                  "balance": 9564.96
+                }
+              ],
+              "lockdown_triggered": true
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        },
+        "KSFO": {
+          "base_combo": {
+            "accuracy": 0.562448,
+            "sharpe": 4.414866,
+            "total_trades": 1193,
+            "correct": 671,
+            "coverage": 0.702178,
+            "brier_score": 0.401333,
+            "max_consecutive_losses": 4,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 29620.33,
+              "final_balance": 39620.33,
+              "sharpe_guarded": 4.57286,
+              "trades_executed": 1193,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "with_adv": {
+            "accuracy": 0.562448,
+            "sharpe": 4.414866,
+            "total_trades": 1193,
+            "correct": 671,
+            "coverage": 0.702178,
+            "brier_score": 0.401333,
+            "max_consecutive_losses": 4,
+            "total_days": 1699,
+            "with_guardrails": {
+              "total_pnl": 29620.33,
+              "final_balance": 39620.33,
+              "sharpe_guarded": 4.57286,
+              "trades_executed": 1193,
+              "guardrail_triggers": [],
+              "lockdown_triggered": false
+            }
+          },
+          "delta_accuracy": 0.0,
+          "delta_trades": 0
+        }
+      },
+      "aggregate": {
+        "base": {
+          "total_trades": 27473,
+          "correct": 15711,
+          "accuracy": 0.571871
+        },
+        "with_adv": {
+          "total_trades": 27473,
+          "correct": 15711,
+          "accuracy": 0.571871
+        },
+        "delta_accuracy": 0.0,
+        "delta_trades": 0
+      },
+      "note": "Temperature Advection is live-only (requires GFS 850-mb data). Adding it to the ensemble has no effect on historical backtest results."
+    },
+    "walk_forward_validation": {
+      "description": "Walk-forward validation across time splits",
+      "signals_used": [
+        "wind_direction_shift",
+        "nwp_analog",
+        "goldilocks",
+        "persistence",
+        "simple_trend",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "regime",
+        "forecast_disagreement",
+        "calendar_climatology",
+        "frontal_detector"
+      ],
+      "splits": {
+        "train_2021_2022": {
+          "test_range": "2023-01-01 to 2023-06-30",
+          "stations": {
+            "KATL": {
+              "accuracy": 0.625698,
+              "sharpe": 5.153481,
+              "total_trades": 179,
+              "correct": 112,
+              "coverage": 0.98895,
+              "brier_score": 0.275095,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 4233.54,
+                "final_balance": 14233.54,
+                "sharpe_guarded": 5.136765,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KAUS": {
+              "accuracy": 0.61236,
+              "sharpe": 4.901875,
+              "total_trades": 178,
+              "correct": 109,
+              "coverage": 0.983425,
+              "brier_score": 0.300852,
+              "max_consecutive_losses": 4,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 4151.81,
+                "final_balance": 14151.81,
+                "sharpe_guarded": 4.891791,
+                "trades_executed": 178,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KBOS": {
+              "accuracy": 0.592179,
+              "sharpe": 4.039036,
+              "total_trades": 179,
+              "correct": 106,
+              "coverage": 0.98895,
+              "brier_score": 0.30146,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 3219.1,
+                "final_balance": 13219.1,
+                "sharpe_guarded": 3.897451,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDCA": {
+              "accuracy": 0.536313,
+              "sharpe": 1.816196,
+              "total_trades": 179,
+              "correct": 96,
+              "coverage": 0.98895,
+              "brier_score": 0.32858,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 1388.92,
+                "final_balance": 11388.92,
+                "sharpe_guarded": 1.624927,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDEN": {
+              "accuracy": 0.659218,
+              "sharpe": 5.939887,
+              "total_trades": 179,
+              "correct": 118,
+              "coverage": 0.98895,
+              "brier_score": 0.280779,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 4632.08,
+                "final_balance": 14632.08,
+                "sharpe_guarded": 5.509366,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDFW": {
+              "accuracy": 0.603352,
+              "sharpe": 4.678177,
+              "total_trades": 179,
+              "correct": 108,
+              "coverage": 0.98895,
+              "brier_score": 0.278594,
+              "max_consecutive_losses": 3,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 4182.08,
+                "final_balance": 14182.08,
+                "sharpe_guarded": 5.070626,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KHOU": {
+              "accuracy": 0.564246,
+              "sharpe": 3.600575,
+              "total_trades": 179,
+              "correct": 101,
+              "coverage": 0.98895,
+              "brier_score": 0.344566,
+              "max_consecutive_losses": 3,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 2792.5,
+                "final_balance": 12792.5,
+                "sharpe_guarded": 3.254374,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAS": {
+              "accuracy": 0.47486,
+              "sharpe": 1.634798,
+              "total_trades": 179,
+              "correct": 85,
+              "coverage": 0.98895,
+              "brier_score": 0.360881,
+              "max_consecutive_losses": 6,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 1341.02,
+                "final_balance": 11341.02,
+                "sharpe_guarded": 1.605954,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAX": {
+              "accuracy": 0.398876,
+              "sharpe": -0.197765,
+              "total_trades": 178,
+              "correct": 71,
+              "coverage": 0.983425,
+              "brier_score": 0.452267,
+              "max_consecutive_losses": 6,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": -318.14,
+                "final_balance": 9681.86,
+                "sharpe_guarded": -0.384189,
+                "trades_executed": 178,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMDW": {
+              "accuracy": 0.564246,
+              "sharpe": 3.48998,
+              "total_trades": 179,
+              "correct": 101,
+              "coverage": 0.98895,
+              "brier_score": 0.264227,
+              "max_consecutive_losses": 6,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 3306.97,
+                "final_balance": 13306.97,
+                "sharpe_guarded": 4.176727,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMIA": {
+              "accuracy": 0.558659,
+              "sharpe": 5.072292,
+              "total_trades": 179,
+              "correct": 100,
+              "coverage": 0.98895,
+              "brier_score": 0.394088,
+              "max_consecutive_losses": 4,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 3908.42,
+                "final_balance": 13908.42,
+                "sharpe_guarded": 4.556588,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSP": {
+              "accuracy": 0.592179,
+              "sharpe": 4.152458,
+              "total_trades": 179,
+              "correct": 106,
+              "coverage": 0.98895,
+              "brier_score": 0.253844,
+              "max_consecutive_losses": 4,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 4109.36,
+                "final_balance": 14109.36,
+                "sharpe_guarded": 5.057862,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSY": {
+              "accuracy": 0.541899,
+              "sharpe": 3.469101,
+              "total_trades": 179,
+              "correct": 97,
+              "coverage": 0.98895,
+              "brier_score": 0.338871,
+              "max_consecutive_losses": 3,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 2962.28,
+                "final_balance": 12962.28,
+                "sharpe_guarded": 3.470788,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KNYC": {
+              "accuracy": 0.533708,
+              "sharpe": 2.437283,
+              "total_trades": 178,
+              "correct": 95,
+              "coverage": 0.983425,
+              "brier_score": 0.339904,
+              "max_consecutive_losses": 4,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 1826.93,
+                "final_balance": 11826.93,
+                "sharpe_guarded": 2.168539,
+                "trades_executed": 178,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KOKC": {
+              "accuracy": 0.608939,
+              "sharpe": 4.886931,
+              "total_trades": 179,
+              "correct": 109,
+              "coverage": 0.98895,
+              "brier_score": 0.257468,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 4455.57,
+                "final_balance": 14455.57,
+                "sharpe_guarded": 5.450738,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHL": {
+              "accuracy": 0.536313,
+              "sharpe": 1.913946,
+              "total_trades": 179,
+              "correct": 96,
+              "coverage": 0.98895,
+              "brier_score": 0.311047,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 1769.96,
+                "final_balance": 11769.96,
+                "sharpe_guarded": 2.109846,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHX": {
+              "accuracy": 0.47191,
+              "sharpe": 2.072614,
+              "total_trades": 178,
+              "correct": 84,
+              "coverage": 0.983425,
+              "brier_score": 0.368391,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 2196.13,
+                "final_balance": 12196.13,
+                "sharpe_guarded": 2.638594,
+                "trades_executed": 178,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSAT": {
+              "accuracy": 0.536313,
+              "sharpe": 2.940157,
+              "total_trades": 179,
+              "correct": 96,
+              "coverage": 0.98895,
+              "brier_score": 0.326709,
+              "max_consecutive_losses": 4,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 2812.35,
+                "final_balance": 12812.35,
+                "sharpe_guarded": 3.280926,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSEA": {
+              "accuracy": 0.50838,
+              "sharpe": 2.178515,
+              "total_trades": 179,
+              "correct": 91,
+              "coverage": 0.98895,
+              "brier_score": 0.341074,
+              "max_consecutive_losses": 5,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 1959.96,
+                "final_balance": 11959.96,
+                "sharpe_guarded": 2.317593,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSFO": {
+              "accuracy": 0.519553,
+              "sharpe": 3.682206,
+              "total_trades": 179,
+              "correct": 93,
+              "coverage": 0.98895,
+              "brier_score": 0.314708,
+              "max_consecutive_losses": 4,
+              "total_days": 181,
+              "with_guardrails": {
+                "total_pnl": 3280.23,
+                "final_balance": 13280.23,
+                "sharpe_guarded": 4.066411,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            }
+          },
+          "aggregate": {
+            "total_trades": 3576,
+            "correct": 1974,
+            "accuracy": 0.552013,
+            "total_days": 3620,
+            "coverage": 0.987845
+          }
+        },
+        "train_2022_2023": {
+          "test_range": "2023-07-01 to 2023-12-31",
+          "stations": {
+            "KATL": {
+              "accuracy": 0.532967,
+              "sharpe": 2.687152,
+              "total_trades": 182,
+              "correct": 97,
+              "coverage": 0.98913,
+              "brier_score": 0.352509,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": -922.8,
+                "final_balance": 9077.2,
+                "sharpe_guarded": -5.587322,
+                "trades_executed": 28,
+                "guardrail_triggers": [
+                  {
+                    "date": "2023-07-31",
+                    "reason": "max_drawdown",
+                    "value": 10.13,
+                    "balance": 9077.2
+                  }
+                ],
+                "lockdown_triggered": true
+              }
+            },
+            "KAUS": {
+              "accuracy": 0.538462,
+              "sharpe": 3.640078,
+              "total_trades": 182,
+              "correct": 98,
+              "coverage": 0.98913,
+              "brier_score": 0.352957,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3216.8,
+                "final_balance": 13216.8,
+                "sharpe_guarded": 3.671523,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KBOS": {
+              "accuracy": 0.558011,
+              "sharpe": 3.253504,
+              "total_trades": 181,
+              "correct": 101,
+              "coverage": 0.983696,
+              "brier_score": 0.298825,
+              "max_consecutive_losses": 7,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3153.36,
+                "final_balance": 13153.36,
+                "sharpe_guarded": 3.742451,
+                "trades_executed": 181,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDCA": {
+              "accuracy": 0.549451,
+              "sharpe": 3.26466,
+              "total_trades": 182,
+              "correct": 100,
+              "coverage": 0.98913,
+              "brier_score": 0.32375,
+              "max_consecutive_losses": 3,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2904.95,
+                "final_balance": 12904.95,
+                "sharpe_guarded": 3.349555,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDEN": {
+              "accuracy": 0.582418,
+              "sharpe": 4.003647,
+              "total_trades": 182,
+              "correct": 106,
+              "coverage": 0.98913,
+              "brier_score": 0.314328,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3404.98,
+                "final_balance": 13404.98,
+                "sharpe_guarded": 3.908984,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDFW": {
+              "accuracy": 0.521978,
+              "sharpe": 2.512701,
+              "total_trades": 182,
+              "correct": 95,
+              "coverage": 0.98913,
+              "brier_score": 0.351733,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2444.98,
+                "final_balance": 12444.98,
+                "sharpe_guarded": 2.83484,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KHOU": {
+              "accuracy": 0.478022,
+              "sharpe": 1.600202,
+              "total_trades": 182,
+              "correct": 87,
+              "coverage": 0.98913,
+              "brier_score": 0.41054,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 1372.12,
+                "final_balance": 11372.12,
+                "sharpe_guarded": 1.543116,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAS": {
+              "accuracy": 0.549451,
+              "sharpe": 5.156326,
+              "total_trades": 182,
+              "correct": 100,
+              "coverage": 0.98913,
+              "brier_score": 0.332388,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 4731.77,
+                "final_balance": 14731.77,
+                "sharpe_guarded": 5.75341,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAX": {
+              "accuracy": 0.467033,
+              "sharpe": 2.035423,
+              "total_trades": 182,
+              "correct": 85,
+              "coverage": 0.98913,
+              "brier_score": 0.40595,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": -1041.04,
+                "final_balance": 8958.96,
+                "sharpe_guarded": -4.324777,
+                "trades_executed": 45,
+                "guardrail_triggers": [
+                  {
+                    "date": "2023-08-17",
+                    "reason": "max_drawdown",
+                    "value": 10.41,
+                    "balance": 8958.96
+                  }
+                ],
+                "lockdown_triggered": true
+              }
+            },
+            "KMDW": {
+              "accuracy": 0.565934,
+              "sharpe": 3.204484,
+              "total_trades": 182,
+              "correct": 103,
+              "coverage": 0.98913,
+              "brier_score": 0.308293,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3086.59,
+                "final_balance": 13086.59,
+                "sharpe_guarded": 3.510749,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMIA": {
+              "accuracy": 0.516484,
+              "sharpe": 4.470991,
+              "total_trades": 182,
+              "correct": 94,
+              "coverage": 0.98913,
+              "brier_score": 0.402053,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3766.99,
+                "final_balance": 13766.99,
+                "sharpe_guarded": 4.443849,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSP": {
+              "accuracy": 0.565934,
+              "sharpe": 3.204484,
+              "total_trades": 182,
+              "correct": 103,
+              "coverage": 0.98913,
+              "brier_score": 0.278995,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3312.46,
+                "final_balance": 13312.46,
+                "sharpe_guarded": 3.895695,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSY": {
+              "accuracy": 0.549451,
+              "sharpe": 2.638255,
+              "total_trades": 182,
+              "correct": 100,
+              "coverage": 0.98913,
+              "brier_score": 0.344277,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2601.24,
+                "final_balance": 12601.24,
+                "sharpe_guarded": 2.776199,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KNYC": {
+              "accuracy": 0.5,
+              "sharpe": 1.367145,
+              "total_trades": 182,
+              "correct": 91,
+              "coverage": 0.98913,
+              "brier_score": 0.328204,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 1522.43,
+                "final_balance": 11522.43,
+                "sharpe_guarded": 1.783292,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KOKC": {
+              "accuracy": 0.524862,
+              "sharpe": 1.914641,
+              "total_trades": 181,
+              "correct": 95,
+              "coverage": 0.983696,
+              "brier_score": 0.30094,
+              "max_consecutive_losses": 6,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2353.32,
+                "final_balance": 12353.32,
+                "sharpe_guarded": 2.722131,
+                "trades_executed": 181,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHL": {
+              "accuracy": 0.554945,
+              "sharpe": 3.138061,
+              "total_trades": 182,
+              "correct": 101,
+              "coverage": 0.98913,
+              "brier_score": 0.315623,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2744.86,
+                "final_balance": 12744.86,
+                "sharpe_guarded": 3.234253,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHX": {
+              "accuracy": 0.615385,
+              "sharpe": 7.133305,
+              "total_trades": 182,
+              "correct": 112,
+              "coverage": 0.98913,
+              "brier_score": 0.278597,
+              "max_consecutive_losses": 3,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 6361.09,
+                "final_balance": 16361.09,
+                "sharpe_guarded": 7.894679,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSAT": {
+              "accuracy": 0.505495,
+              "sharpe": 2.561498,
+              "total_trades": 182,
+              "correct": 92,
+              "coverage": 0.98913,
+              "brier_score": 0.397407,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2052.92,
+                "final_balance": 12052.92,
+                "sharpe_guarded": 2.318699,
+                "trades_executed": 182,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSEA": {
+              "accuracy": 0.552486,
+              "sharpe": 3.492072,
+              "total_trades": 181,
+              "correct": 100,
+              "coverage": 0.983696,
+              "brier_score": 0.303391,
+              "max_consecutive_losses": 4,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 3561.13,
+                "final_balance": 13561.13,
+                "sharpe_guarded": 4.14053,
+                "trades_executed": 181,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSFO": {
+              "accuracy": 0.530387,
+              "sharpe": 2.711702,
+              "total_trades": 181,
+              "correct": 96,
+              "coverage": 0.983696,
+              "brier_score": 0.346233,
+              "max_consecutive_losses": 5,
+              "total_days": 184,
+              "with_guardrails": {
+                "total_pnl": 2278.7,
+                "final_balance": 12278.7,
+                "sharpe_guarded": 2.613015,
+                "trades_executed": 181,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            }
+          },
+          "aggregate": {
+            "total_trades": 3636,
+            "correct": 1956,
+            "accuracy": 0.537954,
+            "total_days": 3680,
+            "coverage": 0.988043
+          }
+        },
+        "train_2021_2023": {
+          "test_range": "2024-01-01 to 2024-06-30",
+          "stations": {
+            "KATL": {
+              "accuracy": 0.566667,
+              "sharpe": 3.567302,
+              "total_trades": 180,
+              "correct": 102,
+              "coverage": 0.989011,
+              "brier_score": 0.313858,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3250.61,
+                "final_balance": 13250.61,
+                "sharpe_guarded": 3.797438,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KAUS": {
+              "accuracy": 0.558659,
+              "sharpe": 3.736655,
+              "total_trades": 179,
+              "correct": 100,
+              "coverage": 0.983516,
+              "brier_score": 0.32163,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3268.74,
+                "final_balance": 13268.74,
+                "sharpe_guarded": 3.781301,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KBOS": {
+              "accuracy": 0.633333,
+              "sharpe": 5.314578,
+              "total_trades": 180,
+              "correct": 114,
+              "coverage": 0.989011,
+              "brier_score": 0.241732,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 4716.72,
+                "final_balance": 14716.72,
+                "sharpe_guarded": 5.906117,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDCA": {
+              "accuracy": 0.577778,
+              "sharpe": 4.193866,
+              "total_trades": 180,
+              "correct": 104,
+              "coverage": 0.989011,
+              "brier_score": 0.310614,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3417.11,
+                "final_balance": 13417.11,
+                "sharpe_guarded": 4.090163,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDEN": {
+              "accuracy": 0.611111,
+              "sharpe": 5.330906,
+              "total_trades": 180,
+              "correct": 110,
+              "coverage": 0.989011,
+              "brier_score": 0.272593,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 4639.63,
+                "final_balance": 14639.63,
+                "sharpe_guarded": 5.708146,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDFW": {
+              "accuracy": 0.616667,
+              "sharpe": 4.928592,
+              "total_trades": 180,
+              "correct": 111,
+              "coverage": 0.989011,
+              "brier_score": 0.290512,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 4096.92,
+                "final_balance": 14096.92,
+                "sharpe_guarded": 4.81928,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KHOU": {
+              "accuracy": 0.533333,
+              "sharpe": 3.369732,
+              "total_trades": 180,
+              "correct": 96,
+              "coverage": 0.989011,
+              "brier_score": 0.353946,
+              "max_consecutive_losses": 5,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2633.63,
+                "final_balance": 12633.63,
+                "sharpe_guarded": 3.104571,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAS": {
+              "accuracy": 0.52514,
+              "sharpe": 3.199633,
+              "total_trades": 179,
+              "correct": 94,
+              "coverage": 0.983516,
+              "brier_score": 0.338945,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2875.88,
+                "final_balance": 12875.88,
+                "sharpe_guarded": 3.396491,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAX": {
+              "accuracy": 0.411111,
+              "sharpe": 0.594521,
+              "total_trades": 180,
+              "correct": 74,
+              "coverage": 0.989011,
+              "brier_score": 0.445589,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 387.83,
+                "final_balance": 10387.83,
+                "sharpe_guarded": 0.456172,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMDW": {
+              "accuracy": 0.583333,
+              "sharpe": 4.166764,
+              "total_trades": 180,
+              "correct": 105,
+              "coverage": 0.989011,
+              "brier_score": 0.272207,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3831.81,
+                "final_balance": 13831.81,
+                "sharpe_guarded": 4.682905,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMIA": {
+              "accuracy": 0.511111,
+              "sharpe": 2.899896,
+              "total_trades": 180,
+              "correct": 92,
+              "coverage": 0.989011,
+              "brier_score": 0.391458,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2308.01,
+                "final_balance": 12308.01,
+                "sharpe_guarded": 2.639828,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSP": {
+              "accuracy": 0.564246,
+              "sharpe": 3.48998,
+              "total_trades": 179,
+              "correct": 101,
+              "coverage": 0.983516,
+              "brier_score": 0.279781,
+              "max_consecutive_losses": 5,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3399.29,
+                "final_balance": 13399.29,
+                "sharpe_guarded": 4.190777,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSY": {
+              "accuracy": 0.511111,
+              "sharpe": 2.899896,
+              "total_trades": 180,
+              "correct": 92,
+              "coverage": 0.989011,
+              "brier_score": 0.380427,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2308.46,
+                "final_balance": 12308.46,
+                "sharpe_guarded": 2.705516,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KNYC": {
+              "accuracy": 0.527778,
+              "sharpe": 2.526898,
+              "total_trades": 180,
+              "correct": 95,
+              "coverage": 0.989011,
+              "brier_score": 0.319392,
+              "max_consecutive_losses": 5,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2178.81,
+                "final_balance": 12178.81,
+                "sharpe_guarded": 2.644665,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KOKC": {
+              "accuracy": 0.677778,
+              "sharpe": 7.099296,
+              "total_trades": 180,
+              "correct": 122,
+              "coverage": 0.989011,
+              "brier_score": 0.236089,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 5738.87,
+                "final_balance": 15738.87,
+                "sharpe_guarded": 7.269989,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHL": {
+              "accuracy": 0.572222,
+              "sharpe": 3.329121,
+              "total_trades": 180,
+              "correct": 103,
+              "coverage": 0.989011,
+              "brier_score": 0.293556,
+              "max_consecutive_losses": 6,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2880.52,
+                "final_balance": 12880.52,
+                "sharpe_guarded": 3.47269,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHX": {
+              "accuracy": 0.538889,
+              "sharpe": 3.571814,
+              "total_trades": 180,
+              "correct": 97,
+              "coverage": 0.989011,
+              "brier_score": 0.361166,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3149.78,
+                "final_balance": 13149.78,
+                "sharpe_guarded": 3.554822,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSAT": {
+              "accuracy": 0.597765,
+              "sharpe": 4.708937,
+              "total_trades": 179,
+              "correct": 107,
+              "coverage": 0.983516,
+              "brier_score": 0.315866,
+              "max_consecutive_losses": 3,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3844.83,
+                "final_balance": 13844.83,
+                "sharpe_guarded": 4.574214,
+                "trades_executed": 179,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSEA": {
+              "accuracy": 0.522222,
+              "sharpe": 2.970153,
+              "total_trades": 180,
+              "correct": 94,
+              "coverage": 0.989011,
+              "brier_score": 0.333187,
+              "max_consecutive_losses": 7,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 2587.78,
+                "final_balance": 12587.78,
+                "sharpe_guarded": 3.127734,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSFO": {
+              "accuracy": 0.55,
+              "sharpe": 3.750408,
+              "total_trades": 180,
+              "correct": 99,
+              "coverage": 0.989011,
+              "brier_score": 0.332327,
+              "max_consecutive_losses": 4,
+              "total_days": 182,
+              "with_guardrails": {
+                "total_pnl": 3433.32,
+                "final_balance": 13433.32,
+                "sharpe_guarded": 4.031328,
+                "trades_executed": 180,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            }
+          },
+          "aggregate": {
+            "total_trades": 3596,
+            "correct": 2012,
+            "accuracy": 0.559511,
+            "total_days": 3640,
+            "coverage": 0.987912
+          }
+        },
+        "train_2022_2024": {
+          "test_range": "2024-07-01 to 2025-01-31",
+          "stations": {
+            "KATL": {
+              "accuracy": 0.561321,
+              "sharpe": 3.243227,
+              "total_trades": 212,
+              "correct": 119,
+              "coverage": 0.986047,
+              "brier_score": 0.318638,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 3743.56,
+                "final_balance": 13743.56,
+                "sharpe_guarded": 3.588147,
+                "trades_executed": 212,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KAUS": {
+              "accuracy": 0.502347,
+              "sharpe": 2.075296,
+              "total_trades": 213,
+              "correct": 107,
+              "coverage": 0.990698,
+              "brier_score": 0.376289,
+              "max_consecutive_losses": 8,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": -534.83,
+                "final_balance": 9465.17,
+                "sharpe_guarded": -1.550976,
+                "trades_executed": 64,
+                "guardrail_triggers": [
+                  {
+                    "date": "2024-09-05",
+                    "reason": "consecutive_losses",
+                    "value": 8,
+                    "balance": 9465.17
+                  }
+                ],
+                "lockdown_triggered": true
+              }
+            },
+            "KBOS": {
+              "accuracy": 0.575472,
+              "sharpe": 3.556092,
+              "total_trades": 212,
+              "correct": 122,
+              "coverage": 0.986047,
+              "brier_score": 0.281071,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 4151.56,
+                "final_balance": 14151.56,
+                "sharpe_guarded": 4.11025,
+                "trades_executed": 212,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDCA": {
+              "accuracy": 0.610329,
+              "sharpe": 5.015343,
+              "total_trades": 213,
+              "correct": 130,
+              "coverage": 0.990698,
+              "brier_score": 0.274532,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 5324.96,
+                "final_balance": 15324.96,
+                "sharpe_guarded": 5.330654,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDEN": {
+              "accuracy": 0.54717,
+              "sharpe": 2.577935,
+              "total_trades": 212,
+              "correct": 116,
+              "coverage": 0.986047,
+              "brier_score": 0.320994,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 2704.27,
+                "final_balance": 12704.27,
+                "sharpe_guarded": 2.69744,
+                "trades_executed": 212,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDFW": {
+              "accuracy": 0.544601,
+              "sharpe": 3.287902,
+              "total_trades": 213,
+              "correct": 116,
+              "coverage": 0.990698,
+              "brier_score": 0.315789,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 3662.86,
+                "final_balance": 13662.86,
+                "sharpe_guarded": 3.601033,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KHOU": {
+              "accuracy": 0.544601,
+              "sharpe": 3.47485,
+              "total_trades": 213,
+              "correct": 116,
+              "coverage": 0.990698,
+              "brier_score": 0.34448,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 3483.76,
+                "final_balance": 13483.76,
+                "sharpe_guarded": 3.432408,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAS": {
+              "accuracy": 0.419811,
+              "sharpe": 1.741068,
+              "total_trades": 212,
+              "correct": 89,
+              "coverage": 0.986047,
+              "brier_score": 0.404184,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 2190.37,
+                "final_balance": 12190.37,
+                "sharpe_guarded": 2.369449,
+                "trades_executed": 212,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAX": {
+              "accuracy": 0.549296,
+              "sharpe": 3.362495,
+              "total_trades": 213,
+              "correct": 117,
+              "coverage": 0.990698,
+              "brier_score": 0.351146,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 3530.74,
+                "final_balance": 13530.74,
+                "sharpe_guarded": 3.355357,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMDW": {
+              "accuracy": 0.605634,
+              "sharpe": 4.440526,
+              "total_trades": 213,
+              "correct": 129,
+              "coverage": 0.990698,
+              "brier_score": 0.27728,
+              "max_consecutive_losses": 5,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 5071.56,
+                "final_balance": 15071.56,
+                "sharpe_guarded": 4.940555,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMIA": {
+              "accuracy": 0.450704,
+              "sharpe": 1.753295,
+              "total_trades": 213,
+              "correct": 96,
+              "coverage": 0.990698,
+              "brier_score": 0.416337,
+              "max_consecutive_losses": 5,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 2121.95,
+                "final_balance": 12121.95,
+                "sharpe_guarded": 2.117392,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSP": {
+              "accuracy": 0.544601,
+              "sharpe": 2.146769,
+              "total_trades": 213,
+              "correct": 116,
+              "coverage": 0.990698,
+              "brier_score": 0.29685,
+              "max_consecutive_losses": 6,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 2806.24,
+                "final_balance": 12806.24,
+                "sharpe_guarded": 2.69189,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSY": {
+              "accuracy": 0.497653,
+              "sharpe": 1.407893,
+              "total_trades": 213,
+              "correct": 106,
+              "coverage": 0.990698,
+              "brier_score": 0.389813,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": -1010.01,
+                "final_balance": 8989.99,
+                "sharpe_guarded": -3.496767,
+                "trades_executed": 51,
+                "guardrail_triggers": [
+                  {
+                    "date": "2024-08-23",
+                    "reason": "max_drawdown",
+                    "value": 10.1,
+                    "balance": 8989.99
+                  }
+                ],
+                "lockdown_triggered": true
+              }
+            },
+            "KNYC": {
+              "accuracy": 0.603774,
+              "sharpe": 4.574631,
+              "total_trades": 212,
+              "correct": 128,
+              "coverage": 0.986047,
+              "brier_score": 0.281729,
+              "max_consecutive_losses": 5,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 4827.27,
+                "final_balance": 14827.27,
+                "sharpe_guarded": 4.879543,
+                "trades_executed": 212,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KOKC": {
+              "accuracy": 0.568075,
+              "sharpe": 3.566224,
+              "total_trades": 213,
+              "correct": 121,
+              "coverage": 0.990698,
+              "brier_score": 0.307291,
+              "max_consecutive_losses": 5,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 3780.15,
+                "final_balance": 13780.15,
+                "sharpe_guarded": 3.808736,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHL": {
+              "accuracy": 0.58216,
+              "sharpe": 3.786942,
+              "total_trades": 213,
+              "correct": 124,
+              "coverage": 0.990698,
+              "brier_score": 0.274806,
+              "max_consecutive_losses": 4,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 4634.33,
+                "final_balance": 14634.33,
+                "sharpe_guarded": 4.598173,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHX": {
+              "accuracy": 0.497653,
+              "sharpe": 2.715617,
+              "total_trades": 213,
+              "correct": 106,
+              "coverage": 0.990698,
+              "brier_score": 0.387641,
+              "max_consecutive_losses": 5,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 2892.84,
+                "final_balance": 12892.84,
+                "sharpe_guarded": 2.853346,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSAT": {
+              "accuracy": 0.507042,
+              "sharpe": 2.238006,
+              "total_trades": 213,
+              "correct": 108,
+              "coverage": 0.990698,
+              "brier_score": 0.371602,
+              "max_consecutive_losses": 6,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 2191.59,
+                "final_balance": 12191.59,
+                "sharpe_guarded": 2.093405,
+                "trades_executed": 213,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSEA": {
+              "accuracy": 0.471698,
+              "sharpe": 1.543379,
+              "total_trades": 212,
+              "correct": 100,
+              "coverage": 0.986047,
+              "brier_score": 0.35728,
+              "max_consecutive_losses": 3,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 1750.65,
+                "final_balance": 11750.65,
+                "sharpe_guarded": 1.764345,
+                "trades_executed": 212,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSFO": {
+              "accuracy": 0.554502,
+              "sharpe": 3.759326,
+              "total_trades": 211,
+              "correct": 117,
+              "coverage": 0.981395,
+              "brier_score": 0.295137,
+              "max_consecutive_losses": 6,
+              "total_days": 215,
+              "with_guardrails": {
+                "total_pnl": 4197.51,
+                "final_balance": 14197.51,
+                "sharpe_guarded": 4.281494,
+                "trades_executed": 211,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            }
+          },
+          "aggregate": {
+            "total_trades": 4252,
+            "correct": 2283,
+            "accuracy": 0.536924,
+            "total_days": 4300,
+            "coverage": 0.988837
+          }
+        },
+        "holdout_all": {
+          "test_range": "first_80% to last_20%",
+          "stations": {
+            "KATL": {
+              "accuracy": 0.534328,
+              "sharpe": 2.387596,
+              "total_trades": 335,
+              "correct": 179,
+              "coverage": 0.985294,
+              "brier_score": 0.332328,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 4143.7,
+                "final_balance": 14143.7,
+                "sharpe_guarded": 2.560809,
+                "trades_executed": 335,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KAUS": {
+              "accuracy": 0.559172,
+              "sharpe": 3.522819,
+              "total_trades": 338,
+              "correct": 189,
+              "coverage": 0.994118,
+              "brier_score": 0.328862,
+              "max_consecutive_losses": 6,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5880.83,
+                "final_balance": 15880.83,
+                "sharpe_guarded": 3.626079,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KBOS": {
+              "accuracy": 0.618343,
+              "sharpe": 5.012247,
+              "total_trades": 338,
+              "correct": 209,
+              "coverage": 0.994118,
+              "brier_score": 0.262531,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 8364.15,
+                "final_balance": 18364.15,
+                "sharpe_guarded": 5.326989,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDCA": {
+              "accuracy": 0.618343,
+              "sharpe": 5.473828,
+              "total_trades": 338,
+              "correct": 209,
+              "coverage": 0.994118,
+              "brier_score": 0.275513,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 8767.86,
+                "final_balance": 18767.86,
+                "sharpe_guarded": 5.602295,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KDEN": {
+              "accuracy": 0.563798,
+              "sharpe": 3.227136,
+              "total_trades": 337,
+              "correct": 190,
+              "coverage": 0.991176,
+              "brier_score": 0.311751,
+              "max_consecutive_losses": 6,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": -1058.54,
+                "final_balance": 8941.46,
+                "sharpe_guarded": -11.717071,
+                "trades_executed": 19,
+                "guardrail_triggers": [
+                  {
+                    "date": "2024-10-13",
+                    "reason": "max_drawdown",
+                    "value": 10.59,
+                    "balance": 8941.46
+                  }
+                ],
+                "lockdown_triggered": true
+              }
+            },
+            "KDFW": {
+              "accuracy": 0.568047,
+              "sharpe": 4.398339,
+              "total_trades": 338,
+              "correct": 192,
+              "coverage": 0.994118,
+              "brier_score": 0.313321,
+              "max_consecutive_losses": 5,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 7381.36,
+                "final_balance": 17381.36,
+                "sharpe_guarded": 4.672248,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KHOU": {
+              "accuracy": 0.54142,
+              "sharpe": 3.358277,
+              "total_trades": 338,
+              "correct": 183,
+              "coverage": 0.994118,
+              "brier_score": 0.337549,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5445.84,
+                "final_balance": 15445.84,
+                "sharpe_guarded": 3.391791,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAS": {
+              "accuracy": 0.504451,
+              "sharpe": 3.717324,
+              "total_trades": 337,
+              "correct": 170,
+              "coverage": 0.991176,
+              "brier_score": 0.35036,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 6249.47,
+                "final_balance": 16249.47,
+                "sharpe_guarded": 4.116014,
+                "trades_executed": 337,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KLAX": {
+              "accuracy": 0.525223,
+              "sharpe": 3.436046,
+              "total_trades": 337,
+              "correct": 177,
+              "coverage": 0.991176,
+              "brier_score": 0.356511,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5266.23,
+                "final_balance": 15266.23,
+                "sharpe_guarded": 3.290627,
+                "trades_executed": 337,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMDW": {
+              "accuracy": 0.623145,
+              "sharpe": 5.13234,
+              "total_trades": 337,
+              "correct": 210,
+              "coverage": 0.991176,
+              "brier_score": 0.269421,
+              "max_consecutive_losses": 5,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 8206.31,
+                "final_balance": 18206.31,
+                "sharpe_guarded": 5.373667,
+                "trades_executed": 337,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMIA": {
+              "accuracy": 0.43787,
+              "sharpe": 1.593909,
+              "total_trades": 338,
+              "correct": 148,
+              "coverage": 0.994118,
+              "brier_score": 0.444138,
+              "max_consecutive_losses": 5,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 2369.45,
+                "final_balance": 12369.45,
+                "sharpe_guarded": 1.504514,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSP": {
+              "accuracy": 0.56213,
+              "sharpe": 3.052705,
+              "total_trades": 338,
+              "correct": 190,
+              "coverage": 0.994118,
+              "brier_score": 0.286624,
+              "max_consecutive_losses": 6,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5470.88,
+                "final_balance": 15470.88,
+                "sharpe_guarded": 3.493662,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KMSY": {
+              "accuracy": 0.52071,
+              "sharpe": 2.567492,
+              "total_trades": 338,
+              "correct": 176,
+              "coverage": 0.994118,
+              "brier_score": 0.363076,
+              "max_consecutive_losses": 4,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 4371.17,
+                "final_balance": 14371.17,
+                "sharpe_guarded": 2.656117,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KNYC": {
+              "accuracy": 0.588757,
+              "sharpe": 3.811005,
+              "total_trades": 338,
+              "correct": 199,
+              "coverage": 0.994118,
+              "brier_score": 0.279164,
+              "max_consecutive_losses": 5,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 6718.54,
+                "final_balance": 16718.54,
+                "sharpe_guarded": 4.255272,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KOKC": {
+              "accuracy": 0.565089,
+              "sharpe": 3.042798,
+              "total_trades": 338,
+              "correct": 191,
+              "coverage": 0.994118,
+              "brier_score": 0.304915,
+              "max_consecutive_losses": 7,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5307.99,
+                "final_balance": 15307.99,
+                "sharpe_guarded": 3.297629,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHL": {
+              "accuracy": 0.62426,
+              "sharpe": 5.236389,
+              "total_trades": 338,
+              "correct": 211,
+              "coverage": 0.994118,
+              "brier_score": 0.266397,
+              "max_consecutive_losses": 3,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 8563.3,
+                "final_balance": 18563.3,
+                "sharpe_guarded": 5.540509,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KPHX": {
+              "accuracy": 0.568047,
+              "sharpe": 4.72205,
+              "total_trades": 338,
+              "correct": 192,
+              "coverage": 0.994118,
+              "brier_score": 0.325571,
+              "max_consecutive_losses": 6,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 7766.83,
+                "final_balance": 17766.83,
+                "sharpe_guarded": 4.863695,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSAT": {
+              "accuracy": 0.508876,
+              "sharpe": 2.433622,
+              "total_trades": 338,
+              "correct": 172,
+              "coverage": 0.994118,
+              "brier_score": 0.368088,
+              "max_consecutive_losses": 6,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 4008.25,
+                "final_balance": 14008.25,
+                "sharpe_guarded": 2.453506,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSEA": {
+              "accuracy": 0.538462,
+              "sharpe": 3.609968,
+              "total_trades": 338,
+              "correct": 182,
+              "coverage": 0.994118,
+              "brier_score": 0.327159,
+              "max_consecutive_losses": 5,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5819.04,
+                "final_balance": 15819.04,
+                "sharpe_guarded": 3.713064,
+                "trades_executed": 338,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            },
+            "KSFO": {
+              "accuracy": 0.550595,
+              "sharpe": 3.703836,
+              "total_trades": 336,
+              "correct": 185,
+              "coverage": 0.988235,
+              "brier_score": 0.329967,
+              "max_consecutive_losses": 6,
+              "total_days": 340,
+              "with_guardrails": {
+                "total_pnl": 5992.78,
+                "final_balance": 15992.78,
+                "sharpe_guarded": 3.758744,
+                "trades_executed": 336,
+                "guardrail_triggers": [],
+                "lockdown_triggered": false
+              }
+            }
+          },
+          "aggregate": {
+            "total_trades": 6751,
+            "correct": 3754,
+            "accuracy": 0.556066,
+            "total_days": 6800,
+            "coverage": 0.992794
+          }
+        }
+      },
+      "aggregate": {
+        "total_trades": 21811,
+        "correct": 11979,
+        "accuracy": 0.549218,
+        "mean_split_accuracy": 0.548494,
+        "min_split_accuracy": 0.536924,
+        "max_split_accuracy": 0.559511,
+        "std_split_accuracy": 0.010441
+      }
+    },
+    "adv_impact_analysis": {
+      "description": "Analyze the impact of adding Temperature Advection to various signal combos",
+      "signal_name": "temperature_advection",
+      "signal_status": {
+        "signal_name": "temperature_advection",
+        "signal_class": "TemperatureAdvectionSignal",
+        "backtest_viable": false,
+        "reason": "Live-only signal \u2014 requires real-time GFS 850-mb forecast data. The evaluate() method is a stub for the BaseSignal interface. Backtesting requires stored NWP forecast data which is limited.",
+        "stored_records": 19,
+        "stations_with_data": [
+          "KATL",
+          "KAUS",
+          "KBOS",
+          "KDEN",
+          "KDFW",
+          "KHOU",
+          "KLAS",
+          "KLAX",
+          "KMDW",
+          "KMIA",
+          "KMSP",
+          "KMSY",
+          "KNYC",
+          "KOKC",
+          "KPHL",
+          "KPHX",
+          "KSAT",
+          "KSEA",
+          "KSFO"
+        ]
+      },
+      "impact": {
+        "with_calendar_climatology": {
+          "signals": [
+            "calendar_climatology",
+            "temperature_advection"
+          ],
+          "total_trades": 7364,
+          "correct": 4652,
+          "accuracy": 0.631722,
+          "coverage": 0.216754
+        },
+        "with_gaussian": {
+          "signals": [
+            "gaussian",
+            "temperature_advection"
+          ],
+          "total_trades": 14093,
+          "correct": 8445,
+          "accuracy": 0.599234,
+          "coverage": 0.414817
+        },
+        "with_forecast_disagreement": {
+          "signals": [
+            "forecast_disagreement",
+            "temperature_advection"
+          ],
+          "total_trades": 14489,
+          "correct": 8602,
+          "accuracy": 0.593692,
+          "coverage": 0.426473
+        },
+        "with_wind_direction_shift": {
+          "signals": [
+            "wind_direction_shift",
+            "temperature_advection"
+          ],
+          "total_trades": 5171,
+          "correct": 2977,
+          "accuracy": 0.575711,
+          "coverage": 0.152205
+        }
+      },
+      "baseline_calendar_climatology": {
+        "total_trades": 7364,
+        "correct": 4652,
+        "accuracy": 0.631722
+      }
+    }
+  },
+  "temperature_advection_viability": {
+    "signal_name": "temperature_advection",
+    "signal_class": "TemperatureAdvectionSignal",
+    "backtest_viable": false,
+    "reason": "Live-only signal \u2014 requires real-time GFS 850-mb forecast data. The evaluate() method is a stub for the BaseSignal interface. Backtesting requires stored NWP forecast data which is limited.",
+    "stored_records": 19,
+    "stations_with_data": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ]
+  },
+  "phase6_baseline": {
+    "best_combo_signals": [
+      "calendar_climatology",
+      "gaussian",
+      "pressure_delta",
+      "forecast_disagreement"
+    ],
+    "best_combo_metrics": {
+      "accuracy": 0.66292,
+      "sharpe": 22.99933,
+      "coverage": 1.85542,
+      "correct": 2952,
+      "total": 4453
+    }
+  },
+  "summary": {
+    "experiments_run": [
+      "temperature_advection_standalone",
+      "all_signals_ensemble",
+      "phase6_combo_with_adv",
+      "walk_forward_validation",
+      "adv_impact_analysis"
+    ],
+    "key_findings": [
+      "Full ensemble (all signals): 0.5541 accuracy, Sharpe=3.6608 (33888 trades)",
+      "Best Phase 6 combo: 0.5719 accuracy (27473 trades)\n  + Signal 6: 0.5719 accuracy (27473 trades)\n  Delta: 0.0 accuracy, 0 trades",
+      "Walk-forward validation: 0.5485 mean accuracy (min=0.5369, max=0.5595, std=0.0104)",
+      "Temperature Advection (Signal 6) is a LIVE-ONLY signal requiring GFS 850-mb forecast data. Historical backtest is not possible without stored NWP data. Currently 19 advection records in NWP database."
+    ],
+    "recommendations": [
+      "Continue collecting GFS 850-mb advection data into nwp_forecasts.db for future backtesting",
+      "Implement cached daily GFS fetch for all 20 cities to build historical advection dataset",
+      "Once sufficient history exists (\u226530 days for rolling std), re-run standalone backtest",
+      "Consider adding temperature_advection to production ensemble once live performance is verified",
+      "Phase 2.5: implement historical NWP reanalysis backfill for advection data"
+    ]
+  }
+}
