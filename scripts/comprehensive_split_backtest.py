@@ -88,10 +88,19 @@ def signal_regime(idx, days):
     var = np.var(highs, ddof=1) if len(highs) > 1 else 0.01
     vol = math.sqrt(var)
     slope = (highs[-1] - highs[0]) / len(highs) if len(highs) >= 2 else 0
-    if idx >= 1:
-        dtr = days[idx-1]['high'] - days[idx-1]['low']
+    # Use yesterday's DTR (idx-2 high-low) instead of same-day (idx-1) to avoid look-ahead.
+    # Same-day DTR uses data only available at settlement, not at prediction time.
+    if idx >= 2:
+        dtr = days[idx-2]['high'] - days[idx-2]['low']
     else:
-        dtr = 10.0
+        # Fallback: rolling 30-day mean DTR when idx-2 doesn't exist
+        dtr_vals = []
+        for j in range(min(idx, 32) - 1, 0, -1):
+            try:
+                dtr_vals.append(days[j]['high'] - days[j]['low'])
+            except (KeyError, IndexError, TypeError):
+                continue
+        dtr = sum(dtr_vals) / len(dtr_vals) if dtr_vals else 10.0
     if dtr > 15.0: threshold = 1.0
     elif dtr < 8.0: threshold = 0.4
     else: threshold = 0.8

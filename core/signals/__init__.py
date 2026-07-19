@@ -18,8 +18,11 @@ from .simple_trend_signal import SimpleTrendSignal
 from .gaussian_signal import GaussianSignal
 from .gaussian_v2_signal import GaussianV2Signal
 from .pressure_delta_signal import PressureDeltaSignal
+from .regime_signal import RegimeSignal
+from .forecast_disagreement_signal import ForecastDisagreementSignal
+from .calendar_climatology_signal import CalendarClimatologySignal
+from .temperature_advection_signal import TemperatureAdvectionSignal
 
-# Import legacy signals if needed here (will be in core/ later)
 
 class SignalRegistry:
     """
@@ -36,19 +39,39 @@ class SignalRegistry:
             'gaussian': GaussianSignal(db_path),
             'gaussian_v2': GaussianV2Signal(db_path),
             'pressure_delta': PressureDeltaSignal(db_path),
-            # Legacy signals will be added here as they're migrated
+            'regime': RegimeSignal(db_path),
+            'forecast_disagreement': ForecastDisagreementSignal(db_path),
+            'calendar_climatology': CalendarClimatologySignal(db_path),
+            'temperature_advection': TemperatureAdvectionSignal(db_path),
         }
-    
+        # Lazy-register frontal detector to avoid circular imports
+        self._lazy_register_frontal_detector(db_path)
+
+    def _lazy_register_frontal_detector(self, db_path: str):
+        """Lazy-register frontal detector to avoid circular imports."""
+        from core.frontal_detector import FrontalDetectorSignal
+        self.signals['frontal_detector'] = FrontalDetectorSignal(db_path)
+
     def get_signal(self, signal_name: str):
         """Get a signal by name."""
         return self.signals.get(signal_name)
-    
+
     def get_all_signals(self):
         """Get all available signals."""
         return self.signals
-    
+
     def add_signal(self, name: str, signal_obj):
-        """Add a new signal to the registry."""
+        """Add a new signal to the registry.
+
+        Raises TypeError if signal_obj does not inherit from BaseSignal.
+        """
+        from .base_signal import BaseSignal
+        if not isinstance(signal_obj, BaseSignal):
+            raise TypeError(
+                f"Cannot register '{name}': object of type {type(signal_obj).__name__} "
+                f"does not inherit from `BaseSignal`. All signals must implement "
+                f"the `evaluate(idx, days)`, `name`, and `min_lookback` interface."
+            )
         self.signals[name] = signal_obj
 
 

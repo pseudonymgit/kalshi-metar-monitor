@@ -1,0 +1,13 @@
+{
+  "accuracy": 0.8998187195878256,
+  "sharpe": 1.3316568365276291,
+  "trade_count": 10481,
+  "weights": {
+    "calendar_climatology": 0.2,
+    "late_day_momentum_hourly": 0.3,
+    "late_day_analysis": 0.25,
+    "nwp_analog": 0.15,
+    "goldilocks": 0.1
+  },
+  "final_confidence_avg": 0.5500000000001058
+}

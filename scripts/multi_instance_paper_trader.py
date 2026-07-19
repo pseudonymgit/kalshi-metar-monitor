@@ -396,7 +396,10 @@ class MultiInstancePaperTrader:
     
     def _get_current_bucket(self, station: str, date: str, conn: sqlite3.Connection) -> int:
         """Get current temperature bucket for station.
-        
+
+        Returns the most recently settled bucket (settlement_bucket) —
+        the bucket that actually resolved, reflecting the current known state.
+
         Falls back to most recent available bucket if no data for exact date.
         """
         c = conn.cursor()
@@ -409,7 +412,7 @@ class MultiInstancePaperTrader:
         row = c.fetchone()
         if row:
             return row[0]
-        
+
         # Fall back to most recent available data
         c.execute("""
             SELECT settlement_bucket FROM settlement_epochs
@@ -419,26 +422,29 @@ class MultiInstancePaperTrader:
         """, (station,))
         row = c.fetchone()
         return row[0] if row else 0
-    
+
     def _get_trading_bucket(self, station: str, date: str, conn: sqlite3.Connection) -> int:
-        """Get the trading bucket (next settlement bucket).
-        
-        Falls back to most recent available trading bucket if no data for exact date.
+        """Get the bucket being predicted (the settlement bucket for the trading date).
+
+        Returns the settlement_bucket — the bucket we are predicting/trading.
+        This is the target bucket the market will settle on.
+
+        Falls back to most recent available settlement bucket if no data for exact date.
         """
         c = conn.cursor()
         # First try exact date match
         c.execute("""
-            SELECT prior_settlement_bucket FROM settlement_epochs
+            SELECT settlement_bucket FROM settlement_epochs
             WHERE station = ? AND local_trading_date = ? AND epoch_status = 'closed'
             LIMIT 1
         """, (station, date))
         row = c.fetchone()
         if row:
             return row[0]
-        
+
         # Fall back to most recent available data
         c.execute("""
-            SELECT prior_settlement_bucket FROM settlement_epochs
+            SELECT settlement_bucket FROM settlement_epochs
             WHERE station = ? AND epoch_status = 'closed'
             ORDER BY local_trading_date DESC
             LIMIT 1

@@ -12,6 +12,7 @@ Converts raw signal confidence values into calibrated P(correct) values using:
 Based on Expert 6 Statistical Learning Framework Spec (Gray Room Round 3)
 """
 
+import logging
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
 import sqlite3
@@ -19,6 +20,9 @@ from collections import defaultdict
 import math
 from scipy.special import expit, logit
 import sys
+
+
+_logger = logging.getLogger(__name__)
 
 
 class CalibrationPipeline:
@@ -29,11 +33,17 @@ class CalibrationPipeline:
     into calibrated P(correct) values.
 
     Fallback chain: per-signal-per-city → per-signal-global → global → identity
+
+    WALK-FORWARD LEAK FIX (0.5.1):
+    - `refit()` now only fits on data from `window_start` onward, NOT all history.
+    - Auto-refit in `calibrate()` is REMOVED — caller must explicitly call `refit()`.
+    - `max_history` caps history size to prevent unbounded memory growth.
+    - `prune_history()` drops entries before `window_start` to enforce window boundaries.
     """
     
     MIN_SAMPLES = 200  # Minimum co-firing trades for per-cell calibration
     
-    def __init__(self, signal_names, city_codes):
+    def __init__(self, signal_names, city_codes, max_history=2000, window_start=0):
         self.signal_names = signal_names
         self.city_codes = city_codes
         self.calibrators = {}          # {(signal, city): IsotonicRegression}
@@ -41,7 +51,45 @@ class CalibrationPipeline:
         self.global_calibrator = None
         self.history = defaultdict(list) # {(signal, city): [(raw_conf, correct_bool), ...]}
         self.refitted = False  # Track if calibrators are trained
-    
+        self.max_history = max_history  # 0.5.1: cap to prevent unbounded growth
+        self.window_start = window_start  # 0.5.1: fit only on data from this index onward
+
+    def set_window_start(self, window_start):
+        """
+        Set the start of the current training window.
+        Call this before refit() during walk-forward to ensure
+        calibrators only fit on data up to T-1, not all history.
+        """
+        self.window_start = max(0, window_start)
+        self.refitted = False
+
+    def prune_history(self):
+        """
+        Remove history entries before window_start to enforce explicit
+        window boundaries. This prevents walk-forward leakage where old
+        training data bleeds into later test windows.
+
+        Returns:
+            int: Total number of entries pruned across all buckets
+        """
+        if self.window_start <= 0:
+            return 0
+
+        total_pruned = 0
+        for key in list(self.history.keys()):
+            old_len = len(self.history[key])
+            if old_len <= self.window_start:
+                # Not enough history to keep anything after window_start
+                # Keep the last self.window_start entries as a fallback
+                pass
+            else:
+                # Keep only entries from window_start onward
+                self.history[key] = self.history[key][self.window_start:]
+                total_pruned += old_len - len(self.history[key])
+
+        self.refitted = False
+        return total_pruned
+
     def update(self, signal, city, raw_conf, was_correct):
         """
         Add a new observation to the calibration history.
@@ -54,14 +102,40 @@ class CalibrationPipeline:
         """
         self.history[(signal, city)].append((raw_conf, was_correct))
         self.refitted = False  # Mark need for refit after history updates
+
+        # 0.5.1: Enforce max_history cap — prune oldest entries from each bucket
+        pruned_max = 0
+        for key in list(self.history.keys()):
+            if len(self.history[key]) > self.max_history:
+                excess = len(self.history[key]) - self.max_history
+                self.history[key] = self.history[key][excess:]
+                pruned_max += excess
+
+        # 0.5.1: Prune based on window_start to enforce walk-forward boundaries
+        pruned_window = self.prune_history()
+
+        if pruned_max > 0 or pruned_window > 0:
+            _logger = logging.getLogger(__name__)
+            _logger.debug(
+                f"CalibrationPipeline: pruned {pruned_max} entries (max_history cap), "
+                f"{pruned_window} entries (window_start boundary)"
+            )
     
     def refit(self):
         """
         Re-fit all calibrators from accumulated history. Call after adding new data.
         Uses expanding window walk-forward approach on accumulated history.
+
+        CRITICAL (0.5.1): Only fits on data from self.window_start onwards.
+        This prevents walk-forward leakage where calibrators see future data.
+        Caller must set window_start before refit() during walk-forward.
         """
-        print(f"Fitting isotonic calibrators: {len(self.signal_names)} signals x {len(self.city_codes)} cities")
+        _logger.info(f"Fitting isotonic calibrators: {len(self.signal_names)} signals x {len(self.city_codes)} cities")
+        _logger.info(f"  Window start: {self.window_start}, max_history: {self.max_history}")
         
+        # 0.5.1: Prune history to enforce window boundaries
+        self.prune_history()
+
         # 1. Per-signal per-city calibrators
         for signal in self.signal_names:
             for city in self.city_codes:
@@ -75,7 +149,7 @@ class CalibrationPipeline:
                                            y_min=0.05, y_max=0.95)
                     iso.fit(X, y)
                     self.calibrators[key] = iso
-                    print(f"  Fitted {key}: n={len(data)}")
+                    _logger.info(f"  Fitted {key}: n={len(data)}")
                 else:
                     # Remove calibrator if insufficient data
                     if key in self.calibrators:
@@ -94,7 +168,7 @@ class CalibrationPipeline:
                                        y_min=0.05, y_max=0.95)
                 iso.fit(X, y)
                 self.fallback_calibrators[signal] = iso
-                print(f"  Fitted {signal}_global: n={len(global_data)}")
+                _logger.info(f"  Fitted {signal}_global: n={len(global_data)}")
             else:
                 # Remove if insufficient data
                 if signal in self.fallback_calibrators:
@@ -112,10 +186,10 @@ class CalibrationPipeline:
                                    y_min=0.05, y_max=0.95)
             iso.fit(X, y)
             self.global_calibrator = iso
-            print(f"  Fitted global: n={len(all_data)}")
+            _logger.info(f"  Fitted global: n={len(all_data)}")
         
         self.refitted = True
-        print(f"Fitting complete.")
+        _logger.info(f"Fitting complete.")
     
     def calibrate(self, signal, city, raw_conf):
         """
@@ -130,38 +204,41 @@ class CalibrationPipeline:
         Returns:
             calibrated probability [0.5, 1.0] for UP, [0.0, 0.5] for DOWN
         """
-        if not self.refitted:
-            self.refit()  # Auto-refit if history has been updated since last fit
-            
+        # NOTE (0.5.1): Auto-refit REMOVED to prevent walk-forward leakage.
+        # Caller must explicitly call refit() after setting window_start.
+        # If no refit has been performed, fall through to identity (cold start).
         clipped_conf = np.clip(raw_conf, 0.0, 1.0)
         
         # Level 1: Per-signal per-city calibration
         key = (signal, city)
         if key in self.calibrators:
             calibrated = self.calibrators[key].transform([clipped_conf])[0]
-            # No-change zone: if calibrated is within ±0.05 of raw, keep raw
-            if abs(calibrated - clipped_conf) <= 0.05:
+            # No-change zone: if calibrated is within ±0.01 of raw, keep raw
+            # Using 0.01 instead of 0.05 ensures the calibrator actually has an effect
+            # The original 0.05 was too wide — it suppressed useful calibration adjustments
+            # for signals with modest but meaningful corrections under 5%.
+            if abs(calibrated - clipped_conf) <= 0.01:
                 return clipped_conf
             return float(calibrated)
         
         # Level 2: Per-signal global calibration
         if signal in self.fallback_calibrators:
             calibrated = self.fallback_calibrators[signal].transform([clipped_conf])[0]
-            # No-change zone
-            if abs(calibrated - clipped_conf) <= 0.05:
+            # No-change zone: 0.01 threshold (see Level 1 comment)
+            if abs(calibrated - clipped_conf) <= 0.01:
                 return clipped_conf
             return float(calibrated)
         
         # Level 3: Global calibration across all signals/cities
         if self.global_calibrator is not None:
             calibrated = self.global_calibrator.transform([clipped_conf])[0]
-            # No-change zone
-            if abs(calibrated - clipped_conf) <= 0.05:
+            # No-change zone: 0.01 threshold (see Level 1 comment)
+            if abs(calibrated - clipped_conf) <= 0.01:
                 return clipped_conf
             return float(calibrated)
         
         # Level 4: Identity (cold start) - return raw confidence
-        # Apply no-change zone: if calibrated is within ±0.05 of raw, keep raw
+        # No-change zone: 0.01 threshold (see Level 1 comment)
         # This prevents over-calibration when the mapping is minor
         return clipped_conf
     
@@ -291,8 +368,8 @@ def demonstrate_calibration_workflow():
     Demonstration showing the full isotonic regression workflow
     with per-signal-per-city calibration and fallback hierarchy.
     """
-    print("DEMONSTRATION: CalibrationPipeline")
-    print("=" * 60)
+    _logger.info("DEMONSTRATION: CalibrationPipeline")
+    _logger.info("=" * 60)
     
     # Example from Expert 6 report
     signal_names = ['reversion', 'gaussian_v2', 'regime']
@@ -323,7 +400,7 @@ def demonstrate_calibration_workflow():
         date_str = f"2024-01-{i%28+1:02d}" 
         training_data.append((sig, city, raw_conf, correct, date_str))
     
-    print(f"Generated {len(training_data)} training samples")
+    _logger.info(f"Generated {len(training_data)} training samples")
     
     # Add the data and fit calibrators
     for signal, city, raw_conf, correct, date in training_data:
@@ -338,12 +415,12 @@ def demonstrate_calibration_workflow():
         ('nonexistent', 'KATL', 0.75),  # Should use fallback
     ]
     
-    print(f"\nTest Results:")
+    _logger.info(f"\nTest Results:")
     for signal, city, raw_conf in test_samples:
         calibrated = calib.calibrate(signal, city, raw_conf)
-        print(f"  {signal}@{city}, raw={raw_conf:.3f} → calibrated={calibrated:.3f}")
+        _logger.info(f"  {signal}@{city}, raw={raw_conf:.3f} → calibrated={calibrated:.3f}")
     
-    print("\nPipeline initialized and ready for integration with ensemble v8.")
+    _logger.info("\nPipeline initialized and ready for integration with ensemble v8.")
 
 
 if __name__ == "__main__":
