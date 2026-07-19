@@ -110,12 +110,11 @@ from alert_builder import (
 )
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from alert_dispatcher import dispatch_current_alert
-)
+
 
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Phase 3 Risk Modules - optional import guards
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.low_liquidity_traps import LowLiquidityTrapFilter
     HAS_LOW_LIQUIDITY_TRAP = True
 except ImportError:
@@ -124,7 +123,6 @@ except ImportError:
     HAS_LOW_LIQUIDITY_TRAP = False
 
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.kelly_position_sizer import KellyPositionSizer
     HAS_KELLY_SIZER = True
 except ImportError:
@@ -133,7 +131,6 @@ except ImportError:
     HAS_KELLY_SIZER = False
 
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.risk_budget import RiskBudgetAllocator
     HAS_RISK_BUDGET = True
 except ImportError:
@@ -142,7 +139,6 @@ except ImportError:
     HAS_RISK_BUDGET = False
 
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.scaling_ladder import ScalingLadder
     HAS_SCALING_LADDER = True
 except ImportError:
@@ -151,7 +147,6 @@ except ImportError:
     HAS_SCALING_LADDER = False
 
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.stop_loss import StopLossMonitor
     HAS_STOP_LOSS = True
 except ImportError:
@@ -162,7 +157,6 @@ except ImportError:
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import Multi-Model Ensemble Signal
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.multi_model_ensemble import multi_model_real_signal as multi_model_ensemble_signal
     HAS_MULTI_MODEL_ENSEMBLE = True
 except ImportError:
@@ -174,7 +168,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import NWP Analog Signal - wrap in try/except to prevent crashes if sklearn/xgboost not installed
 # Check the NWP_ANALOG_ENABLED flag — this signal is experimental and gated
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.signals.nwp_analog_signal import NwpAnalogSignal, NWP_ANALOG_ENABLED
 except ImportError:
     print("Warning: NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
@@ -186,6 +179,8 @@ if not NWP_ANALOG_ENABLED:
     print("WARNING: NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
 HAS_NWP_ANOG = NWP_ANALOG_ENABLED
 
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+
 # Import Temperature Advection Signal (850-mb advection)
 TEMPERATURE_ADVECTION_ENABLED = True
 try:
@@ -195,11 +190,8 @@ except ImportError as e:
     _LOGGER.warning(f"TemperatureAdvectionSignal import failed: {e}")
     TemperatureAdvectionSignal = None
     TEMPERATURE_ADVECTION_ENABLED = False
-
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     from core.calibration_pipeline import CalibrationPipeline
     HAS_CALIBRATION_PIPELINE = True
 except ImportError:
@@ -309,7 +301,6 @@ class PaperTrader:
 
         # Initialize station skill gate (T5 - per station skill gating)
         try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             from core.station_skill_gate import StationSkillGate
             self._skill_gate = StationSkillGate(self.metar_db)
         except Exception as e:
@@ -1075,7 +1066,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         
         Returns: float - previous day's high temperature or None if not available
         """
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         from datetime import datetime, timedelta
         current_dt = datetime.strptime(current_date, '%Y-%m-%d')
         prev_date = (current_dt - timedelta(days=1)).strftime('%Y-%m-%d')
@@ -1570,7 +1560,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         self.update_risk_metrics_on_trade(net_cost, 'loss' if net_cost < 0 else 'win')
 
         # Update RiskManager with the new trade result
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         from dataclasses import asdict
         trade_result = TradeResult(
             trade_id=trade_uuid,
@@ -1850,7 +1839,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
         Sums position_size_usd from all open trades for stations in the cluster.
         """
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         from station_registry import get_cluster_stations
         cluster_stations = get_cluster_stations(cluster_name)
         if not cluster_stations:
@@ -2210,7 +2198,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
                 all_stations = []
                 # Try to get all stations from various sources
                 try:
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
                     from station_registry import get_all_stations
                     all_stations = get_all_stations()
                 except ImportError:
@@ -2622,7 +2609,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
     def get_approved_stations(self) -> List[str]:
         """Return list of approved station codes."""
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         import station_registry
         return station_registry.get_all_stations()
         return get_all_stations()
