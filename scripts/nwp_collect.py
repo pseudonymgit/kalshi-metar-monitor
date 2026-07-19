@@ -25,10 +25,11 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 # Configuration: Database path can be set via environment variable or command-line argument
-NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"  # Relative to script execution directory
+NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"  # Relative to project root (parent of scripts/)
 
-# Determine the script directory
+# Determine the script directory and project root
 SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent  # weather-engine-source/
 
 # Parse command line arguments
 def parse_args():
@@ -44,7 +45,7 @@ if args.db_path:
 elif os.environ.get('NWP_DB_PATH'):
     DB_PATH = Path(os.environ['NWP_DB_PATH']).absolute()
 else:
-    DB_PATH = SCRIPT_DIR / NWP_DB_PATH_DEFAULT
+    DB_PATH = PROJECT_ROOT / NWP_DB_PATH_DEFAULT
 
 # Convert to absolute path
 DB_PATH = Path(DB_PATH).absolute()
@@ -93,6 +94,8 @@ FORECAST_VARIABLES = [
     "temperature_850hPa",
     "wind_speed_10m",
     "wind_direction_10m",
+    "wind_speed_850hPa",
+    "wind_direction_850hPa",
     "cloud_cover",
     "dew_point_2m",
     "geopotential_height_500hPa",
@@ -153,6 +156,8 @@ def fetch_forecast(api_url, lat, lon):
         "temperature_850hPa",
         "wind_speed_10m",
         "wind_direction_10m",
+        "wind_speed_850hPa",
+        "wind_direction_850hPa",
         "cloud_cover",
         "dew_point_2m",
         "geopotential_height_500hPa",
@@ -232,6 +237,7 @@ def parse_and_store(conn, data, model_name, station, fetch_date, fetch_timestamp
     hourly_time = hourly.get("time", [])
 
     for var in ["temperature_850hPa", "wind_speed_10m", "wind_direction_10m",
+                "wind_speed_850hPa", "wind_direction_850hPa",
                 "cloud_cover", "dew_point_2m", "geopotential_height_500hPa"]:
         values = hourly.get(var, [])
         if not values:

@@ -13,11 +13,20 @@ MANDATORY DELIVERABLES:
 import json
 import sqlite3
 import os
+import sys
 import math
 from datetime import datetime, timezone
 from typing import Dict, List, Tuple, Optional, Any
 from collections import defaultdict
 import statistics
+
+# Ensure repo root is on sys.path so we can import core.signal modules
+REPO_ROOT_FOR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if REPO_ROOT_FOR_PATH not in sys.path:
+    sys.path.insert(0, REPO_ROOT_FOR_PATH)
+
+# Import real signal implementations (no look-ahead bias)
+from core.signals.nwp_analog_signal import NwpAnalogSignal
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -73,6 +82,32 @@ class SimpleKalman:
         self.estimate = self.estimate + K * (measurement - self.estimate)
         self.error = (1 - K) * self.error
         return self.estimate
+
+
+# ── NWP Analog Signal Factory ────────────────────────────────────────
+
+def _make_nwp_analog_signal(station: str, db_path: str):
+    """
+    Create an NWP analog signal function adapted for the backtest runner's
+    interface: signal_func(today, yesterday, market_data) -> Optional[str].
+
+    Uses the real k-NN NwpAnalogSignal from core/signals/nwp_analog_signal.py
+    instead of the placeholder 7-day trend function.
+    """
+    try:
+        sig = NwpAnalogSignal(db_path=db_path)
+
+        def _fn(today: Dict, yesterday: Dict, market_data: Dict = None) -> Optional[str]:
+            direction, _ = sig.evaluate_nwp_analog(station, today['date'])
+            return direction
+
+        return _fn
+    except Exception as e:
+        print(f"  ⚠ Failed to load NWP analog signal for {station}: {e}")
+        # Fallback: return None (no signal) to avoid polluting results
+        def _fallback(today, yesterday, market_data):
+            return None
+        return _fallback
 
 
 class RiskManager:
@@ -176,11 +211,17 @@ def get_calibration_params():
 # ─── Signal Implementations ─────────────────────────────────────────────
 
 def simple_trend_signal(today: Dict, yesterday: Dict, market_data: Dict = None) -> Optional[str]:
-    """Compare today's HIGH to yesterday's HIGH."""
-    if today['high'] is not None and yesterday['high'] is not None:
-        if today['high'] > yesterday['high']:
+    """
+    Compare yesterday's HIGH to day_before_yesterday's HIGH.
+    No look-ahead — uses only data available before the prediction day.
+    """
+    day_before_yesterday = market_data.get('day_before_yesterday', {}) if market_data else {}
+    yest_high = yesterday.get('high')
+    dby_high = day_before_yesterday.get('high')
+    if yest_high is not None and dby_high is not None:
+        if yest_high > dby_high:
             return 'up'
-        elif today['high'] < yesterday['high']:
+        elif yest_high < dby_high:
             return 'down'
     return None
 
@@ -214,18 +255,27 @@ def gaussian_model_signal(today: Dict, yesterday: Dict, market_data: Dict[str, D
 
 def forecast_disagreement_signal(today: Dict, yesterday: Dict,
                                 market_data: Dict[str, Dict]) -> Optional[str]:
-    """Compare today's observed trend against historical climate normal."""
+    """
+    Compare yesterday's observed trend against historical climate normal.
+    No look-ahead — uses only data available before the prediction day.
+
+    Logic: if yesterday's high deviated significantly from the historical
+    average around yesterday's day-of-year, predict yesterday's trend
+    will continue today.
+    """
     all_temps = market_data.get('all_temps', [])
+    day_before_yesterday = market_data.get('day_before_yesterday', {})
+
     if len(all_temps) < 366:
         return None
 
-    today_doy = datetime.strptime(today['date'], '%Y-%m-%d').timetuple().tm_yday
+    yesterday_doy = datetime.strptime(yesterday['date'], '%Y-%m-%d').timetuple().tm_yday
     recent_temps = []
 
     for t in all_temps[-366:]:
         if t['high'] is not None:
             doy = datetime.strptime(t['date'], '%Y-%m-%d').timetuple().tm_yday
-            if abs(doy - today_doy) <= 3:
+            if abs(doy - yesterday_doy) <= 3:
                 recent_temps.append(t['high'])
 
     if len(recent_temps) < 5:
@@ -233,17 +283,18 @@ def forecast_disagreement_signal(today: Dict, yesterday: Dict,
 
     historical_avg = sum(recent_temps) / len(recent_temps)
 
-    today_high = today.get('high')
     yesterday_high = yesterday.get('high')
-    if today_high is None or yesterday_high is None:
+    dby_high = day_before_yesterday.get('high')
+    if yesterday_high is None or dby_high is None:
         return None
 
-    observed_trend = today_high - yesterday_high
-    climate_deviation = observed_trend - (today_high - historical_avg)
+    # Observed trend: yesterday -> day_before_yesterday (not today -> yesterday)
+    observed_trend = yesterday_high - dby_high
+    # Climate deviation: how much yesterday's high differed from historical norm
+    climate_deviation = observed_trend - (yesterday_high - historical_avg)
 
     if abs(climate_deviation) > 5:
-        trend_diff = today_high - yesterday_high
-        return 'up' if trend_diff > 0 else 'down'
+        return 'up' if observed_trend > 0 else 'down'
 
     return None
 
@@ -325,6 +376,7 @@ def run_signal_backtest(station: str, signal_func, conn) -> Dict[str, Any]:
     for i in range(29, len(aligned)):
         today = aligned[i]
         yesterday = aligned[i-1]
+        market_data['day_before_yesterday'] = aligned[i-2]
 
         actual = today['market_dir']
         if actual == 'flat':
@@ -377,13 +429,16 @@ def run_ensemble_backtest(station: str, skill_data: Dict, calib_params: Dict, co
     # Get signal weights from calibration
     signal_weights = calib_params.get('signal_weights', {sig: 1.0 for sig in SIGNALS})
     
+    # Real NWP analog signal for this station
+    nwp_signal_fn = _make_nwp_analog_signal(station, METAR_DB)
+
     strategies = {
         'simple_trend': simple_trend_signal,
         'gaussian': gaussian_model_signal,
         'forecast_disagreement': forecast_disagreement_signal,
         'climate_persistence': climate_persistence_signal,
         'wind_direction_shift': wind_direction_shift_signal,
-        'nwp_analog': nwp_analog_signal,
+        'nwp_analog': nwp_signal_fn,
     }
 
     results = {
@@ -405,6 +460,7 @@ def run_ensemble_backtest(station: str, skill_data: Dict, calib_params: Dict, co
     for i in range(29, len(aligned)):
         today = aligned[i]
         yesterday = aligned[i-1]
+        market_data['day_before_yesterday'] = aligned[i-2]
 
         actual = today['market_dir']
         if actual == 'flat':
@@ -623,13 +679,16 @@ def run_complete_backtest_suite():
             'forecast_disagreement': forecast_disagreement_signal,
             'climate_persistence': climate_persistence_signal,
             'wind_direction_shift': wind_direction_shift_signal,
-            'nwp_analog': nwp_analog_signal,
             'late_day_momentum_hourly': lambda t, y, md: None  # Placeholder as we don't need hourly here
         }
         
-        signal_func = signal_func_map.get(signal_name)
-        if signal_func:
-            for station in ALL_STATIONS:
+        for station in ALL_STATIONS:
+            # NWP analog needs per-station instantiation
+            if signal_name == 'nwp_analog':
+                signal_func = _make_nwp_analog_signal(station, METAR_DB)
+            else:
+                signal_func = signal_func_map.get(signal_name)
+            if signal_func:
                 sig_results = run_signal_backtest(station, signal_func, conn)
                 if sig_results and sig_results.get('total', 0) > 0:
                     sig_station_results[station] = sig_results

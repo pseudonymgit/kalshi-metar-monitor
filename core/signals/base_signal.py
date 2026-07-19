@@ -16,6 +16,65 @@ Usage:
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple, List, Dict
 import sqlite3
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
+def _window(days, idx, n, offset=1):
+    """Return n values before idx-offset, exclusive of the target day.
+
+    Args:
+        days: List of daily weather dicts
+        idx: Current day index
+        n: Number of values to return
+        offset: How many days before idx to start (default 1 = yesterday)
+
+    Returns:
+        List of n dicts, or None if insufficient history
+    """
+    start = idx - n - offset
+    end = idx - offset
+    if start < 0:
+        return None  # insufficient history
+    return days[start:end]
+
+
+def _safe_get(days, idx, field, default=None):
+    """Safely retrieve a field from days[idx], returning default if unavailable.
+
+    Args:
+        days: List of daily weather dicts
+        idx: Index to access
+        field: Key to retrieve
+        default: Default value if idx OOB or field is None
+
+    Returns:
+        Field value or default
+    """
+    if idx < 0 or idx >= len(days):
+        return default
+    val = days[idx].get(field)
+    return val if val is not None else default
+
+
+def validate_signal(func):
+    """Decorator that validates evaluate() return values."""
+    def wrapper(self, *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        if result is None:
+            return None, 0.0
+        direction, confidence = result
+        if direction is not None and direction not in ('up', 'down'):
+            logger.warning(
+                f"Signal '{self.name}' returned invalid direction={direction!r}. "
+                f"Expected 'up', 'down', or None. Returning (None, 0.0)."
+            )
+            return None, 0.0
+        confidence = max(0.0, min(1.0, confidence if confidence is not None else 0.0))
+        return direction, confidence
+    return wrapper
 
 
 class BaseSignal(ABC):

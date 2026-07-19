@@ -34,7 +34,7 @@ ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',
                 'KSAT','KSEA','KSFO']
 
-SIGNAL_NAMES = ['reversion', 'gaussian_v2', 'regime', 'gaussian_v2', 'pressure'] # Based on ensemble_v8
+SIGNAL_NAMES = ['reversion', 'gaussian_v2', 'regime', 'gaussian', 'pressure'] # Based on ensemble_v8 — gaussian = 48d version, gaussian_v2 = 30d version
 
 
 def load_station_data(station, conn):

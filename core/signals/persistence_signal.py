@@ -5,10 +5,9 @@ Based on approach_persistence from ensemble_v7_sharpe_opt.py
 Yesterday's direction → predict same direction today
 """
 
-from abc import ABC
 from typing import Optional, Tuple, List, Dict
 import sqlite3
-from .base_signal import BaseSignal
+from .base_signal import BaseSignal, _safe_get, validate_signal
 
 
 class PersistenceSignal(BaseSignal):
@@ -31,6 +30,7 @@ class PersistenceSignal(BaseSignal):
     def min_lookback(self) -> int:
         return 2
 
+    @validate_signal
     def evaluate(self, idx: int, days: List[Dict]) -> Tuple[Optional[str], float]:
         """
         Evaluate persistence signal.
@@ -47,11 +47,13 @@ class PersistenceSignal(BaseSignal):
         if idx < 2:
             return None, 0.0
 
-        prev_high = days[idx-2]['high']
-        today_high = days[idx-1]['high']
-        prev_dir = 'up' if today_high > prev_high else 'down'
+        prev_high = _safe_get(days, idx - 2, 'high')
+        today_high = _safe_get(days, idx - 1, 'high')
 
-        # Return the predicted direction and weak confidence
+        if prev_high is None or today_high is None:
+            return None, 0.0
+
+        prev_dir = 'up' if today_high > prev_high else 'down'
         return prev_dir, 0.3
 
     def evaluate_for_station(self, station: str, date: str, conn: sqlite3.Connection = None) -> Tuple[Optional[str], float]:

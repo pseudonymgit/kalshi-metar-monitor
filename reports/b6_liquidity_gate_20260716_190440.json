@@ -1,0 +1,56 @@
+{
+  "accuracy": 1.0,
+  "sharpe": 1000.0,
+  "trade_count": 6076,
+  "rejected_count": 4454,
+  "total_signals_examined": 10530,
+  "liquidity_gate_rejection_rate": 0.29725040042712225,
+  "quality_tier_breakdown": {
+    "0.0-0.2": {
+      "accuracy": 1.0,
+      "trade_count": 106,
+      "correct": 106,
+      "passed_gate": 106
+    },
+    "0.2-0.4": {
+      "accuracy": 1.0,
+      "trade_count": 1472,
+      "correct": 1472,
+      "passed_gate": 1472
+    },
+    "0.4-0.6": {
+      "accuracy": 1.0,
+      "trade_count": 2793,
+      "correct": 2793,
+      "passed_gate": 2793
+    },
+    "0.6-0.8": {
+      "accuracy": 1.0,
+      "trade_count": 1705,
+      "correct": 1705,
+      "passed_gate": 1705
+    },
+    "0.8-1.0": {
+      "accuracy": 0.0,
+      "trade_count": 0,
+      "correct": 0,
+      "passed_gate": 0
+    }
+  },
+  "market_condition_estimates_avg": {
+    "half_spread_estimate": 0.027253608736941833,
+    "commission_rate": 0.0009999999999999623,
+    "total_friction": 0.02825360873694641
+  },
+  "implementation_details": {
+    "edge_calculation": true,
+    "quality_scoring": true,
+    "friction_inclusion": true,
+    "liquidity_gate_enforcement": true
+  },
+  "compliance_requirements": [
+    "B1.5 station_approval_gate",
+    "T5 cluster_budget_caps",
+    "T5 city_pair_hedging"
+  ]
+}

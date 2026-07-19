@@ -13,6 +13,7 @@ from itertools import combinations
 import json
 import os
 import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import argparse
 from datetime import datetime
 
@@ -325,8 +326,10 @@ def main():
     all_signals = registry.get_all_signals()
     
     # Limit to just the 5 new signals plus existing ones we want to include
+    # All 10 standard signals (exclude nwp_analog — DB-based by design)
     desired_signals = ['persistence', 'simple_trend', 'gaussian', 'gaussian_v2', 'pressure_delta', 
-                       'wind_direction_shift', 'nwp_analog', 'goldilocks']
+                       'goldilocks', 'wind_direction_shift', 'regime', 'forecast_disagreement', 
+                       'calendar_climatology']
     
     active_signals = {}
     for key, signal in all_signals.items():
@@ -342,7 +345,7 @@ def main():
     if args.station and args.station.upper() != 'ALL':
         all_stations = [args.station.upper()]
     else:
-        cur.execute("SELECT DISTINCT station FROM metar_observations WHERE station IN (SELECT station FROM settlement_epochs) LIMIT 5")  # Limit for speed
+        cur.execute("SELECT DISTINCT station FROM metar_observations WHERE station IN (SELECT station FROM settlement_epochs) ORDER BY station")
         all_stations = [row[0] for row in cur.fetchall()]
     
     conn.close()
@@ -405,8 +408,9 @@ def main():
             print(f"    Testing {len(signal_combinations)} combinations over {total_days_tested} test days")
             
             # Run backtest with these combinations on this station
+            # Test all combinations (1023 for 10 signals)
             combo_results = walk_forward_backtest(
-                days, market, signal_combinations[:20],  # Limit combinations for speed initially
+                days, market, signal_combinations,
                 train_days=180, test_days=30, min_agreement=min_agreement
             )
             

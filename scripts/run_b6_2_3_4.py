@@ -148,19 +148,19 @@ def run_b6_experiments():
             if actual == 'flat':
                 continue
             
-            # Generate signals
+            # Generate signals (FIXED: use only prior-day data, no look-ahead bias)
             raw_signals = []
             
-            # Simple trend
-            if today['high'] and yesterday['high']:
-                direction = 'up' if today['high'] > yesterday['high'] else 'down'
+            # Simple trend: yesterday vs day-before, not today vs yesterday
+            if i >= 2 and yesterday['high'] and aligned[i-2]['high']:
+                direction = 'up' if yesterday['high'] > aligned[i-2]['high'] else 'down'
                 conf = 0.6 if direction else 0.0
                 if conf > 0:
                     raw_signals.append({'dir': direction, 'conf': conf})
             
-            # Momentum
-            if i >= 32 and today['high'] and aligned[i-3]['high']:
-                trend = today['high'] - aligned[i-3]['high']
+            # Momentum: prior 3-day trend ending at yesterday
+            if i >= 33 and yesterday['high'] and aligned[i-4]['high']:
+                trend = yesterday['high'] - aligned[i-4]['high']
                 direction = 'up' if trend > 0 else 'down'
                 conf = min(0.7, 0.5 + abs(trend) * 0.02)
                 raw_signals.append({'dir': direction, 'conf': conf})

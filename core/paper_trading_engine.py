@@ -186,6 +186,16 @@ if not NWP_ANALOG_ENABLED:
     print("WARNING: NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
 HAS_NWP_ANOG = NWP_ANALOG_ENABLED
 
+# Import Temperature Advection Signal (850-mb advection)
+TEMPERATURE_ADVECTION_ENABLED = True
+try:
+    from core.signals.temperature_advection_signal import TemperatureAdvectionSignal
+    _LOGGER.info("TemperatureAdvectionSignal imported successfully")
+except ImportError as e:
+    _LOGGER.warning(f"TemperatureAdvectionSignal import failed: {e}")
+    TemperatureAdvectionSignal = None
+    TEMPERATURE_ADVECTION_ENABLED = False
+
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
@@ -272,6 +282,9 @@ class PaperTrader:
         # Initialize signal instances
         # NWP Analog is NOT instantiated at init — lazy-loaded when first needed
         self._nwp_analog = None
+
+        # Temperature Advection Signal — lazy-loaded when first needed
+        self._temp_advection = None
 
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
@@ -889,6 +902,24 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
                         _LOGGER.info(f"Multi-Model Ensemble signal fired for {station} on {date}: direction={direction}, confidence={confidence}")
                 except Exception as e:
                     _LOGGER.warning(f"Failed to compute Multi-Model Ensemble signal for {station} on {date}: {e}")
+
+            # Signal 6: 850-mb Temperature Advection (gated behind TEMPERATURE_ADVECTION_ENABLED)
+            if TEMPERATURE_ADVECTION_ENABLED and TemperatureAdvectionSignal is not None:
+                if self._temp_advection is None:
+                    try:
+                        self._temp_advection = TemperatureAdvectionSignal()
+                        _LOGGER.info("Temperature Advection signal initialized (lazy load)")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to initialize Temperature Advection Signal: {e}")
+                if self._temp_advection is not None:
+                    try:
+                        direction, confidence = self._temp_advection.evaluate_for_station(station, date)
+                        if direction is not None and confidence >= 0.25:
+                            market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
+                            signals.append((station, "HIGH", market_side, "temperature_advection"))
+                            _LOGGER.info(f"Temperature Advection signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to compute Temperature Advection signal for {station} on {date}: {e}")
 
         metar_conn.close()
 
