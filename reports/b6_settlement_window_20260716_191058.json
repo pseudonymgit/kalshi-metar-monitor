@@ -1,0 +1,12 @@
+{
+  "accuracy": 0.5087879182398125,
+  "sharpe": 0.017578551784800115,
+  "trade_count": 7681,
+  "total_trades_attempted": 7681,
+  "settlement_window_used": "T-18h to T-2h",
+  "signals_used": [
+    "prior_day_trend_only"
+  ],
+  "lookahead_bias_fixed": true,
+  "physical_reasoning": "Settlement window restricts entry timing; signal from prior-day trends only"
+}

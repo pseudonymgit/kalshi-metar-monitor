@@ -1,0 +1,25 @@
+{
+  "accuracy": 0.5405844155844156,
+  "sharpe": 0.08143754521032011,
+  "trade_count": 616,
+  "total_processed_trades": 616,
+  "stations_evaluated": [
+    "KNYC"
+  ],
+  "station_breakdown": {
+    "KNYC": {
+      "accuracy": 0.5405844155844156,
+      "trade_count": 616,
+      "correct": 333
+    }
+  },
+  "signals_used": [
+    "goldilocks_v2",
+    "regime_detection"
+  ],
+  "regime_detection_params": {
+    "window_size": 10
+  },
+  "knyc_specific_edge": 0.5405844155844156,
+  "physical_reasoning": "Spike->Revert mechanism with asymmetric confidence based on Gray Room findings"
+}

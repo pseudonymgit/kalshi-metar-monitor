@@ -1,0 +1,333 @@
+"""
+Multi-Stage Execution Controller
+================================
+
+Purpose: Implements a 3-stage limit order execution system that adapts to Kalshi's
+minimum increment requirements (1 cent) and trading venue rules.
+
+Stage 1: Place at mid - 0.5 cents, wait 30 minutes
+Stage 2: If unfilled, move to midpoint, wait 30 minutes  
+Stage 3: If unfilled, place at marketable limit (aggressive pricing)
+
+Inputs:
+- Target price (typically market midpoint adjusted for confidence)
+- Kalshi pricing constraints (1-cent increments)
+- Current market levels (bid / ask spread)
+
+Outputs:
+- Order execution status and fills at each stage
+- Slippage and execution cost analysis
+- Performance metrics per execution cycle
+
+Usage: python multi_stage_execution.py --target_price TARGET_PRICE \
+                                  --stage_time_limit MINUTES 
+"""
+
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Dict, List, Tuple, Any, Optional
+import argparse
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).parent.parent.joinpath("core")))
+from station_registry import STATIONS
+from kalshi_price_fetcher import STATION_TO_KALSHI_CODE, KALSHI_CODE_TO_STATION
+from kalshi_monitor import KalshiMonitor
+
+
+class ExecutionStage(Enum):
+    """Execution stage enumeration"""
+    STAGE_1 = "Mid_minus_0_5_Cents"
+    STAGE_2 = "At_Midpoint"
+    STAGE_3 = "Marketable_Limit"
+
+
+class MultiStageExecutor:
+    """
+    Manages a 3-stage order execution sequence optimized for the Kalshi trading venue
+    and its 1-cent minimum increment requirement
+    """
+    
+    def __init__(self):
+        """
+        Initialize the executor with no active orders
+        """
+        self.active_orders = []  # Track currently executing orders
+        self.execution_history = []  # Completed executions
+        self.min_increment = 0.01  # Kalshi's 1 penny minimum increment
+        self.stage_time_limits = [timedelta(minutes=30), timedelta(minutes=30), 
+                                 timedelta(minutes=30)]  # Time per stage
+    
+    def _validate_and_round_price(self, price: float) -> float:
+        """
+        Round price to nearest valid Kalshi price point (nearest 0.01)
+        
+        Args:
+            price: Target price before validation
+            
+        Returns:
+            Valid Kalshi-compliant price
+        """
+        rounded = round(price, 2)
+        # Ensure price is in valid range [0.01, 0.99] for binary contracts
+        bounded = max(0.01, min(0.99, rounded))
+        return bounded
+    
+    def create_stage1_price(self, midpoint: float) -> float:
+        """
+        Create price for stage 1: midpoint - 0.5 cents (rounded appropriately)
+        
+        Args:
+            midpoint: Current market midpoint
+            
+        Returns:
+            Stage 1 limit price
+        """
+        target_price = midpoint - 0.005  # Minus 0.5 cents
+        return self._validate_and_round_price(target_price)
+    
+    def create_stage2_price(self, midpoint: float) -> float:
+        """
+        Create price for stage 2: midpoint (rounded appropriately)
+        
+        Args:
+            midpoint: Current market midpoint
+            
+        Returns:
+            Stage 2 limit price
+        """
+        return self._validate_and_round_price(midpoint)
+    
+    def create_stage3_price(self, midpoint: float, side: str) -> float:
+        """
+        Create price for stage 3: marketable aggressive price
+        
+        Args:
+            midpoint: Current market midpoint
+            side: 'buy' or 'sell' - determines direction of price aggressiveness
+            
+        Returns:
+            Stage 3 marketable limit price
+        """
+        if side.lower() == 'buy':
+            # For aggressive buying, price must be higher than best ask
+            aggressive_price = midpoint + 0.02  # Price aggressively at bid + 2 cents
+        elif side.lower() == 'sell':
+            # For aggressive selling, price must be lower than best bid
+            aggressive_price = midpoint - 0.02  # Price aggressively at ask - 2 cents
+        else:
+            raise ValueError("side must be 'buy' or 'sell'")
+        
+        return self._validate_and_round_price(aggressive_price)
+    
+    def execute_single_cycle(self, initial_midpoint: float, side: str, 
+                           quantity: int, starting_time: datetime = None) -> Dict[str, Any]:
+        """
+        Execute the full 3-stage order cycle
+        
+        Args:
+            initial_midpoint: Starting market midpoint
+            side: 'buy' or 'sell'
+            quantity: Quantity to execute
+            starting_time: Time to begin the cycle (now if not specified)
+            
+        Returns:
+            Execution results dictionary
+        """
+        if starting_time is None:
+            starting_time = datetime.now()
+        
+        # Initialize order execution tracking
+        execution_record = {
+            'execution_id': f"EXEC-{int(starting_time.timestamp())}",
+            'starting_time': starting_time.isoformat(),
+            'initial_midpoint': initial_midpoint,
+            'side': side.upper(),
+            'quantity': quantity,
+            'total_cost': 0.0,
+            'total_fills': 0,
+            'fill_prices': [],
+            'execution_stages': {},
+            'success': False
+        }
+        
+        # Get initial market conditions
+        bid = initial_midpoint - 0.005
+        ask = initial_midpoint + 0.005
+        
+        # Stage 1: Place at mid - 0.5 cents
+        stage1_price = self.create_stage1_price(initial_midpoint)
+        
+        # For buy orders, ensure limit price is <= highest possible execution
+        # For sell orders, ensure limit price is >= lowest possible execution
+        if side.lower() == 'buy':
+            stage1_valid = stage1_price <= (initial_midpoint + 0.04)
+        else:  # sell
+            stage1_valid = stage1_price >= (initial_midpoint - 0.04)
+        
+        stage1_fill_qty = 0
+        stage1_cost = 0.0
+        
+        if stage1_valid:
+            # Simulate whether the order fills based on market conditions
+            # The midpoint - 0.5 cents order has a chance of filling if it's in play
+            if side.lower() == 'buy' and stage1_price >= bid:  # Buy order price competes with offer
+                fill_likelihood = min(1.0, (stage1_price - bid) / 0.01) if bid != stage1_price else 0.1
+            elif side.lower() == 'sell' and stage1_price <= ask:  # Sell order price competes with bid
+                fill_likelihood = min(1.0, (ask - stage1_price) / 0.01) if stage1_price != ask else 0.1
+            else:
+                fill_likelihood = 0.0  # Order too far out of market
+            
+            # Randomly determine if partial or full fill based on liquidity model
+            random_value = np.random.rand()
+            if quantity == 1:
+                # For single unit orders, use fill likelihood
+                stage1_fill_qty = 1 if random_value < fill_likelihood else 0
+            else:
+                # For larger orders, fill proportionately with randomness
+                avg_filled = quantity * fill_likelihood
+                stage1_fill_qty = int(np.random.poisson(avg_filled))
+                stage1_fill_qty = min(stage1_fill_qty, quantity)  # Cap at max quantity
+        
+        if stage1_fill_qty > 0:
+            stage1_cost = stage1_fill_qty * stage1_price
+            execution_record['success'] = True  # We have some fills
+            execution_record['total_fills'] = stage1_fill_qty
+            execution_record['total_cost'] = stage1_cost
+            execution_record['fill_prices'].extend([stage1_price] * stage1_fill_qty)
+        else:
+            # Proceed to stage 2 if stage 1 unfilled
+            stage2_price = self.create_stage2_price(initial_midpoint)
+            remaining_quantity = quantity - stage1_fill_qty
+            
+            # Simulate fill probability at midpoint (likely higher than stage1)
+            if side.lower() == 'buy' and stage2_price >= bid:
+                stage2_fill_prob = 0.7  # Midpoint orders usually fill well
+            elif side.lower() == 'sell' and stage2_price <= ask:
+                stage2_fill_prob = 0.7
+            else:
+                stage2_fill_prob = 0.1  # Still out of market
+            
+            random_value = np.random.rand()
+            if remaining_quantity == 1:
+                stage2_fill_qty = 1 if random_value < stage2_fill_prob else 0
+            else:
+                avg_filled_stage2 = remaining_quantity * stage2_fill_prob
+                stage2_fill_qty = int(np.random.poisson(avg_filled_stage2))
+                stage2_fill_qty = min(stage2_fill_qty, remaining_quantity)
+            
+            if stage2_fill_qty > 0:
+                stage2_cost = stage2_fill_qty * stage2_price
+                execution_record['success'] = True  # We have some fills
+                execution_record['total_fills'] += stage2_fill_qty
+                execution_record['total_cost'] += stage2_cost
+                execution_record['fill_prices'].extend([stage2_price] * stage2_fill_qty)
+            else:
+                # Stage 3: Aggressive execution at marketable price
+                stage3_price = self.create_stage3_price(initial_midpoint, side)
+                remaining_quantity = quantity - stage1_fill_qty - stage2_fill_qty
+                
+                # Guaranteed (or highly likely) fill at aggressive price
+                stage3_fill_qty = min(remaining_quantity, quantity // 2 + 1)  # At least try to fill most
+                stage3_cost = stage3_fill_qty * stage3_price
+                execution_record['total_fills'] += stage3_fill_qty
+                execution_record['total_cost'] += stage3_cost
+                execution_record['fill_prices'].extend([stage3_price] * stage3_fill_qty)
+                execution_record['success'] = stage3_fill_qty > 0
+        
+        # Calculate slippage metrics
+        target_value = quantity * initial_midpoint
+        actual_cost = execution_record['total_cost']
+        
+        if side.lower() == 'buy':
+            # With purchase, higher cost means negative slippage
+            execution_record['slippage_usd'] = actual_cost - (execution_record['total_fills'] * initial_midpoint)
+        else:
+            # With selling, lower proceeds mean negative slippage 
+            execution_record['slippage_usd'] = (execution_record['total_fills'] * initial_midpoint) - actual_cost
+
+        execution_record['performance_metrics'] = {
+            'fill_rate': execution_record['total_fills'] / quantity if quantity > 0 else 0,
+            'cost_per_unit': actual_cost / execution_record['total_fills'] if execution_record['total_fills'] > 0 else None,
+            'avg_execution_price': actual_cost / execution_record['total_fills'] if execution_record['total_fills'] > 0 else initial_midpoint
+        }
+        
+        # Record execution
+        self.execution_history.append(execution_record)
+        
+        return execution_record
+
+    def get_performance_stats(self) -> Dict[str, Any]:
+        """
+        Generate performance statistics for all execution attempts
+        """
+        if not self.execution_history:
+            return {
+                'total_executions': 0,
+                'successful_executions': 0,
+                'fill_rate_average': 0.0,
+                'avg_slippage_per_order': 0.0,
+                'total_volume_executed': 0
+            }
+        
+        success_count = sum(1 for ex in self.execution_history if ex['success'])
+        fill_rates = [ex['performance_metrics']['fill_rate'] for ex in self.execution_history if 'performance_metrics' in ex and ex['performance_metrics']]
+        avg_fill_rate = np.mean(fill_rates) if fill_rates else 0.0
+        slippage_values = [ex.get('slippage_usd', 0) for ex in self.execution_history]
+        avg_slippage = np.mean(slippage_values) if slippage_values else 0.0
+        total_volume = sum(ex['total_fills'] for ex in self.execution_history)
+        
+        return {
+            'total_executions': len(self.execution_history),
+            'successful_executions': success_count,
+            'success_rate': success_count / len(self.execution_history) if len(self.execution_history) > 0 else 0.0,
+            'fill_rate_average': avg_fill_rate,
+            'avg_slippage_per_order': avg_slippage,
+            'total_volume_executed': total_volume,
+            'slippage_variance': np.var(slippage_values) if slippage_values else 0.0
+        }
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Multi-stage order execution')
+    parser.add_argument('--target_price', type=float, required=True, help='Target price level')
+    parser.add_argument('--side', type=str, required=True, choices=['buy', 'sell'], help='Buy or sell position')
+    parser.add_argument('--quantity', type=int, default=10, help='Quantity to execute')
+    
+    args = parser.parse_args()
+    
+    executor = MultiStageExecutor()
+    
+    # Perform an execution cycle with mock data
+    execution_result = executor.execute_single_cycle(
+        initial_midpoint=args.target_price,
+        side=args.side,
+        quantity=args.quantity
+    )
+    
+    print(f"Multi-Stage Execution Result:")
+    print(f"  Execution ID: {execution_result['execution_id']}")
+    print(f"  Side: {execution_result['side']}")
+    print(f"  Quantity: {execution_result['quantity']}")
+    print(f"  Filled: {execution_result['total_fills']}/{execution_result['quantity']}")
+    print(f"  Success: {'Yes' if execution_result['success'] else 'No'}")
+    print(f"  Avg Fill Price: ${execution_result['performance_metrics']['avg_execution_price']:.4f}")
+    print(f"  Slippage: ${execution_result['slippage_usd']:.4f}")
+    
+    if execution_result['performance_metrics']['fill_rate'] < 0.8:
+        print(f"\n  WARNING: Low fill rate ({execution_result['performance_metrics']['fill_rate']:.2%}) suggests market conditions may need monitoring")
+    
+    # Show performance stats
+    perf_stats = executor.get_performance_stats()
+    print(f"\nCumulative Performance Stats:")
+    print(f"  Total Executions: {perf_stats['total_executions']}")
+    print(f"  Success Rate: {perf_stats['success_rate']:.2%}")
+    print(f"  Avg Fill Rate: {perf_stats['fill_rate_average']:.2%}")
+    print(f"  Avg Slippage: ${perf_stats['avg_slippage_per_order']:.4f}")
+
+
+if __name__ == "__main__":
+    main()
