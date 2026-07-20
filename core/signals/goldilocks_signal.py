@@ -114,7 +114,7 @@ class GoldilocksSignal(BaseSignal):
         yesterday_high = _safe_get(days, idx - 1, 'high')
         day_before_high = _safe_get(days, idx - 2, 'high')
 
-        if today_high is None or yesterday_high is None:
+        if day_before_high is None or yesterday_high is None:
             return None, 0.0
 
         # Calculate temperature change using only prior-day data
