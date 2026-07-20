@@ -1,0 +1,2008 @@
+{
+  "wind_direction_shift": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.5994,
+    "cross_station_mean_accuracy": 0.5886,
+    "cross_station_mean_trades": 447.4,
+    "cross_station_mean_brier": 0.2837,
+    "cross_station_mean_ece": 0.1912,
+    "cross_station_mean_sharpe": 2.9466,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.6323,
+        "trade_count": 310,
+        "mean_confidence": 0.6394,
+        "brier_score": 0.2273,
+        "ece": 0.0604,
+        "sharpe": 4.3471,
+        "up_accuracy": 0.3282,
+        "down_accuracy": 0.8547
+      },
+      "KAUS": {
+        "accuracy": 0.5907,
+        "trade_count": 259,
+        "mean_confidence": 0.6977,
+        "brier_score": 0.2884,
+        "ece": 0.2018,
+        "sharpe": 2.9237,
+        "up_accuracy": 0.3333,
+        "down_accuracy": 0.945
+      },
+      "KBOS": {
+        "accuracy": 0.6141,
+        "trade_count": 907,
+        "mean_confidence": 0.6457,
+        "brier_score": 0.2357,
+        "ece": 0.0587,
+        "sharpe": 3.7191,
+        "up_accuracy": 0.5089,
+        "down_accuracy": 0.6953
+      },
+      "KDCA": {
+        "accuracy": 0.7044,
+        "trade_count": 389,
+        "mean_confidence": 0.6667,
+        "brier_score": 0.2306,
+        "ece": 0.144,
+        "sharpe": 7.1004,
+        "up_accuracy": 0.4885,
+        "down_accuracy": 0.814
+      },
+      "KDEN": {
+        "accuracy": 0.4599,
+        "trade_count": 424,
+        "mean_confidence": 0.698,
+        "brier_score": 0.3321,
+        "ece": 0.2433,
+        "sharpe": -1.2756,
+        "up_accuracy": 0.3345,
+        "down_accuracy": 0.75
+      },
+      "KDFW": {
+        "accuracy": 0.6209,
+        "trade_count": 728,
+        "mean_confidence": 0.7355,
+        "brier_score": 0.2746,
+        "ece": 0.1889,
+        "sharpe": 3.9524,
+        "up_accuracy": 0.465,
+        "down_accuracy": 0.9066
+      },
+      "KHOU": {
+        "accuracy": 0.6176,
+        "trade_count": 272,
+        "mean_confidence": 0.6835,
+        "brier_score": 0.2799,
+        "ece": 0.2114,
+        "sharpe": 3.836,
+        "up_accuracy": 0.3139,
+        "down_accuracy": 0.9259
+      },
+      "KLAS": {
+        "accuracy": 0.3074,
+        "trade_count": 309,
+        "mean_confidence": 0.7227,
+        "brier_score": 0.4625,
+        "ece": 0.4243,
+        "sharpe": -6.6137,
+        "up_accuracy": 0.1142,
+        "down_accuracy": 0.7778
+      },
+      "KLAX": {
+        "accuracy": 0.6111,
+        "trade_count": 108,
+        "mean_confidence": 0.64,
+        "brier_score": 0.2947,
+        "ece": 0.2465,
+        "sharpe": 3.6013,
+        "up_accuracy": 0.5,
+        "down_accuracy": 0.6875
+      },
+      "KMDW": {
+        "accuracy": 0.6327,
+        "trade_count": 776,
+        "mean_confidence": 0.6547,
+        "brier_score": 0.264,
+        "ece": 0.1751,
+        "sharpe": 4.3681,
+        "up_accuracy": 0.4697,
+        "down_accuracy": 0.8026
+      },
+      "KMIA": {
+        "accuracy": 0.5694,
+        "trade_count": 144,
+        "mean_confidence": 0.6071,
+        "brier_score": 0.2404,
+        "ece": 0.0377,
+        "sharpe": 2.2186,
+        "up_accuracy": 0.5484,
+        "down_accuracy": 0.7
+      },
+      "KMSP": {
+        "accuracy": 0.6857,
+        "trade_count": 684,
+        "mean_confidence": 0.6628,
+        "brier_score": 0.2393,
+        "ece": 0.1453,
+        "sharpe": 6.3443,
+        "up_accuracy": 0.5159,
+        "down_accuracy": 0.8297
+      },
+      "KMSY": {
+        "accuracy": 0.6702,
+        "trade_count": 282,
+        "mean_confidence": 0.6668,
+        "brier_score": 0.2408,
+        "ece": 0.1606,
+        "sharpe": 5.7372,
+        "up_accuracy": 0.44,
+        "down_accuracy": 0.9318
+      },
+      "KNYC": {
+        "accuracy": 0.5372,
+        "trade_count": 914,
+        "mean_confidence": 0.6324,
+        "brier_score": 0.2687,
+        "ece": 0.0952,
+        "sharpe": 1.1837,
+        "up_accuracy": 0.3723,
+        "down_accuracy": 0.6524
+      },
+      "KOKC": {
+        "accuracy": 0.5953,
+        "trade_count": 887,
+        "mean_confidence": 0.7274,
+        "brier_score": 0.2716,
+        "ece": 0.1375,
+        "sharpe": 3.0793,
+        "up_accuracy": 0.4724,
+        "down_accuracy": 0.8745
+      },
+      "KPHL": {
+        "accuracy": 0.5988,
+        "trade_count": 501,
+        "mean_confidence": 0.6257,
+        "brier_score": 0.2632,
+        "ece": 0.129,
+        "sharpe": 3.1968,
+        "up_accuracy": 0.3704,
+        "down_accuracy": 0.708
+      },
+      "KPHX": {
+        "accuracy": 0.6429,
+        "trade_count": 70,
+        "mean_confidence": 0.5796,
+        "brier_score": 0.3274,
+        "ece": 0.3864,
+        "sharpe": 4.6989,
+        "up_accuracy": 0.2083,
+        "down_accuracy": 0.8696
+      },
+      "KSAT": {
+        "accuracy": 0.5613,
+        "trade_count": 253,
+        "mean_confidence": 0.6822,
+        "brier_score": 0.3003,
+        "ece": 0.2077,
+        "sharpe": 1.956,
+        "up_accuracy": 0.3593,
+        "down_accuracy": 0.9535
+      },
+      "KSEA": {
+        "accuracy": 0.4,
+        "trade_count": 140,
+        "mean_confidence": 0.7377,
+        "brier_score": 0.3795,
+        "ece": 0.3377,
+        "sharpe": -3.2288,
+        "up_accuracy": 0.3893,
+        "down_accuracy": 0.5556
+      },
+      "KSFO": {
+        "accuracy": 0.7203,
+        "trade_count": 590,
+        "mean_confidence": 0.6209,
+        "brier_score": 0.2526,
+        "ece": 0.2321,
+        "sharpe": 7.7864,
+        "up_accuracy": 0.5602,
+        "down_accuracy": 0.8128
+      }
+    }
+  },
+  "nwp_analog": {
+    "status": "ok",
+    "stations_tested": 0,
+    "overall_accuracy": 0.0,
+    "cross_station_mean_accuracy": 0.0,
+    "cross_station_mean_trades": 0,
+    "cross_station_mean_brier": 0.0,
+    "cross_station_mean_ece": 0.0,
+    "cross_station_mean_sharpe": 0.0,
+    "per_station": {}
+  },
+  "goldilocks": {
+    "status": "skipped",
+    "reason": "runtime error (NameError)"
+  },
+  "persistence": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.5094,
+    "cross_station_mean_accuracy": 0.5095,
+    "cross_station_mean_trades": 3030,
+    "cross_station_mean_brier": 0.2938,
+    "cross_station_mean_ece": 0.2095,
+    "cross_station_mean_sharpe": 0.3066,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.5007,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2903,
+        "ece": 0.2007,
+        "sharpe": 0.021,
+        "up_accuracy": 0.4706,
+        "down_accuracy": 0.5275
+      },
+      "KAUS": {
+        "accuracy": 0.4894,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2858,
+        "ece": 0.1894,
+        "sharpe": -0.3353,
+        "up_accuracy": 0.4382,
+        "down_accuracy": 0.532
+      },
+      "KBOS": {
+        "accuracy": 0.4911,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2864,
+        "ece": 0.1911,
+        "sharpe": -0.2829,
+        "up_accuracy": 0.4289,
+        "down_accuracy": 0.5411
+      },
+      "KDCA": {
+        "accuracy": 0.4934,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2874,
+        "ece": 0.1934,
+        "sharpe": -0.2095,
+        "up_accuracy": 0.4599,
+        "down_accuracy": 0.523
+      },
+      "KDEN": {
+        "accuracy": 0.4884,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2854,
+        "ece": 0.1884,
+        "sharpe": -0.3668,
+        "up_accuracy": 0.4355,
+        "down_accuracy": 0.5323
+      },
+      "KDFW": {
+        "accuracy": 0.5267,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.3007,
+        "ece": 0.2267,
+        "sharpe": 0.8498,
+        "up_accuracy": 0.4882,
+        "down_accuracy": 0.5599
+      },
+      "KHOU": {
+        "accuracy": 0.4799,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2819,
+        "ece": 0.1799,
+        "sharpe": -0.6396,
+        "up_accuracy": 0.4435,
+        "down_accuracy": 0.5118
+      },
+      "KLAS": {
+        "accuracy": 0.5779,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.3212,
+        "ece": 0.2779,
+        "sharpe": 2.503,
+        "up_accuracy": 0.5221,
+        "down_accuracy": 0.622
+      },
+      "KLAX": {
+        "accuracy": 0.4934,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2874,
+        "ece": 0.1934,
+        "sharpe": -0.2095,
+        "up_accuracy": 0.3695,
+        "down_accuracy": 0.5767
+      },
+      "KMDW": {
+        "accuracy": 0.5366,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.3047,
+        "ece": 0.2366,
+        "sharpe": 1.166,
+        "up_accuracy": 0.4898,
+        "down_accuracy": 0.5756
+      },
+      "KMIA": {
+        "accuracy": 0.4809,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2823,
+        "ece": 0.1809,
+        "sharpe": -0.6081,
+        "up_accuracy": 0.3861,
+        "down_accuracy": 0.5503
+      },
+      "KMSP": {
+        "accuracy": 0.5337,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.3035,
+        "ece": 0.2337,
+        "sharpe": 1.071,
+        "up_accuracy": 0.4805,
+        "down_accuracy": 0.5769
+      },
+      "KMSY": {
+        "accuracy": 0.4772,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2809,
+        "ece": 0.1772,
+        "sharpe": -0.7236,
+        "up_accuracy": 0.4407,
+        "down_accuracy": 0.5093
+      },
+      "KNYC": {
+        "accuracy": 0.5056,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2922,
+        "ece": 0.2056,
+        "sharpe": 0.1781,
+        "up_accuracy": 0.4525,
+        "down_accuracy": 0.5493
+      },
+      "KOKC": {
+        "accuracy": 0.5185,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2974,
+        "ece": 0.2185,
+        "sharpe": 0.5871,
+        "up_accuracy": 0.4923,
+        "down_accuracy": 0.542
+      },
+      "KPHL": {
+        "accuracy": 0.502,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2908,
+        "ece": 0.202,
+        "sharpe": 0.0629,
+        "up_accuracy": 0.4702,
+        "down_accuracy": 0.5302
+      },
+      "KPHX": {
+        "accuracy": 0.5851,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.3241,
+        "ece": 0.2851,
+        "sharpe": 2.743,
+        "up_accuracy": 0.518,
+        "down_accuracy": 0.6359
+      },
+      "KSAT": {
+        "accuracy": 0.4815,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2826,
+        "ece": 0.1815,
+        "sharpe": -0.5871,
+        "up_accuracy": 0.4221,
+        "down_accuracy": 0.5299
+      },
+      "KSEA": {
+        "accuracy": 0.5271,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.3008,
+        "ece": 0.2271,
+        "sharpe": 0.8603,
+        "up_accuracy": 0.4882,
+        "down_accuracy": 0.5604
+      },
+      "KSFO": {
+        "accuracy": 0.5017,
+        "trade_count": 3030,
+        "mean_confidence": 0.3,
+        "brier_score": 0.2907,
+        "ece": 0.2017,
+        "sharpe": 0.0524,
+        "up_accuracy": 0.3945,
+        "down_accuracy": 0.5766
+      }
+    }
+  },
+  "simple_trend": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.5094,
+    "cross_station_mean_accuracy": 0.5095,
+    "cross_station_mean_trades": 3030,
+    "cross_station_mean_brier": 0.2619,
+    "cross_station_mean_ece": 0.1095,
+    "cross_station_mean_sharpe": 0.3066,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.5007,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2601,
+        "ece": 0.1007,
+        "sharpe": 0.021,
+        "up_accuracy": 0.4706,
+        "down_accuracy": 0.5275
+      },
+      "KAUS": {
+        "accuracy": 0.4894,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2579,
+        "ece": 0.0894,
+        "sharpe": -0.3353,
+        "up_accuracy": 0.4382,
+        "down_accuracy": 0.532
+      },
+      "KBOS": {
+        "accuracy": 0.4911,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2582,
+        "ece": 0.0911,
+        "sharpe": -0.2829,
+        "up_accuracy": 0.4289,
+        "down_accuracy": 0.5411
+      },
+      "KDCA": {
+        "accuracy": 0.4934,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2587,
+        "ece": 0.0934,
+        "sharpe": -0.2095,
+        "up_accuracy": 0.4599,
+        "down_accuracy": 0.523
+      },
+      "KDEN": {
+        "accuracy": 0.4884,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2577,
+        "ece": 0.0884,
+        "sharpe": -0.3668,
+        "up_accuracy": 0.4355,
+        "down_accuracy": 0.5323
+      },
+      "KDFW": {
+        "accuracy": 0.5267,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2653,
+        "ece": 0.1267,
+        "sharpe": 0.8498,
+        "up_accuracy": 0.4882,
+        "down_accuracy": 0.5599
+      },
+      "KHOU": {
+        "accuracy": 0.4799,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.256,
+        "ece": 0.0799,
+        "sharpe": -0.6396,
+        "up_accuracy": 0.4435,
+        "down_accuracy": 0.5118
+      },
+      "KLAS": {
+        "accuracy": 0.5779,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2756,
+        "ece": 0.1779,
+        "sharpe": 2.503,
+        "up_accuracy": 0.5221,
+        "down_accuracy": 0.622
+      },
+      "KLAX": {
+        "accuracy": 0.4934,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2587,
+        "ece": 0.0934,
+        "sharpe": -0.2095,
+        "up_accuracy": 0.3695,
+        "down_accuracy": 0.5767
+      },
+      "KMDW": {
+        "accuracy": 0.5366,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2673,
+        "ece": 0.1366,
+        "sharpe": 1.166,
+        "up_accuracy": 0.4898,
+        "down_accuracy": 0.5756
+      },
+      "KMIA": {
+        "accuracy": 0.4809,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2562,
+        "ece": 0.0809,
+        "sharpe": -0.6081,
+        "up_accuracy": 0.3861,
+        "down_accuracy": 0.5503
+      },
+      "KMSP": {
+        "accuracy": 0.5337,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2667,
+        "ece": 0.1337,
+        "sharpe": 1.071,
+        "up_accuracy": 0.4805,
+        "down_accuracy": 0.5769
+      },
+      "KMSY": {
+        "accuracy": 0.4772,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2554,
+        "ece": 0.0772,
+        "sharpe": -0.7236,
+        "up_accuracy": 0.4407,
+        "down_accuracy": 0.5093
+      },
+      "KNYC": {
+        "accuracy": 0.5056,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2611,
+        "ece": 0.1056,
+        "sharpe": 0.1781,
+        "up_accuracy": 0.4525,
+        "down_accuracy": 0.5493
+      },
+      "KOKC": {
+        "accuracy": 0.5185,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2637,
+        "ece": 0.1185,
+        "sharpe": 0.5871,
+        "up_accuracy": 0.4923,
+        "down_accuracy": 0.542
+      },
+      "KPHL": {
+        "accuracy": 0.502,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2604,
+        "ece": 0.102,
+        "sharpe": 0.0629,
+        "up_accuracy": 0.4702,
+        "down_accuracy": 0.5302
+      },
+      "KPHX": {
+        "accuracy": 0.5851,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.277,
+        "ece": 0.1851,
+        "sharpe": 2.743,
+        "up_accuracy": 0.518,
+        "down_accuracy": 0.6359
+      },
+      "KSAT": {
+        "accuracy": 0.4815,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2563,
+        "ece": 0.0815,
+        "sharpe": -0.5871,
+        "up_accuracy": 0.4221,
+        "down_accuracy": 0.5299
+      },
+      "KSEA": {
+        "accuracy": 0.5271,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2654,
+        "ece": 0.1271,
+        "sharpe": 0.8603,
+        "up_accuracy": 0.4882,
+        "down_accuracy": 0.5604
+      },
+      "KSFO": {
+        "accuracy": 0.5017,
+        "trade_count": 3030,
+        "mean_confidence": 0.4,
+        "brier_score": 0.2603,
+        "ece": 0.1017,
+        "sharpe": 0.0524,
+        "up_accuracy": 0.3945,
+        "down_accuracy": 0.5766
+      }
+    }
+  },
+  "gaussian": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.6638,
+    "cross_station_mean_accuracy": 0.6666,
+    "cross_station_mean_trades": 1300.0,
+    "cross_station_mean_brier": 0.3334,
+    "cross_station_mean_ece": 0.0,
+    "cross_station_mean_sharpe": 5.6695,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.6674,
+        "trade_count": 1368,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3326,
+        "ece": 0.0,
+        "sharpe": 5.6381,
+        "up_accuracy": 0.6437,
+        "down_accuracy": 0.6891
+      },
+      "KAUS": {
+        "accuracy": 0.6995,
+        "trade_count": 1268,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3005,
+        "ece": 0.0,
+        "sharpe": 6.906,
+        "up_accuracy": 0.6544,
+        "down_accuracy": 0.7396
+      },
+      "KBOS": {
+        "accuracy": 0.6856,
+        "trade_count": 1301,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3144,
+        "ece": 0.0,
+        "sharpe": 6.3446,
+        "up_accuracy": 0.6115,
+        "down_accuracy": 0.766
+      },
+      "KDCA": {
+        "accuracy": 0.6723,
+        "trade_count": 1352,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3277,
+        "ece": 0.0,
+        "sharpe": 5.8266,
+        "up_accuracy": 0.6327,
+        "down_accuracy": 0.7145
+      },
+      "KDEN": {
+        "accuracy": 0.7053,
+        "trade_count": 1225,
+        "mean_confidence": 1.0,
+        "brier_score": 0.2947,
+        "ece": 0.0,
+        "sharpe": 7.1458,
+        "up_accuracy": 0.6533,
+        "down_accuracy": 0.7548
+      },
+      "KDFW": {
+        "accuracy": 0.6833,
+        "trade_count": 1279,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3167,
+        "ece": 0.0,
+        "sharpe": 6.2545,
+        "up_accuracy": 0.6438,
+        "down_accuracy": 0.7196
+      },
+      "KHOU": {
+        "accuracy": 0.6811,
+        "trade_count": 1314,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3189,
+        "ece": 0.0,
+        "sharpe": 6.1673,
+        "up_accuracy": 0.6322,
+        "down_accuracy": 0.7234
+      },
+      "KLAS": {
+        "accuracy": 0.5606,
+        "trade_count": 1552,
+        "mean_confidence": 1.0,
+        "brier_score": 0.4394,
+        "ece": 0.0,
+        "sharpe": 1.9366,
+        "up_accuracy": 0.5013,
+        "down_accuracy": 0.6183
+      },
+      "KLAX": {
+        "accuracy": 0.6837,
+        "trade_count": 1132,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3163,
+        "ece": 0.0,
+        "sharpe": 6.2699,
+        "up_accuracy": 0.5852,
+        "down_accuracy": 0.7581
+      },
+      "KMDW": {
+        "accuracy": 0.6688,
+        "trade_count": 1241,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3312,
+        "ece": 0.0,
+        "sharpe": 5.6918,
+        "up_accuracy": 0.609,
+        "down_accuracy": 0.734
+      },
+      "KMIA": {
+        "accuracy": 0.7396,
+        "trade_count": 1125,
+        "mean_confidence": 1.0,
+        "brier_score": 0.2604,
+        "ece": 0.0,
+        "sharpe": 8.661,
+        "up_accuracy": 0.6532,
+        "down_accuracy": 0.8207
+      },
+      "KMSP": {
+        "accuracy": 0.661,
+        "trade_count": 1289,
+        "mean_confidence": 1.0,
+        "brier_score": 0.339,
+        "ece": 0.0,
+        "sharpe": 5.3962,
+        "up_accuracy": 0.5909,
+        "down_accuracy": 0.7397
+      },
+      "KMSY": {
+        "accuracy": 0.6792,
+        "trade_count": 1384,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3208,
+        "ece": 0.0,
+        "sharpe": 6.0917,
+        "up_accuracy": 0.6296,
+        "down_accuracy": 0.7174
+      },
+      "KNYC": {
+        "accuracy": 0.6468,
+        "trade_count": 1339,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3532,
+        "ece": 0.0,
+        "sharpe": 4.872,
+        "up_accuracy": 0.5863,
+        "down_accuracy": 0.7132
+      },
+      "KOKC": {
+        "accuracy": 0.676,
+        "trade_count": 1358,
+        "mean_confidence": 1.0,
+        "brier_score": 0.324,
+        "ece": 0.0,
+        "sharpe": 5.9675,
+        "up_accuracy": 0.6369,
+        "down_accuracy": 0.7096
+      },
+      "KPHL": {
+        "accuracy": 0.647,
+        "trade_count": 1371,
+        "mean_confidence": 1.0,
+        "brier_score": 0.353,
+        "ece": 0.0,
+        "sharpe": 4.8801,
+        "up_accuracy": 0.6028,
+        "down_accuracy": 0.6937
+      },
+      "KPHX": {
+        "accuracy": 0.62,
+        "trade_count": 1513,
+        "mean_confidence": 1.0,
+        "brier_score": 0.38,
+        "ece": 0.0,
+        "sharpe": 3.9219,
+        "up_accuracy": 0.5612,
+        "down_accuracy": 0.6781
+      },
+      "KSAT": {
+        "accuracy": 0.6953,
+        "trade_count": 1244,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3047,
+        "ece": 0.0,
+        "sharpe": 6.7345,
+        "up_accuracy": 0.6351,
+        "down_accuracy": 0.7578
+      },
+      "KSEA": {
+        "accuracy": 0.5781,
+        "trade_count": 1318,
+        "mean_confidence": 1.0,
+        "brier_score": 0.4219,
+        "ece": 0.0,
+        "sharpe": 2.5111,
+        "up_accuracy": 0.5293,
+        "down_accuracy": 0.6333
+      },
+      "KSFO": {
+        "accuracy": 0.6813,
+        "trade_count": 1026,
+        "mean_confidence": 1.0,
+        "brier_score": 0.3187,
+        "ece": 0.0,
+        "sharpe": 6.1729,
+        "up_accuracy": 0.5761,
+        "down_accuracy": 0.789
+      }
+    }
+  },
+  "gaussian_v2": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.639,
+    "cross_station_mean_accuracy": 0.6395,
+    "cross_station_mean_trades": 2079.4,
+    "cross_station_mean_brier": 0.3054,
+    "cross_station_mean_ece": 0.0685,
+    "cross_station_mean_sharpe": 4.6359,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.6349,
+        "trade_count": 2090,
+        "mean_confidence": 0.9002,
+        "brier_score": 0.305,
+        "ece": 0.071,
+        "sharpe": 4.4478,
+        "up_accuracy": 0.6113,
+        "down_accuracy": 0.6561
+      },
+      "KAUS": {
+        "accuracy": 0.6649,
+        "trade_count": 2110,
+        "mean_confidence": 0.8959,
+        "brier_score": 0.2848,
+        "ece": 0.0523,
+        "sharpe": 5.5455,
+        "up_accuracy": 0.6317,
+        "down_accuracy": 0.6895
+      },
+      "KBOS": {
+        "accuracy": 0.6746,
+        "trade_count": 2056,
+        "mean_confidence": 0.8919,
+        "brier_score": 0.2799,
+        "ece": 0.0496,
+        "sharpe": 5.9148,
+        "up_accuracy": 0.6163,
+        "down_accuracy": 0.7407
+      },
+      "KDCA": {
+        "accuracy": 0.6492,
+        "trade_count": 2104,
+        "mean_confidence": 0.9017,
+        "brier_score": 0.3091,
+        "ece": 0.0582,
+        "sharpe": 4.9633,
+        "up_accuracy": 0.6186,
+        "down_accuracy": 0.6808
+      },
+      "KDEN": {
+        "accuracy": 0.6635,
+        "trade_count": 2077,
+        "mean_confidence": 0.8873,
+        "brier_score": 0.2773,
+        "ece": 0.0757,
+        "sharpe": 5.49,
+        "up_accuracy": 0.6109,
+        "down_accuracy": 0.7068
+      },
+      "KDFW": {
+        "accuracy": 0.6445,
+        "trade_count": 2132,
+        "mean_confidence": 0.8875,
+        "brier_score": 0.2973,
+        "ece": 0.0644,
+        "sharpe": 4.7898,
+        "up_accuracy": 0.6206,
+        "down_accuracy": 0.6633
+      },
+      "KHOU": {
+        "accuracy": 0.6534,
+        "trade_count": 2158,
+        "mean_confidence": 0.8955,
+        "brier_score": 0.295,
+        "ece": 0.054,
+        "sharpe": 5.1153,
+        "up_accuracy": 0.6222,
+        "down_accuracy": 0.676
+      },
+      "KLAS": {
+        "accuracy": 0.5763,
+        "trade_count": 2143,
+        "mean_confidence": 0.9179,
+        "brier_score": 0.3798,
+        "ece": 0.0779,
+        "sharpe": 2.4504,
+        "up_accuracy": 0.5244,
+        "down_accuracy": 0.6259
+      },
+      "KLAX": {
+        "accuracy": 0.6275,
+        "trade_count": 1989,
+        "mean_confidence": 0.8856,
+        "brier_score": 0.3018,
+        "ece": 0.0872,
+        "sharpe": 4.1836,
+        "up_accuracy": 0.53,
+        "down_accuracy": 0.7294
+      },
+      "KMDW": {
+        "accuracy": 0.6304,
+        "trade_count": 2105,
+        "mean_confidence": 0.8949,
+        "brier_score": 0.3099,
+        "ece": 0.0712,
+        "sharpe": 4.2876,
+        "up_accuracy": 0.5826,
+        "down_accuracy": 0.6795
+      },
+      "KMIA": {
+        "accuracy": 0.6874,
+        "trade_count": 1942,
+        "mean_confidence": 0.8765,
+        "brier_score": 0.2557,
+        "ece": 0.0685,
+        "sharpe": 6.4173,
+        "up_accuracy": 0.639,
+        "down_accuracy": 0.7265
+      },
+      "KMSP": {
+        "accuracy": 0.6312,
+        "trade_count": 2050,
+        "mean_confidence": 0.8969,
+        "brier_score": 0.31,
+        "ece": 0.0632,
+        "sharpe": 4.3164,
+        "up_accuracy": 0.5756,
+        "down_accuracy": 0.6841
+      },
+      "KMSY": {
+        "accuracy": 0.6537,
+        "trade_count": 2137,
+        "mean_confidence": 0.8961,
+        "brier_score": 0.2955,
+        "ece": 0.0623,
+        "sharpe": 5.1277,
+        "up_accuracy": 0.6282,
+        "down_accuracy": 0.6733
+      },
+      "KNYC": {
+        "accuracy": 0.6406,
+        "trade_count": 2070,
+        "mean_confidence": 0.8953,
+        "brier_score": 0.3099,
+        "ece": 0.0735,
+        "sharpe": 4.6498,
+        "up_accuracy": 0.5909,
+        "down_accuracy": 0.6964
+      },
+      "KOKC": {
+        "accuracy": 0.6441,
+        "trade_count": 2127,
+        "mean_confidence": 0.8978,
+        "brier_score": 0.3013,
+        "ece": 0.0723,
+        "sharpe": 4.7766,
+        "up_accuracy": 0.6317,
+        "down_accuracy": 0.6545
+      },
+      "KPHL": {
+        "accuracy": 0.6351,
+        "trade_count": 2094,
+        "mean_confidence": 0.9014,
+        "brier_score": 0.3185,
+        "ece": 0.0715,
+        "sharpe": 4.4556,
+        "up_accuracy": 0.6019,
+        "down_accuracy": 0.6699
+      },
+      "KPHX": {
+        "accuracy": 0.5922,
+        "trade_count": 2197,
+        "mean_confidence": 0.9033,
+        "brier_score": 0.343,
+        "ece": 0.0736,
+        "sharpe": 2.9767,
+        "up_accuracy": 0.5297,
+        "down_accuracy": 0.6505
+      },
+      "KSAT": {
+        "accuracy": 0.667,
+        "trade_count": 2036,
+        "mean_confidence": 0.8905,
+        "brier_score": 0.2786,
+        "ece": 0.057,
+        "sharpe": 5.6235,
+        "up_accuracy": 0.621,
+        "down_accuracy": 0.7044
+      },
+      "KSEA": {
+        "accuracy": 0.5869,
+        "trade_count": 2082,
+        "mean_confidence": 0.8951,
+        "brier_score": 0.3539,
+        "ece": 0.0757,
+        "sharpe": 2.8021,
+        "up_accuracy": 0.5486,
+        "down_accuracy": 0.6326
+      },
+      "KSFO": {
+        "accuracy": 0.6331,
+        "trade_count": 1889,
+        "mean_confidence": 0.889,
+        "brier_score": 0.301,
+        "ece": 0.0902,
+        "sharpe": 4.3842,
+        "up_accuracy": 0.5478,
+        "down_accuracy": 0.7416
+      }
+    }
+  },
+  "pressure_delta": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.6099,
+    "cross_station_mean_accuracy": 0.6074,
+    "cross_station_mean_trades": 1734.7,
+    "cross_station_mean_brier": 0.2676,
+    "cross_station_mean_ece": 0.1719,
+    "cross_station_mean_sharpe": 3.5183,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.6089,
+        "trade_count": 1667,
+        "mean_confidence": 0.7753,
+        "brier_score": 0.269,
+        "ece": 0.1664,
+        "sharpe": 3.5407,
+        "up_accuracy": 0.5699,
+        "down_accuracy": 0.6463
+      },
+      "KAUS": {
+        "accuracy": 0.6215,
+        "trade_count": 1601,
+        "mean_confidence": 0.7798,
+        "brier_score": 0.2574,
+        "ece": 0.1584,
+        "sharpe": 3.975,
+        "up_accuracy": 0.5872,
+        "down_accuracy": 0.6541
+      },
+      "KBOS": {
+        "accuracy": 0.6058,
+        "trade_count": 2250,
+        "mean_confidence": 0.7864,
+        "brier_score": 0.2714,
+        "ece": 0.1806,
+        "sharpe": 3.4353,
+        "up_accuracy": 0.5541,
+        "down_accuracy": 0.6586
+      },
+      "KDCA": {
+        "accuracy": 0.6249,
+        "trade_count": 2077,
+        "mean_confidence": 0.7859,
+        "brier_score": 0.2611,
+        "ece": 0.1609,
+        "sharpe": 4.0957,
+        "up_accuracy": 0.6075,
+        "down_accuracy": 0.6416
+      },
+      "KDEN": {
+        "accuracy": 0.6655,
+        "trade_count": 2075,
+        "mean_confidence": 0.7866,
+        "brier_score": 0.2354,
+        "ece": 0.121,
+        "sharpe": 5.5686,
+        "up_accuracy": 0.6145,
+        "down_accuracy": 0.7127
+      },
+      "KDFW": {
+        "accuracy": 0.6164,
+        "trade_count": 1705,
+        "mean_confidence": 0.7799,
+        "brier_score": 0.2625,
+        "ece": 0.1635,
+        "sharpe": 3.7996,
+        "up_accuracy": 0.6005,
+        "down_accuracy": 0.6312
+      },
+      "KHOU": {
+        "accuracy": 0.5802,
+        "trade_count": 1508,
+        "mean_confidence": 0.7793,
+        "brier_score": 0.2825,
+        "ece": 0.1991,
+        "sharpe": 2.5801,
+        "up_accuracy": 0.5645,
+        "down_accuracy": 0.5947
+      },
+      "KLAS": {
+        "accuracy": 0.6632,
+        "trade_count": 1740,
+        "mean_confidence": 0.7761,
+        "brier_score": 0.2337,
+        "ece": 0.1129,
+        "sharpe": 5.4808,
+        "up_accuracy": 0.6223,
+        "down_accuracy": 0.7057
+      },
+      "KLAX": {
+        "accuracy": 0.5247,
+        "trade_count": 1052,
+        "mean_confidence": 0.7624,
+        "brier_score": 0.3087,
+        "ece": 0.2377,
+        "sharpe": 0.7853,
+        "up_accuracy": 0.43,
+        "down_accuracy": 0.6128
+      },
+      "KMDW": {
+        "accuracy": 0.6441,
+        "trade_count": 2068,
+        "mean_confidence": 0.7861,
+        "brier_score": 0.2488,
+        "ece": 0.142,
+        "sharpe": 4.7766,
+        "up_accuracy": 0.6114,
+        "down_accuracy": 0.6759
+      },
+      "KMIA": {
+        "accuracy": 0.562,
+        "trade_count": 968,
+        "mean_confidence": 0.762,
+        "brier_score": 0.2869,
+        "ece": 0.2,
+        "sharpe": 1.9822,
+        "up_accuracy": 0.5064,
+        "down_accuracy": 0.6149
+      },
+      "KMSP": {
+        "accuracy": 0.6071,
+        "trade_count": 2161,
+        "mean_confidence": 0.787,
+        "brier_score": 0.2722,
+        "ece": 0.1799,
+        "sharpe": 3.4812,
+        "up_accuracy": 0.567,
+        "down_accuracy": 0.6453
+      },
+      "KMSY": {
+        "accuracy": 0.5824,
+        "trade_count": 1408,
+        "mean_confidence": 0.7727,
+        "brier_score": 0.2771,
+        "ece": 0.1903,
+        "sharpe": 2.651,
+        "up_accuracy": 0.5675,
+        "down_accuracy": 0.5969
+      },
+      "KNYC": {
+        "accuracy": 0.5813,
+        "trade_count": 2164,
+        "mean_confidence": 0.7869,
+        "brier_score": 0.2834,
+        "ece": 0.2055,
+        "sharpe": 2.6164,
+        "up_accuracy": 0.5444,
+        "down_accuracy": 0.6181
+      },
+      "KOKC": {
+        "accuracy": 0.6075,
+        "trade_count": 1903,
+        "mean_confidence": 0.7845,
+        "brier_score": 0.2704,
+        "ece": 0.1771,
+        "sharpe": 3.4925,
+        "up_accuracy": 0.6,
+        "down_accuracy": 0.6145
+      },
+      "KPHL": {
+        "accuracy": 0.5936,
+        "trade_count": 2111,
+        "mean_confidence": 0.787,
+        "brier_score": 0.2776,
+        "ece": 0.1935,
+        "sharpe": 3.023,
+        "up_accuracy": 0.568,
+        "down_accuracy": 0.6189
+      },
+      "KPHX": {
+        "accuracy": 0.6643,
+        "trade_count": 1269,
+        "mean_confidence": 0.7701,
+        "brier_score": 0.2314,
+        "ece": 0.1058,
+        "sharpe": 5.521,
+        "up_accuracy": 0.6205,
+        "down_accuracy": 0.7053
+      },
+      "KSAT": {
+        "accuracy": 0.6102,
+        "trade_count": 1565,
+        "mean_confidence": 0.7813,
+        "brier_score": 0.2652,
+        "ece": 0.171,
+        "sharpe": 3.5866,
+        "up_accuracy": 0.5898,
+        "down_accuracy": 0.6288
+      },
+      "KSEA": {
+        "accuracy": 0.5949,
+        "trade_count": 1980,
+        "mean_confidence": 0.785,
+        "brier_score": 0.2767,
+        "ece": 0.1901,
+        "sharpe": 3.0696,
+        "up_accuracy": 0.5568,
+        "down_accuracy": 0.6328
+      },
+      "KSFO": {
+        "accuracy": 0.59,
+        "trade_count": 1422,
+        "mean_confidence": 0.7731,
+        "brier_score": 0.2811,
+        "ece": 0.1831,
+        "sharpe": 2.9043,
+        "up_accuracy": 0.4965,
+        "down_accuracy": 0.6835
+      }
+    }
+  },
+  "regime": {
+    "status": "ok",
+    "stations_tested": 6,
+    "overall_accuracy": 0.7561,
+    "cross_station_mean_accuracy": 0.804,
+    "cross_station_mean_trades": 13.7,
+    "cross_station_mean_brier": 0.181,
+    "cross_station_mean_ece": 0.2067,
+    "cross_station_mean_sharpe": 5.3176,
+    "per_station": {
+      "KAUS": {
+        "accuracy": 1.0,
+        "trade_count": 2,
+        "mean_confidence": 0.8,
+        "brier_score": 0.04,
+        "ece": 0.2,
+        "sharpe": 0.0,
+        "up_accuracy": 1.0,
+        "down_accuracy": 0.0
+      },
+      "KHOU": {
+        "accuracy": 1.0,
+        "trade_count": 4,
+        "mean_confidence": 0.692,
+        "brier_score": 0.1065,
+        "ece": 0.308,
+        "sharpe": 0.0,
+        "up_accuracy": 1.0,
+        "down_accuracy": 1.0
+      },
+      "KLAX": {
+        "accuracy": 0.6154,
+        "trade_count": 26,
+        "mean_confidence": 0.6574,
+        "brier_score": 0.2265,
+        "ece": 0.142,
+        "sharpe": 3.6919,
+        "up_accuracy": 0.5,
+        "down_accuracy": 0.6364
+      },
+      "KMIA": {
+        "accuracy": 0.875,
+        "trade_count": 32,
+        "mean_confidence": 0.6481,
+        "brier_score": 0.1917,
+        "ece": 0.2269,
+        "sharpe": 17.7165,
+        "up_accuracy": 0.8333,
+        "down_accuracy": 0.9
+      },
+      "KSAT": {
+        "accuracy": 0.6667,
+        "trade_count": 12,
+        "mean_confidence": 0.637,
+        "brier_score": 0.2815,
+        "ece": 0.2297,
+        "sharpe": 5.3735,
+        "up_accuracy": 0.3333,
+        "down_accuracy": 1.0
+      },
+      "KSFO": {
+        "accuracy": 0.6667,
+        "trade_count": 6,
+        "mean_confidence": 0.8,
+        "brier_score": 0.24,
+        "ece": 0.1333,
+        "sharpe": 5.1235,
+        "up_accuracy": 0.6667,
+        "down_accuracy": 0.0
+      }
+    }
+  },
+  "forecast_disagreement": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.6453,
+    "cross_station_mean_accuracy": 0.6495,
+    "cross_station_mean_trades": 1277.7,
+    "cross_station_mean_brier": 0.2536,
+    "cross_station_mean_ece": 0.143,
+    "cross_station_mean_sharpe": 5.0145,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.65,
+        "trade_count": 1243,
+        "mean_confidence": 0.7491,
+        "brier_score": 0.2524,
+        "ece": 0.1445,
+        "sharpe": 4.9918,
+        "up_accuracy": 0.6409,
+        "down_accuracy": 0.6588
+      },
+      "KAUS": {
+        "accuracy": 0.6745,
+        "trade_count": 1103,
+        "mean_confidence": 0.7817,
+        "brier_score": 0.2509,
+        "ece": 0.1338,
+        "sharpe": 5.9102,
+        "up_accuracy": 0.6612,
+        "down_accuracy": 0.6878
+      },
+      "KBOS": {
+        "accuracy": 0.6628,
+        "trade_count": 1708,
+        "mean_confidence": 0.7776,
+        "brier_score": 0.2422,
+        "ece": 0.1405,
+        "sharpe": 5.4637,
+        "up_accuracy": 0.5982,
+        "down_accuracy": 0.7308
+      },
+      "KDCA": {
+        "accuracy": 0.6585,
+        "trade_count": 1514,
+        "mean_confidence": 0.7729,
+        "brier_score": 0.2497,
+        "ece": 0.1376,
+        "sharpe": 5.3049,
+        "up_accuracy": 0.638,
+        "down_accuracy": 0.6803
+      },
+      "KDEN": {
+        "accuracy": 0.655,
+        "trade_count": 1771,
+        "mean_confidence": 0.8077,
+        "brier_score": 0.2607,
+        "ece": 0.1732,
+        "sharpe": 5.1745,
+        "up_accuracy": 0.631,
+        "down_accuracy": 0.6763
+      },
+      "KDFW": {
+        "accuracy": 0.655,
+        "trade_count": 1316,
+        "mean_confidence": 0.7856,
+        "brier_score": 0.2642,
+        "ece": 0.1535,
+        "sharpe": 5.1747,
+        "up_accuracy": 0.681,
+        "down_accuracy": 0.6312
+      },
+      "KHOU": {
+        "accuracy": 0.6575,
+        "trade_count": 1054,
+        "mean_confidence": 0.7623,
+        "brier_score": 0.251,
+        "ece": 0.1372,
+        "sharpe": 5.266,
+        "up_accuracy": 0.6832,
+        "down_accuracy": 0.6321
+      },
+      "KLAS": {
+        "accuracy": 0.5865,
+        "trade_count": 1231,
+        "mean_confidence": 0.7261,
+        "brier_score": 0.2676,
+        "ece": 0.1379,
+        "sharpe": 2.7877,
+        "up_accuracy": 0.5944,
+        "down_accuracy": 0.5788
+      },
+      "KLAX": {
+        "accuracy": 0.6149,
+        "trade_count": 779,
+        "mean_confidence": 0.7219,
+        "brier_score": 0.2453,
+        "ece": 0.107,
+        "sharpe": 3.7456,
+        "up_accuracy": 0.4887,
+        "down_accuracy": 0.7461
+      },
+      "KMDW": {
+        "accuracy": 0.6335,
+        "trade_count": 1790,
+        "mean_confidence": 0.8006,
+        "brier_score": 0.2782,
+        "ece": 0.1814,
+        "sharpe": 4.3976,
+        "up_accuracy": 0.5758,
+        "down_accuracy": 0.6932
+      },
+      "KMIA": {
+        "accuracy": 0.7486,
+        "trade_count": 354,
+        "mean_confidence": 0.665,
+        "brier_score": 0.2076,
+        "ece": 0.1334,
+        "sharpe": 9.0834,
+        "up_accuracy": 0.7183,
+        "down_accuracy": 0.7943
+      },
+      "KMSP": {
+        "accuracy": 0.6251,
+        "trade_count": 1763,
+        "mean_confidence": 0.8054,
+        "brier_score": 0.2802,
+        "ece": 0.1974,
+        "sharpe": 4.1001,
+        "up_accuracy": 0.5754,
+        "down_accuracy": 0.6718
+      },
+      "KMSY": {
+        "accuracy": 0.6544,
+        "trade_count": 926,
+        "mean_confidence": 0.7485,
+        "brier_score": 0.2565,
+        "ece": 0.1673,
+        "sharpe": 5.1522,
+        "up_accuracy": 0.6421,
+        "down_accuracy": 0.6667
+      },
+      "KNYC": {
+        "accuracy": 0.6487,
+        "trade_count": 1523,
+        "mean_confidence": 0.7744,
+        "brier_score": 0.2477,
+        "ece": 0.1257,
+        "sharpe": 4.9439,
+        "up_accuracy": 0.6075,
+        "down_accuracy": 0.6917
+      },
+      "KOKC": {
+        "accuracy": 0.6326,
+        "trade_count": 1557,
+        "mean_confidence": 0.7871,
+        "brier_score": 0.2647,
+        "ece": 0.1681,
+        "sharpe": 4.3658,
+        "up_accuracy": 0.6309,
+        "down_accuracy": 0.6342
+      },
+      "KPHL": {
+        "accuracy": 0.6463,
+        "trade_count": 1541,
+        "mean_confidence": 0.7731,
+        "brier_score": 0.2563,
+        "ece": 0.1579,
+        "sharpe": 4.8571,
+        "up_accuracy": 0.6185,
+        "down_accuracy": 0.6755
+      },
+      "KPHX": {
+        "accuracy": 0.6247,
+        "trade_count": 1143,
+        "mean_confidence": 0.7197,
+        "brier_score": 0.2508,
+        "ece": 0.0959,
+        "sharpe": 4.0855,
+        "up_accuracy": 0.6138,
+        "down_accuracy": 0.6343
+      },
+      "KSAT": {
+        "accuracy": 0.6861,
+        "trade_count": 1064,
+        "mean_confidence": 0.7717,
+        "brier_score": 0.239,
+        "ece": 0.1405,
+        "sharpe": 6.3625,
+        "up_accuracy": 0.6807,
+        "down_accuracy": 0.6913
+      },
+      "KSEA": {
+        "accuracy": 0.635,
+        "trade_count": 1296,
+        "mean_confidence": 0.7322,
+        "brier_score": 0.2567,
+        "ece": 0.1174,
+        "sharpe": 4.4508,
+        "up_accuracy": 0.6018,
+        "down_accuracy": 0.6687
+      },
+      "KSFO": {
+        "accuracy": 0.6412,
+        "trade_count": 878,
+        "mean_confidence": 0.7159,
+        "brier_score": 0.2506,
+        "ece": 0.1102,
+        "sharpe": 4.6716,
+        "up_accuracy": 0.553,
+        "down_accuracy": 0.731
+      }
+    }
+  },
+  "calendar_climatology": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.688,
+    "cross_station_mean_accuracy": 0.6935,
+    "cross_station_mean_trades": 689.8,
+    "cross_station_mean_brier": 0.2258,
+    "cross_station_mean_ece": 0.1152,
+    "cross_station_mean_sharpe": 6.7544,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.7022,
+        "trade_count": 732,
+        "mean_confidence": 0.5775,
+        "brier_score": 0.2258,
+        "ece": 0.1247,
+        "sharpe": 7.0138,
+        "up_accuracy": 0.6535,
+        "down_accuracy": 0.7622
+      },
+      "KAUS": {
+        "accuracy": 0.7108,
+        "trade_count": 619,
+        "mean_confidence": 0.5809,
+        "brier_score": 0.2221,
+        "ece": 0.1299,
+        "sharpe": 7.3758,
+        "up_accuracy": 0.6667,
+        "down_accuracy": 0.7801
+      },
+      "KBOS": {
+        "accuracy": 0.7114,
+        "trade_count": 752,
+        "mean_confidence": 0.58,
+        "brier_score": 0.222,
+        "ece": 0.1315,
+        "sharpe": 7.4029,
+        "up_accuracy": 0.6366,
+        "down_accuracy": 0.8012
+      },
+      "KDCA": {
+        "accuracy": 0.6821,
+        "trade_count": 758,
+        "mean_confidence": 0.5798,
+        "brier_score": 0.226,
+        "ece": 0.1022,
+        "sharpe": 6.2021,
+        "up_accuracy": 0.6414,
+        "down_accuracy": 0.7368
+      },
+      "KDEN": {
+        "accuracy": 0.7315,
+        "trade_count": 622,
+        "mean_confidence": 0.5783,
+        "brier_score": 0.2205,
+        "ece": 0.1532,
+        "sharpe": 8.2861,
+        "up_accuracy": 0.6704,
+        "down_accuracy": 0.8161
+      },
+      "KDFW": {
+        "accuracy": 0.7024,
+        "trade_count": 625,
+        "mean_confidence": 0.579,
+        "brier_score": 0.2262,
+        "ece": 0.1234,
+        "sharpe": 7.0219,
+        "up_accuracy": 0.6615,
+        "down_accuracy": 0.7676
+      },
+      "KHOU": {
+        "accuracy": 0.6872,
+        "trade_count": 649,
+        "mean_confidence": 0.5765,
+        "brier_score": 0.2259,
+        "ece": 0.1107,
+        "sharpe": 6.4051,
+        "up_accuracy": 0.6524,
+        "down_accuracy": 0.7421
+      },
+      "KLAS": {
+        "accuracy": 0.5842,
+        "trade_count": 873,
+        "mean_confidence": 0.5777,
+        "brier_score": 0.2422,
+        "ece": 0.0166,
+        "sharpe": 2.7102,
+        "up_accuracy": 0.5367,
+        "down_accuracy": 0.6316
+      },
+      "KLAX": {
+        "accuracy": 0.7374,
+        "trade_count": 537,
+        "mean_confidence": 0.5777,
+        "brier_score": 0.2201,
+        "ece": 0.1598,
+        "sharpe": 8.5575,
+        "up_accuracy": 0.6766,
+        "down_accuracy": 0.7649
+      },
+      "KMDW": {
+        "accuracy": 0.6965,
+        "trade_count": 692,
+        "mean_confidence": 0.5821,
+        "brier_score": 0.2232,
+        "ece": 0.1144,
+        "sharpe": 6.781,
+        "up_accuracy": 0.625,
+        "down_accuracy": 0.7857
+      },
+      "KMIA": {
+        "accuracy": 0.7287,
+        "trade_count": 575,
+        "mean_confidence": 0.5809,
+        "brier_score": 0.2204,
+        "ece": 0.1478,
+        "sharpe": 8.1579,
+        "up_accuracy": 0.6608,
+        "down_accuracy": 0.8263
+      },
+      "KMSP": {
+        "accuracy": 0.6744,
+        "trade_count": 737,
+        "mean_confidence": 0.5812,
+        "brier_score": 0.2285,
+        "ece": 0.0932,
+        "sharpe": 5.9023,
+        "up_accuracy": 0.612,
+        "down_accuracy": 0.7727
+      },
+      "KMSY": {
+        "accuracy": 0.7364,
+        "trade_count": 679,
+        "mean_confidence": 0.5801,
+        "brier_score": 0.2216,
+        "ece": 0.1562,
+        "sharpe": 8.5103,
+        "up_accuracy": 0.6595,
+        "down_accuracy": 0.8285
+      },
+      "KNYC": {
+        "accuracy": 0.6989,
+        "trade_count": 734,
+        "mean_confidence": 0.583,
+        "brier_score": 0.2249,
+        "ece": 0.1159,
+        "sharpe": 6.8786,
+        "up_accuracy": 0.6522,
+        "down_accuracy": 0.7594
+      },
+      "KOKC": {
+        "accuracy": 0.7545,
+        "trade_count": 664,
+        "mean_confidence": 0.5753,
+        "brier_score": 0.2187,
+        "ece": 0.1792,
+        "sharpe": 9.381,
+        "up_accuracy": 0.6992,
+        "down_accuracy": 0.8327
+      },
+      "KPHL": {
+        "accuracy": 0.6866,
+        "trade_count": 753,
+        "mean_confidence": 0.5801,
+        "brier_score": 0.2266,
+        "ece": 0.1065,
+        "sharpe": 6.381,
+        "up_accuracy": 0.6366,
+        "down_accuracy": 0.7581
+      },
+      "KPHX": {
+        "accuracy": 0.6224,
+        "trade_count": 882,
+        "mean_confidence": 0.5793,
+        "brier_score": 0.2339,
+        "ece": 0.0431,
+        "sharpe": 4.0075,
+        "up_accuracy": 0.5494,
+        "down_accuracy": 0.7043
+      },
+      "KSAT": {
+        "accuracy": 0.6995,
+        "trade_count": 659,
+        "mean_confidence": 0.582,
+        "brier_score": 0.2267,
+        "ece": 0.1176,
+        "sharpe": 6.9042,
+        "up_accuracy": 0.6377,
+        "down_accuracy": 0.8041
+      },
+      "KSEA": {
+        "accuracy": 0.5912,
+        "trade_count": 751,
+        "mean_confidence": 0.5771,
+        "brier_score": 0.2399,
+        "ece": 0.0296,
+        "sharpe": 2.9433,
+        "up_accuracy": 0.5333,
+        "down_accuracy": 0.6489
+      },
+      "KSFO": {
+        "accuracy": 0.7311,
+        "trade_count": 502,
+        "mean_confidence": 0.5821,
+        "brier_score": 0.22,
+        "ece": 0.149,
+        "sharpe": 8.2647,
+        "up_accuracy": 0.6313,
+        "down_accuracy": 0.7864
+      }
+    }
+  },
+  "temperature_advection": {
+    "status": "ok",
+    "stations_tested": 0,
+    "overall_accuracy": 0.0,
+    "cross_station_mean_accuracy": 0.0,
+    "cross_station_mean_trades": 0,
+    "cross_station_mean_brier": 0.0,
+    "cross_station_mean_ece": 0.0,
+    "cross_station_mean_sharpe": 0.0,
+    "per_station": {}
+  },
+  "frontal_detector": {
+    "status": "ok",
+    "stations_tested": 20,
+    "overall_accuracy": 0.4628,
+    "cross_station_mean_accuracy": 0.4669,
+    "cross_station_mean_trades": 1509.9,
+    "cross_station_mean_brier": 0.2888,
+    "cross_station_mean_ece": 0.1435,
+    "cross_station_mean_sharpe": -1.0589,
+    "per_station": {
+      "KATL": {
+        "accuracy": 0.4406,
+        "trade_count": 1632,
+        "mean_confidence": 0.6045,
+        "brier_score": 0.2886,
+        "ece": 0.1639,
+        "sharpe": -1.8999,
+        "up_accuracy": 0.4231,
+        "down_accuracy": 0.459
+      },
+      "KAUS": {
+        "accuracy": 0.4605,
+        "trade_count": 1431,
+        "mean_confidence": 0.6388,
+        "brier_score": 0.3054,
+        "ece": 0.1783,
+        "sharpe": -1.257,
+        "up_accuracy": 0.4325,
+        "down_accuracy": 0.4925
+      },
+      "KBOS": {
+        "accuracy": 0.4304,
+        "trade_count": 1998,
+        "mean_confidence": 0.634,
+        "brier_score": 0.3052,
+        "ece": 0.2036,
+        "sharpe": -2.2299,
+        "up_accuracy": 0.3666,
+        "down_accuracy": 0.4974
+      },
+      "KDCA": {
+        "accuracy": 0.4272,
+        "trade_count": 1945,
+        "mean_confidence": 0.6227,
+        "brier_score": 0.3007,
+        "ece": 0.1955,
+        "sharpe": -2.334,
+        "up_accuracy": 0.3976,
+        "down_accuracy": 0.46
+      },
+      "KDEN": {
+        "accuracy": 0.4169,
+        "trade_count": 1938,
+        "mean_confidence": 0.631,
+        "brier_score": 0.3006,
+        "ece": 0.2141,
+        "sharpe": -2.674,
+        "up_accuracy": 0.3805,
+        "down_accuracy": 0.4561
+      },
+      "KDFW": {
+        "accuracy": 0.4965,
+        "trade_count": 1563,
+        "mean_confidence": 0.633,
+        "brier_score": 0.2923,
+        "ece": 0.1365,
+        "sharpe": -0.1117,
+        "up_accuracy": 0.4957,
+        "down_accuracy": 0.4974
+      },
+      "KHOU": {
+        "accuracy": 0.4675,
+        "trade_count": 1230,
+        "mean_confidence": 0.6315,
+        "brier_score": 0.2917,
+        "ece": 0.1641,
+        "sharpe": -1.0343,
+        "up_accuracy": 0.4655,
+        "down_accuracy": 0.4697
+      },
+      "KLAS": {
+        "accuracy": 0.4592,
+        "trade_count": 1311,
+        "mean_confidence": 0.5831,
+        "brier_score": 0.2931,
+        "ece": 0.124,
+        "sharpe": -1.2995,
+        "up_accuracy": 0.4173,
+        "down_accuracy": 0.5
+      },
+      "KLAX": {
+        "accuracy": 0.4389,
+        "trade_count": 622,
+        "mean_confidence": 0.528,
+        "brier_score": 0.2555,
+        "ece": 0.0891,
+        "sharpe": -1.9527,
+        "up_accuracy": 0.3404,
+        "down_accuracy": 0.5206
+      },
+      "KMDW": {
+        "accuracy": 0.4507,
+        "trade_count": 2037,
+        "mean_confidence": 0.6302,
+        "brier_score": 0.2928,
+        "ece": 0.1795,
+        "sharpe": -1.5737,
+        "up_accuracy": 0.4122,
+        "down_accuracy": 0.4879
+      },
+      "KMIA": {
+        "accuracy": 0.4862,
+        "trade_count": 763,
+        "mean_confidence": 0.5682,
+        "brier_score": 0.2698,
+        "ece": 0.0819,
+        "sharpe": -0.4368,
+        "up_accuracy": 0.4535,
+        "down_accuracy": 0.5131
+      },
+      "KMSP": {
+        "accuracy": 0.4667,
+        "trade_count": 2102,
+        "mean_confidence": 0.6472,
+        "brier_score": 0.3025,
+        "ece": 0.1805,
+        "sharpe": -1.0594,
+        "up_accuracy": 0.4102,
+        "down_accuracy": 0.5258
+      },
+      "KMSY": {
+        "accuracy": 0.4736,
+        "trade_count": 1157,
+        "mean_confidence": 0.6181,
+        "brier_score": 0.2895,
+        "ece": 0.1444,
+        "sharpe": -0.8377,
+        "up_accuracy": 0.4485,
+        "down_accuracy": 0.5009
+      },
+      "KNYC": {
+        "accuracy": 0.4716,
+        "trade_count": 2040,
+        "mean_confidence": 0.6369,
+        "brier_score": 0.2965,
+        "ece": 0.1653,
+        "sharpe": -0.9039,
+        "up_accuracy": 0.4101,
+        "down_accuracy": 0.5341
+      },
+      "KOKC": {
+        "accuracy": 0.4833,
+        "trade_count": 1767,
+        "mean_confidence": 0.6308,
+        "brier_score": 0.2992,
+        "ece": 0.1475,
+        "sharpe": -0.5302,
+        "up_accuracy": 0.472,
+        "down_accuracy": 0.4958
+      },
+      "KPHL": {
+        "accuracy": 0.4559,
+        "trade_count": 2007,
+        "mean_confidence": 0.622,
+        "brier_score": 0.3085,
+        "ece": 0.1661,
+        "sharpe": -1.4051,
+        "up_accuracy": 0.4136,
+        "down_accuracy": 0.498
+      },
+      "KPHX": {
+        "accuracy": 0.5094,
+        "trade_count": 1066,
+        "mean_confidence": 0.5775,
+        "brier_score": 0.2777,
+        "ece": 0.0972,
+        "sharpe": 0.2977,
+        "up_accuracy": 0.4916,
+        "down_accuracy": 0.5273
+      },
+      "KSAT": {
+        "accuracy": 0.5015,
+        "trade_count": 1292,
+        "mean_confidence": 0.6253,
+        "brier_score": 0.286,
+        "ece": 0.1238,
+        "sharpe": 0.0491,
+        "up_accuracy": 0.4761,
+        "down_accuracy": 0.5328
+      },
+      "KSEA": {
+        "accuracy": 0.4913,
+        "trade_count": 1374,
+        "mean_confidence": 0.5652,
+        "brier_score": 0.2617,
+        "ece": 0.0739,
+        "sharpe": -0.2772,
+        "up_accuracy": 0.3994,
+        "down_accuracy": 0.5789
+      },
+      "KSFO": {
+        "accuracy": 0.5092,
+        "trade_count": 923,
+        "mean_confidence": 0.5494,
+        "brier_score": 0.2583,
+        "ece": 0.0402,
+        "sharpe": 0.2923,
+        "up_accuracy": 0.3862,
+        "down_accuracy": 0.6253
+      }
+    }
+  }
+}
