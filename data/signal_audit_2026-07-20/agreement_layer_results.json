@@ -1,0 +1,181 @@
+{
+  "n_of_m_agreement": [
+    {
+      "threshold": "2_of_9",
+      "n_required": 2,
+      "total_signals": 9,
+      "accuracy": 0.5399,
+      "trade_count": 1530
+    },
+    {
+      "threshold": "3_of_9",
+      "n_required": 3,
+      "total_signals": 9,
+      "accuracy": 0.6388,
+      "trade_count": 1066
+    },
+    {
+      "threshold": "4_of_9",
+      "n_required": 4,
+      "total_signals": 9,
+      "accuracy": 0.715,
+      "trade_count": 586
+    },
+    {
+      "threshold": "5_of_9",
+      "n_required": 5,
+      "total_signals": 9,
+      "accuracy": 0.7674,
+      "trade_count": 258
+    },
+    {
+      "threshold": "6_of_9",
+      "n_required": 6,
+      "total_signals": 9,
+      "accuracy": 0.7808,
+      "trade_count": 73
+    },
+    {
+      "threshold": "7_of_9",
+      "n_required": 7,
+      "total_signals": 9,
+      "accuracy": 0.8519,
+      "trade_count": 27
+    }
+  ],
+  "conviction_weighted": [
+    {
+      "threshold": 0.5,
+      "accuracy": 0.6539,
+      "trade_count": 1020
+    },
+    {
+      "threshold": 0.6,
+      "accuracy": 0.697,
+      "trade_count": 660
+    },
+    {
+      "threshold": 0.7,
+      "accuracy": 0.755,
+      "trade_count": 151
+    },
+    {
+      "threshold": 0.8,
+      "accuracy": 0.0,
+      "trade_count": 0
+    }
+  ],
+  "best_combos_katl": [
+    {
+      "combo_size": 1,
+      "signals": [
+        "calendar_climatology"
+      ],
+      "accuracy": 0.7038,
+      "trade_count": 368
+    },
+    {
+      "combo_size": 2,
+      "signals": [
+        "persistence",
+        "calendar_climatology"
+      ],
+      "accuracy": 0.7778,
+      "trade_count": 81
+    },
+    {
+      "combo_size": 3,
+      "signals": [
+        "persistence",
+        "regime",
+        "calendar_climatology"
+      ],
+      "accuracy": 0.7778,
+      "trade_count": 81
+    },
+    {
+      "combo_size": 4,
+      "signals": [
+        "persistence",
+        "gaussian",
+        "pressure_delta",
+        "calendar_climatology"
+      ],
+      "accuracy": 0.7193,
+      "trade_count": 481
+    },
+    {
+      "combo_size": 5,
+      "signals": [
+        "persistence",
+        "gaussian",
+        "pressure_delta",
+        "regime",
+        "calendar_climatology"
+      ],
+      "accuracy": 0.7193,
+      "trade_count": 481
+    }
+  ],
+  "confirmation_filter": [
+    {
+      "primary_signal": "wind_direction_shift",
+      "accuracy_with_confirmation": 0.6571,
+      "trade_count": 140
+    },
+    {
+      "primary_signal": "persistence",
+      "accuracy_with_confirmation": 0.5007,
+      "trade_count": 1530
+    },
+    {
+      "primary_signal": "simple_trend",
+      "accuracy_with_confirmation": 0.5007,
+      "trade_count": 1530
+    },
+    {
+      "primary_signal": "gaussian",
+      "accuracy_with_confirmation": 0.6686,
+      "trade_count": 688
+    },
+    {
+      "primary_signal": "gaussian_v2",
+      "accuracy_with_confirmation": 0.6463,
+      "trade_count": 967
+    },
+    {
+      "primary_signal": "pressure_delta",
+      "accuracy_with_confirmation": 0.6288,
+      "trade_count": 722
+    },
+    {
+      "primary_signal": "regime",
+      "accuracy_with_confirmation": 0.0,
+      "trade_count": 0
+    },
+    {
+      "primary_signal": "forecast_disagreement",
+      "accuracy_with_confirmation": 0.6667,
+      "trade_count": 576
+    },
+    {
+      "primary_signal": "calendar_climatology",
+      "accuracy_with_confirmation": 0.7038,
+      "trade_count": 368
+    }
+  ],
+  "stations_used": [
+    "KATL"
+  ],
+  "working_signals": [
+    "wind_direction_shift",
+    "persistence",
+    "simple_trend",
+    "gaussian",
+    "gaussian_v2",
+    "pressure_delta",
+    "regime",
+    "forecast_disagreement",
+    "calendar_climatology"
+  ]
+}
