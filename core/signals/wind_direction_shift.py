@@ -237,7 +237,7 @@ class WindDirectionShiftSignal(BaseSignal):
 
         # Extract wind data from in-memory days list (reverse chronological)
         wind_history = []
-        for i in range(idx, idx - self.lookback_days - 1, -1):
+        for i in range(idx - 1, idx - self.lookback_days - 2, -1):
             if i < 0:
                 break
             d = days[i]
