@@ -114,6 +114,52 @@
 - `get_frontal_conditions(station, date, metar_db_path, nwp_db_path) → detailed_breakdown_dict`
 - Expected to fire on ~10% of days with 80-85% expected accuracy
 
+### Phase 4.7: Intraday METAR Confirmation Signal (IMPLEMENTED)
+**Goal:** Uses same-day METAR observations (10 AM, 1 PM Eastern) to confirm or weaken ensemble predictions. A confirmation signal that adjusts confidence based on whether the actual temperature is tracking in the predicted direction. Logic:
+- Fetch METAR observations (time window: 14:00-20:00 UTC = 10AM-4PM Eastern)
+- Compute temperature trend: (current_temp - earliest_temp) / hours_elapsed 
+- Compare to ensemble prediction: If ensemble predicts UP, trend should be positive
+- If trend positive and rate > 0.5°F/hour: CONFIRM → boost confidence +15%
+- If trend opposite direction: WEAKEN → reduce confidence -25%
+- If trend flat (|rate| < 0.2°F/hour): NEUTRAL → no change
+- Track current temp vs yesterday's high: If exceeding yesterday's high before 2PM EST → boost +10%
+- If below yesterday's high after 4PM EST → penalty -15%
+
+### Phase 4.4: Adaptive Confidence Thresholds (IMPLEMENTED)
+**Goal:** Dynamically adjust minimum confidence requirements based on rolling 30-day accuracy tracking for each signal type at each station. Signals with accuracy > 70% get lower confidence thresholds (making them easier to fire), signals with < 50% accuracy get higher thresholds (making them harder to engage). Implemented as pre-filter on signal votes before the agreement gate.
+
+**Status:** IMPLEMENTED (July 21, 2026)
+
+**Technical implementation:**
+- Created `core/adaptive_thresholds.py` module that tracks rolling 30-day performance 
+- Enhanced `core/trade_journal.py` with `get_accuracy_by_signal_station()` method
+- Integrated into `paper_trading_engine.py` as pre-processing step before agreement gate
+- Default threshold: 0.25, Floor: 0.15 (never lower), Ceiling: 0.70 (never higher)
+- Adjustment: ±0.1 based on accuracy performance
+
+**Logic:**
+- If a signal's rolling 30d accuracy > 70%: lower its confidence threshold by 0.1
+- If accuracy < 50%: raise threshold by 0.1
+- Applied to each signal_type × station combination individually
+- Filters signal list before agreement gate consensus calculation
+
+**Benefits:**
+- Reduces influence of consistently underperforming signals
+- Allows successful signal types to trigger more readily
+- Maintains adaptive response to changing market conditions
+- Improves overall ensemble accuracy by adjusting sensitivity
+
+**Status:** IMPLEMENTED (July 21, 2026)
+
+**Implementation:**
+- Created `core/signals/intraday_metar_confirmation.py`
+- Exports `get_intraday_confirmation(station, date, metar_db_path, predicted_direction, base_confidence)`
+- Only activates for today/yesterday (same-day METAR requirement)
+- Returns (adjusted_confidence, reason, details) for confidence updates
+- Integrates into `paper_trading_engine.py` as post-processing step BEFORE agreement gate (per requirement)
+- Configurable via environment vars: INTRADAY_CONFIRMATION_ENABLED, CONFIRM_BOOST (0.15), WEAKEN_PENALTY (0.25)
+- Applied during signal processing flow: skill gate → intraday confirmation → agreement gate → spatial coherence → dewpoint depression → trading
+
 **Task completion criteria:**
 - [x] 4.6.1 Create frontal passage detection logic - Complete
 - [x] 4.6.2 Implement 4-condition evaluation - Complete  
