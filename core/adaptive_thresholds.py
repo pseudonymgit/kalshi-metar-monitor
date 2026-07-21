@@ -6,6 +6,25 @@ import logging
 from typing import List, Dict, Tuple, Optional
 from .trade_journal import TradeJournal
 
+
+def _get_overall_signal_accuracy(signal_name: str, trade_journal: TradeJournal) -> float:
+    """
+    Helper to get overall signal accuracy when station-specific data is unavailable.
+    """
+    try:
+        accuracy_by_signal = trade_journal.get_accuracy_by_signal()
+        
+        if signal_name in accuracy_by_signal:
+            signal_stats = accuracy_by_signal[signal_name]
+            directional_acc_pct = signal_stats.get('directional_accuracy_pct', 0.0)
+            return directional_acc_pct / 100.0
+        else:
+            # If no data exists at all, return None
+            return None
+    except Exception:
+        # On any error, return None
+        return None
+
 # Configuration
 ADAPTIVE_THRESHOLDS_ENABLED = True
 ADAPTIVE_WINDOW_DAYS = 30
@@ -51,17 +70,26 @@ def get_adaptive_threshold(signal_name: str, station: str, trade_journal: TradeJ
         return DEFAULT_THRESHOLD
     
     try:
-        # Get all signal accuracy data
-        accuracy_data = trade_journal.get_accuracy_by_signal()
+        # Get signal-station accuracy data for the configured window
+        accuracy_by_signal_station = trade_journal.get_accuracy_by_signal_station(ADAPTIVE_WINDOW_DAYS)
         
-        # Check if the specific signal exists in the data
-        if signal_name in accuracy_data:
-            signal_stats = accuracy_data[signal_name]
-            # Extract directional accuracy percentage and convert to decimal
-            directional_acc_pct = signal_stats.get('directional_accuracy_pct', 0.0)
-            accuracy = directional_acc_pct / 100.0
+        # Check if the signal_name and station combination exists
+        if signal_name in accuracy_by_signal_station:
+            station_accuracy = accuracy_by_signal_station[signal_name]
+            if station in station_accuracy:
+                station_stats = station_accuracy[station]
+                # Get the accuracy percentage and convert to decimal
+                acc_pct = station_stats.get('accuracy_pct', 0.0)
+                accuracy = acc_pct / 100.0
+            else:
+                # No specific station data - fall back to overall signal accuracy
+                accuracy = _get_overall_signal_accuracy(signal_name, trade_journal)
         else:
-            # If no data for this signal type, use default threshold
+            # No data for this signal type - fall back to overall signal accuracy
+            accuracy = _get_overall_signal_accuracy(signal_name, trade_journal)
+        
+        if accuracy is None:
+            # If everything fails to retrieve accuracy data, use default threshold
             return DEFAULT_THRESHOLD
         
         # Start with default threshold
