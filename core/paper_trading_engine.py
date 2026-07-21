@@ -38,6 +38,7 @@ from datetime import datetime, timedelta, timezone
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .agreement_gate import AgreementGate, SimpleAgreementChecker
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from .adaptive_thresholds import filter_signals_by_adaptive_threshold, get_adaptive_threshold
 from typing import Dict, List, Optional, Tuple, Any
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from enum import Enum
@@ -354,6 +355,15 @@ class PaperTrader:
         except Exception as e:
             print(f"Warning: Failed to initialize StationSkillGate: {e}, feature will be disabled")
             self._skill_gate = None
+        
+        # Initialize trade journal for adaptive thresholds (Phase 4.4)
+        try:
+            from core.trade_journal import get_journal
+            self._trade_journal = get_journal()  # Use default journal path
+            _LOGGER.info("Trade journal initialized for adaptive thresholds")
+        except Exception as e:
+            print(f"Warning: Failed to initialize TradeJournal for adaptive thresholds: {e}")
+            self._trade_journal = None
 
         # Initialize Phase 3 risk modules
         self._kelly_sizer = None
@@ -1002,6 +1012,66 @@ class PaperTrader:
             goldilocks_signals = []
             other_signals = signals
             
+        # Apply adaptive confidence thresholds BEFORE the agreement gate filtering (Phase 4.4)
+        if other_signals and self._trade_journal is not None:
+            # Convert signal tuples in other_signals to dictionary format for adaptive threshold filtering
+            # Format from generate_signals is (station, market_type, direction, reason)
+            # We need to convert to {'type': reason, 'station': station, 'confidence': DEFAULT_CONF, ...}
+            # We'll assign a default confidence here before applying adaptive thresholds
+            signal_dicts = []
+            for station, market_type, direction, reason in other_signals:
+                # For the initial confidence, use a reasonable default or assign based on signal type
+                # This is important because adaptive thresholds compare confidence to threshold
+                base_confidence = 0.5  # Default conservative value
+                
+                # Different signal types may have different baseline confidences
+                if reason in ["calendar_trend_up", "calendar_trend_down"]:
+                    base_confidence = 0.6 
+                elif reason in ["late_day_momentum_hourly"]:
+                    base_confidence = 0.7
+                elif reason in ["nwp_analog"]:
+                    base_confidence = 0.75
+                elif reason in ["multi_model_ensemble"]:
+                    base_confidence = 0.75
+                elif reason in ["temperature_advection"]:
+                    base_confidence = 0.6
+                elif reason in ["goldilocks_spike_reversion"]:
+                    base_confidence = 0.65
+                else:
+                    base_confidence = 0.5
+                
+                signal_dict = {
+                    'type': reason,
+                    'station': station,
+                    'market_type': market_type,
+                    'direction': direction,
+                    'confidence': base_confidence,
+                    'market_side': direction  # Assuming direction and market_side are the same for this context
+                }
+                signal_dicts.append(signal_dict)
+            
+            # Apply adaptive threshold filtering
+            try:
+                filtered_signal_dicts = filter_signals_by_adaptive_threshold(signal_dicts, self._trade_journal)
+                
+                # Convert back to tuple format (station, market_type, direction, reason, adaptive_conf) 
+                filtered_other_signals = []
+                for sig_dict in filtered_signal_dicts:
+                    # Extract values
+                    station = sig_dict['station']
+                    market_type = sig_dict['market_type']
+                    direction = sig_dict['direction']
+                    reason = sig_dict['type']
+                    # Use the computed adaptive threshold as proxy for adjusted confidence or keep original confidence
+                    confidence = sig_dict['confidence']  # This would remain original confidence for now
+                    filtered_other_signals.append((station, market_type, direction, reason, confidence))
+                
+                other_signals = filtered_other_signals
+                _LOGGER.info(f"Applied adaptive thresholds: {len(other_signals)} signals remained after threshold filtering out of {len(signal_dicts)} prior to agreement gate")
+            except Exception as e:
+                _LOGGER.error(f"Error applying adaptive threshold filtering: {e}")
+                # Continue without filtering if it fails
+        
         # Apply agreement gate filter ONLY to non-Goldilocks signals
         if other_signals:
             before_agreement_count = len(other_signals)

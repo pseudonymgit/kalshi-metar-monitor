@@ -573,6 +573,65 @@ class TradeJournal:
         finally:
             conn.close()
     
+    def get_accuracy_by_signal_station(self, window_days: int = 30) -> Dict[str, Dict[str, Dict[str, float]]]:
+        """
+        Get accuracy statistics by signal type and station with configurable window.
+        
+        Args:
+            window_days: Number of days to look back (default 30)
+            
+        Returns:
+            Dict keyed as {signal_name: {station: {metric: value}}}
+            Example: {"late_day_momentum": {"KATL": {"accuracy": 0.72, "win_rate": 0.65}}}
+        """
+        cutoff_date = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
+        
+        conn = sqlite3.connect(self._db_path)
+        try:
+            # Get success rates by functionality (signal type) and station
+            rows = conn.execute('''
+                SELECT 
+                    functionality,
+                    station,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN outcome = 'EXECUTED' THEN 1 ELSE 0 END) as placed,
+                    SUM(CASE WHEN outcome = 'SETTLED_WIN' THEN 1 ELSE 0 END) as wins,
+                    SUM(CASE WHEN outcome = 'SETTLED_LOSS' THEN 1 ELSE 0 END) as losses
+                FROM trade_journal 
+                WHERE outcome IN ('EXECUTED', 'SETTLED_WIN', 'SETTLED_LOSS', 'SKIPPED_EDGE', 'SKIPPED_FILTER')
+                AND timestamp_utc >= ?
+                GROUP BY functionality, station
+                HAVING total > 0
+                ORDER BY total DESC
+            ''', (cutoff_date,)).fetchall()
+            
+            results = {}
+            for row in rows:
+                func = row[0] if row[0] else 'unknown'
+                station = row[1] if row[1] else 'unknown'
+                total = row[2] or 0
+                placed = row[3] or 0
+                wins = row[4] or 0
+                losses = row[5] or 0
+
+                # Calculate metrics
+                accuracy = (wins / placed * 100.0) if placed > 0 else 0.0
+                win_rate = (wins / (wins + losses) * 100.0) if (wins + losses) > 0 else 0.0
+
+                if func not in results:
+                    results[func] = {}
+                results[func][station] = {
+                    'accuracy_pct': accuracy,
+                    'win_rate_pct': win_rate,
+                    'total': total,
+                    'placed': placed,
+                    'wins': wins,
+                    'losses': losses
+                }
+            return results
+        finally:
+            conn.close()
+
     def get_trade_counts_by_station(self) -> Dict[str, Dict[str, int]]:
         """Get trade counts (successful, skipped, total) by station."""
         conn = sqlite3.connect(self._db_path)  
