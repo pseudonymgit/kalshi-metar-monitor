@@ -38,7 +38,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 CDS_DATASET = "reanalysis-era5-pressure-levels"
 CDS_VARIABLES = ["temperature", "u_component_of_wind", "v_component_of_wind", "geopotential"]
 CDS_PRESSURE_LEVELS = ["850", "500"]
-CDS_GRID = [0.5, 0.5]  # 0.25° × 0.25° resolution
+CDS_GRID = [1.0, 1.0]  # 1.0° × 1.0° resolution (reduced from 0.5° to fit CDS free tier cost limits)
 
 # Bounding box half-size around each station (degrees)
 # At 0.25° resolution, a 1°×1° area gives ~5×5 grid points — enough for gradients
@@ -81,8 +81,9 @@ MODEL_NAME = "ERA5"
 
 # Retry configuration
 MAX_RETRIES = 5
-RETRY_BASE_DELAY = 30  # seconds
-MAX_RETRY_DELAY = 300  # 5 minutes
+RETRY_BASE_DELAY = 60   # seconds
+MAX_RETRY_DELAY = 600  # 10 minutes
+MIN_CDS_INTERVAL = 5.0  # seconds between CDS requests
 
 
 def parse_args():
@@ -406,29 +407,60 @@ def cds_download_monthly(client, year, month, lat, lon, output_path):
     area = [lat + AREA_HALF_SIZE, lon - AREA_HALF_SIZE,
             lat - AREA_HALF_SIZE, lon + AREA_HALF_SIZE]
 
-    request = {
-        "product_type": "reanalysis",
-        "format": "netcdf",
-        "variable": CDS_VARIABLES,
-        "pressure_level": CDS_PRESSURE_LEVELS,
-        "year": str(year),
-        "month": f"{month:02d}",
-        "day": days,
-        "time": times,
-        "area": area,
-        "grid": CDS_GRID,
-    }
-
-    try:
-        client.retrieve(CDS_DATASET, request, str(output_path))
-        if output_path.exists() and output_path.stat().st_size > 1000:
-            return output_path
-        else:
-            print(f"    Warning: Downloaded file too small: {output_path}")
-            return None
-    except Exception as e:
-        print(f"    CDS download failed: {e}")
+    # CDS free tier has cost limits per request. Split by variable + pressure level.
+    # Download each combo separately, then merge.
+    import xarray as xr
+    
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    datasets = []
+    for var in CDS_VARIABLES:
+        for plevel in CDS_PRESSURE_LEVELS:
+            var_request = {
+                "product_type": "reanalysis",
+                "format": "netcdf",
+                "variable": [var],
+                "pressure_level": [plevel],
+                "year": str(year),
+                "month": f"{month:02d}",
+                "day": days,
+                "time": times,
+                "area": area,
+                "grid": CDS_GRID,
+            }
+            var_path = output_path.parent / f"{output_path.stem}_{var}_{plevel}hPa.nc"
+            try:
+                print(f"    Downloading {var} @ {plevel}hPa...")
+                client.retrieve(CDS_DATASET, var_request, str(var_path))
+                if var_path.exists() and var_path.stat().st_size > 1000:
+                    ds = xr.open_dataset(var_path)
+                    datasets.append(ds)
+                else:
+                    print(f"    Warning: {var} @ {plevel}hPa file too small, skipping")
+            except Exception as e:
+                print(f"    CDS download failed for {var} @ {plevel}hPa: {e}")
+                return None
+            time.sleep(3.0)  # polite delay between requests
+    
+    if not datasets:
+        print(f"    No data downloaded for {year}-{month:02d}")
         return None
+    
+    # Merge all datasets into one file
+    merged = xr.merge(datasets)
+    merged.to_netcdf(str(output_path))
+    for ds in datasets:
+        ds.close()
+    # Clean up temp files
+    for var in CDS_VARIABLES:
+        for plevel in CDS_PRESSURE_LEVELS:
+            tmp = output_path.parent / f"{output_path.stem}_{var}_{plevel}hPa.nc"
+            if tmp.exists():
+                tmp.unlink()
+    
+    print(f"    Merged to {output_path.name}")
+    return output_path
 
 
 def process_netcdf_file(nc_path, station_code, station_lat, station_lon):
