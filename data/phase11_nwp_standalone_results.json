@@ -1,0 +1,1397 @@
+{
+  "summary": {
+    "overall_accuracy": 0.48166666666666663,
+    "total_predictions": 79,
+    "total_correct": 38,
+    "prediction_rate": 0.48166666666666663,
+    "stations_evaluated": 5,
+    "method": "mahalanobis_pca_nwp_signal",
+    "timestamp": "2026-07-21T15:36:39.321012"
+  },
+  "per_station": {
+    "KATL": {
+      "accuracy": 0.5,
+      "total_predictions": 16,
+      "correct_predictions": 8,
+      "average_confidence": 0.004425701775373714,
+      "results": [
+        {
+          "date": "2026-07-04",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-05",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-06",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-07",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-10",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-11",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-12",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-13",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-14",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-15",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-16",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-17",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-18",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-19",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-20",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        },
+        {
+          "date": "2026-07-21",
+          "predicted": "up",
+          "confidence": 0.004425701775373714,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 22,
+            "up_weight": 5.45943277306924,
+            "down_weight": 5.402509651645427,
+            "probability": 0.5022128508876869,
+            "raw_confidence": 0.002212850887686857
+          }
+        }
+      ]
+    },
+    "KAUS": {
+      "accuracy": 0.4375,
+      "total_predictions": 16,
+      "correct_predictions": 7,
+      "average_confidence": 0.2402750882333069,
+      "results": [
+        {
+          "date": "2026-07-04",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-05",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-06",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-07",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-10",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-11",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-12",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-13",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-14",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-15",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-16",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-17",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-18",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "equal",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-19",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-20",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        },
+        {
+          "date": "2026-07-21",
+          "predicted": "down",
+          "confidence": 0.2402750882333069,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 1.2289446704192997,
+            "down_weight": 2.9079986571981125,
+            "probability": 0.37986245588334655,
+            "raw_confidence": 0.12013754411665345
+          }
+        }
+      ]
+    },
+    "KBOS": {
+      "accuracy": 0.5,
+      "total_predictions": 16,
+      "correct_predictions": 8,
+      "average_confidence": 0.04557064917851883,
+      "results": [
+        {
+          "date": "2026-07-04",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-05",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-06",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-07",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "equal",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-10",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-11",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-12",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "equal",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-13",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-14",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-15",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-16",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-17",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-18",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-19",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-20",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "down",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        },
+        {
+          "date": "2026-07-21",
+          "predicted": "down",
+          "confidence": 0.04557064917851883,
+          "actual": "up",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 9,
+            "up_weight": 1.4806837339637857,
+            "down_weight": 2.281252351907841,
+            "probability": 0.4772146754107406,
+            "raw_confidence": 0.022785324589259415
+          }
+        }
+      ]
+    },
+    "KDCA": {
+      "accuracy": 0.4375,
+      "total_predictions": 16,
+      "correct_predictions": 7,
+      "average_confidence": 0.07192672278649881,
+      "results": [
+        {
+          "date": "2026-07-04",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-05",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-06",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-07",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-10",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-11",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-12",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-13",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-14",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-15",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-16",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "equal",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-17",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-18",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-19",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-20",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        },
+        {
+          "date": "2026-07-21",
+          "predicted": "up",
+          "confidence": 0.07192672278649881,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 2.9503567445603367,
+            "down_weight": 2.8872516495904095,
+            "probability": 0.4640366386067506,
+            "raw_confidence": 0.035963361393249405
+          }
+        }
+      ]
+    },
+    "KDEN": {
+      "accuracy": 0.5333333333333333,
+      "total_predictions": 15,
+      "correct_predictions": 8,
+      "average_confidence": 0.2588205854946617,
+      "results": [
+        {
+          "date": "2026-07-04",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-05",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-06",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-10",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-11",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-12",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-13",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-14",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-15",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-16",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-17",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-18",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-19",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-20",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "up",
+          "correct": 1,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        },
+        {
+          "date": "2026-07-21",
+          "predicted": "up",
+          "confidence": 0.2588205854946617,
+          "actual": "down",
+          "correct": 0,
+          "info": {
+            "method": "mahalanobis_pca",
+            "k": 30,
+            "analog_count": 30,
+            "metar_count": 30,
+            "up_weight": 5.091340594531964,
+            "down_weight": 2.093153749327351,
+            "probability": 0.6294102927473308,
+            "raw_confidence": 0.12941029274733085
+          }
+        }
+      ]
+    }
+  },
+  "details_by_date": {}
+}

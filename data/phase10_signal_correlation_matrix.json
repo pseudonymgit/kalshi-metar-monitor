@@ -1,0 +1,140 @@
+{
+  "timestamp": "2026-07-21T13:02:08.076080",
+  "database": "data/metar_backfill.db",
+  "stations_analyzed": [
+    "KATL",
+    "KAUS",
+    "KBOS",
+    "KDCA",
+    "KDEN",
+    "KDFW",
+    "KHOU",
+    "KLAS",
+    "KLAX",
+    "KMDW",
+    "KMIA",
+    "KMSP",
+    "KMSY",
+    "KNYC",
+    "KOKC",
+    "KPHL",
+    "KPHX",
+    "KSAT",
+    "KSEA",
+    "KSFO"
+  ],
+  "signals_analyzed": [
+    "calendar_climatology",
+    "forecast_disagreement",
+    "frontal_detector",
+    "gaussian",
+    "gaussian_v2",
+    "persistence",
+    "pressure_delta",
+    "regime",
+    "wind_direction_shift"
+  ],
+  "correlation_matrix": {
+    "calendar_climatology": {
+      "calendar_climatology": 1.0,
+      "forecast_disagreement": 0.48718204759732336,
+      "frontal_detector": 0.5058229722380823,
+      "gaussian": 0.4900916191365356,
+      "gaussian_v2": 0.4836603683782152,
+      "persistence": 0.5014145770435465,
+      "pressure_delta": 0.4926997544420404,
+      "regime": 0.6038995726495726,
+      "wind_direction_shift": 0.528525704206714
+    },
+    "forecast_disagreement": {
+      "calendar_climatology": 0.48718204759732336,
+      "forecast_disagreement": 1.0,
+      "frontal_detector": 0.5033683576619197,
+      "gaussian": 0.5074000215405717,
+      "gaussian_v2": 0.4961715854778073,
+      "persistence": 0.5022795584989008,
+      "pressure_delta": 0.49684264371054293,
+      "regime": 0.5389957264957265,
+      "wind_direction_shift": 0.4886576253183077
+    },
+    "frontal_detector": {
+      "calendar_climatology": 0.5058229722380823,
+      "forecast_disagreement": 0.5033683576619197,
+      "frontal_detector": 1.0,
+      "gaussian": 0.49495209314407596,
+      "gaussian_v2": 0.49416117753035166,
+      "persistence": 0.49575682098368884,
+      "pressure_delta": 0.49035547709628907,
+      "regime": 0.7564102564102564,
+      "wind_direction_shift": 0.49852664307707906
+    },
+    "gaussian": {
+      "calendar_climatology": 0.4900916191365356,
+      "forecast_disagreement": 0.5074000215405717,
+      "frontal_detector": 0.49495209314407596,
+      "gaussian": 1.0,
+      "gaussian_v2": 0.4888543462706501,
+      "persistence": 0.5024069017392414,
+      "pressure_delta": 0.4974536942308977,
+      "regime": 0.5953525641025641,
+      "wind_direction_shift": 0.4934200120669997
+    },
+    "gaussian_v2": {
+      "calendar_climatology": 0.4836603683782152,
+      "forecast_disagreement": 0.4961715854778073,
+      "frontal_detector": 0.49416117753035166,
+      "gaussian": 0.4888543462706501,
+      "gaussian_v2": 1.0,
+      "persistence": 0.5037679983535557,
+      "pressure_delta": 0.5037452231301661,
+      "regime": 0.29086538461538464,
+      "wind_direction_shift": 0.485054284002867
+    },
+    "persistence": {
+      "calendar_climatology": 0.5014145770435465,
+      "forecast_disagreement": 0.5022795584989008,
+      "frontal_detector": 0.49575682098368884,
+      "gaussian": 0.5024069017392414,
+      "gaussian_v2": 0.5037679983535557,
+      "persistence": 1.0,
+      "pressure_delta": 0.5011178293530867,
+      "regime": 0.5747863247863249,
+      "wind_direction_shift": 0.5031274049021558
+    },
+    "pressure_delta": {
+      "calendar_climatology": 0.4926997544420404,
+      "forecast_disagreement": 0.49684264371054293,
+      "frontal_detector": 0.49035547709628907,
+      "gaussian": 0.4974536942308977,
+      "gaussian_v2": 0.5037452231301661,
+      "persistence": 0.5011178293530867,
+      "pressure_delta": 1.0,
+      "regime": 0.6196581196581197,
+      "wind_direction_shift": 0.49662151894639595
+    },
+    "regime": {
+      "calendar_climatology": 0.6038995726495726,
+      "forecast_disagreement": 0.5389957264957265,
+      "frontal_detector": 0.7564102564102564,
+      "gaussian": 0.5953525641025641,
+      "gaussian_v2": 0.29086538461538464,
+      "persistence": 0.5747863247863249,
+      "pressure_delta": 0.6196581196581197,
+      "regime": 1.0,
+      "wind_direction_shift": 0.45566239316239315
+    },
+    "wind_direction_shift": {
+      "calendar_climatology": 0.528525704206714,
+      "forecast_disagreement": 0.4886576253183077,
+      "frontal_detector": 0.49852664307707906,
+      "gaussian": 0.4934200120669997,
+      "gaussian_v2": 0.485054284002867,
+      "persistence": 0.5031274049021558,
+      "pressure_delta": 0.49662151894639595,
+      "regime": 0.45566239316239315,
+      "wind_direction_shift": 1.0
+    }
+  },
+  "high_correlation_pairs": [],
+  "recommendations_for_removal": []
+}

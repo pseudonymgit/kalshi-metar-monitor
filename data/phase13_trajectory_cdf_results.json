@@ -1,0 +1,50 @@
+{
+  "pipeline_status": "SUCCESSFUL_EXECUTION",
+  "ensemble_size": 30,
+  "time_horizon": 24,
+  "calibration_metrics": {
+    "pit_test_conducted": true,
+    "ks_statistic": 0.36614778300051964,
+    "ks_pvalue": 4.805454576802145e-87,
+    "pit_sample_size": 720,
+    "calibration_good": false,
+    "pit_scores_preview": [
+      0.04991300380372457,
+      1e-05,
+      0.99999,
+      0.15749091255027897,
+      1e-05,
+      0.082611240561965,
+      0.37391609256794633,
+      0.99999,
+      1e-05,
+      0.99999
+    ]
+  },
+  "final_cdf_summary": {
+    "horizon": 23,
+    "expected_value": 72.59700924607571,
+    "p10_p90_range": [
+      71.69829462012368,
+      73.43453223867459
+    ],
+    "market_application_example": {
+      "strike": 80.0,
+      "prob_exceeding": 0.0
+    }
+  },
+  "uncertainty_analysis": {
+    "aleatoric": 7.191252163647876,
+    "epistemic": 1.6061849114146762,
+    "total": 8.797437075062552,
+    "analogs_to_add_for_halving_epistemic": 90
+  },
+  "trajectory_pipeline_components": [
+    "Bayesian bootstrap ensemble aggregation",
+    "Kernel density smoothing",
+    "PIT histogram validation",
+    "Epistemic/aleatoric decomposition",
+    "CDF output at settlement time"
+  ],
+  "timestamp": "2026-07-21T15:34:35.666996"
+}
