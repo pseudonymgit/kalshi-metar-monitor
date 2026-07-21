@@ -100,6 +100,28 @@
 
 **Status:** IMPLEMENTED (July 21, 2026)
 
+### Phase 4.6: Frontal Passage Detector (IMPLEMENTED)
+**Goal:** Detect frontal passages (cold fronts, warm fronts) that cause rapid temperature changes. Identifies events using 4 meteorological conditions: 1) pressure tendency > 1.5 mb/3h, 2) wind shift > 60° within 3 hours, 3) temperature gradient > 6°C/1000km (from NWP data), 4) temperature trend > 3°F in 3 hours. Requires 3/4 conditions for regular signal (65% confidence) or 4/4 for "Sure Thing" signal (80% confidence). Output direction based on post-front temperature trend.
+
+**Status:** IMPLEMENTED (July 21, 2026)
+
+**Implementation:**
+- Created `core/signals/frontal_passage_detector.py`
+- Implements 4 conditions with appropriate thresholds
+- Uses both METAR hourly data and optionally NWP data
+- Falls back to 3/3 conditions if NWP unavailable 
+- `evaluate(station, date, metar_db_path, nwp_db_path) → (direction, confidence, conditions_met)`
+- `get_frontal_conditions(station, date, metar_db_path, nwp_db_path) → detailed_breakdown_dict`
+- Expected to fire on ~10% of days with 80-85% expected accuracy
+
+**Task completion criteria:**
+- [x] 4.6.1 Create frontal passage detection logic - Complete
+- [x] 4.6.2 Implement 4-condition evaluation - Complete  
+- [x] 4.6.3 Wire into paper trading engine - Complete
+- [x] 4.6.4 Add configuration flags - Complete
+
+**Expected impact:** Adds meteorological phenomenon detection for cold/warm fronts which can cause rapid temperature changes, increasing signal diversity and accuracy by identifying major atmospheric transitions.
+
 **Implementation:**
 - Created `core/signals/dewpoint_depression_modulator.py` 
 - DPD > 15°F: confidence * 1.2 (max 0.95) for clear sky conditions
