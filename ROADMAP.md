@@ -90,6 +90,30 @@
 
 **Goal:** Expand to Polymarket, add secondary signals, optimize parameters
 
+### Phase 4.1: Spatial Coherence Gate (IN PROGRESS)
+**Goal:** Enhance signal quality by grouping 20 stations into 6 NOAA climate regions, applying confidence modulation based on regional consensus
+
+**Status:** IMPLEMENTED (July 21, 2026)
+
+**Implementation:**
+- Created `core/spatial_coherence.py` with 6 regional groupings based on NOAA climate divisions
+- Group stations: Northeast (4), Southeast (4), Midwest (4), South Central (3), West (3), Pacific Coast (3)
+- Apply confidence boost (+15%) when station agrees with regional majority consensus
+- Apply confidence penalty (-40%) when station disagrees with regional majority consensus
+- Promote to "Sure Thing" lane when all stations in region agree and have high enough confidence (>0.70)
+- Wire into paper trading after agreement gate, before alert generation
+- Configurable via environment variables (SPATIAL_COHERENCE_ENABLED, SPATIAL_BOOST_FACTOR, SPATIAL_PENALTY_FACTOR)
+
+**Task completion criteria:**
+- [x] 4.1.1 Create spatial coherence logic - Complete
+- [x] 4.1.2 Group 20 stations into 6 NOAA climate regions - Complete
+- [x] 4.1.3 Implement confidence modulation based on regional consensus - Complete
+- [x] 4.1.4 Wire into paper trading engine - Complete
+- [x] 4.1.5 Add configuration flags - Complete
+- [x] 4.1.6 Add "Sure Thing" lane for regional unanimous consensus - Complete
+
+**Expected impact:** Improved signal reliability, reduced isolated false alerts, ~3-5% accuracy improvement based on Gray Room expert recommendations.
+
 ### Phase 7: Kalshi API Integration (COMPLETED)
 
 **Goal:** Full Kalshi API integration with advanced trading mechanisms

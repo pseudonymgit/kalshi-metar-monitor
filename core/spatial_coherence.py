@@ -97,6 +97,12 @@ def apply_spatial_coherence_gate(
         same_direction_count = sum(1 for s in other_signals_in_region if s[2] == direction)
         opposite_direction_count = len(other_signals_in_region) - same_direction_count
         
+        import os
+        spatial_boost_multiplier = 1.0 + float(os.getenv("SPATIAL_BOOST_FACTOR", "0.15"))  # 0.15 becomes 1.15
+        spatial_penalty_multiplier = 1.0 - float(os.getenv("SPATIAL_PENALTY_FACTOR", "0.40"))  # 0.40 becomes 0.60
+        conf_max = float(os.getenv("CONFIDENCE_MAX", "0.95"))
+        conf_min = float(os.getenv("CONFIDENCE_MIN", "0.10"))
+        
         consensus_exists = len(other_signals_in_region) > 0
         if consensus_exists:
             consensus_direction = direction if same_direction_count > opposite_direction_count else (
@@ -106,10 +112,10 @@ def apply_spatial_coherence_gate(
             # Check if current station agrees with regional consensus
             if consensus_direction and consensus_direction == direction:
                 # Station agrees with regional consensus, BOOST confidence
-                new_confidence = min(original_confidence * 1.15, 0.95)
+                new_confidence = min(original_confidence * spatial_boost_multiplier, conf_max)
             elif consensus_direction and consensus_direction != direction:
                 # Station disagrees with regional consensus, REDUCE confidence
-                new_confidence = max(original_confidence * 0.60, 0.10)
+                new_confidence = max(original_confidence * spatial_penalty_multiplier, conf_min)
             else:
                 # Split vote, no strong consensus
                 new_confidence = original_confidence
@@ -148,25 +154,31 @@ def apply_regional_super_consensus(signals: List[Tuple[str, str, str, str, float
         
         if region and region in region_to_directions:
             # Check if all signals in this region agree directionally
-            region_signals = region_to_directions[region]
+            region_signals = [s for s in signals if get_region_for_station(s[0]) == region]
+            region_directions = [s[2] for s in region_signals]  # Get directions for stations in region
             
-            # Get the actual stations that have signals in this region
-            region_stations_with_signals = [s[0] for s in signals if get_region_for_station(s[0]) == region]
-            actual_region_stations = STATION_REGIONS[region]
+            # Check if all signals in this region agree on the same direction
+            all_agree_direction = len(set(region_directions)) == 1 if region_directions else False
+            actual_region_station_list = STATION_REGIONS[region]
             
-            # Check if all stations from this region have signals AND they all agree
-            all_have_signals = set(actual_region_stations).issubset(set(region_stations_with_signals))
-            all_agree_direction = len(set(s[0] for s in region_signals)) == 1  # All directions are the same
+            # Check if ALL stations in the physical region have a matching signal in our dataset
+            region_stations_with_signals = [s[0] for s in region_signals]
+            all_stations_present = set(actual_region_station_list).issubset(set(region_stations_with_signals))
             
-            current_signal_belongs_to_complete_agreement = any(s[0] == station for s in signals)
+            # Only promote to sure thing if all region stations agree AND all region stations are active
+            current_station_is_part_of_region = station in actual_region_station_list and station in region_stations_with_signals
             
-            if all_have_signals and all_agree_direction and current_signal_belongs_to_complete_agreement:
-                # Apply sure thing boost if confidence is already high enough
-                if original_confidence > 0.70:
-                    new_confidence = min(original_confidence * 1.10, 0.98)  # Small additional boost
+            if all_agree_direction and all_stations_present and current_station_is_part_of_region:
+                # Apply sure thing promotion if confidence is already high enough
+                sure_thing_min_conf = float(os.getenv("SURE_THING_MIN_CONFIDENCE", "0.70"))
+                sure_thing_bonus_multiplier = 1.0 + float(os.getenv("SURE_THING_BONUS_MULTIPLIER", "0.10"))  # Small additional boost
+                max_sure_conf = float(os.getenv("SURE_THING_MAX_CONFIDENCE", "0.98"))
+                
+                if original_confidence > sure_thing_min_conf:
+                    new_confidence = min(original_confidence * sure_thing_bonus_multiplier, max_sure_conf)
                     updated_signals.append((station, f"{market_type}_SURE_THING", direction, f"{reason} | REGIONAL_SUPER_CONSENSUS", new_confidence))
                 else:
-                    updated_signals.append(signal)  # Don't boost low confidence even with super consesus
+                    updated_signals.append(signal)  # Don't boost low confidence even with super consensus
             else:
                 updated_signals.append(signal)
         else:
