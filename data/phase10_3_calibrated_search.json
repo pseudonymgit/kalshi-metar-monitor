@@ -1,0 +1,687 @@
+{
+  "phase10_3_calibrated_search": {
+    "timestamp": "2026-07-21T16:53:15.470016",
+    "combinatorial_source": "data/phase10_combinatorial_search.json",
+    "database": "data/metar_backfill.db",
+    "combinations_tested": 10,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "description": "Rolling walk-forward (180d train, 30d test) with per-signal per-station calibration."
+  },
+  "calibrated_walkforward_results": [
+    {
+      "combo": "pressure_delta+frontal_detector+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 1.0,
+      "calibrated_accuracy": 1.0,
+      "raw_trades": 1,
+      "cal_trades": 1,
+      "stations_tested": 1,
+      "station_breakdown": {
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "persistence+pressure_delta+frontal_detector+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 1.0,
+      "calibrated_accuracy": 1.0,
+      "raw_trades": 1,
+      "cal_trades": 1,
+      "stations_tested": 1,
+      "station_breakdown": {
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "pressure_delta+regime",
+      "min_agreement": 2,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "persistence+pressure_delta+regime",
+      "min_agreement": 2,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "gaussian_v2+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "persistence+gaussian_v2+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "gaussian+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.8,
+      "calibrated_accuracy": 0.8,
+      "raw_trades": 5,
+      "cal_trades": 5,
+      "stations_tested": 3,
+      "station_breakdown": {
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "persistence+gaussian+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.8,
+      "calibrated_accuracy": 0.8,
+      "raw_trades": 5,
+      "cal_trades": 5,
+      "stations_tested": 3,
+      "station_breakdown": {
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "regime",
+      "min_agreement": 1,
+      "raw_accuracy": 0.73913,
+      "calibrated_accuracy": 0.73913,
+      "raw_trades": 23,
+      "cal_trades": 23,
+      "stations_tested": 6,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KHOU": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 6,
+          "cal_trades": 6
+        },
+        "KMIA": {
+          "raw_accuracy": 0.8,
+          "cal_accuracy": 0.8,
+          "raw_trades": 10,
+          "cal_trades": 10
+        },
+        "KSAT": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 3,
+          "cal_trades": 3
+        }
+      }
+    },
+    {
+      "combo": "persistence+regime",
+      "min_agreement": 1,
+      "raw_accuracy": 0.73913,
+      "calibrated_accuracy": 0.73913,
+      "raw_trades": 23,
+      "cal_trades": 23,
+      "stations_tested": 6,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KHOU": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 6,
+          "cal_trades": 6
+        },
+        "KMIA": {
+          "raw_accuracy": 0.8,
+          "cal_accuracy": 0.8,
+          "raw_trades": 10,
+          "cal_trades": 10
+        },
+        "KSAT": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 3,
+          "cal_trades": 3
+        }
+      }
+    }
+  ],
+  "top_20_by_calibrated": [
+    {
+      "combo": "pressure_delta+frontal_detector+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 1.0,
+      "calibrated_accuracy": 1.0,
+      "raw_trades": 1,
+      "cal_trades": 1,
+      "stations_tested": 1,
+      "station_breakdown": {
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "persistence+pressure_delta+frontal_detector+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 1.0,
+      "calibrated_accuracy": 1.0,
+      "raw_trades": 1,
+      "cal_trades": 1,
+      "stations_tested": 1,
+      "station_breakdown": {
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "pressure_delta+regime",
+      "min_agreement": 2,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "persistence+pressure_delta+regime",
+      "min_agreement": 2,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "gaussian_v2+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "persistence+gaussian_v2+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.85714,
+      "calibrated_accuracy": 0.85714,
+      "raw_trades": 7,
+      "cal_trades": 7,
+      "stations_tested": 4,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        }
+      }
+    },
+    {
+      "combo": "gaussian+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.8,
+      "calibrated_accuracy": 0.8,
+      "raw_trades": 5,
+      "cal_trades": 5,
+      "stations_tested": 3,
+      "station_breakdown": {
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "persistence+gaussian+pressure_delta+regime",
+      "min_agreement": 3,
+      "raw_accuracy": 0.8,
+      "calibrated_accuracy": 0.8,
+      "raw_trades": 5,
+      "cal_trades": 5,
+      "stations_tested": 3,
+      "station_breakdown": {
+        "KLAX": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KMIA": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        }
+      }
+    },
+    {
+      "combo": "regime",
+      "min_agreement": 1,
+      "raw_accuracy": 0.73913,
+      "calibrated_accuracy": 0.73913,
+      "raw_trades": 23,
+      "cal_trades": 23,
+      "stations_tested": 6,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KHOU": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 6,
+          "cal_trades": 6
+        },
+        "KMIA": {
+          "raw_accuracy": 0.8,
+          "cal_accuracy": 0.8,
+          "raw_trades": 10,
+          "cal_trades": 10
+        },
+        "KSAT": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 3,
+          "cal_trades": 3
+        }
+      }
+    },
+    {
+      "combo": "persistence+regime",
+      "min_agreement": 1,
+      "raw_accuracy": 0.73913,
+      "calibrated_accuracy": 0.73913,
+      "raw_trades": 23,
+      "cal_trades": 23,
+      "stations_tested": 6,
+      "station_breakdown": {
+        "KAUS": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KHOU": {
+          "raw_accuracy": 1.0,
+          "cal_accuracy": 1.0,
+          "raw_trades": 1,
+          "cal_trades": 1
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 6,
+          "cal_trades": 6
+        },
+        "KMIA": {
+          "raw_accuracy": 0.8,
+          "cal_accuracy": 0.8,
+          "raw_trades": 10,
+          "cal_trades": 10
+        },
+        "KSAT": {
+          "raw_accuracy": 0.5,
+          "cal_accuracy": 0.5,
+          "raw_trades": 2,
+          "cal_trades": 2
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6666666666666666,
+          "cal_accuracy": 0.6666666666666666,
+          "raw_trades": 3,
+          "cal_trades": 3
+        }
+      }
+    }
+  ]
+}

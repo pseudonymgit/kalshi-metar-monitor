@@ -1,0 +1,84 @@
+{
+  "overview": {
+    "half_lives_used": {
+      "nwp_direct": 6.0,
+      "temperature_advection": 6.0,
+      "forecast_disagreement": 2.0,
+      "pressure_delta": 2.0,
+      "calendar_climatology": 24.0,
+      "gaussian": 2.0,
+      "frontal_detector": 1.0,
+      "persistence": 0.0,
+      "wind_direction_shift": 2.0
+    },
+    "training_period": "NaT to NaT",
+    "test_period": "2026-07-01 00:00:00 to 2026-07-20 00:00:00",
+    "total_test_samples": 1648,
+    "total_combinations_evaluated": 15
+  },
+  "unweighted_performance": {
+    "accuracy": 0.1547,
+    "mae": 7089.7955,
+    "rmse": 17592.5548,
+    "trade_count": 1648
+  },
+  "weighted_performance": {
+    "accuracy": 0.1547,
+    "mae": 7089.7955,
+    "rmse": 17592.5548,
+    "trade_count": 1648
+  },
+  "improvement_vs_unweighted": {
+    "accuracy_change": 0.0,
+    "mae_change": 0.0,
+    "rmse_change": 0.0,
+    "trade_count_change": 0
+  },
+  "top_5_combinations_comparison": [
+    {
+      "ensemble_id": "disagreement_ensemble",
+      "unweighted_accuracy": 0.0,
+      "weighted_accuracy": 0.0,
+      "accuracy_improvement": 0.0,
+      "trade_count_unweighted": 261,
+      "trade_count_weighted": 261,
+      "trade_count_change": 0
+    },
+    {
+      "ensemble_id": "ecmwf_precipitation_sum",
+      "unweighted_accuracy": 0.0,
+      "weighted_accuracy": 0.0,
+      "accuracy_improvement": 0.0,
+      "trade_count_unweighted": 101,
+      "trade_count_weighted": 101,
+      "trade_count_change": 0
+    },
+    {
+      "ensemble_id": "ecmwf_temperature_2m_max",
+      "unweighted_accuracy": 0.5743,
+      "weighted_accuracy": 0.5743,
+      "accuracy_improvement": 0.0,
+      "trade_count_unweighted": 101,
+      "trade_count_weighted": 101,
+      "trade_count_change": 0
+    },
+    {
+      "ensemble_id": "ecmwf_temperature_2m_min",
+      "unweighted_accuracy": 0.0198,
+      "weighted_accuracy": 0.0198,
+      "accuracy_improvement": 0.0,
+      "trade_count_unweighted": 101,
+      "trade_count_weighted": 101,
+      "trade_count_change": 0
+    },
+    {
+      "ensemble_id": "ecmwf_temperature_850hPa_daily_mean",
+      "unweighted_accuracy": 0.0,
+      "weighted_accuracy": 0.0,
+      "accuracy_improvement": 0.0,
+      "trade_count_unweighted": 101,
+      "trade_count_weighted": 101,
+      "trade_count_change": 0
+    }
+  ]
+}
