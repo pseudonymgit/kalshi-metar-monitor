@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "generation_timestamp": "2026-07-21T19:55:03.682379",
+    "script_version": "v1.0",
+    "description": "Bayesian Log-Odds Fusion vs Agree-N Gate Experiment"
+  },
+  "method_comparison": {
+    "bayesian_fusion": {
+      "trade_count": 128,
+      "accuracy": 0.684,
+      "correct_predictions": 88
+    },
+    "agree_n_approach": {
+      "trade_count": 76,
+      "n_threshold": 2,
+      "accuracy": 0.711,
+      "correct_predictions": 54
+    }
+  },
+  "analysis": {
+    "bayesian_vs_agree_n": {
+      "more_trades": true,
+      "better_accuracy": false,
+      "trade_increase_percentage": 68.4,
+      "accuracy_difference_percentage": -2.7
+    }
+  }
+}

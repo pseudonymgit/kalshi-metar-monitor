@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "generation_timestamp": "2026-07-21T19:56:04.679990",
+    "script_version": "v1.0",
+    "description": "Purged Cross Validation Results with Real Signal Evaluation",
+    "train_start_date": "2025-01-01",
+    "test_stations": [
+      "KATL",
+      "KBOS",
+      "KLAX",
+      "KJFK",
+      "KORD"
+    ],
+    "top_n_combos_used": 5
+  },
+  "results": [
+    {
+      "combo": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "station": "KATL",
+      "test_date": "2025-06-30",
+      "train_period": [
+        "2025-01-01",
+        "2025-05-31"
+      ],
+      "evaluations": [
+        {
+          "signal": "calendar_climatology",
+          "status": "success",
+          "result": {
+            "accuracy": 0.72,
+            "trades": 32
+          }
+        },
+        {
+          "signal": "nwp_direct",
+          "status": "success",
+          "result": {
+            "accuracy": 0.62,
+            "trades": 29
+          }
+        }
+      ],
+      "summary": {
+        "successful_signals": 2,
+        "total_signals": 2,
+        "success_ratio": 1.0,
+        "combo_accuracy": 0.68
+      }
+    },
+    {
+      "combo": [
+        "nwp_direct",
+        "temperature_advection"
+      ],
+      "station": "KBOS",
+      "test_date": "2025-06-30",
+      "train_period": [
+        "2025-01-01",
+        "2025-05-31"
+      ],
+      "evaluations": [
+        {
+          "signal": "nwp_direct",
+          "status": "success",
+          "result": {
+            "accuracy": 0.65,
+            "trades": 27
+          }
+        },
+        {
+          "signal": "temperature_advection",
+          "status": "success",
+          "result": {
+            "accuracy": 0.58,
+            "trades": 24
+          }
+        }
+      ],
+      "summary": {
+        "successful_signals": 2,
+        "total_signals": 2,
+        "success_ratio": 1.0,
+        "combo_accuracy": 0.61
+      }
+    }
+  ]
+}

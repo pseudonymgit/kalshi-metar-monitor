@@ -1,0 +1,196 @@
+{
+  "phase11_combinatorial_search": {
+    "timestamp": "2026-07-21T18:52:53.376003",
+    "database": "data/metar_backfill.db",
+    "combos_tested": 12,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "description": "Compare METAR-only vs NWP-included combos"
+  },
+  "results": [
+    {
+      "label": "cc_only",
+      "signals": [
+        "calendar_climatology"
+      ],
+      "min_agreement": 1,
+      "accuracy": 0.7003,
+      "trades": 5669,
+      "correct": 3970,
+      "total": 5669,
+      "stations": 20
+    },
+    {
+      "label": "fd+cc",
+      "signals": [
+        "forecast_disagreement",
+        "calendar_climatology"
+      ],
+      "min_agreement": 2,
+      "accuracy": 0.71313,
+      "trades": 3946,
+      "correct": 2814,
+      "total": 3946,
+      "stations": 20
+    },
+    {
+      "label": "pd+fd+cc",
+      "signals": [
+        "pressure_delta",
+        "forecast_disagreement",
+        "calendar_climatology"
+      ],
+      "min_agreement": 3,
+      "accuracy": 0.723,
+      "trades": 2657,
+      "correct": 1921,
+      "total": 2657,
+      "stations": 20
+    },
+    {
+      "label": "pd+fd+cc+regime",
+      "signals": [
+        "pressure_delta",
+        "forecast_disagreement",
+        "calendar_climatology",
+        "regime"
+      ],
+      "min_agreement": 3,
+      "accuracy": 0.72293,
+      "trades": 2660,
+      "correct": 1923,
+      "total": 2660,
+      "stations": 20
+    },
+    {
+      "label": "nwp_direct",
+      "signals": [
+        "nwp_direct"
+      ],
+      "min_agreement": 1,
+      "accuracy": 0.52526,
+      "trades": 1702,
+      "correct": 894,
+      "total": 1702,
+      "stations": 20
+    },
+    {
+      "label": "nwp+cc",
+      "signals": [
+        "nwp_direct",
+        "calendar_climatology"
+      ],
+      "min_agreement": 2,
+      "accuracy": 0.58763,
+      "trades": 291,
+      "correct": 171,
+      "total": 291,
+      "stations": 20
+    },
+    {
+      "label": "nwp+fd+cc",
+      "signals": [
+        "nwp_direct",
+        "forecast_disagreement",
+        "calendar_climatology"
+      ],
+      "min_agreement": 2,
+      "accuracy": 0.69557,
+      "trades": 4474,
+      "correct": 3112,
+      "total": 4474,
+      "stations": 20
+    },
+    {
+      "label": "nwp+pd+fd+cc",
+      "signals": [
+        "nwp_direct",
+        "pressure_delta",
+        "forecast_disagreement",
+        "calendar_climatology"
+      ],
+      "min_agreement": 3,
+      "accuracy": 0.71391,
+      "trades": 3006,
+      "correct": 2146,
+      "total": 3006,
+      "stations": 20
+    },
+    {
+      "label": "nwp+regime",
+      "signals": [
+        "nwp_direct",
+        "regime"
+      ],
+      "min_agreement": 2,
+      "accuracy": 0.71429,
+      "trades": 7,
+      "correct": 5,
+      "total": 7,
+      "stations": 2
+    },
+    {
+      "label": "nwp+pd+regime",
+      "signals": [
+        "nwp_direct",
+        "pressure_delta",
+        "regime"
+      ],
+      "min_agreement": 2,
+      "accuracy": 0.56366,
+      "trades": 754,
+      "correct": 425,
+      "total": 754,
+      "stations": 20
+    },
+    {
+      "label": "nwp+gauss+cc",
+      "signals": [
+        "nwp_direct",
+        "gaussian",
+        "calendar_climatology"
+      ],
+      "min_agreement": 2,
+      "accuracy": 0.69474,
+      "trades": 6044,
+      "correct": 4199,
+      "total": 6044,
+      "stations": 20
+    },
+    {
+      "label": "nwp+fd+gauss+cc",
+      "signals": [
+        "nwp_direct",
+        "forecast_disagreement",
+        "gaussian",
+        "calendar_climatology"
+      ],
+      "min_agreement": 3,
+      "accuracy": 0.7132,
+      "trades": 4205,
+      "correct": 2999,
+      "total": 4205,
+      "stations": 20
+    }
+  ]
+}

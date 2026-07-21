@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "generation_timestamp": "2026-07-21T19:55:33.042805",
+    "script_version": "v1.0",
+    "description": "Climatology Residual vs Full Climatology Accuracy Analysis",
+    "stations_count": 8,
+    "date_range": {
+      "start": "2025-01-01",
+      "end": "2025-05-01"
+    },
+    "days_count": 120
+  },
+  "components": {
+    "gfs_baseline": {
+      "accuracy_metrics": {
+        "accuracy": 0.58,
+        "precision": 45,
+        "total_predictions": 78,
+        "mae": 0.14,
+        "rmse": 0.22
+      }
+    },
+    "full_climatology": {
+      "accuracy_metrics": {
+        "accuracy": 0.72,
+        "precision": 68,
+        "total_predictions": 95,
+        "mae": 0.11,
+        "rmse": 0.18
+      }
+    },
+    "calculated_residuals": {
+      "accuracy_metrics": {
+        "accuracy": 0.65,
+        "precision": 52,
+        "total_predictions": 80,
+        "mae": 0.12,
+        "rmse": 0.19
+      },
+      "has_any_residuals": true
+    }
+  }
+}

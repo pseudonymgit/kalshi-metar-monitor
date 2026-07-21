@@ -1,0 +1,791 @@
+{
+  "metadata": {
+    "generation_timestamp": "2026-07-21T20:15:54.919998",
+    "script_version": "v2.0",
+    "description": "Fixed Purged Cross Validation Results - 5 Combos x 5 Stations",
+    "database_used": "data/metar_backfill.db",
+    "combination_count": 5,
+    "station_count": 5,
+    "total_tests_run": 25,
+    "expected_tests": 25,
+    "train_start_date": "2025-01-01",
+    "test_stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN"
+    ],
+    "purge_buffer_days": 30
+  },
+  "results": [
+    {
+      "combo_name": "climate_plus_nwp",
+      "station": "KATL",
+      "signal_count": 2,
+      "signals_used": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 3,
+      "correct_predictions": 2,
+      "accuracy": 0.6666666666666666,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "climate_plus_nwp",
+      "station": "KAUS",
+      "signal_count": 2,
+      "signals_used": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 2,
+      "correct_predictions": 1,
+      "accuracy": 0.5,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "climate_plus_nwp",
+      "station": "KBOS",
+      "signal_count": 2,
+      "signals_used": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 3,
+      "correct_predictions": 2,
+      "accuracy": 0.6666666666666666,
+      "daily_results": [
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 334,
+          "date": "2021-12-01",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "climate_plus_nwp",
+      "station": "KDCA",
+      "signal_count": 2,
+      "signals_used": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 3,
+      "correct_predictions": 2,
+      "accuracy": 0.6666666666666666,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "climate_plus_nwp",
+      "station": "KDEN",
+      "signal_count": 2,
+      "signals_used": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "advective_flow",
+      "station": "KATL",
+      "signal_count": 2,
+      "signals_used": [
+        "temperature_advection",
+        "wind_direction_shift"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "advective_flow",
+      "station": "KAUS",
+      "signal_count": 2,
+      "signals_used": [
+        "temperature_advection",
+        "wind_direction_shift"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "advective_flow",
+      "station": "KBOS",
+      "signal_count": 2,
+      "signals_used": [
+        "temperature_advection",
+        "wind_direction_shift"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "advective_flow",
+      "station": "KDCA",
+      "signal_count": 2,
+      "signals_used": [
+        "temperature_advection",
+        "wind_direction_shift"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 3,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        },
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        }
+      ]
+    },
+    {
+      "combo_name": "advective_flow",
+      "station": "KDEN",
+      "signal_count": 2,
+      "signals_used": [
+        "temperature_advection",
+        "wind_direction_shift"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "disagreement_cluster",
+      "station": "KATL",
+      "signal_count": 3,
+      "signals_used": [
+        "forecast_disagreement",
+        "nwp_analog",
+        "gaussian"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 1,
+      "correct_predictions": 1,
+      "accuracy": 1.0,
+      "daily_results": [
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "disagreement_cluster",
+      "station": "KAUS",
+      "signal_count": 3,
+      "signals_used": [
+        "forecast_disagreement",
+        "nwp_analog",
+        "gaussian"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 2,
+      "correct_predictions": 1,
+      "accuracy": 0.5,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "disagreement_cluster",
+      "station": "KBOS",
+      "signal_count": 3,
+      "signals_used": [
+        "forecast_disagreement",
+        "nwp_analog",
+        "gaussian"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 2,
+      "correct_predictions": 1,
+      "accuracy": 0.5,
+      "daily_results": [
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "disagreement_cluster",
+      "station": "KDCA",
+      "signal_count": 3,
+      "signals_used": [
+        "forecast_disagreement",
+        "nwp_analog",
+        "gaussian"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 1,
+      "correct_predictions": 1,
+      "accuracy": 1.0,
+      "daily_results": [
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "disagreement_cluster",
+      "station": "KDEN",
+      "signal_count": 3,
+      "signals_used": [
+        "forecast_disagreement",
+        "nwp_analog",
+        "gaussian"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "front_pressure_combo",
+      "station": "KATL",
+      "signal_count": 2,
+      "signals_used": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 4,
+      "correct_predictions": 3,
+      "accuracy": 0.75,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": true
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "down",
+          "predicted_confidence": 0.6153846153846154,
+          "actual_direction": "down",
+          "was_correct": true
+        },
+        {
+          "day_index": 334,
+          "date": "2021-12-01",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        }
+      ]
+    },
+    {
+      "combo_name": "front_pressure_combo",
+      "station": "KAUS",
+      "signal_count": 2,
+      "signals_used": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 5,
+      "correct_predictions": 4,
+      "accuracy": 0.8,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": true
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        },
+        {
+          "day_index": 334,
+          "date": "2021-12-01",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "front_pressure_combo",
+      "station": "KBOS",
+      "signal_count": 2,
+      "signals_used": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 4,
+      "correct_predictions": 3,
+      "accuracy": 0.75,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "down",
+          "predicted_confidence": 0.6153846153846154,
+          "actual_direction": "down",
+          "was_correct": true
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": true
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        },
+        {
+          "day_index": 334,
+          "date": "2021-12-01",
+          "predicted_direction": "up",
+          "predicted_confidence": 0.6153846153846154,
+          "actual_direction": "up",
+          "was_correct": true
+        }
+      ]
+    },
+    {
+      "combo_name": "front_pressure_combo",
+      "station": "KDCA",
+      "signal_count": 2,
+      "signals_used": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 5,
+      "correct_predictions": 2,
+      "accuracy": 0.4,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": true
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "up",
+          "predicted_confidence": 0.5294117647058824,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "up",
+          "predicted_confidence": 0.5725922697864572,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 334,
+          "date": "2021-12-01",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        }
+      ]
+    },
+    {
+      "combo_name": "front_pressure_combo",
+      "station": "KDEN",
+      "signal_count": 2,
+      "signals_used": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "agreement_threshold": 1,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 5,
+      "correct_predictions": 1,
+      "accuracy": 0.2,
+      "daily_results": [
+        {
+          "day_index": 330,
+          "date": "2021-11-27",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 331,
+          "date": "2021-11-28",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": true
+        },
+        {
+          "day_index": 332,
+          "date": "2021-11-29",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        },
+        {
+          "day_index": 333,
+          "date": "2021-11-30",
+          "predicted_direction": "up",
+          "predicted_confidence": 1.0,
+          "actual_direction": "down",
+          "was_correct": false
+        },
+        {
+          "day_index": 334,
+          "date": "2021-12-01",
+          "predicted_direction": "down",
+          "predicted_confidence": 1.0,
+          "actual_direction": "up",
+          "was_correct": false
+        }
+      ]
+    },
+    {
+      "combo_name": "diverse_blend",
+      "station": "KATL",
+      "signal_count": 3,
+      "signals_used": [
+        "persistence",
+        "gaussian",
+        "regime"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "diverse_blend",
+      "station": "KAUS",
+      "signal_count": 3,
+      "signals_used": [
+        "persistence",
+        "gaussian",
+        "regime"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "diverse_blend",
+      "station": "KBOS",
+      "signal_count": 3,
+      "signals_used": [
+        "persistence",
+        "gaussian",
+        "regime"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "diverse_blend",
+      "station": "KDCA",
+      "signal_count": 3,
+      "signals_used": [
+        "persistence",
+        "gaussian",
+        "regime"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    },
+    {
+      "combo_name": "diverse_blend",
+      "station": "KDEN",
+      "signal_count": 3,
+      "signals_used": [
+        "persistence",
+        "gaussian",
+        "regime"
+      ],
+      "agreement_threshold": 2,
+      "data_points_available": 1700,
+      "data_used_for_testing": 5,
+      "total_predictions": 0,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "daily_results": []
+    }
+  ]
+}
