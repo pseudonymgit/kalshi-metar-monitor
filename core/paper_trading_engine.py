@@ -2846,6 +2846,54 @@ def daily_paper_run(run_date=None):
         # Ensure signals have confidence values (default 0.5) for downstream compatibility
         signals = [(s[0], s[1], s[2], s[3], 0.5) if len(s) < 5 else s for s in signals]
 
+    # Apply intraday METAR confirmation signal to adjust confidence based on same-day temperature trends
+    # Only applies to signals where same-day METAR data is available (dates within last 24 hours)
+    print("Applying intraday METAR confirmation...")
+    intraday_confirmation_enabled = os.getenv('INTRADAY_CONFIRMATION_ENABLED', 'True').lower() == 'true'
+    
+    if intraday_confirmation_enabled:
+        confirmed_signals = []
+        intraday_confirmed = 0
+        intraday_adjustments = 0
+        
+        for signal in signals:
+            if len(signal) >= 5:
+                # Extract signal components including original confidence
+                station, market_type, signal_direction, reason, original_confidence = signal[0], signal[1], signal[2], signal[3], signal[4]
+                
+                # For intraday confirmation, predict direction: 'UP' if we expect higher temperature, 'DOWN' if lower
+                predicted_direction = signal_direction.value  # MarketSide.UP.value='UP', MarketSide.DOWN.value='DOWN'
+                
+                # Get intraday confirmation
+                confirmation_result = get_intraday_confirmation(
+                    station=station,
+                    date=run_date,
+                    metar_db_path=trader.metar_db,
+                    predicted_direction=predicted_direction,
+                    base_confidence=original_confidence
+                )
+                
+                if confirmation_result is not None:
+                    # Apply intraday confirmation adjustment
+                    intraday_confirmed += 1
+                    new_confidence, confirmation_reason, details = confirmation_result
+                    
+                    if abs(new_confidence - original_confidence) > 0.001:  # Only count if changed meaningfully
+                        intraday_adjustments += 1
+                        
+                    confirmed_signals.append((
+                        station, market_type, signal_direction, reason, new_confidence
+                    ))
+                else:
+                    # No intraday confirmation available for this signal, keep as is
+                    confirmed_signals.append(signal)
+            else:
+                # Signal doesn't have confidence value, append as is
+                confirmed_signals.append(signal)
+        
+        signals = confirmed_signals
+        print(f"Applied intraday confirmation to {intraday_confirmed} signals, made meaningful confidence adjustments to {intraday_adjustments} signals")
+    
     print(f"Generated {len(signals)} signals:")
     for i, sig in enumerate(signals):
         if len(sig) >= 5:  
