@@ -186,7 +186,19 @@ HAS_NWP_ANOG = NWP_ANALOG_ENABLED
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 # Import Temperature Advection Signal (850-mb advection)
+# Dewpoint Depression Modulation - Phase 4.3 config flag
+dewpoint_depression_modulation_enabled = os.getenv('DEWPOINT_MODULATION_ENABLED', 'True').lower() == 'true'
+DEWPOINT_MODULATION_ENABLED = dewpoint_depression_modulation_enabled
+
 TEMPERATURE_ADVECTION_ENABLED = True
+dewpoint_depression_imported = False
+try:
+    from core.signals.dewpoint_depression_modulator import modulate_confidence
+    dewpoint_depression_imported = True
+    print("INFO: Dewpoint depression modulator imported successfully")
+except ImportError as e:
+    print(f"Warning: Dewpoint depression modulator import failed: {e}")
+    modulate_confidence = None
 try:
     from core.signals.temperature_advection_signal import TemperatureAdvectionSignal
     # Skip logger info due to initialization order; _LOGGER defined after imports
@@ -2740,6 +2752,47 @@ def daily_paper_run(run_date=None):
         
         print(f"Applied spatial coherence to {len(signals_with_conf)} signals, modified confidence of {conf_modified} signals")
         signals = signals_with_conf
+        
+        # Apply dewpoint depression modulation after spatial coherence gate
+        DEWPOINT_MODULATION_ENABLED = dewpoint_depression_modulation_enabled
+        if DEWPOINT_MODULATION_ENABLED and dewpoint_depression_imported:
+            print("Applying dewpoint depression modulation...")
+            
+            # Parse date string to datetime object
+            try:
+                run_datetime = datetime.strptime(run_date, '%Y-%m-%d')
+            except ValueError:
+                # Try ISO format if not basic format
+                from datetime import datetime, timezone
+                run_datetime = datetime.fromisoformat(run_date.replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
+                
+            modulated_signals = []
+            dpd_modifications = 0
+            for signal in signals:
+                if len(signal) >= 5:
+                    # Signal contains confidence value
+                    station, market_type, signal_direction, reason, original_confidence = signal[0], signal[1], signal[2], signal[3], signal[4]
+                    
+                    # Apply dewpoint depression modulation
+                    modulated_confidence = modulate_confidence(
+                        station=station,
+                        date=run_datetime,
+                        metar_db_path=trader.metar_db,
+                        confidence=original_confidence
+                    )
+                    
+                    if abs(original_confidence - modulated_confidence) > 0.001:
+                        dpd_modifications += 1
+                    
+                    modulated_signals.append((
+                        station, market_type, signal_direction, reason, modulated_confidence
+                    ))
+                else:
+                    # Backwards compatibility - append default confidence
+                    modulated_signals.append((*signal, 0.5))
+            
+            signals = modulated_signals
+            print(f"Applied dewpoint depression modulation to {len(signals_with_conf)} signals, modified confidence of {dpd_modifications} signals")
     else:
         print("Spatial coherence gate disabled")
         # Ensure signals have confidence values (default 0.5) for downstream compatibility

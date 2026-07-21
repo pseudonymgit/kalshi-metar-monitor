@@ -90,10 +90,33 @@
 
 **Goal:** Expand to Polymarket, add secondary signals, optimize parameters
 
-### Phase 4.1: Spatial Coherence Gate (IN PROGRESS)
+### Phase 4.1: Spatial Coherence Gate (IMPLEMENTED)
 **Goal:** Enhance signal quality by grouping 20 stations into 6 NOAA climate regions, applying confidence modulation based on regional consensus
 
 **Status:** IMPLEMENTED (July 21, 2026)
+
+### Phase 4.3: Dewpoint Depression Modulator (IMPLEMENTED)
+**Goal:** Apply confidence boost/penalty based on humidity levels using dewpoint depression (DPD = temperature - dewpoint). Boost confidence by 20% when DPD > 15°F (clear skies), penalty of 20% when DPD < 5°F (cloudy), no change for 5-15°F.
+
+**Status:** IMPLEMENTED (July 21, 2026)
+
+**Implementation:**
+- Created `core/signals/dewpoint_depression_modulator.py` 
+- DPD > 15°F: confidence * 1.2 (max 0.95) for clear sky conditions
+- DPD < 5°F: confidence * 0.8 for cloudy conditions  
+- 5-15°F DPD: no change for moderate humidity
+- Wire into paper trading engine after spatial coherence gate
+- Configurable via environment variables (DEWPOINT_MODULATION_ENABLED)
+
+**Task completion criteria:**
+- [x] 4.3.1 Create dewpoint depression logic - Complete
+- [x] 4.3.2 Implement confidence modulation based on DPD values - Complete 
+- [x] 4.3.3 Wire into paper trading engine - Complete
+- [x] 4.3.4 Add configuration flags - Complete
+
+**Expected impact:** Improved signal reliability by accounting for atmospheric humidity conditions, potentially ~2-3% accuracy improvement based on meteorological first principles.
+
+### Phase 4.1: Spatial Coherence Gate (IMPLEMENTED)
 
 **Implementation:**
 - Created `core/spatial_coherence.py` with 6 regional groupings based on NOAA climate divisions
