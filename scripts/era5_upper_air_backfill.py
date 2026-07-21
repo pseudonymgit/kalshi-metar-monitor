@@ -551,10 +551,18 @@ def process_netcdf_file(nc_path, station_code, station_lat, station_lon):
         return da.values
 
     # Extract time series for each variable at nearest point
-    temp_series = extract_series(ds, "t", 85000) or extract_series(ds, "temperature", 85000)
-    u_series = extract_series(ds, "u", 85000) or extract_series(ds, "u_component_of_wind", 85000)
-    v_series = extract_series(ds, "v", 85000) or extract_series(ds, "v_component_of_wind", 85000)
-    z_series = extract_series(ds, "z", 50000) or extract_series(ds, "geopotential", 50000)
+    temp_series = extract_series(ds, "t", 85000)
+    if temp_series is None:
+        temp_series = extract_series(ds, "temperature", 85000)
+    u_series = extract_series(ds, "u", 85000)
+    if u_series is None:
+        u_series = extract_series(ds, "u_component_of_wind", 85000)
+    v_series = extract_series(ds, "v", 85000)
+    if v_series is None:
+        v_series = extract_series(ds, "v_component_of_wind", 85000)
+    z_series = extract_series(ds, "z", 50000)
+    if z_series is None:
+        z_series = extract_series(ds, "geopotential", 50000)
 
     # For each date, compute daily means
     for date_str, indices in date_to_indices.items():

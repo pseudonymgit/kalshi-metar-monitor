@@ -1,201 +1,175 @@
-#!/usr/bin/env python3
 """
-Spatial Coherence Gate — Regional Consensus Confidence Modifier
-
-Applied AFTER signal generation, BEFORE ensemble voting.
-
-For each station region, computes regional consensus on direction (up/down/neutral)
-and adjusts individual station confidence based on agreement with the region.
-
-Regions:
-  - Northeast: KNYC, KBOS, KPHL, KDCA
-  - Southeast: KATL, KMIA, KMSY, KHOU
-  - Midwest: KMDW, KMSP, KDFW, KOKC
-  - West Coast: KLAX, KSFO, KSEA
-  - Southwest: KPHX, KLAS, KDEN, KSAT, KAUS
-
-Modulation:
-  - City disagrees with region, both low confidence  (<0.70): reduce 30-50%
-  - City high confidence (>0.80) but region disagrees: cap at 0.70
-  - Region strong consensus (>0.80) and city agrees: boost 10-20%
-
-Usage:
-    from core.spatial_coherence import apply_spatial_coherence_gate
-    adjusted_signals = apply_spatial_coherence_gate(per_station_signals)
+Spatial Coherence Gate for Weather Engine
+Groups stations into NOAA climate regions and applies confidence modulation
+based on regional consensus to enhance signal quality.
 """
 
+from typing import List, Tuple, Dict, Set
 import logging
-from typing import Dict, List, Optional, Tuple
 
-_logger = logging.getLogger(__name__)
-
-# ─── Station Regions ────────────────────────────────────────────────────────
-
+# Station to region mapping based on NOAA climate divisions
 STATION_REGIONS = {
-    "northeast": ["KNYC", "KBOS", "KPHL", "KDCA"],
-    "southeast": ["KATL", "KMIA", "KMSY", "KHOU"],
-    "midwest":   ["KMDW", "KMSP", "KDFW", "KOKC"],
-    "west_coast": ["KLAX", "KSFO", "KSEA"],
-    "southwest": ["KPHX", "KLAS", "KDEN", "KSAT", "KAUS"],
+    "Northeast": ["KBOS", "KNYC", "KPHL", "KDCA"],
+    "Southeast": ["KATL", "KMIA", "KMSY", "KHOU"],
+    "Midwest": ["KORD", "KMDW", "KMSP", "KOKC"],
+    "South Central": ["KDFW", "KAUS", "KSAT"],
+    "West": ["KDEN", "KPHX", "KLAS"],
+    "Pacific Coast": ["KLAX", "KSFO", "KSEA"],
 }
 
-# Reverse mapping: station -> region name
-_STATION_TO_REGION = {
-    station: region
-    for region, stations in STATION_REGIONS.items()
-    for station in stations
-}
-
-# Default confidence boost/reduction factors
-CONFIDENCE_REDUCTION_LOW = 0.6     # 40% reduction: city disagrees region, both low
-CONFIDENCE_REDUCTION_HIGH = 0.5    # 50% reduction: if both very low
-CONFIDENCE_CAP = 0.70              # Cap: city high conf but region disagrees
-CONFIDENCE_BOOST_MIN = 1.10        # 10% boost: region strong consensus, city agrees
-CONFIDENCE_BOOST_MAX = 1.20        # 20% boost: very strong agreement
+# Reverse lookup: from station to region
+STATION_TO_REGION = {}
+for region, stations in STATION_REGIONS.items():
+    for station in stations:
+        STATION_TO_REGION[station] = region
 
 
-def get_region_for_station(station: str) -> Optional[str]:
-    """Return the region name for a station, or None if unassigned."""
-    return _STATION_TO_REGION.get(station.upper())
-
-
-def get_stations_in_region(region: str) -> List[str]:
-    """Return the list of stations in a region."""
-    return STATION_REGIONS.get(region, [])
-
-
-def compute_regional_consensus(
-    station_signals: Dict[str, Tuple[Optional[str], float]],
-) -> Dict[str, Dict]:
-    """
-    For each region, compute the majority direction and consensus strength.
-
-    Args:
-        station_signals: dict mapping station code -> (direction, confidence)
-
-    Returns:
-        dict mapping region name -> {
-            'majority_direction': 'up'|'down'|None,
-            'consensus_strength': float (0.0-1.0),
-            'total_signals': int,
-            'agreeing': int,
-        }
-    """
-    # Group stations by region
-    region_votes: Dict[str, Dict[str, list]] = {}
-    for station, (direction, confidence) in station_signals.items():
-        region = get_region_for_station(station)
-        if region is None or direction is None:
-            continue
-        if region not in region_votes:
-            region_votes[region] = {"up": [], "down": []}
-        region_votes[region][direction].append((station, confidence))
-
-    result = {}
-    for region, votes in region_votes.items():
-        up_count = len(votes["up"])
-        down_count = len(votes["down"])
-        total = up_count + down_count
-
-        if total == 0:
-            result[region] = {
-                "majority_direction": None,
-                "consensus_strength": 0.0,
-                "total_signals": 0,
-                "agreeing": 0,
-            }
-            continue
-
-        if up_count > down_count:
-            majority = "up"
-            agreeing = up_count
-        elif down_count > up_count:
-            majority = "down"
-            agreeing = down_count
-        else:
-            majority = None  # tie
-            agreeing = total  # counts as perfect agreement on "no consensus"
-
-        consensus_strength = agreeing / total
-
-        result[region] = {
-            "majority_direction": majority,
-            "consensus_strength": consensus_strength,
-            "total_signals": total,
-            "agreeing": agreeing,
-        }
-
-    return result
+def get_region_for_station(station: str) -> str:
+    """Get the climate region for a given station."""
+    return STATION_TO_REGION.get(station)
 
 
 def apply_spatial_coherence_gate(
-    per_station_signals: Dict[str, Tuple[Optional[str], float]],
-) -> Dict[str, Tuple[Optional[str], float]]:
+    signals: List[Tuple[str, str, str, str]], 
+    date: str, 
+    metar_db
+) -> List[Tuple[str, str, str, str, float]]:
     """
-    Apply spatial coherence gate to adjust confidence values.
-
-    The gate is applied AFTER signal generation, BEFORE ensemble voting.
-
+    Apply spatial coherence filtering to enhance signal confidence based on regional consensus.
+    
     Args:
-        per_station_signals: dict mapping station code -> (direction, confidence)
-
+        signals: List of (station, market_type, direction, reason) tuples
+        date: Trading date
+        metar_db: METAR database instance
+    
     Returns:
-        dict mapping station code -> (direction, adjusted_confidence)
-        Only stations in known regions are modified; others pass through unchanged.
+        Updated list of signals with confidence scores applied (station, market_type, direction, reason, confidence)
     """
-    if not per_station_signals:
-        return per_station_signals
-
-    adjusted = dict(per_station_signals)  # Copy to avoid mutating input
-
-    # Compute regional consensus
-    region_consensus = compute_regional_consensus(per_station_signals)
-
-    for station, (direction, confidence) in adjusted.items():
-        region = get_region_for_station(station)
-        if region is None or direction is None:
-            continue
-
-        consensus = region_consensus.get(region)
-        if consensus is None or consensus["majority_direction"] is None:
-            continue
-
-        station_agrees = (direction == consensus["majority_direction"])
-        consensus_strength = consensus["consensus_strength"]
-
-        if station_agrees:
-            # City agrees with regional consensus
-            if consensus_strength > 0.80:
-                boost = CONFIDENCE_BOOST_MIN + (CONFIDENCE_BOOST_MAX - CONFIDENCE_BOOST_MIN) * (
-                    (consensus_strength - 0.80) / 0.20
-                )
-                new_conf = min(1.0, confidence * boost)
-                _logger.debug(
-                    f"SpatialGate: {station} agrees with {region} consensus "
-                    f"(strength={consensus_strength:.2f}), boosting confidence "
-                    f"{confidence:.3f} -> {new_conf:.3f}"
-                )
-                adjusted[station] = (direction, new_conf)
-
+    # Convert existing signals to include confidence (default 0.5)
+    signals_with_confidence = []
+    for signal in signals:
+        if len(signal) >= 5:
+            # Signal already has confidence, use it
+            station, market_type, direction, reason, confidence = signal
+            signals_with_confidence.append((station, market_type, direction, reason, confidence))
         else:
-            # City disagrees with regional consensus
-            if confidence < 0.70 and consensus_strength < 0.70:
-                # Both low confidence: reduce by 40-50%
-                reduction = CONFIDENCE_REDUCTION_HIGH if (confidence < 0.50 and consensus_strength < 0.50) else CONFIDENCE_REDUCTION_LOW
-                new_conf = confidence * reduction
-                _logger.debug(
-                    f"SpatialGate: {station} disagrees with {region} consensus "
-                    f"(both low conf), reducing {confidence:.3f} -> {new_conf:.3f}"
-                )
-                adjusted[station] = (direction, new_conf)
+            # Add default confidence of 0.5
+            station, market_type, direction, reason = signal
+            signals_with_confidence.append((station, market_type, direction, reason, 0.5))
+    
+    # Group signals by region
+    region_signals = {}
+    for signal in signals_with_confidence:
+        station, market_type, direction, reason, confidence = signal
+        region = get_region_for_station(station)
+        
+        if region:
+            if region not in region_signals:
+                region_signals[region] = []
+            region_signals[region].append(signal)
+    
+    # Apply spatial coherence adjustment
+    adjusted_signals = []
+    for signal in signals_with_confidence:
+        station, market_type, direction, reason, original_confidence = signal
+        region = get_region_for_station(station)
+        
+        if not region:
+            # Station not in any defined region, keep original confidence
+            adjusted_signals.append((station, market_type, direction, reason, original_confidence))
+            continue
+        
+        # Calculate regional consensus
+        region_signal_list = region_signals.get(region, [])
+        
+        # Separate current station from others in region
+        other_signals_in_region = [
+            s for s in region_signal_list 
+            if s[0] != station
+        ]
+        
+        if not other_signals_in_region:
+            # Only this station in region firing, no consensus possible
+            adjusted_signals.append((station, market_type, direction, reason, original_confidence))
+            continue
+        
+        # Calculate consensus direction among other stations in the same region
+        same_direction_count = sum(1 for s in other_signals_in_region if s[2] == direction)
+        opposite_direction_count = len(other_signals_in_region) - same_direction_count
+        
+        consensus_exists = len(other_signals_in_region) > 0
+        if consensus_exists:
+            consensus_direction = direction if same_direction_count > opposite_direction_count else (
+                "DOWN" if same_direction_count < opposite_direction_count else None
+            )
+            
+            # Check if current station agrees with regional consensus
+            if consensus_direction and consensus_direction == direction:
+                # Station agrees with regional consensus, BOOST confidence
+                new_confidence = min(original_confidence * 1.15, 0.95)
+            elif consensus_direction and consensus_direction != direction:
+                # Station disagrees with regional consensus, REDUCE confidence
+                new_confidence = max(original_confidence * 0.60, 0.10)
+            else:
+                # Split vote, no strong consensus
+                new_confidence = original_confidence
+        else:
+            # No consensus available
+            new_confidence = original_confidence
+        
+        adjusted_signals.append((station, market_type, direction, reason, new_confidence))
+    
+    # Check for regional super-consensus - if ALL stations in a region agree, promote to sure thing
+    return apply_regional_super_consensus(adjusted_signals)
 
-            elif confidence > 0.80:
-                # City is confident but region disagrees: cap at 0.70
-                new_conf = min(CONFIDENCE_CAP, confidence)
-                _logger.debug(
-                    f"SpatialGate: {station} disagrees with {region} consensus "
-                    f"(high city conf), capping {confidence:.3f} -> {new_conf:.3f}"
-                )
-                adjusted[station] = (direction, new_conf)
 
-    return adjusted
+def apply_regional_super_consensus(signals: List[Tuple[str, str, str, str, float]]) -> List[Tuple[str, str, str, str, float]]:
+    """
+    If all stations in a region agree on a direction, and confidence is > 0.70, promote to sure thing lane.
+    This identifies 'sure thing' opportunities where entire regions are aligned.
+    """
+    # Group signals by region with their directions
+    region_to_directions = {}
+    
+    for signal in signals:
+        station, market_type, direction, reason, confidence = signal
+        region = get_region_for_station(station)
+        
+        if region:
+            if region not in region_to_directions:
+                region_to_directions[region] = []
+            region_to_directions[region].append((direction, confidence))
+    
+    # Identify regions where all signals agree directionally
+    updated_signals = []
+    for signal in signals:
+        station, market_type, direction, reason, original_confidence = signal
+        region = get_region_for_station(station)
+        
+        if region and region in region_to_directions:
+            # Check if all signals in this region agree directionally
+            region_signals = region_to_directions[region]
+            
+            # Get the actual stations that have signals in this region
+            region_stations_with_signals = [s[0] for s in signals if get_region_for_station(s[0]) == region]
+            actual_region_stations = STATION_REGIONS[region]
+            
+            # Check if all stations from this region have signals AND they all agree
+            all_have_signals = set(actual_region_stations).issubset(set(region_stations_with_signals))
+            all_agree_direction = len(set(s[0] for s in region_signals)) == 1  # All directions are the same
+            
+            current_signal_belongs_to_complete_agreement = any(s[0] == station for s in signals)
+            
+            if all_have_signals and all_agree_direction and current_signal_belongs_to_complete_agreement:
+                # Apply sure thing boost if confidence is already high enough
+                if original_confidence > 0.70:
+                    new_confidence = min(original_confidence * 1.10, 0.98)  # Small additional boost
+                    updated_signals.append((station, f"{market_type}_SURE_THING", direction, f"{reason} | REGIONAL_SUPER_CONSENSUS", new_confidence))
+                else:
+                    updated_signals.append(signal)  # Don't boost low confidence even with super consesus
+            else:
+                updated_signals.append(signal)
+        else:
+            updated_signals.append(signal)
+    
+    return updated_signals

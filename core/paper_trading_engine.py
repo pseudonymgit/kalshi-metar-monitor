@@ -62,6 +62,8 @@ from late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_sig
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_skill_gate import StationSkillGate
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from .spatial_coherence import apply_spatial_coherence_gate, STATION_REGIONS as SPATIAL_REGIONS, STATION_TO_REGION
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from position_sizing import (
     compute_position_size as _compute_confidence_weighted_size,
     extract_confidence_from_signal_context as _extract_confidence,
@@ -2723,9 +2725,38 @@ def daily_paper_run(run_date=None):
     print(f"Generating signals for {run_date}...")
     signals = trader.generate_signals(run_date)
 
+    # Apply spatial coherence gate - enhance confidence based on regional agreement
+    try:
+        from config import spatial_coherence
+        SPATIAL_COHERENCE_ENABLED = spatial_coherence.get('enabled', True)
+    except ImportError:
+        SPATIAL_COHERENCE_ENABLED = True  # Default to enabled if config issue
+    
+    if SPATIAL_COHERENCE_ENABLED:
+        print("Applying spatial coherence gate...")
+        signals_with_conf = apply_spatial_coherence_gate(signals, run_date, trader.metar_db)
+        
+        # Count signal adjustments for logging
+        conf_modified = 0
+        for orig_sig, new_sig in zip(signals, signals_with_conf):
+            if orig_sig[-1] != new_sig[-1]:  # Compare confidence values
+                conf_modified += 1
+        
+        print(f"Applied spatial coherence to {len(signals_with_conf)} signals, modified confidence of {conf_modified} signals")
+        signals = signals_with_conf
+    else:
+        print("Spatial coherence gate disabled")
+        # Ensure signals have confidence values (default 0.5) for downstream compatibility
+        signals = [(s[0], s[1], s[2], s[3], 0.5) if len(s) < 5 else s for s in signals]
+
     print(f"Generated {len(signals)} signals:")
-    for i, (station, mtype, direction, reason) in enumerate(signals):
-        print(f"  {i+1:2d}. {station} {mtype} {direction.value:>4s}: {reason}")
+    for i, sig in enumerate(signals):
+        if len(sig) >= 5:  
+            station, mtype, direction, reason, confidence = sig[0], sig[1], sig[2], sig[3], sig[4]
+        else:
+            station, mtype, direction, reason = sig
+            confidence = 0.5  # Default
+        print(f"  {i+1:2d}. {station} {mtype} {direction.value:>4s}: {reason} (conf: {confidence:.2f})")
 
     # Execute trades based on signals
     executed = 0
