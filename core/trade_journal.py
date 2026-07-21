@@ -513,10 +513,98 @@ class TradeJournal:
         finally:
             conn.close()
 
+    def get_recent_trades(self, limit: int = 50) -> List[Dict[str, Any]]:
+        """Get the most recent trades from the journal (limit=50 by requirement)."""
+        conn = sqlite3.connect(self._db_path)
+        try:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute('''SELECT * FROM trade_journal  
+                ORDER BY timestamp_utc DESC
+                LIMIT ?''', (limit,)).fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            conn.close()
+    
     def get_recent_entries(self, limit: int = 20) -> List[Dict[str, Any]]:
         """Get the most recent journal entries."""
         return self.query(limit=limit)
 
+    def get_accuracy_by_signal(self) -> Dict[str, Dict[str, Any]]:
+        """Get accuracy statistics grouped by signal type."""
+        conn = sqlite3.connect(self._db_path)
+        try:
+            # Get success rates by functionality (signal type)
+            rows = conn.execute('''
+                SELECT 
+                    functionality,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN outcome = 'EXECUTED' THEN 1 ELSE 0 END) as placed,
+                    SUM(CASE WHEN outcome = 'SETTLED_WIN' THEN 1 ELSE 0 END) as wins,
+                    SUM(CASE WHEN outcome = 'SETTLED_LOSS' THEN 1 ELSE 0 END) as losses
+                FROM trade_journal 
+                WHERE outcome IN ('EXECUTED', 'SETTLED_WIN', 'SETTLED_LOSS', 'SKIPPED_EDGE', 'SKIPPED_FILTER')
+                GROUP BY functionality
+                HAVING total > 0
+                ORDER BY total DESC
+            ''').fetchall()
+            
+            results = {}
+            for row in rows:
+                func = row[0] if row[0] else 'unknown'
+                total = row[1] or 0
+                wins = row[3] or 0
+                losses = row[4] or 0
+                placed = row[2] or 0 
+                
+                accuracy = (wins / placed * 100.0) if placed > 0 else 0.0
+                win_rate = (wins / (wins + losses) * 100.0) if (wins + losses) > 0 else 0.0
+                
+                results[func] = {
+                    'total': total,
+                    'placed': placed,
+                    'executed': placed,  # Same as placed for our purposes
+                    'wins': wins, 
+                    'losses': losses,
+                    'directional_accuracy_pct': accuracy,
+                    'win_rate_pct': win_rate,
+                    'success_ratio': f'{wins}/{wins + losses}' if (wins + losses) > 0 else '0/0'
+                }
+            return results
+        finally:
+            conn.close()
+    
+    def get_trade_counts_by_station(self) -> Dict[str, Dict[str, int]]:
+        """Get trade counts (successful, skipped, total) by station."""
+        conn = sqlite3.connect(self._db_path)  
+        try:
+            # Get counts by station and outcome category
+            rows = conn.execute('''
+                SELECT 
+                    station,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN outcome IN ('EXECUTED', 'SETTLED_WIN', 'SETTLED_LOSS') THEN 1 ELSE 0 END) as traded,
+                    SUM(CASE WHEN outcome = 'SETTLED_WIN' THEN 1 ELSE 0 END) as wins,
+                    SUM(CASE WHEN outcome = 'SETTLED_LOSS' THEN 1 ELSE 0 END) as losses,
+                    SUM(CASE WHEN outcome IN ('SKIPPED_EDGE', 'SKIPPED_COST', 'SKIPPED_CONFIDENCE', 'SKIPPED_FILTER', 'SKIPPED_COOLDOWN', 'SKIPPED_RISK', 'SKIPPED_STATION', 'SKIPPED_SKILL', 'SKIPPED_WINDOW', 'SKIPPED_CLUSTER', 'SKIPPED_CITY_PAIR', 'SKIPPED_SIZE_ZERO', 'ERROR') THEN 1 ELSE 0 END) as skipped
+                FROM trade_journal
+                GROUP BY station
+                ORDER BY total DESC
+            ''').fetchall()
+            
+            results = {}
+            for row in rows:
+                station = row[0]
+                results[station] = {
+                    'total': row[1] or 0,
+                    'traded': row[2] or 0,
+                    'wins': row[3] or 0,
+                    'losses': row[4] or 0,
+                    'skipped': row[5] or 0
+                }
+            return results
+        finally:
+            conn.close()
+    
     def get_failure_breakdown(self) -> List[Dict[str, Any]]:
         """Get a breakdown of skip/failure reasons."""
         conn = sqlite3.connect(self._db_path)
