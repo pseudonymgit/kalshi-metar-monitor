@@ -2726,11 +2726,7 @@ def daily_paper_run(run_date=None):
     signals = trader.generate_signals(run_date)
 
     # Apply spatial coherence gate - enhance confidence based on regional agreement
-    try:
-        from config import spatial_coherence
-        SPATIAL_COHERENCE_ENABLED = spatial_coherence.get('enabled', True)
-    except ImportError:
-        SPATIAL_COHERENCE_ENABLED = True  # Default to enabled if config issue
+    SPATIAL_COHERENCE_ENABLED = bool(int(os.getenv('SPATIAL_COHERENCE_ENABLED', '1')))  # Enabled by default, 0/1
     
     if SPATIAL_COHERENCE_ENABLED:
         print("Applying spatial coherence gate...")
@@ -2763,7 +2759,14 @@ def daily_paper_run(run_date=None):
     skipped = 0
     trade_results = []
 
-    for station, market_type, signal_direction, reason in signals:
+    for sig_item in signals:
+        # Handle both 4-tuple and 5-tuple signals
+        if len(sig_item) >= 5:
+            station, market_type, signal_direction, reason, confidence = sig_item[0], sig_item[1], sig_item[2], sig_item[3], sig_item[4]
+        else:
+            station, market_type, signal_direction, reason = sig_item
+            confidence = 0.5  # Default confidence
+        
         # Version-tag late_day_momentum_hourly trades distinctly
         if reason == "late_day_momentum_hourly":
             trade_ver = "v2.1_ldm_hourly"
