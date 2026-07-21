@@ -4,5 +4,10 @@
     "base_url": "https://api.elections.kalshi.com/trade-api/v2",
     "key_id": "",
     "has_private_key": false
+  },
+  "spatial_coherence": {
+    "enabled": true,
+    "boost_factor": 0.15,
+    "penalty_factor": 0.40
   }
 }
