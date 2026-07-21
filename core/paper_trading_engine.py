@@ -996,7 +996,7 @@ class PaperTrader:
             # Check agreement for each group and collect results
             final_other_signals = []
             for key, signal_group in grouped_signals.items():
-                agreed_signals = SimpleAgreementChecker.check_agreement(signal_group, n_required=3)
+                agreed_signals = SimpleAgreementChecker.check_agreement(signal_group, n_required=int(os.getenv("AGREEMENT_THRESHOLD", "2")))
                 final_other_signals.extend(agreed_signals)
             
             other_signals = final_other_signals
