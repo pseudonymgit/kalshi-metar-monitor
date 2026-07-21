@@ -1,0 +1,173 @@
+{
+  "phase": "PHASE_14_30_DAY_UNATTENDED_TEST",
+  "setup_overview": {
+    "date_created": "2026-07-21T15:34:26.701338",
+    "system_version": "WeatherEngine_v5_fused_2026-07-21",
+    "includes": [
+      "Phase 1-13 fully integrated",
+      "Mahalanobis NWP signal",
+      "Bayesian fusion",
+      "Trajectory CDF output"
+    ],
+    "expected_performance": {
+      "accuracy_baseline": 0.6,
+      "projected_improvement": "+2-5 pp over baseline (from Phase 11 results)",
+      "daily_volume_expected": "15-30 trades per day across all stations"
+    }
+  },
+  "configuration_alerting": {
+    "accuracy_thresholds": {
+      "alert_low": 0.5,
+      "warning_low": 0.5499999999999999,
+      "expectation": {
+        "daily_average": 0.6,
+        "weekly_average": 0.6,
+        "monthly_average": 0.6
+      },
+      "performance_recovery": 0.58
+    },
+    "volume_thresholds": {
+      "alert_low": 1,
+      "warning_low": 5,
+      "normal_range": [
+        10,
+        50
+      ],
+      "alert_high": 100
+    },
+    "confidence_thresholds": {
+      "minimum_trading": 0.6,
+      "high_conviction": 0.75,
+      "monitor_low_conviction": 0.55
+    }
+  },
+  "monitoring_procedures": {
+    "daily_checks": [
+      "Verify accuracy rate for the day (compared to threshold)",
+      "Check trading volume against expected norms",
+      "Review signal agreement rates (both_agree vs single_lane vs conflict)",
+      "Monitor confidence distribution and flag unusual values"
+    ],
+    "early_warning_indicators": [
+      "3 consecutive losing days >5% of capital",
+      "Accuracy falling below warning level for 3 days consecutively",
+      "Majority of trades coming from 'conflict' pattern (indicating misaligned signals)",
+      "Volume dropping below warning threshold for 2+ consecutive days",
+      "Calibration drift (confidences not matching actual win rate)"
+    ],
+    "automated_alert_conditions": [
+      "Daily accuracy < alert_low",
+      "Weekly accuracy < (expected_accuracy - 0.08)",
+      "Daily volume > alert_high or < alert_low",
+      "Consecutive losses > 5 trades",
+      "Total drawdown > 1.5% of capital in single day"
+    ],
+    "manual_review_triggers": [
+      "After any automated alert",
+      "Every 7 days regardless",
+      "When entering new month/regime",
+      "If signal disagreement rates exceed 30%"
+    ]
+  },
+  "rollback_procedures": {
+    "immediate_rollback_triggers": [
+      "System error preventing trades",
+      "Security compromise or suspicious activity",
+      "Major accuracy crash (>20 pp decline)",
+      "Drawdown exceeding emergency limit (3% in one day)"
+    ],
+    "rollback_process": {
+      "step_1_pause_new_trades": "Stop generating new alerts/orders immediately",
+      "step_2_verify_accuracy": "Manually verify latest outcomes against predictions",
+      "step_3_revert_configuration": "Switch back to last known stable config",
+      "step_4_investigate": "Analyze logs to understand root cause",
+      "step_5_resume_decision": "Decide whether to resume or remain paused after analysis"
+    },
+    "circuit_breaker_rules": {
+      "daily_stop_loss": "Stop trading if P&L < -2% of starting capital in single day",
+      "cumulative_stop_loss": "Stop trading if cum P&L < -5% over 7-day period",
+      "consecutive_negative_days": "Pause trading after 5 consecutive negative days",
+      "loss_per_trade_limit": "Abort single trade if realized loss exceeds 0.5% of capital"
+    },
+    "rollback_verification": {
+      "accuracy_improve_after_rollback": "Post-rollback accuracy should return to baseline within 3 days",
+      "volume_normalization_check": "Trading volume should return to normal range within 2 days",
+      "profit_recovery_indicator": "Rollback successful if positive daily performance resumes in 5 days"
+    }
+  },
+  "30_day_test_plan": {
+    "test_duration_days": 30,
+    "test_objectives": [
+      "Validate sustained accuracy of fused system",
+      "Test robustness under changing market conditions",
+      "Verify automated monitoring/alarming works correctly",
+      "Ensure rollback procedures are understood and accessible",
+      "Gather sufficient data for full deployment decision"
+    ],
+    "key_performance_indicators": {
+      "primary_kpi": {
+        "accuracy_rate": {
+          "measurement_frequency": "daily",
+          "success_criteria": ">= 0.58 (2 pp above warning threshold)",
+          "escalation": "alert if < warning threshold"
+        },
+        "average_confidence": {
+          "measurement_frequency": "daily",
+          "target_range": [
+            0.65,
+            0.8
+          ],
+          "success_criteria": "Remains in target range",
+          "escalation": "review if < 0.60 or > 0.85 consistently"
+        }
+      },
+      "secondary_kpis": {
+        "signal_agreement_analysis": {
+          "both_agree_percent": "Target: >25% of trades",
+          "conflict_percent": "Maximum: <15% of trades",
+          "single_lane_acceptance": "Only single-lane where >75% confidence"
+        },
+        "risk_metrics": {
+          "max_single_day_drawdown": "< 2% of capital",
+          "max_7_day_drawdown": "< 4% of capital",
+          "sharpe_ratio_min": "> 1.0 (annualized)"
+        }
+      }
+    },
+    "scheduled_reviews": {
+      "daily_automated": "Daily accuracy and volume check",
+      "3_day_manual": "Manual system health check and configuration review",
+      "weekly_analytical": "Performance analysis and potential parameter adjustments",
+      "at_rollbacks": "Full system review and procedure update if rollback triggered"
+    },
+    "success_criteria": {
+      "minimum_success_metrics": {
+        "accuracy": ">= 0.57",
+        "drawdown": "< 5% over 30 day period",
+        "volatility_ratio": "Sharpe-like ratio > 1.0",
+        "alert_frequency": "< 3 major alerts during 30 days"
+      },
+      "success_confirmation_process": [
+        "Confirm accuracy holds over 3 different weeks",
+        "Verify all major alert pathways work correctly",
+        "Validate rollback procedures through at least 1 test trigger",
+        "Document lessons learned for permanent deployment"
+      ]
+    }
+  },
+  "deployment_checklist": [
+    "All Phase 11-13 components loaded and operational",
+    "Calibration parameters updated with latest results",
+    "Discord/webhook alerts configured",
+    "Database connections tested",
+    "Emergency contacts verified",
+    "Monitoring dashboards accessible",
+    "Backup communication channels tested"
+  ],
+  "emergency_contacts": {
+    "primary_operator": "Gilfoyle",
+    "secondary_reviewer": "Dan (approval)",
+    "technical_support": "Main agent system",
+    "communication_channel": "Webhook + email alerts configured"
+  }
+}

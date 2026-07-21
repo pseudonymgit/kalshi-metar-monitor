@@ -1,0 +1,322 @@
+{
+  "audit_timestamp": "2026-07-21T15:44:00Z",
+  "auditor": "critical-code-reviewer-local",
+  "phase_1": {
+    "status": "DONE",
+    "items": {
+      "baseline_signals": {
+        "status": "DONE",
+        "evidence": "git log: de6d27f — Phase 1 fixes include initial baseline signals (reversion, regime, DTR trend, pressure_regime_interaction). Files: core/signals/regime_signal.py exists (re-registered); original dead signal files removed from registry."
+      },
+      "dead_signals_removed": {
+        "status": "DONE",
+        "evidence": "git log: de6d27f — 'remove dead signals (reversion/regime/dtr_trend/pressure_regime_interaction)'. find . -name 'reversion_signal.py' — no results. Registry in __init__.py excludes them."
+      },
+      "risk_guardrails": {
+        "status": "DONE",
+        "evidence": "git log: 4c48740 — 'Implement Marty's Phase 1 risk guardrails'. File: core/risk_controls.py (263 lines, kill switch, daily loss, drawdown, consecutive losses)."
+      },
+      "render_metar_auto_refresh": {
+        "status": "DONE",
+        "evidence": "git log: cd2340f — 'feat(render): auto-refresh METAR on startup + periodic (Phase 1)'. Files: app.py, scripts/add_render_refresh.py exist."
+      },
+      "station_registry_dedup": {
+        "status": "DONE",
+        "evidence": "git log: de6d27f — 'station registry dedupe KJFK/KNYC + KORD/KMDW'. File: core/station_registry.py exists."
+      }
+    },
+    "note": "All Phase 1 items verified complete."
+  },
+  "phase_2": {
+    "status": "DONE",
+    "items": {
+      "temperature_advection_signal": {
+        "status": "DONE",
+        "evidence": "git log: 774deca — 'Phase 2: Add 850-mb temperature advection signal + wire into engine'. File: core/signals/temperature_advection_signal.py exists."
+      },
+      "goldilocks_nameerror_fix": {
+        "status": "DONE",
+        "evidence": "git log: ed09216 — 'Fix Phase 2 audit bugs: Goldilocks NameError'. File: core/signals/goldilocks_signal.py — NameError fixed."
+      },
+      "wind_direction_shift_lookahead_fix": {
+        "status": "DONE",
+        "evidence": "git log: ed09216 — 'Fix Phase 2 audit bugs: Wind Direction Shift look-ahead'. File: core/signals/wind_direction_shift.py fixed."
+      },
+      "signal_hygiene_pass": {
+        "status": "DONE",
+        "evidence": "git log: ed09216 (hygiene pass), f3d26bf 'T2: Remove 4 dead signals from all code paths'. Registry updated to exclude dead signals."
+      },
+      "nwp_analog_signal_v1": {
+        "status": "DONE",
+        "evidence": "git log: 0615fe6 'T1: Wire NWP analog signal into paper trading engine'. File: core/signals/nwp_analog_signal.py exists. Initial k-NN implementation."
+      }
+    },
+    "note": "All Phase 2 items verified complete."
+  },
+  "phase_3": {
+    "status": "DONE",
+    "items": {
+      "kelly_sizing_formula": {
+        "status": "PARTIAL",
+        "evidence": "git log: bb01e8e — 'Fix Bug 2: Kelly formula — replace f*=p-0.0526 with f*=(p-c)/(1-c)'. Code: core/kelly_position_sizer.py line 166: kelly = (win_rate - c) / (1.0 - c) ✅. However, legacy core/position_sizing.py line 73 still has KellyPositionSizer.__init__(fee_rate=0.05) and line 172/183/194 have fee_rate=0.001 in get_config_for_instance()."
+      },
+      "quarter_kelly_scaling": {
+        "status": "DONE",
+        "evidence": "File: core/kelly_position_sizer.py implements adaptive multiplier based on confidence tiers. Default multiplier is 0.5 (conservative). Confidence-based multipliers range from 0.5 to 1.0."
+      },
+      "risk_budget_allocator": {
+        "status": "DONE",
+        "evidence": "File: core/risk_budget.py exists (Edge 16). Implements 3D allocation matrix, per-trade cap ($250 budget, $10/trade), portfolio allocation."
+      },
+      "scaling_ladder": {
+        "status": "DONE",
+        "evidence": "File: core/scaling_ladder.py exists (Edge 17). Multi-tier position sizing (TIER1-TIER4, FROZEN) with confidence-based scaling."
+      },
+      "stop_loss_monitor": {
+        "status": "DONE",
+        "evidence": "File: core/stop_loss.py exists (Edge 18). Kill switch, daily loss limit, drawdown, consecutive losses. Also core/risk_controls.py."
+      },
+      "dynamic_station_discovery": {
+        "status": "DONE",
+        "evidence": "git log: f9697ee — 'Phase 3: Dynamic Station Discovery + Full 20-City Coverage'. File: core/station_registry.py has 34 station codes."
+      },
+      "dynamic_market_types": {
+        "status": "DONE",
+        "evidence": "git log: 8fba1c0 — 'Phase 3 implementation: dynamic market types, rate limiting'. File: core/market_phase_classifier.py exists."
+      }
+    },
+    "note": "Kelly formula fix is correct in primary kelly_position_sizer.py, but legacy position_sizing.py still has old fee defaults (0.05/0.001/0.002). This is a PARTIAL cleanup."
+  },
+  "phase_4": {
+    "status": "DONE",
+    "items": {
+      "spatial_coherence_gate": {
+        "status": "DONE",
+        "evidence": "git log: 1b4088f, 80fb0f7 — 'Phase 4.1: Spatial coherence gate'. File: core/spatial_coherence.py (8752 bytes, 6 regions, consensus modulation)."
+      },
+      "dashboard_mvp": {
+        "status": "DONE",
+        "evidence": "File: core/dashboard.py (27706 bytes). Flask app with health, predictions, discrepancies. Plotly charts referenced in git history."
+      },
+      "dewpoint_depression_modulator": {
+        "status": "DONE",
+        "evidence": "git log: 66c6ac4 — 'Phase 4.3: Dewpoint depression modulator'. File: core/dewpoint_modulator.py exists."
+      },
+      "adaptive_confidence_thresholds": {
+        "status": "DONE",
+        "evidence": "git log: 82a5cf0 — 'Phase 4.4: Adaptive confidence thresholds'. File: core/adaptive_thresholds.py (6919 bytes, rolling 30d adjustment)."
+      },
+      "ensemble_diversity_score": {
+        "status": "DONE",
+        "evidence": "git log: 6339c38 — 'Phase 4.5: Ensemble diversity score'. File: core/ensemble_diversity.py (4853 bytes)."
+      },
+      "frontal_passage_detector": {
+        "status": "DONE",
+        "evidence": "git log: acd0257 — 'Phase 4.6: Frontal passage detector'. File: core/frontal_detector.py (13816 bytes, 4-condition event detection)."
+      },
+      "intraday_metar_confirmation": {
+        "status": "DONE",
+        "evidence": "git log: b0f35e1 — 'Phase 4.7: Intraday METAR confirmation'. File: core/signals/intraday_metar_confirmation_signal.py exists."
+      },
+      "confidence_tracker": {
+        "status": "DONE",
+        "evidence": "File: core/confidence_dashboard.py (24640 bytes, Edge 19). Contains Monte Carlo simulation, rolling Sharpe/win rate, p-value, drawdown tracking."
+      }
+    },
+    "note": "All Phase 4 items verified complete. Git history shows separate commits for each sub-phase."
+  },
+  "phase_5": {
+    "status": "DONE",
+    "items": {
+      "alert_dispatcher": {
+        "status": "DONE",
+        "evidence": "File: core/alert_dispatcher.py (5373 bytes). Discord webhook integration. Multiple commits in git history for webhook delivery."
+      },
+      "kalshi_api_integration": {
+        "status": "DONE",
+        "evidence": "File: core/kalshi_monitor.py (111010 bytes). KALSHI_API_INTEGRATION_PROGRESS.md exists. git log: f699533 'Phase 3-7: Kalshi API integration'."
+      },
+      "market_phase_classification": {
+        "status": "DONE",
+        "evidence": "File: core/market_phase_classifier.py (13024 bytes)."
+      },
+      "spread_calibration": {
+        "status": "DONE",
+        "evidence": "File: core/spread_calibrator.py (7622 bytes)."
+      }
+    },
+    "note": "All Phase 5 items verified complete."
+  },
+  "phase_6": {
+    "status": "DONE",
+    "items": {
+      "initial_7_signal_search": {
+        "status": "DONE",
+        "evidence": "File: scripts/phase6_combinatorial_search.py (23432 bytes). git log: 98293ac 'T9: Build 5 Tier 1 signals + combinatorial backtest harness'. 127 combos, 20 stations."
+      },
+      "calibrated_search": {
+        "status": "DONE",
+        "evidence": "File: scripts/phase6_calibrated_search.py (14886 bytes)."
+      },
+      "parameter_sweep": {
+        "status": "DONE",
+        "evidence": "File: scripts/phase6_parameter_sweep.py (23359 bytes)."
+      },
+      "calibration_v3_validation": {
+        "status": "DONE",
+        "evidence": "File: scripts/phase6_validate_calibration.py (15355 bytes)."
+      }
+    },
+    "note": "All Phase 6 items verified complete."
+  },
+  "phase_7": {
+    "status": "PARTIAL",
+    "items": {
+      "agreement_gate": {
+        "status": "DONE",
+        "evidence": "File: core/agreement_gate.py (6397 bytes). N-of-M consensus filter. Agreement threshold configurable via AGREEMENT_THRESHOLD env var."
+      },
+      "sbox_prod_deployment_configs": {
+        "status": "PARTIAL",
+        "evidence": "git log: 3b4bc29 — 'Phase 8: Configure agreement threshold=2, deploy SBOX/PROD config'. Commit only modifies paper_trading_engine.py and a log file. No separate deployment config files found. Instance config in core/instance_config.py defines PROD/DEV/SBOX webhook env vars."
+      },
+      "test_plan_30_day": {
+        "status": "DONE",
+        "evidence": "File: docs/plans/30DAY-UNATTENDED-TEST-PLAN.md (5613 bytes). Initial draft of unattended test plan."
+      }
+    },
+    "note": "Agreement gate and test plan exist. SBOX/PROD config is partially implemented via environment variables in instance_config.py but no dedicated deployment config files."
+  },
+  "phase_8": {
+    "status": "PARTIAL",
+    "items": {
+      "bug_1_goldilocks_lookahead": {
+        "status": "DONE",
+        "evidence": "git log: 08071b8 — 'Fix Bug 1: Goldilocks look-ahead bias'. Code: goldilocks_signal.py evaluate() uses days[idx-1] and days[idx-2] ✅. No look-ahead."
+      },
+      "bug_2_kelly_formula": {
+        "status": "DONE",
+        "evidence": "git log: bb01e8e — 'Fix Bug 2: Kelly formula'. Code: core/kelly_position_sizer.py line 166: kelly = (win_rate - c) / (1.0 - c) ✅. Correct formula f*=(p-c)/(1-c)."
+      },
+      "bug_3_conflicting_sizing": {
+        "status": "DONE",
+        "evidence": "git log: 2e114a9 — 'Fix Bug 3: Consolidate 3 conflicting position sizing systems'. Code: paper_trading_engine.py lines 1575-1630 show single pipeline: Kelly primary → fallback → ladder modifier."
+      },
+      "bug_4_confidence_squaring": {
+        "status": "DONE",
+        "evidence": "git log: 497439a — 'Fix Bug 4: Ensemble confidence squaring — remove p*p'. Code: scripts/phase6_combinatorial_search.py line 202: '# FIXED: was p * p (squared)'. confidence = consensus_strength (no squaring) ✅."
+      },
+      "bug_5_calibration_data_leakage": {
+        "status": "DONE",
+        "evidence": "No dedicated commit. Code: core/calibration_pipeline.py implements walk-forward leak fix v0.5.1: refit() only fits from window_start onward, auto-refit in calibrate() is REMOVED, caller must explicitly call refit()."
+      },
+      "bug_6_xgboost_removed": {
+        "status": "DONE",
+        "evidence": "git log: a86c341 — 'Fix Bug 6: Remove XGBoost from NWP analog prediction path'. Code: core/signals/nwp_analog_signal.py — no XGBoost references. Uses deterministic consensus-weighted adjustment."
+      },
+      "bug_7_fee_model_zero_commissions": {
+        "status": "PARTIAL",
+        "evidence": "git log: 216dcc6 — 'Fix Bug 7: Remove hardcoded fee rates'. Code: paper_trading_engine.py line 283 fee_rate=0.0 ✅, line 2006 commission_per_contract=0.0 ✅. But legacy core/position_sizing.py line 73 still has KellyPositionSizer.__init__(fee_rate=0.05) and get_config_for_instance() returns fee_rate=0.001."
+      },
+      "bug_8_lane_thresholds_aligned": {
+        "status": "DONE",
+        "evidence": "git log: bdc4eb1 — 'Fix Bug 8: Align alert filter thresholds with lane configuration'. Threshold changed from 65% to 50% to match lane definitions."
+      },
+      "bug_9_sqlite_concurrency": {
+        "status": "DONE",
+        "evidence": "git log: 242c165 — 'Fix Bug 9: Add SQLite concurrency fixes'. File: core/sqlite_utils.py (1382 bytes) with WAL mode, busy_timeout. Updated paper_trading_engine.py to use new connection handler."
+      }
+    },
+    "note": "8 of 9 bugs verified DONE with correct code. Bug 7 (fee model) is PARTIAL: primary engine is fixed (fee_rate=0.0), but legacy position_sizing.py still has non-zero fee defaults (0.05/0.001/0.002) that could be picked up by multi_instance_paper_trader.py."
+  },
+  "phase_9": {
+    "status": "DONE",
+    "items": {
+      "nwp_data_backfill": {
+        "status": "DONE",
+        "evidence": "File: data/nwp_forecasts.db exists (83MB). Scripts: scripts/nwp_archive_backfill.py, scripts/nwp_era5_backfill.py, scripts/era5_upper_air_backfill.py all exist. Roadmap claims 18+ months, 5 models, 20 stations, 21 variables, 217K+ rows."
+      },
+      "era5_backfill_fixes": {
+        "status": "DONE",
+        "evidence": "git log: f71e808 'Fix ERA5 backfill: numpy array truthiness', 7a14a55 'ERA5 backfill: split requests by variable+pressure level'. Files: scripts/era5_upper_air_backfill.py (34522 bytes), scripts/nwp_era5_backfill.py (13585 bytes)."
+      },
+      "nwp_analog_signal_v2": {
+        "status": "DONE",
+        "evidence": "git log: 0fb12dc 'NWP Analog Signal: deterministic k-NN (v2.0)'. File: core/signals/nwp_analog_signal.py — deterministic k-NN, no XGBoost."
+      },
+      "full_11_signal_search": {
+        "status": "DONE",
+        "evidence": "git log: fdc9c39 'Phase 9: Full 11-signal combinatorial search + calibration + purged CV'. File: scripts/phase9_combinatorial_search.py (29064 bytes). Roadmap: 85 combos, 10 stations."
+      },
+      "purged_cv_phase9": {
+        "status": "DONE",
+        "evidence": "File: scripts/phase9_purged_cv.py (18625 bytes). Roadmap notes bug found: 34% accuracy — broken accounting."
+      }
+    },
+    "note": "All Phase 9 items verified. NWP database exists at 83MB. Search scripts exist. Purged CV found a bug (34% accuracy — broken accounting)."
+  },
+  "gray_room_rounds": {
+    "status": "PARTIAL",
+    "items": {
+      "gr1_initial_advisory": {
+        "status": "MISSING",
+        "evidence": "Roadmap states 'Gray Room Round 1: Initial Weather Trading Advisory — COMPLETE' but no dedicated document file found. Only referenced in roadmap.md."
+      },
+      "gr2_meteorological_experts": {
+        "status": "MISSING",
+        "evidence": "Roadmap states 'Gray Room Round 2: Meteorological Experts — COMPLETE' but no dedicated document file found."
+      },
+      "gr3_6_expert_panel_synthesis": {
+        "status": "MISSING",
+        "evidence": "Roadmap states 'Gray Room Round 3: 6-Expert Panel — COMPLETE' with specific expert predictions (+2.5-5.5pp etc.) but no dedicated document file. docs/PHASE3-GRAY-ROOM-SYNTHESIS.md exists but is Phase 3 specific, not Round 3."
+      },
+      "gr4_regime_market_micro": {
+        "status": "MISSING",
+        "evidence": "Roadmap states 'Gray Room Round 4: Meteorological Regime + Market Microstructure — COMPLETE' but no dedicated document file found."
+      },
+      "gr5_bugs_ideas_roadmap": {
+        "status": "PARTIAL",
+        "evidence": "9 bugs fixed in Phase 8 commits (08071b8-242c165). docs/CODE-REVIEW-2026-07-06-FULL.md and CODE-REVIEW-2026-07-06-FIXES-COMPLETE.md exist. But no dedicated 'Gray Room Round 5: 9 bugs + 19 ideas' document file."
+      },
+      "gr6_6_experts_synthesis": {
+        "status": "DONE",
+        "evidence": "Files: docs/plans/WEATHER-ENGINE-GRAY-ROOM-ROUND6-SYNTHESIS.md exists. Directory: docs/plans/gray-room-round6/ with 10 files (6 experts + followups + consensus)."
+      }
+    },
+    "note": "Only Gray Room Round 6 has dedicated document files. Rounds 1-4 are mentioned as 'COMPLETE' in the roadmap but have no standalone documents. Round 5 bugs are fixed in code but no dedicated Gray Room document exists."
+  },
+  "additional_checks": {
+    "status": "MIXED",
+    "items": {
+      "late_day_momentum_killed": {
+        "status": "PARTIAL",
+        "evidence": "Files: core/late_day_momentum.py and core/late_day_momentum_hourly.py exist. paper_trading_engine.py references late_day_momentum_hourly in generate_signals() and __init__. Not in signal registry but used directly. No 'KILLED' or 'DISABLED' markers found."
+      },
+      "goldilocks_removed_from_engine": {
+        "status": "MISSING",
+        "evidence": "core/signals/__init__.py line 37: 'goldilocks': GoldilocksSignal(db_path) — STILL REGISTERED. paper_trading_engine.py references goldilocks signal. Not removed from engine config despite Phase 10 using '9 signals (no goldilocks)'."
+      },
+      "regime_signal_registered": {
+        "status": "DONE",
+        "evidence": "core/signals/__init__.py line 54: 'regime': RegimeSignal(db_path) — properly registered."
+      },
+      "phase_10_3_calibration_integrated_search": {
+        "status": "PARTIAL",
+        "evidence": "Script: scripts/phase10_calibrated_search.py (23122 bytes) exists. Output JSON: data/phase10_calibrated_search_full.json — NOT FOUND. Roadmap: 'DISPATCHED — Currently running'."
+      },
+      "phase_10_4_purged_cv": {
+        "status": "PENDING",
+        "evidence": "No dedicated Phase 10 purged CV script found. Roadmap: 'DISPATCHED — Currently running'. Output: data/phase10_purged_cv_results.json — NOT FOUND."
+      },
+      "phase_10_5_nwp_standalone": {
+        "status": "PENDING",
+        "evidence": "No dedicated Phase 10 NWP standalone script found. Roadmap: 'DISPATCHED — Currently running'. Output: data/phase10_nwp_results.json — NOT FOUND."
+      },
+      "phase_10_6_temp_advection_intraday": {
+        "status": "PENDING",
+        "evidence": "No dedicated Phase 10 temp advection / intraday METAR investigation script found. Roadmap: 'DISPATCHED — Currently running'."
+      }
+    },
+    "note": "Regime signal is properly registered. Goldilocks is still in the registry (should be removed per Phase 10). Late-day momentum is still active in the engine. Phase 10.3-10.6 scripts exist but output files are pending."
+  }
+}
