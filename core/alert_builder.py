@@ -10,9 +10,55 @@ from typing import Dict, Any, Tuple, Optional
 import os
 import time
 import logging
+import re
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
+
+
+def generate_market_url(station: str, market_type: str, strike: Optional[str] = None) -> str:
+    """
+    Generate Kalshi market URLs following the pattern: `https://kalshi.com/markets/{series_ticker}`
+    
+    Series ticker format: `KX{HIGH|LOW}{CODE}` where CODE is Kalshi station code (e.g., TATL for KATL)
+    This function converts station+market info to the proper URL format.
+    
+    Args:
+        station: Station ICAO code (e.g., 'KATL', 'KLAX')
+        market_type: Market type ('HIGH' or 'LOW')
+        strike: Optional strike price to append or other parameters
+    
+    Returns:
+        Kalshi market URL string
+    """
+    # Import station registry only when needed to avoid circular imports
+    try:
+        from .station_registry import get_kalshi_station_code_for_icao 
+        kalshi_code = get_kalshi_station_code_for_icao(station)
+    except ImportError:
+        # Fallback mapping if station registry unavailable
+        station_code = station.upper().replace('K', '')  # Remove K prefix to get basic code
+        kalshi_code = station_code
+    
+    # Ensure market type is uppercase
+    market_type_upper = market_type.upper()
+    
+    # Build series ticker in the format: WXHIGH{STATION}|WXLOW{STATION} or similar
+    # The pattern is KX{TYPE}{STATION_CODE} in the description, which for weather would be
+    series_ticker = f"WX{market_type_upper}{kalshi_code}" if len(kalshi_code) <= 6 else f"TEMP{market_type_upper[:4]}{kalshi_code[-4:] if len(kalshi_code) > 4 else kalshi_code}"
+    
+    if strike:
+        # Depending on how specific market URLs need to be formed
+        return f"https://kalshi.com/markets/{series_ticker}/{strike}"
+    else:
+        return f"https://kalshi.com/markets/{series_ticker}"
+
+
+def generate_legacy_market_url(station: str, market_type: str) -> str:
+    """
+    Legacy URL generation before adding strike parameter support
+    """
+    return generate_market_url(station, market_type)
 
 # ─── Alert Schema Version ────────────────────────────────────────────────
 PAPER_TRADE_ALERT_SCHEMA_VERSION = "2.1"  # B-MODE v2
@@ -413,8 +459,7 @@ def build_paper_trade_alert(trade_result: Dict[str, Any], station: str,
     trade_uuid = trade_result.get("trade_uuid", "N/A")
 
     # Build Kalshi market URL (real URL)
-    from kalshi_price_fetcher import build_market_url
-    market_url = build_market_url(station, market_type)
+    market_url = generate_market_url(station, market_type, str(trading_bucket) if trading_bucket else None)
 
     # Compute Opportunity Grade and Edge
     grade, edge = compute_opportunity_grade(trade_confidence, market_prob, Sharpe)

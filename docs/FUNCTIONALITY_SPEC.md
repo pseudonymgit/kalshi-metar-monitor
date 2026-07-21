@@ -16,7 +16,7 @@ The OpenClaw Weather Engine is a deterministic system for generating, evaluating
 - **Cache:** Centralized for all instance types (DEV/SBOX/PROD)
 
 ### Processing Layer (All Instances)
-- **Signal Generation:** 8+ signal types evaluated in real-time against incoming METAR data
+- **Signal Generation:** 10+ signal types evaluated in real-time against incoming METAR data, with NEW N-of-M agreement gate validation
 - **Hydration Cache:** Market eligibility and ladder data maintained for all 20 stations
 - **State Management:** Epoch tracking, cooldown enforcement, boundary monitoring
 
@@ -27,7 +27,11 @@ The OpenClaw Weather Engine is a deterministic system for generating, evaluating
 
 ## 2. Signal Catalog
 
-### A. Core Structural Signals (Immediate Response)
+### A. Agreement Layer
+
+A NEW N-of-M agreement filter exists as a final consensus validator before trade signals are processed. The gate requires minimum consensus among signals before emitting a trade signal. Default configuration: 3 out of 9 signals must agree on direction after individual confidence thresholds. Implemented in `core/agreement_gate.py` and wired into `core/paper_trading_engine.py`.
+
+### B. Core Structural Signals (Immediate Response)
 1. **`instant_up` / `instant_down`**
    - **Trigger:** Temperature crosses integer bounds upward/downward
    - **Mechanism:** Real-time bucket tracking from METAR ingestion
@@ -182,6 +186,10 @@ Position sizing respects confidence as a proportional weight without arbitrary t
 - **Resource Management:** SQLite timeouts, connection pooling, file descriptor handling
 
 ## 7. Current Gaps & Known Issues
+
+### Special Architectural Features
+- **Goldilocks Separate Lane:** Spike-reversion pattern signals (goldilocks) are processed separately when GOLDILOCKS_SEPARATE_LANE flag is enabled, bypassing the agreement gate and firing independently
+- **Configurable Consensus:** Agreement gate N-of-M parameters are configurable via runtime constants
 
 ### Data Gaps (by Design)
 - **Forecasct Disagreement Signal:** Cannot evaluate `GFS vs NWS forecast_difference` signals until settlement data extends to cover NWP overlap period

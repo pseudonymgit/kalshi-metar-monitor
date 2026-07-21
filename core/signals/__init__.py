@@ -14,11 +14,9 @@ from .wind_direction_shift import WindDirectionShiftSignal
 from .nwp_analog_signal import NwpAnalogSignal
 from .goldilocks_signal import GoldilocksSignal
 from .persistence_signal import PersistenceSignal
-from .simple_trend_signal import SimpleTrendSignal
 from .gaussian_signal import GaussianSignal
 from .gaussian_v2_signal import GaussianV2Signal
 from .pressure_delta_signal import PressureDeltaSignal
-from .regime_signal import RegimeSignal
 from .forecast_disagreement_signal import ForecastDisagreementSignal
 from .calendar_climatology_signal import CalendarClimatologySignal
 from .temperature_advection_signal import TemperatureAdvectionSignal
@@ -35,22 +33,14 @@ class SignalRegistry:
             'nwp_analog': NwpAnalogSignal(db_path),
             'goldilocks': GoldilocksSignal(db_path),
             'persistence': PersistenceSignal(db_path),
-            'simple_trend': SimpleTrendSignal(db_path),
             'gaussian': GaussianSignal(db_path),
             'gaussian_v2': GaussianV2Signal(db_path),
             'pressure_delta': PressureDeltaSignal(db_path),
-            'regime': RegimeSignal(db_path),
             'forecast_disagreement': ForecastDisagreementSignal(db_path),
             'calendar_climatology': CalendarClimatologySignal(db_path),
             'temperature_advection': TemperatureAdvectionSignal(db_path),
         }
-        # Lazy-register frontal detector to avoid circular imports
-        self._lazy_register_frontal_detector(db_path)
 
-    def _lazy_register_frontal_detector(self, db_path: str):
-        """Lazy-register frontal detector to avoid circular imports."""
-        from core.frontal_detector import FrontalDetectorSignal
-        self.signals['frontal_detector'] = FrontalDetectorSignal(db_path)
 
     def get_signal(self, signal_name: str):
         """Get a signal by name."""

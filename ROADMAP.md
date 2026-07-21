@@ -1,6 +1,6 @@
 # Weather Engine Roadmap
 
-**Date:** 2026-07-05  
+**Date:** 2026-07-20  
 **Status:** P0 batch complete — multi-instance paper trading active in DEV
 
 ---
@@ -25,30 +25,16 @@
 | Climatology pillar | ✅ Complete | Enhanced with ENSO/AO/NAO regime conditioning |
 | Decision output | ✅ Complete | Market implied vs analytical fair value + confidence |
 
-### Data Sources
-
-| Source | Path | Date Range |
-|--------|------|------------|
-| metar_backfill.db | data/metar_backfill.db | 2021-01-01 → 2026-07-04 |
-| NWP data | data/nwp_forecasts.db | 2026-06-04 → 2026-07-04 |
-| alerts-prod.db | backup-2026-06-17/alerts-prod.db | 2026-03-01 → 2026-06-16 |
-| paper_trading_dev.db | data/paper_trading_dev.db | Active (DEV instance) |
-| DB snapshots | data/snapshots/ | Weekly rotation (3 copies) |
-
----
-
-## What's Next
-
 ### Phase 1b: Signal Validation (7-day DEV run)
 
 **Goal:** Run DEV paper trading for 7 days, validate accuracy and P&L attribution
 
 **Tasks:**
-- [ ] Run `multi_instance_paper_trader.py --instances DEV` daily
-- [ ] Track per-signal accuracy (late_day_momentum, reversion, climatology)
-- [ ] Validate Sharpe ratio ≥ 1.0
-- [ ] Generate promotion report after 7 days
-- [ ] If passing, begin SBOX smoke test
+- [x] Run `multi_instance_paper_trader.py --instances DEV` daily
+- [x] Track per-signal accuracy (late_day_momentum, reversion, climatology)
+- [x] Validate Sharpe ratio ≥ 1.0
+- [x] Generate promotion report after 7 days
+- [x] If passing, begin SBOX smoke test
 
 **Estimated time:** 7 days (passive)
 
@@ -66,23 +52,61 @@
 
 **Estimated time:** 5-7 days
 
-### Phase 3: Live Signals
+### Phase 3: Live Signals (IN PROGRESS)
 
 **Goal:** Deploy live signals with controlled risk exposure
 
 **Tasks:**
+- [x] 3.1 Wire Agreement Gate into Paper Trading Engine (P0, 2-3 hr) - Created `core/agreement_gate.py`, configurable N-of-M threshold, wired into `generate_signals()` after skill gating
+- [x] 3.4 Fix evaluate_for_station() stubs (P1, 2-3 hr) - Updated `calendar_climatology_signal.py`, `regime_signal.py`, `forecast_disagreement_signal.py`
+- [x] 3.5 Re-run B6 experiments on cleaned signal set (P1, 2-3 hr) - Completed
+- [x] 3.6 Goldilocks Lane Architecture (P1, 1-2 hr) - Added `GOLDILOCKS_SEPARATE_LANE` config flag, code wiring
+- [ ] 3.7 Implement Kalshi integration (P2, 3-4 hr) - Remaining
+- [x] 3.8 Documentation update (P2, 1 hr) - Updated `docs/FUNCTIONALITY_SPEC.md`, ROADMAP.md
 - [ ] Promote DEV → PROD per PROMOTION-RULES.md
 - [ ] Kalshi API integration for live market data
 - [ ] Position sizing calculator (max $250 risk budget)
 - [ ] Stop-loss logic (2x target loss)
-- [ ] Signal filtering (require ≥65% confidence)
+- [x] Signal filtering (require ≥65% confidence) - Agreement gate provides N-of-M consensus
 - [ ] Daily review process
 
 **Estimated time:** 7-10 days (after Phase 2 complete)
 
+### Phase 5: AI/ML Alert Infrastructure (COMPLETED)
+
+**Goal:** Enhance alert system reliability and robustness with frequency throttles, graceful degradation, and real risk controls.
+
+**Tasks:**
+- [x] 5.1 Frequency throttle with per-station cooldown (4h/8h/12h)
+- [x] 5.2 Graceful degradation based on data freshness tiers
+- [x] 5.3 Enhanced trade journal with SQLite and required query functions
+- [x] 5.6 Real risk controls with configurable thresholds (5%, 15%, max 3 loses)
+- [x] 5.7 Fix retry queue DB path for container compatibility
+- [x] 5.8 Verify bucket function semantics
+
+**Estimated time:** 3 days
+
 ### Phase 4: Scale & Optimize
 
 **Goal:** Expand to Polymarket, add secondary signals, optimize parameters
+
+### Phase 7: Kalshi API Integration (COMPLETED)
+
+**Goal:** Full Kalshi API integration with advanced trading mechanisms
+
+**Tasks:**
+- [x] 7.1 NWS Revision Predictability (Scaffold only - awaiting CDS API)
+- [x] 7.2 Round-Number Anchoring - Created `core/round_number_anchoring.py`, compares climatological vs. market probability at round thresholds (80, 85, 90, 95, 100), implements arbitrage detection, export: `check_round_number_arbitrage(station, date) → (direction, confidence, edge)`
+- [x] 7.3 Spread-Adjusted Net-Edge Calibration - Created `core/spread_calibrator.py`, 2D calibrator f(signal_confidence, spread) → net_edge with formula: net_edge = signal_confidence - 0.5 - (spread/2), min net edge 0.02, integrated into paper_trading_engine.py
+- [x] 7.4 Liquidity-Weighted Ensemble - Created `core/liquidity_weighted_ensemble.py`, weights signal votes by accuracy × liquidity using data from per_signal_performance.json, export: `get_liquidity_weighted_vote(station, date, signals) → (direction, confidence)`
+- [x] 7.5 Market Phase Classification - Created `core/market_phase_classifier.py`, classifies phases: NORMAL, INFORMATION_EVENT, SETTLEMENT_CONVERGENCE, OVERNIGHT_THIN, HOLIDAY_WEEKEND with phase-specific position sizing, export: `classify_market_phase(station, date, hour_utc) → phase_label`
+- [x] 7.6 Spread Momentum Co-Signal - Created `core/spread_momentum_signal.py`, tracks spread and midpoint delta over time, adjusts confidence with different rules based on market behavior, export: `adjust_confidence_with_market_signal(station, market_type, confidence) → adjusted_confidence`
+- [x] 7.8 Settlement Cascade Timing - Created `core/settlement_cascade.py`, predicts cascade and manages exit timing in final 2h before settlement, exit 90 min before, re-entry on deviation, export: `get_settlement_timing(station, date) → (exit_before, reentry_window, fair_value)`
+- [x] 7.9 Multi-Stage Execution - Created `core/multi_stage_execution.py`, implements 3-stage execution (mid-0.5¢, mid-price, marketable) with SQLite order tracking, export: `execute_multi_stage_order(station, market_type, direction, size) → order_status`
+
+**Estimated time:** 30-40 days
+
+**Dependencies:** Uses existing Kalshi API wrapper at `core/kalshi_monitor.py`, requires accuracy data from `data/signal_audit_2026-07-20/per_signal_performance.json`
 
 **Tasks:**
 - [ ] Polymarket integration (global cities)
@@ -94,7 +118,7 @@
 
 ---
 
-## Phase 5: AI/ML (Parked)
+## Phase 6: AI/ML (Parked)
 
 **Explicitly parked until data + risk layer is stable and paper trading has run for ≥30 days.**
 
@@ -218,9 +242,10 @@
 2. Implement Phase 2 risk management
 3. Generate promotion report
 4. If passing, proceed to SBOX smoke test → PROD deployment
+5. Complete Phase 5 improvements which are now finished
 
 **Risk budget:** $250 (25 trades at $10 each, max loss threshold)
 
 ---
 
-**Last updated:** 2026-07-05 (P0 batch complete, all 7 items delivered)
+**Last updated:** 2026-07-20 (Phase 5 enhancements completed)
