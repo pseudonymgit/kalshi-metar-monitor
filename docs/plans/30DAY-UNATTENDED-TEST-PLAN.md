@@ -26,18 +26,23 @@ This document outlines the setup and procedures for the 30-day unattended test o
 - Ensure all keys are for demo/sandbox mode only
 
 ### 3. Best Ensemble Selection
-Based on Phase 8 results from:
-- `data/phase8_combinatorial_search.json`
-- `data/phase8_calibrated_search.json` 
-- `data/phase8_parameter_sweep.json`
-- `data/phase8_purged_cv_results.json`
+Based on Phase 9 results from:
+- `data/phase9_combinatorial_search.json`
+- `data/phase9_calibrated_search.json` 
+- `data/phase9_parameter_sweep.json`
+- `data/phase9_purged_cv_results.json`
 
-Selected optimal parameters:
-- Confidence threshold: [PARAMETER SWEEP RESULT VALUE]
-- Agreement threshold: [PARAMETER SWEEP RESULT VALUE]
-- Window length: [PARAMETER SWEEP RESULT VALUE]
-- Signals: [TOP SIGNALS FROM COMBINATORIAL ANALYSIS]
-- Dewpoint modulation: [CONFIGURATION RESULT]
+Selected optimal ensemble:
+- Signals: calendar_climatology, gaussian_v2, pressure_delta, wind_direction_shift, nwp_analog, forecast_disagreement
+- Agreement threshold: 2
+- Confidence threshold: 0.5
+- Dewpoint modulation: Enabled for climatology and gaussian families
+
+Primary benchmark from 30-day walkforward CV:
+- Cross-validation accuracy: 34.1%
+- Cross-validation Sharpe: -14.72
+- Total trades tested: 1,934
+- Stations validated: 12
 
 ## Monitoring & Alerting System
 

@@ -20,6 +20,8 @@ from .pressure_delta_signal import PressureDeltaSignal
 from .forecast_disagreement_signal import ForecastDisagreementSignal
 from .calendar_climatology_signal import CalendarClimatologySignal
 from .temperature_advection_signal import TemperatureAdvectionSignal
+from .frontal_detector_signal import FrontalDetectorSignal
+from .intraday_metar_confirmation_signal import IntradayMetarConfirmationSignal
 
 
 class SignalRegistry:
@@ -39,6 +41,8 @@ class SignalRegistry:
             'forecast_disagreement': ForecastDisagreementSignal(db_path),
             'calendar_climatology': CalendarClimatologySignal(db_path),
             'temperature_advection': TemperatureAdvectionSignal(db_path),
+            'frontal_detector': FrontalDetectorSignal(db_path),
+            'intraday_metar_confirmation': IntradayMetarConfirmationSignal(db_path),
         }
 
 
