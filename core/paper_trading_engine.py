@@ -59,10 +59,12 @@ CALIBRATION_REPORT_PATH = str(REPO_ROOT / "reports" / "paper_trading_calibration
 sys.path.insert(0, str(REPO_ROOT / "core"))
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_signal
+from core.signals.intraday_metar_confirmation import get_intraday_confirmation
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_skill_gate import StationSkillGate
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .spatial_coherence import apply_spatial_coherence_gate, STATION_REGIONS as SPATIAL_REGIONS, STATION_TO_REGION
+from .ensemble_diversity import compute_diversity_score, apply_diversity_penalty
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from position_sizing import (
     compute_position_size as _compute_confidence_weighted_size,
@@ -225,6 +227,11 @@ except ImportError:
     CalibrationPipeline = None
     HAS_CALIBRATION_PIPELINE = False
 
+
+# Configuration flags for ensemble diversity (Phase 4.5)
+ENSEMBLE_DIVERSITY_ENABLED = True
+DIVERSITY_BASE_WEIGHT = 0.75  # Minimum weight when diversity = 0
+DIVERSITY_MAX_WEIGHT = 1.0    # Max weight when diversity = 1
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
@@ -1021,6 +1028,47 @@ class PaperTrader:
         _LOGGER.info(f"Total final signals: {len(all_final_signals)} (non-Goldilocks passed agreement: {len(other_signals)}, Goldilocks (unfiltered): {len(goldilocks_signals)})")
         
         signals = all_final_signals
+
+        # Apply diversity scoring to signals from Ensemble Diversity Score module (Phase 4.5)
+        # This modulates confidence after agreement gate to penalize when signals are too redundant
+        if ENSEMBLE_DIVERSITY_ENABLED and len(signals) > 1:
+            try:
+                # Collect signal votes for diversity scoring (convert to appropriate format)
+                # For diversity calculation, we need to convert signals to (direction, confidence) tuples
+                signal_votes = []
+                for signal_tuple in signals:
+                    if len(signal_tuple) >= 5:
+                        # Signal tuple has confidence value: (station, market_type, direction, reason, confidence)
+                        _, _, direction, _, confidence = signal_tuple
+                        # Convert direction to numeric: UP=1, DOWN=-1
+                        numeric_direction = 1 if direction.value == "UP" else -1
+                        signal_votes.append((numeric_direction, confidence))
+                    else:
+                        # Default confidence if not available
+                        _, _, direction, _ = signal_tuple
+                        # Convert direction to numeric: UP=1, DOWN=-1
+                        numeric_direction = 1 if direction.value == "UP" else -1
+                        signal_votes.append((numeric_direction, 0.5))
+
+                diversity_score = compute_diversity_score(signal_votes)
+                _LOGGER.info(f"Ensemble diversity score: {diversity_score:.3f} for {len(signal_votes)} signals")
+
+                # Apply diversity penalty to all signals that have confidence values
+                updated_signals = []
+                for signal_tuple in signals:
+                    if len(signal_tuple) >= 5:
+                        # Has confidence component, apply diversity penalty
+                        station, market_type, direction, reason, old_confidence = signal_tuple
+                        new_confidence = apply_diversity_penalty(old_confidence, diversity_score)
+                        updated_signals.append((station, market_type, direction, reason, new_confidence))
+                    else:
+                        # No confidence component, append as-is
+                        updated_signals.append(signal_tuple)
+
+                signals = updated_signals
+                
+            except Exception as e:
+                _LOGGER.error(f"Error applying ensemble diversity scoring: {e}")
 
         # Also look for late-day METAR momentum patterns if date is today/tomorrow
         if self.is_recent_enough_for_late_day_analysis(date):

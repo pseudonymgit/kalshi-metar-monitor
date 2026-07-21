@@ -53,7 +53,18 @@ def apply_diversity_penalty(confidence, diversity_score):
     Returns:
         float: Confidence score after applying diversity penalty
     """
-    from .config import DIVERSITY_BASE_WEIGHT, DIVERSITY_MAX_WEIGHT
+    # Import from paper_trading_engine where config constants are defined
+    try:
+        from .paper_trading_engine import DIVERSITY_BASE_WEIGHT, DIVERSITY_MAX_WEIGHT
+    except ImportError:
+        # Fall back to default values if paper_trading_engine module cannot be imported
+        DIVERSITY_BASE_WEIGHT = 0.75
+        DIVERSITY_MAX_WEIGHT = 1.0
+
+        # Allow override from environment variables
+        import os
+        DIVERSITY_BASE_WEIGHT = float(os.getenv("DIVERSITY_BASE_WEIGHT", DIVERSITY_BASE_WEIGHT))
+        DIVERSITY_MAX_WEIGHT = float(os.getenv("DIVERSITY_MAX_WEIGHT", DIVERSITY_MAX_WEIGHT))
     
     # Calculate the penalty factor based on diversity
     # When diversity = 0 (all agree): penalty_factor = DIVERSITY_BASE_WEIGHT
