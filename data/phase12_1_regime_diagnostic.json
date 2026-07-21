@@ -1,0 +1,23 @@
+{
+  "action": "SKIP Phase 12 - insufficient data for comparison",
+  "metadata": {
+    "total_stations_sampled": 5,
+    "total_dates_sampled": 30,
+    "total_datapoints": 150
+  },
+  "regime_breakdown": {
+    "unknown": 150
+  },
+  "results_by_regime": {
+    "stormy": {},
+    "stable": {}
+  },
+  "comparisons": {
+    "accuracy_difference": 0,
+    "kelly_ratio": 0,
+    "criteria_passed": {
+      "accuracy_threshold_met": false,
+      "kelly_threshold_met": false
+    }
+  }
+}
