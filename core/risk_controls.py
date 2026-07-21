@@ -24,13 +24,13 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class RiskConfig:
-    """Risk control configuration parameters — Phase 3.6 real defaults."""
-    # Daily loss limit in dollars (not percentage)
-    max_daily_loss_dollars: float = 100.0    # $100 daily loss limit
+    """Risk control configuration parameters — Phase 5.6 Updated defaults."""
+    # Daily loss as percentage of account (per requirement)
+    max_daily_loss_percentage: float = 0.05    # 5% max daily loss of account balance
     # Drawdown limit as fraction of peak
-    max_drawdown_percent: float = 0.20       # 20% max drawdown
+    max_drawdown_percent: float = 0.15       # 15% max drawdown from peak
     # Consecutive loss limit
-    max_consecutive_losses: int = 8          # 8 consecutive losses
+    max_consecutive_losses: int = 3          # 3 consecutive losses max
     # Starting capital (for percentage reference)
     initial_capital: float = 10000.0
     # Daily loss reset — whether to reset daily P&L at midnight
@@ -226,18 +226,26 @@ class RiskManager:
 
     def check_daily_loss(self) -> Tuple[bool, str]:
         """
-        Check if daily loss exceeds configured threshold (default $100).
+        Check if daily loss exceeds configured percentage of account threshold (default 5%).
 
         Returns:
             (True, "OK") if within limits
             (False, "reason") if exceeded
         """
-        if self.daily_pnl >= -self.config.max_daily_loss_dollars:
-            remaining = self.config.max_daily_loss_dollars + self.daily_pnl
-            return True, f"Daily P&L ${self.daily_pnl:+.2f} within ${self.config.max_daily_loss_dollars:.0f} limit (${remaining:+.2f} remaining)"
+        # Calculate daily loss as percentage based on account balance per requirement: max 5% of account per day  
+        if self.daily_pnl >= 0:  # Profitable day, so pass
+            return True, f"Daily P&L ${self.daily_pnl:+.2f} profitable (non-lossy day passes condition)"
+        
+        # Max daily loss allowed as percentage of initial capital
+        max_daily_loss_dollars = self.config.max_daily_loss_percentage * self.config.initial_capital
+        
+        # If daily loss is less than this value (closer to zero), we pass
+        if abs(self.daily_pnl) <= max_daily_loss_dollars:
+            max_loss_fraction = abs(self.daily_pnl) / self.config.initial_capital
+            return True, f"Daily P&L ${self.daily_pnl:+.2f} ({max_loss_fraction:.1%}) within {self.config.max_daily_loss_percentage:.1%} of account limit (${-max_daily_loss_dollars:.2f}/day)"
         return False, (
-            f"Daily loss ${abs(self.daily_pnl):.2f} exceeds "
-            f"${self.config.max_daily_loss_dollars:.0f} limit"
+            f"Daily loss ${abs(self.daily_pnl):.2f} ({abs(self.daily_pnl)/self.config.initial_capital:.1%}) exceeds "
+            f"{self.config.max_daily_loss_percentage:.1%} per day of account ({self.config.initial_capital:.2f}), max daily loss ${max_daily_loss_dollars:.2f}, actual loss ${abs(self.daily_pnl):.2f}"
         )
 
     def check_drawdown(self) -> Tuple[bool, str]:

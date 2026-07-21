@@ -36,6 +36,8 @@ import threading
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from datetime import datetime, timedelta, timezone
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from .agreement_gate import AgreementGate, SimpleAgreementChecker
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from typing import Dict, List, Optional, Tuple, Any
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from enum import Enum
@@ -166,7 +168,7 @@ except ImportError:
 
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import NWP Analog Signal - wrap in try/except to prevent crashes if sklearn/xgboost not installed
-# Check the NWP_ANALOG_ENABLED flag — this signal is experimental and gated
+# Check the NWP_ANALOG_ENABLED flag - this signal is experimental and gated
 try:
     from core.signals.nwp_analog_signal import NwpAnalogSignal, NWP_ANALOG_ENABLED
 except ImportError:
@@ -185,11 +187,21 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 TEMPERATURE_ADVECTION_ENABLED = True
 try:
     from core.signals.temperature_advection_signal import TemperatureAdvectionSignal
-    _LOGGER.info("TemperatureAdvectionSignal imported successfully")
+    # Skip logger info due to initialization order; _LOGGER defined after imports
 except ImportError as e:
-    _LOGGER.warning(f"TemperatureAdvectionSignal import failed: {e}")
+    print(f"Warning: TemperatureAdvectionSignal import failed: {e}")
     TemperatureAdvectionSignal = None
     TEMPERATURE_ADVECTION_ENABLED = False
+
+# Import Goldilocks Signal (spike-reversion pattern)
+try:
+    from core.signals.goldilocks_signal import GoldilocksSignal
+    HAS_GOLDILOCKS_SIGNAL = True
+except ImportError as e:
+    print(f"Warning: GoldilocksSignal import failed: {e}")
+    GoldilocksSignal = None
+    HAS_GOLDILOCKS_SIGNAL = False
+
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
     from core.calibration_pipeline import CalibrationPipeline
@@ -202,6 +214,9 @@ except ImportError:
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
+
+# Configuration flag for Goldilocks lane separation
+GOLDILOCKS_SEPARATE_LANE = True
 _LOGGER = logging.getLogger(__name__)
 
 # Alert builder integration - export alert builder functions
@@ -272,11 +287,23 @@ class PaperTrader:
         self._init_metar_db_if_needed()
 
         # Initialize signal instances
-        # NWP Analog is NOT instantiated at init — lazy-loaded when first needed
+        # NWP Analog is NOT instantiated at init - lazy-loaded when first needed
         self._nwp_analog = None
 
-        # Temperature Advection Signal — lazy-loaded when first needed
+        # Temperature Advection Signal - lazy-loaded when first needed
         self._temp_advection = None
+
+        # Goldilocks Signal (spike-reversion pattern)
+        self._goldilocks_signal = None
+        if HAS_GOLDILOCKS_SIGNAL:
+            try:
+                self._goldilocks_signal = GoldilocksSignal(self.metar_db)
+                _LOGGER.info("Goldilocks signal initialized")
+            except Exception as e:
+                _LOGGER.warning(f"Failed to initialize Goldilocks Signal: {e}")
+                self._goldilocks_signal = None
+        else:
+            _LOGGER.warning("Goldilocks signal not imported")
 
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
@@ -315,7 +342,7 @@ class PaperTrader:
             except Exception as e:
                 print(f"Warning: Failed to initialize KellyPositionSizer: {e}")
                 self._kelly_sizer = None
-        
+
         self._risk_budget = None
         if HAS_RISK_BUDGET:
             try:
@@ -324,7 +351,7 @@ class PaperTrader:
                 print(f"Warning: Failed to initialize RiskBudgetAllocator: {e}")
                 self._risk_budget = None
 
-        self._scaling_ladder = None        
+        self._scaling_ladder = None
         if HAS_SCALING_LADDER:
             try:
                 self._scaling_ladder = ScalingLadder()
@@ -339,7 +366,7 @@ class PaperTrader:
             except Exception as e:
                 print(f"Warning: Failed to initialize LowLiquidityTrapFilter: {e}")
                 self._low_liquidity_trap_filter = None
-        
+
         self._stop_loss_monitor = None
         if HAS_STOP_LOSS:
             try:
@@ -861,7 +888,7 @@ class PaperTrader:
                 market_side = MarketSide.UP if ldm_direction == "up" else MarketSide.DOWN
                 signals.append((station, "HIGH", market_side, "late_day_momentum_hourly"))
 
-            # Signal 4: NWP Analog (experimental — gated behind NWP_ANALOG_ENABLED flag)
+            # Signal 4: NWP Analog (experimental - gated behind NWP_ANALOG_ENABLED flag)
             if NWP_ANALOG_ENABLED:
                 # Lazy-initialize the NWP analog signal on first use
                 if self._nwp_analog is None:
@@ -912,12 +939,23 @@ class PaperTrader:
                     except Exception as e:
                         _LOGGER.warning(f"Failed to compute Temperature Advection signal for {station} on {date}: {e}")
 
+            # Signal 7: Goldilocks (spike-reversion pattern) - added to signals like others
+            if HAS_GOLDILOCKS_SIGNAL and self._goldilocks_signal is not None:
+                try:
+                    direction, confidence = self._goldilocks_signal.evaluate_for_station(station, date, metar_conn)
+                    if direction is not None and confidence >= 0.25:
+                        market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
+                        signals.append((station, "HIGH", market_side, "goldilocks_spike_reversion"))
+                        _LOGGER.info(f"Goldilocks signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
+                except Exception as e:
+                    _LOGGER.warning(f"Failed to compute Goldilocks signal for {station} on {date}: {e}")
+
         metar_conn.close()
 
         # Filter signals based on station skill (T5 - per station skill gating)
         if self._skill_gate is not None:
             before_count = len(signals)
-            filtered_signals = []
+            filtered_signals = []  
             for station, market_type, signal_direction, reason in signals:
                 if self._skill_gate.is_station_skilled(station, market_type):
                     filtered_signals.append((station, market_type, signal_direction, reason))
@@ -925,6 +963,50 @@ class PaperTrader:
                     _LOGGER.debug(f"Skipped unskilled station trade: {station} for {market_type} market")
             signals = filtered_signals
             _LOGGER.info(f"Applied skill gate filter: {len(signals)} skilled out of {before_count} total signals")
+
+        # Separate goldilocks signals if separate lane is enabled
+        goldilocks_signals = []
+        other_signals = []
+        
+        if GOLDILOCKS_SEPARATE_LANE:
+            for station, market_type, direction, reason in signals:
+                if reason == "goldilocks_spike_reversion":
+                    goldilocks_signals.append((station, market_type, direction, reason))
+                else:
+                    other_signals.append((station, market_type, direction, reason))
+            signals = other_signals
+            _LOGGER.info(f"Separated Goldilocks signals for independent processing. Other signals: {len(other_signals)}, Goldilocks: {len(goldilocks_signals)}")
+        else:
+            # All signals remain together when separate lane is disabled
+            goldilocks_signals = []
+            other_signals = signals
+            
+        # Apply agreement gate filter ONLY to non-Goldilocks signals
+        if other_signals:
+            before_agreement_count = len(other_signals)
+            
+            # Group signals by station and market type, then apply agreement check
+            grouped_signals = {}
+            for station, market_type, direction, reason in other_signals:
+                key = (station, market_type)
+                if key not in grouped_signals:
+                    grouped_signals[key] = []
+                grouped_signals[key].append((station, market_type, direction, reason))
+            
+            # Check agreement for each group and collect results
+            final_other_signals = []
+            for key, signal_group in grouped_signals.items():
+                agreed_signals = SimpleAgreementChecker.check_agreement(signal_group, n_required=3)
+                final_other_signals.extend(agreed_signals)
+            
+            other_signals = final_other_signals
+            _LOGGER.info(f"Applied agreement gate: {len(other_signals)} non-Goldilocks signals passed consensus out of {before_agreement_count} post-skill-gate signals")
+        
+        # Combine Goldilocks signals (unfiltered) with agreeing non-Goldilocks signals
+        all_final_signals = other_signals + goldilocks_signals
+        _LOGGER.info(f"Total final signals: {len(all_final_signals)} (non-Goldilocks passed agreement: {len(other_signals)}, Goldilocks (unfiltered): {len(goldilocks_signals)})")
+        
+        signals = all_final_signals
 
         # Also look for late-day METAR momentum patterns if date is today/tomorrow
         if self.is_recent_enough_for_late_day_analysis(date):
@@ -1059,17 +1141,17 @@ class PaperTrader:
         """
         Get the previous day's high temperature for a given station and current date.
         This is needed for the multi-model ensemble signal which compares forecasts to prior actual.
-        
+
         Args:
             station: ICAO station code (e.g., 'KATL')
             current_date: current date string (YYYY-MM-DD) to get yesterday's data for
-        
+
         Returns: float - previous day's high temperature or None if not available
         """
         from datetime import datetime, timedelta
         current_dt = datetime.strptime(current_date, '%Y-%m-%d')
         prev_date = (current_dt - timedelta(days=1)).strftime('%Y-%m-%d')
-        
+
         conn = get_sqlite_connection(self.metar_db)
         c = conn.cursor()
 
@@ -1215,7 +1297,7 @@ class PaperTrader:
             calibrated_confidence = confidence
 
         # Record decision output - this is P1.4 requirement
-        
+
         # ─── PHASE 3 RISK MODULES: PRE-TRADE CHECKS ───────────────────────
         # 1. Stop-loss pre-trade check - check if the stop-loss conditions are triggered
         if self._stop_loss_monitor is not None:
@@ -1365,7 +1447,7 @@ class PaperTrader:
         #
         # Rules:
         # 1. Kelly sizer is primary (corrected formula: f* = (p - c) / (1 - c))
-        # 2. No min_size_usd floor — Kelly naturally produces 0 for no-edge trades
+        # 2. No min_size_usd floor - Kelly naturally produces 0 for no-edge trades
         # 3. Single cap: 8% of bankroll (from Kelly sizer)
         # 4. Scaling ladder is a downward modifier only (can reduce, never increase)
         # 5. Edge must be positive to size > 0
@@ -1570,7 +1652,7 @@ class PaperTrader:
         risk_state_after_execution = self._risk_manager.update_after_trade(trade_result)
 
         # ─── PHASE 3 RISK MODULES: POST-TRADE RECORDING ───────────────────────
-        # Record trade result with Stop Loss Monitor 
+        # Record trade result with Stop Loss Monitor
         if self._stop_loss_monitor is not None:
             try:
                 self._stop_loss_monitor.record_trade(
@@ -1597,7 +1679,7 @@ class PaperTrader:
         # Check if any risk control has been violated after this trade
         if not risk_state_after_execution.get('passed', True):
             print(f"Risk kill switch triggered for {station} by risk: {risk_state_after_execution.get('checks')} - skipping remaining trades")
-            
+
             # Prepare failure reasons from failed checks
             kill_reasons = []
             checks = risk_state_after_execution.get('checks', {})
@@ -1607,7 +1689,7 @@ class PaperTrader:
                 kill_reasons.append(f"Drawdown limit exceeded ({risk_state_after_execution.get('drawdown_pct', 0):.1%})")
             if not checks.get('consecutive_losses_check', True):
                 kill_reasons.append(f"Consecutive losses exceeded ({risk_state_after_execution.get('consecutive_losses', 0)})")
-                
+
             return {
                 'status': 'skipped',
                 'reason': f'Risk kill switch activated: {"; ".join(kill_reasons)}',
@@ -2203,11 +2285,11 @@ class PaperTrader:
                 except ImportError:
                     # Fallback to known stations if registry not available
                     all_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']
-                
+
                 skilled_stations = self._skill_gate.get_skilled_stations('HIGH')
                 skilled_stations_count = len(skilled_stations)
                 total_stations_count = len(all_stations)
-                
+
             except Exception as e:
                 _LOGGER.warning(f"Error getting skill gate statistics: {e}")
                 skilled_stations_count = 0

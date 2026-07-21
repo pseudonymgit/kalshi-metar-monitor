@@ -1,346 +1,468 @@
 #!/usr/bin/env python3
 """
-Heartbeat v1.0 — Phase 4.2 System Health Heartbeat
+Heartbeat System v1.0 — Phase 6.2
 
-Sends periodic status heartbeats to monitor system health.
-
-Tiers:
-  🟢 OK — System running normally
-  🟡 WARNING — METAR data stale
-  🔴 ERROR — Errors detected in last hour
-
-Heartbeat interval: 60 minutes (configurable)
-Tracks last heartbeat time to avoid duplicates.
-
-Scripts only — no AI/ML in the heartbeat loop.
+System health reporting with delivery routing integration.
+Reports on scheduler status, signal counts, last trade timestamps,
+account balance, and kill switch status via configured delivery channels.
 """
 
-import os
-import logging
-import time
+import asyncio
 import json
+import logging
+import aiohttp
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Tuple, Any
-from pathlib import Path
+from typing import Dict, Any, Optional, Union
+import sqlite3
+import time
+
+# Import delivery components
+try:
+    from .delivery_router import create_default_delivery_router, HeartbeatDeliverer
+except ImportError:
+    from delivery_router import create_default_delivery_router, HeartbeatDeliverer
+
+# Also import the paper trading engine components
+try:
+    from .paper_trading_engine import PaperTradingEngine, get_latest_account_balance
+    from .alert_schema import parse_alert_from_db_row
+except ImportError:
+    from paper_trading_engine import PaperTradingEngine, get_latest_account_balance
+    from alert_schema import parse_alert_from_db_row
+
+try:
+    from .metar_monitor import MetarMonitor
+except ImportError:
+    # MetarMonitor may not be available in this module, we'll handle it gracefully
+    MetarMonitor = None
+
+# Try to import settings
+try:
+    from .instance_config import INSTANCE_CONFIG
+except ImportError:
+    # Fallback to simple config dict
+    INSTANCE_CONFIG = {
+        'instance_id': 'weather-engine-local',
+        'version': '6.2.heartbear-0.1',
+    }
 
 _LOGGER = logging.getLogger(__name__)
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# Default heartbeat interval: 60 minutes
-DEFAULT_HEARTBEAT_INTERVAL_SECONDS = 3600
-
-# Staleness thresholds
-METAR_STALE_HOURS = 2  # Warn if last METAR collection was > 2 hours ago
+# Global singleton for heartbeat manager
+_HEARTBEAT_MANAGER = None
 
 
-# ─── Heartbeat State Tracking ───────────────────────────────────────────
-
-class HeartbeatSender:
-    """
-    Periodic health heartbeat sender.
-
-    Tracks last heartbeat time to avoid sending duplicates within the interval.
-    Builds status messages based on current system health.
-    Supports primary (Discord webhook), secondary (console/log), and
-    tertiary (SMS — future stub) delivery tiers.
-
-    Usage:
-        hb = HeartbeatSender()
-        hb.update_metrics(signals_evaluated=42, alerts_pending=3, errors=[])
-        hb.maybe_send_heartbeat()  # Sends only if interval has elapsed
-    """
-
-    def __init__(self, interval_seconds: int = DEFAULT_HEARTBEAT_INTERVAL_SECONDS):
-        """
-        Args:
-            interval_seconds: Minimum interval between heartbeats in seconds.
-        """
-        self._interval_seconds = interval_seconds
-        self._last_heartbeat_time: Optional[float] = None
-        self._logger = logging.getLogger(f"{__name__}.HeartbeatSender")
-
-        # Metrics state
-        self._signals_evaluated: int = 0
-        self._alerts_pending: int = 0
-        self._alerts_issued: int = 0
-        self._errors: List[str] = []
-        self._last_metar_collection_time: Optional[float] = None
-        self._last_metar_collection_str: Optional[str] = None
-
-        # Active health state
-        self._health_status: str = "ok"  # "ok", "warning", "error"
-
-    def update_metrics(self, signals_evaluated: int = 0, alerts_pending: int = 0,
-                       alerts_issued: int = 0, errors: Optional[List[str]] = None,
-                       last_metar_collection: Optional[str] = None):
-        """
-        Update heartbeat metrics for the next heartbeat.
-
-        Args:
-            signals_evaluated: Number of signals evaluated in the current cycle
-            alerts_pending: Number of alerts pending delivery
-            alerts_issued: Number of alerts issued in the current cycle
-            errors: List of error messages from the current cycle
-            last_metar_collection: ISO timestamp of last METAR data collection
-        """
-        self._signals_evaluated = signals_evaluated
-        self._alerts_pending = alerts_pending
-        self._alerts_issued = alerts_issued
-        self._errors = errors or []
-
-        if last_metar_collection:
-            self._last_metar_collection_str = last_metar_collection
-            try:
-                self._last_metar_collection_time = datetime.fromisoformat(
-                    last_metar_collection
-                ).timestamp()
-            except (ValueError, TypeError):
-                self._last_metar_collection_time = None
-
-        # Update health status
-        if self._errors:
-            self._health_status = "error"
-        elif self._is_metar_stale():
-            self._health_status = "warning"
-        else:
-            self._health_status = "ok"
-
-    def _is_metar_stale(self) -> bool:
-        """Check if METAR data is stale."""
-        if self._last_metar_collection_time is None:
-            return False  # Unknown, don't warn
-        elapsed_hours = (time.time() - self._last_metar_collection_time) / 3600
-        return elapsed_hours > METAR_STALE_HOURS
-
-    def _get_metar_stale_hours(self) -> float:
-        """Get hours since last METAR collection."""
-        if self._last_metar_collection_time is None:
-            return 0.0
-        return (time.time() - self._last_metar_collection_time) / 3600
-
-    def create_heartbeat_message(self) -> Dict[str, Any]:
-        """
-        Build the heartbeat status message.
-
-        Produces three tiers based on health:
-          🟢 OK — "System OK — N signals evaluated — M alerts pending — 0 errors"
-          🟡 WARNING — "System OK — METAR data stale (N hours) — N signals — M alerts"
-          🔴 ERROR — "System ERROR — {error summary} — check logs"
-
-        Returns:
-            Dict with Discord embed structure for the heartbeat
-        """
-        now_utc = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
-
-        if self._health_status == "error":
-            # 🔴 ERROR
-            error_summary = "; ".join(self._errors[:3])  # Show top 3 errors
-            if len(self._errors) > 3:
-                error_summary += f" (+{len(self._errors) - 3} more)"
-
-            embed = {
-                "title": "🔴 System ERROR",
-                "description": f"Errors detected in the last hour.",
-                "color": 0xFF0000,  # Red
-                "fields": [
-                    {"name": "Errors", "value": error_summary, "inline": False},
-                    {"name": "Signals Evaluated", "value": str(self._signals_evaluated), "inline": True},
-                    {"name": "Alerts Pending", "value": str(self._alerts_pending), "inline": True},
-                    {"name": "Alerts Issued", "value": str(self._alerts_issued), "inline": True},
-                ],
-                "footer": {"text": f"Weather Engine Heartbeat • {now_utc}"},
-            }
-
-            return {
-                "content": None,
-                "embeds": [embed],
-                "health_status": "error",
-                "summary": f"System ERROR — {error_summary} — check logs",
-            }
-
-        elif self._health_status == "warning":
-            # 🟡 WARNING: stale METAR data
-            stale_hours = self._get_metar_stale_hours()
-            embed = {
-                "title": "🟡 System OK — Data Stale",
-                "description": f"METAR data is stale ({stale_hours:.1f} hours).",
-                "color": 0xFFA500,  # Orange
-                "fields": [
-                    {"name": "METAR Staleness", "value": f"{stale_hours:.1f} hours", "inline": True},
-                    {"name": "Signals Evaluated", "value": str(self._signals_evaluated), "inline": True},
-                    {"name": "Alerts Pending", "value": str(self._alerts_pending), "inline": True},
-                    {"name": "Alerts Issued", "value": str(self._alerts_issued), "inline": True},
-                    {"name": "Errors", "value": "0", "inline": True},
-                ],
-                "footer": {"text": f"Weather Engine Heartbeat • {now_utc}"},
-            }
-
-            return {
-                "content": None,
-                "embeds": [embed],
-                "health_status": "warning",
-                "summary": f"🟡 System OK — METAR data stale ({stale_hours:.1f}h) — {self._signals_evaluated} signals — {self._alerts_pending} alerts",
-            }
-
-        else:
-            # 🟢 OK
-            embed = {
-                "title": "🟢 System OK",
-                "description": "All systems nominal.",
-                "color": 0x00FF00,  # Green
-                "fields": [
-                    {"name": "Signals Evaluated", "value": str(self._signals_evaluated), "inline": True},
-                    {"name": "Alerts Pending", "value": str(self._alerts_pending), "inline": True},
-                    {"name": "Alerts Issued", "value": str(self._alerts_issued), "inline": True},
-                    {"name": "Errors", "value": "0", "inline": True},
-                ],
-                "footer": {"text": f"Weather Engine Heartbeat • {now_utc}"},
-            }
-
-            return {
-                "content": None,
-                "embeds": [embed],
-                "health_status": "ok",
-                "summary": f"🟢 System OK — {self._signals_evaluated} signals evaluated — {self._alerts_pending} alerts pending — 0 errors",
-            }
-
-    def maybe_send_heartbeat(self) -> Tuple[bool, Optional[Dict[str, Any]]]:
-        """
-        Send heartbeat if the interval has elapsed since last send.
-
-        Returns:
-            Tuple of (sent: bool, message: dict or None)
-        """
-        now = time.time()
-
-        if self._last_heartbeat_time is not None:
-            elapsed = now - self._last_heartbeat_time
-            if elapsed < self._interval_seconds:
-                remaining = self._interval_seconds - elapsed
-                self._logger.debug(
-                    "Heartbeat skipped — last was %.0fs ago (interval %ds, %.0fs remaining)",
-                    elapsed, self._interval_seconds, remaining
-                )
-                return False, None
-
-        # Build and record heartbeat
-        message = self.create_heartbeat_message()
-        self._last_heartbeat_time = now
-
-        self._logger.info(
-            "Heartbeat sent: %s",
-            message.get("summary", "unknown")
-        )
-        return True, message
-
-    def force_send_heartbeat(self) -> Dict[str, Any]:
-        """
-        Force send a heartbeat regardless of interval.
-
-        Useful for manual status checks or initial startup.
-
-        Returns:
-            Heartbeat message dict
-        """
-        message = self.create_heartbeat_message()
-        self._last_heartbeat_time = time.time()
-        self._logger.info(
-            "Forced heartbeat sent: %s",
-            message.get("summary", "unknown")
-        )
-        return message
-
-    def get_status(self) -> Dict[str, Any]:
-        """
-        Get current heartbeat status without sending.
-
-        Returns:
-            Dict with current metrics and health status
-        """
-        return {
-            "health_status": self._health_status,
-            "signals_evaluated": self._signals_evaluated,
-            "alerts_pending": self._alerts_pending,
-            "alerts_issued": self._alerts_issued,
-            "errors": self._errors,
-            "last_heartbeat_time": self._last_heartbeat_time,
-            "interval_seconds": self._interval_seconds,
-            "metar_stale": self._is_metar_stale(),
-            "metar_stale_hours": self._get_metar_stale_hours() if self._is_metar_stale() else 0,
-        }
-
-    def reset_interval(self):
-        """Reset the heartbeat timer (force next send to be immediate)."""
+class HeartbeatManager:
+    """Manages periodic heartbeat generation and status collection"""
+    
+    def __init__(self, db_path: str = "./data/weather_alerts.db"):
+        self.db_path = db_path
+        self.delivery_router = None
+        self.heartbeat_deliverer = None
+        self.is_running = False
         self._last_heartbeat_time = None
-        self._logger.debug("Heartbeat interval reset")
+        self.alert_db_path = db_path
+        self.instance_id = INSTANCE_CONFIG.get('instance_id', 'weather-engine-standalone')
+        self.version = INSTANCE_CONFIG.get('version', 'unversioned')
+        
+        # Tracking various metrics
+        self.kill_switch_activated = False
+        self.paper_trading_engine = None
+        
+    async def initialize(self):
+        """Initialize heartbeat system with delivery router"""
+        # Create delivery components
+        self.delivery_router = await create_default_delivery_router()
+        self.heartbeat_deliverer = HeartbeatDeliverer(self.delivery_router)
+        _LOGGER.info("Heartbeat system initialized with delivery router integration")
+    
+    def get_scheduler_status(self) -> Optional[Dict[str, Any]]:
+        """
+        Get scheduler status from running MetarMonitor instance or from database logs.
+        This depends on which modules are available in the codebase.
+        """
+        if MetarMonitor is not None:
+            try:
+                # Look for active MetarMonitor in globals or as a daemon
+                import gc
+                for obj in gc.get_objects():
+                    if isinstance(obj, MetarMonitor) and hasattr(obj, '__dict__'):
+                        status = {
+                            'scheduler_running': getattr(obj, 'scheduler_running', False),
+                            'poll_count': getattr(obj, 'poll_count', 0),
+                            'last_poll_utc': getattr(obj, 'last_poll_utc', 'N/A'),
+                            'last_loop_utc': getattr(obj, 'last_loop_utc', 'N/A'),
+                            'timeout_count': getattr(obj, 'timeout_count', 0),
+                            'last_timeout_station': getattr(obj, 'last_timeout_station', 'N/A'),
+                            'last_timeout_utc': getattr(obj, 'last_timeout_utc', 'N/A'),
+                        }
+                        return status
+            except Exception as e:
+                _LOGGER.debug(f"Could not get scheduler status from active MetarMonitor: {e}")
+        
+        # Extract scheduler info from database if available
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                latest_poll_log = conn.execute("""
+                    SELECT created_utc, metadata_json 
+                    FROM alerts 
+                    WHERE alert_type LIKE '%heartbeat%' OR alert_type LIKE '%status%'
+                    ORDER BY created_utc DESC LIMIT 1
+                """).fetchone()
+                
+                if latest_poll_log:
+                    # Attempt to parse any stored scheduler data
+                    metadata_json = latest_poll_log[1]
+                    if metadata_json:
+                        try:
+                            metadata = json.loads(metadata_json)
+                            if 'scheduler' in metadata:
+                                return metadata['scheduler']
+                        except:
+                            pass
+                        
+                # Try to estimate scheduler activity from overall alert patterns
+                recent_alerts = conn.execute("""
+                    SELECT COUNT(*) FROM alerts 
+                    WHERE created_utc > datetime('now', '-30 minutes')
+                """).fetchone()[0]
+                
+                return {
+                    'recent_activity_count': recent_alerts,
+                    'estimation_method': 'database_activity_recent',
+                }
+        except Exception as e:
+            _LOGGER.debug(f"Could not determine scheduler status from database: {e}")
+        
+        # If nothing else available, return a minimal status
+        return {
+            'status_estimation': 'not_monitored',
+            'reason': 'MetarMonitor not found in context',
+            'instance_type': self.instance_id,
+        }
+    
+    def get_signal_counts(self) -> Dict[str, int]:
+        """Count recent signals and alerts in the system"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                # Total alerts count
+                total_alerts = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
+                
+                # Recent alerts (last 24 hours)
+                recent_alerts = conn.execute("""
+                    SELECT COUNT(*) FROM alerts 
+                    WHERE created_utc > datetime('now', '-24 hours')
+                """).fetchone()[0]
+                
+                # Recent alerts (last 6 hours)
+                recent_short_alerts = conn.execute("""
+                    SELECT COUNT(*) FROM alerts 
+                    WHERE created_utc > datetime('now', '-6 hours')
+                """).fetchone()[0]
+                
+                # Alerts by type breakdown
+                type_counts = [0, 0, 0, 0, 0, 0]  # Initialize counters  
+                
+                alert_types = conn.execute("""
+                    SELECT alert_type, COUNT(*) 
+                    FROM alerts 
+                    GROUP BY alert_type
+                """).fetchall()
+                
+                type_breakdown = {}
+                for type_name, count in alert_types:
+                    type_breakdown[type_name or 'UNKNOWN'] = count
+                
+                return {
+                    'total_signals_all_time': total_alerts,
+                    'recent_signals_24h': recent_alerts,
+                    'recent_signals_6h': recent_short_alerts,
+                    'by_type': type_breakdown,
+                }
+        except Exception as e:
+            _LOGGER.error(f"Error getting signal counts: {e}")
+            return {
+                'error': str(e),
+                'total_signals_all_time': 0,
+                'recent_signals_24h': 0,
+                'recent_signals_6h': 0,
+                'by_type': {}
+            }
+    
+    def get_last_trade_timestamp(self) -> Optional[str]:
+        """Get timestamp of the last trade from the paper trading engine log if available"""
+        if not self.paper_trading_engine:
+            try:
+                # Look for available paper trading engine instance
+                import gc
+                for obj in gc.get_objects():
+                    if (
+                        obj.__class__.__module__.startswith('paper_trading_engine') or 
+                        obj.__class__.__name__ == 'PaperTradingEngine'
+                    ):
+                        if hasattr(obj, '_get_latest_trade_timestamp'):
+                            return obj._get_latest_trade_timestamp()
+                        elif hasattr(obj, 'log_manager') and hasattr(obj.log_manager, 'get_last_record'):
+                            # Check trade log if we find a paper trading engine
+                            try:
+                                last_trade = obj.log_manager.get_last_record('trades.jsonl')
+                                if last_trade and 'timestamp' in last_trade:
+                                    return last_trade['timestamp']
+                            except:
+                                pass
+            except Exception as e:
+                _LOGGER.debug(f"Could not find active paper trading engine for trade timestamp: {e}")
+        
+        # If no live engine available, extract from trade logs
+        try:
+            trade_logs_path = self.db_path.replace('.db', '') + '_trades.jsonl'
+            import os
+            if os.path.exists(trade_logs_path):
+                latest_line = None
+                with open(trade_logs_path, 'rb') as f:
+                    f.seek(-2, 2)  # Go to second last character
+                    while f.read(1) != b'\n':
+                        f.seek(-2, 1)
+                        if f.tell() == 0:
+                            f.seek(0)
+                            break
+                    latest_line = f.readline().decode()
+                
+                if latest_line:
+                    record = json.loads(latest_line.strip())
+                    return record.get('timestamp', 'Unknown')
+        except Exception as e:
+            _LOGGER.debug(f"Could not get last trade timestamp from trade log: {e}")
+        
+        # Fall back to database trade tracking
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                latest_trade = conn.execute("""
+                    SELECT created_utc FROM alerts 
+                    WHERE alert_type LIKE '%trade%' OR metadata_json LIKE '%"trade_id"%'
+                    ORDER BY created_utc DESC LIMIT 1
+                """).fetchone()
+                if latest_trade:
+                    return latest_trade[0]
+        except:
+            pass
+        
+        return 'N/A'
+    
+    def get_account_balance(self) -> Union[float, str]:
+        """Get latest available account balance from engine or log data"""
+        try:
+            # Try directly from paper trading engine if present
+            if self.paper_trading_engine:
+                if hasattr(self.paper_trading_engine, 'get_current_balance'):
+                    return self.paper_trading_engine.get_current_balance()
+            else:
+                # Try to import and use function from paper_trading_engine
+                return get_latest_account_balance(self.db_path)
+        except Exception as e:
+            _LOGGER.debug(f"Could not get account balance: {e}")
+            try:
+                # Look in database for balance information
+                with sqlite3.connect(self.db_path) as conn:
+                    row = conn.execute("""
+                        SELECT metadata_json 
+                        FROM alerts 
+                        WHERE metadata_json LIKE '%balance%' 
+                        ORDER BY created_utc DESC LIMIT 1
+                    """).fetchone()
+                    
+                    if row and row[0]:
+                        md = json.loads(row[0])
+                        # Look for balance in common keys
+                        for key in ['balance', 'account_balance', 'current_balance']:
+                            if key in md:
+                                return float(md[key])
+            except:
+                pass
+        
+        return 'Untracked'
+    
+    def get_kill_switch_status(self) -> bool:
+        """Check if the kill switch is activated"""
+        # If kill_switch_status file exists, consider it active
+        import os
+        kill_switch_path = self.db_path.replace('.db', '_kill_switch.lock')
+        self.kill_switch_activated = os.path.exists(kill_switch_path)
+        
+        # Also check from live engine status
+        try:
+            import gc
+            for obj in gc.get_objects():
+                if hasattr(obj, 'kill_switch_enabled'):
+                    self.kill_switch_activated = obj.kill_switch_enabled
+                    break
+        except:
+            pass
+        
+        return self.kill_switch_activated
+    
+    async def collect_system_metrics(self) -> Dict[str, Any]:
+        """
+        Collect various system metrics for heartbeat.
+        
+        Combines scheduler status, signal data, trading data, and system health.
+        """
+        # Get scheduler status
+        scheduler_status = self.get_scheduler_status()
+        
+        # Get signal data
+        signal_data = self.get_signal_counts()
+        
+        # Get trade data
+        last_trade_ts = self.get_last_trade_timestamp()
+        
+        # Get account balance
+        account_balance = self.get_account_balance()
+        
+        # Get kill switch status
+        kill_switch_status = self.get_kill_switch_status()
+        
+        # System uptime estimation (since process start)
+        if self._last_heartbeat_time is not None:
+            uptime_seconds = (datetime.now(timezone.utc) - self._last_heartbeat_time).total_seconds()
+        else:
+            # Initial heartbeat, use time since some fixed marker or approximate
+            uptime_seconds = 0
+        
+        # Compile full heartbeat package
+        heartbeat_data = {
+            'instance_id': self.instance_id,
+            'version': self.version,
+            'status': 'healthy' if not kill_switch_status else 'kill-switch activated',
+            'uptime_seconds': int(uptime_seconds),
+            'timestamp_utc': datetime.now(timezone.utc).isoformat(),
+            
+            # Scheduler metrics
+            'scheduler': scheduler_status,
+            
+            # Signal metrics
+            'signals': signal_data,
+            
+            # Trading metrics
+            'last_trade_timestamp': last_trade_ts,
+            'account_balance_currency': f"${account_balance}" if isinstance(account_balance, (int, float)) else str(account_balance),
+            'kill_switch_activated': kill_switch_status,
+            
+            # System metrics
+            'cpu_usage_approximation': 'not_available',
+            'memory_usage_approximation': 'not_available',
+            'disk_space_warning_level': 'not_measured'
+        }
+        
+        return heartbeat_data
+    
+    async def send_heartbeat(self, custom_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Generate heartbeat data and deliver via delivery router.
+        """
+        self._last_heartbeat_time = datetime.now(timezone.utc)
+        
+        # Collect system metrics
+        system_metrics = await self.collect_system_metrics()
+        
+        # Add any custom data provided
+        if custom_data:
+            system_metrics.update(custom_data)
+        
+        # Use heartbeat deliverer to send across all configured channels
+        if self.heartbeat_deliverer:
+            result = await self.heartbeat_deliverer.send_heartbeat(
+                system_metrics,
+                heartbeat_id=f"{int(time.time())}-{self.instance_id.split('-')[0]}"
+            )
+            
+            _LOGGER.info(f"Heartbeat status: success={result.get('success', 'unknown')}")
+            return result
+        else:
+            _LOGGER.warning("Heartbeat deliverer not initialized")
+            return {
+                'success': False,
+                'error': 'Heartbeat deliverer not initialized',
+                'system_data': system_metrics
+            }
+    
+    async def start_periodic_heartbeat(self, interval_seconds: int = 3600):  # 1 hour default
+        """Start periodic heartbeat generation"""
+        self.is_running = True
+        _LOGGER.info(f"Starting periodic heartbeat every {interval_seconds} seconds")
+        
+        while self.is_running:
+            try:
+                await self.send_heartbeat()
+                await asyncio.sleep(interval_seconds)
+            except asyncio.CancelledError:
+                _LOGGER.info("Heartbeat cancelled")
+                self.is_running = False
+                break
+            except Exception as e:
+                _LOGGER.error(f"Error in heartbeat loop: {e}")
+                logger.error(f"Stack trace: {traceback.format_exc()}")
+                await asyncio.sleep(min(300, interval_seconds))  # Retry after 5 minutes if error
+    
+    def stop(self):
+        """Stop the heartbeat system"""
+        self.is_running = False
+        _LOGGER.info("Heartbeat system stopped")
 
 
-# ─── Module-level singleton ─────────────────────────────────────────────
-
-_HEARTBEAT: Optional[HeartbeatSender] = None
-
-
-def get_heartbeat_sender(interval_seconds: int = DEFAULT_HEARTBEAT_INTERVAL_SECONDS) -> HeartbeatSender:
-    """Get or create the module-level HeartbeatSender singleton."""
-    global _HEARTBEAT
-    if _HEARTBEAT is None:
-        _HEARTBEAT = HeartbeatSender(interval_seconds)
-    return _HEARTBEAT
+async def get_heartbeat_manager(alert_db_path: str = "./data/weather_alerts.db") -> HeartbeatManager:
+    """Get singleton instance of heartbeat manager, creating if needed"""
+    global _HEARTBEAT_MANAGER
+    
+    if _HEARTBEAT_MANAGER is None:
+        _HEARTBEAT_MANAGER = HeartbeatManager(db_path=alert_db_path)
+        await _HEARTBEAT_MANAGER.initialize()
+    
+    return _HEARTBEAT_MANAGER
 
 
-# ─── Self-test ───────────────────────────────────────────────────────────
+# Convenience functions for external use
+async def send_single_heartbeat() -> Dict[str, Any]:
+    """Send a single heartbeat for ad-hoc use"""
+    manager = await get_heartbeat_manager()
+    return await manager.send_heartbeat()
+
+
+def is_kill_switch_activated() -> bool:
+    """Check kill switch status directly"""
+    manager = None
+    try:
+        import gc
+        for obj in gc.get_objects():
+            if hasattr(obj, 'get_kill_switch_status'):
+                if callable(getattr(obj, 'get_kill_switch_status')):
+                    return obj.get_kill_switch_status()
+    except:
+        pass
+    
+    # Default: kill switch not active
+    return False
+
+
+# Compatibility functions that may be referenced elsewhere
+async def send_heartbeat_if_configured() -> Optional[Dict[str, Any]]:
+    """Backwards compatibility: conditional heartbeat sending"""
+    return await send_single_heartbeat()
+
+
+async def run_heartbeat_cycle() -> Dict[str, Any]:
+    """Execute one full heartbeat cycle (for use in main application loops)"""
+    return await send_single_heartbeat()
+
+
+# Main execution for testing
+async def main():
+    """Test heartbeat functionality directly"""
+    hb_manager = await get_heartbeat_manager()
+    print("Sending test heartbeat...")
+    result = await hb_manager.send_heartbeat()
+    print(json.dumps(result, indent=2, default=str))
 
 if __name__ == "__main__":
-    # Test heartbeat sender
-    hb = HeartbeatSender(interval_seconds=10)  # Short interval for testing
-
-    # Test 🟢 OK
-    hb.update_metrics(
-        signals_evaluated=42,
-        alerts_pending=3,
-        alerts_issued=2,
-        errors=[],
-        last_metar_collection=datetime.now(timezone.utc).isoformat(),
-    )
-    sent, msg = hb.maybe_send_heartbeat()
-    print(f"Sent: {sent}")
-    if sent:
-        print(f"  Title: {msg['embeds'][0]['title']}")
-        print(f"  Summary: {msg['summary']}")
-
-    # Test duplicate skip
-    sent, msg = hb.maybe_send_heartbeat()
-    print(f"Duplicate skip: {not sent}")
-
-    # Test 🟡 WARNING — stale METAR
-    hb.reset_interval()
-    hb.update_metrics(
-        signals_evaluated=10,
-        alerts_pending=1,
-        alerts_issued=0,
-        errors=[],
-        last_metar_collection=(datetime.now(timezone.utc) - timedelta(hours=3)).isoformat(),
-    )
-    sent, msg = hb.maybe_send_heartbeat()
-    print(f"\nWARNING sent: {sent}")
-    if sent:
-        print(f"  Title: {msg['embeds'][0]['title']}")
-        print(f"  Summary: {msg['summary']}")
-
-    # Test 🔴 ERROR
-    hb.reset_interval()
-    hb.update_metrics(
-        signals_evaluated=5,
-        alerts_pending=0,
-        alerts_issued=0,
-        errors=["Webhook timeout", "Kalshi API rate limit exceeded"],
-        last_metar_collection=datetime.now(timezone.utc).isoformat(),
-    )
-    sent, msg = hb.maybe_send_heartbeat()
-    print(f"\nERROR sent: {sent}")
-    if sent:
-        print(f"  Title: {msg['embeds'][0]['title']}")
-        print(f"  Summary: {msg['summary']}")
-
-    print("\nHeartbeat module OK")
+    import traceback
+    asyncio.run(main())

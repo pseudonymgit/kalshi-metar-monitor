@@ -51,7 +51,8 @@ class PressureDeltaSignal(BaseSignal):
         """
         Compute exponential weight with half-life of 12 hours.
 
-        w = 2^(-hours_ago / 12)
+        w = exp(-days_ago * ln(2) / 0.5) where 0.5 days = half-life
+        This means weight halves every 12 hours (0.5 days)
 
         Args:
             hours_ago: Hours before the current reference time
@@ -59,7 +60,9 @@ class PressureDeltaSignal(BaseSignal):
         Returns:
             Weight value (0.0 to 1.0)
         """
-        return 2.0 ** (-hours_ago / 12.0)
+        import math
+        days_ago = hours_ago / 24.0
+        return math.exp(-days_ago * math.log(2) / 0.5)
 
     @staticmethod
     def _compute_weighted_pressure(
@@ -93,6 +96,7 @@ class PressureDeltaSignal(BaseSignal):
                 continue
             # Each day offset is ~24 hours apart; use the midpoint
             hours_ago = (offset - 0.5) * 24.0
+            # Convert to days for our new exponential weighting function
             w = PressureDeltaSignal._exponential_weight(hours_ago)
             weights.append(w)
             pressures.append(pressure)

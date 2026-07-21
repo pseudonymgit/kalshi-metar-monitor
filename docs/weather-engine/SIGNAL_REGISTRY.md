@@ -1,6 +1,6 @@
 # Weather Engine Signal Registry
 
-Last Updated: 2026-07-19T03:27:16.346575+00:00
+Last Updated: 2026-07-19T04:24:06.955550+00:00
 
 ## Active Signals
 

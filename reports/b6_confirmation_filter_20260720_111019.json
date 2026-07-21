@@ -1,0 +1,14 @@
+{
+  "accuracy": 0.5182493040519641,
+  "sharpe": 0.036522943201175134,
+  "trade_count": 6466,
+  "agreement_threshold": 2,
+  "confidence_threshold": 0.5,
+  "signals_tracked": [
+    "calendar_climatology",
+    "late_day_momentum_hourly",
+    "late_day_analysis",
+    "nwp_analog",
+    "goldilocks"
+  ]
+}

@@ -53,6 +53,10 @@ class CalibrationPipeline:
         self.refitted = False  # Track if calibrators are trained
         self.max_history = max_history  # 0.5.1: cap to prevent unbounded growth
         self.window_start = window_start  # 0.5.1: fit only on data from this index onward
+        
+        # Initialize database-based history tracking to support signal history pruning (Task 4.9)
+        self.db_path = os.getenv("SIGNAL_CALIBRATION_DB", "/var/data/signal_calibration.db")
+        self._init_history_db()
 
     def set_window_start(self, window_start):
         """
@@ -101,6 +105,18 @@ class CalibrationPipeline:
             was_correct: boolean indicating if prediction was correct
         """
         self.history[(signal, city)].append((raw_conf, was_correct))
+        
+        # Persist to SQLite database for long-term storage and history management (task 4.9)
+        try:
+            import os
+            import sqlite3
+            
+            # Only persist if database path exists - for backward compatibility
+            if hasattr(self, 'db_path') and self.db_path and os.path.exists(os.path.dirname(self.db_path)):
+                self.persist_evaluation_to_db(signal, city, raw_conf, was_correct)
+        except Exception as e:
+            # Silently fail if database operations have issues
+            pass
         self.refitted = False  # Mark need for refit after history updates
 
         # 0.5.1: Enforce max_history cap — prune oldest entries from each bucket
@@ -361,6 +377,9 @@ class CalibrationPipeline:
                 result.append((bin_center, empirical_acc, len(bin_correct)))
 
         return result
+
+
+
 
 
 def demonstrate_calibration_workflow():
