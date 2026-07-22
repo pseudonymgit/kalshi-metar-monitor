@@ -190,12 +190,13 @@ class HrrrBiasCorrectedSignal(BaseSignal):
             t_metar_now = metar_obs['temp_f']
             metar_ts = metar_obs['timestamp_utc']
 
-            # Parse the timestamp
+            # Parse the timestamp (strip timezone offset like +00:00 or Z)
+            clean_ts = metar_ts.split('+')[0].split('Z')[0]
             try:
-                metar_dt = datetime.strptime(metar_ts, '%Y-%m-%dT%H:%M:%S')
+                metar_dt = datetime.strptime(clean_ts, '%Y-%m-%dT%H:%M:%S')
             except ValueError:
                 try:
-                    metar_dt = datetime.strptime(metar_ts, '%Y-%m-%d %H:%M:%S')
+                    metar_dt = datetime.strptime(clean_ts, '%Y-%m-%d %H:%M:%S')
                 except ValueError:
                     return None, 0.0
 

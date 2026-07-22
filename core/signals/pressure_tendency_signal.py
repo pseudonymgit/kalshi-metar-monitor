@@ -108,10 +108,10 @@ class PressureTendencySignal(BaseSignal):
 
             # Parse latest timestamp
             try:
-                latest_dt = datetime.strptime(latest_ts, '%Y-%m-%dT%H:%M:%S')
+                latest_dt = datetime.strptime(latest_ts.split('+')[0].split('Z')[0], '%Y-%m-%dT%H:%M:%S')
             except ValueError:
                 try:
-                    latest_dt = datetime.strptime(latest_ts, '%Y-%m-%d %H:%M:%S')
+                    latest_dt = datetime.strptime(latest_ts.split('+')[0].split('Z')[0], '%Y-%m-%d %H:%M:%S')
                 except ValueError:
                     return None, 0.0
 
@@ -123,10 +123,10 @@ class PressureTendencySignal(BaseSignal):
                 if ts is None:
                     continue
                 try:
-                    obs_dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S')
+                    obs_dt = datetime.strptime(ts.split('+')[0].split('Z')[0], '%Y-%m-%dT%H:%M:%S')
                 except ValueError:
                     try:
-                        obs_dt = datetime.strptime(ts, '%Y-%m-%d %H:%M:%S')
+                        obs_dt = datetime.strptime(ts.split('+')[0].split('Z')[0], '%Y-%m-%d %H:%M:%S')
                     except ValueError:
                         continue
 
@@ -140,10 +140,10 @@ class PressureTendencySignal(BaseSignal):
                 oldest_ts = rows[-1][2]
                 if oldest_pressure is not None and oldest_ts is not None:
                     try:
-                        oldest_dt = datetime.strptime(oldest_ts, '%Y-%m-%dT%H:%M:%S')
+                        oldest_dt = datetime.strptime(oldest_ts.split('+')[0].split('Z')[0], '%Y-%m-%dT%H:%M:%S')
                     except ValueError:
                         try:
-                            oldest_dt = datetime.strptime(oldest_ts, '%Y-%m-%d %H:%M:%S')
+                            oldest_dt = datetime.strptime(oldest_ts.split('+')[0].split('Z')[0], '%Y-%m-%d %H:%M:%S')
                         except ValueError:
                             oldest_dt = None
 
