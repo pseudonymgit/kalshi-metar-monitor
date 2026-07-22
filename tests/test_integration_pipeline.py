@@ -327,6 +327,7 @@ class TestKalshiApiMock:
             except ImportError:
                 pytest.skip("Kalshi client not importable")
 
+    @pytest.mark.skipif("not __import__('importlib').util.find_spec('core.kalshi_client')")
     @patch('core.kalshi_client.requests.Session')
     def test_market_lookup(self, mock_session):
         """Test market lookup with mocked API."""
@@ -354,6 +355,7 @@ class TestKalshiApiMock:
         except (ImportError, AttributeError) as e:
             pytest.skip(f"Kalshi client test skipped: {e}")
 
+    @pytest.mark.skipif("not __import__('importlib').util.find_spec('core.kalshi_client')")
     @patch('core.kalshi_client.requests.Session')
     def test_place_order_mock(self, mock_session):
         """Test placing an order with mocked API."""

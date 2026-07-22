@@ -84,6 +84,8 @@ except Exception:
 # Layer 4: Webhook signature verification and alert categorization
 import hmac
 import hashlib
+__all__ = ['reset_station_daily_state', 'get_default_config', 'ensure_state_loaded', 'get_state', 'get_latest_station_signal_runtime', 'log_near_miss', 'log_near_miss_if_cooldown', 'log_near_miss_if_distance_to_boundary', 'log_near_miss_if_no_eligible_market', 'log_near_miss_if_epoch_alert_emitted']
+
 
 # Layer 4: Webhook signature verification
 def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = False) -> Tuple[float, Dict[str, Any]]:

@@ -1,3 +1,7 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-22 Phase 23.5: Physics Correction - Pressure rise → cooling (not warming)]
+#
+
 """
 Pressure Delta Signal - Exponentially-weighted pressure change
 
@@ -5,8 +9,8 @@ Based on pressure_signal_production.py
 Uses pressure trend with exponential weighting (half-life 12 hours) as
 barometric pressure change directional predictor.
 
-Signal: if (weighted_pressure_change) > 3.0mb, predict UP (warming)
-        if (weighted_pressure_change) < -3.0mb, predict DOWN (cooling)
+Signal: if (weighted_pressure_change) > 3.0mb, predict DOWN (cooling - Expert 1 finding)
+        if (weighted_pressure_change) < -3.0mb, predict UP (warming - Expert 1 finding)
         otherwise no signal
 
 Weighting: w = 2^(-hours_ago / 12) — half-life of 12 hours
@@ -23,10 +27,11 @@ class PressureDeltaSignal(BaseSignal):
     """
     Pressure Delta Signal - Uses exponentially-weighted pressure change as predictor
 
-    Logic: Compute exponentially-weighted average of recent pressure readings
+    Logic: COMPUTE EXPONENTIALLY-WEIGHTED AVERAGE OF RECENT PRESSURE READINGS
            (half-life 12 hours) and compare to a baseline from 3 days ago.
-           If ΔP > 3.0mb → predict UP (warming)
-           If ΔP < -3.0mb → predict DOWN (cooling)
+           PHYSICS-CORRECTED (Expert 1 finding):
+           If ΔP > 3.0mb (pressure RISES) → predict DOWN (cooling from cold air advection)
+           If ΔP < -3.0mb (pressure FALLS) → predict UP (warming from warm air advection)
            Otherwise no signal
     Confidence: abs(ΔP) scaled appropriately (between acceptable bounds)
     Min lookback: 4
@@ -151,7 +156,10 @@ class PressureDeltaSignal(BaseSignal):
         if abs(dp) < threshold:
             return None, 0.0
 
-        direction = 'up' if dp > 0 else 'down'
+        # PHYSICS CORRECTION (Expert 1 Meteorology Finding #5):
+        # When pressure rises (dp > 0), it reflects cold air advection (cooling) 
+        # When pressure falls (dp < 0), it reflects warm air advection (warming)
+        direction = 'down' if dp > 0 else 'up'  # Inverted from original
         confidence = min(abs(dp) / 5.0, 0.8)
 
         return direction, confidence
@@ -224,7 +232,9 @@ class PressureDeltaSignal(BaseSignal):
             if abs(dp) < threshold:
                 return None, 0.0  # No signal strong enough
 
-            direction = 'up' if dp > 0 else 'down'
+            # PHYSICS CORRECTION (Phase 23.5 - Expert 1 finding):
+            # Rising pressure (dp > 0) causes cooling, falling pressure warming
+            direction = 'down' if dp > 0 else 'up'
 
             # Scale confidence based on strength of the signal
             confidence = min(abs(dp) / 5.0, 0.8)

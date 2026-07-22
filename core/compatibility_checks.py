@@ -13,6 +13,8 @@ import math
 from collections import defaultdict
 from scipy.special import expit, logit
 from core.calibration_pipeline import CalibrationPipeline
+__all__ = ['demonstrate_fusion_stack']
+
 
 _logger = logging.getLogger(__name__)
 

@@ -66,7 +66,20 @@ class SpreadBasedEntrySignal(BaseSignal):
     def min_lookback(self) -> int:
         return self._signal_min_lookback
 
-    def evaluate(self, idx: int, days: int) -> Dict[str, any]:
+    def evaluate(self, idx: int, days: list) -> tuple:
+        """
+        Evaluate spread conditions for the given index.
+
+        Returns standard (direction, confidence) tuple for BaseSignal interface.
+        direction = None (modulation signal), confidence = spread-based confidence.
+        """
+        result = self.evaluate_raw(idx, days)
+        signal = result.get('signal', 0.0)
+        confidence = result.get('confidence', 0.0)
+        # Modulation signal: direction is None, confidence represents spread quality
+        return None, min(float(confidence), 1.0)
+
+    def evaluate_raw(self, idx: int, days: list) -> Dict[str, any]:
         """
         Evaluate spread conditions for the given index.
 

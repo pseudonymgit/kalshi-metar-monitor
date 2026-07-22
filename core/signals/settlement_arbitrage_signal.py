@@ -64,7 +64,23 @@ class SettlementTimeArbitrageSignal(BaseSignal):
     def min_lookback(self) -> int:
         return self._signal_min_lookback
 
-    def evaluate(self, idx: int, days: int) -> Dict[str, any]:
+    def evaluate(self, idx: int, days: list) -> tuple:
+        """
+        Evaluate settlement-time arbitrage opportunity.
+
+        Returns standard (direction, confidence) tuple for BaseSignal interface.
+        direction = 'up' or 'down' when arb is detected, None otherwise.
+        """
+        result = self.evaluate_raw(idx, days)
+        signal = result.get('signal', 0.0)
+        confidence = result.get('confidence', 0.0)
+        if signal > 0:
+            return 'up', min(float(confidence), 1.0)
+        elif signal < 0:
+            return 'down', min(float(confidence), 1.0)
+        return None, 0.0
+
+    def evaluate_raw(self, idx: int, days: list) -> Dict[str, any]:
         """
         Evaluate settlement-time arbitrage opportunity.
 

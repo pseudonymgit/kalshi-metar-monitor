@@ -108,6 +108,8 @@ except Exception:
 # Layer 4: Webhook signature verification and alert categorization
 import hmac
 import hashlib
+__all__ = ['verify_webhook_signature', 'reset_station_daily_state', 'get_default_config', 'ensure_state_loaded', 'get_state', 'get_station_ingestion_runtime', 'get_station_ingestion_window_runtime', 'get_last_nws_fetch_diagnostic', 'get_latest_station_signal_runtime', 'run_replay_for_station_day', 'get_transition_history', 'get_persisted_transition_history', 'get_alert_review_diagnostics', 'get_latest_station_market_evaluation_context', 'get_recent_alerts', 'get_retention_metrics', 'prune_old_alerts', 'fetch_window', 'fetch_latest', 'fetch_now', 'get_latest_metar', 'set_watchlist', 'get_watchlist', 'get_metrics', 'set_live_station_universe_resolver', 'start_scheduler', 'ensure_scheduler_started', 'stop_scheduler', 'is_scheduler_running', 'log_near_miss', 'log_near_miss_if_cooldown', 'log_near_miss_if_distance_to_boundary', 'log_near_miss_if_no_eligible_market', 'log_near_miss_if_epoch_alert_emitted']
+
 
 # Layer 4: Webhook signature verification
 def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> bool:

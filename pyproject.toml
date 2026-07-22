@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "kalshi-metar-monitor"
+version = "2.0.0"
+description = "Kalshi METAR-based weather market trading engine — signal fusion, paper trading, live trading"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+
+dependencies = [
+    "Flask>=3.1",
+    "gunicorn>=23.0",
+    "requests>=2.32",
+    "APScheduler>=3.10",
+    "cryptography>=42.0",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "xgboost>=2.0",
+    "pandas>=2.0",
+]
+
+[project.urls]
+"Source" = "https://github.com/opencwals/weather-engine"
+"Deploy" = "https://kalshi-metar-monitor.onrender.com"
+
+[tool.setuptools.packages.find]
+include = ["core*", "scripts*", "tests*"]
+
+[tool.setuptools.package-data]
+core = ["py.typed"]
+
+[project.scripts]
+paper-trader = "core.paper_trader:main"
+live-trader = "core.live_trader:main"
+backfill = "scripts.backfill_and_backtest:main"
+nwp-collect = "scripts.nwp_collect:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["core", "scripts", "tests"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[project.entry-points."kalshi.signals"]
+base = "core.signals.base_signal:BaseSignal"

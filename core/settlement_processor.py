@@ -7,6 +7,8 @@ import logging
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+__all__ = ['SettlementProcessor']
+
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -22,6 +22,8 @@ from .station_registry import (
     validate_station_registry as _validate_station_registry,
     get_cluster_for_station as _get_cluster_for_station,
 )
+__all__ = ['record_explicit_decision_output', 'generate_signals', 'is_recent_enough_for_late_day_analysis', 'calculate_temperature_trend']
+
 
 _LOGGER = logging.getLogger(__name__)
 
