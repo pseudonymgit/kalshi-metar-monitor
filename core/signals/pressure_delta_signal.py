@@ -169,7 +169,7 @@ class PressureDeltaSignal(BaseSignal):
         Evaluate signal for a specific station and date using DB data.
         This needs to be overridden because this signal requires specific pressure data
         from multiple days ago.
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
         Args:
             station: Station code (e.g. 'KATL')

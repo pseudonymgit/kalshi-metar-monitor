@@ -79,7 +79,7 @@ class GoldilocksSignal(BaseSignal):
         """Parse signal state JSON string."""
         try:
             import json
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+            from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             return json.loads(data)
         except Exception:
             return {}

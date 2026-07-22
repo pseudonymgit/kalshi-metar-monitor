@@ -19,7 +19,7 @@ Conditions (3/4+ required for detection):
 
 import math
 from datetime import datetime, timedelta
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 def get_wind_direction_change(current_wdir, previous_wdir):

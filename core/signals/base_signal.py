@@ -23,7 +23,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Tuple, List, Dict
 import sqlite3
 import logging
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 logger = logging.getLogger(__name__)

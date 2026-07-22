@@ -85,7 +85,7 @@ class RegimeSignal(BaseSignal):
     def evaluate_for_station(self, station: str, date: str, conn=None) -> Tuple[Optional[str], float]:
         """DB-based evaluation for regime signal."""
         import math
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+        from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         
         own_conn = conn is None
         if own_conn:

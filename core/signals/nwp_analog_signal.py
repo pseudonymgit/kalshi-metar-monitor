@@ -461,7 +461,7 @@ class NwpAnalogSignal:
                        ) -> Optional[Dict[str, Any]]:
         """Public dict-returning API (compatibility with existing callers)."""
         from datetime import datetime as dt
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         if target_date is None:
             target_date = dt.now().strftime('%Y-%m-%d')
         direction, confidence = self.evaluate_nwp_analog(station, target_date)

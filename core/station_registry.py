@@ -247,7 +247,7 @@ def validate_station_registry():
     """
     try:
         from kalshi_price_fetcher import STATION_TO_KALSHI_CODE
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+        from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     except ImportError:
         return {"error": "kalshi_price_fetcher not available", "valid": False}
     

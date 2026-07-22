@@ -8,7 +8,7 @@ whether the actual temperature is tracking toward the predicted direction.
 """
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Tuple, Dict, Any
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 class IntradayMETARConfirmation:

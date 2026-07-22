@@ -33,7 +33,7 @@ import logging
 
 from .base_signal import BaseSignal, _safe_get, validate_signal
 from core.station_effects import get_wind_delta_t, is_warming_wind
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 _logger = logging.getLogger(__name__)
 

@@ -253,7 +253,7 @@ class SettlementTimeArbitrageSignal(BaseSignal):
 
         try:
             from pathlib import Path
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
             repo_root = Path(__file__).resolve().parents[2]
             metar_db = str(repo_root / "data" / "metar_backfill.db")

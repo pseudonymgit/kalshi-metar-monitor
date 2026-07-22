@@ -22,7 +22,7 @@ import logging
 from datetime import datetime, timedelta
 
 from .base_signal import BaseSignal, validate_signal
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 logger = logging.getLogger(__name__)
 

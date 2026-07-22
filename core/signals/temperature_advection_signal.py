@@ -502,7 +502,7 @@ class TemperatureAdvectionSignal:
 # ── Standalone test ──────────────────────────────────────────────────
 if __name__ == "__main__":
     import sys
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     logging.basicConfig(level=logging.INFO)
 
     print("=" * 60)

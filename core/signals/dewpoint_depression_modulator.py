@@ -1,6 +1,6 @@
 import math
 from datetime import datetime, timedelta
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 def modulate_confidence(station, date, metar_db_path, confidence):
