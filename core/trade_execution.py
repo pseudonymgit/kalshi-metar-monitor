@@ -1,8 +1,31 @@
+"""Trade Execution Module
 
+Trade placement, execution, position management, and mark-to-market.
+Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition.
+"""
+import json
+import uuid
+import logging
+import os
+from datetime import datetime, timezone
+from typing import Dict, List, Optional, Tuple, Any
+from pathlib import Path
+from enum import Enum
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from .market_cost_model import estimate_total_cost
+from .station_registry import get_cluster_for_station as _get_cluster_for_station
+from .kalshi_price_fetcher import get_live_market_price as _get_live_market_price
+
+_LOGGER = logging.getLogger(__name__)
+
+
+class TradeType(Enum):
     BUY_YES = "buy_yes"
     SELL_YES = "sell_yes"
     BUY_NO = "buy_no"
     SELL_NO = "sell_no"
+
+
 class MarketSide(Enum):
     UP = "UP"
     DOWN = "DOWN"

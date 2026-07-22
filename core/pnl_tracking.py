@@ -1,4 +1,21 @@
+"""PnL Tracking Module
 
+Profit & loss tracking, reconciliation, calibration metrics, and reporting.
+Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition.
+"""
+import json
+import logging
+import statistics
+from datetime import datetime, timezone
+from typing import Dict, List, Optional, Tuple, Any
+from pathlib import Path
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from .market_cost_model import estimate_total_cost
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def process_settlements_for_date(self, settlement_date):
     """
     Process settlements for a specific date. Updates trades with settlement results
     and calculates realized P/L.

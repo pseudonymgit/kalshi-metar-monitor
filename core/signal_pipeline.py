@@ -1,4 +1,32 @@
+"""Signal Pipeline Module
 
+Signal generation, analysis, and probability estimation functions.
+Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition.
+"""
+import logging
+import os
+import statistics
+from datetime import datetime, timedelta, timezone
+from typing import Dict, List, Optional, Tuple, Any
+from pathlib import Path
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+from .agreement_gate import AgreementGate, SimpleAgreementChecker
+from .adaptive_thresholds import filter_signals_by_adaptive_threshold, get_adaptive_threshold
+from .spatial_coherence import apply_spatial_coherence_gate, STATION_REGIONS as SPATIAL_REGIONS, STATION_TO_REGION
+from .ensemble_diversity import compute_diversity_score, apply_diversity_penalty
+from .station_skill_gate import StationSkillGate
+from .station_time import is_within_entry_window as _is_within_entry_window
+from .station_registry import (
+    get_all_stations as _get_all_stations,
+    get_station_mapping as _get_station_mapping,
+    validate_station_registry as _validate_station_registry,
+    get_cluster_for_station as _get_cluster_for_station,
+)
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _get_daily_metars(self, target_date):
     """Get daily METAR data for a target date from metar DB."""
     conn = get_sqlite_connection(self.metar_db)
     c = conn.cursor()
