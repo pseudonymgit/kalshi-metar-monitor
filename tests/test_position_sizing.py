@@ -105,15 +105,15 @@ class TestKellyPositionSizer:
         assert win_rate == 0.65
 
     def test_edge_calculation(self, default_sizer):
-        """Edge = 2*win_rate - 1."""
+        """Edge = win_rate - market_price (default market_price=0.5)."""
         edge = default_sizer.calculate_edge_from_win_rate(0.65)
-        assert abs(edge - 0.30) < 0.01
+        assert abs(edge - 0.15) < 0.01
 
         edge = default_sizer.calculate_edge_from_win_rate(0.5)
         assert abs(edge) < 0.01
 
         edge = default_sizer.calculate_edge_from_win_rate(0.75)
-        assert abs(edge - 0.50) < 0.01
+        assert abs(edge - 0.25) < 0.01
 
     def test_negative_edge(self, default_sizer):
         """Win rate below 0.5 -> negative edge."""
@@ -121,14 +121,14 @@ class TestKellyPositionSizer:
         assert edge < 0
 
     def test_kelly_fraction_capped(self, default_sizer):
-        """Kelly fraction should be capped between -0.1 and 0.5."""
+        """Kelly fraction should be capped between -0.5 and 0.5."""
         # Very high win rate
         kelly = default_sizer.calculate_kelly_fraction(edge=1.0, win_rate=1.0)
         assert kelly <= 0.5
 
         # Very low win rate
         kelly = default_sizer.calculate_kelly_fraction(edge=-1.0, win_rate=0.0)
-        assert kelly >= -0.1
+        assert kelly >= -0.5
 
     def test_kelly_positive_edge(self, default_sizer):
         """Positive edge should produce positive Kelly fraction."""

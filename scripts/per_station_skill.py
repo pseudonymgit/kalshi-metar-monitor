@@ -15,6 +15,7 @@ Uses the 13-month METAR backfill for daily HIGH/LOW extraction.
 No AI/ML in any loop.
 """
 
+import sys
 import sqlite3
 import math
 import random
