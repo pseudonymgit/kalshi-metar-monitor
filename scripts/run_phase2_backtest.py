@@ -25,6 +25,7 @@ from collections import defaultdict, Counter
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Tuple, Optional, Any
 from pathlib import Path
+from core.market_cost_model import MARKET_COST_MODEL
 
 # ── Paths ──────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +48,7 @@ MAX_DAILY_LOSS = 300.0
 MAX_DRAWDOWN_PCT = 10.0
 INITIAL_BALANCE = 10000.0
 POSITION_SIZE = 100.0
-FEE_RATE = 0.0
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 # Walk-forward split ratios
 WALK_FORWARD_SPLITS = [

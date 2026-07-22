@@ -38,6 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from calibration_pipeline import CalibrationPipeline
     from signal_fusion import SignalFusionEngine
+    from market_cost_model import MARKET_COST_MODEL
 except ImportError as e:
     print(f"Import error: {e}")
     print(f"Current directory: {os.getcwd()}")
@@ -47,7 +48,7 @@ except ImportError as e:
 
 
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
-FEE_RATE = 0.05
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',

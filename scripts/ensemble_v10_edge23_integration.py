@@ -20,11 +20,18 @@ import math
 import random
 from collections import defaultdict
 import os
+import sys
+
+# Add core modules to path
+CORE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'core')
+sys.path.insert(0, CORE_DIR)
+
+from market_cost_model import MARKET_COST_MODEL
 
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
 ISD_LITE_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/isd_lite_raw.db"
 
-FEE_RATE = 0.05
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',

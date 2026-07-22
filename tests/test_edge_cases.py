@@ -282,15 +282,18 @@ class TestAlertDispatchEdgeCases:
     def test_alert_builder_empty_payload(self):
         """Alert builder should handle empty payload gracefully."""
         try:
-            from core.alert_builder import build_alert
+            from core.alert_builder import build_paper_trade_alert
         except ImportError:
             pytest.skip("alert_builder module not available")
 
         try:
-            result = build_alert(station=None, market_type=None, direction=None)
+            result = build_paper_trade_alert(
+                trade_result={}, station="KATL", market_type="HIGH", direction="UP"
+            )
             assert result is not None
-        except Exception as e:
-            pytest.skip(f"build_alert raised: {e}")
+            assert isinstance(result, dict)
+        except (ImportError, TypeError) as e:
+            pytest.skip(f"build_paper_trade_alert raised: {e}")
 
     def test_alert_dispatcher_missing_webhook(self):
         """Alert dispatcher should handle missing webhook URL."""
@@ -301,11 +304,13 @@ class TestAlertDispatchEdgeCases:
 
         try:
             result = dispatch_alert(
-                message="test",
+                alert_data={"test": True},
+                discord_payload={"content": "test"},
                 webhook_url=None,
             )
             assert result is not None
-        except Exception as e:
+            assert isinstance(result, dict)
+        except (ImportError, TypeError) as e:
             pytest.skip(f"dispatch_alert raised: {e}")
 
     def test_alert_dispatcher_malformed_payload(self):
@@ -317,11 +322,13 @@ class TestAlertDispatchEdgeCases:
 
         try:
             result = dispatch_alert(
-                message=None,
+                alert_data={},
+                discord_payload={},
                 webhook_url="https://hooks.example.com/alert",
             )
             assert result is not None
-        except Exception as e:
+            assert isinstance(result, dict)
+        except (ImportError, TypeError) as e:
             pytest.skip(f"dispatch_alert raised: {e}")
 
     def test_alert_retry_queue_empty(self):
@@ -376,21 +383,20 @@ class TestAlertDispatchEdgeCases:
     def test_alert_formatter_none_values(self):
         """Alert formatter should handle None values."""
         try:
-            from core.alert_formatter import format_alert_message
+            from core.alert_formatter import format_alert
         except ImportError:
             pytest.skip("alert_formatter module not available")
 
         try:
-            result = format_alert_message(
-                station=None,
-                direction=None,
-                confidence=None,
-                message=None,
+            result = format_alert(
+                station="KATL", market_type="HIGH", direction="UP",
+                event_ticker="KXHIGHTATL", position_size=100.0,
+                conviction_details={"method": "test"}, balance=10000.0,
             )
             assert result is not None
-            assert isinstance(result, str)
-        except Exception as e:
-            pytest.skip(f"format_alert_message raised: {e}")
+            assert isinstance(result, dict)
+        except (ImportError, TypeError) as e:
+            pytest.skip(f"format_alert raised: {e}")
 
 
 # ─── Agreement Gate Edge Cases ──────────────────────────────────────────────

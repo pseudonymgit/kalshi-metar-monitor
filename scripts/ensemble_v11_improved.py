@@ -17,7 +17,14 @@ import math
 import random
 from collections import defaultdict
 import os
+import sys
 from datetime import datetime, timedelta
+
+# Add core modules to path
+CORE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'core')
+sys.path.insert(0, CORE_DIR)
+
+from market_cost_model import MARKET_COST_MODEL
 
 # ─── CONFIGURATION ──────────────────────────────────────────────────────────
 
@@ -28,7 +35,7 @@ ALL_STATIONS = ['KATL','KBOS','KDCA','KDEN','KDFW','KHOU','KLAS','KLAX','KMDW',
                 'KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX','KSAT','KSEA','KSFO']
 
 MIN_OVERLAP_DAYS = 90  # Require at least 90 days of overlapping data to use combined
-FEE_RATE = 0.05
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 # Enhanced approach naming
 APPROACHES_DESC = {

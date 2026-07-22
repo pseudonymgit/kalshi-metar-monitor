@@ -25,8 +25,10 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 sys.path.insert(0, os.path.join(REPO_ROOT, 'core'))
 
+from market_cost_model import MARKET_COST_MODEL
+
 DB_PATH = os.path.join(REPO_ROOT, 'data', 'metar_backfill.db')
-FEE_RATE = 0.05
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU',
                 'KLAX','KMDW','KMIA','KMSP','KNYC','KPHL','KPHX',

@@ -26,6 +26,7 @@ METAR_DB = str(REPO_ROOT / "data" / "metar_backfill.db")
 # Import the module functions we need to override
 sys.path.insert(0, str(REPO_ROOT / "core"))
 import late_day_momentum_hourly as ldm
+from market_cost_model import MARKET_COST_MODEL
 
 STATIONS = [
     'KATL', 'KAUS', 'KBOS', 'KDCA', 'KDEN', 'KDFW', 'KHOU', 'KLAS',
@@ -37,7 +38,7 @@ STATIONS = [
 THRESHOLDS = [round(x, 1) for x in np.arange(1.2, 2.6, 0.1)]
 CONF_GATES = [0.0, 0.5, 0.6, 0.7]
 
-FEE_RATE = 0.001
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 
 def load_settlement_data(start_date=None, end_date=None):
