@@ -16,4 +16,6 @@ data/
 # VSCode
 .vscode/
 *.db
+*.db-shm
+*.db-wal
 *.db
