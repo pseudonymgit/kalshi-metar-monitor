@@ -105,6 +105,7 @@ class PaperTrader:
         self._init_paper_db()
         self._init_metar_db_if_needed()
         self.settlement_processor = SettlementProcessor(db_path)
+        self._risk_manager = RiskManager(config=RiskConfig())
         _LOGGER.info(f"PaperTrader initialized: version={trade_version}, instance={instance}, db={db_path}")
 
     def _init_paper_db(self):
@@ -190,10 +191,10 @@ class PaperTrader:
         return datetime.now(timezone.utc)
 
     def risk_report(self) -> dict:
-        return risk_report(self.db_path, RISK_CONFIG)
+        return risk_report(self._risk_manager)
 
     def format_risk_alert(self) -> str:
-        return format_risk_alert()
+        return format_risk_alert(self._risk_manager)
 
     def build_paper_trade_alert(self, trade_result, station, market_type, direction, confidence, grade):
         return build_paper_trade_alert(

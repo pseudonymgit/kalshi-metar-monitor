@@ -24,9 +24,10 @@ sys.path.insert(0, CORE_DIR)
 
 from forecast_disagreement import forecast_disagreement_signal
 from time_decay import time_decay_signal, parse_timestamp, WINDOW_START_HOUR, RATE_THRESHOLD, SIGNAL_MODE
+from market_cost_model import MARKET_COST_MODEL
 
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
-FEE_RATE = 0.05
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 SIGNAL_VARIANT = 'v8'  # Signal variant flag for A/B testing ('v8' or 'v9')
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',

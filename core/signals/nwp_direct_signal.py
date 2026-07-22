@@ -46,12 +46,21 @@ class NwpDirectSignal:
         return 0
 
     def evaluate(self, idx: int, days: list) -> Tuple[Optional[str], float]:
-        """Standard evaluate interface - opens DB connection and evaluates."""
-        # This method is called by the backtest engine, but we need station context.
-        # The base class evaluate_for_station calls this after loading days data.
-        # Since NwpDirectSignal doesn't use historical days (it queries NWP DB),
-        # this is a placeholder. Real callers should use evaluate_for_station().
-        return None, 0.0
+        """Standard evaluate interface - queries NWP forecasts for the given day."""
+        # Get station context from instance attribute (set externally or by evaluate_for_station)
+        station = getattr(self, '_station', None)
+        if station is None:
+            return None, 0.0
+
+        # Get date from days list
+        if idx < 0 or idx >= len(days):
+            return None, 0.0
+        target_date = days[idx].get('date') if isinstance(days[idx], dict) else None
+        if target_date is None:
+            return None, 0.0
+
+        # Default to HIGH market type; evaluate_for_station will handle it
+        return self.evaluate_for_station(station, str(target_date), market_type='HIGH')
 
     def evaluate_for_station(self, station: str, date: str,
                               market_type: str = 'HIGH',

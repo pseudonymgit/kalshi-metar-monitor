@@ -22,6 +22,8 @@ Builds on the B1.5 baseline interface. Backward compatible.
 Version: v2.0 (Phase 3.6)
 """
 
+import os
+import sqlite3
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Union, List, Tuple, Optional
 from dataclasses import dataclass, field
@@ -346,7 +348,7 @@ class RiskManager:
                 consecutive_losses=self.consecutive_losses,
                 peak_balance=self.peak_capital,
                 current_balance=self.current_capital,
-                max_daily_loss_dollars=self.config.max_daily_loss_dollars,
+                max_daily_loss_dollars=self.config.max_daily_loss_percentage * self.config.initial_capital,
             ),
             checks=checks,
             halted=not all_pass,
@@ -424,6 +426,63 @@ def to_legacy_risk_state(risk_manager: RiskManager) -> 'RiskState':
     )
     compat.passed_checks = {k: v[0] for k, v in state.checks.items()}
     return compat
+
+
+# ─── Kill Switch Checks ──────────────────────────────────────────────────
+
+
+def check_kill_switches(db_path: str = None, risk_config: Any = None) -> Tuple[bool, List[str]]:
+    """
+    Check global kill-switch state.
+
+    Args:
+        db_path: Path to the paper trading database (may be None).
+        risk_config: RiskConfig or dict with risk configuration.
+
+    Returns:
+        (should_halt: bool, reasons: List[str])
+    """
+    reasons: List[str] = []
+
+    # 1. File-based kill switch
+    kill_switch_file = os.environ.get("KILL_SWITCH_FILE", "")
+    if kill_switch_file and os.path.exists(kill_switch_file):
+        reasons.append(f"Kill switch file present: {kill_switch_file}")
+
+    # 2. Environment variable kill switch
+    if os.environ.get("KILL_SWITCH_ACTIVE", "0") == "1":
+        reasons.append("KILL_SWITCH_ACTIVE env var is set to 1")
+
+    # 3. Database integrity check (if db_path provided)
+    if db_path and os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(str(db_path), timeout=5)
+            cur = conn.cursor()
+            # Quick integrity check
+            cur.execute("PRAGMA integrity_check")
+            integrity_result = cur.fetchone()
+            if integrity_result and integrity_result[0] != "ok":
+                reasons.append(f"Database integrity check failed: {integrity_result[0]}")
+            conn.close()
+        except Exception as e:
+            reasons.append(f"Database access error during kill switch check: {e}")
+
+    # 4. Check for alert backlog (if db_path provided)
+    if db_path and os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(str(db_path), timeout=5)
+            cur = conn.cursor()
+            # Check decision_output_log for recent entries
+            cur.execute("SELECT COUNT(*) FROM decision_output_log WHERE logged_at > datetime('now', '-1 hour')")
+            recent_alerts = cur.fetchone()[0]
+            if recent_alerts > 50:
+                reasons.append(f"Alert backlog: {recent_alerts} alerts in last hour")
+            conn.close()
+        except Exception:
+            pass
+
+    should_halt = len(reasons) > 0
+    return should_halt, reasons
 
 
 # ─── Self-test ───────────────────────────────────────────────────────────

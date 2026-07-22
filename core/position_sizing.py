@@ -9,25 +9,27 @@
 #
 
 """
-Confidence-Weighted Position Sizing Module with Fee-Aware Kelly (SH3 Enhancement)
+Confidence-Weighted Position Sizing Module with Binary-Option Kelly (Phase A.2)
 
-Implements fee-adjusted Kelly position sizing per requirement:
-- Formula: Kelly fraction = edge / (1 - fee) / variance  
-- Cap max position at 25% of balance
-- Use 30-day rolling win rate for edge estimation
-- High-confidence signals → larger position size. Low-confidence → smaller.
+Implements the correct Kelly formula for binary options per:
+    f* = (W - P) / (1 - P)
 
-Previous 8 signal types supported.
-New feature: Fee-aware Kelly sizing as SH3 requirement.
+Where:
+    W = win probability (estimated from rolling win rate)
+    P = market price (implied probability from Kalshi market)
 
-Version: SH3 — 2026-07-06 
+This replaces the old edge/variance formula which is wrong for binary outcomes.
+Cap max position at 25% of balance. Use 30-day rolling win rate.
+Cost model from core.market_cost_model.MARKET_COST_MODEL.
 """
 
 import math
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime, timezone, timedelta
+
+from .market_cost_model import MARKET_COST_MODEL
 
 
 class ConfidenceTier(Enum):
@@ -129,47 +131,43 @@ class KellyPositionSizer:
         wins = sum(1 for r in recent_results if r['win'])
         return wins / len(recent_results) if recent_results else 0.5
 
-    def calculate_edge_from_win_rate(self, win_rate: float) -> float:
+    def calculate_edge_from_win_rate(self, win_rate: float, market_price: float = 0.5) -> float:
         """
-        Calculate statistical edge from win rate.
+        Calculate statistical edge from win rate vs market price.
+        Edge = W - P (correct for binary options)
         """
-        # Edge = expected value of prediction
-        # If you predict up with probability p and win with rate w, expected edge = p*w - (1-p)*(1-w) 
-        # Simplified: edge ≈ 2*win_rate - 1  (when predicting optimistically)
-        return 2 * win_rate - 1
+        return win_rate - market_price
 
-    def calculate_kelly_fraction(self, edge: float, win_rate: float, signal_id: str = 'default') -> float:
+    def calculate_kelly_fraction(self, edge: float, win_rate: float, market_price: float = 0.5, signal_id: str = 'default') -> float:
         """
-        Calculate Kelly fraction accounting for fees per formula kelly = edge / (1-fee) / variance.
-        Uses per-signal variance for accurate estimation instead of global variance.
-        """
-        # Compute per-signal variance from tracked win history
-        signal_results = [r for r in self.win_history if r.get('signal_id', 'default') == signal_id]
-        if len(signal_results) >= 5:
-            # Use actual variance of returns for this signal
-            returns = [1.0 if r['win'] else -1.0 for r in signal_results]
-            mean_ret = sum(returns) / len(returns)
-            variance_estimate = sum((r - mean_ret) ** 2 for r in returns) / (len(returns) - 1)
-            variance_estimate = max(variance_estimate, 0.01)  # Minimum floor
-        else:
-            # Fallback to Bernoulli variance when insufficient data
-            variance_estimate = win_rate * (1 - win_rate) if win_rate and win_rate < 1 else 0.25
+        Calculate Kelly fraction for binary options using the correct formula:
+            f* = (W - P) / (1 - P)
         
-        if variance_estimate == 0:
-            variance_estimate = 0.25  # Minimum variance to avoid division issues
+        Where W = win_rate, P = market_price.
+        
+        This replaces the old edge/variance formula which is wrong for
+        binary YES/NO outcomes.
+        """
+        # For binary options, the correct Kelly formula is:
+        # f* = (W - P) / (1 - P)
+        # where W = win rate, P = market price
+        
+        # Clamp market price to avoid division by zero or negative
+        price = max(0.001, min(0.999, market_price))
+        
+        # Binary Kelly formula
+        kelly_fraction = (win_rate - price) / (1.0 - price)
 
-        # Kelly formula component: edge / variance
-        basic_kelly = edge / variance_estimate if variance_estimate != 0 else 0.0
-
-        # Apply fee adjustment per formula kelly = edge / (1 - fee) / variance
-        adjusted_edge = edge - self.fee_rate  # Adjusting edge directly for fees
-        kelly_fraction = (adjusted_edge / variance_estimate) if variance_estimate != 0 else 0.0
+        # Apply fee adjustment using the centralized cost model
+        round_trip_cost = MARKET_COST_MODEL.round_trip_fraction()
+        # Reduce Kelly fraction slightly for the friction cost
+        kelly_fraction -= round_trip_cost * 0.5
 
         # Apply fractional Kelly
         fractional_kelly = kelly_fraction * self.fraction_kelly
 
         # Cap between practical limits
-        return max(-0.1, min(0.5, fractional_kelly))  # Limit to reasonable ranges
+        return max(-0.5, min(0.5, fractional_kelly))
 
 
 def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
@@ -270,10 +268,10 @@ def compute_position_size(
     
     # Calculate win rate and derived edge
     current_win_rate = kelly_sizer.get_rolling_win_rate()
-    edge = kelly_sizer.calculate_edge_from_win_rate(current_win_rate)
+    edge = kelly_sizer.calculate_edge_from_win_rate(current_win_rate, market_price)
     
-    # Calculate Kelly fraction with fee awareness
-    kelly_fraction = kelly_sizer.calculate_kelly_fraction(edge, current_win_rate)
+    # Calculate Kelly fraction using binary-option formula: f* = (W - P) / (1 - P)
+    kelly_fraction = kelly_sizer.calculate_kelly_fraction(edge, current_win_rate, market_price)
     
     # Size is Kelly fraction of balance, modulated by confidence
     # But also ensure it doesn't exceed 25% of balance per requirements
@@ -300,6 +298,7 @@ def compute_position_size(
         "confidence": confidence,
         "confidence_tier": tier.value,
         "current_balance": current_balance,
+        "market_price": market_price,
         "calculated_win_rate": current_win_rate,
         "calculated_edge": edge,
         "raw_kelly_fraction": kelly_fraction,
@@ -307,8 +306,9 @@ def compute_position_size(
         "position_size": final_size,
         "max_position_allowed": max_amount_cap,
         "max_config_cap": config.max_size_usd,
-        "sh3_compliance": {
-            "uses_fee_aware_kelly": True,
+        "kelly_formula": "f* = (W - P) / (1 - P)",
+        "phase_a2_compliance": {
+            "uses_binary_option_kelly": True,
             "fraction": config.fraction_kelly,
             "fee_rate": config.fee_rate,
             "max_position_fraction": config.max_position_fraction,
@@ -374,7 +374,7 @@ def extract_confidence_from_signal_context(signal_context: Dict[str, Any]) -> fl
 _DEFAULT_KELLY_SIZER = KellyPositionSizer()
 
 def main():
-    """Test Kelly-position sizing across all 8 signal types with SH3 compliance."""
+    """Test binary-option Kelly position sizing (Phase A.2)."""
     # Add some historical results to demonstrate win rate calculation
     for i in range(15):
         date = datetime.now(timezone.utc) - timedelta(days=i)
@@ -383,36 +383,41 @@ def main():
 
     balance = 10000.0
     
-    print(f"\nSH3: Fee-Aware Kelly Position Sizing — Balance: ${balance:,.2f}")
-    print(f"Config: 50% fractional Kelly, 5% fee rate, 25% max position cap, 30-day win rate window")
+    cost = MARKET_COST_MODEL.round_trip_fraction()
+    print(f"\nPhase A.2: Binary-Option Kelly Position Sizing — Balance: ${balance:,.2f}")
+    print(f"Formula: f* = (W - P) / (1 - P)")
+    print(f"Round-trip cost: {cost:.4f} ({cost*100:.1f}¢)")
+    print(f"Config: 50% fractional Kelly, 25% max position cap, 30-day win rate window")
     print("=" * 120)
     
     test_signals = [
-        ("near_boundary_momentum_up", 0.85),
-        ("near_boundary_momentum_up", 0.55),
-        ("near_boundary_momentum_down", 0.75),
-        ("near_boundary_momentum_down", 0.45),
-        ("goldilocks_reversion_alert", 0.80),
-        ("goldilocks_momentum_down", 0.65),
-        ("reversion_after_settlement", 0.60),
-        ("late_day_momentum_hourly", 0.70),
+        ("near_boundary_momentum_up", 0.85, 0.55),
+        ("near_boundary_momentum_up", 0.55, 0.50),
+        ("near_boundary_momentum_down", 0.75, 0.60),
+        ("near_boundary_momentum_down", 0.45, 0.55),
+        ("goldilocks_reversion_alert", 0.80, 0.50),
+        ("goldilocks_momentum_down", 0.65, 0.55),
+        ("reversion_after_settlement", 0.60, 0.45),
+        ("late_day_momentum_hourly", 0.70, 0.50),
     ]
     
-    print(f"{'Signal Type':<35} {'Conf':<5} {'WinRate':<8} {'Kelly Frac':<12} {'Position':<12} {'Cap Applied':<12}")
+    print(f"{'Signal Type':<35} {'Conf':<5} {'Price':<6} {'WinRate':<8} {'Kelly Frac':<12} {'Position':<12}")
     print("-" * 120)
     
-    for signal_type, confidence in test_signals:
-        size, tier, meta = compute_position_size(signal_type, confidence, balance, 
-                                              kelly_sizer=_DEFAULT_KELLY_SIZER)
-        cap_applied = "MAX_CAP" if size == min(balance * 0.25, balance * abs(meta['raw_kelly_fraction']) * confidence) else "KELLY"
-        print(f"{signal_type:<35} {confidence:<5.2f} {meta['calculated_win_rate']:<8.3f} {meta['raw_kelly_fraction']:<12.4f} ${size:<11.2f} {cap_applied:<12}")
+    for signal_type, confidence, market_price in test_signals:
+        size, tier, meta = compute_position_size(
+            signal_type, confidence, balance,
+            market_price=market_price,
+            kelly_sizer=_DEFAULT_KELLY_SIZER
+        )
+        print(f"{signal_type:<35} {confidence:<5.2f} {market_price:<6.2f} {meta['calculated_win_rate']:<8.3f} {meta['raw_kelly_fraction']:<12.4f} ${size:<11.2f}")
     
-    print(f"\nSH3 Compliance Summary:")
-    print(f"✓ Formula: Kelly fraction = edge / (1-fee) / variance - Implemented")
+    print(f"\nPhase A.2 Compliance Summary:")
+    print(f"✓ Formula: f* = (W - P) / (1 - P) - Correct binary-option Kelly")
     print(f"✓ 50% fractional Kelly - Implemented")  
     print(f"✓ 25% max position of balance - Enforced")
     print(f"✓ 30-day rolling win rate - Used for edge estimation")
-    print(f"✓ Fee awareness at 5% - Incorporated into calculation")
+    print(f"✓ Cost model: MARKET_COST_MODEL.round_trip_fraction() = {cost:.4f}")
     print()
 
 

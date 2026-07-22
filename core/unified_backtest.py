@@ -28,6 +28,7 @@ if CORE_DIR not in sys.path:
 
 from signals import SignalRegistry
 from signal_fusion import SignalFusionEngine, TimeDecaySignalManager
+from market_cost_model import MARKET_COST_MODEL
 
 # Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
 BACKTEST_SIGNALS = [
@@ -47,7 +48,7 @@ DB_PATH = os.environ.get(
     'METAR_DB_PATH',
     '/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db'
 )
-FEE_RATE = 0.0
+FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 
 def load_station_data(station, conn):
@@ -87,8 +88,10 @@ def load_station_data(station, conn):
     return days, market
 
 
-def compute_sharpe(returns, fee_rate=FEE_RATE):
+def compute_sharpe(returns, fee_rate=None):
     """Compute Sharpe ratio from (confidence, correct) pairs."""
+    if fee_rate is None:
+        fee_rate = MARKET_COST_MODEL.round_trip_fraction()
     if not returns:
         return 0.0
     vals = []

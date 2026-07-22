@@ -32,7 +32,7 @@ from typing import Dict, List, Optional, Tuple
 import logging
 
 from .base_signal import BaseSignal, _safe_get, validate_signal
-from ..station_effects import get_wind_delta_t, is_warming_wind
+from core.station_effects import get_wind_delta_t, is_warming_wind
 
 _logger = logging.getLogger(__name__)
 
