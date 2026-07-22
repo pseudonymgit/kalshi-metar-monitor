@@ -359,3 +359,28 @@ Ready for Phase 16 with:
 - Uses `market_cost_model.py` (3.1¢ spread) and `FeeAwareKellyPositionSizer`.
 - All 7 new signals registered in `core/signals/__init__.py`.
 - **0 new syntax errors** (only pre-existing `alert_state_machine.py` L115).
+
+## Phase 22: Production Operations (2026-07-22 03:30 UTC)
+
+### 22.1 — Deployment Pipeline
+- **`render.yaml`**: Infrastructure-as-code for prod (kalshi-metar-monitor) + staging (kalshi-metar-monitor-staging). Health check path, env vars, build/start commands, pre-deploy validation.
+- **`scripts/bootstrap.sh`**: Pre-deploy health bootstrap — Python version, dependencies, env vars, SQLite connectivity, syntax check, station registry validation, webhook URL check.
+- **`Makefile`**: Added `deploy-check`, `deploy-staging`, `deploy-prod` targets. `deploy-check` validates syntax, env vars, DB, webhook, and render.yaml.
+- **`docs/ops/DEPLOYMENT.md`**: Full deployment documentation including architecture diagram, environment table, staging strategy, rollback procedure, monitoring endpoints, and security notes.
+
+### 22.2 — Monitoring & Observability
+- **`GET /healthz`**: Imported in app.py as first route. Returns 200 with per-check (metar_db, alerts_db, scheduler) status when healthy, 503 when any DB is disconnected. Used by Render load balancer.
+- **`core/structured_logger.py`**: Structured JSON logging module. `StructuredFormatter` outputs JSON lines with timestamp, level, module, event_id, and extra fields. `configure_root_logger()`, `get_logger()`, `LogContext`, and `log_print()` for legacy migration.
+- **`core/db_health_monitor.py`**: `DatabaseHealthCheck` class with `check_connectivity()`, `check_integrity()` (PRAGMA integrity_check), `attempt_recovery()` (VACUUM). Background monitor thread runs every 5 min. Auto-recovery after 3 consecutive failures. Auto-registers metar.db, alerts.db, and forecast_disagreement_live.db.
+- **`core/heartbeat_monitor.py`**: Background thread runs every 5 min. Tests self-health via `/healthz` and webhook delivery. Tracks consecutive failures, alerts on 3+ persistent failures.
+- **Wired into app.py**: Both monitors start automatically on app startup (unless `SKIP_DB_HEALTH_MONITOR=1` or `WEBHOOK_BASE_URL` not configured).
+
+### 22.3 — Cron Job Recovery
+- **Diagnosed 5 ERROR cron jobs** with root causes:
+  - 3 backup jobs: `openai/gpt-5-mini` model rejected by agents.defaults.models allowlist
+  - 1 forecast disagreement: Transient infra error (`nova-comet` process failure)
+  - 1 clawhub update: Discord `OutboundDeliveryError: Invalid Form Body`
+- **Fixed 3 backup jobs**: Changed model from `openai/gpt-5-mini` → `openai-codex/gpt-5.4-mini` (validated allowlist entry). Added failure alerts after 2 consecutive errors.
+- **Fixed forecast disagreement**: Added failure alerts after 2 consecutive errors. Created `scripts/cron_retry_wrapper.py` for retry logic with exponential backoff.
+- **Fixed clawhub**: Disabled delivery to prevent Discord delivery errors.
+- **Fixed pre-existing bug**: `alert_state_machine.py` — 8 instances of wrong indentation on PRAGMA journal_mode/busy_timeout lines (4-space instead of 8-space inside methods). All syntax errors resolved.

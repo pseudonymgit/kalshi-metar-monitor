@@ -168,3 +168,31 @@ Fixes applied before dispatch: agreement threshold, signal registry, fee rates. 
 - [x] CLI mode: `python3 -m core.intraday_trading_loop --mode check|trade`
 - [x] All 6 new signals registered in `core/signals/__init__.py`
 - [x] 0 new syntax errors (only pre-existing alert_state_machine.py L115)
+
+## Phase 22: Production Operations (2026-07-22 03:30 UTC)
+**Status:** ✅ COMPLETE
+
+### 22.1 — Deployment Pipeline
+- [x] `render.yaml` — Infrastructure as Code for prod + staging
+- [x] `scripts/bootstrap.sh` — Pre-deploy health bootstrap (syntax, env vars, DB, webhook)
+- [x] `Makefile deploy-check` target — Syntax check, env vars, DB connectivity, webhook dry-run
+- [x] `Makefile deploy-staging` / `deploy-prod` targets — Manual deploy via Render CLI
+- [x] `docs/ops/DEPLOYMENT.md` — Staging environment, architecture, rollback procedure documented
+
+### 22.2 — Monitoring & Observability
+- [x] `GET /healthz` endpoint in app.py — Returns 200 with per-check status, 503 on DB failure
+- [x] `core/structured_logger.py` — Structured JSON logging (timestamp, level, module, event_id)
+- [x] `core/db_health_monitor.py` — PRAGMA integrity_check, auto-recovery after 3 consecutive failures, background thread
+- [x] `core/heartbeat_monitor.py` — Synthetic heartbeat (every 5 min), self-health check, webhook delivery test
+- [x] Wired all monitors into app.py startup sequence
+
+### 22.3 — Cron Job Recovery
+- [x] **Diagnosed 5 ERROR cron jobs:**
+  - 3 backup jobs: `openai/gpt-5-mini` model rejected by allowlist
+  - 1 forecast disagreement: Transient infra error (`nova-comet` process failure)
+  - 1 clawhub update: Discord delivery error (Invalid Form Body)
+- [x] **Fixed 3 backup jobs:** Changed model from `openai/gpt-5-mini` → `openai-codex/gpt-5.4-mini`, added failure alerts after 2 consecutive errors
+- [x] **Fixed forecast disagreement:** Added failure alerts after 2 consecutive errors
+- [x] **Fixed clawhub:** Disabled delivery to prevent Discord delivery errors
+- [x] **Added `scripts/cron_retry_wrapper.py`** — Generic retry wrapper with exponential backoff
+- [x] **Fixed pre-existing bug:** `alert_state_machine.py` — 8 instances of wrong indentation on PRAGMA lines (4-space instead of 8-space inside methods)
