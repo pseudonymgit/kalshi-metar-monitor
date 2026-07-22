@@ -88,9 +88,10 @@ class KellyPositionSizer:
         # Track trade history for win rate estimation
         self.win_history: list = []
 
-    def add_win_result(self, date_string: str, win: bool, prob_predicted: float = None):
+    def add_win_result(self, date_string: str, win: bool, prob_predicted: float = None, signal_id: str = None):
         """
         Add a trade result to history for win rate calculation.
+        Tracks per-signal results for accurate variance estimation.
         """
         today = datetime.now()
         dt = datetime.strptime(date_string, '%Y-%m-%d') if isinstance(date_string, str) else date_string
@@ -100,19 +101,27 @@ class KellyPositionSizer:
         self.win_history.append({
             'date': date_string,
             'win': win,
-            'timestamp': dt
+            'timestamp': dt,
+            'signal_id': signal_id or 'default',
         })
 
-    def get_rolling_win_rate(self) -> float:
+    def get_rolling_win_rate(self, signal_id: str = None) -> float:
         """
         Return 30-day rolling win rate or default value.
+        If signal_id is provided, returns per-signal win rate.
         """
         cutoff_date = datetime.now() - timedelta(days=self.window_days)
         
-        recent_results = [
-            h for h in self.win_history
-            if h['timestamp'] >= cutoff_date
-        ]
+        if signal_id:
+            recent_results = [
+                h for h in self.win_history
+                if h['timestamp'] >= cutoff_date and h.get('signal_id', 'default') == signal_id
+            ]
+        else:
+            recent_results = [
+                h for h in self.win_history
+                if h['timestamp'] >= cutoff_date
+            ]
 
         if not recent_results:
             return 0.65  # Default conservative estimate
@@ -129,13 +138,22 @@ class KellyPositionSizer:
         # Simplified: edge ≈ 2*win_rate - 1  (when predicting optimistically)
         return 2 * win_rate - 1
 
-    def calculate_kelly_fraction(self, edge: float, win_rate: float) -> float:
+    def calculate_kelly_fraction(self, edge: float, win_rate: float, signal_id: str = 'default') -> float:
         """
         Calculate Kelly fraction accounting for fees per formula kelly = edge / (1-fee) / variance.
-        This is adapted from the general Kelly formula assuming binary outcomes.
+        Uses per-signal variance for accurate estimation instead of global variance.
         """
-        # For binary outcomes where success has probability p, variance ≈ p*(1-p)
-        variance_estimate = win_rate * (1 - win_rate) if win_rate and win_rate < 1 else 0.25  # Conservative 0.25 when unclear
+        # Compute per-signal variance from tracked win history
+        signal_results = [r for r in self.win_history if r.get('signal_id', 'default') == signal_id]
+        if len(signal_results) >= 5:
+            # Use actual variance of returns for this signal
+            returns = [1.0 if r['win'] else -1.0 for r in signal_results]
+            mean_ret = sum(returns) / len(returns)
+            variance_estimate = sum((r - mean_ret) ** 2 for r in returns) / (len(returns) - 1)
+            variance_estimate = max(variance_estimate, 0.01)  # Minimum floor
+        else:
+            # Fallback to Bernoulli variance when insufficient data
+            variance_estimate = win_rate * (1 - win_rate) if win_rate and win_rate < 1 else 0.25
         
         if variance_estimate == 0:
             variance_estimate = 0.25  # Minimum variance to avoid division issues
@@ -144,9 +162,6 @@ class KellyPositionSizer:
         basic_kelly = edge / variance_estimate if variance_estimate != 0 else 0.0
 
         # Apply fee adjustment per formula kelly = edge / (1 - fee) / variance
-        # Actually, the formula in description says "edge / (1 - fee) / variance"
-        # If edge = 2*p - 1, the actual expected value after fees = edge_net = 2*p - 1 - fee_adjustment
-        # To keep things aligned with the requirement statement:
         adjusted_edge = edge - self.fee_rate  # Adjusting edge directly for fees
         kelly_fraction = (adjusted_edge / variance_estimate) if variance_estimate != 0 else 0.0
 
