@@ -3,8 +3,11 @@ __pycache__/
 *.pyc
 *.pyo
 *.db
+*.db-shm
+*.db-wal
 data/*.db
 logs/
+.gitignore.swp
 .pytest_cache/
 *.egg-info/
 data/isd_lite_raw.db
