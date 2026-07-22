@@ -1,6 +1,54 @@
-# WEATHER ENGINE PROJECT - PHASE 20 ACCOMPLISHMENTS
+# WEATHER ENGINE PROJECT - PHASE 21 ACCOMPLISHMENTS
 
 Date: 2026-07-22
+
+## Phase 21: Test Infrastructure — COMPLETED
+
+### ✅ 21.1: Testing Framework Setup — VERIFIED
+- **tests/ directory**: Pre-existing with conftest.py, __init__.py, and 50+ test files.
+- **pytest config**: pyproject.toml has pytest.ini_options with testpaths, python_files, warnings filter.
+- **Test fixtures**: conftest.py handles ALERT_DB_PATH env var. Each test file has its own fixtures (temp_db, temp_dir, sample_days, short_days, long_days).
+- **Integration test helpers**: test_integration_pipeline.py has fixtures for temp_db, temp_dir, sample_days.
+
+### ✅ 21.2: Core Signal Tests — COMPLETED
+- **test_signals.py (164 tests)**:
+  - BaseSignal helpers: _window, _safe_get, @validate_signal decorator
+  - All 22 registered signals tested via SignalTestBase mixin:
+    - evaluate() returns valid (direction, confidence) tuple
+    - Insufficient history returns (None, 0.0)
+    - Missing/None fields handled gracefully
+    - Confidence clamping (0.0-1.0)
+    - Direction validity ('up', 'down', None, or 'indeterminate' for SeasonalRegimeClassifier)
+  - 4 new test classes added for Phase 19 signals: SeasonalRegimeClassifier, SettlementTimeArbitrageSignal, SpreadBasedEntrySignal, VolumeMomentumSignal
+  - SignalRegistry: all 22 signals instantiated, names unique, evaluate/name/min_lookback present
+- **test_agreement_gate.py**: AgreementGate.filter_signals(), SimpleAgreementChecker.check_agreement(), N-of-M threshold, direction handling, edge cases
+- **test_position_sizing.py**: ConfidenceTier classification, KellyPositionSizer, Kelly sizing with fee awareness, compute_position_size, config factory, edge cases
+- **test_trade_journal.py**: Schema creation, append_entry, append_from_decision, query with filters, update_outcome, stats, edge cases
+
+### ✅ 21.3: Architecture Decomposition Tests — COMPLETED
+- **signal_fusion facade**: All 7 standalone functions + 2 classes importable, __all__ exports verified, class methods verified via inspect
+- **paper_trading_engine facade**: PaperTrader, generate_signals, SettlementProcessor importable
+- **kalshi_monitor facade**: get_default_config, get_public_markets, kalshi_execution_domain, __all__ verified
+- **metar_monitor facade**: fetch_window, reset_station_daily_state, get_station_ingestion_runtime, __all__ verified
+- **Signal registry import paths**: All 24 signal modules importable independently, SignalRegistry creates all 22 signals, factory function works
+- **Core package import paths**: 10 core modules importable via core.__init__
+- **Behavioral regression**: All import paths unchanged from pre-decomposition
+
+### ✅ 21.4: Edge Case Tests — COMPLETED
+- **Kalshi API**: Empty market responses, connection errors, None market handled gracefully
+- **Position sizing**: Zero confidence produces LOW tier, Kelly sizing with negative edge returns non-positive fraction, extreme confidence values classified correctly, zero/negative/None balance handles
+- **DB operations**: Schema creation on empty DB, reentrant schema creation, schema report, missing table queries, migration tests
+- **Alert dispatch**: Empty payloads, missing webhook URLs, malformed payloads, empty retry queue, invalid state machine transitions, excessive throttling, None formatter values
+- **Agreement gate**: Empty signals, single with insufficient count, SimpleAgreementChecker edge cases, dynamic threshold update
+- **Trade journal**: Empty journal query/stats, duplicate alert IDs, missing optional fields, update nonexistent entries
+- **Signal factory**: None db_path, nonexistent signal, get_all_signals, add valid/invalid signal
+
+### ✅ Pre-existing Bug Fixes from Phase 20
+- **signal_fusion.py facade**: Removed method-only imports (adjust_confidence, adjust_confidence_by_regime, etc.) that caused ImportError
+- **fusion_logic.py __all__**: Removed 16 method-only symbols that were incorrectly listed as standalone functions
+- **calibration_pipeline.py**: Added missing `import os` (was used but not imported)
+- **price_fetcher.py**: Added missing _LOGGER, _alert_db_path(), _ensure_alert_schema() (referenced but not defined)
+- **settlement_processor.py**: Added stub SettlementProcessor class (was __all__-listed but not defined)
 
 ## Phase 20: Architecture Decomposition — COMPLETED
 

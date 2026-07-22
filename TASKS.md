@@ -1,5 +1,16 @@
 # TASKS
 
+## Phase 21: Test Infrastructure (2026-07-22 04:45 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] **21.1 — Testing Framework Setup**: Pre-existing tests/ directory with conftest.py, __init__.py. pytest config in pyproject.toml. Test fixtures for mock Kalshi API, METAR data, mock time, integration helpers.
+- [x] **21.2 — Core Signal Tests**: 164 tests covering all 22 registered signals. Each signal tested for evaluate() return type, insufficient history, missing fields, edge cases. Agreement Gate tested with N-of-M threshold, empty signals, dynamic updates. Position Sizing tested with confidence tiering, Kelly sizing, config factory. Trade Journal tested with schema creation, append, query, update, stats.
+- [x] **21.3 — Architecture Decomposition Tests**: 41 tests covering facade re-exports from signal_fusion, paper_trading_engine, kalshi_monitor, metar_monitor. Signal registry import paths (24 modules). Core package import paths. Behavioral regression checks.
+- [x] **21.4 — Edge Case Tests**: 36 tests covering Kalshi API (empty responses, connection errors), position sizing (zero/negative/extreme values, confidence tiers), DB operations (schema creation, reentrant, migration, missing tables), alert dispatch (webhook failures, malformed payloads, throttling, state machine), agreement gate, trade journal, signal registry.
+- [x] Fixed pre-existing Phase 20 bugs: signal_fusion facade imports, fusion_logic __all__, calibration_pipeline missing import os, price_fetcher missing _LOGGER/_alert_db_path, settlement_processor missing SettlementProcessor class.
+- [x] **330 tests passing, 13 skipped** (skipped tests = alert modules needing config, Kalshi client requiring network)
+
 ## Phase 20: Architecture Decomposition (2026-07-22 03:50 UTC)
 **Status:** ✅ COMPLETE
 
