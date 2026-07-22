@@ -18,8 +18,8 @@ No data migration or transformation is performed. This is schema-only.
 """
 
 import os
-import sqlite3
 
+from .sqlite_utils import get_sqlite_connection
 from core.settlement_epoch_logger import _alert_db_path as get_db_path
 
 
@@ -56,7 +56,7 @@ def ensure_phase3_index():
     db_path = _resolve_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
-    conn = sqlite3.connect(db_path, timeout=1)
+    conn = get_sqlite_connection(db_path, timeout=1)
     try:
         cursor = conn.cursor()
         
@@ -120,7 +120,7 @@ def verify_index():
     """
     db_path = _resolve_db_path()
     
-    conn = sqlite3.connect(db_path, timeout=1)
+    conn = get_sqlite_connection(db_path, timeout=1)
     try:
         cursor = conn.cursor()
         
@@ -153,7 +153,7 @@ def drop_index():
     """
     db_path = _resolve_db_path()
     
-    conn = sqlite3.connect(db_path, timeout=1)
+    conn = get_sqlite_connection(db_path, timeout=1)
     try:
         cursor = conn.cursor()
         cursor.execute("DROP INDEX IF EXISTS idx_settlement_epochs_station_date")
