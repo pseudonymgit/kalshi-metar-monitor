@@ -2,34 +2,34 @@ import unittest
 from unittest.mock import patch
 
 import app as app_module
-from core import kalshi_monitor
+from core import kalshi_monitor, market_monitor
 
 
 class KalshiConnectivitySnapshotTests(unittest.TestCase):
     def setUp(self):
-        self.original_series_discovered = kalshi_monitor._SERIES_DISCOVERED
-        self.original_series_by_station = dict(kalshi_monitor._SERIES_BY_STATION)
-        self.original_attempt_count = kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT
-        self.original_last_success = kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC
-        self.original_last_error = kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR
-        self.original_last_hydration_execution = dict(kalshi_monitor._LAST_HYDRATION_EXECUTION)
+        self.original_series_discovered = market_monitor._SERIES_DISCOVERED
+        self.original_series_by_station = dict(market_monitor._SERIES_BY_STATION)
+        self.original_attempt_count = market_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT
+        self.original_last_success = market_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC
+        self.original_last_error = market_monitor._LAST_SERIES_DISCOVERY_ERROR
+        self.original_last_hydration_execution = dict(market_monitor._LAST_HYDRATION_EXECUTION)
 
     def tearDown(self):
-        kalshi_monitor._SERIES_DISCOVERED = self.original_series_discovered
-        kalshi_monitor._SERIES_BY_STATION = dict(self.original_series_by_station)
-        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = self.original_attempt_count
-        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = self.original_last_success
-        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
-        kalshi_monitor._LAST_HYDRATION_EXECUTION = dict(self.original_last_hydration_execution)
+        market_monitor._SERIES_DISCOVERED = self.original_series_discovered
+        market_monitor._SERIES_BY_STATION = dict(self.original_series_by_station)
+        market_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = self.original_attempt_count
+        market_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = self.original_last_success
+        market_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
+        market_monitor._LAST_HYDRATION_EXECUTION = dict(self.original_last_hydration_execution)
 
     def test_connectivity_snapshot_records_series_discovery_success(self):
-        kalshi_monitor._SERIES_DISCOVERED = False
-        kalshi_monitor._SERIES_BY_STATION = {}
-        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
-        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
-        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = "stale-error"
+        market_monitor._SERIES_DISCOVERED = False
+        market_monitor._SERIES_BY_STATION = {}
+        market_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+        market_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+        market_monitor._LAST_SERIES_DISCOVERY_ERROR = "stale-error"
 
-        with patch("core.kalshi_monitor._discover_series_for_stations", return_value={"KDEN": "KXHIGHDEN"}):
+        with patch("core.market_monitor._discover_series_for_stations", return_value={"KDEN": "KXHIGHDEN"}):
             discovered = kalshi_monitor.ensure_series_discovery_loaded()
 
         snapshot = kalshi_monitor.get_kalshi_connectivity_snapshot()
@@ -39,13 +39,13 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertIsNone(snapshot["last_series_discovery_error"])
 
     def test_connectivity_snapshot_records_last_discovery_failure(self):
-        kalshi_monitor._SERIES_DISCOVERED = False
-        kalshi_monitor._SERIES_BY_STATION = {}
-        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
-        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
-        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = None
+        market_monitor._SERIES_DISCOVERED = False
+        market_monitor._SERIES_BY_STATION = {}
+        market_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+        market_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+        market_monitor._LAST_SERIES_DISCOVERY_ERROR = None
 
-        with patch("core.kalshi_monitor._discover_series_for_stations", side_effect=RuntimeError("series-api-down")):
+        with patch("core.market_monitor._discover_series_for_stations", side_effect=RuntimeError("series-api-down")):
             with self.assertRaises(RuntimeError):
                 kalshi_monitor.ensure_series_discovery_loaded()
 
@@ -55,14 +55,14 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertIsNone(snapshot["last_series_discovery_success_utc"])
 
     def test_observability_context_does_not_mutate_connectivity_counters(self):
-        kalshi_monitor._SERIES_DISCOVERED = False
-        kalshi_monitor._SERIES_BY_STATION = {}
-        kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
-        kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
-        kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = None
+        market_monitor._SERIES_DISCOVERED = False
+        market_monitor._SERIES_BY_STATION = {}
+        market_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
+        market_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = None
+        market_monitor._LAST_SERIES_DISCOVERY_ERROR = None
 
         with app_module.app.test_request_context("/observability/runtime-authority-snapshot"):
-            with patch("core.kalshi_monitor._discover_series_for_stations", side_effect=RuntimeError("blocked")):
+            with patch("core.market_monitor._discover_series_for_stations", side_effect=RuntimeError("blocked")):
                 with self.assertRaises(RuntimeError):
                     kalshi_monitor.ensure_series_discovery_loaded()
 
@@ -73,7 +73,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
 
 
     def test_get_last_hydration_execution_snapshot_returns_deep_copy(self):
-        kalshi_monitor._LAST_HYDRATION_EXECUTION = {
+        market_monitor._LAST_HYDRATION_EXECUTION = {
             "KDEN": {
                 "rejection_counts": {"date_mismatch": 2},
                 "cache_written": False,
@@ -84,7 +84,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         snapshot["KDEN"]["rejection_counts"]["date_mismatch"] = 999
 
         self.assertEqual(
-            kalshi_monitor._LAST_HYDRATION_EXECUTION["KDEN"]["rejection_counts"]["date_mismatch"],
+            market_monitor._LAST_HYDRATION_EXECUTION["KDEN"]["rejection_counts"]["date_mismatch"],
             2,
         )
 

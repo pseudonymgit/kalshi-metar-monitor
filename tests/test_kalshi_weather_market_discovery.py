@@ -28,7 +28,7 @@ class KalshiWeatherMarketDiscoveryTests(unittest.TestCase):
             "cursor": None,
         }
 
-        with patch("core.kalshi_monitor._kalshi_public_get", return_value=payload):
+        with patch("core.market_monitor._kalshi_public_get", return_value=payload):
             discovered = kalshi_monitor.discover_kalshi_weather_markets()
 
         self.assertEqual(len(discovered), 1)
@@ -50,7 +50,7 @@ class KalshiWeatherMarketDiscoveryTests(unittest.TestCase):
             "cursor": None,
         }
 
-        with patch("core.kalshi_monitor._kalshi_public_get", return_value=payload):
+        with patch("core.market_monitor._kalshi_public_get", return_value=payload):
             discovered = kalshi_monitor.discover_kalshi_weather_markets()
 
         self.assertEqual(len(discovered), 1)
@@ -88,7 +88,7 @@ class KalshiWeatherMarketDiscoveryTests(unittest.TestCase):
             "cursor": None,
         }
 
-        with patch("core.kalshi_monitor._kalshi_public_get", return_value=payload):
+        with patch("core.market_monitor._kalshi_public_get", return_value=payload):
             kalshi_monitor.discover_kalshi_weather_markets()
 
         station_mapping = kalshi_monitor.get_discovered_weather_market_station_mapping()

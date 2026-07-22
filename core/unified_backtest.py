@@ -26,8 +26,22 @@ CORE_DIR = os.path.dirname(os.path.abspath(__file__))
 if CORE_DIR not in sys.path:
     sys.path.insert(0, CORE_DIR)
 
-from signals import SignalRegistry, BACKTEST_SIGNALS, FULL_ENSEMBLE
+from signals import SignalRegistry
 from signal_fusion import SignalFusionEngine, TimeDecaySignalManager
+
+# Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
+BACKTEST_SIGNALS = [
+    'gaussian', 'gaussian_v2', 'goldilocks', 'persistence',
+    'pressure_delta', 'calendar_climatology', 'wind_direction_shift',
+    'forecast_disagreement', 'temperature_advection', 'frontal_detector',
+    'nwp_direct', 'intraday_metar_confirmation', 'fogr_reversion',
+    'metar_dtdt', 'pressure_tendency', 'hrrr_bias_corrected',
+    'esdr', 'nwp_dtdt_fusion', 'spread_based_entry', 'volume_momentum',
+    'settlement_arbitrage', 'seasonal_regime',
+]
+
+FULL_ENSEMBLE = BACKTEST_SIGNALS
+
 
 DB_PATH = os.environ.get(
     'METAR_DB_PATH',

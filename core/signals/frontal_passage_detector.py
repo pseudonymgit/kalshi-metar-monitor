@@ -104,7 +104,7 @@ def get_temperature_gradient_at_station(station_code, date, nwp_db_path):
 
         conn_nwp.close()
         return max_temp_diff if max_temp_diff >= 6.0 else 0.0
-    except:
+    except Exception:
         # If NWP database doesn't exist or has issues, return None
         return None
 
@@ -234,7 +234,7 @@ def evaluate(station, date, metar_db_path, nwp_db_path=None):
             grad_result = get_temperature_gradient_at_station(station, date, nwp_db_path)
             if grad_result and grad_result >= 6.0:
                 condition_3_temp_grad = True
-        except:
+        except Exception:
             # If we can't read NWP data, proceed with the other 3 conditions
             pass
     
