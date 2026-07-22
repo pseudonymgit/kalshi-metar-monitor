@@ -1583,6 +1583,19 @@ class PaperTrader:
                 'metadata': metadata
             }
 
+        # ── RISK CONTROLS: Pre-trade check ────────────────────────
+        # Check kill switches before sizing
+        should_halt, kill_reasons = self.check_kill_switches()
+        if should_halt:
+            return {
+                'status': 'skipped',
+                'reason': f'Risk controls triggered: {"; ".join(kill_reasons)}',
+                'market_price': market_price,
+                'analytical_prob': analytical_prob,
+                'confidence': calibrated_confidence,
+                'metadata': {**metadata, 'risk_controls_halted': True, 'kill_reasons': kill_reasons},
+            }
+
         # ── CONSOLIDATED POSITION SIZING PIPELINE ────────────────
         # Single pipeline: Kelly (primary) → fallback (if Kelly unavailable) → ladder (modifier)
         # Replaces 3 conflicting systems: Kelly sizer, confidence sizer, scaling ladder
