@@ -15,6 +15,17 @@
 ## Phase 16: Bug Fixes & Pipeline Corrections (2026-07-21 — ROLLED BACK 2026-07-22)
 **Status:** ⚠️ ROLLED BACK — subagent corrupted 87 files with syntax errors. Only safe fixes retained.
 
+## Phase 19: Cost Model & Execution Realism (2026-07-22 03:30 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] 19.1 — Centralized Cost Model v2: dynamic bid/ask from Kalshi API, market depth analysis, slippage model with random fill within spread and partial fill probability
+- [x] 19.2 — Execution Simulator: Monte Carlo simulation (1000 scenarios), P&L percentiles (5th/50th/95th), Sharpe ratio, win rate, fill risk assessment, is_trade_actionable() gate
+- [x] 19.3 — Market Micro Signals: SpreadBasedEntrySignal (widening spread = informed liquidity), VolumeMomentumSignal (volume spike + wide spread = confirm), SettlementTimeArbitrageSignal (last-hour arb vs known METAR)
+- [x] 19.4 — Contract Selection Optimizer: picks best risk-adjusted edge across D+1/D+2, weighted scoring (edge/spread/liquidity/time-decay), gate filters
+- [x] All 3 new signals registered in SignalRegistry
+- [x] Zero new syntax errors (only pre-existing alert_state_machine.py L115)
+
 ### Retained Fixes (verified clean):
 - [x] Agreement threshold: changed default to "3" in paper_trading_engine.py
 - [x] Signal registry: removed nwp_analog, registered nwp_direct

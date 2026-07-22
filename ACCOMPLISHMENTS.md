@@ -1,3 +1,45 @@
+# WEATHER ENGINE PROJECT - PHASE 19 ACCOMPLISHMENTS
+
+Date: 2026-07-22
+
+## Phase 19: Cost Model & Execution Realism — COMPLETED
+
+### ✅ 19.1: Centralized Cost Model v2 - COMPLETED
+- Enhanced `core/market_cost_model.py` with dynamic bid/ask from Kalshi API
+- Added `MarketDepthSnapshot` dataclass with bid/ask/spread/volume/depth score
+- Added `SlippageEstimate` model: random fill price within spread, partial fill probability based on position-size-to-depth ratio
+- Added `estimate_liquidity_depth()` for position sizing decisions
+- Added `estimate_total_cost()` for comprehensive cost breakdown (spread + slippage + commission)
+- Preserved fallback to 3.1¢ measured mean when API is unavailable
+
+### ✅ 19.2: Execution Simulator - COMPLETED
+- Created `core/execution_simulator.py` with realistic execution model
+- Spread widened by 30% for simulated fills (accounts for adverse selection)
+- Square-root market impact model: impact ∝ sqrt(size/depth)
+- Monte Carlo simulation: 1000 scenarios per trade with P&L percentiles (5th, 25th, 50th, 75th, 95th)
+- Reports: Sharpe ratio, win rate, avg win/loss, max drawdown, fill probability
+- `is_trade_actionable()` gate: rejects trades with excessive tail risk, negative median P&L, or sub-50% win rate
+
+### ✅ 19.3: Market Micro Signals - COMPLETED
+- **SpreadBasedEntrySignal**: widening spreads indicate informed traders pulling liquidity. Gating/confidence modulation signal.
+- **VolumeMomentumSignal**: volume spikes + wide spread = informed flow (confirm); volume spikes + tight spread = sentiment flow (weaken). Confidence modulation.
+- **SettlementTimeArbitrageSignal**: last-hour arb when METAR outcome is known. Directional signal, fires only when edge > 5¢.
+- All three registered in `core/signals/__init__.py` SignalRegistry
+
+### ✅ 19.4: Contract Selection Optimizer - COMPLETED
+- Created `core/contract_selection_optimizer.py`
+- Scores candidates on edge (40%), spread (25%), liquidity (20%), time decay (15%)
+- Gates: minimum edge > 0, maximum spread, minimum liquidity depth
+- D+2 edge must be 1.5x D+1 edge to be worth the extra uncertainty
+- D+2 spread gets additional penalty factor for horizon uncertainty
+- Full ranking with rationale string for each candidate
+- Convenience `select_for_station()` for D+1 vs D+2 comparison
+
+### ✅ Syntax Verification
+- Full syntax check across all `core/` files: 0 new errors (only 1 pre-existing in `alert_state_machine.py` L115)
+- Fixed 4 syntax-broken extracted modules (trade_execution, pnl_tracking, signal_pipeline, settlement_processor)
+
+
 # WEATHER ENGINE PROJECT - PHASE 15 ACCOMPLISHMENTS
 
 Date: 2026-07-21

@@ -94,7 +94,7 @@ class KellyPositionSizer:
         Tracks per-signal results for accurate variance estimation.
         """
         today = datetime.now(timezone.utc)
-        dt = datetime.strptime(date_string, '%Y-%m-%d') if isinstance(date_string, str) else date_string
+        dt = datetime.strptime(date_string, '%Y-%m-%d').replace(tzinfo=timezone.utc) if isinstance(date_string, str) else date_string
         if dt < datetime.now(timezone.utc) - timedelta(days=self.window_days + 1):
             return  # Outdated
         

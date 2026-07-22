@@ -185,8 +185,8 @@ class AlertStateMachine:
 
         # Ensure uniqueness
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             existing = conn.execute(
                 "SELECT alert_id FROM alert_states WHERE alert_id = ?",
@@ -258,8 +258,8 @@ class AlertStateMachine:
             (success: bool, message: str)
         """
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Get current state
             row = conn.execute(
@@ -324,8 +324,8 @@ class AlertStateMachine:
             Dict with all alert state fields, or None if not found
         """
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
@@ -347,8 +347,8 @@ class AlertStateMachine:
             List of transition records in chronological order
         """
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute("""
@@ -372,8 +372,8 @@ class AlertStateMachine:
             List of alert state records
         """
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute("""
@@ -395,8 +395,8 @@ class AlertStateMachine:
         """
         now = datetime.now(timezone.utc)
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute("""
@@ -418,8 +418,8 @@ class AlertStateMachine:
         """
         now = datetime.now(timezone.utc)
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             # Alerts in DELIVERED or ACKNOWLEDGED past execution timeout
@@ -463,8 +463,8 @@ class AlertStateMachine:
             Dict with counts by state, total alerts, etc.
         """
         conn = sqlite3.connect(self._db_path)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             total = conn.execute("SELECT COUNT(*) FROM alert_states").fetchone()[0]
 
