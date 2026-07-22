@@ -1,0 +1,18 @@
+[run]
+source = core
+omit =
+    */__pycache__/*
+    */tests/*
+    conftest.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == "__main__":
+    def main()
+    raise NotImplementedError
+    pass
+    def __str__
+    def __repr__
+
+show_missing = True
