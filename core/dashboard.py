@@ -45,6 +45,12 @@ import pandas as pd
 from flask import Flask, jsonify, render_template_string
 from scipy import stats as sp_stats
 
+# Try to import live market price fetcher for real market_prob values
+try:
+    from core.kalshi_price_fetcher import get_live_market_price as _dashboard_get_market_price
+except ImportError:
+    _dashboard_get_market_price = None
+
 _LOGGER = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -482,8 +488,15 @@ class DashboardApp:
         # If latest > mean, model thinks upward bias is more likely
         model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
 
-        # Market probability: default 0.5 (no live market data in demo)
+        # Market probability: try live Kalshi price, fallback to 0.5
         market_prob = 0.5
+        if _dashboard_get_market_price is not None:
+            try:
+                live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
+                if live_price is not None and 0.01 <= live_price <= 0.99:
+                    market_prob = live_price
+            except Exception:
+                pass
 
         # Discrepancy
         discrepancy = model_prob - market_prob
@@ -545,6 +558,13 @@ class DashboardApp:
             z = (latest - mean) / std if std > 0 else 0.0
             model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
             market_prob = 0.5
+            if _dashboard_get_market_price is not None:
+                try:
+                    live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
+                    if live_price is not None and 0.01 <= live_price <= 0.99:
+                        market_prob = live_price
+                except Exception:
+                    pass
             discrepancy = model_prob - market_prob
             raw_discrepancies.append(discrepancy)
 

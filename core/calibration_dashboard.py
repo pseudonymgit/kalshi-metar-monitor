@@ -128,7 +128,7 @@ def fetch_paper_trading_metrics():
                 'winning_trades': winning,
                 'losing_trades': losing,
                 'trade_count': winning + losing,
-                'avg_confidence': round(random.uniform(0.45, 0.85), 3)
+                'avg_confidence': round(0.65, 3)
             })
         
         return {
@@ -237,17 +237,17 @@ def create_confidence_calibration_plot(data):
         # Add some realistic values based on "model slightly overconfident"
         if conf_low < 0.3:
             # Lower confidence bands may have lower actual accuracy due to hedging
-            actual = min(mid_point + random.uniform(-0.1, 0.05), 1.0)
+            actual = min(mid_point + 0.02, 1.0)
         elif conf_low > 0.7:
             # Higher confidence bands often overestimate actual accuracy
-            actual = max(mid_point - random.uniform(0.0, 0.15), 0.0)
+            actual = max(mid_point - 0.08, 0.0)
         else:
             # Middle range more accurate
-            actual = mid_point + random.uniform(-0.05, 0.05)
+            actual = mid_point
     
         buckets.append(f"{int(conf_low*100)}-{int(conf_high*100)}%")
         accuracies.append(actual)
-        sample_counts.append(random.randint(40, 200))  # Simulated sample sizes
+        sample_counts.append(100 + (i * 10) % 150)  # Simulated sample sizes
     
     fig = go.Figure()
     
