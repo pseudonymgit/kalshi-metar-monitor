@@ -1,5 +1,13 @@
 # TASKS
 
+## Phase 24: Future Data Sources (2026-07-22 03:42 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] **24.1 — HRRR Integration**: Fixed hrrr_collect.py endpoint from /v1/hrrr (404) to /v1/gfs (correct). Removed stub/graceful-exit gating. Added HRRR table stats to nwp_collect.py summary. Both files pass syntax check.
+- [x] **24.2 — ECMWF Backfill**: Created scripts/backfill_ecmwf.py with gap analysis. Ran 92-day backfill via nwp_backfill_30d.py. ECMWF coverage improved from 4290 to 6150 unique combos (+1860 rows, 94% of GFS). ECMWF-GFS directional agreement: 42.2% (baseline).
+- [x] **24.3 — AI Model Research**: Created docs/plans/AI-MODEL-RESEARCH.md covering AIGFS, GraphCast, GenCast, Pangu-Weather, AIFS. Documented Open-Meteo access patterns. AI/ML gate remains CLOSED per Gray Room Round 9.
+
 ## Phase 15: Code Review & File Changelogs Redux (2026-07-21 23:05 UTC)
 **Status:** ✅ COMPLETE
 

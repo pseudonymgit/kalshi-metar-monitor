@@ -2,6 +2,31 @@
 
 Date: 2026-07-22
 
+## Phase 24: Future Data Sources — COMPLETED
+
+### ✅ 24.1: HRRR Integration — COMPLETED
+- Fixed `scripts/hrrr_collect.py` endpoint from `/v1/hrrr` (404) to `/v1/gfs` (correct endpoint, includes HRRR for US locations)
+- Removed stub/graceful-exit gating — collector is now fully functional
+- Added HRRR table stats to `nwp_collect.py` database summary
+- Added HRRR documentation comment to MODELS list
+- Both files pass syntax check
+
+### ✅ 24.2: ECMWF Backfill — COMPLETED
+- Created `scripts/backfill_ecmwf.py` with gap analysis, backfill, and NWP Direct Signal assessment
+- ECMWF backfill: 92-day historical backfill via `nwp_backfill_30d.py --past-days 92 --models ecmwf`
+- ECMWF data: 37,454 → 51,994 rows (+14,540)
+- Coverage: 4,290 → 6,150 unique combos (+1,860, now 94% of GFS)
+- ECMWF-GFS directional agreement: 42.2% (baseline for future monitoring)
+
+### ✅ 24.3: AI Model Research — COMPLETED (Research Only)
+- Created `docs/plans/AI-MODEL-RESEARCH.md`
+- Researched 5 AI weather models: AIGFS (NOAA), GraphCast (Google DeepMind), GenCast (Google DeepMind), Pangu-Weather (Huawei), AIFS (ECMWF)
+- Documented Open-Meteo access patterns: `models=gfs_global`, `models=gfs_graphcast025`, `models=ecmwf_aifs025`
+- Mapped integration path for when AI/ML gate opens
+- **AI/ML gate remains CLOSED** per Gray Room Round 9 decision
+
+---
+
 ## Phase 19: Cost Model & Execution Realism — COMPLETED
 
 ### ✅ 19.1: Centralized Cost Model v2 - COMPLETED
