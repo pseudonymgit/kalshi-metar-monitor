@@ -470,3 +470,24 @@ Ready for Phase 16 with:
 - **Fixed forecast disagreement**: Added failure alerts after 2 consecutive errors. Created `scripts/cron_retry_wrapper.py` for retry logic with exponential backoff.
 - **Fixed clawhub**: Disabled delivery to prevent Discord delivery errors.
 - **Fixed pre-existing bug**: `alert_state_machine.py` — 8 instances of wrong indentation on PRAGMA journal_mode/busy_timeout lines (4-space instead of 8-space inside methods). All syntax errors resolved.
+
+## Phase 20: Architecture Decomposition — COMPLETED
+
+### ✅ 20.1: Monolith Extraction — COMPLETED
+- **signal_fusion.py** → facade re-exporting from `fusion_logic.py` + `compatibility_checks.py`
+- **paper_trading_engine.py** → facade re-exporting from `signal_pipeline.py` + `trade_execution.py` + `pnl_tracking.py` + `settlement_processor.py`
+- **metar_monitor.py** → facade re-exporting from `data_collector.py` + `data_processor.py` + `health_monitor.py`
+- **kalshi_monitor.py** → facade re-exporting from `market_monitor.py` + `price_fetcher.py` + `order_manager.py`
+- All 12 extracted modules compile-clean. Facades preserve full public API surface.
+
+### ✅ 20.2: Mode Separation — COMPLETED
+- `trading_modes.py`, `paper_trader.py`, `live_trader.py` all verified with `__all__` exports
+
+### ✅ 20.3: DB Connection Standardization — COMPLETED
+- `sqlite_utils.py`: centralized connection pool, schema registry, migration testing
+- `db_schema.py`: 24+ tables, version tracking
+
+### ✅ 20.4: Import Path Standardization — COMPLETED
+- `pyproject.toml` with project metadata, dependencies, entry points
+- `__all__` exports on 14 modules
+- `core/__init__.py` updated with comprehensive package documentation
