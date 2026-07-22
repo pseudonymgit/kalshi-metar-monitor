@@ -231,3 +231,13 @@ Fixes applied before dispatch: agreement threshold, signal registry, fee rates. 
 - [x] **Fixed clawhub:** Disabled delivery to prevent Discord delivery errors
 - [x] **Added `scripts/cron_retry_wrapper.py`** — Generic retry wrapper with exponential backoff
 - [x] **Fixed pre-existing bug:** `alert_state_machine.py` — 8 instances of wrong indentation on PRAGMA lines (4-space instead of 8-space inside methods)
+
+## Phase 20: Architecture Decomposition (2026-07-22 04:50 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] 20.1 — Monolith Extraction: All 3 monoliths (signal_fusion, paper_trading_engine, metar_monitor, kalshi_monitor) now facades re-exporting from 12 extracted modules — fusion_logic, compatibility_checks, signal_pipeline, trade_execution, pnl_tracking, settlement_processor, data_collector, data_processor, health_monitor, market_monitor, price_fetcher, order_manager
+- [x] 20.2 — Mode Separation: trading_modes.py, paper_trader.py, live_trader.py all verified with __all__ exports
+- [x] 20.3 — DB Connection Standardization: sqlite_utils.py (connection pool), db_schema.py (24+ tables, version tracking)
+- [x] 20.4 — Import Path Standardization: pyproject.toml created, __all__ exports on 14 modules, core/__init__.py updated
+- [x] All 12 extracted modules compile-clean
