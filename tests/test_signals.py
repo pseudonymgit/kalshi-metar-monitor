@@ -538,6 +538,260 @@ class TestNwpDtdtFusionSignal(SignalTestBase):
     SIGNAL_CLASS = __import__('core.signals', fromlist=['NwpDtdtFusionSignal']).NwpDtdtFusionSignal
 
 
+class TestSeasonalRegimeClassifier(SignalTestBase):
+    SIGNAL_CLASS = __import__('core.signals', fromlist=['SeasonalRegimeClassifier']).SeasonalRegimeClassifier
+    # SeasonalRegimeClassifier requires db_path
+    @pytest.fixture(autouse=True)
+    def _setup_sig(self):
+        self._sig = self.SIGNAL_CLASS(db_path="/tmp/test_registry.db")
+
+    def _get_sig(self):
+        return self._sig
+
+    @pytest.mark.unit
+    def test_insufficient_history(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(len(short_days), short_days)
+            assert direction is None
+            assert confidence == 0.0
+
+    @pytest.mark.unit
+    def test_min_lookback_correct(self):
+        sig = self._get_sig()
+        lookback = getattr(sig, 'min_lookback', 0)
+        assert lookback >= 0
+
+    @pytest.mark.unit
+    def test_evaluate_at_min_lookback(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(sig.min_lookback, short_days)
+            assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_missing_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'date': '2025-06-01'} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        # SeasonalRegimeClassifier can return 'indeterminate' as valid direction
+        assert direction is None or direction in ('up', 'down', 'indeterminate')
+        assert confidence >= 0.0 and confidence <= 1.0
+
+    @pytest.mark.unit
+    def test_none_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'high': None, 'date': '2025-06-01', 'pressure': 1013,
+                      'low': 50, 'dewpoint': 40, 'temp': 55,
+                      'wind_dir': 180, 'wind_speed': 10} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down', 'indeterminate')
+
+    @pytest.mark.unit
+    def test_return_type(self, long_days):
+        sig = self._get_sig()
+        idx = max(sig.min_lookback + 5, 10)
+        if idx >= len(long_days):
+            pytest.skip("Not enough test data")
+        result = sig.evaluate(idx, long_days)
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        direction, confidence = result
+        # SeasonalRegimeClassifier can return 'indeterminate' as valid direction
+        assert direction is None or direction in ('up', 'down', 'indeterminate')
+        assert isinstance(confidence, float)
+        assert 0.0 <= confidence <= 1.0
+
+
+class TestSettlementTimeArbitrageSignal(SignalTestBase):
+    SIGNAL_CLASS = __import__('core.signals', fromlist=['SettlementTimeArbitrageSignal']).SettlementTimeArbitrageSignal
+    # SettlementTimeArbitrageSignal requires db_path
+    @pytest.fixture(autouse=True)
+    def _setup_sig(self):
+        self._sig = self.SIGNAL_CLASS(db_path="/tmp/test_registry.db")
+
+    def _get_sig(self):
+        return self._sig
+
+    @pytest.mark.unit
+    def test_insufficient_history(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(len(short_days), short_days)
+            assert direction is None
+            assert confidence == 0.0
+
+    @pytest.mark.unit
+    def test_min_lookback_correct(self):
+        sig = self._get_sig()
+        lookback = getattr(sig, 'min_lookback', 0)
+        assert lookback >= 0
+
+    @pytest.mark.unit
+    def test_evaluate_at_min_lookback(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(sig.min_lookback, short_days)
+            assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_missing_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'date': '2025-06-01'} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down')
+        assert confidence >= 0.0 and confidence <= 1.0
+
+    @pytest.mark.unit
+    def test_none_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'high': None, 'date': '2025-06-01', 'pressure': 1013,
+                      'low': 50, 'dewpoint': 40, 'temp': 55,
+                      'wind_dir': 180, 'wind_speed': 10} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_return_type(self, long_days):
+        sig = self._get_sig()
+        idx = max(sig.min_lookback + 5, 10)
+        if idx >= len(long_days):
+            pytest.skip("Not enough test data")
+        result = sig.evaluate(idx, long_days)
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        direction, confidence = result
+        assert direction is None or direction in ('up', 'down')
+        assert isinstance(confidence, float)
+        assert 0.0 <= confidence <= 1.0
+
+
+class TestSpreadBasedEntrySignal(SignalTestBase):
+    SIGNAL_CLASS = __import__('core.signals', fromlist=['SpreadBasedEntrySignal']).SpreadBasedEntrySignal
+    # SpreadBasedEntrySignal requires db_path
+    @pytest.fixture(autouse=True)
+    def _setup_sig(self):
+        self._sig = self.SIGNAL_CLASS(db_path="/tmp/test_registry.db")
+
+    def _get_sig(self):
+        return self._sig
+
+    @pytest.mark.unit
+    def test_insufficient_history(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(len(short_days), short_days)
+            assert direction is None
+            assert confidence == 0.0
+
+    @pytest.mark.unit
+    def test_min_lookback_correct(self):
+        sig = self._get_sig()
+        lookback = getattr(sig, 'min_lookback', 0)
+        assert lookback >= 0
+
+    @pytest.mark.unit
+    def test_evaluate_at_min_lookback(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(sig.min_lookback, short_days)
+            assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_missing_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'date': '2025-06-01'} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down')
+        assert confidence >= 0.0 and confidence <= 1.0
+
+    @pytest.mark.unit
+    def test_none_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'high': None, 'date': '2025-06-01', 'pressure': 1013,
+                      'low': 50, 'dewpoint': 40, 'temp': 55,
+                      'wind_dir': 180, 'wind_speed': 10} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_return_type(self, long_days):
+        sig = self._get_sig()
+        idx = max(sig.min_lookback + 5, 10)
+        if idx >= len(long_days):
+            pytest.skip("Not enough test data")
+        result = sig.evaluate(idx, long_days)
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        direction, confidence = result
+        assert direction is None or direction in ('up', 'down')
+        assert isinstance(confidence, float)
+        assert 0.0 <= confidence <= 1.0
+
+
+class TestVolumeMomentumSignal(SignalTestBase):
+    SIGNAL_CLASS = __import__('core.signals', fromlist=['VolumeMomentumSignal']).VolumeMomentumSignal
+    # VolumeMomentumSignal requires db_path
+    @pytest.fixture(autouse=True)
+    def _setup_sig(self):
+        self._sig = self.SIGNAL_CLASS(db_path="/tmp/test_registry.db")
+
+    def _get_sig(self):
+        return self._sig
+
+    @pytest.mark.unit
+    def test_insufficient_history(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(len(short_days), short_days)
+            assert direction is None
+            assert confidence == 0.0
+
+    @pytest.mark.unit
+    def test_min_lookback_correct(self):
+        sig = self._get_sig()
+        lookback = getattr(sig, 'min_lookback', 0)
+        assert lookback >= 0
+
+    @pytest.mark.unit
+    def test_evaluate_at_min_lookback(self, short_days):
+        sig = self._get_sig()
+        if sig.min_lookback >= len(short_days):
+            direction, confidence = sig.evaluate(sig.min_lookback, short_days)
+            assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_missing_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'date': '2025-06-01'} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down')
+        assert confidence >= 0.0 and confidence <= 1.0
+
+    @pytest.mark.unit
+    def test_none_high_field(self, long_days):
+        sig = self._get_sig()
+        bad_days = [{'high': None, 'date': '2025-06-01', 'pressure': 1013,
+                      'low': 50, 'dewpoint': 40, 'temp': 55,
+                      'wind_dir': 180, 'wind_speed': 10} for _ in range(100)]
+        direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
+        assert direction is None or direction in ('up', 'down')
+
+    @pytest.mark.unit
+    def test_return_type(self, long_days):
+        sig = self._get_sig()
+        idx = max(sig.min_lookback + 5, 10)
+        if idx >= len(long_days):
+            pytest.skip("Not enough test data")
+        result = sig.evaluate(idx, long_days)
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        direction, confidence = result
+        assert direction is None or direction in ('up', 'down')
+        assert isinstance(confidence, float)
+        assert 0.0 <= confidence <= 1.0
+
+
 @pytest.mark.unit
 class TestSignalRegistry:
     """Test that SignalRegistry instantiates all signals correctly."""

@@ -13,7 +13,17 @@ import math
 from collections import defaultdict
 from scipy.special import expit, logit
 from core.calibration_pipeline import CalibrationPipeline
-__all__ = ['SignalFusionEngine', 'TimeDecaySignalManager', 'mutual_information_from_boolean_pairs', 'mutual_information_matrix', 'mutual_information_simple_correlation', 'unique_information_fraction', 'compute_weights_from_significance', 'dempster_shafer_conflict', 'apply_conflict_modulation', 'compute_signal_agreement_score', 'compute_local_ece', 'compute_conviction_score', 'should_take_trade', 'decompose_brier_score', 'adjust_confidence_by_regime', 'update_signal_weights_bayesian', 'enhance_with_agreement_and_conviction', 'get_recent_calibration_performance', 'fit_calibration', 'compute_fusion_weights', 'fuse_signals', 'update', 'compute_reliability', 'adjust_confidence', 'get_lop_weight', 'get_all_reliabilities', 'get_reliability_report']
+__all__ = [
+    'SignalFusionEngine',
+    'TimeDecaySignalManager',
+    'mutual_information_from_boolean_pairs',
+    'mutual_information_matrix',
+    'mutual_information_simple_correlation',
+    'unique_information_fraction',
+    'compute_weights_from_significance',
+    'dempster_shafer_conflict',
+    'apply_conflict_modulation',
+]
 
 
 _logger = logging.getLogger(__name__)

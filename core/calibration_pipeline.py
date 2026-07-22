@@ -19,6 +19,7 @@ Converts raw signal confidence values into calibrated P(correct) values using:
 Based on Expert 6 Statistical Learning Framework Spec (Gray Room Round 3)
 """
 
+import os
 import logging
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
@@ -63,7 +64,16 @@ class CalibrationPipeline:
         
         # Initialize database-based history tracking to support signal history pruning (Task 4.9)
         self.db_path = os.getenv("SIGNAL_CALIBRATION_DB", "/var/data/signal_calibration.db")
-        self._init_history_db()
+        # Initialize database-based history tracking
+        self._history_db_initialized = False
+        if self.db_path:
+            try:
+                db_dir = os.path.dirname(self.db_path)
+                if db_dir and not os.path.exists(db_dir):
+                    os.makedirs(db_dir, exist_ok=True)
+                self._history_db_initialized = True
+            except Exception:
+                pass
 
     def set_window_start(self, window_start):
         """

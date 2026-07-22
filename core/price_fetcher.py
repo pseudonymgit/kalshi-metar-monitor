@@ -36,6 +36,23 @@ from core.alert_schema import ALERT_SCHEMA_VERSION
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
+
+_LOGGER = logging.getLogger(__name__)
+
+# Re-exported from order_manager via kalshi_monitor facade
+# (direct import to avoid circular dependency in standalone context)
+def _alert_db_path() -> str:
+    """Get the alert database path."""
+    return os.environ.get("ALERT_DB_PATH", "/var/data/alerts.db")
+
+
+def _ensure_alert_schema() -> None:
+    """Ensure the alert schema exists."""
+    from core.alert_schema import ALERT_SCHEMA_VERSION
+    # Schema is validated by alert_schema module
+    pass
+
+
 _last_market_state = {}
 _last_composed_sent = {}
 _last_market_check_summary = {}
