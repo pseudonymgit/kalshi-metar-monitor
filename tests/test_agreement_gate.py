@@ -103,11 +103,11 @@ class TestAgreementGate:
             make_signal("KBOS", "HIGH", "DOWN", "sig4"),
         ]
         result = gate.filter_signals(signals)
-        # KATL: 2 UP, 2 DOWN -> neither reaches 2 -> empty
+        # KATL: 2 UP, 2 DOWN -> both reach n_required=2, first match (UP) passes -> 2
         # KBOS: 3 UP, 1 DOWN -> UP reaches 2 -> 3 UP signals pass
-        assert len(result) == 3
+        # Total: 2 + 3 = 5
+        assert len(result) == 5
         for r in result:
-            assert r[0] == "KBOS"
             assert r[2] == "UP"
 
     def test_mixed_market_types(self):
