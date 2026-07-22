@@ -135,7 +135,7 @@ def process_settlements_for_date(self, settlement_date):
             WHERE trade_uuids LIKE ?
         """, (profit, trade_qty, profit, f'%{trade_uuid}%'))
 
-        # Check if trade was directionally correct by comparing signal direction with actual settlement direction
+        # Check if trade was correct: does signal direction match strike-based outcome?
         # Query the original trade for the signal direction and functionality
         c.execute("SELECT signal_direction, functionality, confidence_indicator, forecast_prob FROM trades WHERE trade_uuid = ?", (trade_uuid,))
         trade_row = c.fetchone()
