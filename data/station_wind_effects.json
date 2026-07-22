@@ -1,6 +1,6 @@
 {
   "KATL": {
-    "67": {
+    "67.5": {
       "delta_t_f": 0.946,
       "obs_count": 64,
       "avg_wind_speed_kt": 7.42
@@ -10,7 +10,7 @@
       "obs_count": 168,
       "avg_wind_speed_kt": 7.15
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.476,
       "obs_count": 171,
       "avg_wind_speed_kt": 6.29
@@ -20,7 +20,7 @@
       "obs_count": 152,
       "avg_wind_speed_kt": 5.76
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.11,
       "obs_count": 131,
       "avg_wind_speed_kt": 5.69
@@ -30,7 +30,7 @@
       "obs_count": 138,
       "avg_wind_speed_kt": 5.71
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -1.269,
       "obs_count": 144,
       "avg_wind_speed_kt": 6.4
@@ -40,7 +40,7 @@
       "obs_count": 158,
       "avg_wind_speed_kt": 6.52
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.845,
       "obs_count": 153,
       "avg_wind_speed_kt": 6.85
@@ -50,7 +50,7 @@
       "obs_count": 139,
       "avg_wind_speed_kt": 7.64
     },
-    "292": {
+    "292.5": {
       "delta_t_f": 0.162,
       "obs_count": 156,
       "avg_wind_speed_kt": 8.26
@@ -60,14 +60,14 @@
       "obs_count": 110,
       "avg_wind_speed_kt": 9.98
     },
-    "337": {
+    "337.5": {
       "delta_t_f": -0.375,
       "obs_count": 20,
       "avg_wind_speed_kt": 10.54
     }
   },
   "KAUS": {
-    "22": {
+    "22.5": {
       "delta_t_f": -0.195,
       "obs_count": 19,
       "avg_wind_speed_kt": 5.08
@@ -77,7 +77,7 @@
       "obs_count": 106,
       "avg_wind_speed_kt": 4.26
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 2.536,
       "obs_count": 178,
       "avg_wind_speed_kt": 3.89
@@ -87,7 +87,7 @@
       "obs_count": 178,
       "avg_wind_speed_kt": 4.63
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.194,
       "obs_count": 222,
       "avg_wind_speed_kt": 5.49
@@ -97,7 +97,7 @@
       "obs_count": 236,
       "avg_wind_speed_kt": 6.02
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.335,
       "obs_count": 313,
       "avg_wind_speed_kt": 7.96
@@ -107,7 +107,7 @@
       "obs_count": 249,
       "avg_wind_speed_kt": 8.62
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -4.734,
       "obs_count": 58,
       "avg_wind_speed_kt": 7.56
@@ -117,7 +117,7 @@
       "obs_count": 39,
       "avg_wind_speed_kt": 8.5
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -3.839,
       "obs_count": 28,
       "avg_wind_speed_kt": 8.69
@@ -127,7 +127,7 @@
       "obs_count": 28,
       "avg_wind_speed_kt": 10.05
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -3.423,
       "obs_count": 23,
       "avg_wind_speed_kt": 10.33
@@ -137,7 +137,7 @@
       "obs_count": 21,
       "avg_wind_speed_kt": 9.94
     },
-    "337": {
+    "337.5": {
       "delta_t_f": -4.199,
       "obs_count": 11,
       "avg_wind_speed_kt": 12.56
@@ -149,7 +149,7 @@
       "obs_count": 31,
       "avg_wind_speed_kt": 12.28
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 1.504,
       "obs_count": 75,
       "avg_wind_speed_kt": 8.24
@@ -159,7 +159,7 @@
       "obs_count": 85,
       "avg_wind_speed_kt": 7.87
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 2.355,
       "obs_count": 77,
       "avg_wind_speed_kt": 7.84
@@ -169,7 +169,7 @@
       "obs_count": 105,
       "avg_wind_speed_kt": 7.73
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.234,
       "obs_count": 112,
       "avg_wind_speed_kt": 7.73
@@ -179,7 +179,7 @@
       "obs_count": 174,
       "avg_wind_speed_kt": 8.25
     },
-    "202": {
+    "202.5": {
       "delta_t_f": 0.21,
       "obs_count": 214,
       "avg_wind_speed_kt": 9.09
@@ -189,7 +189,7 @@
       "obs_count": 211,
       "avg_wind_speed_kt": 9.37
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.069,
       "obs_count": 203,
       "avg_wind_speed_kt": 9.79
@@ -199,7 +199,7 @@
       "obs_count": 185,
       "avg_wind_speed_kt": 10.84
     },
-    "292": {
+    "292.5": {
       "delta_t_f": 0.363,
       "obs_count": 144,
       "avg_wind_speed_kt": 11.75
@@ -209,7 +209,7 @@
       "obs_count": 77,
       "avg_wind_speed_kt": 11.71
     },
-    "337": {
+    "337.5": {
       "delta_t_f": 0.317,
       "obs_count": 11,
       "avg_wind_speed_kt": 10.19
@@ -221,7 +221,7 @@
       "obs_count": 25,
       "avg_wind_speed_kt": 8.59
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.669,
       "obs_count": 80,
       "avg_wind_speed_kt": 6.27
@@ -231,7 +231,7 @@
       "obs_count": 110,
       "avg_wind_speed_kt": 6.15
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.671,
       "obs_count": 180,
       "avg_wind_speed_kt": 6.51
@@ -241,7 +241,7 @@
       "obs_count": 194,
       "avg_wind_speed_kt": 7.22
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.721,
       "obs_count": 306,
       "avg_wind_speed_kt": 9.01
@@ -251,7 +251,7 @@
       "obs_count": 392,
       "avg_wind_speed_kt": 11.12
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -2.112,
       "obs_count": 133,
       "avg_wind_speed_kt": 9.67
@@ -261,7 +261,7 @@
       "obs_count": 72,
       "avg_wind_speed_kt": 9.92
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.252,
       "obs_count": 51,
       "avg_wind_speed_kt": 10.43
@@ -271,7 +271,7 @@
       "obs_count": 59,
       "avg_wind_speed_kt": 10.24
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.337,
       "obs_count": 37,
       "avg_wind_speed_kt": 11.61
@@ -281,7 +281,7 @@
       "obs_count": 31,
       "avg_wind_speed_kt": 12.65
     },
-    "337": {
+    "337.5": {
       "delta_t_f": 1.373,
       "obs_count": 25,
       "avg_wind_speed_kt": 14.18
@@ -293,7 +293,7 @@
       "obs_count": 44,
       "avg_wind_speed_kt": 7.29
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.885,
       "obs_count": 83,
       "avg_wind_speed_kt": 6.13
@@ -303,7 +303,7 @@
       "obs_count": 114,
       "avg_wind_speed_kt": 5.2
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.641,
       "obs_count": 126,
       "avg_wind_speed_kt": 5.26
@@ -313,7 +313,7 @@
       "obs_count": 145,
       "avg_wind_speed_kt": 5.51
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 1.192,
       "obs_count": 161,
       "avg_wind_speed_kt": 5.81
@@ -323,7 +323,7 @@
       "obs_count": 290,
       "avg_wind_speed_kt": 7.39
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.28,
       "obs_count": 157,
       "avg_wind_speed_kt": 7.15
@@ -333,7 +333,7 @@
       "obs_count": 132,
       "avg_wind_speed_kt": 7.46
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.662,
       "obs_count": 134,
       "avg_wind_speed_kt": 8.07
@@ -343,7 +343,7 @@
       "obs_count": 104,
       "avg_wind_speed_kt": 8.57
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -1.656,
       "obs_count": 102,
       "avg_wind_speed_kt": 10.02
@@ -353,14 +353,14 @@
       "obs_count": 87,
       "avg_wind_speed_kt": 11.3
     },
-    "337": {
+    "337.5": {
       "delta_t_f": 0.751,
       "obs_count": 24,
       "avg_wind_speed_kt": 11.02
     }
   },
   "KDEN": {
-    "67": {
+    "67.5": {
       "delta_t_f": -0.991,
       "obs_count": 25,
       "avg_wind_speed_kt": 7.89
@@ -370,7 +370,7 @@
       "obs_count": 42,
       "avg_wind_speed_kt": 8.63
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.144,
       "obs_count": 90,
       "avg_wind_speed_kt": 8.02
@@ -380,7 +380,7 @@
       "obs_count": 159,
       "avg_wind_speed_kt": 8.33
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.066,
       "obs_count": 335,
       "avg_wind_speed_kt": 8.31
@@ -390,7 +390,7 @@
       "obs_count": 427,
       "avg_wind_speed_kt": 8.51
     },
-    "202": {
+    "202.5": {
       "delta_t_f": 0.291,
       "obs_count": 336,
       "avg_wind_speed_kt": 8.82
@@ -400,7 +400,7 @@
       "obs_count": 179,
       "avg_wind_speed_kt": 9.5
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.288,
       "obs_count": 64,
       "avg_wind_speed_kt": 10.15
@@ -410,7 +410,7 @@
       "obs_count": 29,
       "avg_wind_speed_kt": 12.51
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -1.557,
       "obs_count": 12,
       "avg_wind_speed_kt": 14.49
@@ -422,7 +422,7 @@
       "obs_count": 25,
       "avg_wind_speed_kt": 8.59
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.669,
       "obs_count": 80,
       "avg_wind_speed_kt": 6.27
@@ -432,7 +432,7 @@
       "obs_count": 110,
       "avg_wind_speed_kt": 6.15
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.671,
       "obs_count": 180,
       "avg_wind_speed_kt": 6.51
@@ -442,7 +442,7 @@
       "obs_count": 196,
       "avg_wind_speed_kt": 7.21
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.714,
       "obs_count": 310,
       "avg_wind_speed_kt": 8.99
@@ -452,7 +452,7 @@
       "obs_count": 396,
       "avg_wind_speed_kt": 11.12
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -2.084,
       "obs_count": 134,
       "avg_wind_speed_kt": 9.65
@@ -462,7 +462,7 @@
       "obs_count": 72,
       "avg_wind_speed_kt": 9.92
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.252,
       "obs_count": 51,
       "avg_wind_speed_kt": 10.43
@@ -472,7 +472,7 @@
       "obs_count": 59,
       "avg_wind_speed_kt": 10.24
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.337,
       "obs_count": 37,
       "avg_wind_speed_kt": 11.61
@@ -482,7 +482,7 @@
       "obs_count": 31,
       "avg_wind_speed_kt": 12.65
     },
-    "337": {
+    "337.5": {
       "delta_t_f": 1.373,
       "obs_count": 25,
       "avg_wind_speed_kt": 14.18
@@ -494,7 +494,7 @@
       "obs_count": 46,
       "avg_wind_speed_kt": 6.08
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 2.203,
       "obs_count": 112,
       "avg_wind_speed_kt": 5.46
@@ -504,7 +504,7 @@
       "obs_count": 224,
       "avg_wind_speed_kt": 5.47
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.601,
       "obs_count": 244,
       "avg_wind_speed_kt": 5.81
@@ -514,7 +514,7 @@
       "obs_count": 268,
       "avg_wind_speed_kt": 6.55
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.284,
       "obs_count": 310,
       "avg_wind_speed_kt": 7.35
@@ -524,7 +524,7 @@
       "obs_count": 221,
       "avg_wind_speed_kt": 6.92
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -2.693,
       "obs_count": 96,
       "avg_wind_speed_kt": 7.11
@@ -534,7 +534,7 @@
       "obs_count": 49,
       "avg_wind_speed_kt": 7.17
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -6.011,
       "obs_count": 26,
       "avg_wind_speed_kt": 8.81
@@ -544,7 +544,7 @@
       "obs_count": 30,
       "avg_wind_speed_kt": 8.96
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -2.146,
       "obs_count": 30,
       "avg_wind_speed_kt": 9.36
@@ -554,14 +554,14 @@
       "obs_count": 35,
       "avg_wind_speed_kt": 11.41
     },
-    "337": {
+    "337.5": {
       "delta_t_f": -2.83,
       "obs_count": 18,
       "avg_wind_speed_kt": 12.54
     }
   },
   "KLAS": {
-    "67": {
+    "67.5": {
       "delta_t_f": 1.421,
       "obs_count": 41,
       "avg_wind_speed_kt": 5.24
@@ -571,7 +571,7 @@
       "obs_count": 107,
       "avg_wind_speed_kt": 4.28
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.687,
       "obs_count": 228,
       "avg_wind_speed_kt": 4.06
@@ -581,7 +581,7 @@
       "obs_count": 350,
       "avg_wind_speed_kt": 4.27
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.176,
       "obs_count": 317,
       "avg_wind_speed_kt": 5.39
@@ -591,7 +591,7 @@
       "obs_count": 276,
       "avg_wind_speed_kt": 6.92
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -2.599,
       "obs_count": 246,
       "avg_wind_speed_kt": 9.37
@@ -601,7 +601,7 @@
       "obs_count": 77,
       "avg_wind_speed_kt": 11.02
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.844,
       "obs_count": 21,
       "avg_wind_speed_kt": 11.4
@@ -611,7 +611,7 @@
       "obs_count": 20,
       "avg_wind_speed_kt": 11.82
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.304,
       "obs_count": 11,
       "avg_wind_speed_kt": 14.5
@@ -623,7 +623,7 @@
       "obs_count": 33,
       "avg_wind_speed_kt": 5.4
     },
-    "112": {
+    "112.5": {
       "delta_t_f": -0.014,
       "obs_count": 108,
       "avg_wind_speed_kt": 4.97
@@ -633,7 +633,7 @@
       "obs_count": 206,
       "avg_wind_speed_kt": 5.17
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.216,
       "obs_count": 275,
       "avg_wind_speed_kt": 5.87
@@ -643,7 +643,7 @@
       "obs_count": 333,
       "avg_wind_speed_kt": 6.4
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.069,
       "obs_count": 267,
       "avg_wind_speed_kt": 6.95
@@ -653,7 +653,7 @@
       "obs_count": 221,
       "avg_wind_speed_kt": 7.32
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.101,
       "obs_count": 187,
       "avg_wind_speed_kt": 8.03
@@ -663,14 +663,14 @@
       "obs_count": 61,
       "avg_wind_speed_kt": 9.09
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.627,
       "obs_count": 12,
       "avg_wind_speed_kt": 11.73
     }
   },
   "KMDW": {
-    "22": {
+    "22.5": {
       "delta_t_f": -0.836,
       "obs_count": 11,
       "avg_wind_speed_kt": 11.83
@@ -680,7 +680,7 @@
       "obs_count": 52,
       "avg_wind_speed_kt": 10.12
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 1.803,
       "obs_count": 92,
       "avg_wind_speed_kt": 7.53
@@ -690,7 +690,7 @@
       "obs_count": 110,
       "avg_wind_speed_kt": 7.38
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 2.191,
       "obs_count": 131,
       "avg_wind_speed_kt": 6.59
@@ -700,7 +700,7 @@
       "obs_count": 135,
       "avg_wind_speed_kt": 6.92
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 1.1,
       "obs_count": 161,
       "avg_wind_speed_kt": 7.14
@@ -710,7 +710,7 @@
       "obs_count": 168,
       "avg_wind_speed_kt": 8.25
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -1.574,
       "obs_count": 229,
       "avg_wind_speed_kt": 9.15
@@ -720,7 +720,7 @@
       "obs_count": 195,
       "avg_wind_speed_kt": 9.47
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.505,
       "obs_count": 151,
       "avg_wind_speed_kt": 9.56
@@ -730,7 +730,7 @@
       "obs_count": 135,
       "avg_wind_speed_kt": 10.46
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.132,
       "obs_count": 95,
       "avg_wind_speed_kt": 9.93
@@ -747,7 +747,7 @@
       "obs_count": 56,
       "avg_wind_speed_kt": 7.08
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.352,
       "obs_count": 195,
       "avg_wind_speed_kt": 6.6
@@ -757,7 +757,7 @@
       "obs_count": 351,
       "avg_wind_speed_kt": 7.03
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.166,
       "obs_count": 378,
       "avg_wind_speed_kt": 7.09
@@ -767,7 +767,7 @@
       "obs_count": 230,
       "avg_wind_speed_kt": 6.25
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.156,
       "obs_count": 128,
       "avg_wind_speed_kt": 5.96
@@ -777,7 +777,7 @@
       "obs_count": 90,
       "avg_wind_speed_kt": 5.85
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -1.505,
       "obs_count": 71,
       "avg_wind_speed_kt": 6.43
@@ -787,7 +787,7 @@
       "obs_count": 68,
       "avg_wind_speed_kt": 6.75
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.25,
       "obs_count": 45,
       "avg_wind_speed_kt": 6.48
@@ -797,7 +797,7 @@
       "obs_count": 33,
       "avg_wind_speed_kt": 6.1
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.212,
       "obs_count": 38,
       "avg_wind_speed_kt": 7.05
@@ -814,7 +814,7 @@
       "obs_count": 18,
       "avg_wind_speed_kt": 9.0
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.64,
       "obs_count": 53,
       "avg_wind_speed_kt": 7.29
@@ -824,7 +824,7 @@
       "obs_count": 90,
       "avg_wind_speed_kt": 6.84
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.037,
       "obs_count": 113,
       "avg_wind_speed_kt": 6.67
@@ -834,7 +834,7 @@
       "obs_count": 176,
       "avg_wind_speed_kt": 6.83
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 1.39,
       "obs_count": 196,
       "avg_wind_speed_kt": 7.51
@@ -844,7 +844,7 @@
       "obs_count": 150,
       "avg_wind_speed_kt": 7.45
     },
-    "202": {
+    "202.5": {
       "delta_t_f": 0.129,
       "obs_count": 122,
       "avg_wind_speed_kt": 7.35
@@ -854,7 +854,7 @@
       "obs_count": 121,
       "avg_wind_speed_kt": 8.04
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.776,
       "obs_count": 123,
       "avg_wind_speed_kt": 8.1
@@ -864,7 +864,7 @@
       "obs_count": 97,
       "avg_wind_speed_kt": 9.56
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -2.641,
       "obs_count": 103,
       "avg_wind_speed_kt": 10.37
@@ -874,7 +874,7 @@
       "obs_count": 85,
       "avg_wind_speed_kt": 10.59
     },
-    "337": {
+    "337.5": {
       "delta_t_f": 0.238,
       "obs_count": 19,
       "avg_wind_speed_kt": 12.78
@@ -886,7 +886,7 @@
       "obs_count": 59,
       "avg_wind_speed_kt": 5.94
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 2.144,
       "obs_count": 155,
       "avg_wind_speed_kt": 5.93
@@ -896,7 +896,7 @@
       "obs_count": 199,
       "avg_wind_speed_kt": 5.54
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.199,
       "obs_count": 225,
       "avg_wind_speed_kt": 6.35
@@ -906,7 +906,7 @@
       "obs_count": 278,
       "avg_wind_speed_kt": 6.48
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.707,
       "obs_count": 214,
       "avg_wind_speed_kt": 6.75
@@ -916,7 +916,7 @@
       "obs_count": 162,
       "avg_wind_speed_kt": 6.46
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -1.338,
       "obs_count": 108,
       "avg_wind_speed_kt": 6.57
@@ -926,7 +926,7 @@
       "obs_count": 100,
       "avg_wind_speed_kt": 6.57
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -2.193,
       "obs_count": 58,
       "avg_wind_speed_kt": 7.06
@@ -936,7 +936,7 @@
       "obs_count": 57,
       "avg_wind_speed_kt": 7.86
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.817,
       "obs_count": 41,
       "avg_wind_speed_kt": 8.26
@@ -946,7 +946,7 @@
       "obs_count": 26,
       "avg_wind_speed_kt": 10.11
     },
-    "337": {
+    "337.5": {
       "delta_t_f": -0.384,
       "obs_count": 16,
       "avg_wind_speed_kt": 11.32
@@ -958,7 +958,7 @@
       "obs_count": 68,
       "avg_wind_speed_kt": 9.51
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 1.65,
       "obs_count": 118,
       "avg_wind_speed_kt": 8.92
@@ -968,7 +968,7 @@
       "obs_count": 114,
       "avg_wind_speed_kt": 7.31
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.071,
       "obs_count": 119,
       "avg_wind_speed_kt": 7.21
@@ -978,7 +978,7 @@
       "obs_count": 139,
       "avg_wind_speed_kt": 7.13
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.267,
       "obs_count": 141,
       "avg_wind_speed_kt": 7.15
@@ -988,7 +988,7 @@
       "obs_count": 158,
       "avg_wind_speed_kt": 8.15
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.309,
       "obs_count": 187,
       "avg_wind_speed_kt": 8.34
@@ -998,7 +998,7 @@
       "obs_count": 130,
       "avg_wind_speed_kt": 9.03
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.887,
       "obs_count": 118,
       "avg_wind_speed_kt": 9.66
@@ -1008,7 +1008,7 @@
       "obs_count": 140,
       "avg_wind_speed_kt": 11.32
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.024,
       "obs_count": 153,
       "avg_wind_speed_kt": 12.45
@@ -1025,7 +1025,7 @@
       "obs_count": 41,
       "avg_wind_speed_kt": 10.44
     },
-    "67": {
+    "67.5": {
       "delta_t_f": -0.197,
       "obs_count": 65,
       "avg_wind_speed_kt": 8.43
@@ -1035,7 +1035,7 @@
       "obs_count": 95,
       "avg_wind_speed_kt": 7.36
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.387,
       "obs_count": 133,
       "avg_wind_speed_kt": 7.85
@@ -1045,7 +1045,7 @@
       "obs_count": 181,
       "avg_wind_speed_kt": 7.98
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.992,
       "obs_count": 353,
       "avg_wind_speed_kt": 9.12
@@ -1055,7 +1055,7 @@
       "obs_count": 428,
       "avg_wind_speed_kt": 10.5
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.837,
       "obs_count": 119,
       "avg_wind_speed_kt": 9.64
@@ -1065,7 +1065,7 @@
       "obs_count": 74,
       "avg_wind_speed_kt": 10.32
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.272,
       "obs_count": 53,
       "avg_wind_speed_kt": 10.68
@@ -1075,7 +1075,7 @@
       "obs_count": 43,
       "avg_wind_speed_kt": 10.85
     },
-    "292": {
+    "292.5": {
       "delta_t_f": 0.027,
       "obs_count": 51,
       "avg_wind_speed_kt": 11.92
@@ -1085,7 +1085,7 @@
       "obs_count": 49,
       "avg_wind_speed_kt": 12.84
     },
-    "337": {
+    "337.5": {
       "delta_t_f": 0.792,
       "obs_count": 20,
       "avg_wind_speed_kt": 16.66
@@ -1097,7 +1097,7 @@
       "obs_count": 51,
       "avg_wind_speed_kt": 8.17
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 1.884,
       "obs_count": 104,
       "avg_wind_speed_kt": 6.7
@@ -1107,7 +1107,7 @@
       "obs_count": 101,
       "avg_wind_speed_kt": 5.81
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 1.49,
       "obs_count": 131,
       "avg_wind_speed_kt": 5.4
@@ -1117,17 +1117,17 @@
       "obs_count": 125,
       "avg_wind_speed_kt": 5.36
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.217,
       "obs_count": 149,
       "avg_wind_speed_kt": 5.89
     },
     "180": {
-      "delta_t_f": 0.369,
-      "obs_count": 132,
-      "avg_wind_speed_kt": 6.22
+      "delta_t_f": 0.337,
+      "obs_count": 133,
+      "avg_wind_speed_kt": 6.24
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -1.005,
       "obs_count": 197,
       "avg_wind_speed_kt": 7.35
@@ -1137,7 +1137,7 @@
       "obs_count": 183,
       "avg_wind_speed_kt": 8.04
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.996,
       "obs_count": 174,
       "avg_wind_speed_kt": 8.71
@@ -1147,7 +1147,7 @@
       "obs_count": 137,
       "avg_wind_speed_kt": 9.8
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.635,
       "obs_count": 141,
       "avg_wind_speed_kt": 10.56
@@ -1157,14 +1157,14 @@
       "obs_count": 65,
       "avg_wind_speed_kt": 11.52
     },
-    "337": {
+    "337.5": {
       "delta_t_f": -1.455,
       "obs_count": 18,
       "avg_wind_speed_kt": 12.16
     }
   },
   "KPHX": {
-    "67": {
+    "67.5": {
       "delta_t_f": 1.357,
       "obs_count": 40,
       "avg_wind_speed_kt": 5.57
@@ -1174,7 +1174,7 @@
       "obs_count": 167,
       "avg_wind_speed_kt": 4.46
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.855,
       "obs_count": 268,
       "avg_wind_speed_kt": 4.74
@@ -1184,7 +1184,7 @@
       "obs_count": 296,
       "avg_wind_speed_kt": 5.06
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.268,
       "obs_count": 282,
       "avg_wind_speed_kt": 5.82
@@ -1194,7 +1194,7 @@
       "obs_count": 249,
       "avg_wind_speed_kt": 6.44
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.776,
       "obs_count": 196,
       "avg_wind_speed_kt": 7.04
@@ -1204,7 +1204,7 @@
       "obs_count": 103,
       "avg_wind_speed_kt": 7.49
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -2.107,
       "obs_count": 57,
       "avg_wind_speed_kt": 8.77
@@ -1221,7 +1221,7 @@
       "obs_count": 44,
       "avg_wind_speed_kt": 7.83
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.451,
       "obs_count": 87,
       "avg_wind_speed_kt": 6.29
@@ -1231,7 +1231,7 @@
       "obs_count": 161,
       "avg_wind_speed_kt": 6.07
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.345,
       "obs_count": 184,
       "avg_wind_speed_kt": 6.53
@@ -1241,7 +1241,7 @@
       "obs_count": 333,
       "avg_wind_speed_kt": 7.86
     },
-    "157": {
+    "157.5": {
       "delta_t_f": -0.075,
       "obs_count": 472,
       "avg_wind_speed_kt": 8.82
@@ -1251,7 +1251,7 @@
       "obs_count": 149,
       "avg_wind_speed_kt": 6.66
     },
-    "202": {
+    "202.5": {
       "delta_t_f": 0.444,
       "obs_count": 87,
       "avg_wind_speed_kt": 6.47
@@ -1261,7 +1261,7 @@
       "obs_count": 66,
       "avg_wind_speed_kt": 7.72
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.198,
       "obs_count": 47,
       "avg_wind_speed_kt": 7.29
@@ -1271,7 +1271,7 @@
       "obs_count": 33,
       "avg_wind_speed_kt": 8.49
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -2.844,
       "obs_count": 22,
       "avg_wind_speed_kt": 10.38
@@ -1288,7 +1288,7 @@
       "obs_count": 18,
       "avg_wind_speed_kt": 6.63
     },
-    "67": {
+    "67.5": {
       "delta_t_f": 0.501,
       "obs_count": 33,
       "avg_wind_speed_kt": 5.48
@@ -1298,7 +1298,7 @@
       "obs_count": 76,
       "avg_wind_speed_kt": 6.12
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.841,
       "obs_count": 122,
       "avg_wind_speed_kt": 6.15
@@ -1308,7 +1308,7 @@
       "obs_count": 207,
       "avg_wind_speed_kt": 6.07
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.632,
       "obs_count": 271,
       "avg_wind_speed_kt": 6.47
@@ -1318,7 +1318,7 @@
       "obs_count": 329,
       "avg_wind_speed_kt": 7.12
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.718,
       "obs_count": 383,
       "avg_wind_speed_kt": 7.78
@@ -1328,7 +1328,7 @@
       "obs_count": 211,
       "avg_wind_speed_kt": 6.6
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -1.165,
       "obs_count": 44,
       "avg_wind_speed_kt": 6.12
@@ -1340,7 +1340,7 @@
     }
   },
   "KSFO": {
-    "67": {
+    "67.5": {
       "delta_t_f": 0.317,
       "obs_count": 29,
       "avg_wind_speed_kt": 3.09
@@ -1350,7 +1350,7 @@
       "obs_count": 63,
       "avg_wind_speed_kt": 4.01
     },
-    "112": {
+    "112.5": {
       "delta_t_f": 0.561,
       "obs_count": 72,
       "avg_wind_speed_kt": 4.25
@@ -1360,7 +1360,7 @@
       "obs_count": 99,
       "avg_wind_speed_kt": 5.46
     },
-    "157": {
+    "157.5": {
       "delta_t_f": 0.307,
       "obs_count": 118,
       "avg_wind_speed_kt": 6.47
@@ -1370,7 +1370,7 @@
       "obs_count": 131,
       "avg_wind_speed_kt": 7.35
     },
-    "202": {
+    "202.5": {
       "delta_t_f": -0.095,
       "obs_count": 168,
       "avg_wind_speed_kt": 8.17
@@ -1380,7 +1380,7 @@
       "obs_count": 204,
       "avg_wind_speed_kt": 8.81
     },
-    "247": {
+    "247.5": {
       "delta_t_f": -0.246,
       "obs_count": 197,
       "avg_wind_speed_kt": 9.78
@@ -1390,7 +1390,7 @@
       "obs_count": 320,
       "avg_wind_speed_kt": 12.37
     },
-    "292": {
+    "292.5": {
       "delta_t_f": -0.203,
       "obs_count": 258,
       "avg_wind_speed_kt": 13.14

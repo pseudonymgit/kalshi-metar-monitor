@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-HRRR Forecast Collection Script — Stub Implementation
+HRRR Forecast Collection Script
 
 Collects HRRR (High Resolution Rapid Refresh) hourly forecast data from
 Open-Meteo for all Kalshi cities.
 
-Open-Meteo HRRR endpoint: https://api.open-meteo.com/v1/hrrr
-3km resolution, hourly, 0-48h forecasts, US-only coverage.
+Open-Meteo GFS & HRRR endpoint: https://api.open-meteo.com/v1/gfs
+3km resolution (HRRR for US, GFS elsewhere), hourly, 0-48h forecasts.
 
-This is a STUB implementation. If the Open-Meteo HRRR endpoint is not
-available, this script will detect that and exit gracefully.
+HRRR is accessed through the Open-Meteo /v1/gfs endpoint which combines
+GFS global data with HRRR high-resolution data for US locations.
 
 Usage:
     python3 scripts/hrrr_collect.py [--db-path PATH]
@@ -33,8 +33,10 @@ NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 
-# Open-Meteo HRRR endpoint
-HRRR_API_URL = "https://api.open-meteo.com/v1/hrrr"
+# Open-Meteo GFS & HRRR endpoint (HRRR included for US locations)
+# The /v1/gfs endpoint returns GFS global data combined with HRRR
+# high-resolution (3km) data for North America.
+HRRR_API_URL = "https://api.open-meteo.com/v1/gfs"
 
 # All 20 Kalshi cities
 CITIES = [
@@ -87,18 +89,16 @@ def get_db_path(args):
 
 
 def check_endpoint_available():
-    """Check if the Open-Meteo HRRR endpoint is available."""
+    """Check if the Open-Meteo GFS/HRRR endpoint is available."""
     test_url = f"{HRRR_API_URL}?latitude=33.64&longitude=-84.43&hourly=temperature_2m&forecast_hours=1&timezone=UTC"
     try:
         req = urllib.request.Request(test_url, headers={"User-Agent": "OpenClaw-WeatherEngine/1.0"})
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-            if "hourly" in data or "error" not in data:
-                return True, "HRRR endpoint available"
+            if "hourly" in data:
+                return True, "HRRR endpoint available (via /v1/gfs)"
             return False, f"Unexpected response: {data.get('error', 'unknown')}"
     except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return False, "HRRR endpoint not found (404) — Open-Meteo may not support /v1/hrrr"
         return False, f"HTTP {e.code}: {e.reason}"
     except urllib.error.URLError as e:
         return False, f"URL error: {e.reason}"
@@ -245,9 +245,8 @@ def main():
         return
 
     if not available:
-        print("\nHRRR endpoint not available. Stub collector stopping.")
-        print("HRRR data not collected. Signals will be built with fallback logic.")
-        print("To enable HRRR collection, ensure Open-Meteo supports /v1/hrrr.")
+        print("\nHRRR endpoint not available. Collector stopping.")
+        print("HRRR data not collected. Signals will use fallback logic.")
         return
 
     conn = init_db(db_path)
