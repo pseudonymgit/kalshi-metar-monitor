@@ -1,3 +1,14 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 9: Full 11-signal combinatorial search + calibration + purged CV]
+# 2. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 3. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 4. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
+# 5. [2026-07-16 T2: Remove 4 dead signals from all code paths]
+# 6. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+# 8. [2026-07-22 Phase 18: Add intraday signals — FOGR Reversion, METAR dT/dt, Pressure Tendency, HRRR Bias-Corrected, ESDR, NWP+METAR Fusion]
+#
+
+
 """
 Signal Registry for Weather Engine
 
@@ -11,7 +22,7 @@ S6 task: Updated to exclude dead signals (pressure_regime, dtr_trend, reversion,
 
   
 from .wind_direction_shift import WindDirectionShiftSignal
-from .nwp_analog_signal import NwpAnalogSignal
+from .nwp_direct_signal import NwpDirectSignal
 from .goldilocks_signal import GoldilocksSignal
 from .persistence_signal import PersistenceSignal
 from .gaussian_signal import GaussianSignal
@@ -22,6 +33,17 @@ from .calendar_climatology_signal import CalendarClimatologySignal
 from .temperature_advection_signal import TemperatureAdvectionSignal
 from .frontal_detector_signal import FrontalDetectorSignal
 from .intraday_metar_confirmation_signal import IntradayMetarConfirmationSignal
+from .fogr_reversion_signal import FogrReversionSignal
+from .metar_dtdt_signal import MetarDtdtSignal
+from .pressure_tendency_signal import PressureTendencySignal
+from .hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
+from .esdr_signal import EsdrSignal
+from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
+from .spread_based_entry_signal import SpreadBasedEntrySignal
+from .ai_composite_signal import AiCompositeSignal
+from .volume_momentum_signal import VolumeMomentumSignal
+from .settlement_arbitrage_signal import SettlementTimeArbitrageSignal
+from .dual_polarity_signal import SeasonalRegimeClassifier, CorrectedPressureDeltaSignal
 
 
 class SignalRegistry:
@@ -32,7 +54,7 @@ class SignalRegistry:
         self.db_path = db_path
         self.signals = {
             'wind_direction_shift': WindDirectionShiftSignal(db_path),
-            'nwp_analog': NwpAnalogSignal(db_path),
+            'nwp_direct': NwpDirectSignal(db_path),
             'goldilocks': GoldilocksSignal(db_path),
             'persistence': PersistenceSignal(db_path),
             'gaussian': GaussianSignal(db_path),
@@ -43,6 +65,18 @@ class SignalRegistry:
             'temperature_advection': TemperatureAdvectionSignal(db_path),
             'frontal_detector': FrontalDetectorSignal(db_path),
             'intraday_metar_confirmation': IntradayMetarConfirmationSignal(db_path),
+            'fogr_reversion': FogrReversionSignal(db_path),
+            'metar_dtdt': MetarDtdtSignal(db_path),
+            'pressure_tendency': PressureTendencySignal(db_path),
+            'hrrr_bias_corrected': HrrrBiasCorrectedSignal(db_path),
+            'esdr': EsdrSignal(db_path),
+            'nwp_dtdt_fusion': NwpDtdtFusionSignal(db_path),
+            'spread_based_entry': SpreadBasedEntrySignal(db_path),
+            'volume_momentum': VolumeMomentumSignal(db_path),
+            'settlement_arbitrage': SettlementTimeArbitrageSignal(db_path),
+            'seasonal_regime': SeasonalRegimeClassifier(db_path),
+            'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
+            'ai_composite': AiCompositeSignal(db_path),
         }
 
 
