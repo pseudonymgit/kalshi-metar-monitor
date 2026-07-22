@@ -71,6 +71,27 @@ _PROXIMITY_RANK = {
     "CRITICAL": 3,
 }
 
+DIRECTIONAL_STRIKE_WINDOW_SIZE = 3
+
+_EXPLICIT_SETTLEMENT_STATION_OVERRIDES = {
+    "NYC": "KNYC",
+    "CHI": "KMDW",
+    "LAX": "KLAX",
+    "DEN": "KDEN",
+    "MIA": "KMIA",
+    "AUS": "KAUS",
+    "PHL": "KPHL",
+    "PHIL": "KPHL",
+}
+
+_SETTLEMENT_ICAO_PATTERN = re.compile(r"\bK[A-Z]{3}\b")
+
+_WEATHER_MARKET_TYPE_LABELS = {
+    "HIGH_TEMP": "HIGH_TEMP",
+    "LOW_TEMP": "LOW_TEMP",
+    "PRECIP": "PRECIP",
+}
+
 # ─── Station city token map (compatibility shim) ───
 # This is now derived from core.station_registry. Kept here for backward compatibility
 # with app.py and other modules that import it directly.
