@@ -351,6 +351,16 @@ def get_live_market_price(
     metadata["yes_bid"] = market.get("yes_bid_dollars") or market.get("yes_bid")
     metadata["yes_ask"] = market.get("yes_ask_dollars") or market.get("yes_ask")
     metadata["volume_24h"] = market.get("volume_24h_fp")
+    metadata["strike_type"] = market.get("strike_type")
+    metadata["floor_strike"] = market.get("floor_strike")
+    metadata["cap_strike"] = market.get("cap_strike")
+    # Extract numeric strike from ticker (e.g., KXHIGHKDEN-24JUL26-B85 -> 85)
+    ticker = market.get("ticker", "")
+    if ticker:
+        import re
+        match = re.search(r"B(\d+)$", ticker)
+        if match:
+            metadata["strike"] = int(match.group(1))
     
     return (price, metadata)
 
