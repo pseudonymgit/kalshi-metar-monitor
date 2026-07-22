@@ -50,6 +50,7 @@ REVERSION_SIGNAL_NAMES = {
     'spread_based_entry',
     'volume_momentum',
     'settlement_arbitrage',
+    'seasonal_regime',
 }
 
 # Trend-following signals
@@ -64,10 +65,13 @@ TREND_SIGNAL_NAMES = {
     'calendar_climatology',
     'hrrr_bias_corrected',
     'esdr',
+    'persistence',
+    'gaussian',
+    'gaussian_v2',
 }
 
 # All active signals
-ALL_SIGNAL_NAMES = REVERSION_SIGNAL_NAMES | TREND_SIGNAL_NAMES
+ALL_SIGNAL_NAMES = REVERSION_SIGNAL_NAMES | TREND_SIGNAL_NAMES | {'goldilocks'}
 
 
 # ─── Station Data Loading ──────────────────────────────────────────────────────

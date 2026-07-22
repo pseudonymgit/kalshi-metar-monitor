@@ -42,7 +42,7 @@ from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 from .spread_based_entry_signal import SpreadBasedEntrySignal
 from .volume_momentum_signal import VolumeMomentumSignal
 from .settlement_arbitrage_signal import SettlementTimeArbitrageSignal
-from .dual_polarity_signal import SeasonalRegimeClassifier
+from .dual_polarity_signal import SeasonalRegimeClassifier, CorrectedPressureDeltaSignal
 
 
 class SignalRegistry:
@@ -74,6 +74,7 @@ class SignalRegistry:
             'volume_momentum': VolumeMomentumSignal(db_path),
             'settlement_arbitrage': SettlementTimeArbitrageSignal(db_path),
             'seasonal_regime': SeasonalRegimeClassifier(db_path),
+            'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
         }
 
 
