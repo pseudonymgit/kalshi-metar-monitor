@@ -29,8 +29,9 @@ import math
 from typing import Tuple, List, Dict, Optional
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from core.structured_logger import get_logger
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 

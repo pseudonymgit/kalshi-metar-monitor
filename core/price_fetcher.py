@@ -10,7 +10,6 @@ import base64
 import copy
 import contextvars
 import json
-import logging
 import os
 import re
 
@@ -28,6 +27,7 @@ import re
 # Layer 4: LOW market discovery regex
 LOW_TICKER_PATTERN = re.compile(r"^LOW-\d{6}$")
 from flask import has_request_context, request
+from core.structured_logger import get_logger
 
 from core.authoritative_state import immutable_public_state_snapshot
 from core.station_time import parse_iso_utc, station_local_day_key, to_station_local
@@ -37,7 +37,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 # Re-exported from order_manager via kalshi_monitor facade
 # (direct import to avoid circular dependency in standalone context)

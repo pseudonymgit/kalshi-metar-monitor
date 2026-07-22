@@ -31,8 +31,9 @@ import logging
 import math
 from typing import Tuple, Dict
 from dataclasses import dataclass
+from core.structured_logger import get_logger
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 

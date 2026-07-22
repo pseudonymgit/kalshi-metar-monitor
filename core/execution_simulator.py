@@ -18,14 +18,14 @@ Version: 1.0 — 2026-07-22 (Phase 19.2)
 
 import math
 import random
-import logging
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
 from core.market_cost_model import MARKET_COST_MODEL, MarketDepthSnapshot
+from core.structured_logger import get_logger
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 # ─── Constants ───────────────────────────────────────────────────────────
 

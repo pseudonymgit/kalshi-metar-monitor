@@ -8,7 +8,7 @@ Paper trading-specific code paths.
 
 Extracted during Phase 20.2 mode separation.
 """
-import logging
+from core.structured_logger import get_logger
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple, Any
 
@@ -21,7 +21,7 @@ from .pnl_tracking import (
     get_version_performance, generate_calibration_report, compute_sharpe,
 )
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 class PaperTrader:

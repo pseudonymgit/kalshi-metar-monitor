@@ -1,35 +1,25 @@
 #!/usr/bin/env python3
 
+"""
+[DEPRECATION NOTICE - Phase C.1]
+
+This module has been converted from a standalone Flask application to a pure
+Python data module. The Flask app and CLI entry points have been removed.
+
+Data functions (get_predictions, get_discrepancies, etc.) remain available as
+module-level API functions. For the Flask-based dashboard, use the Trading
+Dashboard blueprint registered in app.py (see core/trading_dashboard/).
+
+The _self_test() function is retained for development verification.
+"""
+
 # CHANGELOG (last 10 broad changes):
 # 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 2. [2026-07-22 Phase C.1: Flask consolidation — removed standalone app + _main(); switched to sqlite_utils]
 #
-
-"""
-DASHBOARD MVP (v1.0) — Edge 11
-Flask-based production dashboard for the weather trading engine.
-
-Provides:
-  - /health              — system status (DB connection, signal count, last update)
-  - /api/predictions/<station> — latest predictions with signal breakdown
-  - /api/discrepancies   — model-vs-market odds discrepancies, flagged >2σ
-  - /dashboard           — HTML page with Plotly grouped bar chart
-
-Stack: Flask → SQLite → pandas → scipy (z-scores) → Plotly → HTML template
-No AI/ML — deterministic math only. All predictions computed from 30-day
-statistical windows (mean + std). Market odds default to 0.5 implicit
-probability for demo purposes.
-
-Usage:
-    python3 core/dashboard.py                    # runs on :5005
-    python3 core/dashboard.py --port 5006       # custom port
-    python3 core/dashboard.py --self-test        # run self-tests
-
-Version: v1.0, 2026-07-18
-"""
 
 from __future__ import annotations
 
-import argparse
 import json
 import logging
 import os
@@ -44,6 +34,8 @@ import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template_string
 from scipy import stats as sp_stats
+
+from .sqlite_utils import get_sqlite_connection
 
 # Try to import live market price fetcher for real market_prob values
 try:
@@ -135,21 +127,21 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             color: #888; font-size: 0.8rem; text-transform: uppercase; }
         .discrepancy-table td { padding: 10px 16px; border-bottom: 1px solid #2a2d39; }
         .discrepancy-table tr.flagged { background: rgba(239, 83, 80, 0.1); }
-        .discrepancy-table tr.flagged td:first-child::before { content: "⚠ "; color: #ef5350; }
+        .discrepancy-table tr.flagged td:first-child::before { content: "\u26a0 "; color: #ef5350; }
         .section-title { font-size: 1.1rem; color: #4fc3f7; margin: 24px 0 12px; }
         .refresh-note { font-size: 0.8rem; color: #666; margin-top: 8px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🌤️ Weather Engine Dashboard</h1>
-        <div class="sub">Model PMF vs Market Odds — auto-refreshed on load</div>
+        <h1>\U0001f324\ufe0f Weather Engine Dashboard</h1>
+        <div class="sub">Model PMF vs Market Odds \u2014 auto-refreshed on load</div>
     </div>
     <div class="container">
         <div class="health-bar" id="health-bar">Loading health...</div>
         <div class="section-title">Model Probability vs Market Odds by Station</div>
         <div id="chart"></div>
-        <div class="section-title">Discrepancy Table (>2σ flagged)</div>
+        <div class="section-title">Discrepancy Table (>2\u03c3 flagged)</div>
         <table class="discrepancy-table" id="disc-table">
             <thead>
                 <tr><th>Station</th><th>City</th><th>Model Prob</th><th>Market Prob</th>
@@ -225,9 +217,12 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
 class DashboardApp:
     """
-    Flask dashboard for the weather trading engine.
+    Legacy dashboard for the weather trading engine (DEPRECATED).
 
-    Serves health checks, prediction APIs, a discrepancy table, and
+    NOTE: This class is kept for backward compatibility. New code should
+    use the Trading Dashboard blueprint in app.py.
+
+    Provides health checks, prediction APIs, a discrepancy table, and
     a Plotly-based HTML dashboard. All computations are deterministic
     (no AI/ML). Predictions use 30-day rolling mean + std from daily_stats.
     """
@@ -249,7 +244,7 @@ class DashboardApp:
     # ─── Setup ────────────────────────────────────────────────────────────
 
     def _load_station_mapping(self) -> Dict[str, Dict[str, Any]]:
-        """Load station → city mapping from JSON."""
+        """Load station \u2192 city mapping from JSON."""
         mapping_path = DEFAULT_MAPPING_PATH
         try:
             with open(mapping_path, "r") as f:
@@ -259,9 +254,9 @@ class DashboardApp:
             self._logger.warning("Could not load station mapping: %s", exc)
             return {}
 
-    def _get_db_connection(self) -> sqlite3.Connection:
+    def _get_db_connection(self):
         """Get a SQLite connection with row factory."""
-        conn = sqlite3.connect(self.db_path)
+        conn = get_sqlite_connection(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
 
@@ -396,7 +391,7 @@ class DashboardApp:
         """
         Compute deterministic signal breakdown for a station.
 
-        Signals are simple statistical features — no AI/ML:
+        Signals are simple statistical features \u2014 no AI/ML:
           1. Mean reversion: distance from 30-day mean
           2. Volatility regime: std dev classification
           3. Momentum: latest vs previous day direction
@@ -431,7 +426,7 @@ class DashboardApp:
                 value=round(vol_value, 2),
                 weight=vol_weight,
                 contribution=round(vol_contrib, 4),
-                description=f"30d σ = {std:.2f}°F ({vol_level} volatility)",
+                description=f"30d \u03c3 = {std:.2f}°F ({vol_level} volatility)",
             )
         )
 
@@ -445,7 +440,7 @@ class DashboardApp:
                 value=round(momentum, 2),
                 weight=mom_weight,
                 contribution=round(mom_contrib, 4),
-                description=f"Latest {latest:.1f}°F vs mean {mean:.1f}°F → {'above' if momentum > 0 else 'below'} average",
+                description=f"Latest {latest:.1f}°F vs mean {mean:.1f}°F \u2192 {'above' if momentum > 0 else 'below'} average",
             )
         )
 
@@ -536,7 +531,7 @@ class DashboardApp:
 
         Computes model probability for each station, compares against
         market probability (0.5 default), and flags rows where the
-        z-score of the discrepancy exceeds 2σ.
+        z-score of the discrepancy exceeds 2\u03c3.
 
         Returns:
             List of dicts with station, model_prob, market_prob, discrepancy,
@@ -625,7 +620,7 @@ class DashboardApp:
     # ─── Run ──────────────────────────────────────────────────────────────
 
     def run(self):
-        """Start the Flask development server."""
+        """Start the Flask development server (DEPRECATED)."""
         app = self.create_app()
         self._logger.info("Starting dashboard on port %d", self.port)
         app.run(host="0.0.0.0", port=self.port, debug=False)
@@ -637,7 +632,7 @@ class DashboardApp:
 def _self_test():
     """Run deterministic self-tests for all dashboard components."""
     print("=" * 60)
-    print("Dashboard MVP — Self-Test")
+    print("Dashboard MVP \u2014 Self-Test")
     print("=" * 60)
 
     dashboard = DashboardApp()
@@ -647,10 +642,10 @@ def _self_test():
     health = dashboard.health_check()
     assert health["db_connected"], "DB should be connected"
     assert health["stations_tracked"] > 0, "Should have stations tracked"
-    print(f"    ✓ DB connected: {health['db_connected']}")
-    print(f"    ✓ Signal count: {health['signal_count']}")
-    print(f"    ✓ Stations tracked: {health['stations_tracked']}")
-    print(f"    ✓ Last update: {health['last_update']}")
+    print(f"    \u2713 DB connected: {health['db_connected']}")
+    print(f"    \u2713 Signal count: {health['signal_count']}")
+    print(f"    \u2713 Stations tracked: {health['stations_tracked']}")
+    print(f"    \u2713 Last update: {health['last_update']}")
 
     # Test 2: Station predictions
     print("\n[2] Station predictions (KATL)...")
@@ -661,16 +656,16 @@ def _self_test():
     assert len(preds["signals"]) == 3, "Should have 3 signals"
     assert 0.0 <= preds["model_prob"] <= 1.0, "Model prob in [0,1]"
     assert 0.0 <= preds["market_prob"] <= 1.0, "Market prob in [0,1]"
-    print(f"    ✓ Station: {preds['station']} ({preds['city_name']})")
-    print(f"    ✓ Predicted temp: {preds['predicted_temp_f']}°F")
-    print(f"    ✓ Model prob: {preds['model_prob']}, Market prob: {preds['market_prob']}")
-    print(f"    ✓ Signals: {len(preds['signals'])} (mean_reversion, volatility, momentum)")
+    print(f"    \u2713 Station: {preds['station']} ({preds['city_name']})")
+    print(f"    \u2713 Predicted temp: {preds['predicted_temp_f']}°F")
+    print(f"    \u2713 Model prob: {preds['model_prob']}, Market prob: {preds['market_prob']}")
+    print(f"    \u2713 Signals: {len(preds['signals'])} (mean_reversion, volatility, momentum)")
 
     # Test 3: Invalid station
     print("\n[3] Invalid station (ZZZZ)...")
     invalid = dashboard.station_predictions("ZZZZ")
     assert "error" in invalid, "Should return error for unknown station"
-    print(f"    ✓ Error returned: {invalid['error']}")
+    print(f"    \u2713 Error returned: {invalid['error']}")
 
     # Test 4: Discrepancy table
     print("\n[4] Discrepancy table...")
@@ -684,8 +679,8 @@ def _self_test():
         assert "z_score" in row, "Row should have z_score"
         assert "flagged" in row, "Row should have flagged"
     flagged_count = sum(1 for r in table if r["flagged"])
-    print(f"    ✓ Total rows: {len(table)}")
-    print(f"    ✓ Flagged (>2σ): {flagged_count}")
+    print(f"    \u2713 Total rows: {len(table)}")
+    print(f"    \u2713 Flagged (>2\u03c3): {flagged_count}")
 
     # Test 5: HTML render
     print("\n[5] HTML dashboard render...")
@@ -693,9 +688,9 @@ def _self_test():
     assert "<html" in html.lower(), "Should be valid HTML"
     assert "plotly" in html.lower(), "Should include Plotly"
     assert "discrepancy" in html.lower(), "Should have discrepancy section"
-    print(f"    ✓ HTML length: {len(html)} chars")
-    print(f"    ✓ Contains Plotly CDN script tag")
-    print(f"    ✓ Contains discrepancy table")
+    print(f"    \u2713 HTML length: {len(html)} chars")
+    print(f"    \u2713 Contains Plotly CDN script tag")
+    print(f"    \u2713 Contains discrepancy table")
 
     # Test 6: Flask app creation
     print("\n[6] Flask app creation...")
@@ -705,29 +700,8 @@ def _self_test():
     assert "/health" in rules, "Should have /health route"
     assert "/api/discrepancies" in rules, "Should have /api/discrepancies route"
     assert "/dashboard" in rules, "Should have /dashboard route"
-    print(f"    ✓ Routes: {', '.join(sorted(rules))}")
+    print(f"    \u2713 Routes: {', '.join(sorted(rules))}")
 
     print("\n" + "=" * 60)
-    print("All self-tests passed ✓")
+    print("All self-tests passed \u2713")
     print("=" * 60)
-
-
-def _main():
-    """Parse args and run either the server or self-tests."""
-    parser = argparse.ArgumentParser(description="Weather Engine Dashboard")
-    parser.add_argument("--port", type=int, default=5005, help="Port to serve on")
-    parser.add_argument("--db", type=str, default=DEFAULT_DB_PATH, help="SQLite DB path")
-    parser.add_argument("--self-test", action="store_true", help="Run self-tests and exit")
-    args = parser.parse_args()
-
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
-
-    if args.self_test:
-        _self_test()
-    else:
-        dashboard = DashboardApp(db_path=args.db, port=args.port)
-        dashboard.run()
-
-
-if __name__ == "__main__":
-    _main()

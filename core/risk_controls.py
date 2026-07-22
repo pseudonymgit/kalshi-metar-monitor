@@ -27,9 +27,9 @@ import sqlite3
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Union, List, Tuple, Optional
 from dataclasses import dataclass, field
-import logging
+from core.structured_logger import get_logger
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 @dataclass
@@ -168,7 +168,7 @@ class RiskManager:
         self.winning_trades = 0
         self.losing_trades = 0
         self._last_trade_date: Optional[str] = None
-        self._logger = logging.getLogger(f"{__name__}.RiskManager")
+        self._logger = get_logger(f"{__name__}.RiskManager")
 
     def _auto_reset_daily_if_needed(self, trade_date: str):
         """Reset daily state if the trading day has changed."""

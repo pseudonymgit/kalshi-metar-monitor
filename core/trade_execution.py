@@ -5,7 +5,6 @@ Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition.
 """
 import json
 import uuid
-import logging
 import os
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple, Any
@@ -15,10 +14,11 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .market_cost_model import MARKET_COST_MODEL
 from .station_registry import get_cluster_for_station as _get_cluster_for_station
 from .kalshi_price_fetcher import get_live_market_price as _get_live_market_price
+from core.structured_logger import get_logger
 __all__ = ['TradeType', 'MarketSide', 'place_paper_trade', 'mark_positions_to_market']
 
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 class TradeType(Enum):

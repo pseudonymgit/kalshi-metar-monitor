@@ -3,7 +3,6 @@
 Signal generation, analysis, and probability estimation functions.
 Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition.
 """
-import logging
 import os
 import statistics
 from datetime import datetime, timedelta, timezone
@@ -22,10 +21,11 @@ from .station_registry import (
     validate_station_registry as _validate_station_registry,
     get_cluster_for_station as _get_cluster_for_station,
 )
+from core.structured_logger import get_logger
 __all__ = ['record_explicit_decision_output', 'generate_signals', 'is_recent_enough_for_late_day_analysis', 'calculate_temperature_trend']
 
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 def _get_daily_metars(self, target_date):
