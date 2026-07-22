@@ -1,0 +1,237 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-22T20:58:23.875603+00:00",
+    "signals_tested": 18,
+    "signals": [
+      "persistence",
+      "seasonal_regime",
+      "forecast_disagreement",
+      "frontal_detector",
+      "gaussian_v2",
+      "gaussian",
+      "corrected_pressure_delta",
+      "pressure_delta",
+      "calendar_climatology",
+      "wind_direction_shift",
+      "fogr_reversion",
+      "temperature_advection",
+      "metar_dtdt",
+      "pressure_tendency",
+      "settlement_arbitrage",
+      "spread_based_entry",
+      "volume_momentum",
+      "ai_composite"
+    ],
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KJAX",
+      "KLAX",
+      "KMIA",
+      "KMSP",
+      "KNYC",
+      "KORD",
+      "KPDX",
+      "KPHL",
+      "KSEA",
+      "KSFO",
+      "KSTL",
+      "KTPA",
+      "KETC",
+      "KDWH"
+    ],
+    "train_days": 180,
+    "test_days": 30,
+    "note": "Strike-based P&L (Phase A.1 fix applied). Split-sample validation recommended before trusting numbers."
+  },
+  "singles": [
+    {
+      "combo": "persistence",
+      "signals": [
+        "persistence"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "seasonal_regime",
+      "signals": [
+        "seasonal_regime"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "forecast_disagreement",
+      "signals": [
+        "forecast_disagreement"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "frontal_detector",
+      "signals": [
+        "frontal_detector"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "gaussian_v2",
+      "signals": [
+        "gaussian_v2"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "gaussian",
+      "signals": [
+        "gaussian"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "corrected_pressure_delta",
+      "signals": [
+        "corrected_pressure_delta"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "pressure_delta",
+      "signals": [
+        "pressure_delta"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "calendar_climatology",
+      "signals": [
+        "calendar_climatology"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "wind_direction_shift",
+      "signals": [
+        "wind_direction_shift"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "fogr_reversion",
+      "signals": [
+        "fogr_reversion"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "temperature_advection",
+      "signals": [
+        "temperature_advection"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "metar_dtdt",
+      "signals": [
+        "metar_dtdt"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "pressure_tendency",
+      "signals": [
+        "pressure_tendency"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "settlement_arbitrage",
+      "signals": [
+        "settlement_arbitrage"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "spread_based_entry",
+      "signals": [
+        "spread_based_entry"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "volume_momentum",
+      "signals": [
+        "volume_momentum"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    },
+    {
+      "combo": "ai_composite",
+      "signals": [
+        "ai_composite"
+      ],
+      "agreement": 1,
+      "accuracy": 0.0,
+      "trades": 0,
+      "correct": 0
+    }
+  ],
+  "pairs": [],
+  "triples": [],
+  "beam_search": [],
+  "validation": {}
+}

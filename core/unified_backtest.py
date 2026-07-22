@@ -173,6 +173,7 @@ def run_backtest(
     stations=None,
     db_path=DB_PATH,
     min_conf=0.0,
+    min_agreement=1,
     use_fusion=False,
     use_time_decay=True,
     fusion_params=None,
@@ -188,6 +189,7 @@ def run_backtest(
         stations: list of station codes (default: all 20)
         db_path: path to metar DB
         min_conf: minimum confidence threshold
+        min_agreement: minimum number of signals that must agree on direction
         use_fusion: if True, use SignalFusionEngine for LLOP fusion
         use_time_decay: if True, apply time-decay reliability adjustment
         fusion_params: dict of fusion params (decay_factor, window, etc.)
@@ -286,6 +288,10 @@ def run_backtest(
                         signal_fired_count[sig_name] += 1
 
                 if not signal_outputs:
+                    continue
+
+                # Agreement gate: require min_agreement signals to fire
+                if len(signal_outputs) < min_agreement:
                     continue
 
                 # Fuse signals or use simple majority vote
