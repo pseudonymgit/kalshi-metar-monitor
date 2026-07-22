@@ -3876,6 +3876,50 @@ def integrity_replay_parity():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Start monitoring services on startup
+try:
+    from core.structured_logger import configure_root_logger, get_logger
+    configure_root_logger()
+    slog = get_logger("startup")
+    slog.info("Starting monitoring services", event_id="startup_begin")
+except Exception as e:
+    print(f"[startup] Structured logger init: {e}")
+    slog = None
+
+# Start Database Health Monitor (unless explicitly skipped)
+if os.environ.get("SKIP_DB_HEALTH_MONITOR") != "1":
+    try:
+        from core.db_health_monitor import (
+            auto_register_databases,
+            start_health_monitor,
+        )
+        auto_register_databases()
+        start_health_monitor()
+        msg = "Database health monitor started"
+        if slog:
+            slog.info(msg, event_id="db_health_monitor_start")
+        else:
+            print(f"[startup] {msg}")
+    except Exception as e:
+        if slog:
+            slog.warning("Failed to start DB health monitor", event_id="db_health_monitor_skip", error=str(e))
+        else:
+            print(f"[startup] DB health monitor skipped: {e}")
+
+# Start Heartbeat Monitor (if WEBHOOK_BASE_URL configured)
+try:
+    from core.heartbeat_monitor import start_heartbeat_monitor
+    heartbeat_thread = start_heartbeat_monitor()
+    if heartbeat_thread and slog:
+        slog.info("Heartbeat monitor started", event_id="heartbeat_monitor_start")
+    elif slog:
+        slog.info("Heartbeat monitor not started (no WEBHOOK_BASE_URL)", event_id="heartbeat_monitor_skip")
+except Exception as e:
+    if slog:
+        slog.warning("Failed to start heartbeat monitor", event_id="heartbeat_monitor_error", error=str(e))
+    else:
+        print(f"[startup] Heartbeat monitor error: {e}")
+
 # Start collector daemon service on Render startup
 try:
     # Run weather data collection in background thread
@@ -3896,18 +3940,30 @@ try:
         collector = WeatherCollectorService()
         collector_thread = threading.Thread(target=collector.start_background_service, daemon=True)
         collector_thread.start()
-        print("Weather data collector started in background")
-        print("  - METAR: every 30 minutes")
-        print("  - NWP: daily at 06:00 UTC")
-        print("  - Kalshi: every 15 minutes")
+        msg = "Weather data collector started in background"
+        if slog:
+            slog.info(msg, event_id="collector_start")
+        else:
+            print(f"[startup] {msg}")
     else:
-        print("Weather data collector skipped via SKIP_WEATHER_COLLECTOR=1")
+        if slog:
+            slog.info("Weather collector skipped via SKIP_WEATHER_COLLECTOR=1", event_id="collector_skip")
+        else:
+            print("Weather data collector skipped via SKIP_WEATHER_COLLECTOR=1")
 except ImportError as e:
-    print(f"Could not start weather collector: {e}")
+    msg = f"Could not start weather collector: {e}"
+    if slog:
+        slog.warning(msg, event_id="collector_import_error")
+    else:
+        print(msg)
 except Exception as e:
-    print(f"Error starting weather collector: {e}")
-    import traceback
-    traceback.print_exc()
+    msg = f"Error starting weather collector: {e}"
+    if slog:
+        slog.error(msg, event_id="collector_error")
+    else:
+        print(msg)
+        import traceback
+        traceback.print_exc()
 
 # Render entry
 if __name__ == "__main__":

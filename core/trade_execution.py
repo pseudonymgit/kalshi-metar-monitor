@@ -1,4 +1,4 @@
-"""Trade Execution ModuleTrade placement, execution, position management, and mark-to-market.Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition."""import jsonimport uuidimport loggingimport osfrom datetime import datetime, timezonefrom typing import Dict, List, Optional, Tuple, Anyfrom pathlib import Pathfrom enum import Enumfrom .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connectionfrom .market_cost_model import estimate_total_costfrom .station_registry import get_cluster_for_station as _get_cluster_for_stationfrom .kalshi_price_fetcher import get_live_market_price as _get_live_market_price_LOGGER = logging.getLogger(__name__)class TradeType(Enum):
+
     BUY_YES = "buy_yes"
     SELL_YES = "sell_yes"
     BUY_NO = "buy_no"
@@ -481,7 +481,6 @@ def place_paper_trade(self, station, market_type, signal_direction,
         trade_version=trade_version,
         notes=f"Trade generated: {trade_type.value} with edge of {abs(fair_price_advantage):.2%}"
     )
-
 
     # Update risk metrics for successful trades
     self.update_risk_metrics_on_trade(net_cost, 'loss' if net_cost < 0 else 'win')
