@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 4.6: Frontal passage detector - 4-condition event detection, 80-85% expected accuracy]
+#
+
+
 """
 Frontal Passage Detector
 

@@ -1,3 +1,10 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+# 2. [2026-06-27 Phase 3 implementation: dynamic market types, rate limiting, type hints, enhanced health check]
+# 3. [2026-06-17 Phase 3: Dynamic Station Discovery + Full 20-City Coverage]
+#
+
+
 """
 Phase 3 Scheduler
 

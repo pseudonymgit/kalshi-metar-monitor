@@ -1,3 +1,10 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 2. [2026-07-16 T5-fix: Fix station_skill_gate imports and remove pandas dependency]
+# 3. [2026-07-16 T5: Wire per-station skill gating into paper trading engine]
+#
+
+
 import json
 import logging
 from typing import Dict, List, Optional

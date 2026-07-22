@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-20 Fix Phase 2 audit bugs: Goldilocks NameError, Wind Direction Shift look-ahead]
+# 2. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 3. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
+# 4. [2026-07-06 fix(code-review): 4 CRITICAL + 3 HIGH items from CODE-REVIEW-2026-07-06-FULL]
+#
+
 """
 SIGNAL: Wind Direction Shift
 

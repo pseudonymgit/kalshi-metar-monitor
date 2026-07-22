@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+#
+
+
 """
 Near-Miss Audit Log - Lightweight signal suppression tracking
 

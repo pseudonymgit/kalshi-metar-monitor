@@ -1,3 +1,9 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Add architectural doctrine comments for determinism guards]
+# 2. [2026-02-28 Implement P3-E deterministic security boundary enforcement]
+#
+
+
 import inspect
 from types import MappingProxyType, ModuleType
 from typing import Any, Dict, Mapping

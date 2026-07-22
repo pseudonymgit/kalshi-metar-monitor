@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-18 Fix Bug 7: Remove hardcoded fee rates - replace 0.05/0.001/0.002 with proper zero commissions (Kalshi charges 0 commission)]
+# 2. [2026-07-16 T2: Remove 4 dead signals from all code paths]
+# 3. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+# 4. [2026-07-06 fix(code-review): 4 CRITICAL + 3 HIGH items from CODE-REVIEW-2026-07-06-FULL]
+# 5. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 Confidence-Weighted Position Sizing Module with Fee-Aware Kelly (SH3 Enhancement)
 
@@ -70,7 +79,7 @@ class KellyPositionSizer:
     Edge estimated from 30-day rolling win rate.
     """
     
-    def __init__(self, fee_rate: float = 0.05, fraction_kelly: float = 0.5,
+    def __init__(self, fee_rate: float = 0.0, fraction_kelly: float = 0.5,
                  window_days: int = 30):
         self.fee_rate = fee_rate
         self.fraction_kelly = fraction_kelly
@@ -169,7 +178,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=100.0,
             max_size_usd=500.0,
             min_size_usd=25.0,
-            fee_rate=0.001,
+            fee_rate=0.0,
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -180,7 +189,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=50.0,
             max_size_usd=250.0,
             min_size_usd=10.0,
-            fee_rate=0.001,
+            fee_rate=0.0,
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -191,7 +200,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=10.0,
             max_size_usd=50.0,
             min_size_usd=5.0,
-            fee_rate=0.002,
+            fee_rate=0.0,
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,

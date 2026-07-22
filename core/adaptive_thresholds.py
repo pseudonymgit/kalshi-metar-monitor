@@ -1,3 +1,10 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 4.4: Adaptive confidence thresholds - rolling 30d accuracy-based threshold adjustment]
+# 2. [2026-07-21 Phase 4.3: Dewpoint depression modulator - confidence boost/penalty based on humidity]
+# 3. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+#
+
+
 """
 Adaptive Confidence Thresholds Module
 Adjusts signal confidence thresholds based on rolling accuracy data.

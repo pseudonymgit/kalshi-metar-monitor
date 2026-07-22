@@ -1,3 +1,13 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Harden replay parity capture without monkeypatching]
+# 2. [2026-03-04 Restore metar module marker comment]
+# 3. [2026-03-01 Add deterministic live settlement epoch logging]
+# 4. [2026-03-01 Fix transition outcome annotation to use exact correlation]
+# 5. [2026-02-28 Implement P3-E deterministic security boundary enforcement]
+# 6. [2026-02-28 Enforce Phase 3A architectural state and transition boundaries]
+#
+
+
 """
 Transition Emitter
 

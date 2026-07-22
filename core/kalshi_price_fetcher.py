@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-06 C4: Restore KLAS/KMSY/KOKC/KSAT to station registry with Kalshi price fetcher mappings]
+# 2. [2026-07-05 R4-1.2: Purge negative-EV markets + fix station registry + dedup]
+# 3. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 Live Kalshi Market Price Fetcher (v1.0 — 2026-07-05)
 

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+#
+
 """
 Dewpoint Depression Modulator — Confidence Modifier Based on Cloud Cover
 

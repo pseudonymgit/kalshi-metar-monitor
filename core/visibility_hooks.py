@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-02 Harden visibility dispatcher hot-path safety]
+#
+
+
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 

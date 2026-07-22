@@ -1,3 +1,11 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+# 2. [2026-03-20 Add LOW parity to discovery and hydration]
+# 3. [2026-03-20 Add LOW parity to discovery and hydration]
+# 4. [2026-03-04 Add ladder cache observability endpoint and snapshot builder]
+#
+
+
 from datetime import datetime, timezone
 import json
 

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 CALIBRATION DASHBOARD (v1.0) with UX Priority
 Interactive dashboard for observing and managing weather trading model calibration metrics.

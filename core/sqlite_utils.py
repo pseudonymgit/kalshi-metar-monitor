@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-18 Fix Bug 9: Add SQLite concurrency fixes]
+#
+
+
 """
 SQLite Utilities Module
 

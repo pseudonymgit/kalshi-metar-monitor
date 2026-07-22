@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 2. [2026-07-18 Fix Bug 8: Align alert filter thresholds with lane configuration]
+# 3. [2026-07-16 T2: Remove 4 dead signals from all code paths]
+#
+
 """
 Paper Trading Alert Builder/Renderer v2.1 (B-MODE v2)
 Slim Discord embed layout with S/A/B/C/D/F Opportunity Grade + Edge calculation

@@ -1,3 +1,17 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+# 2. [2026-07-08 fix(alerts): allow sandbox and development domains to send alerts (not only production)]
+# 3. [2026-07-06 C5: Fix is_down branch to use is_daily_low for down-reversion signals in metar_monitor.py]
+# 4. [2026-07-05 R4-1.5: Goldilocks confidence split (up/down directional components)]
+# 5. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+# 6. [2026-06-17 fix: bypass blocking hydration on health check paths]
+# 7. [2026-06-17 fix: schema init ordering + non-fatal hydration for Render deploy]
+# 8. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+# 9. [2026-03-21 test: keep canonical series discovery contract]
+# 10. [2026-03-20 Add authority-path seam comments]
+#
+
+
 """
 METAR Monitor
 

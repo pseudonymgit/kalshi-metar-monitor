@@ -35,38 +35,68 @@ ALL_STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL',
                 'KPHX','KSAT','KSEA','KSFO']
 
-# Load from combinatorial search results - top 5 configurations
-TOP_5_CONFIGS = [
-    {
-        'name': 'calendar_climatology+gaussian_v2+pressure_delta+wind_direction_shift+nwp_analog+forecast_disagreement',
-        'signals': ['calendar_climatology', 'gaussian_v2', 'pressure_delta', 
-                    'wind_direction_shift', 'nwp_analog', 'forecast_disagreement'],
-        'agreement_threshold': 2
-    },
-    {
-        'name': 'calendar_climatology+persistence+gaussian_v2+goldilocks+forecast_disagreement+frontal_detector+intraday_metar_confirmation',
-        'signals': ['calendar_climatology', 'persistence', 'gaussian_v2', 'goldilocks', 
-                   'forecast_disagreement', 'frontal_detector', 'intraday_metar_confirmation'],
-        'agreement_threshold': 2
-    }, 
-    {
-        'name': 'calendar_climatology+gaussian+gaussian_v2+goldilocks+pressure_delta+wind_direction_shift+frontal_detector',
-        'signals': ['calendar_climatology', 'gaussian', 'gaussian_v2', 'goldilocks', 
-                   'pressure_delta', 'wind_direction_shift', 'frontal_detector'],
-        'agreement_threshold': 2
-    },
-    {
-        'name': 'calendar_climatology+persistence+gaussian_v2+nwp_analog+frontal_detector',
-        'signals': ['calendar_climatology', 'persistence', 'gaussian_v2', 'nwp_analog', 'frontal_detector'],
-        'agreement_threshold': 1
-    },
-    {
-        'name': 'persistence+gaussian_v2+pressure_delta+wind_direction_shift+forecast_disagreement+intraday_metar_confirmation',
-        'signals': ['persistence', 'gaussian_v2', 'pressure_delta', 'wind_direction_shift', 
-                   'forecast_disagreement', 'intraday_metar_confirmation'],
-        'agreement_threshold': 1
-    }
-]
+# Helper function to load top configs from combinatorial search results dynamically instead of hardcoded
+TOP_5_CONFIGS = []
+
+
+def load_top_configs_from_file(combo_file_path: str, top_n: int = 5) -> List[Dict]:
+    """Load top N configurations from combinatorial search results."""
+    if not os.path.exists(combo_file_path):
+        logger.warning(f"Combinatorial search file not found: {combo_file_path}, using defaults")
+        # Return some default configurations based on correlation analysis
+        return [
+            {
+                'name': 'calendar_climatology+forecast_disagreement+persistence',
+                'signals': ['calendar_climatology', 'forecast_disagreement', 'persistence'],
+                'agreement_threshold': 1
+            },
+            {
+                'name': 'gaussian+gaussian_v2+pressure_delta',
+                'signals': ['gaussian', 'gaussian_v2', 'pressure_delta'],
+                'agreement_threshold': 1
+            },
+            {
+                'name': 'wind_direction_shift+persistence+forecast_disagreement',
+                'signals': ['wind_direction_shift', 'persistence', 'forecast_disagreement'],
+                'agreement_threshold': 1
+            },
+            {
+                'name': 'regime+frontal_detector+calendar_climatology',
+                'signals': ['regime', 'frontal_detector', 'calendar_climatology'], 
+                'agreement_threshold': 1
+            },
+            {
+                'name': 'pressure_delta+gaussian+forecast_disagreement',
+                'signals': ['pressure_delta', 'gaussian', 'forecast_disagreement'],
+                'agreement_threshold': 1
+            }
+        ]
+    
+    try:
+        with open(combo_file_path, 'r') as f:
+            data = json.load(f)
+        
+        top_results = data.get('top_by_accuracy', [])[:top_n]
+        configs = []
+        for result in top_results:
+            name = result.get('combo', '').split('_agree_')[0]  # Remove agreement suffix
+            signals = name.split('+')
+            agreement = result.get('min_agreement', 1)
+            configs.append({
+                'name': name,
+                'signals': signals,
+                'agreement_threshold': agreement
+            })
+        
+        if not configs:
+            logger.warning(f"No top configurations found in {combo_file_path}, using defaults")
+            return load_top_configs_from_file(None, top_n)  # Fallback to defaults
+        
+        return configs[:top_n]
+    
+    except Exception as e:
+        logger.warning(f"Error loading combinatorial search results from {combo_file_path}: {e}, using defaults")
+        return load_top_configs_from_file(None, top_n)
 
 # Signals that get dewpoint modulator
 DEWPOINT_MODULATED = {'calendar_climatology', 'gaussian', 'gaussian_v2'}
@@ -264,17 +294,15 @@ def purged_walkforward_cv_on_combo(combo_config: Dict, all_signals: Dict[str, An
                     continue
                     
                 fold_result['predictions'] += 1
-                result['total_predictions'] += 1
-                result['total_trades'] += 1
 
                 was_correct = pred_dir == actual
                 if was_correct:
                     fold_result['correct'] += 1
-                    result['correct_predictions'] += 1
                     
             fold_result['accuracy'] = fold_result['correct'] / fold_result['predictions'] if fold_result['predictions'] > 0 else 0
             result['window_results'].append(fold_result)
             result['total_predictions'] += fold_result['predictions']
+            result['correct_predictions'] += fold_result['correct']  # Consistent accounting
             result['total_trades'] += fold_result['predictions']
             
             # Move to next fold (past purge period)
@@ -361,8 +389,8 @@ def main():
     logger.info(f"Loaded data for {len(station_data)} active stations")
 
     # Get the best 5 configurations from combinatorial search or use defaults
-    top_configs = TOP_5_CONFIGS
-    logger.info(f"Testing top 5 configurations identified in phase 9 combinatorial search")
+    top_configs = load_top_configs_from_file(args.combo_file, 5)
+    logger.info(f"Testing top {len(top_configs)} configurations dynamically loaded from combinatorial search")
 
     master_results = {
         'phase9_purged_cv_results': {

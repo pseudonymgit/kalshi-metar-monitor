@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+#
+
+
 """
 Alert Dispatcher — Bridges the alert builder to Discord webhook delivery.
 

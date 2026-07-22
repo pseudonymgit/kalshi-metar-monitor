@@ -1,3 +1,10 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+# 2. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+# 3. [2026-03-04 Fix alert schema v2 constant, causality docs, and classification logic]
+#
+
+
 """
 Alert Schema v1.0 — Frozen (2026-07-05)
 

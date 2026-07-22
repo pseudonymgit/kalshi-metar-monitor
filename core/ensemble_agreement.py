@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-13 A1: Fix alert dummy data - add bucket fallback to most recent available data]
+# 2. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 P2: 3-of-4 Ensemble Agreement Gate
 

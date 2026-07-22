@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+#
+
+
 """
 Core module for liquidity-weighted ensemble voting.
 Weights each signal's vote by its accuracy multiplied by market liquidity.

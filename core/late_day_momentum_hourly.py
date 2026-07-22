@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-06 C2: Replace numpy with pure-Python linear regression in late_day_momentum_hourly.py]
+# 2. [2026-07-05 R4-1.4: Signal 4 regime-adaptive threshold + persistence filter]
+# 3. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 Hourly Late-Day Momentum Signal Module (v1.0 — 2026-07-04)
 

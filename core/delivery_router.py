@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+#
+
 """
 Delivery Router v1.0 — Phase 6.2 Multi-Channel Delivery System
 

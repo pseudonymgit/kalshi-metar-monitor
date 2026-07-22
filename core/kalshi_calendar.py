@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-06 C5: Add kalshi_calendar.py and integrate with station_time.py for trading day checks]
+#
+
 """
 Kalshi Trading Calendar Module
 

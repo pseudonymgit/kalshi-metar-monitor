@@ -1,3 +1,14 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 9: Full 11-signal combinatorial search + calibration + purged CV]
+# 2. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 3. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 4. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
+# 5. [2026-07-16 T2: Remove 4 dead signals from all code paths]
+# 6. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+# 7. [2026-07-06 fix(code-review): 4 CRITICAL + 3 HIGH items from CODE-REVIEW-2026-07-06-FULL]
+#
+
+
 """
 Signal Registry for Weather Engine
 
@@ -11,7 +22,7 @@ S6 task: Updated to exclude dead signals (pressure_regime, dtr_trend, reversion,
 
   
 from .wind_direction_shift import WindDirectionShiftSignal
-from .nwp_analog_signal import NwpAnalogSignal
+from .nwp_direct_signal import NwpDirectSignal
 from .goldilocks_signal import GoldilocksSignal
 from .persistence_signal import PersistenceSignal
 from .gaussian_signal import GaussianSignal
@@ -32,7 +43,7 @@ class SignalRegistry:
         self.db_path = db_path
         self.signals = {
             'wind_direction_shift': WindDirectionShiftSignal(db_path),
-            'nwp_analog': NwpAnalogSignal(db_path),
+            'nwp_direct': NwpDirectSignal(db_path),
             'goldilocks': GoldilocksSignal(db_path),
             'persistence': PersistenceSignal(db_path),
             'gaussian': GaussianSignal(db_path),

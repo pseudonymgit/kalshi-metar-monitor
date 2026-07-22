@@ -1,3 +1,9 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-02-28 Implement P3-E deterministic security boundary enforcement]
+# 2. [2026-02-28 Add deterministic replay engine entrypoint on ingestion path]
+#
+
+
 from typing import Any, Callable, Dict, List
 
 from core.security_boundaries import (

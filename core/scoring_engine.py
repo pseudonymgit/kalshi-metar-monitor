@@ -1,3 +1,9 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Add architectural doctrine comments for determinism guards]
+# 2. [2026-02-28 Add deterministic settlement epoch scoring foundation]
+#
+
+
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 

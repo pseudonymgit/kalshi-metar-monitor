@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 2. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 3. [2026-07-16 T4: Enforce risk guardrails - kill switch, daily loss, drawdown, consecutive losses]
+# 4. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+#
+
 """
 Risk Management Controls — Phase 3.6 Real Implementation
 

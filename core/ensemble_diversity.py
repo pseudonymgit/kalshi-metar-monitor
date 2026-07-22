@@ -1,3 +1,9 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 4.5: Ensemble diversity score - penalize confidence when signals are redundant]
+# 2. [2026-07-21 Phase 4.3: Dewpoint depression modulator - confidence boost/penalty based on humidity]
+#
+
+
 """
 Ensemble Diversity Score Module
 

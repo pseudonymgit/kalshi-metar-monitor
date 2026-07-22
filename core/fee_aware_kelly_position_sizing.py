@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-18 Fix Bug 7: Remove hardcoded fee rates - replace 0.05/0.001/0.002 with proper zero commissions (Kalshi charges 0 commission)]
+# 2. [2026-07-06 fix(code-review): 4 CRITICAL + 3 HIGH items from CODE-REVIEW-2026-07-06-FULL]
+#
+
 """
 SH3 - Fee-Aware Kelly Position Sizing Module
 

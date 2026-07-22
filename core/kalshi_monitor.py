@@ -1,3 +1,17 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-08 fix(alerts): allow prod/sbox/dev domains + normalize environment names (production->prod, sandbox->sbox, development->dev)]
+# 2. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+# 3. [2026-06-17 Phase 3: Dynamic Station Discovery + Full 20-City Coverage]
+# 4. [2026-06-17 fix: bypass blocking hydration on health check paths]
+# 5. [2026-06-17 fix: schema init ordering + non-fatal hydration for Render deploy]
+# 6. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+# 7. [2026-03-20 Add authority-path seam comments]
+# 8. [2026-03-20 fix: remove kalshi monitor compatibility wrappers]
+# 9. [2026-03-20 Extract shared structured snapshot assembly (#276)]
+# 10. [2026-03-20 Align live station universe with market discovery (#271)]
+#
+
+
 """
 Kalshi Monitor
 

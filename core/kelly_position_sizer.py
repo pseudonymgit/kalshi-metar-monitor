@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-18 Fix Bug 2: Kelly formula - replace f*=p-0.0526 with f*=(p-c)/(1-c) using spread-based cost]
+#
+
 """
 Kelly Position Sizer — Edge 13, Phase 3 Risk Management
 

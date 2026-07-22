@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-20 Fix Phase 2 audit bugs: Goldilocks NameError, Wind Direction Shift look-ahead]
+# 2. [2026-07-18 Fix Bug 1: Goldilocks look-ahead bias - use days[idx-1]/idx-2 instead of idx/idx-1]
+# 3. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
+# 4. [2026-07-16 T2: Remove 4 dead signals from all code paths]
+#
+
 """
 Goldilocks Signal Module
 

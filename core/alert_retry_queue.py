@@ -1,3 +1,9 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 2. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+#
+
+
 """Alert Retry Queue - Infrastructure Hardening (Layer 1, CRITICAL-1).
 
 This module implements alert delivery retry with exponential backoff and a dead-letter queue

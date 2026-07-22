@@ -1,3 +1,10 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Restore metar module marker comment]
+# 2. [2026-03-01 Restore metar monitor to shared station-time helpers]
+# 3. [2026-03-01 Add deterministic live settlement epoch logging]
+#
+
+
 """
 Settlement Epoch Logger
 

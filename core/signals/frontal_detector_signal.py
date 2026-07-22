@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 9: Full 11-signal combinatorial search + calibration + purged CV]
+#
+
+
 """
 Frontal Passage Detector Signal - BaseSignal Implementation
 

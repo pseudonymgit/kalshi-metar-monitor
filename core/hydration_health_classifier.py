@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Add hydration health classifier signals to system snapshot]
+#
+
+
 import os
 
 

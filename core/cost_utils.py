@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-18 Add Bug 7 fix: cost_utils.py with get_cost() function for live spread-based costs]
+#
+
+
 """
 Cost Utilities Module for Kalshi Trading
 

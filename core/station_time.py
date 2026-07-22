@@ -1,3 +1,11 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-06 C5: Add kalshi_calendar.py and integrate with station_time.py for trading day checks]
+# 2. [2026-07-05 R4-1.3: Settlement-window entry timing (T-18h to T-2h)]
+# 3. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+# 4. [2026-03-01 Restore metar monitor to shared station-time helpers]
+#
+
+
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Tuple
 import sys

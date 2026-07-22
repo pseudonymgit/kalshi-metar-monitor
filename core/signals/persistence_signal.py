@@ -1,3 +1,9 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 2. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
+#
+
+
 """
 Persistence Signal - Predicts same direction as yesterday
 

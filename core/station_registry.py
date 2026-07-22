@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-13 A1: Fix alert dummy data - add bucket fallback to most recent available data]
+# 2. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+# 3. [2026-07-06 C4: Restore KLAS/KMSY/KOKC/KSAT to station registry with Kalshi price fetcher mappings]
+# 4. [2026-07-05 R4-1.6: Cluster budget caps + same-city pair hedging]
+# 5. [2026-07-05 R4-1.2: Purge negative-EV markets + fix station registry + dedup]
+# 6. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 CORE MODULE: Station Registry — Authoritative Station List
 

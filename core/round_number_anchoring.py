@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+#
+
+
 """
 Core module for round-number anchoring analysis - compares climatological probability
 vs. market-implied probability at round thresholds, identifying arbitrage opportunities.

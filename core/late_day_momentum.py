@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-05 R4-1.1: Fix P&L mark-to-market + thread-safe price cache]
+#
+
 """
 CORE MODULE: Enhanced Late-Day Temperature Momentum & Same-Day Platteau/Slope Detection (LDTM v2.0)
 

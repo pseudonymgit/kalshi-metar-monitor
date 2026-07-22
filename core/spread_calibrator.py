@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+#
+
+
 """
 Core module for spread-adjusted net edge calibration.
 Calculates net edge after accounting for bid-ask spread costs.

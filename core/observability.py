@@ -1,3 +1,14 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Restore metar module marker comment]
+# 2. [2026-03-01 Refine terminal epoch day-structure counting]
+# 3. [2026-03-01 Add deterministic observability station summary endpoint]
+# 4. [2026-03-01 Add current settlement epoch observability endpoint]
+# 5. [2026-02-28 Implement P3-E deterministic security boundary enforcement]
+# 6. [2026-02-28 Add deterministic settlement epoch scoring foundation]
+# 7. [2026-02-28 Add deterministic read-only observability helpers]
+#
+
+
 """
 Observability
 

@@ -1,5 +1,17 @@
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 #!/usr/bin/env python3
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 4.4: Adaptive confidence thresholds - rolling 30d accuracy-based threshold adjustment]
+# 2. [2026-07-21 Phase 4.7: Intraday METAR confirmation - same-day temperature trend confirmation signal]
+# 3. [2026-07-21 Phase 4.5: Ensemble diversity score - penalize confidence when signals are redundant]
+# 4. [2026-07-21 Phase 4.3: Dewpoint depression modulator - confidence boost/penalty based on humidity]
+# 5. [2026-07-21 Phase 4.1: Spatial coherence gate - group 20 stations into 6 regions, confidence modulation based on regional consensus]
+# 6. [2026-07-21 Fix ERA5 backfill: numpy array truthiness in process_netcdf_file]
+# 7. [2026-07-21 Phase 8: Configure agreement threshold=3 (env var AGREEMENT_THRESHOLD), align with agreement_gate.py default]
+# 8. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 9. [2026-07-19 Fix: Move TemperatureAdvectionSignal import to proper location, fix syntax errors]
+# 10. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+#
 """
 PAPER TRADING ENGINE - Deterministic Implementation (v2.0)
 Standalone script for paper trading, NO AI IN THE LOOP.
@@ -1087,7 +1099,7 @@ class PaperTrader:
             # Check agreement for each group and collect results
             final_other_signals = []
             for key, signal_group in grouped_signals.items():
-                agreed_signals = SimpleAgreementChecker.check_agreement(signal_group, n_required=int(os.getenv("AGREEMENT_THRESHOLD", "2")))
+                agreed_signals = SimpleAgreementChecker.check_agreement(signal_group, n_required=int(os.getenv("AGREEMENT_THRESHOLD", "3")))
                 final_other_signals.extend(agreed_signals)
             
             other_signals = final_other_signals
@@ -2177,9 +2189,9 @@ class PaperTrader:
         c.execute("""
             SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
                    t.quantity,
-                   p.settlement_bucket
+                   p.settlement_bucket, p.prior_settlement_bucket
             FROM trades t
-            JOIN (SELECT station, market_type, local_trading_date, settlement_bucket
+            JOIN (SELECT station, market_type, local_trading_date, settlement_bucket, prior_settlement_bucket
                   FROM metar.settlement_epochs
                   WHERE epoch_status = 'closed' AND local_trading_date = ?) p
             ON t.station = p.station AND t.trade_date_utc = date(p.local_trading_date)
@@ -2190,7 +2202,7 @@ class PaperTrader:
         unsettled_trades = c.fetchall()
 
         settled_count = 0
-        for trade_uuid, station, trade_type_str, filled_price, market_price, quantity, settlement_value in unsettled_trades:
+        for trade_uuid, station, trade_type_str, filled_price, market_price, quantity, settlement_value, prior_settlement_value in unsettled_trades:
             # Convert trade type to enum
             try:
                 trade_type = TradeType(trade_type_str)
@@ -2200,7 +2212,13 @@ class PaperTrader:
             # Calculate settlement return based on the trade type and settlement value.
             # Long YES pays $1 when event occurs; long NO pays $1 when it does not.
             # Short sides are represented as negative exposure with realized P&L mirrored.
-            settlement_contract_value = 1.0 if settlement_value > 50.0 else 0.0
+            # Settlement is directional: compare today's temp vs yesterday's temp
+            # If temp went up, UP predictions win ($1); if temp went down, DOWN predictions win ($1)
+            if prior_settlement_value is not None:
+                settlement_contract_value = 1.0 if settlement_value > prior_settlement_value else 0.0
+            else:
+                # Fallback: compare against 50°F midpoint if no prior data
+                settlement_contract_value = 1.0 if settlement_value > 50.0 else 0.0
             qty = quantity or 0
 
             if trade_type == TradeType.BUY_YES:
@@ -2256,7 +2274,8 @@ class PaperTrader:
                 orig_signal_direction, functionality, raw_confidence, raw_forecast_prob = trade_row
 
                 # Determine if the prediction was directionally correct
-                settlement_is_up = settlement_contract_value > 0.5  # Settlement goes UP if > $0.50 (over 50F)
+                # Settlement goes UP if temperature rose vs yesterday
+                settlement_is_up = settlement_contract_value > 0.5
                 predicted_is_up = orig_signal_direction == "UP"  # Signal was UP/DOWN
 
                 # If signal was "UP" and settlement went UP, or signal was "DOWN" and settlement went DOWN, then correct

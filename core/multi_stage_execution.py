@@ -1,3 +1,8 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+#
+
+
 """
 Core module for multi-stage execution system.
 Implements a 3-stage order execution approach with time limits and status tracking.

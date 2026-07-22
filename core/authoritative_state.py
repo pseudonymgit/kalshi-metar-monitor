@@ -1,3 +1,13 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-03-04 Add architectural doctrine comments for determinism guards]
+# 2. [2026-03-02 Add ingestion runtime observability endpoint and counters]
+# 3. [2026-03-02 Add in-memory ingestion admission observability]
+# 4. [2026-03-01 Use station-local previous-day helper for hydration rollover]
+# 5. [2026-02-28 Implement P3-E deterministic security boundary enforcement]
+# 6. [2026-02-28 Enforce Phase 3A architectural state and transition boundaries]
+#
+
+
 import copy
 import threading
 from types import MappingProxyType

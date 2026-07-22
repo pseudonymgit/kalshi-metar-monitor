@@ -1,3 +1,10 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 4.1: Spatial coherence gate - group 20 stations into 6 regions, confidence modulation based on regional consensus]
+# 2. [2026-07-21 Fix ERA5 backfill: numpy array truthiness in process_netcdf_file]
+# 3. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+#
+
+
 """
 Spatial Coherence Gate for Weather Engine
 Groups stations into NOAA climate regions and applies confidence modulation

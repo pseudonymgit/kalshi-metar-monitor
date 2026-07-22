@@ -1,3 +1,12 @@
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-06-17 feat: L0-L4 implementation + 4 backtest fixes + goldilocks confidence scoring]
+# 2. [2026-03-14 fix: harden suppression parsing in alert integrity monitor]
+# 3. [2026-03-14 Fix integrity suppression reason token handling for MARKET_RULE]
+# 4. [2026-03-08 Add hydration stall signal and enrich hydration queue observability]
+# 5. [2026-03-04 Add alert integrity monitor observability endpoint]
+#
+
+
 """Observability-only alert pipeline integrity checks."""
 
 from __future__ import annotations
