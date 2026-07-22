@@ -39,6 +39,9 @@ from .pressure_tendency_signal import PressureTendencySignal
 from .hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
 from .esdr_signal import EsdrSignal
 from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
+from .spread_based_entry_signal import SpreadBasedEntrySignal
+from .volume_momentum_signal import VolumeMomentumSignal
+from .settlement_arbitrage_signal import SettlementTimeArbitrageSignal
 
 
 class SignalRegistry:
@@ -66,6 +69,9 @@ class SignalRegistry:
             'hrrr_bias_corrected': HrrrBiasCorrectedSignal(db_path),
             'esdr': EsdrSignal(db_path),
             'nwp_dtdt_fusion': NwpDtdtFusionSignal(db_path),
+            'spread_based_entry': SpreadBasedEntrySignal(db_path),
+            'volume_momentum': VolumeMomentumSignal(db_path),
+            'settlement_arbitrage': SettlementTimeArbitrageSignal(db_path),
         }
 
 

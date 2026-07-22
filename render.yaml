@@ -1,0 +1,95 @@
+# render.yaml — Infrastructure as Code for Weather Engine
+# Deploys: Production (prod) and Staging (staging) services
+# See: https://render.com/docs/infrastructure-as-code
+
+services:
+  # ─── Production Service ──────────────────────────────────────────────────
+  - type: web
+    name: kalshi-metar-monitor
+    runtime: python
+    region: oregon
+    plan: standard
+    healthCheckPath: /healthz
+    envVars:
+      - key: RENDER
+        value: "true"
+      - key: PORT
+        value: "10000"
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: ENVIRONMENT
+        value: "production"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: METAR_DB_PATH
+        value: "/opt/render/project/src/data/metar_backfill.db"
+      - key: ALERTS_DB_PATH
+        value: "/opt/render/project/src/data/alerts.db"
+      - key: SKIP_WEATHER_COLLECTOR
+        value: "0"
+      - key: WEBHOOK_BASE_URL
+        sync: false
+      - key: KALSHI_API_KEY
+        sync: false
+      - key: KALSHI_API_SECRET
+        sync: false
+      - key: OPENCLAW_WEBHOOK_TOKEN
+        sync: false
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      mkdir -p data logs
+      python3 -m compileall app.py core scripts
+      chmod +x scripts/bootstrap.sh
+    startCommand: |
+      bash scripts/bootstrap.sh && gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --access-logfile - --error-logfile -
+    preDeployCommand: |
+      python3 -c "import sys; sys.path.insert(0, '.'); from core.station_registry import validate_station_registry; r = validate_station_registry(); assert r.get('valid', False), 'Station registry validation failed'"
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
+    pullRequestPreviewsEnabled: false
+    autoDeploy: true
+
+  # ─── Staging Service ────────────────────────────────────────────────────
+  - type: web
+    name: kalshi-metar-monitor-staging
+    runtime: python
+    region: oregon
+    plan: starter
+    healthCheckPath: /healthz
+    envVars:
+      - key: RENDER
+        value: "true"
+      - key: PORT
+        value: "10000"
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: ENVIRONMENT
+        value: "staging"
+      - key: LOG_LEVEL
+        value: "DEBUG"
+      - key: METAR_DB_PATH
+        value: "/opt/render/project/src/data/metar_backfill_staging.db"
+      - key: ALERTS_DB_PATH
+        value: "/opt/render/project/src/data/alerts_staging.db"
+      - key: SKIP_WEATHER_COLLECTOR
+        value: "0"
+      - key: WEBHOOK_BASE_URL
+        sync: false
+      - key: KALSHI_API_KEY
+        sync: false
+      - key: KALSHI_API_SECRET
+        sync: false
+      - key: OPENCLAW_WEBHOOK_TOKEN
+        sync: false
+      - key: KALSHI_LIVE_DOMAIN
+        value: "staging"
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      mkdir -p data logs
+      python3 -m compileall app.py core scripts
+    startCommand: |
+      bash scripts/bootstrap.sh && gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --access-logfile - --error-logfile -
+    pullRequestPreviewsEnabled: false
+    autoDeploy: false
