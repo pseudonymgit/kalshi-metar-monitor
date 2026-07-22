@@ -259,16 +259,19 @@ def run_backfill(conn, args):
     total_stored = 0
     total_errors = []
 
+    # Open-Meteo supports up to past_days=92
+    # Use 92 to cover the May 2026 missing dates, dedup via INSERT OR REPLACE
+    PAST_DAYS = 92
+
     # Process each contiguous block
     for block_idx, block in enumerate(blocks):
         block_dates = [d.strftime('%Y-%m-%d') for d in block]
-        past_days = len(block) + 5  # Add buffer
-        print(f"\nBlock {block_idx+1}/{total_blocks}: {block_dates[0]} to {block_dates[-1]} ({past_days} past_days)")
+        print(f"\nBlock {block_idx+1}/{total_blocks}: {block_dates[0]} to {block_dates[-1]} (using past_days={PAST_DAYS})")
 
         for station, city_name, lat, lon in CITIES:
             print(f"  {station} ({city_name})...", end=" ", flush=True)
 
-            data = fetch_ecmwf_past(ECMWF_API, lat, lon, past_days)
+            data = fetch_ecmwf_past(ECMWF_API, lat, lon, PAST_DAYS)
 
             if "error" in data:
                 print(f"ERROR: {data['error']}")
@@ -282,7 +285,7 @@ def run_backfill(conn, args):
             total_errors.extend(errors)
             print(f"OK ({stored} values)")
 
-            time.sleep(0.5)  # Rate limiting
+            time.sleep(1.0)  # Rate limiting
 
     print(f"\n=== Backfill Complete ===")
     print(f"Total values stored: {total_stored}")
