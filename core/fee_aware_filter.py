@@ -28,7 +28,8 @@ Usage:
 
 # Kalshi fee structure (approximate)
 FEE_RATE = 0.0            # 0% commission charged by Kalshi (updated from 0.05)
-DEFAULT_SPREAD = 0.02     # 2 cents average bid-ask spread for liquid markets
+from core.market_cost_model import MARKET_COST_MODEL
+DEFAULT_SPREAD = MARKET_COST_MODEL.spread  # 3.1¢ measured mean spread
 
 # Entry thresholds
 MIN_DOLLAR_EDGE = 0.50   # Minimum dollar profit after fees/spread to enter

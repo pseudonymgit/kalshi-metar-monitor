@@ -2018,13 +2018,14 @@ class PaperTrader:
         Returns:
             Estimated round-trip cost as a fraction of notional (0.0-1.0 range)
         """
-        # Kalshi cost structure per contract
-        spread_per_contract = 0.005       # 0.5¢
-        commission_per_contract = 0.0     # Kalshi: no commission
-        slippage_per_contract = 0.005     # 0.5¢
+        # Kalshi cost structure per contract (from centralized model)
+        from core.market_cost_model import MARKET_COST_MODEL
+        spread_per_contract = MARKET_COST_MODEL.spread       # 3.1¢ measured mean
+        commission_per_contract = MARKET_COST_MODEL.commission  # 0% commission
+        slippage_per_contract = MARKET_COST_MODEL.slippage     # 0.5¢
 
         # Round-trip: buy + hold to settlement (one leg + slippage)
-        cost_per_contract = (spread_per_contract / 2) + commission_per_contract + slippage_per_contract
+        cost_per_contract = MARKET_COST_MODEL.round_trip_fraction()
 
         # Estimate contract count for this position
         if market_price > 0.001:
