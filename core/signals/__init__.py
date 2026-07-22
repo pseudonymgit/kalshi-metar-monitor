@@ -5,7 +5,7 @@
 # 4. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
 # 5. [2026-07-16 T2: Remove 4 dead signals from all code paths]
 # 6. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
-# 7. [2026-07-06 fix(code-review): 4 CRITICAL + 3 HIGH items from CODE-REVIEW-2026-07-06-FULL]
+# 8. [2026-07-22 Phase 18: Add intraday signals — FOGR Reversion, METAR dT/dt, Pressure Tendency, HRRR Bias-Corrected, ESDR, NWP+METAR Fusion]
 #
 
 
@@ -33,6 +33,12 @@ from .calendar_climatology_signal import CalendarClimatologySignal
 from .temperature_advection_signal import TemperatureAdvectionSignal
 from .frontal_detector_signal import FrontalDetectorSignal
 from .intraday_metar_confirmation_signal import IntradayMetarConfirmationSignal
+from .fogr_reversion_signal import FogrReversionSignal
+from .metar_dtdt_signal import MetarDtdtSignal
+from .pressure_tendency_signal import PressureTendencySignal
+from .hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
+from .esdr_signal import EsdrSignal
+from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 
 
 class SignalRegistry:
@@ -54,6 +60,12 @@ class SignalRegistry:
             'temperature_advection': TemperatureAdvectionSignal(db_path),
             'frontal_detector': FrontalDetectorSignal(db_path),
             'intraday_metar_confirmation': IntradayMetarConfirmationSignal(db_path),
+            'fogr_reversion': FogrReversionSignal(db_path),
+            'metar_dtdt': MetarDtdtSignal(db_path),
+            'pressure_tendency': PressureTendencySignal(db_path),
+            'hrrr_bias_corrected': HrrrBiasCorrectedSignal(db_path),
+            'esdr': EsdrSignal(db_path),
+            'nwp_dtdt_fusion': NwpDtdtFusionSignal(db_path),
         }
 
 

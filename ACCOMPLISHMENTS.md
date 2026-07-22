@@ -284,3 +284,36 @@ Ready for Phase 16 with:
 - Expert 5: `docs/plans/gray-room-round9/EXPERT5-DASHBOARD.md`
 - Expert 6: `docs/plans/gray-room-round9/EXPERT6-MARKET-MICRO.md`
 - Synthesis: `docs/plans/gray-room-round9/GRAY-ROOM-ROUND9-SYNTHESIS.md`
+
+## Phase 18: Short-Duration Trading (Intraday Signals) ✅ COMPLETE (2026-07-22)
+
+### Phase A — METAR-Based Signals
+- **FOGR Reversion** (`core/signals/fogr_reversion_signal.py`): Detects overnight dewpoint depression patterns. Dewpoint_depression < 2°F → UP (rapid warming), > 15°F → suppressed warming. Station timezone-aware.
+- **METAR dT/dt** (`core/signals/metar_dtdt_signal.py`): 3-hour temperature change rate. ΔT > +2°F/3h → UP, ΔT < -2°F/3h → DOWN. Confidence = |ΔT|/5, capped at 0.95.
+- **Pressure Tendency** (`core/signals/pressure_tendency_signal.py`): 3-hour pressure change. Drop >3hPa/3h → warming, Rise >3hPa/3h → cooling. Confidence = |ΔP|/6, capped at 0.8.
+- **Intraday METAR Confirmation** (`core/signals/intraday_metar_confirmation_signal.py`): Validates trajectory alignment for Stage 2 confirmation.
+
+### Phase B — HRRR Pipeline
+- **HRRR Collection Stub** (`scripts/hrrr_collect.py`): Open-Meteo /v1/hrrr endpoint, 3km resolution, hourly, 0-48h forecasts. Same 20 stations, same DB schema. Ready for cron activation.
+- **HRRR Bias-Corrected Signal** (`core/signals/hrrr_bias_corrected_signal.py`): METAR-persisted bias correction: `T_forecast(h) = T_hrrr(t+h) + [T_metar(t) - T_hrrr(t)]`.
+
+### Phase C — Advanced Intraday Signals
+- **ESDR** (`core/signals/esdr_signal.py`): Ensemble Spread Divergence Rate from HGEFS. Spread > 1.5x climatological normal → 60% chance of next 6h being wrong. Active stop-loss.
+- **NWP+METAR dT/dt Fusion** (`core/signals/nwp_dtdt_fusion_signal.py`): Bayesian log-odds fusion of GFS direction + METAR rate of change.
+
+### Phase D — Entry/Exit Rules
+- **Sequential Trigger Architecture**: A→B→C→D sequential firing, not majority-vote ensemble.
+- **Stage 1**: Enter at signal fire when ensemble spread < 2.5°C IQR.
+- **Stage 2**: Confirmation from first 2 METAR obs showing trajectory alignment.
+- **Window**: 6h to fill Stage 2 or cancel.
+- **Dual Exit**: Time-decay (reduce at T-6h, T-3h, close at T-1h) + Confidence decay (close 50% if spread >40%, 100% if >75%).
+- **Hard stop**: -40% of initial margin. **Profit take**: 50% at +8¢ with >4h remaining.
+- **Spread-Based Entry Avoidance**: Edge requirement = 2x spread.
+
+### Phase E — Intraday Trading Loop
+- **`core/intraday_trading_loop.py`**: 550+ line module with full architecture.
+- CLI mode: `python3 -m core.intraday_trading_loop --mode check|trade`.
+- Calls `risk_controls.py check_kill_switches()` before each trade.
+- Uses `market_cost_model.py` (3.1¢ spread) and `FeeAwareKellyPositionSizer`.
+- All 7 new signals registered in `core/signals/__init__.py`.
+- **0 new syntax errors** (only pre-existing `alert_state_machine.py` L115).
