@@ -38,7 +38,7 @@ Rules:
 import os
 import sys
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from . import p3_db_migration as p3db
@@ -86,7 +86,7 @@ def run_prediction_for_station(
                 success=False,
                 message=f"No open epoch found for {station}/{market_type}",
                 prediction=None,
-                timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         
         # Get closed epochs (corpus for matching)
@@ -96,7 +96,7 @@ def run_prediction_for_station(
                 success=False,
                 message=f"No historical data found for {station}/{market_type}",
                 prediction=None,
-                timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         
         # Extract features from query epoch
@@ -110,7 +110,7 @@ def run_prediction_for_station(
                 success=False,
                 message=f"No compatible analogs found for {station}/{market_type}",
                 prediction=None,
-                timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         
         # Get top analogs
@@ -192,7 +192,7 @@ def run_prediction_for_station(
             success=False,
             message=f"Prediction failed for {station}/{market_type}: {str(e)}",
             prediction=None,
-            timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         )
 
 
@@ -257,7 +257,7 @@ def get_phase3_summary() -> Dict[str, Any]:
         "files_present": present,
         "files_missing": missing,
         "modules_loaded": True,
-        "timestamp_utc": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
 

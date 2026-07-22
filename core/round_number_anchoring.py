@@ -14,7 +14,7 @@ import os
 import math
 import requests
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Tuple, Optional
 
 
@@ -119,8 +119,8 @@ def get_kalshi_midpoint_price(series_ticker: str, market_type: str, threshold: i
     try:
         # Construct individual market ticker
         # Format: KXHIGHKATL-{YYYYMMDD}-{strike}
-        from datetime import datetime
-        today = datetime.now()
+        from datetime import datetime, timezone
+        today = datetime.now(timezone.utc)
         date_str = today.strftime('%y%m%d')
         
         # Example: KXHIGHKATL-270120-80

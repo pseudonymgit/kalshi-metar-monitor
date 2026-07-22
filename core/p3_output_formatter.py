@@ -18,7 +18,7 @@ Output includes:
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from core.p3_match_engine import Match
@@ -189,7 +189,7 @@ def format_prediction(
         warnings=warnings,
         errors=errors,
         raw_output=raw_output,
-        timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     )
 
 
@@ -422,5 +422,5 @@ def format_error_prediction(
         warnings=[error_msg],
         errors=[error_msg],
         raw_output=f"ERROR: {error_msg}",
-        timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     )

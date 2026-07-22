@@ -23,7 +23,7 @@ Core Function:
 import time
 import requests
 import statistics
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Tuple, Optional
 import sqlite3
 import json
@@ -60,7 +60,7 @@ class CrossPlatformPair:
     
     def __post_init__(self):
         if self.created_at is None:
-            self.created_at = datetime.now()
+            self.created_at = datetime.now(timezone.utc)
     
     def get_divergence(self) -> Tuple[float, bool]:
         """Calculate price divergence between the two platforms 
@@ -124,10 +124,10 @@ class MockKalshiClient(MarketAPIClient):
                 'volume': round(1000 + (hash(f'{city}-{date}') % 10000), 2),
                 'liquidity': round(10000 + (hash(f'{city}-{date}') % 50000), 2),
                 'fee_rate': 0.10,    # 10%
-                'timestamp': datetime.now()
+                'timestamp': datetime.now(timezone.utc)
             }
             for city in ['ATLANTA', 'BOSTON', 'CHICAGO', 'DENVER', 'MIAMI', 'DALLAS', 'LOS_ANGELES']
-            for date in [(datetime.now() + timedelta(days=d)).strftime('%Y-%m-%d') for d in [1, 2, 3, 4, 5]]
+            for date in [(datetime.now(timezone.utc) + timedelta(days=d)).strftime('%Y-%m-%d') for d in [1, 2, 3, 4, 5]]
         }
     
     def _simulate_base_price(self, city, date_str):
@@ -181,7 +181,7 @@ class MockKalshiClient(MarketAPIClient):
                 volume=data['volume'],
                 liquidity=data['liquidity'],
                 fee_rate=data['fee_rate'],
-                timestamp=datetime.now(),
+                timestamp=datetime.now(timezone.utc),
                 metadata={'original_price': data['current_price']}
             )
             events.append(event)
@@ -203,7 +203,7 @@ class MockKalshiClient(MarketAPIClient):
                 volume=data['volume'],
                 liquidity=data['liquidity'],
                 fee_rate=data['fee_rate'],
-                timestamp=datetime.now(),
+                timestamp=datetime.now(timezone.utc),
                 metadata={'original_price': data['current_price']}
             )
         return None
@@ -244,10 +244,10 @@ class MockPolymarketClient(MarketAPIClient):
                 'volume': round(800 + (hash(f'PM-{city}-{date}') % 8000), 2),  # Different volumes
                 'liquidity': round(8000 + (hash(f'PM-{city}-{date}') % 40000), 2),
                 'fee_rate': 0.08,    # Slightly different fees
-                'timestamp': datetime.now()
+                'timestamp': datetime.now(timezone.utc)
             }
             for city in ['ATLANTA', 'BOSTON', 'CHICAGO', 'DENVER', 'MIAMI', 'DALLAS', 'LOS_ANGELES']
-            for date in [(datetime.now() + timedelta(days=d)).strftime('%Y-%m-%d') for d in [1, 2, 3, 4, 5]]
+            for date in [(datetime.now(timezone.utc) + timedelta(days=d)).strftime('%Y-%m-%d') for d in [1, 2, 3, 4, 5]]
         }
     
     def _simulate_divergent_price(self, city, date_str):
@@ -290,7 +290,7 @@ class MockPolymarketClient(MarketAPIClient):
                 volume=data['volume'],
                 liquidity=data['liquidity'],
                 fee_rate=data['fee_rate'],
-                timestamp=datetime.now(),
+                timestamp=datetime.now(timezone.utc),
                 metadata={'original_price': data['current_price']}
             )
             events.append(event)
@@ -311,7 +311,7 @@ class MockPolymarketClient(MarketAPIClient):
                 volume=data['volume'],
                 liquidity=data['liquidity'], 
                 fee_rate=data['fee_rate'],
-                timestamp=datetime.now(),
+                timestamp=datetime.now(timezone.utc),
                 metadata={'original_price': data['current_price']}
             )
         return None
@@ -486,7 +486,7 @@ class CrossPlatformDivergenceTracker:
         
         # Time factor - if approaching expiry and prices still differ markedly, confidence decreases
         exp_date = datetime.strptime(pair.kalshi_event.date, '%Y-%m-%d')  # Same for both by design
-        days_to_expiry = (exp_date - datetime.now()).days
+        days_to_expiry = (exp_date - datetime.now(timezone.utc)).days
         if days_to_expiry < 2 and divergence > 0.1:
             # Large divergences close to expiry are probably going to converge naturally, reduce confidence
             confidence *= 0.7 
@@ -572,7 +572,7 @@ class CrossPlatformDivergenceTracker:
     
     def get_divergence_history(self, days_back=7) -> List[Dict]:
         """Get historical divergence data."""
-        from_date = (datetime.now() - timedelta(days=days_back)).isoformat()
+        from_date = (datetime.now(timezone.utc) - timedelta(days=days_back)).isoformat()
         
         cur = self.divergence_db.cursor()
         cur.execute(
@@ -634,7 +634,7 @@ class CrossPlatformDivergenceTracker:
                         print(f"     Kalshi: {opp['kalshi_price']:.3f} | PM: {opp['pm_price']:.3f} | Diff: {opp['divergence']:.3f}")
                         print(f"     Type: {opp['opportunity_type']} | Confidence: {opp['confidence']:.2f}")
                 else:
-                    print(f"✓ No meaningful divergences detected at {datetime.now().strftime('%H:%M:%S UTC')}")
+                    print(f"✓ No meaningful divergences detected at {datetime.now(timezone.utc).strftime('%H:%M:%S UTC')}")
                 
                 print(f"Stats: Total: {self._stats['total_comparisons']}, Divergences: {self._stats['divergences_found']}, Opportunities: {self._stats['opportunities_flagged']}")
                 

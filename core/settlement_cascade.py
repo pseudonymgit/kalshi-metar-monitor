@@ -11,7 +11,7 @@ Part of Phase 7 - Kalshi API Integration.
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Optional
 from statistics import mean, stdev
 import pytz
@@ -38,7 +38,7 @@ def predict_settlement_timing(station: str, date: str, market_hours: list = None
         target_date = datetime.fromisoformat(date)
     except ValueError:
         # If date format is wrong, use today
-        target_date = datetime.now()
+        target_date = datetime.now(timezone.utc)
     
     # Set the settlement datetime for this particular day
     settlement_datetime = target_date.replace(hour=settlement_hour_utc, minute=settlement_minute_utc, second=0, microsecond=0)
@@ -97,7 +97,7 @@ def predict_settlement_timing(station: str, date: str, market_hours: list = None
         'actions': get_timing_actions(
             is_in_exit_window, is_in_cascade_period, minutes_to_settlement
         ),
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -249,9 +249,9 @@ class SettlementTimer:
         
         # Cache fair value prediction
         if not self.cache_fair_value or not self.last_update_time or \
-           (datetime.now() - self.last_update_time.replace(tzinfo=None)).seconds > 300:  # Every 5 minutes
+           (datetime.now(timezone.utc) - self.last_update_time.replace(tzinfo=None)).seconds > 300:  # Every 5 minutes
             self.cache_fair_value = get_fair_value_prediction(self.station, self.current_date, self.market_type)
-            self.last_update_time = datetime.now()
+            self.last_update_time = datetime.now(timezone.utc)
         
         return {
             **result,

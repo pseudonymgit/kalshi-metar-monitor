@@ -24,6 +24,7 @@ import time
 import core.p3_scheduler as p3sch
 import core.p3_output_formatter as p3of
 from core.station_time import parse_iso_utc
+from datetime import timezone
 
 
 # FastAPI router
@@ -244,7 +245,7 @@ async def run_predictions_now():
     results = p3sch.run_predictions_for_all_stations()
     
     return {
-        "triggered_at_utc": p3of.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "triggered_at_utc": p3of.datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "total_runs": len(results),
         "successful": sum(1 for r in results.values() if r.success),
         "failed": sum(1 for r in results.values() if not r.success),
@@ -279,7 +280,7 @@ async def clear_cache_endpoint(
         )
     
     p3sch.clear_cache()
-    return {"status": "cache_cleared", "timestamp_utc": p3of.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")}
+    return {"status": "cache_cleared", "timestamp_utc": p3of.datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 
 
 @router.get("/health")
@@ -298,7 +299,7 @@ async def health_check():
     health = {
         "status": "healthy",
         "checks": {},
-        "timestamp_utc": p3of.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp_utc": p3of.datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     
     try:

@@ -124,7 +124,7 @@ class HeartbeatManager:
                             metadata = json.loads(metadata_json)
                             if 'scheduler' in metadata:
                                 return metadata['scheduler']
-                        except:
+                        except Exception as e:
                             pass
                         
                 # Try to estimate scheduler activity from overall alert patterns
@@ -214,7 +214,7 @@ class HeartbeatManager:
                                 last_trade = obj.log_manager.get_last_record('trades.jsonl')
                                 if last_trade and 'timestamp' in last_trade:
                                     return last_trade['timestamp']
-                            except:
+                            except Exception as e:
                                 pass
             except Exception as e:
                 _LOGGER.debug(f"Could not find active paper trading engine for trade timestamp: {e}")
@@ -250,7 +250,7 @@ class HeartbeatManager:
                 """).fetchone()
                 if latest_trade:
                     return latest_trade[0]
-        except:
+        except Exception as e:
             pass
         
         return 'N/A'
@@ -283,7 +283,7 @@ class HeartbeatManager:
                         for key in ['balance', 'account_balance', 'current_balance']:
                             if key in md:
                                 return float(md[key])
-            except:
+            except Exception as e:
                 pass
         
         return 'Untracked'
@@ -302,7 +302,7 @@ class HeartbeatManager:
                 if hasattr(obj, 'kill_switch_enabled'):
                     self.kill_switch_activated = obj.kill_switch_enabled
                     break
-        except:
+        except Exception as e:
             pass
         
         return self.kill_switch_activated
@@ -443,7 +443,7 @@ def is_kill_switch_activated() -> bool:
             if hasattr(obj, 'get_kill_switch_status'):
                 if callable(getattr(obj, 'get_kill_switch_status')):
                     return obj.get_kill_switch_status()
-    except:
+    except Exception as e:
         pass
     
     # Default: kill switch not active

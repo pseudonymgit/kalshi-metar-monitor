@@ -18,7 +18,7 @@ Constraints: max position size ≤ 25% of balance.
 import math
 from typing import Dict, Any, Tuple, List
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 
 @dataclass
@@ -69,7 +69,7 @@ class KellyPositionSizer:
         })
         
         # Keep only last N days of history
-        cutoff_date = datetime.now() - timedelta(days=self.config.window_days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=self.config.window_days)
         self.trade_history = [
             t for t in self.trade_history 
             if datetime.strptime(t['date'], '%Y-%m-%d').date() >= cutoff_date.date()

@@ -30,8 +30,8 @@ def get_kalshi_spread(series_ticker: str, market_type: str, threshold: int) -> f
     """
     try:
         # Construct individual market ticker
-        from datetime import datetime
-        today = datetime.now()
+        from datetime import datetime, timezone
+        today = datetime.now(timezone.utc)
         date_str = today.strftime('%y%m%d')
         
         # Example: KXHIGHKATL-270120-80
@@ -152,7 +152,7 @@ def calibrate_signal_with_spread(
         'spread': spread,
         'min_net_edge': min_net_edge,
         'should_trade': should_trade,
-        'calibration_timestamp': datetime.now().isoformat()
+        'calibration_timestamp': datetime.now(timezone.utc).isoformat()
     }
 
 

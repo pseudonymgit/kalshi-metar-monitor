@@ -11,7 +11,7 @@ Part of Phase 7 - Kalshi API Integration.
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Tuple, Dict, Any
 import pytz
 from zoneinfo import ZoneInfo
@@ -223,7 +223,7 @@ class MarketPhaseClassifier:
             'utc_hour': current_hour,
             'is_low_liquidity_day': is_holiday_like,
             'has_information_event': has_news_event,
-            'classification_timestamp': datetime.now().isoformat()
+            'classification_timestamp': datetime.now(timezone.utc).isoformat()
         }
     
     def get_position_size_multiplier(self, phase: str) -> float:

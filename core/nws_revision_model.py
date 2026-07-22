@@ -14,7 +14,7 @@ Part of Phase 7 - Kalshi API Integration.
 """
 
 from typing import Dict, Tuple, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def get_revision_bias(station: str, date: str) -> Tuple[float, float]:
@@ -164,6 +164,6 @@ def compare_forecast_with_revision_adjusted_baseline(station: str, forecast_valu
         # Metadata
         'station': station,
         'date': date,
-        'timestamp': datetime.now().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'caveat': 'Adjustment is based on historical NWS revision patterns, pending CDS data integration'
     }

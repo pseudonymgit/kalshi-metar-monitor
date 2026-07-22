@@ -9,7 +9,7 @@ import json
 import logging
 from typing import Dict, List, Optional
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import os
 import sqlite3
 import sys
@@ -85,7 +85,7 @@ class StationSkillGate:
             # Check if cache exists and is valid
             if (self._cache_file.exists() and 
                 datetime.fromtimestamp(self._cache_file.stat().st_mtime) > 
-                datetime.now() - timedelta(hours=cache_valid_hours)):
+                datetime.now(timezone.utc) - timedelta(hours=cache_valid_hours)):
                 
                 with open(self._cache_file, 'r') as f:
                     cached_data = json.load(f)
@@ -103,7 +103,7 @@ class StationSkillGate:
         try:
             with open(self._cache_file, 'w') as f:
                 json.dump({
-                    'timestamp': datetime.now().isoformat(),
+                    'timestamp': datetime.now(timezone.utc).isoformat(),
                     'bss_matrix': self._bss_matrix
                 }, f, indent=2)
         except Exception as e:
@@ -284,7 +284,7 @@ class StationSkillGate:
         try:
             with open(self._cache_file, 'w') as f:
                 json.dump({
-                    'timestamp': datetime.now().isoformat(),
+                    'timestamp': datetime.now(timezone.utc).isoformat(),
                     'bss_matrix': self._bss_matrix
                 }, f, indent=2)
         except Exception as e:

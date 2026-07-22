@@ -22,7 +22,7 @@ import sqlite3
 import json
 import os
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any, Tuple
 from collections import defaultdict
@@ -91,7 +91,7 @@ class PredictionResult:
     trajectory_direction: Optional[str]
     trajectory_match: Optional[bool]
     
-    timestamp_utc: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    timestamp_utc: str = field(default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 
 @dataclass
@@ -147,7 +147,7 @@ class BacktestSummary:
     # Timestamps
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    generated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    generated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 
 # =============================================================================
@@ -714,7 +714,7 @@ def main():
                     db_path = path
                     print(f"Using database: {db_path} ({count} epochs)")
                     break
-            except:
+            except Exception as e:
                 pass
     
     if not db_path:

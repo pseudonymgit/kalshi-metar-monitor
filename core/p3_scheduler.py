@@ -23,7 +23,7 @@ import os
 import threading
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from core.settlement_epoch_logger import _alert_db_path as get_db_path
@@ -267,7 +267,7 @@ def run_prediction_for_station(
                 success=False,
                 message=f"No open epoch found for {station}/{market_type}",
                 prediction=None,
-                timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         
         # Step 2: Get closed epochs (corpus)
@@ -277,7 +277,7 @@ def run_prediction_for_station(
                 success=False,
                 message=f"No historical data found for {station}/{market_type}",
                 prediction=None,
-                timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         
         # Step 3: Extract features
@@ -291,7 +291,7 @@ def run_prediction_for_station(
                 success=False,
                 message=f"No compatible analogs found for {station}/{market_type}",
                 prediction=None,
-                timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         
         # Step 5: Get top analogs
@@ -369,7 +369,7 @@ def run_prediction_for_station(
         with _cache_lock:
             _cache[cache_key] = {
                 "prediction": prediction,
-                "timestamp_utc": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             }
         
         return PredictionResponse(
@@ -384,7 +384,7 @@ def run_prediction_for_station(
             success=False,
             message=f"Prediction failed for {station}/{market_type}: {str(e)}",
             prediction=None,
-            timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         )
 
 
@@ -413,7 +413,7 @@ def run_predictions_for_all_stations() -> Dict[str, PredictionResponse]:
                     success=False,
                     message=f"Prediction crashed for {station}/{market_type}: {str(e)}",
                     prediction=None,
-                    timestamp_utc=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    timestamp_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 )
     
     # If any failures occurred, clear cache to avoid inconsistent state
@@ -450,7 +450,7 @@ def post_settlement_hook():
     Called after L4 commit completes for all active stations.
     Runs predictions for all station/market_type combinations.
     """
-    print(f"[{datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')}] POST-SETTLEMENT HOOK TRIGGERED")
+    print(f"[{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}] POST-SETTLEMENT HOOK TRIGGERED")
     print("Running Phase 3 predictions for all stations...")
     
     results = run_predictions_for_all_stations()
@@ -458,7 +458,7 @@ def post_settlement_hook():
     success_count = sum(1 for r in results.values() if r.success)
     fail_count = len(results) - success_count
     
-    print(f"[{datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')}] POST-SETTLEMENT HOOK COMPLETE")
+    print(f"[{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}] POST-SETTLEMENT HOOK COMPLETE")
     print(f"  Successful: {success_count}")
     print(f"  Failed: {fail_count}")
     
@@ -489,13 +489,13 @@ def start_prediction_worker():
     
     def worker_loop():
         """Background worker loop."""
-        last_daily_task = datetime.now()  # Track when daily task was run
+        last_daily_task = datetime.now(timezone.utc)  # Track when daily task was run
         daily_task_cooldown = timedelta(hours=24)  # Run daily task once per day
         
         while _worker_running:
             try:
                 # Run daily Kalshi discovery task approximately once per day
-                now = datetime.now()
+                now = datetime.now(timezone.utc)
                 if now - last_daily_task > daily_task_cooldown:
                     print(f"[{now.strftime('%Y-%m-%dT%H:%M:%SZ')}] RUNNING DAILY KALSHI DISCOVERY")
                     refresh_kalshi_station_mapping()

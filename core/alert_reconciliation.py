@@ -178,7 +178,7 @@ class AlertReconciler:
                 
                 if result:
                     return json.loads(result[0])
-        except:
+        except Exception as e:
             pass  # DB connection error, continue silently
         
         # If no internal settlement data, simulate it for demonstration

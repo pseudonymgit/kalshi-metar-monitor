@@ -59,7 +59,7 @@ def parse_ymd(date_str):
     """Parse YYYY-MM-DD string to datetime object."""
     try:
         return datetime.strptime(date_str, '%Y-%m-%d')
-    except:
+    except Exception as e:
         return None
 
 

@@ -27,7 +27,7 @@ import math
 from typing import Dict, Any, Tuple
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 
 class ConfidenceTier(Enum):
@@ -93,9 +93,9 @@ class KellyPositionSizer:
         Add a trade result to history for win rate calculation.
         Tracks per-signal results for accurate variance estimation.
         """
-        today = datetime.now()
+        today = datetime.now(timezone.utc)
         dt = datetime.strptime(date_string, '%Y-%m-%d') if isinstance(date_string, str) else date_string
-        if dt < datetime.now() - timedelta(days=self.window_days + 1):
+        if dt < datetime.now(timezone.utc) - timedelta(days=self.window_days + 1):
             return  # Outdated
         
         self.win_history.append({
@@ -110,7 +110,7 @@ class KellyPositionSizer:
         Return 30-day rolling win rate or default value.
         If signal_id is provided, returns per-signal win rate.
         """
-        cutoff_date = datetime.now() - timedelta(days=self.window_days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=self.window_days)
         
         if signal_id:
             recent_results = [
@@ -378,7 +378,7 @@ def main():
     """Test Kelly-position sizing across all 8 signal types with SH3 compliance."""
     # Add some historical results to demonstrate win rate calculation
     for i in range(15):
-        date = datetime.now() - timedelta(days=i)
+        date = datetime.now(timezone.utc) - timedelta(days=i)
         win = i % 3 != 2  # About 66% win rate
         _DEFAULT_KELLY_SIZER.add_win_result(date.strftime('%Y-%m-%d'), win)
 

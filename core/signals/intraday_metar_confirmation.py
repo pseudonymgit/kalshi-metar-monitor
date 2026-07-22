@@ -6,7 +6,7 @@ to confirm or weaken the ensemble's prediction. It's a confirmation
 signal, not a standalone prediction — it adjusts confidence based on 
 whether the actual temperature is tracking toward the predicted direction.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import sqlite3
 from typing import Optional, Tuple, Dict, Any
 
@@ -126,7 +126,7 @@ class IntradayMETARConfirmation:
             
         # Only process if the date is today or yesterday (same-day METAR data availability)
         target_dt = datetime.fromisoformat(date)
-        today = datetime.now().date()
+        today = datetime.now(timezone.utc).date()
         yesterday = today - timedelta(days=1)
         
         if target_dt.date() != today and target_dt.date() != yesterday:
@@ -204,7 +204,7 @@ class IntradayMETARConfirmation:
         
         # Additional check: compare current temp to yesterday's high
         if temp_data:
-            current_time = datetime.now()
+            current_time = datetime.now(timezone.utc)
             current_utc_hour = current_time.hour + current_time.minute / 60.0  # Include minutes
             
             current_temp = temp_data[-1][1]  # Latest temperature

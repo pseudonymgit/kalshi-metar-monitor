@@ -26,7 +26,7 @@ Usage:
 """
 
 import os
-from datetime import datetime, timedelta, date
+from datetime import datetime, timezone, timedelta, date
 from typing import Optional, Set
 from pathlib import Path
 
@@ -94,7 +94,7 @@ def _load_holidays() -> Set[date]:
     
     # Generate default holidays for current year
     _LOADED_HOLIDAYS = set()
-    current_year = datetime.now().year
+    current_year = datetime.now(timezone.utc).year
     for month, day in ANNUAL_HOLIDAYS:
         _LOADED_HOLIDAYS.add(_get_observed_date(month, day, current_year))
         # Also add the previous year's holidays for cross-year coverage
@@ -242,7 +242,7 @@ def generate_holidays_json():
     import json
     
     holidays = []
-    current_year = datetime.now().year
+    current_year = datetime.now(timezone.utc).year
     for month, day in ANNUAL_HOLIDAYS:
         observed = _get_observed_date(month, day, current_year)
         holidays.append({
@@ -253,7 +253,7 @@ def generate_holidays_json():
         })
     
     output = {
-        "generated": datetime.now().isoformat(),
+        "generated": datetime.now(timezone.utc).isoformat(),
         "year": current_year,
         "holidays": holidays
     }
@@ -272,7 +272,7 @@ if __name__ == "__main__":
     print("Kalshi Trading Calendar")
     print("=" * 50)
     
-    today = datetime.now().date()
+    today = datetime.now(timezone.utc).date()
     print(f"Today: {today} ({['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][today.weekday()]})")
     print(f"Is trading day: {is_trading_day(today)}")
     

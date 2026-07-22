@@ -15,7 +15,7 @@ import os
 import time
 import requests
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Optional, List, Tuple
 
 # In-memory cache for historical spread data
@@ -29,8 +29,8 @@ def get_current_market_state(series_ticker: str, market_type: str, threshold: in
     Uses new API fields 'yes_bid_dollars' and 'yes_ask_dollars'.
     """
     try:
-        from datetime import datetime
-        today = datetime.now()
+        from datetime import datetime, timezone
+        today = datetime.now(timezone.utc)
         date_str = today.strftime('%y%m%d')
         
         # Construct full ticker for this market
@@ -65,7 +65,7 @@ def get_current_market_state(series_ticker: str, market_type: str, threshold: in
                     'ask': ask,
                     'spread': spread,
                     'midpoint': midpoint,
-                    'timestamp': datetime.now().isoformat(),
+                    'timestamp': datetime.now(timezone.utc).isoformat(),
                     'last_price': market_data.get('last_price_dollars'),
                     'volume_24h': market_data.get('volume_24h', 0)
                 }
@@ -90,7 +90,7 @@ def get_current_market_state(series_ticker: str, market_type: str, threshold: in
                     'ask': ask,
                     'spread': spread,
                     'midpoint': midpoint,
-                    'timestamp': datetime.now().isoformat(),
+                    'timestamp': datetime.now(timezone.utc).isoformat(),
                     'last_price': market_data.get('last_price') / 100.0,
                     'volume_24h': market_data.get('volume_24h', 0)
                 }
@@ -123,7 +123,7 @@ def get_recent_spread_history(market_key: str, minutes_back: int = 60) -> List[D
     """
     global _SPREAD_HISTORY_DB
     
-    cutoff_time = datetime.now() - timedelta(minutes=minutes_back)
+    cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=minutes_back)
     
     with _SPREAD_DB_LOCK:
         history = _SPREAD_HISTORY_DB.get(market_key, [])
@@ -315,7 +315,7 @@ def get_complete_market_behavior_analysis(
         'station': station,
         'market_type': market_type,
         'threshold': threshold,
-        'timestamp': datetime.now().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         
         'original_confidence': original_confidence,
         'adjusted_confidence': adjusted_confidence,
@@ -417,7 +417,7 @@ def cleanup_old_spread_data(max_age_minutes: int = 120):
     """
     global _SPREAD_HISTORY_DB
     
-    cutoff_time = datetime.now() - timedelta(minutes=max_age_minutes)
+    cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=max_age_minutes)
     
     with _SPREAD_DB_LOCK:
         for market_key, data_points in _SPREAD_HISTORY_DB.items():

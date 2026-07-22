@@ -14,7 +14,7 @@ import os
 import sqlite3
 import time
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Optional, Literal, Tuple
 import uuid
 import requests
@@ -123,7 +123,7 @@ def place_kalshi_order(
         order_result = {
             "success": True,
             "order_id": f"S_{str(uuid.uuid4())[:8]}",
-            "placed_at": datetime.now().isoformat(),
+            "placed_at": datetime.now(timezone.utc).isoformat(),
             "quantity": quantity,
             "limit_price": limit_price,
             "side": side,
@@ -191,12 +191,12 @@ def execute_multi_stage_order(
     unfilled_quantity = total_quantity
     order_status = "CREATED"
     stage = 1
-    start_time = datetime.now()
+    start_time = datetime.now(timezone.utc)
     avg_fill_price = 0.0
     
     # Calculate current strike price (for this example, assume daily market with strikes)
-    from datetime import datetime
-    target_date = datetime.now()
+    from datetime import datetime, timezone
+    target_date = datetime.now(timezone.utc)
     strike_price = 80  # Placeholder strike for today - would be calculated based on forecast
     
     # Stage 1: Limit order at mid - 0.5¢
@@ -233,7 +233,7 @@ def execute_multi_stage_order(
         
         # Simulate 30-minute wait
         time.sleep(1)  # Actual implementation would monitor API for fills
-        stage_completion_time = datetime.now()
+        stage_completion_time = datetime.now(timezone.utc)
         
         # Check if order filled (simulated)
         # In real system would query Kalshi for order status
@@ -300,7 +300,7 @@ def execute_multi_stage_order(
                              / (stage1_fill_quantity + stage2_fill_quantity))
             record_order_status(order_id, station, market_type, direction, size, 
                               stage, "FILLED", stage2_fill_quantity, total_quantity, stage_price)
-        elif (datetime.now() - start_time).total_seconds() / 60 >= 90:  # Total 90 min deadline
+        elif (datetime.now(timezone.utc) - start_time).total_seconds() / 60 >= 90:  # Total 90 min deadline
             order_status = "CANCELLED_AT_DEADLINE"
             record_order_status(order_id, station, market_type, direction, size, 
                               stage, "CANCELLED", 0, total_quantity - filled_quantity, stage_price)
@@ -357,7 +357,7 @@ def execute_multi_stage_order(
         'remaining_size': total_quantity - filled_quantity,
         'final_status': order_status,
         'avg_fill_price': avg_fill_price if avg_fill_price > 0 else (current_midpoint if filled_quantity > 0 else None),
-        'total_execution_time_minutes': (datetime.now() - start_time).total_seconds() / 60,
+        'total_execution_time_minutes': (datetime.now(timezone.utc) - start_time).total_seconds() / 60,
         'stage_progress': stage,
         'order_sequence': [
             {'stage': i, 'status': get_stage_status(order_id, i)} 
@@ -386,7 +386,7 @@ def record_stage_attempt(order_id: str, station: str, market_type: str, stage: i
          status, attempt_seq)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
-        order_id, stage, limit_price, datetime.now().isoformat(), 
+        order_id, stage, limit_price, datetime.now(timezone.utc).isoformat(), 
         quantity, 0, 0.0, status, stage
     ))
     

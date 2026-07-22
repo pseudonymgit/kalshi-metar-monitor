@@ -80,7 +80,7 @@ class RegimeConditioner:
                     # Match the season that would affect this month's weather
                     return abs(anom) > 0.5  # Strong ENSO phase
                     
-        except:
+        except Exception as e:
             pass
         return False
     
@@ -98,7 +98,7 @@ class RegimeConditioner:
                     elif anom < -0.5:
                         return 'la_nina'
                     
-        except:
+        except Exception as e:
             pass
         return 'neutral'  # Default if no climate data available
     
@@ -120,7 +120,7 @@ class RegimeConditioner:
                 return 'negative_strong'
             elif ao_val < -0.5:
                 return 'negative'
-        except:
+        except Exception as e:
             pass
         return 'neutral'
     
@@ -142,7 +142,7 @@ class RegimeConditioner:
                 return 'negative_strong'
             elif nao_val < -0.5:
                 return 'negative'
-        except:
+        except Exception as e:
             pass
         return 'neutral'
     

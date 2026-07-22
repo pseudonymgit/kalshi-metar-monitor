@@ -419,7 +419,7 @@ class DecisionOutputGenerator:
         """
         if filename is None:
             symbol_safe = decision.symbol.replace("/", "_").replace("\\", "_").replace(" ", "_")
-            filename = f"decision_{symbol_safe}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            filename = f"decision_{symbol_safe}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.txt"
             
         filepath = os.path.join(DEVELOPMENTS_PATH, filename)
         
@@ -435,7 +435,7 @@ class DecisionOutputGenerator:
         Export multiple decisions to JSON for external consumption or dashboard display.
         """
         if not filename:
-            filename = f"decisions_batch_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            filename = f"decisions_batch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
         
         filepath = os.path.join(DEVELOPMENTS_PATH, filename)
         
@@ -492,13 +492,13 @@ def main():
     generator = DecisionOutputGenerator()
     
     print("\n1. Generating sample decision for ATLANTA HIGH temperature on upcoming date...")
-    decision = generator.generate_single_decision("KATL", (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    decision = generator.generate_single_decision("KATL", (datetime.now(timezone.utc) + timedelta(days=1)).strftime('%Y-%m-%d'))
     
     print(generator.generate_detailed_report(decision))
     
     print(f"\n2. Generating batch decisions for multiple stations...")
     stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD']
-    date = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
+    date = (datetime.now(timezone.utc) + timedelta(days=2)).strftime('%Y-%m-%d')
     
     batch_decisions = generator.generate_bulk_decisions(date, stations)
     
@@ -511,7 +511,7 @@ def main():
     
     # Save a decision report
     print(f"\n3. Saving sample decision to file...")
-    sample_decision = generator.generate_single_decision("KORD", (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d'))
+    sample_decision = generator.generate_single_decision("KORD", (datetime.now(timezone.utc) + timedelta(days=3)).strftime('%Y-%m-%d'))
     file_saved = generator.save_decision_report(sample_decision)
     print(f"  Report saved to: {file_saved}")
     

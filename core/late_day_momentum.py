@@ -328,7 +328,7 @@ def late_day_plateau_slope_analysis(hourly_obs: List[Tuple[int, float, str]], da
                     # Construct from date str and hour
                     dt = dt or datetime.strptime(f"{date_str[:10]} {hour:02d}:00:00", "%Y-%m-%d %H:%M:%S")
                 hourly_data.append((dt, temp))
-            except:
+            except Exception as e:
                 continue  # Skip unparsable timestamps
 
     if len(hourly_data) < 3:

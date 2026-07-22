@@ -13,7 +13,7 @@ Part of Phase 7 - Kalshi API Integration.
 import os
 import requests
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 
 
@@ -285,5 +285,5 @@ def generate_ensemble_prediction(
         'individual_signal_weights': signal_weights,
         'final_decision': direction if confidence > 0.60 else 'NONE',
         'decision_confidence': confidence if direction != 'NONE' else 0.0,
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now(timezone.utc).isoformat()
     }

@@ -271,7 +271,7 @@ def get_station_model_accuracy_weights(station):
         weights = {model: 1.0/(mae + 0.1) for model, mae in MODEL_MAE.items()}
         total_w = sum(weights.values())
         return {model: weight/total_w for model, weight in weights.items()}
-    except:
+    except Exception as e:
         # In case of error, provide standard weights based on static MAEs
         weights = {model: 1.0/(mae + 0.1) for model, mae in MODEL_MAE.items()}
         total_w = sum(weights.values())

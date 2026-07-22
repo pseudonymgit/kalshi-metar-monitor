@@ -29,7 +29,7 @@ import pandas as pd
 import numpy as np
 import sqlite3
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import os
 import statistics
 import random  # Only needed for simulation data
@@ -112,7 +112,7 @@ def fetch_paper_trading_metrics():
         print(f"Simulating with dummy data due to: {e}")
         
         # Generate some simulation data
-        dates = [(datetime.now() - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(90)]
+        dates = [(datetime.now(timezone.utc) - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(90)]
         performance_data = []
         total_pnl = 0
         
@@ -503,7 +503,7 @@ def dashboard():
         'pnl_chart': pnl_chart,
         'calibration_chart': calibration_chart,
         'version_table': version_table,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+        'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
     }
     
     return render_template_string(html, **context)

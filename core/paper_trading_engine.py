@@ -1159,7 +1159,7 @@ class PaperTrader:
             target_date = analysis_date.date()
             # Check if target date is today or recent enough to have METAR data
             return (today - target_date).days <= 1   # Allow for today and yesterday
-        except:
+        except Exception as e:
             return False
 
     def _analyze_late_day_momentum_signals(self, date):
