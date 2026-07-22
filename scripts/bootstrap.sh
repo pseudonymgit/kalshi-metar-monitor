@@ -3,6 +3,14 @@
 # Runs before gunicorn starts. Exits non-zero on failure to abort deploy.
 set -euo pipefail
 
+# Source webhook URLs (not loaded by non-interactive shells)
+if [ -f .env.webhooks ]; then
+  . .env.webhooks
+  export DISCORD_WEBHOOK_DEV="$WEBHOOK_DEV"
+  export DISCORD_WEBHOOK_PROD="$WEBHOOK_PROD"
+  export DISCORD_WEBHOOK_SBOX="$WEBHOOK_SBOX"
+fi
+
 echo "[bootstrap] Starting Weather Engine bootstrap..."
 
 # ─── 1. Verify Python and dependencies ─────────────────────────────────────
