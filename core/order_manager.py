@@ -14,6 +14,8 @@ import logging
 import os
 import re
 
+_KALSHI_EXECUTION_DOMAIN = contextvars.ContextVar("kalshi_execution_domain", default="production")
+
 # Layer 4: LOW market discovery regex
 LOW_TICKER_PATTERN = re.compile(r"^LOW-\d{6}$")
 import sqlite3

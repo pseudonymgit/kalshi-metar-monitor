@@ -83,7 +83,7 @@ __all__ = [
     # Delegated functions
     'generate_signals', 'place_paper_trade', 'mark_positions_to_market',
     'process_settlements_for_date', 'daily_reconciliation',
-    'check_kill_switches', 'risk_report', 'compute_sharpe',
+    'risk_report', 'compute_sharpe',
 ]
 
 

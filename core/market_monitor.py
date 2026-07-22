@@ -36,6 +36,10 @@ from core.alert_schema import ALERT_SCHEMA_VERSION
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
+# Cross-module imports (Phase 20 decomposition — originally shared via monolith namespace)
+from .order_manager import _current_kalshi_execution_domain
+from .kalshi_price_fetcher import _kalshi_public_get
+
 _last_market_state = {}
 _last_composed_sent = {}
 _last_market_check_summary = {}
