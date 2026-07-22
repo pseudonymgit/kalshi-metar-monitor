@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
+# DEPRECATED — standalone Flask app. Use app.py Trading Dashboard blueprint instead.
+
 """
-DASHBOARD MVP (v1.0) — Edge 11
-Flask-based production dashboard for the weather trading engine.
+[DEPRECATION NOTICE - Phase C.1]
 
-Provides:
-  - /health              — system status (DB connection, signal count, last update)
-  - /api/predictions/<station> — latest predictions with signal breakdown
-  - /api/discrepancies   — model-vs-market odds discrepancies, flagged >2σ
-  - /dashboard           — HTML page with Plotly grouped bar chart
+This module has been converted from a standalone Flask application to a pure
+Python data module. The Flask app and CLI entry points have been removed.
 
-Stack: Flask → SQLite → pandas → scipy (z-scores) → Plotly → HTML template
-No AI/ML — deterministic math only. All predictions computed from 30-day
-statistical windows (mean + std). Market odds default to 0.5 implicit
-probability for demo purposes.
+Data functions (get_predictions, get_discrepancies, etc.) remain available as
+module-level API functions. For the Flask-based dashboard, use the Trading
+Dashboard blueprint registered in app.py (see core/trading_dashboard/).
 
-Usage:
-    python3 core/dashboard.py                    # runs on :5005
-    python3 core/dashboard.py --port 5006       # custom port
-    python3 core/dashboard.py --self-test        # run self-tests
-
-Version: v1.0, 2026-07-18
+The _self_test() function is retained for development verification.
 """
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 2. [2026-07-22 Phase C.1: Flask consolidation — removed standalone app + _main(); switched to sqlite_utils]
+#
 
 from __future__ import annotations
 
-import argparse
 import json
 import logging
 import os
@@ -39,6 +35,14 @@ import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template_string
 from scipy import stats as sp_stats
+
+from .sqlite_utils import get_sqlite_connection
+
+# Try to import live market price fetcher for real market_prob values
+try:
+    from core.kalshi_price_fetcher import get_live_market_price as _dashboard_get_market_price
+except ImportError:
+    _dashboard_get_market_price = None
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -124,7 +128,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             color: #888; font-size: 0.8rem; text-transform: uppercase; }
         .discrepancy-table td { padding: 10px 16px; border-bottom: 1px solid #2a2d39; }
         .discrepancy-table tr.flagged { background: rgba(239, 83, 80, 0.1); }
-        .discrepancy-table tr.flagged td:first-child::before { content: "⚠ "; color: #ef5350; }
+        .discrepancy-table tr.flagged td:first-child::before { content: "\u26a0 "; color: #ef5350; }
         .section-title { font-size: 1.1rem; color: #4fc3f7; margin: 24px 0 12px; }
         .refresh-note { font-size: 0.8rem; color: #666; margin-top: 8px; }
     </style>
@@ -214,9 +218,12 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
 class DashboardApp:
     """
-    Flask dashboard for the weather trading engine.
+    Legacy dashboard for the weather trading engine (DEPRECATED).
 
-    Serves health checks, prediction APIs, a discrepancy table, and
+    NOTE: This class is kept for backward compatibility. New code should
+    use the Trading Dashboard blueprint in app.py.
+
+    Provides health checks, prediction APIs, a discrepancy table, and
     a Plotly-based HTML dashboard. All computations are deterministic
     (no AI/ML). Predictions use 30-day rolling mean + std from daily_stats.
     """
@@ -248,9 +255,9 @@ class DashboardApp:
             self._logger.warning("Could not load station mapping: %s", exc)
             return {}
 
-    def _get_db_connection(self) -> sqlite3.Connection:
+    def _get_db_connection(self):
         """Get a SQLite connection with row factory."""
-        conn = sqlite3.connect(self.db_path)
+        conn = get_sqlite_connection(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
 
@@ -477,8 +484,15 @@ class DashboardApp:
         # If latest > mean, model thinks upward bias is more likely
         model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
 
-        # Market probability: default 0.5 (no live market data in demo)
+        # Market probability: try live Kalshi price, fallback to 0.5
         market_prob = 0.5
+        if _dashboard_get_market_price is not None:
+            try:
+                live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
+                if live_price is not None and 0.01 <= live_price <= 0.99:
+                    market_prob = live_price
+            except Exception:
+                pass
 
         # Discrepancy
         discrepancy = model_prob - market_prob
@@ -540,6 +554,13 @@ class DashboardApp:
             z = (latest - mean) / std if std > 0 else 0.0
             model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
             market_prob = 0.5
+            if _dashboard_get_market_price is not None:
+                try:
+                    live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
+                    if live_price is not None and 0.01 <= live_price <= 0.99:
+                        market_prob = live_price
+                except Exception:
+                    pass
             discrepancy = model_prob - market_prob
             raw_discrepancies.append(discrepancy)
 
@@ -600,7 +621,7 @@ class DashboardApp:
     # ─── Run ──────────────────────────────────────────────────────────────
 
     def run(self):
-        """Start the Flask development server."""
+        """Start the Flask development server (DEPRECATED)."""
         app = self.create_app()
         self._logger.info("Starting dashboard on port %d", self.port)
         app.run(host="0.0.0.0", port=self.port, debug=False)
@@ -685,24 +706,3 @@ def _self_test():
     print("\n" + "=" * 60)
     print("All self-tests passed ✓")
     print("=" * 60)
-
-
-def _main():
-    """Parse args and run either the server or self-tests."""
-    parser = argparse.ArgumentParser(description="Weather Engine Dashboard")
-    parser.add_argument("--port", type=int, default=5005, help="Port to serve on")
-    parser.add_argument("--db", type=str, default=DEFAULT_DB_PATH, help="SQLite DB path")
-    parser.add_argument("--self-test", action="store_true", help="Run self-tests and exit")
-    args = parser.parse_args()
-
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
-
-    if args.self_test:
-        _self_test()
-    else:
-        dashboard = DashboardApp(db_path=args.db, port=args.port)
-        dashboard.run()
-
-
-if __name__ == "__main__":
-    _main()
