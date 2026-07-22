@@ -27,6 +27,40 @@ Date: 2026-07-22
 
 ---
 
+## Phase 23: Signal Improvements — COMPLETED
+
+### ✅ 23.1: Station-Specific Effects - COMPLETED
+- Created `core/station_effects.py` with station-specific wind→temp mappings derived from regression on 24+ months METAR data
+- Key findings: KLAX NE winds = warming (Santa Ana), KDEN E winds = warming (upslope), KSEA S winds = cooling (marine push) — all opposite of global rules
+- 21 stations with 288 month-hour bins each (12 months × 24 hours)
+- Fallback to global mid-latitude rule for unknown sectors
+
+### ✅ 23.2: Signal Independence Validation - COMPLETED
+- Built `scripts/validate_signal_independence.py` with Spearman rank correlation analysis
+- All 17 active signals tested: no redundant pairs (|ρ| < 0.7 threshold)
+- Ensemble Diversity Score: 0.498 (moderate diversity)
+- Reversion cluster dominance: 41.2% (7/17 reversion-based vs 10/17 trend-based)
+
+### ✅ 23.3: Frontal Detection Fix - COMPLETED
+- Updated `core/signals/frontal_detector_signal.py` to use 3-6 hour METAR window analysis
+- Replaced ineffective day-over-day aggregate comparison
+- 3-6h physics: 2+mb pressure change, >45° wind shift, >3°F temp change
+- Physics-corrected: pressure rise → cooling, pressure fall → warming
+
+### ✅ 23.4: Seasonal Diurnal Curve Model - COMPLETED
+- Built `core/seasonal_diurnal_curve.py` with expected temperature curves by (month, local_hour)
+- Timezone-correct: UTC METAR → local time for diurnal curve computation
+- 21 stations × 288 bins with observation count and std dev metrics
+- Cloud-cover confidence modulator: clear skies → higher confidence
+- Anomaly detection: z-score based on curve deviation
+
+### ✅ 23.5: Dual-Polarity Signal Framework - COMPLETED
+- Created `core/signals/dual_polarity_signal.py` with warm/cool season regime classification
+- Physics correction: Fixed PressureDeltaSignal direction mapping (Expert 1 finding #5)
+- Rising pressure now predicts COOLING (cold air advection), not warming
+- Seasonal adjustments for different signal polarities between seasons
+- Added SeasonalRegimeClassifier to signal registry
+
 ## Phase 19: Cost Model & Execution Realism — COMPLETED
 
 ### ✅ 19.1: Centralized Cost Model v2 - COMPLETED

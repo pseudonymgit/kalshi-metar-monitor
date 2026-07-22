@@ -42,6 +42,7 @@ from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 from .spread_based_entry_signal import SpreadBasedEntrySignal
 from .volume_momentum_signal import VolumeMomentumSignal
 from .settlement_arbitrage_signal import SettlementTimeArbitrageSignal
+from .dual_polarity_signal import SeasonalRegimeClassifier
 
 
 class SignalRegistry:
@@ -72,6 +73,7 @@ class SignalRegistry:
             'spread_based_entry': SpreadBasedEntrySignal(db_path),
             'volume_momentum': VolumeMomentumSignal(db_path),
             'settlement_arbitrage': SettlementTimeArbitrageSignal(db_path),
+            'seasonal_regime': SeasonalRegimeClassifier(db_path),
         }
 
 

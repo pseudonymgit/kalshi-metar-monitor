@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Tuple, Any
 from pathlib import Path
 from enum import Enum
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
-from .market_cost_model import estimate_total_cost
+from .market_cost_model import MARKET_COST_MODEL
 from .station_registry import get_cluster_for_station as _get_cluster_for_station
 from .kalshi_price_fetcher import get_live_market_price as _get_live_market_price
 __all__ = ['TradeType', 'MarketSide', 'place_paper_trade', 'mark_positions_to_market']

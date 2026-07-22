@@ -177,6 +177,23 @@ Fixes applied before dispatch: agreement threshold, signal registry, fee rates. 
 - [x] All 6 new signals registered in `core/signals/__init__.py`
 - [x] 0 new syntax errors (only pre-existing alert_state_machine.py L115)
 
+## Phase 23: Signal Improvements (2026-07-22 03:59 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] 23.1 — Station-Specific Wind → Temp Effects: Created `core/station_effects.py` for KLAX (Santa Ana winds = warming), KDEN (upslope = warming), KSEA (sea breeze = cooling); 21 stations with 288-hourly bins (12 months × 24 hours) derived from 24+ months of METAR regression
+- [x] 23.2 — Signal Independence Validation: Built `scripts/validate_signal_independence.py` with Spearman rank correlation, no redundant signals found (|ρ| < 0.7), ensemble diversity score = 0.498
+- [x] 23.3 — Frontal Detection Fix: Updated `core/signals/frontal_detector_signal.py` to use 3-6 hour METAR window analysis instead of daily aggregates; physics-correct: pressure rise = cooling, fall = warming
+- [x] 23.4 — Seasonal Diurnal Curve Model: Built `core/seasonal_diurnal_curve.py` with expected temperature curves by (month, local_hour) for each station; confidence modulated by ceiling_height
+- [x] 23.5 — Dual-Polarity Signal Framework: Created `core/signals/dual_polarity_signal.py` with seasonal regime classifier, pressure rise → cooling (physics-corrected per Expert 1 finding #5), rising pressure now predicts cooling (not warming)
+
+
+### Technical Changes:
+- Fixed PressureDeltaSignal direction: dp > 0 now → 'down' (cooling), dp < 0 → 'up' (warming)
+- Added SeasonalRegimeClassifier to signal registry
+- 0 new syntax errors (only pre-existing in other modules)
+
+
 ## Phase 22: Production Operations (2026-07-22 03:30 UTC)
 **Status:** ✅ COMPLETE
 
