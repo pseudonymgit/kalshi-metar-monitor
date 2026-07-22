@@ -286,6 +286,23 @@ CREATE TABLE IF NOT EXISTS transition_events (
 """
 
 # ---------------------------------------------------------------------------
+# AI/ML forecast tables (B-Mode 3: AI/ML gate open)
+# ---------------------------------------------------------------------------
+TABLES["ai_forecasts"] = """
+CREATE TABLE IF NOT EXISTS ai_forecasts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    station TEXT NOT NULL,
+    model TEXT NOT NULL CHECK(model IN ('aigfs', 'graphcast', 'aifs')),
+    forecast_date TEXT NOT NULL,
+    forecast_hour INTEGER NOT NULL CHECK(forecast_hour IN (0, 6, 12, 18)),
+    temp_f REAL,
+    confidence REAL,
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(station, model, forecast_date, forecast_hour)
+)
+"""
+
+# ---------------------------------------------------------------------------
 # Kalshi tables
 # ---------------------------------------------------------------------------
 TABLES["kalshi_rate_limit"] = """
@@ -383,8 +400,29 @@ def ensure_all_tables(conn) -> int:
     for table_name, ddl in TABLES.items():
         conn.execute(ddl)
         count += 1
+
+    # Create indexes for registered tables
+    _ensure_indexes(conn)
+
     conn.commit()
     return count
+
+
+# Index definitions for registered tables
+_INDEXES = {
+    "idx_ai_forecasts_lookup":
+        "CREATE INDEX IF NOT EXISTS idx_ai_forecasts_lookup "
+        "ON ai_forecasts(forecast_date, station, model)",
+}
+
+
+def _ensure_indexes(conn):
+    """Create all registered indexes on the given connection."""
+    for idx_name, ddl in _INDEXES.items():
+        try:
+            conn.execute(ddl)
+        except Exception:
+            pass  # Table may not exist yet
 
 
 def get_table_names() -> List[str]:

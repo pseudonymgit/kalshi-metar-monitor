@@ -40,6 +40,7 @@ from .hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
 from .esdr_signal import EsdrSignal
 from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 from .spread_based_entry_signal import SpreadBasedEntrySignal
+from .ai_composite_signal import AiCompositeSignal
 from .volume_momentum_signal import VolumeMomentumSignal
 from .settlement_arbitrage_signal import SettlementTimeArbitrageSignal
 from .dual_polarity_signal import SeasonalRegimeClassifier, CorrectedPressureDeltaSignal
@@ -75,6 +76,7 @@ class SignalRegistry:
             'settlement_arbitrage': SettlementTimeArbitrageSignal(db_path),
             'seasonal_regime': SeasonalRegimeClassifier(db_path),
             'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
+            'ai_composite': AiCompositeSignal(db_path),
         }
 
 

@@ -86,6 +86,10 @@ MODELS = [
     ("ecmwf", "https://api.open-meteo.com/v1/ecmwf"),
     ("icon",  "https://api.open-meteo.com/v1/dwd-icon"),
     ("gem",   "https://api.open-meteo.com/v1/gem"),
+    # AI/ML models (B-Mode 3, AI/ML gate open)
+    ("aigfs",     "https://api.open-meteo.com/v1/gfs?models=gfs_global"),
+    ("graphcast", "https://api.open-meteo.com/v1/gfs?models=gfs_graphcast025"),
+    ("aifs",      "https://api.open-meteo.com/v1/ecmwf?models=ecmwf_aifs025"),
 ]
 
 FORECAST_VARIABLES = [
