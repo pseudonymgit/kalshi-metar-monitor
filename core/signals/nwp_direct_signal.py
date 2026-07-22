@@ -46,21 +46,24 @@ class NwpDirectSignal:
         return 0
 
     def evaluate(self, idx: int, days: list) -> Tuple[Optional[str], float]:
-
+        """Standard evaluate interface - opens DB connection and evaluates."""
+        # This method is called by the backtest engine, but we need station context.
+        # The base class evaluate_for_station calls this after loading days data.
+        # Since NwpDirectSignal doesn't use historical days (it queries NWP DB),
+        # this is a placeholder. Real callers should use evaluate_for_station().
         return None, 0.0
 
     def evaluate_for_station(self, station: str, date: str,
+                              market_type: str = 'HIGH',
                               conn: sqlite3.Connection = None) -> Tuple[Optional[str], float]:
-        """Evaluate for a specific station+date.
-# 1. [2026-07-21] Initial implementation
+        """Evaluate for a specific station+date+market_type using NWP forecasts.
 
-        Core evaluation for a specific market type.
         HIGH -> temperature_2m_max, LOW -> temperature_2m_min
         """
         field = 'temperature_2m_max' if market_type == 'HIGH' else 'temperature_2m_min'
 
         try:
-            today_dt = datetime.strptime(today_date, '%Y-%m-%d')
+            today_dt = datetime.strptime(date, '%Y-%m-%d')
         except ValueError:
             return None, 0.0
         tomorrow_date = (today_dt + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -70,7 +73,7 @@ class NwpDirectSignal:
         magnitudes = []
 
         for model in self._model_order:
-            today_temp = self._get_temp(station, today_date, model, field)
+            today_temp = self._get_temp(station, date, model, field)
             tomorrow_temp = self._get_temp(station, tomorrow_date, model, field)
 
             if today_temp is not None and tomorrow_temp is not None:
@@ -153,6 +156,20 @@ class NwpDirectSignal:
 
     def get_calibration_key(self) -> str:
         return self.name
+
+    def compute_signal(self, station: str, target_date: str = None) -> Optional[Dict]:
+        """Public dict-returning API (compatibility with NwpAnalogSignal callers)."""
+        from datetime import datetime as dt
+        if target_date is None:
+            target_date = dt.now().strftime('%Y-%m-%d')
+        direction, confidence = self.evaluate_for_station(station, target_date, market_type='HIGH')
+        if direction is None:
+            return None
+        return {
+            'direction': 1 if direction == 'up' else -1,
+            'confidence': confidence,
+            'source': 'nwp_direct',
+        }
 
 
 # ── Standalone test ──────────────────────────────────────────────────

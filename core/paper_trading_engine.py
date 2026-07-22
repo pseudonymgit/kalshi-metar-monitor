@@ -184,19 +184,17 @@ except ImportError:
     HAS_MULTI_MODEL_ENSEMBLE = False
 
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
-# Attempt to import NWP Analog Signal - wrap in try/except to prevent crashes if sklearn/xgboost not installed
-# Check the NWP_ANALOG_ENABLED flag - this signal is experimental and gated
+# Attempt to import NWP Direct Signal - replaces the old NWP Analog Signal
+# Uses direct NWP forecast model data (GFS, ECMWF, ICON, GEM) via DB
 try:
-    from core.signals.nwp_analog_signal import NwpAnalogSignal, NWP_ANALOG_ENABLED
+    from core.signals.nwp_direct_signal import NwpDirectSignal
 except ImportError:
-    print("Warning: NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
-    NwpAnalogSignal = None
-    NWP_ANALOG_ENABLED = False
+    print("Warning: NWP Direct Signal module not available.")
+    NwpDirectSignal = None
 
-# Determine if we should attempt to use the NWP analog signal
-if not NWP_ANALOG_ENABLED:
-    print("WARNING: NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
-HAS_NWP_ANOG = NWP_ANALOG_ENABLED
+# NWP Direct is always enabled when the module is available
+NWP_DIRECT_ENABLED = NwpDirectSignal is not None
+HAS_NWP_DIRECT = NWP_DIRECT_ENABLED
 
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
@@ -321,8 +319,8 @@ class PaperTrader:
         self._init_metar_db_if_needed()
 
         # Initialize signal instances
-        # NWP Analog is NOT instantiated at init - lazy-loaded when first needed
-        self._nwp_analog = None
+        # NWP Direct is NOT instantiated at init - lazy-loaded when first needed
+        self._nwp_direct = None
 
         # Temperature Advection Signal - lazy-loaded when first needed
         self._temp_advection = None
@@ -342,8 +340,8 @@ class PaperTrader:
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
         self.signal_names = ["calendar_climatology", "late_day_momentum", "late_day_analysis"]
-        if NWP_ANALOG_ENABLED:
-            self.signal_names.append("nwp_analog")
+        if NWP_DIRECT_ENABLED:
+            self.signal_names.append("nwp_direct")
         # Add multi-model ensemble signal if available
         if HAS_MULTI_MODEL_ENSEMBLE:
             self.signal_names.append("multi_model_ensemble")
@@ -931,25 +929,25 @@ class PaperTrader:
                 market_side = MarketSide.UP if ldm_direction == "up" else MarketSide.DOWN
                 signals.append((station, "HIGH", market_side, "late_day_momentum_hourly"))
 
-            # Signal 4: NWP Analog (experimental - gated behind NWP_ANALOG_ENABLED flag)
-            if NWP_ANALOG_ENABLED:
-                # Lazy-initialize the NWP analog signal on first use
-                if self._nwp_analog is None:
+            # Signal 4: NWP Direct (uses real NWP forecast model data from DB)
+            if NWP_DIRECT_ENABLED:
+                # Lazy-initialize the NWP direct signal on first use
+                if self._nwp_direct is None:
                     try:
-                        self._nwp_analog = NwpAnalogSignal()
-                        _LOGGER.info("NWP analog signal initialized (lazy load)")
+                        self._nwp_direct = NwpDirectSignal()
+                        _LOGGER.info("NWP direct signal initialized (lazy load)")
                     except Exception as e:
-                        _LOGGER.warning(f"Failed to initialize NWP Analog Signal: {e}")
-                if self._nwp_analog is not None:
+                        _LOGGER.warning(f"Failed to initialize NWP Direct Signal: {e}")
+                if self._nwp_direct is not None:
                     try:
-                        result = self._nwp_analog.compute_signal(station, date)
+                        result = self._nwp_direct.compute_signal(station, date)
                         if result and result.get('direction') is not None and result.get('confidence', 0) > 0:
                             direction = result['direction']
                             market_side = MarketSide.UP if direction == 1 else MarketSide.DOWN
-                            signals.append((station, "HIGH", market_side, "nwp_analog"))
-                            _LOGGER.info(f"NWP analog signal fired for {station} on {date}: direction={direction}, confidence={result.get('confidence', 0)}")
+                            signals.append((station, "HIGH", market_side, "nwp_direct"))
+                            _LOGGER.info(f"NWP direct signal fired for {station} on {date}: direction={direction}, confidence={result.get('confidence', 0)}")
                     except Exception as e:
-                        _LOGGER.warning(f"Failed to compute NWP analog signal for {station} on {date}: {e}")
+                        _LOGGER.warning(f"Failed to compute NWP direct signal for {station} on {date}: {e}")
 
             # Signal 5: Multi-Model Ensemble (using real NWP forecasts from database)
             if HAS_MULTI_MODEL_ENSEMBLE:
@@ -1041,7 +1039,7 @@ class PaperTrader:
                     base_confidence = 0.6 
                 elif reason in ["late_day_momentum_hourly"]:
                     base_confidence = 0.7
-                elif reason in ["nwp_analog"]:
+                elif reason in ["nwp_direct"]:
                     base_confidence = 0.75
                 elif reason in ["multi_model_ensemble"]:
                     base_confidence = 0.75
@@ -1419,8 +1417,8 @@ class PaperTrader:
                     signal_name = "calendar_climatology"
                 elif "momentum" in functionality or "late_day" in functionality:
                     signal_name = "late_day_momentum"
-                elif "nwp" in functionality or "analog" in functionality:
-                    signal_name = "nwp_analog"
+                elif "nwp" in functionality or "direct" in functionality:
+                    signal_name = "nwp_direct"
                 elif "analysis" in functionality:
                     signal_name = "late_day_analysis"
                 else:
@@ -2286,8 +2284,8 @@ class PaperTrader:
                     signal_name = "calendar_climatology"
                 elif "momentum" in functionality or "late_day" in functionality:
                     signal_name = "late_day_momentum"  # Using appropriate name for the late-day momentum signal
-                elif "nwp" in functionality or "analog" in functionality:
-                    signal_name = "nwp_analog"
+                elif "nwp" in functionality or "direct" in functionality:
+                    signal_name = "nwp_direct"
                 elif "analysis" in functionality:
                     signal_name = "late_day_analysis"
                 else:
