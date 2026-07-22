@@ -1,0 +1,218 @@
+{
+  "timestamp": "2026-07-22T03:51:07.580033",
+  "database": "data/metar_backfill.db",
+  "stations_analyzed": [
+    "KATL",
+    "KAUS",
+    "KBOS",
+    "KDAL",
+    "KDCA",
+    "KDEN",
+    "KDFW",
+    "KHOU",
+    "KLAS",
+    "KLAX",
+    "KMDW",
+    "KMIA",
+    "KMSP",
+    "KMSY",
+    "KNYC",
+    "KOKC",
+    "KPHL",
+    "KPHX",
+    "KSAT",
+    "KSEA",
+    "KSFO"
+  ],
+  "signals_analyzed": [
+    "calendar_climatology",
+    "esdr",
+    "fogr_reversion",
+    "forecast_disagreement",
+    "frontal_detector",
+    "hrrr_bias_corrected",
+    "intraday_metar_confirmation",
+    "metar_dtdt",
+    "nwp_direct",
+    "nwp_dtdt_fusion",
+    "pressure_delta",
+    "pressure_tendency",
+    "settlement_arbitrage",
+    "spread_based_entry",
+    "temperature_advection",
+    "volume_momentum",
+    "wind_direction_shift"
+  ],
+  "redundancy_threshold": 0.7,
+  "pairwise_spearman": {
+    "calendar_climatology vs forecast_disagreement": 0.3856,
+    "calendar_climatology vs frontal_detector": 0.3234,
+    "calendar_climatology vs pressure_delta": 0.4074,
+    "forecast_disagreement vs frontal_detector": 0.2353,
+    "forecast_disagreement vs pressure_delta": 0.3201,
+    "pressure_delta vs frontal_detector": 0.411,
+    "wind_direction_shift vs calendar_climatology": 0.1844,
+    "wind_direction_shift vs forecast_disagreement": 0.0488,
+    "wind_direction_shift vs frontal_detector": 0.086,
+    "wind_direction_shift vs pressure_delta": 0.374
+  },
+  "redundant_pairs": [],
+  "reversion_dominance": {
+    "reversion_count": 7,
+    "trend_count": 10,
+    "dominance_ratio": 0.4117647058823529
+  },
+  "ensemble_diversity_score": {
+    "overall_eds": 0.4985,
+    "per_station": {
+      "KATL": {
+        "eds": 0.5052,
+        "avg_pairwise_rho": 0.295,
+        "avg_dir_agreement": 0.5108,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KAUS": {
+        "eds": 0.5116,
+        "avg_pairwise_rho": 0.2478,
+        "avg_dir_agreement": 0.5273,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KBOS": {
+        "eds": 0.5193,
+        "avg_pairwise_rho": 0.2883,
+        "avg_dir_agreement": 0.5055,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KDAL": {
+        "eds": 0.4823,
+        "avg_pairwise_rho": 0.2896,
+        "avg_dir_agreement": 0.5177,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KDCA": {
+        "eds": 0.5233,
+        "avg_pairwise_rho": 0.294,
+        "avg_dir_agreement": 0.4953,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KDEN": {
+        "eds": 0.5451,
+        "avg_pairwise_rho": 0.2252,
+        "avg_dir_agreement": 0.5042,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KDFW": {
+        "eds": 0.4821,
+        "avg_pairwise_rho": 0.2917,
+        "avg_dir_agreement": 0.5155,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KHOU": {
+        "eds": 0.4917,
+        "avg_pairwise_rho": 0.2632,
+        "avg_dir_agreement": 0.5214,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KLAS": {
+        "eds": 0.5015,
+        "avg_pairwise_rho": 0.2725,
+        "avg_dir_agreement": 0.5029,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KLAX": {
+        "eds": 0.4737,
+        "avg_pairwise_rho": 0.268,
+        "avg_dir_agreement": 0.4501,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KMDW": {
+        "eds": 0.5216,
+        "avg_pairwise_rho": 0.2921,
+        "avg_dir_agreement": 0.5044,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KMIA": {
+        "eds": 0.4661,
+        "avg_pairwise_rho": 0.1924,
+        "avg_dir_agreement": 0.5504,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KMSP": {
+        "eds": 0.5134,
+        "avg_pairwise_rho": 0.3166,
+        "avg_dir_agreement": 0.5031,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KMSY": {
+        "eds": 0.4842,
+        "avg_pairwise_rho": 0.2357,
+        "avg_dir_agreement": 0.5369,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KNYC": {
+        "eds": 0.5077,
+        "avg_pairwise_rho": 0.3027,
+        "avg_dir_agreement": 0.5166,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KOKC": {
+        "eds": 0.495,
+        "avg_pairwise_rho": 0.2786,
+        "avg_dir_agreement": 0.5288,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KPHL": {
+        "eds": 0.5072,
+        "avg_pairwise_rho": 0.3283,
+        "avg_dir_agreement": 0.5118,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KPHX": {
+        "eds": 0.46,
+        "avg_pairwise_rho": 0.3146,
+        "avg_dir_agreement": 0.5556,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KSAT": {
+        "eds": 0.4885,
+        "avg_pairwise_rho": 0.2736,
+        "avg_dir_agreement": 0.543,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KSEA": {
+        "eds": 0.53,
+        "avg_pairwise_rho": 0.2776,
+        "avg_dir_agreement": 0.4915,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      },
+      "KSFO": {
+        "eds": 0.4581,
+        "avg_pairwise_rho": 0.2904,
+        "avg_dir_agreement": 0.4808,
+        "balance_score": 0.0,
+        "n_signals_fired": 5
+      }
+    }
+  },
+  "recommendations": []
+}

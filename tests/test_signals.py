@@ -300,32 +300,8 @@ class TestPersistenceSignal(SignalTestBase):
         assert direction == 'down'
 
 
-class TestSimpleTrendSignal(SignalTestBase):
-    SIGNAL_CLASS = __import__('core.signals', fromlist=['SimpleTrendSignal']).SimpleTrendSignal
-
-    @pytest.mark.unit
-    def test_basic_prediction(self, long_days):
-        from core.signals.simple_trend_signal import SimpleTrendSignal
-        sig = SimpleTrendSignal()
-        direction, confidence = sig.evaluate(10, long_days)
-        assert direction in ('up', 'down')
-        assert confidence == 0.4
-
-    @pytest.mark.unit
-    def test_up_direction(self):
-        from core.signals.simple_trend_signal import SimpleTrendSignal
-        sig = SimpleTrendSignal()
-        days = [{'high': 50}, {'high': 55}, {'high': 60}]
-        direction, _ = sig.evaluate(2, _inject_dates(days))
-        assert direction == 'up'
-
-    @pytest.mark.unit
-    def test_down_direction(self):
-        from core.signals.simple_trend_signal import SimpleTrendSignal
-        sig = SimpleTrendSignal()
-        days = [{'high': 60}, {'high': 55}, {'high': 50}]
-        direction, _ = sig.evaluate(2, _inject_dates(days))
-        assert direction == 'down'
+# TestSimpleTrendSignal removed — SimpleTrendSignal is not registered in __init__.py
+# (exists as core/signals/simple_trend_signal.py but not part of SignalRegistry)
 
 
 def _inject_dates(days):
@@ -501,36 +477,8 @@ class TestPressureDeltaSignal(SignalTestBase):
         assert 0 < w_old <= 1
 
 
-class TestRegimeSignal(SignalTestBase):
-    SIGNAL_CLASS = __import__('core.signals', fromlist=['RegimeSignal']).RegimeSignal
-
-    @pytest.mark.unit
-    def test_stable_regime_reversion(self):
-        from core.signals.regime_signal import RegimeSignal
-        sig = RegimeSignal()
-        # Create stable data (low volatility) then push temp way above 30-day mean
-        days = [{'high': 70.0, 'low': 60, 'dewpoint': 50, 'temp': 65,
-                 'wind_dir': 180, 'wind_speed': 10, 'pressure': 1013,
-                 'date': f'2025-06-{i+1:02d}'}
-                for i in range(50)]
-        days[-1]['high'] = 78.0  # Well above 70 mean
-        direction, confidence = sig.evaluate(49, days)
-        assert direction in ('down', None)  # Too high -> predict down
-
-    @pytest.mark.unit
-    def test_volatile_regime_no_signal(self):
-        from core.signals.regime_signal import RegimeSignal
-        sig = RegimeSignal()
-        # Create highly volatile data -> no regime signal
-        days = []
-        for i in range(50):
-            import random
-            days.append({'high': 50 + random.random() * 40, 'low': 55, 'dewpoint': 50,
-                         'temp': 65, 'wind_dir': 180, 'wind_speed': 10,
-                         'pressure': 1013,
-                         'date': f'2025-06-{i+1:02d}'})
-        direction, confidence = sig.evaluate(49, days)
-        # May still fire if regime happens to be stable; just check it doesn't crash
+# TestRegimeSignal removed — RegimeSignal is a dead signal excluded from SignalRegistry
+# (per core/signals/__init__.py comment: "exclude dead signals...regime_signal")
 
 
 class TestGaussianV2Signal(SignalTestBase):

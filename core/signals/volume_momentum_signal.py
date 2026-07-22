@@ -50,9 +50,17 @@ class VolumeMomentumSignal(BaseSignal):
 
     def __init__(self, db_path: str):
         super().__init__(db_path)
-        self.name = "volume_momentum"
-        self.min_lookback = 1
+        self._signal_name = "volume_momentum"
+        self._signal_min_lookback = 1
         self.cost_model = MARKET_COST_MODEL
+
+    @property
+    def name(self) -> str:
+        return self._signal_name
+
+    @property
+    def min_lookback(self) -> int:
+        return self._signal_min_lookback
 
     def evaluate(self, idx: int, days: int) -> Dict[str, any]:
         """

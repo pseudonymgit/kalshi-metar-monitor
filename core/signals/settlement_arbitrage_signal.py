@@ -52,9 +52,17 @@ class SettlementTimeArbitrageSignal(BaseSignal):
 
     def __init__(self, db_path: str):
         super().__init__(db_path)
-        self.name = "settlement_arbitrage"
-        self.min_lookback = 0  # No lookback needed — real-time signal
+        self._signal_name = "settlement_arbitrage"
+        self._signal_min_lookback = 0  # No lookback needed — real-time signal
         self.cost_model = MARKET_COST_MODEL
+
+    @property
+    def name(self) -> str:
+        return self._signal_name
+
+    @property
+    def min_lookback(self) -> int:
+        return self._signal_min_lookback
 
     def evaluate(self, idx: int, days: int) -> Dict[str, any]:
         """

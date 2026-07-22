@@ -52,11 +52,19 @@ class SpreadBasedEntrySignal(BaseSignal):
         narrow_threshold: float = SPREAD_NARROW_THRESHOLD,
     ):
         super().__init__(db_path)
-        self.name = "spread_based_entry"
-        self.min_lookback = 1  # Real-time signal, no lookback needed
+        self._signal_name = "spread_based_entry"
+        self._signal_min_lookback = 1  # Real-time signal, no lookback needed
         self.widening_threshold = widening_threshold
         self.narrow_threshold = narrow_threshold
         self.cost_model = MARKET_COST_MODEL
+
+    @property
+    def name(self) -> str:
+        return self._signal_name
+
+    @property
+    def min_lookback(self) -> int:
+        return self._signal_min_lookback
 
     def evaluate(self, idx: int, days: int) -> Dict[str, any]:
         """
