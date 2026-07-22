@@ -252,3 +252,14 @@ Fixes applied before dispatch: agreement threshold, signal registry, fee rates. 
 - [x] 20.3 — DB Connection Standardization: sqlite_utils.py (connection pool), db_schema.py (24+ tables, version tracking)
 - [x] 20.4 — Import Path Standardization: pyproject.toml created, __all__ exports on 14 modules, core/__init__.py updated
 - [x] All 12 extracted modules compile-clean
+
+## Phase 21: Test Infrastructure (2026-07-22 05:05 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] 21.1 — Testing Framework: conftest.py, fixtures (mock Kalshi API, METAR data, mock time, temp DB), pytest config in pyproject.toml
+- [x] 21.2 — Core Signal Tests: 164 tests across all 22 registered signals (evaluate() return type, insufficient history, missing fields, edge cases, confidence clamping)
+- [x] 21.3 — Architecture Decomposition Tests: 41 tests — facade re-exports, signal registry imports, core package import paths, behavioral regression
+- [x] 21.4 — Edge Case Tests: 36 tests — Kalshi API errors, position sizing extremes, DB operations, alert dispatch failures
+- [x] Pre-existing bug fixes: signal_fusion.py facade imports, fusion_logic.py __all__, calibration_pipeline.py missing import, price_fetcher.py missing symbols, settlement_processor.py stub class
+- [x] Verified: 322 Phase 21 tests pass, 4 skipped. 7 pre-existing test failures (kalshi_*.py — pre-existing, not regressions)

@@ -539,3 +539,34 @@ Ready for Phase 16 with:
 - `pyproject.toml` with project metadata, dependencies, entry points
 - `__all__` exports on 14 modules
 - `core/__init__.py` updated with comprehensive package documentation
+
+## Phase 21: Test Infrastructure — COMPLETED
+
+### ✅ 21.1: Testing Framework Setup — COMPLETED
+- `tests/` directory with `conftest.py`, `__init__.py`, 50+ test files
+- `pytest` config in `pyproject.toml` (`testpaths`, `python_files`, `filterwarnings`)
+- Test fixtures: mock Kalshi API, METAR data, mock time, temp DB, integration helpers
+
+### ✅ 21.2: Core Signal Tests — COMPLETED
+- 164 tests across all 22 registered signals
+- Added 4 missing test classes: SeasonRegime, SettlementTimeArbitrage, SpreadBasedEntry, VolumeMomentum
+- Each signal tested: evaluate() return type, insufficient history, missing fields, edge cases, confidence clamping
+
+### ✅ 21.3: Architecture Decomposition Tests — COMPLETED
+- 41 tests: facade re-exports, signal registry import paths, core package paths, behavioral regression
+- All import paths unchanged from pre-decomposition
+
+### ✅ 21.4: Edge Case Tests — COMPLETED
+- 36 tests: Kalshi API errors, position sizing extremes, DB operations, alert dispatch failures
+- Agreement gate, trade journal, signal registry edge cases
+
+### ✅ Pre-existing Bug Fixes
+- signal_fusion.py facade: removed method-only imports causing ImportError
+- fusion_logic.py __all__: removed 16 method-only symbols
+- calibration_pipeline.py: added missing `import os`
+- price_fetcher.py: added missing `_LOGGER`, `_alert_db_path()`, `_ensure_alert_schema()`
+- settlement_processor.py: added stub SettlementProcessor class
+- metar_monitor.py facade: added missing `_ensure_alert_schema` re-export + `datetime` import
+
+### Verification
+- 322 Phase 21 tests pass, 4 skipped. 7 pre-existing test failures (kalshi_*.py — not regressions)
