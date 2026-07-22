@@ -372,7 +372,7 @@ class TestCalendarClimatologySignal(SignalTestBase):
                  'wind_dir': 180, 'wind_speed': 10, 'pressure': 1013,
                  'date': f'2025-06-{i+1:02d}'}
                 for i in range(65)]
-        days[-1]['high'] = 95.0  # Extreme spike above 1.5 z threshold
+        days[63]['high'] = 95.0  # Extreme spike above 1.5 z threshold (current = days[idx-1])
         direction, confidence = sig.evaluate(64, days)
         assert direction == 'down'
         assert confidence > 0
@@ -385,7 +385,7 @@ class TestCalendarClimatologySignal(SignalTestBase):
                  'wind_dir': 180, 'wind_speed': 10, 'pressure': 1013,
                  'date': f'2025-06-{i+1:02d}'}
                 for i in range(65)]
-        days[-1]['high'] = 40.0  # Extreme cold
+        days[63]['high'] = 40.0  # Extreme cold (current = days[idx-1])
         direction, confidence = sig.evaluate(64, days)
         assert direction == 'up'
         assert confidence > 0

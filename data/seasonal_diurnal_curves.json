@@ -1,0 +1,128 @@
+{
+  "KATL": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -5,
+    "total_obs": 41363
+  },
+  "KAUS": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41390
+  },
+  "KBOS": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -5,
+    "total_obs": 41331
+  },
+  "KDAL": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 40766
+  },
+  "KDCA": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -5,
+    "total_obs": 41424
+  },
+  "KDEN": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -7,
+    "total_obs": 41042
+  },
+  "KDFW": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41393
+  },
+  "KHOU": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41414
+  },
+  "KLAS": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -8,
+    "total_obs": 41347
+  },
+  "KLAX": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -8,
+    "total_obs": 41410
+  },
+  "KMDW": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41384
+  },
+  "KMIA": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -5,
+    "total_obs": 41366
+  },
+  "KMSP": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 34012
+  },
+  "KMSY": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41289
+  },
+  "KNYC": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -5,
+    "total_obs": 41172
+  },
+  "KOKC": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41379
+  },
+  "KPHL": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -5,
+    "total_obs": 41430
+  },
+  "KPHX": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -7,
+    "total_obs": 41336
+  },
+  "KSAT": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -6,
+    "total_obs": 41455
+  },
+  "KSEA": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -8,
+    "total_obs": 41381
+  },
+  "KSFO": {
+    "diurnal_curve": {},
+    "monthly_baseline": {},
+    "tz_offset": -8,
+    "total_obs": 41324
+  }
+}
