@@ -1,0 +1,2773 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-22T20:10:14.690444+00:00",
+    "script": "run_calibration_live.py",
+    "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db",
+    "nwp_db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db",
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "date_range": "2026-07-17 to 2026-07-21 (5 days)",
+    "db_status": {
+      "metar_db": true,
+      "metar_obs_count": 861172,
+      "nwp_db": true,
+      "nwp_forecast_count": 240822
+    }
+  },
+  "signal_results": [
+    {
+      "signal": "ai_composite",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "calendar_climatology",
+      "total_attempts": 100,
+      "total_fired": 35,
+      "total_errors": 0,
+      "fire_rate_pct": 35.0,
+      "avg_confidence": 0.5947,
+      "max_confidence": 0.6,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "corrected_pressure_delta",
+      "total_attempts": 100,
+      "total_fired": 37,
+      "total_errors": 0,
+      "fire_rate_pct": 37.0,
+      "avg_confidence": 0.7422,
+      "max_confidence": 0.8,
+      "data_source": "dual_polarity (daily metar)",
+      "per_station": {
+        "KATL": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "esdr",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 100,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "nwp_forecasts",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 5
+        }
+      }
+    },
+    {
+      "signal": "fogr_reversion",
+      "total_attempts": 100,
+      "total_fired": 51,
+      "total_errors": 0,
+      "fire_rate_pct": 51.0,
+      "avg_confidence": 0.2522,
+      "max_confidence": 0.55,
+      "data_source": "metar_observations (intraday)",
+      "per_station": {
+        "KATL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "forecast_disagreement",
+      "total_attempts": 100,
+      "total_fired": 94,
+      "total_errors": 0,
+      "fire_rate_pct": 94.0,
+      "avg_confidence": 0.9923,
+      "max_confidence": 1.0,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "frontal_detector",
+      "total_attempts": 100,
+      "total_fired": 60,
+      "total_errors": 0,
+      "fire_rate_pct": 60.0,
+      "avg_confidence": 0.65,
+      "max_confidence": 0.85,
+      "data_source": "metar_observations (intraday)",
+      "per_station": {
+        "KATL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "gaussian",
+      "total_attempts": 100,
+      "total_fired": 39,
+      "total_errors": 0,
+      "fire_rate_pct": 39.0,
+      "avg_confidence": 1.0,
+      "max_confidence": 1.0,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "gaussian_v2",
+      "total_attempts": 100,
+      "total_fired": 49,
+      "total_errors": 0,
+      "fire_rate_pct": 49.0,
+      "avg_confidence": 0.9129,
+      "max_confidence": 1.0,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "goldilocks",
+      "total_attempts": 100,
+      "total_fired": 68,
+      "total_errors": 0,
+      "fire_rate_pct": 68.0,
+      "avg_confidence": 0.8659,
+      "max_confidence": 1.0,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "hrrr_bias_corrected",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "nwp_forecasts + metar_observations",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "intraday_metar_confirmation",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "metar_observations (intraday)",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "metar_dtdt",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "metar_observations (intraday)",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "nwp_direct",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "nwp_forecasts",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "nwp_dtdt_fusion",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "nwp_forecasts + metar_observations",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "persistence",
+      "total_attempts": 100,
+      "total_fired": 100,
+      "total_errors": 0,
+      "fire_rate_pct": 100.0,
+      "avg_confidence": 0.3,
+      "max_confidence": 0.3,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "pressure_delta",
+      "total_attempts": 100,
+      "total_fired": 37,
+      "total_errors": 0,
+      "fire_rate_pct": 37.0,
+      "avg_confidence": 0.7422,
+      "max_confidence": 0.8,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 3,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "pressure_tendency",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "metar_observations (intraday)",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "seasonal_regime",
+      "total_attempts": 100,
+      "total_fired": 100,
+      "total_errors": 0,
+      "fire_rate_pct": 100.0,
+      "avg_confidence": 0.8225,
+      "max_confidence": 0.85,
+      "data_source": "dual_polarity (daily metar)",
+      "per_station": {
+        "KATL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "settlement_arbitrage",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "kalshi_api",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      },
+      "note": "Requires live Kalshi API (order book data). Cannot be evaluated historically without API access. See KALSHI_API_INTEGRATION_PROGRESS.md for integration status."
+    },
+    {
+      "signal": "spread_based_entry",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "kalshi_api",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      },
+      "note": "Requires live Kalshi API (order book data). Cannot be evaluated historically without API access. See KALSHI_API_INTEGRATION_PROGRESS.md for integration status."
+    },
+    {
+      "signal": "temperature_advection",
+      "total_attempts": 100,
+      "total_fired": 45,
+      "total_errors": 0,
+      "fire_rate_pct": 45.0,
+      "avg_confidence": 0.5703,
+      "max_confidence": 0.85,
+      "data_source": "nwp_forecasts",
+      "per_station": {
+        "KATL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    },
+    {
+      "signal": "volume_momentum",
+      "total_attempts": 100,
+      "total_fired": 0,
+      "total_errors": 0,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "data_source": "kalshi_api",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        }
+      },
+      "note": "Requires live Kalshi API (order book data). Cannot be evaluated historically without API access. See KALSHI_API_INTEGRATION_PROGRESS.md for integration status."
+    },
+    {
+      "signal": "wind_direction_shift",
+      "total_attempts": 100,
+      "total_fired": 11,
+      "total_errors": 0,
+      "fire_rate_pct": 11.0,
+      "avg_confidence": 0.6352,
+      "max_confidence": 0.85,
+      "data_source": "metar_observations (daily aggregates)",
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KBOS": {
+          "fired": 4,
+          "total": 5,
+          "errors": 0
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMDW": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSP": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KOKC": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHL": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSAT": {
+          "fired": 2,
+          "total": 5,
+          "errors": 0
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 5,
+          "errors": 0
+        },
+        "KSFO": {
+          "fired": 1,
+          "total": 5,
+          "errors": 0
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "total_signals": 24,
+    "signals_with_trades": 13,
+    "signals_with_zero_trades": 11,
+    "signals_with_errors": 1,
+    "total_attempts": 2400,
+    "total_fired": 726,
+    "overall_fire_rate_pct": 30.25,
+    "signals_with_trades_list": [
+      "calendar_climatology",
+      "corrected_pressure_delta",
+      "fogr_reversion",
+      "forecast_disagreement",
+      "frontal_detector",
+      "gaussian",
+      "gaussian_v2",
+      "goldilocks",
+      "persistence",
+      "pressure_delta",
+      "seasonal_regime",
+      "temperature_advection",
+      "wind_direction_shift"
+    ],
+    "signals_with_zero_trades_list": [
+      "ai_composite",
+      "esdr",
+      "hrrr_bias_corrected",
+      "intraday_metar_confirmation",
+      "metar_dtdt",
+      "nwp_direct",
+      "nwp_dtdt_fusion",
+      "pressure_tendency",
+      "settlement_arbitrage",
+      "spread_based_entry",
+      "volume_momentum"
+    ],
+    "market_signals_require_live_api": [
+      "settlement_arbitrage",
+      "spread_based_entry",
+      "volume_momentum"
+    ]
+  },
+  "errors": []
+}

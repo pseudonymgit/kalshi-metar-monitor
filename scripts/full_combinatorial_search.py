@@ -48,6 +48,17 @@ if PROJECT_DIR not in sys.path:
 if CORE_DIR not in sys.path:
     sys.path.insert(0, CORE_DIR)
 
+# Workaround: import core.signal_fusion first, then alias it so unified_backtest's
+# bare 'from signal_fusion import ...' finds it
+import importlib
+import types
+
+try:
+    import core.signal_fusion
+    sys.modules['signal_fusion'] = sys.modules['core.signal_fusion']
+except ImportError:
+    pass
+
 from core.signals import SignalRegistry
 from core.unified_backtest import (
     load_station_data,

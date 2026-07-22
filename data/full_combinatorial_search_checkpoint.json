@@ -1,0 +1,2509 @@
+{
+  "timestamp": "2026-07-22T20:11:05.420802",
+  "tested_combinations": 200,
+  "total_estimated_combinations": 4422,
+  "elapsed_seconds": 112.8126323223114,
+  "results_count": 145,
+  "results": {
+    "calendar_climatology+corrected_pressure_delta_agree_1": {
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9559,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+corrected_pressure_delta_agree_2": {
+      "accuracy": 0.574224,
+      "sharpe": -0.167039,
+      "brier": 0.563295,
+      "ece": 0.596286,
+      "drawdown": 0.983063,
+      "trades": 4190,
+      "correct": 2406,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+forecast_disagreement_agree_1": {
+      "accuracy": 0.37046,
+      "sharpe": -0.279242,
+      "brier": 0.629842,
+      "ece": 0.629858,
+      "drawdown": 1.0,
+      "trades": 14895,
+      "correct": 5518,
+      "total": 14895,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+forecast_disagreement_agree_2": {
+      "accuracy": 0.265134,
+      "sharpe": -0.545455,
+      "brier": 0.735816,
+      "ece": 0.735866,
+      "drawdown": 1.0,
+      "trades": 4741,
+      "correct": 1257,
+      "total": 4741,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+frontal_detector_agree_1": {
+      "accuracy": 0.483457,
+      "sharpe": -0.063227,
+      "brier": 0.513841,
+      "ece": 0.517469,
+      "drawdown": 1.0,
+      "trades": 18376,
+      "correct": 8884,
+      "total": 18376,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+frontal_detector_agree_2": {
+      "accuracy": 0.517734,
+      "sharpe": -0.088549,
+      "brier": 0.469596,
+      "ece": 0.486604,
+      "drawdown": 0.999298,
+      "trades": 3919,
+      "correct": 2029,
+      "total": 3919,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+gaussian_agree_1": {
+      "accuracy": 0.309599,
+      "sharpe": -0.4229,
+      "brier": 0.690401,
+      "ece": 0.690401,
+      "drawdown": 1.0,
+      "trades": 12991,
+      "correct": 4022,
+      "total": 12991,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+gaussian_agree_2": {
+      "accuracy": 0.276605,
+      "sharpe": -0.510828,
+      "brier": 0.723395,
+      "ece": 0.723395,
+      "drawdown": 1.0,
+      "trades": 6869,
+      "correct": 1900,
+      "total": 6869,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+gaussian_v2_agree_1": {
+      "accuracy": 0.368264,
+      "sharpe": -0.28374,
+      "brier": 0.631736,
+      "ece": 0.631736,
+      "drawdown": 1.0,
+      "trades": 20841,
+      "correct": 7675,
+      "total": 20841,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+gaussian_v2_agree_2": {
+      "accuracy": 0.276605,
+      "sharpe": -0.510828,
+      "brier": 0.723395,
+      "ece": 0.723395,
+      "drawdown": 1.0,
+      "trades": 6869,
+      "correct": 1900,
+      "total": 6869,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+goldilocks_agree_1": {
+      "accuracy": 0.396665,
+      "sharpe": -0.220612,
+      "brier": 0.594219,
+      "ece": 0.592526,
+      "drawdown": 1.0,
+      "trades": 19790,
+      "correct": 7850,
+      "total": 19790,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+goldilocks_agree_2": {
+      "accuracy": 0.290413,
+      "sharpe": -0.49586,
+      "brier": 0.667504,
+      "ece": 0.659688,
+      "drawdown": 1.0,
+      "trades": 4287,
+      "correct": 1245,
+      "total": 4287,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+persistence_agree_1": {
+      "accuracy": 0.454348,
+      "sharpe": -0.053088,
+      "brier": 0.45855,
+      "ece": 0.433351,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 13809,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+persistence_agree_2": {
+      "accuracy": 0.276605,
+      "sharpe": -0.410978,
+      "brier": 0.337999,
+      "ece": 0.226503,
+      "drawdown": 1.0,
+      "trades": 6869,
+      "correct": 1900,
+      "total": 6869,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+pressure_delta_agree_1": {
+      "accuracy": 0.476592,
+      "sharpe": -0.118716,
+      "brier": 0.559597,
+      "ece": 0.56574,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9559,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+pressure_delta_agree_2": {
+      "accuracy": 0.574224,
+      "sharpe": -0.196773,
+      "brier": 0.599008,
+      "ece": 0.628413,
+      "drawdown": 0.988641,
+      "trades": 4190,
+      "correct": 2406,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+seasonal_regime_agree_1": {
+      "accuracy": 0.276605,
+      "sharpe": -0.510828,
+      "brier": 0.723395,
+      "ece": 0.723395,
+      "drawdown": 1.0,
+      "trades": 6869,
+      "correct": 1900,
+      "total": 6869,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+seasonal_regime_agree_2": {
+      "accuracy": 0.276605,
+      "sharpe": -0.510828,
+      "brier": 0.723395,
+      "ece": 0.723395,
+      "drawdown": 1.0,
+      "trades": 6869,
+      "correct": 1900,
+      "total": 6869,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+wind_direction_shift_agree_1": {
+      "accuracy": 0.397949,
+      "sharpe": -0.234838,
+      "brier": 0.60161,
+      "ece": 0.60293,
+      "drawdown": 1.0,
+      "trades": 10142,
+      "correct": 4036,
+      "total": 10142,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+wind_direction_shift_agree_2": {
+      "accuracy": 0.467728,
+      "sharpe": -0.212414,
+      "brier": 0.528524,
+      "ece": 0.539744,
+      "drawdown": 0.999975,
+      "trades": 1193,
+      "correct": 558,
+      "total": 1193,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+forecast_disagreement_agree_1": {
+      "accuracy": 0.455032,
+      "sharpe": -0.11131,
+      "brier": 0.522002,
+      "ece": 0.520389,
+      "drawdown": 1.0,
+      "trades": 21660,
+      "correct": 9856,
+      "total": 21660,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+forecast_disagreement_agree_2": {
+      "accuracy": 0.44726,
+      "sharpe": -0.182918,
+      "brier": 0.494114,
+      "ece": 0.489998,
+      "drawdown": 1.0,
+      "trades": 8485,
+      "correct": 3795,
+      "total": 8485,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+frontal_detector_agree_1": {
+      "accuracy": 0.517908,
+      "sharpe": 0.054782,
+      "brier": 0.437713,
+      "ece": 0.428452,
+      "drawdown": 0.664611,
+      "trades": 22253,
+      "correct": 11525,
+      "total": 22253,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+frontal_detector_agree_2": {
+      "accuracy": 0.50455,
+      "sharpe": 0.067908,
+      "brier": 0.396682,
+      "ece": 0.376072,
+      "drawdown": 0.855405,
+      "trades": 9999,
+      "correct": 5045,
+      "total": 9999,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+gaussian_agree_1": {
+      "accuracy": 0.380091,
+      "sharpe": -0.197878,
+      "brier": 0.529544,
+      "ece": 0.521819,
+      "drawdown": 1.0,
+      "trades": 22734,
+      "correct": 8641,
+      "total": 22734,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+gaussian_agree_2": {
+      "accuracy": 0.303471,
+      "sharpe": -0.298592,
+      "brier": 0.42746,
+      "ece": 0.404459,
+      "drawdown": 1.0,
+      "trades": 7635,
+      "correct": 2317,
+      "total": 7635,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+gaussian_v2_agree_1": {
+      "accuracy": 0.397253,
+      "sharpe": -0.190591,
+      "brier": 0.526036,
+      "ece": 0.518984,
+      "drawdown": 1.0,
+      "trades": 26137,
+      "correct": 10383,
+      "total": 26137,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+gaussian_v2_agree_2": {
+      "accuracy": 0.377255,
+      "sharpe": -0.218806,
+      "brier": 0.456795,
+      "ece": 0.441541,
+      "drawdown": 1.0,
+      "trades": 12082,
+      "correct": 4558,
+      "total": 12082,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+goldilocks_agree_1": {
+      "accuracy": 0.487473,
+      "sharpe": -0.06359,
+      "brier": 0.498552,
+      "ece": 0.483394,
+      "drawdown": 1.0,
+      "trades": 23868,
+      "correct": 11635,
+      "total": 23868,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+goldilocks_agree_2": {
+      "accuracy": 0.491883,
+      "sharpe": -0.097983,
+      "brier": 0.476996,
+      "ece": 0.44324,
+      "drawdown": 1.0,
+      "trades": 10718,
+      "correct": 5272,
+      "total": 10718,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+persistence_agree_1": {
+      "accuracy": 0.503438,
+      "sharpe": 0.012611,
+      "brier": 0.40628,
+      "ece": 0.352809,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 15301,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+persistence_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": 0.035735,
+      "brier": 0.335947,
+      "ece": 0.242428,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+pressure_delta_agree_1": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+pressure_delta_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+seasonal_regime_agree_1": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+seasonal_regime_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+wind_direction_shift_agree_1": {
+      "accuracy": 0.515204,
+      "sharpe": 0.026013,
+      "brier": 0.468278,
+      "ece": 0.462668,
+      "drawdown": 1.0,
+      "trades": 18647,
+      "correct": 9607,
+      "total": 18647,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "corrected_pressure_delta+wind_direction_shift_agree_2": {
+      "accuracy": 0.52518,
+      "sharpe": 0.096708,
+      "brier": 0.378476,
+      "ece": 0.345751,
+      "drawdown": 0.577308,
+      "trades": 3197,
+      "correct": 1679,
+      "total": 3197,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+frontal_detector_agree_1": {
+      "accuracy": 0.447313,
+      "sharpe": -0.08033,
+      "brier": 0.470364,
+      "ece": 0.453437,
+      "drawdown": 1.0,
+      "trades": 19910,
+      "correct": 8906,
+      "total": 19910,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+frontal_detector_agree_2": {
+      "accuracy": 0.416636,
+      "sharpe": -0.126991,
+      "brier": 0.385482,
+      "ece": 0.344795,
+      "drawdown": 1.0,
+      "trades": 8283,
+      "correct": 3451,
+      "total": 8283,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+gaussian_agree_1": {
+      "accuracy": 0.363577,
+      "sharpe": -0.293857,
+      "brier": 0.635345,
+      "ece": 0.635062,
+      "drawdown": 1.0,
+      "trades": 18516,
+      "correct": 6732,
+      "total": 18516,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+gaussian_agree_2": {
+      "accuracy": 0.296189,
+      "sharpe": -0.456918,
+      "brier": 0.701055,
+      "ece": 0.700332,
+      "drawdown": 1.0,
+      "trades": 7242,
+      "correct": 2145,
+      "total": 7242,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+gaussian_v2_agree_1": {
+      "accuracy": 0.382388,
+      "sharpe": -0.253086,
+      "brier": 0.616816,
+      "ece": 0.616695,
+      "drawdown": 1.0,
+      "trades": 23280,
+      "correct": 8902,
+      "total": 23280,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+gaussian_v2_agree_2": {
+      "accuracy": 0.352246,
+      "sharpe": -0.321793,
+      "brier": 0.64596,
+      "ece": 0.645688,
+      "drawdown": 1.0,
+      "trades": 10328,
+      "correct": 3638,
+      "total": 10328,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+goldilocks_agree_1": {
+      "accuracy": 0.411854,
+      "sharpe": -0.191875,
+      "brier": 0.575579,
+      "ece": 0.569077,
+      "drawdown": 1.0,
+      "trades": 21022,
+      "correct": 8658,
+      "total": 21022,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+goldilocks_agree_2": {
+      "accuracy": 0.387244,
+      "sharpe": -0.252019,
+      "brier": 0.583247,
+      "ece": 0.567981,
+      "drawdown": 1.0,
+      "trades": 8953,
+      "correct": 3467,
+      "total": 8953,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+persistence_agree_1": {
+      "accuracy": 0.447175,
+      "sharpe": -0.080893,
+      "brier": 0.430279,
+      "ece": 0.385208,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 13591,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+persistence_agree_2": {
+      "accuracy": 0.381452,
+      "sharpe": -0.228723,
+      "brier": 0.326817,
+      "ece": 0.219522,
+      "drawdown": 1.0,
+      "trades": 12767,
+      "correct": 4870,
+      "total": 12767,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+pressure_delta_agree_1": {
+      "accuracy": 0.442982,
+      "sharpe": -0.115876,
+      "brier": 0.512844,
+      "ece": 0.508169,
+      "drawdown": 1.0,
+      "trades": 21660,
+      "correct": 9595,
+      "total": 21660,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+pressure_delta_agree_2": {
+      "accuracy": 0.4165,
+      "sharpe": -0.201513,
+      "brier": 0.470737,
+      "ece": 0.458803,
+      "drawdown": 1.0,
+      "trades": 8485,
+      "correct": 3534,
+      "total": 8485,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+seasonal_regime_agree_1": {
+      "accuracy": 0.381452,
+      "sharpe": -0.254595,
+      "brier": 0.618548,
+      "ece": 0.618548,
+      "drawdown": 1.0,
+      "trades": 12767,
+      "correct": 4870,
+      "total": 12767,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+seasonal_regime_agree_2": {
+      "accuracy": 0.381452,
+      "sharpe": -0.254595,
+      "brier": 0.618548,
+      "ece": 0.618548,
+      "drawdown": 1.0,
+      "trades": 12767,
+      "correct": 4870,
+      "total": 12767,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+wind_direction_shift_agree_1": {
+      "accuracy": 0.413903,
+      "sharpe": -0.170399,
+      "brier": 0.55206,
+      "ece": 0.545998,
+      "drawdown": 1.0,
+      "trades": 14687,
+      "correct": 6079,
+      "total": 14687,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "forecast_disagreement+wind_direction_shift_agree_2": {
+      "accuracy": 0.384132,
+      "sharpe": -0.174447,
+      "brier": 0.419524,
+      "ece": 0.384555,
+      "drawdown": 1.0,
+      "trades": 2546,
+      "correct": 978,
+      "total": 2546,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+gaussian_agree_1": {
+      "accuracy": 0.387396,
+      "sharpe": -0.174122,
+      "brier": 0.496158,
+      "ece": 0.467527,
+      "drawdown": 1.0,
+      "trades": 21580,
+      "correct": 8360,
+      "total": 21580,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+gaussian_agree_2": {
+      "accuracy": 0.305105,
+      "sharpe": -0.255679,
+      "brier": 0.327348,
+      "ece": 0.236979,
+      "drawdown": 1.0,
+      "trades": 6837,
+      "correct": 2086,
+      "total": 6837,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "gaussian"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+gaussian_v2_agree_1": {
+      "accuracy": 0.400604,
+      "sharpe": -0.171622,
+      "brier": 0.495465,
+      "ece": 0.467238,
+      "drawdown": 1.0,
+      "trades": 25489,
+      "correct": 10211,
+      "total": 25489,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+gaussian_v2_agree_2": {
+      "accuracy": 0.377528,
+      "sharpe": -0.17783,
+      "brier": 0.376684,
+      "ece": 0.309931,
+      "drawdown": 1.0,
+      "trades": 10778,
+      "correct": 4069,
+      "total": 10778,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+goldilocks_agree_1": {
+      "accuracy": 0.501923,
+      "sharpe": -0.027678,
+      "brier": 0.448424,
+      "ece": 0.428821,
+      "drawdown": 1.0,
+      "trades": 21577,
+      "correct": 10830,
+      "total": 21577,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+goldilocks_agree_2": {
+      "accuracy": 0.522746,
+      "sharpe": 0.015058,
+      "brier": 0.380361,
+      "ece": 0.342107,
+      "drawdown": 0.978009,
+      "trades": 11057,
+      "correct": 5780,
+      "total": 11057,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+persistence_agree_1": {
+      "accuracy": 0.523443,
+      "sharpe": 0.043941,
+      "brier": 0.451388,
+      "ece": 0.440024,
+      "drawdown": 0.649212,
+      "trades": 30393,
+      "correct": 15909,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+persistence_agree_2": {
+      "accuracy": 0.556852,
+      "sharpe": 0.126987,
+      "brier": 0.39356,
+      "ece": 0.371168,
+      "drawdown": 0.384511,
+      "trades": 15426,
+      "correct": 8590,
+      "total": 15426,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+pressure_delta_agree_1": {
+      "accuracy": 0.534847,
+      "sharpe": 0.058473,
+      "brier": 0.452128,
+      "ece": 0.446539,
+      "drawdown": 0.641646,
+      "trades": 21092,
+      "correct": 11281,
+      "total": 21092,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+pressure_delta_agree_2": {
+      "accuracy": 0.543222,
+      "sharpe": 0.078386,
+      "brier": 0.425695,
+      "ece": 0.412355,
+      "drawdown": 0.804305,
+      "trades": 8838,
+      "correct": 4801,
+      "total": 8838,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+seasonal_regime_agree_1": {
+      "accuracy": 0.556852,
+      "sharpe": 0.104126,
+      "brier": 0.443148,
+      "ece": 0.443148,
+      "drawdown": 0.367089,
+      "trades": 15426,
+      "correct": 8590,
+      "total": 15426,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+seasonal_regime_agree_2": {
+      "accuracy": 0.556852,
+      "sharpe": 0.104126,
+      "brier": 0.443148,
+      "ece": 0.443148,
+      "drawdown": 0.367089,
+      "trades": 15426,
+      "correct": 8590,
+      "total": 15426,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+wind_direction_shift_agree_1": {
+      "accuracy": 0.556953,
+      "sharpe": 0.104949,
+      "brier": 0.438343,
+      "ece": 0.43627,
+      "drawdown": 0.397152,
+      "trades": 16224,
+      "correct": 9036,
+      "total": 16224,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+wind_direction_shift_agree_2": {
+      "accuracy": 0.612178,
+      "sharpe": 0.249527,
+      "brier": 0.36493,
+      "ece": 0.354845,
+      "drawdown": 0.06828,
+      "trades": 3334,
+      "correct": 2041,
+      "total": 3334,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+gaussian_v2_agree_1": {
+      "accuracy": 0.368264,
+      "sharpe": -0.28374,
+      "brier": 0.631736,
+      "ece": 0.631736,
+      "drawdown": 1.0,
+      "trades": 20841,
+      "correct": 7675,
+      "total": 20841,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+gaussian_v2_agree_2": {
+      "accuracy": 0.309599,
+      "sharpe": -0.4229,
+      "brier": 0.690401,
+      "ece": 0.690401,
+      "drawdown": 1.0,
+      "trades": 12991,
+      "correct": 4022,
+      "total": 12991,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "gaussian_v2"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+goldilocks_agree_1": {
+      "accuracy": 0.379119,
+      "sharpe": -0.257976,
+      "brier": 0.595907,
+      "ece": 0.590798,
+      "drawdown": 1.0,
+      "trades": 22671,
+      "correct": 8595,
+      "total": 22671,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+goldilocks_agree_2": {
+      "accuracy": 0.315174,
+      "sharpe": -0.420569,
+      "brier": 0.609593,
+      "ece": 0.594204,
+      "drawdown": 1.0,
+      "trades": 7526,
+      "correct": 2372,
+      "total": 7526,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+persistence_agree_1": {
+      "accuracy": 0.418024,
+      "sharpe": -0.137194,
+      "brier": 0.458052,
+      "ece": 0.447689,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12705,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+persistence_agree_2": {
+      "accuracy": 0.309599,
+      "sharpe": -0.398387,
+      "brier": 0.400474,
+      "ece": 0.376231,
+      "drawdown": 1.0,
+      "trades": 12991,
+      "correct": 4022,
+      "total": 12991,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+pressure_delta_agree_1": {
+      "accuracy": 0.380091,
+      "sharpe": -0.202465,
+      "brier": 0.524958,
+      "ece": 0.511591,
+      "drawdown": 1.0,
+      "trades": 22734,
+      "correct": 8641,
+      "total": 22734,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+pressure_delta_agree_2": {
+      "accuracy": 0.303471,
+      "sharpe": -0.319048,
+      "brier": 0.413805,
+      "ece": 0.374001,
+      "drawdown": 1.0,
+      "trades": 7635,
+      "correct": 2317,
+      "total": 7635,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+seasonal_regime_agree_1": {
+      "accuracy": 0.309599,
+      "sharpe": -0.4229,
+      "brier": 0.690401,
+      "ece": 0.690401,
+      "drawdown": 1.0,
+      "trades": 12991,
+      "correct": 4022,
+      "total": 12991,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+seasonal_regime_agree_2": {
+      "accuracy": 0.309599,
+      "sharpe": -0.4229,
+      "brier": 0.690401,
+      "ece": 0.690401,
+      "drawdown": 1.0,
+      "trades": 12991,
+      "correct": 4022,
+      "total": 12991,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+wind_direction_shift_agree_1": {
+      "accuracy": 0.350675,
+      "sharpe": -0.298202,
+      "brier": 0.605288,
+      "ece": 0.599412,
+      "drawdown": 1.0,
+      "trades": 15473,
+      "correct": 5426,
+      "total": 15473,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "gaussian+wind_direction_shift_agree_2": {
+      "accuracy": 0.283266,
+      "sharpe": -0.29926,
+      "brier": 0.3733,
+      "ece": 0.327468,
+      "drawdown": 1.0,
+      "trades": 1984,
+      "correct": 562,
+      "total": 1984,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+goldilocks_agree_1": {
+      "accuracy": 0.388468,
+      "sharpe": -0.244824,
+      "brier": 0.582789,
+      "ece": 0.573207,
+      "drawdown": 1.0,
+      "trades": 26118,
+      "correct": 10146,
+      "total": 26118,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian_v2",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+goldilocks_agree_2": {
+      "accuracy": 0.377483,
+      "sharpe": -0.280817,
+      "brier": 0.559584,
+      "ece": 0.538605,
+      "drawdown": 1.0,
+      "trades": 11929,
+      "correct": 4503,
+      "total": 11929,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian_v2",
+        "goldilocks"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+persistence_agree_1": {
+      "accuracy": 0.410621,
+      "sharpe": -0.160462,
+      "brier": 0.421703,
+      "ece": 0.376241,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12480,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian_v2",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+persistence_agree_2": {
+      "accuracy": 0.368264,
+      "sharpe": -0.270331,
+      "brier": 0.387209,
+      "ece": 0.32091,
+      "drawdown": 1.0,
+      "trades": 20841,
+      "correct": 7675,
+      "total": 20841,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian_v2",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+pressure_delta_agree_1": {
+      "accuracy": 0.395416,
+      "sharpe": -0.195137,
+      "brier": 0.521802,
+      "ece": 0.510269,
+      "drawdown": 1.0,
+      "trades": 26137,
+      "correct": 10335,
+      "total": 26137,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian_v2",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+pressure_delta_agree_2": {
+      "accuracy": 0.373283,
+      "sharpe": -0.232383,
+      "brier": 0.447637,
+      "ece": 0.422687,
+      "drawdown": 1.0,
+      "trades": 12082,
+      "correct": 4510,
+      "total": 12082,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian_v2",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+seasonal_regime_agree_1": {
+      "accuracy": 0.368264,
+      "sharpe": -0.28374,
+      "brier": 0.631736,
+      "ece": 0.631736,
+      "drawdown": 1.0,
+      "trades": 20841,
+      "correct": 7675,
+      "total": 20841,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian_v2",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+seasonal_regime_agree_2": {
+      "accuracy": 0.368264,
+      "sharpe": -0.28374,
+      "brier": 0.631736,
+      "ece": 0.631736,
+      "drawdown": 1.0,
+      "trades": 20841,
+      "correct": 7675,
+      "total": 20841,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian_v2",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+wind_direction_shift_agree_1": {
+      "accuracy": 0.383922,
+      "sharpe": -0.23478,
+      "brier": 0.583207,
+      "ece": 0.576911,
+      "drawdown": 1.0,
+      "trades": 22179,
+      "correct": 8515,
+      "total": 22179,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian_v2",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "gaussian_v2+wind_direction_shift_agree_2": {
+      "accuracy": 0.36477,
+      "sharpe": -0.185674,
+      "brier": 0.40216,
+      "ece": 0.357514,
+      "drawdown": 1.0,
+      "trades": 3128,
+      "correct": 1141,
+      "total": 3128,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian_v2",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+persistence_agree_1": {
+      "accuracy": 0.42115,
+      "sharpe": -0.090532,
+      "brier": 0.398618,
+      "ece": 0.335252,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12800,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "goldilocks",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+persistence_agree_2": {
+      "accuracy": 0.382148,
+      "sharpe": -0.243899,
+      "brier": 0.299523,
+      "ece": 0.187605,
+      "drawdown": 1.0,
+      "trades": 17208,
+      "correct": 6576,
+      "total": 17208,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "goldilocks",
+        "persistence"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+pressure_delta_agree_1": {
+      "accuracy": 0.487682,
+      "sharpe": -0.065716,
+      "brier": 0.503798,
+      "ece": 0.492581,
+      "drawdown": 1.0,
+      "trades": 23868,
+      "correct": 11640,
+      "total": 23868,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "goldilocks",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+pressure_delta_agree_2": {
+      "accuracy": 0.492349,
+      "sharpe": -0.103934,
+      "brier": 0.488678,
+      "ece": 0.463698,
+      "drawdown": 1.0,
+      "trades": 10718,
+      "correct": 5277,
+      "total": 10718,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "goldilocks",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+seasonal_regime_agree_1": {
+      "accuracy": 0.425848,
+      "sharpe": -0.160321,
+      "brier": 0.574152,
+      "ece": 0.574152,
+      "drawdown": 1.0,
+      "trades": 17208,
+      "correct": 7328,
+      "total": 17208,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "goldilocks",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+seasonal_regime_agree_2": {
+      "accuracy": 0.425848,
+      "sharpe": -0.160321,
+      "brier": 0.574152,
+      "ece": 0.574152,
+      "drawdown": 1.0,
+      "trades": 17208,
+      "correct": 7328,
+      "total": 17208,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "goldilocks",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+wind_direction_shift_agree_1": {
+      "accuracy": 0.471504,
+      "sharpe": -0.096034,
+      "brier": 0.535812,
+      "ece": 0.537575,
+      "drawdown": 1.0,
+      "trades": 18494,
+      "correct": 8720,
+      "total": 18494,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "goldilocks",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "goldilocks+wind_direction_shift_agree_2": {
+      "accuracy": 0.569497,
+      "sharpe": -0.011314,
+      "brier": 0.473053,
+      "ece": 0.483303,
+      "drawdown": 0.996907,
+      "trades": 3180,
+      "correct": 1811,
+      "total": 3180,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "goldilocks",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "persistence+pressure_delta_agree_1": {
+      "accuracy": 0.503438,
+      "sharpe": 0.014874,
+      "brier": 0.405124,
+      "ece": 0.331229,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 15301,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "persistence",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "persistence+pressure_delta_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": 0.040734,
+      "brier": 0.333925,
+      "ece": 0.204686,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "persistence",
+        "pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "persistence+seasonal_regime_agree_1": {
+      "accuracy": 0.529859,
+      "sharpe": 0.049555,
+      "brier": 0.470141,
+      "ece": 0.470141,
+      "drawdown": 0.542548,
+      "trades": 30393,
+      "correct": 16104,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "persistence",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "persistence+seasonal_regime_agree_2": {
+      "accuracy": 0.529859,
+      "sharpe": 0.049555,
+      "brier": 0.470141,
+      "ece": 0.470141,
+      "drawdown": 0.542548,
+      "trades": 30393,
+      "correct": 16104,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "persistence",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "persistence+wind_direction_shift_agree_1": {
+      "accuracy": 0.525812,
+      "sharpe": 0.045627,
+      "brier": 0.458448,
+      "ece": 0.44846,
+      "drawdown": 0.66688,
+      "trades": 30393,
+      "correct": 15981,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "persistence",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "persistence+wind_direction_shift_agree_2": {
+      "accuracy": 0.581281,
+      "sharpe": 0.21866,
+      "brier": 0.311599,
+      "ece": 0.243627,
+      "drawdown": 0.13758,
+      "trades": 4466,
+      "correct": 2596,
+      "total": 4466,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "persistence",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "pressure_delta+seasonal_regime_agree_1": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "pressure_delta+seasonal_regime_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 2
+    },
+    "pressure_delta+wind_direction_shift_agree_1": {
+      "accuracy": 0.514292,
+      "sharpe": 0.02695,
+      "brier": 0.468832,
+      "ece": 0.465527,
+      "drawdown": 1.0,
+      "trades": 18647,
+      "correct": 9590,
+      "total": 18647,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "pressure_delta+wind_direction_shift_agree_2": {
+      "accuracy": 0.519862,
+      "sharpe": 0.105022,
+      "brier": 0.381703,
+      "ece": 0.362429,
+      "drawdown": 0.523369,
+      "trades": 3197,
+      "correct": 1662,
+      "total": 3197,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "seasonal_regime+wind_direction_shift_agree_1": {
+      "accuracy": 0.581281,
+      "sharpe": 0.154348,
+      "brier": 0.418719,
+      "ece": 0.418719,
+      "drawdown": 0.215478,
+      "trades": 4466,
+      "correct": 2596,
+      "total": 4466,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "seasonal_regime+wind_direction_shift_agree_2": {
+      "accuracy": 0.581281,
+      "sharpe": 0.154348,
+      "brier": 0.418719,
+      "ece": 0.418719,
+      "drawdown": 0.215478,
+      "trades": 4466,
+      "correct": 2596,
+      "total": 4466,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+corrected_pressure_delta+forecast_disagreement_agree_1": {
+      "accuracy": 0.428131,
+      "sharpe": -0.156054,
+      "brier": 0.517089,
+      "ece": 0.500294,
+      "drawdown": 1.0,
+      "trades": 22729,
+      "correct": 9731,
+      "total": 22729,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+forecast_disagreement_agree_2": {
+      "accuracy": 0.395822,
+      "sharpe": -0.269069,
+      "brier": 0.492551,
+      "ece": 0.458326,
+      "drawdown": 1.0,
+      "trades": 11154,
+      "correct": 4415,
+      "total": 11154,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+forecast_disagreement_agree_3": {
+      "accuracy": 0.252316,
+      "sharpe": -0.468735,
+      "brier": 0.372456,
+      "ece": 0.270247,
+      "drawdown": 1.0,
+      "trades": 3131,
+      "correct": 790,
+      "total": 3131,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+frontal_detector_agree_1": {
+      "accuracy": 0.488099,
+      "sharpe": -0.041672,
+      "brier": 0.465207,
+      "ece": 0.45076,
+      "drawdown": 1.0,
+      "trades": 23737,
+      "correct": 11586,
+      "total": 23737,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+frontal_detector_agree_2": {
+      "accuracy": 0.50214,
+      "sharpe": -0.010837,
+      "brier": 0.411597,
+      "ece": 0.384909,
+      "drawdown": 1.0,
+      "trades": 12849,
+      "correct": 6452,
+      "total": 12849,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+frontal_detector_agree_3": {
+      "accuracy": 0.503194,
+      "sharpe": 0.045983,
+      "brier": 0.274001,
+      "ece": 0.177618,
+      "drawdown": 0.412136,
+      "trades": 2661,
+      "correct": 1339,
+      "total": 2661,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian_agree_1": {
+      "accuracy": 0.380091,
+      "sharpe": -0.211548,
+      "brier": 0.524415,
+      "ece": 0.498308,
+      "drawdown": 1.0,
+      "trades": 22734,
+      "correct": 8641,
+      "total": 22734,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian_agree_2": {
+      "accuracy": 0.298623,
+      "sharpe": -0.389364,
+      "brier": 0.490892,
+      "ece": 0.433346,
+      "drawdown": 1.0,
+      "trades": 10314,
+      "correct": 3080,
+      "total": 10314,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian_agree_3": {
+      "accuracy": 0.27136,
+      "sharpe": -0.432028,
+      "brier": 0.375126,
+      "ece": 0.251632,
+      "drawdown": 1.0,
+      "trades": 4190,
+      "correct": 1137,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian_v2_agree_1": {
+      "accuracy": 0.397253,
+      "sharpe": -0.20301,
+      "brier": 0.521572,
+      "ece": 0.498086,
+      "drawdown": 1.0,
+      "trades": 26137,
+      "correct": 10383,
+      "total": 26137,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian_v2"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian_v2_agree_2": {
+      "accuracy": 0.360477,
+      "sharpe": -0.303411,
+      "brier": 0.495789,
+      "ece": 0.454203,
+      "drawdown": 1.0,
+      "trades": 14761,
+      "correct": 5321,
+      "total": 14761,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian_v2"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian_v2_agree_3": {
+      "accuracy": 0.27136,
+      "sharpe": -0.431982,
+      "brier": 0.375114,
+      "ece": 0.251601,
+      "drawdown": 1.0,
+      "trades": 4190,
+      "correct": 1137,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian_v2"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+goldilocks_agree_1": {
+      "accuracy": 0.459292,
+      "sharpe": -0.123113,
+      "brier": 0.515347,
+      "ece": 0.498114,
+      "drawdown": 1.0,
+      "trades": 24995,
+      "correct": 11480,
+      "total": 24995,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+goldilocks_agree_2": {
+      "accuracy": 0.451439,
+      "sharpe": -0.181534,
+      "brier": 0.502375,
+      "ece": 0.470992,
+      "drawdown": 1.0,
+      "trades": 13725,
+      "correct": 6196,
+      "total": 13725,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+goldilocks_agree_3": {
+      "accuracy": 0.389031,
+      "sharpe": -0.300391,
+      "brier": 0.46952,
+      "ece": 0.427542,
+      "drawdown": 1.0,
+      "trades": 2735,
+      "correct": 1064,
+      "total": 2735,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+persistence_agree_1": {
+      "accuracy": 0.469582,
+      "sharpe": -0.067015,
+      "brier": 0.4177,
+      "ece": 0.363831,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 14272,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "persistence"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+persistence_agree_2": {
+      "accuracy": 0.468066,
+      "sharpe": -0.07047,
+      "brier": 0.361128,
+      "ece": 0.2795,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9388,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "persistence"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+persistence_agree_3": {
+      "accuracy": 0.533413,
+      "sharpe": -0.091148,
+      "brier": 0.405794,
+      "ece": 0.438293,
+      "drawdown": 0.999166,
+      "trades": 4190,
+      "correct": 2235,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "persistence"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+pressure_delta_agree_1": {
+      "accuracy": 0.476592,
+      "sharpe": -0.094738,
+      "brier": 0.521299,
+      "ece": 0.519296,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9559,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+pressure_delta_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": -0.037403,
+      "brier": 0.491409,
+      "ece": 0.489097,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+pressure_delta_agree_3": {
+      "accuracy": 0.574224,
+      "sharpe": -0.022237,
+      "brier": 0.41568,
+      "ece": 0.406091,
+      "drawdown": 0.975268,
+      "trades": 4190,
+      "correct": 2406,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+seasonal_regime_agree_1": {
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9559,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+seasonal_regime_agree_2": {
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9559,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+seasonal_regime_agree_3": {
+      "accuracy": 0.574224,
+      "sharpe": -0.167039,
+      "brier": 0.563295,
+      "ece": 0.596286,
+      "drawdown": 0.983063,
+      "trades": 4190,
+      "correct": 2406,
+      "total": 4190,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+wind_direction_shift_agree_1": {
+      "accuracy": 0.480754,
+      "sharpe": -0.086742,
+      "brier": 0.516348,
+      "ece": 0.512547,
+      "drawdown": 1.0,
+      "trades": 21017,
+      "correct": 10104,
+      "total": 21017,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+wind_direction_shift_agree_2": {
+      "accuracy": 0.53259,
+      "sharpe": -0.053971,
+      "brier": 0.458467,
+      "ece": 0.446742,
+      "drawdown": 0.999747,
+      "trades": 6812,
+      "correct": 3628,
+      "total": 6812,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+wind_direction_shift_agree_3": {
+      "accuracy": 0.419683,
+      "sharpe": -0.111103,
+      "brier": 0.28588,
+      "ece": 0.188204,
+      "drawdown": 0.999862,
+      "trades": 884,
+      "correct": 371,
+      "total": 884,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+frontal_detector_agree_1": {
+      "accuracy": 0.422191,
+      "sharpe": -0.138457,
+      "brier": 0.479398,
+      "ece": 0.45764,
+      "drawdown": 1.0,
+      "trades": 21225,
+      "correct": 8961,
+      "total": 21225,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+frontal_detector_agree_2": {
+      "accuracy": 0.380859,
+      "sharpe": -0.245639,
+      "brier": 0.424492,
+      "ece": 0.381455,
+      "drawdown": 1.0,
+      "trades": 10731,
+      "correct": 4087,
+      "total": 10731,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+frontal_detector_agree_3": {
+      "accuracy": 0.248229,
+      "sharpe": -0.471582,
+      "brier": 0.286709,
+      "ece": 0.225339,
+      "drawdown": 1.0,
+      "trades": 3106,
+      "correct": 771,
+      "total": 3106,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_agree_1": {
+      "accuracy": 0.363577,
+      "sharpe": -0.293885,
+      "brier": 0.635359,
+      "ece": 0.635102,
+      "drawdown": 1.0,
+      "trades": 18516,
+      "correct": 6732,
+      "total": 18516,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_agree_2": {
+      "accuracy": 0.297972,
+      "sharpe": -0.452436,
+      "brier": 0.699926,
+      "ece": 0.699417,
+      "drawdown": 1.0,
+      "trades": 9370,
+      "correct": 2792,
+      "total": 9370,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_agree_3": {
+      "accuracy": 0.26429,
+      "sharpe": -0.545865,
+      "brier": 0.735087,
+      "ece": 0.735127,
+      "drawdown": 1.0,
+      "trades": 4741,
+      "correct": 1253,
+      "total": 4741,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_v2_agree_1": {
+      "accuracy": 0.382388,
+      "sharpe": -0.253109,
+      "brier": 0.616827,
+      "ece": 0.616699,
+      "drawdown": 1.0,
+      "trades": 23280,
+      "correct": 8902,
+      "total": 23280,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_v2_agree_2": {
+      "accuracy": 0.344011,
+      "sharpe": -0.340777,
+      "brier": 0.654523,
+      "ece": 0.654284,
+      "drawdown": 1.0,
+      "trades": 12456,
+      "correct": 4285,
+      "total": 12456,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2"
+      ],
+      "num_signals": 3
+    }
+  }
+}
