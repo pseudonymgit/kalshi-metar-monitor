@@ -1,0 +1,3537 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-22T20:09:05.232939",
+    "database": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db",
+    "signals_registered": [
+      "wind_direction_shift",
+      "nwp_direct",
+      "goldilocks",
+      "persistence",
+      "gaussian",
+      "gaussian_v2",
+      "pressure_delta",
+      "forecast_disagreement",
+      "calendar_climatology",
+      "temperature_advection",
+      "frontal_detector",
+      "intraday_metar_confirmation",
+      "fogr_reversion",
+      "metar_dtdt",
+      "pressure_tendency",
+      "hrrr_bias_corrected",
+      "esdr",
+      "nwp_dtdt_fusion",
+      "spread_based_entry",
+      "volume_momentum",
+      "settlement_arbitrage",
+      "seasonal_regime",
+      "corrected_pressure_delta",
+      "ai_composite"
+    ],
+    "working_signals": [
+      "calendar_climatology",
+      "corrected_pressure_delta",
+      "forecast_disagreement",
+      "frontal_detector",
+      "gaussian",
+      "gaussian_v2",
+      "goldilocks",
+      "persistence",
+      "pressure_delta",
+      "seasonal_regime",
+      "wind_direction_shift"
+    ],
+    "total_combinations_possible": 4422,
+    "total_combinations_tested": 45,
+    "total_combinations_with_trades": 45,
+    "min_trades_threshold": 50,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "agreement_levels": [
+      1,
+      2,
+      3
+    ],
+    "train_days": 180,
+    "test_days": 30,
+    "runtime_seconds": 35.1,
+    "description": "B-Mode 2: Full combinatorial search \u2014 all combos of 2-6 signals \u00d7 all 3 agreement levels"
+  },
+  "results": {
+    "calendar_climatology+corrected_pressure_delta_agree_1": {
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "correct": 9559,
+      "total": 20057,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta"
+      ],
+      "num_signals": 2
+    },
+    "frontal_detector+wind_direction_shift_agree_2": {
+      "accuracy": 0.612178,
+      "sharpe": 0.249527,
+      "brier": 0.36493,
+      "ece": 0.354845,
+      "drawdown": 0.06828,
+      "trades": 3334,
+      "correct": 2041,
+      "total": 3334,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "frontal_detector",
+        "wind_direction_shift"
+      ],
+      "num_signals": 2
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_v2_agree_3": {
+      "accuracy": 0.26429,
+      "sharpe": -0.545858,
+      "brier": 0.735083,
+      "ece": 0.735121,
+      "drawdown": 1.0,
+      "trades": 4741,
+      "correct": 1253,
+      "total": 4741,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2"
+      ],
+      "num_signals": 3
+    },
+    "corrected_pressure_delta+forecast_disagreement+frontal_detector_agree_1": {
+      "accuracy": 0.482449,
+      "sharpe": -0.047228,
+      "brier": 0.438143,
+      "ece": 0.409493,
+      "drawdown": 1.0,
+      "trades": 24243,
+      "correct": 11696,
+      "total": 24243,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector"
+      ],
+      "num_signals": 3
+    },
+    "corrected_pressure_delta+pressure_delta+seasonal_regime_agree_2": {
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "correct": 8796,
+      "total": 17378,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 3
+    },
+    "frontal_detector+gaussian+persistence_agree_3": {
+      "accuracy": 0.489835,
+      "sharpe": -0.166066,
+      "brier": 0.473116,
+      "ece": 0.456816,
+      "drawdown": 1.0,
+      "trades": 6837,
+      "correct": 3349,
+      "total": 6837,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "persistence"
+      ],
+      "num_signals": 3
+    },
+    "gaussian_v2+goldilocks+persistence_agree_1": {
+      "accuracy": 0.387326,
+      "sharpe": -0.229556,
+      "brier": 0.382723,
+      "ece": 0.327079,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 11772,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian_v2",
+        "goldilocks",
+        "persistence"
+      ],
+      "num_signals": 3
+    },
+    "calendar_climatology+corrected_pressure_delta+frontal_detector+seasonal_regime_agree_2": {
+      "accuracy": 0.488099,
+      "sharpe": -0.041672,
+      "brier": 0.465207,
+      "ece": 0.45076,
+      "drawdown": 1.0,
+      "trades": 23737,
+      "correct": 11586,
+      "total": 23737,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "seasonal_regime"
+      ],
+      "num_signals": 4
+    },
+    "calendar_climatology+forecast_disagreement+gaussian+pressure_delta_agree_3": {
+      "accuracy": 0.288993,
+      "sharpe": -0.45448,
+      "brier": 0.468056,
+      "ece": 0.415854,
+      "drawdown": 1.0,
+      "trades": 7450,
+      "correct": 2153,
+      "total": 7450,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "pressure_delta"
+      ],
+      "num_signals": 4
+    },
+    "calendar_climatology+frontal_detector+persistence+seasonal_regime_agree_1": {
+      "accuracy": 0.493864,
+      "sharpe": -0.031686,
+      "brier": 0.462156,
+      "ece": 0.44258,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 15010,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "persistence",
+        "seasonal_regime"
+      ],
+      "num_signals": 4
+    },
+    "calendar_climatology+goldilocks+pressure_delta+seasonal_regime_agree_2": {
+      "accuracy": 0.453531,
+      "sharpe": -0.126765,
+      "brier": 0.51449,
+      "ece": 0.499433,
+      "drawdown": 1.0,
+      "trades": 24995,
+      "correct": 11336,
+      "total": 24995,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 4
+    },
+    "corrected_pressure_delta+forecast_disagreement+pressure_delta+wind_direction_shift_agree_3": {
+      "accuracy": 0.518606,
+      "sharpe": -0.054478,
+      "brier": 0.392337,
+      "ece": 0.333532,
+      "drawdown": 1.0,
+      "trades": 9782,
+      "correct": 5073,
+      "total": 9782,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 4
+    },
+    "corrected_pressure_delta+gaussian+persistence+wind_direction_shift_agree_1": {
+      "accuracy": 0.443932,
+      "sharpe": -0.133487,
+      "brier": 0.427866,
+      "ece": 0.380401,
+      "drawdown": 1.0,
+      "trades": 30356,
+      "correct": 13476,
+      "total": 30356,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ],
+      "num_signals": 4
+    },
+    "forecast_disagreement+frontal_detector+gaussian_v2+seasonal_regime_agree_2": {
+      "accuracy": 0.39997,
+      "sharpe": -0.192697,
+      "brier": 0.484047,
+      "ece": 0.445865,
+      "drawdown": 1.0,
+      "trades": 26292,
+      "correct": 10516,
+      "total": 26292,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "seasonal_regime"
+      ],
+      "num_signals": 4
+    },
+    "forecast_disagreement+gaussian_v2+persistence+wind_direction_shift_agree_3": {
+      "accuracy": 0.366179,
+      "sharpe": -0.268981,
+      "brier": 0.386912,
+      "ece": 0.361403,
+      "drawdown": 1.0,
+      "trades": 11904,
+      "correct": 4359,
+      "total": 11904,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "wind_direction_shift"
+      ],
+      "num_signals": 4
+    },
+    "frontal_detector+gaussian_v2+persistence+seasonal_regime_agree_1": {
+      "accuracy": 0.453525,
+      "sharpe": -0.125623,
+      "brier": 0.449705,
+      "ece": 0.414972,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 13784,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "frontal_detector",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime"
+      ],
+      "num_signals": 4
+    },
+    "gaussian+persistence+seasonal_regime+wind_direction_shift_agree_2": {
+      "accuracy": 0.425098,
+      "sharpe": -0.12963,
+      "brier": 0.452656,
+      "ece": 0.434182,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12920,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "gaussian",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 4
+    },
+    "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian_v2+seasonal_regime_agree_3": {
+      "accuracy": 0.376584,
+      "sharpe": -0.263605,
+      "brier": 0.478737,
+      "ece": 0.44037,
+      "drawdown": 1.0,
+      "trades": 18304,
+      "correct": 6893,
+      "total": 18304,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "seasonal_regime"
+      ],
+      "num_signals": 5
+    },
+    "calendar_climatology+corrected_pressure_delta+gaussian+gaussian_v2+persistence_agree_1": {
+      "accuracy": 0.402494,
+      "sharpe": -0.196849,
+      "brier": 0.409383,
+      "ece": 0.344364,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12233,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian",
+        "gaussian_v2",
+        "persistence"
+      ],
+      "num_signals": 5
+    },
+    "calendar_climatology+corrected_pressure_delta+pressure_delta+seasonal_regime+wind_direction_shift_agree_2": {
+      "accuracy": 0.485179,
+      "sharpe": -0.071006,
+      "brier": 0.491364,
+      "ece": 0.467421,
+      "drawdown": 1.0,
+      "trades": 21017,
+      "correct": 10197,
+      "total": 21017,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "calendar_climatology+forecast_disagreement+gaussian+persistence+wind_direction_shift_agree_3": {
+      "accuracy": 0.322756,
+      "sharpe": -0.384079,
+      "brier": 0.441593,
+      "ece": 0.444646,
+      "drawdown": 1.0,
+      "trades": 10841,
+      "correct": 3499,
+      "total": 10841,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "calendar_climatology+frontal_detector+gaussian+persistence+seasonal_regime_agree_1": {
+      "accuracy": 0.421512,
+      "sharpe": -0.127994,
+      "brier": 0.449712,
+      "ece": 0.424101,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12811,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian",
+        "persistence",
+        "seasonal_regime"
+      ],
+      "num_signals": 5
+    },
+    "calendar_climatology+gaussian+gaussian_v2+pressure_delta+wind_direction_shift_agree_2": {
+      "accuracy": 0.366283,
+      "sharpe": -0.297726,
+      "brier": 0.48528,
+      "ece": 0.456661,
+      "drawdown": 1.0,
+      "trades": 18685,
+      "correct": 6844,
+      "total": 18685,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian_v2+goldilocks_agree_3": {
+      "accuracy": 0.400336,
+      "sharpe": -0.207935,
+      "brier": 0.349991,
+      "ece": 0.275189,
+      "drawdown": 1.0,
+      "trades": 17273,
+      "correct": 6915,
+      "total": 17273,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks"
+      ],
+      "num_signals": 5
+    },
+    "corrected_pressure_delta+forecast_disagreement+gaussian_v2+persistence+pressure_delta_agree_1": {
+      "accuracy": 0.451453,
+      "sharpe": -0.160085,
+      "brier": 0.438823,
+      "ece": 0.40472,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 13721,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta"
+      ],
+      "num_signals": 5
+    },
+    "corrected_pressure_delta+frontal_detector+gaussian_v2+goldilocks+seasonal_regime_agree_2": {
+      "accuracy": 0.428517,
+      "sharpe": -0.164062,
+      "brier": 0.436613,
+      "ece": 0.391743,
+      "drawdown": 1.0,
+      "trades": 28643,
+      "correct": 12274,
+      "total": 28643,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime"
+      ],
+      "num_signals": 5
+    },
+    "corrected_pressure_delta+gaussian+goldilocks+seasonal_regime+wind_direction_shift_agree_3": {
+      "accuracy": 0.397914,
+      "sharpe": -0.210577,
+      "brier": 0.445999,
+      "ece": 0.401098,
+      "drawdown": 1.0,
+      "trades": 17544,
+      "correct": 6981,
+      "total": 17544,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "forecast_disagreement+frontal_detector+gaussian+seasonal_regime+wind_direction_shift_agree_1": {
+      "accuracy": 0.404413,
+      "sharpe": -0.182022,
+      "brier": 0.477779,
+      "ece": 0.445862,
+      "drawdown": 1.0,
+      "trades": 23837,
+      "correct": 9640,
+      "total": 23837,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "forecast_disagreement+gaussian+goldilocks+persistence+wind_direction_shift_agree_2": {
+      "accuracy": 0.374284,
+      "sharpe": -0.260669,
+      "brier": 0.357184,
+      "ece": 0.287833,
+      "drawdown": 1.0,
+      "trades": 24794,
+      "correct": 9280,
+      "total": 24794,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "frontal_detector+gaussian+goldilocks+persistence+pressure_delta_agree_3": {
+      "accuracy": 0.444308,
+      "sharpe": -0.158964,
+      "brier": 0.349645,
+      "ece": 0.275472,
+      "drawdown": 1.0,
+      "trades": 20299,
+      "correct": 9019,
+      "total": 20299,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ],
+      "num_signals": 5
+    },
+    "gaussian+gaussian_v2+pressure_delta+seasonal_regime+wind_direction_shift_agree_1": {
+      "accuracy": 0.399172,
+      "sharpe": -0.201481,
+      "brier": 0.491949,
+      "ece": 0.467715,
+      "drawdown": 1.0,
+      "trades": 26565,
+      "correct": 10604,
+      "total": 26565,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 5
+    },
+    "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks_agree_2": {
+      "accuracy": 0.385345,
+      "sharpe": -0.260784,
+      "brier": 0.485947,
+      "ece": 0.451877,
+      "drawdown": 1.0,
+      "trades": 23719,
+      "correct": 9140,
+      "total": 23719,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks"
+      ],
+      "num_signals": 6
+    },
+    "calendar_climatology+corrected_pressure_delta+forecast_disagreement+persistence+seasonal_regime+wind_direction_shift_agree_3": {
+      "accuracy": 0.441483,
+      "sharpe": -0.121137,
+      "brier": 0.35593,
+      "ece": 0.279254,
+      "drawdown": 1.0,
+      "trades": 23258,
+      "correct": 10268,
+      "total": 23258,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "calendar_climatology+corrected_pressure_delta+frontal_detector+persistence+pressure_delta+wind_direction_shift_agree_1": {
+      "accuracy": 0.493465,
+      "sharpe": -0.0312,
+      "brier": 0.409983,
+      "ece": 0.355019,
+      "drawdown": 1.0,
+      "trades": 30375,
+      "correct": 14989,
+      "total": 30375,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "calendar_climatology+corrected_pressure_delta+goldilocks+persistence+pressure_delta+seasonal_regime_agree_2": {
+      "accuracy": 0.446649,
+      "sharpe": -0.111573,
+      "brier": 0.380969,
+      "ece": 0.321714,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 13575,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 6
+    },
+    "calendar_climatology+forecast_disagreement+frontal_detector+goldilocks+pressure_delta+seasonal_regime_agree_3": {
+      "accuracy": 0.426651,
+      "sharpe": -0.15663,
+      "brier": 0.387512,
+      "ece": 0.326238,
+      "drawdown": 1.0,
+      "trades": 20675,
+      "correct": 8821,
+      "total": 20675,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ],
+      "num_signals": 6
+    },
+    "calendar_climatology+forecast_disagreement+gaussian_v2+persistence+pressure_delta+wind_direction_shift_agree_1": {
+      "accuracy": 0.412451,
+      "sharpe": -0.186333,
+      "brier": 0.392072,
+      "ece": 0.326163,
+      "drawdown": 1.0,
+      "trades": 30343,
+      "correct": 12515,
+      "total": 30343,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "calendar_climatology+frontal_detector+gaussian_v2+goldilocks+seasonal_regime+wind_direction_shift_agree_2": {
+      "accuracy": 0.405346,
+      "sharpe": -0.194815,
+      "brier": 0.448478,
+      "ece": 0.400687,
+      "drawdown": 1.0,
+      "trades": 27574,
+      "correct": 11177,
+      "total": 27574,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian+gaussian_v2+pressure_delta_agree_3": {
+      "accuracy": 0.393828,
+      "sharpe": -0.199456,
+      "brier": 0.384987,
+      "ece": 0.324721,
+      "drawdown": 1.0,
+      "trades": 19506,
+      "correct": 7682,
+      "total": 19506,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta"
+      ],
+      "num_signals": 6
+    },
+    "corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks+pressure_delta_agree_1": {
+      "accuracy": 0.403564,
+      "sharpe": -0.199368,
+      "brier": 0.490095,
+      "ece": 0.446713,
+      "drawdown": 1.0,
+      "trades": 28397,
+      "correct": 11460,
+      "total": 28397,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks",
+        "pressure_delta"
+      ],
+      "num_signals": 6
+    },
+    "corrected_pressure_delta+forecast_disagreement+persistence+pressure_delta+seasonal_regime+wind_direction_shift_agree_2": {
+      "accuracy": 0.486428,
+      "sharpe": -0.056419,
+      "brier": 0.400662,
+      "ece": 0.345922,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 14784,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "corrected_pressure_delta+frontal_detector+goldilocks+persistence+seasonal_regime+wind_direction_shift_agree_3": {
+      "accuracy": 0.494536,
+      "sharpe": 0.008803,
+      "brier": 0.321815,
+      "ece": 0.233551,
+      "drawdown": 1.0,
+      "trades": 25529,
+      "correct": 12625,
+      "total": 25529,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "forecast_disagreement+frontal_detector+gaussian+goldilocks+persistence+pressure_delta_agree_1": {
+      "accuracy": 0.398961,
+      "sharpe": -0.202075,
+      "brier": 0.364573,
+      "ece": 0.28962,
+      "drawdown": 1.0,
+      "trades": 30211,
+      "correct": 12053,
+      "total": 30211,
+      "stations_tested": 20,
+      "min_agreement": 1,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ],
+      "num_signals": 6
+    },
+    "forecast_disagreement+gaussian+gaussian_v2+persistence+seasonal_regime+wind_direction_shift_agree_2": {
+      "accuracy": 0.411016,
+      "sharpe": -0.184733,
+      "brier": 0.446738,
+      "ece": 0.41587,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "correct": 12492,
+      "total": 30393,
+      "stations_tested": 20,
+      "min_agreement": 2,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    },
+    "frontal_detector+goldilocks+persistence+pressure_delta+seasonal_regime+wind_direction_shift_agree_3": {
+      "accuracy": 0.499665,
+      "sharpe": 0.010779,
+      "brier": 0.325961,
+      "ece": 0.237833,
+      "drawdown": 1.0,
+      "trades": 25343,
+      "correct": 12663,
+      "total": 25343,
+      "stations_tested": 20,
+      "min_agreement": 3,
+      "signals": [
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ],
+      "num_signals": 6
+    }
+  },
+  "top_by_accuracy": [
+    {
+      "combo": "frontal_detector+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 2,
+      "accuracy": 0.612178,
+      "sharpe": 0.249527,
+      "brier": 0.36493,
+      "ece": 0.354845,
+      "drawdown": 0.06828,
+      "trades": 3334,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+pressure_delta+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.518606,
+      "sharpe": -0.054478,
+      "brier": 0.392337,
+      "ece": 0.333532,
+      "drawdown": 1.0,
+      "trades": 9782,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 3,
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+goldilocks+persistence+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.499665,
+      "sharpe": 0.010779,
+      "brier": 0.325961,
+      "ece": 0.237833,
+      "drawdown": 1.0,
+      "trades": 25343,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+frontal_detector+goldilocks+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.494536,
+      "sharpe": 0.008803,
+      "brier": 0.321815,
+      "ece": 0.233551,
+      "drawdown": 1.0,
+      "trades": 25529,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.493864,
+      "sharpe": -0.031686,
+      "brier": 0.462156,
+      "ece": 0.44258,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+frontal_detector+persistence+pressure_delta+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.493465,
+      "sharpe": -0.0312,
+      "brier": 0.409983,
+      "ece": 0.355019,
+      "drawdown": 1.0,
+      "trades": 30375,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian+persistence",
+      "agreement": 3,
+      "num_signals": 3,
+      "accuracy": 0.489835,
+      "sharpe": -0.166066,
+      "brier": 0.473116,
+      "ece": 0.456816,
+      "drawdown": 1.0,
+      "trades": 6837,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+frontal_detector+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.488099,
+      "sharpe": -0.041672,
+      "brier": 0.465207,
+      "ece": 0.45076,
+      "drawdown": 1.0,
+      "trades": 23737,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+persistence+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.486428,
+      "sharpe": -0.056419,
+      "brier": 0.400662,
+      "ece": 0.345922,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.485179,
+      "sharpe": -0.071006,
+      "brier": 0.491364,
+      "ece": 0.467421,
+      "drawdown": 1.0,
+      "trades": 21017,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector",
+      "agreement": 1,
+      "num_signals": 3,
+      "accuracy": 0.482449,
+      "sharpe": -0.047228,
+      "brier": 0.438143,
+      "ece": 0.409493,
+      "drawdown": 1.0,
+      "trades": 24243,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta",
+      "agreement": 1,
+      "num_signals": 2,
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+goldilocks+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.453531,
+      "sharpe": -0.126765,
+      "brier": 0.51449,
+      "ece": 0.499433,
+      "drawdown": 1.0,
+      "trades": 24995,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian_v2+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.453525,
+      "sharpe": -0.125623,
+      "brier": 0.449705,
+      "ece": 0.414972,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+gaussian_v2+persistence+pressure_delta",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.451453,
+      "sharpe": -0.160085,
+      "brier": 0.438823,
+      "ece": 0.40472,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+goldilocks+persistence+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.446649,
+      "sharpe": -0.111573,
+      "brier": 0.380969,
+      "ece": 0.321714,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian+goldilocks+persistence+pressure_delta",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.444308,
+      "sharpe": -0.158964,
+      "brier": 0.349645,
+      "ece": 0.275472,
+      "drawdown": 1.0,
+      "trades": 20299,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+gaussian+persistence+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.443932,
+      "sharpe": -0.133487,
+      "brier": 0.427866,
+      "ece": 0.380401,
+      "drawdown": 1.0,
+      "trades": 30356,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.441483,
+      "sharpe": -0.121137,
+      "brier": 0.35593,
+      "ece": 0.279254,
+      "drawdown": 1.0,
+      "trades": 23258,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+frontal_detector+gaussian_v2+goldilocks+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.428517,
+      "sharpe": -0.164062,
+      "brier": 0.436613,
+      "ece": 0.391743,
+      "drawdown": 1.0,
+      "trades": 28643,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+frontal_detector+goldilocks+pressure_delta+seasonal_regime",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.426651,
+      "sharpe": -0.15663,
+      "brier": 0.387512,
+      "ece": 0.326238,
+      "drawdown": 1.0,
+      "trades": 20675,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "gaussian+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.425098,
+      "sharpe": -0.12963,
+      "brier": 0.452656,
+      "ece": 0.434182,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+gaussian+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.421512,
+      "sharpe": -0.127994,
+      "brier": 0.449712,
+      "ece": 0.424101,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian_v2+persistence+pressure_delta+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.412451,
+      "sharpe": -0.186333,
+      "brier": 0.392072,
+      "ece": 0.326163,
+      "drawdown": 1.0,
+      "trades": 30343,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian+gaussian_v2+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.411016,
+      "sharpe": -0.184733,
+      "brier": 0.446738,
+      "ece": 0.41587,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+gaussian_v2+goldilocks+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.405346,
+      "sharpe": -0.194815,
+      "brier": 0.448478,
+      "ece": 0.400687,
+      "drawdown": 1.0,
+      "trades": 27574,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian+seasonal_regime+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.404413,
+      "sharpe": -0.182022,
+      "brier": 0.477779,
+      "ece": 0.445862,
+      "drawdown": 1.0,
+      "trades": 23837,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks+pressure_delta",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.403564,
+      "sharpe": -0.199368,
+      "brier": 0.490095,
+      "ece": 0.446713,
+      "drawdown": 1.0,
+      "trades": 28397,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+gaussian+gaussian_v2+persistence",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.402494,
+      "sharpe": -0.196849,
+      "brier": 0.409383,
+      "ece": 0.344364,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian",
+        "gaussian_v2",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian_v2+goldilocks",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.400336,
+      "sharpe": -0.207935,
+      "brier": 0.349991,
+      "ece": 0.275189,
+      "drawdown": 1.0,
+      "trades": 17273,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian_v2+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.39997,
+      "sharpe": -0.192697,
+      "brier": 0.484047,
+      "ece": 0.445865,
+      "drawdown": 1.0,
+      "trades": 26292,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "gaussian+gaussian_v2+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.399172,
+      "sharpe": -0.201481,
+      "brier": 0.491949,
+      "ece": 0.467715,
+      "drawdown": 1.0,
+      "trades": 26565,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian+goldilocks+persistence+pressure_delta",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.398961,
+      "sharpe": -0.202075,
+      "brier": 0.364573,
+      "ece": 0.28962,
+      "drawdown": 1.0,
+      "trades": 30211,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+gaussian+goldilocks+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.397914,
+      "sharpe": -0.210577,
+      "brier": 0.445999,
+      "ece": 0.401098,
+      "drawdown": 1.0,
+      "trades": 17544,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian+gaussian_v2+pressure_delta",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.393828,
+      "sharpe": -0.199456,
+      "brier": 0.384987,
+      "ece": 0.324721,
+      "drawdown": 1.0,
+      "trades": 19506,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "gaussian_v2+goldilocks+persistence",
+      "agreement": 1,
+      "num_signals": 3,
+      "accuracy": 0.387326,
+      "sharpe": -0.229556,
+      "brier": 0.382723,
+      "ece": 0.327079,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian_v2",
+        "goldilocks",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.385345,
+      "sharpe": -0.260784,
+      "brier": 0.485947,
+      "ece": 0.451877,
+      "drawdown": 1.0,
+      "trades": 23719,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian_v2+seasonal_regime",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.376584,
+      "sharpe": -0.263605,
+      "brier": 0.478737,
+      "ece": 0.44037,
+      "drawdown": 1.0,
+      "trades": 18304,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian+goldilocks+persistence+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.374284,
+      "sharpe": -0.260669,
+      "brier": 0.357184,
+      "ece": 0.287833,
+      "drawdown": 1.0,
+      "trades": 24794,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+gaussian+gaussian_v2+pressure_delta+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.366283,
+      "sharpe": -0.297726,
+      "brier": 0.48528,
+      "ece": 0.456661,
+      "drawdown": 1.0,
+      "trades": 18685,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian_v2+persistence+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.366179,
+      "sharpe": -0.268981,
+      "brier": 0.386912,
+      "ece": 0.361403,
+      "drawdown": 1.0,
+      "trades": 11904,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian+persistence+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.322756,
+      "sharpe": -0.384079,
+      "brier": 0.441593,
+      "ece": 0.444646,
+      "drawdown": 1.0,
+      "trades": 10841,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian+pressure_delta",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.288993,
+      "sharpe": -0.45448,
+      "brier": 0.468056,
+      "ece": 0.415854,
+      "drawdown": 1.0,
+      "trades": 7450,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian_v2",
+      "agreement": 3,
+      "num_signals": 3,
+      "accuracy": 0.26429,
+      "sharpe": -0.545858,
+      "brier": 0.735083,
+      "ece": 0.735121,
+      "drawdown": 1.0,
+      "trades": 4741,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2"
+      ]
+    }
+  ],
+  "top_by_sharpe": [
+    {
+      "combo": "frontal_detector+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 2,
+      "accuracy": 0.612178,
+      "sharpe": 0.249527,
+      "brier": 0.36493,
+      "ece": 0.354845,
+      "drawdown": 0.06828,
+      "trades": 3334,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "frontal_detector+goldilocks+persistence+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.499665,
+      "sharpe": 0.010779,
+      "brier": 0.325961,
+      "ece": 0.237833,
+      "drawdown": 1.0,
+      "trades": 25343,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+frontal_detector+goldilocks+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.494536,
+      "sharpe": 0.008803,
+      "brier": 0.321815,
+      "ece": 0.233551,
+      "drawdown": 1.0,
+      "trades": 25529,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 3,
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+frontal_detector+persistence+pressure_delta+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.493465,
+      "sharpe": -0.0312,
+      "brier": 0.409983,
+      "ece": 0.355019,
+      "drawdown": 1.0,
+      "trades": 30375,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.493864,
+      "sharpe": -0.031686,
+      "brier": 0.462156,
+      "ece": 0.44258,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+frontal_detector+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.488099,
+      "sharpe": -0.041672,
+      "brier": 0.465207,
+      "ece": 0.45076,
+      "drawdown": 1.0,
+      "trades": 23737,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector",
+      "agreement": 1,
+      "num_signals": 3,
+      "accuracy": 0.482449,
+      "sharpe": -0.047228,
+      "brier": 0.438143,
+      "ece": 0.409493,
+      "drawdown": 1.0,
+      "trades": 24243,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+pressure_delta+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.518606,
+      "sharpe": -0.054478,
+      "brier": 0.392337,
+      "ece": 0.333532,
+      "drawdown": 1.0,
+      "trades": 9782,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+persistence+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.486428,
+      "sharpe": -0.056419,
+      "brier": 0.400662,
+      "ece": 0.345922,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.485179,
+      "sharpe": -0.071006,
+      "brier": 0.491364,
+      "ece": 0.467421,
+      "drawdown": 1.0,
+      "trades": 21017,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+goldilocks+persistence+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.446649,
+      "sharpe": -0.111573,
+      "brier": 0.380969,
+      "ece": 0.321714,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta",
+      "agreement": 1,
+      "num_signals": 2,
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.441483,
+      "sharpe": -0.121137,
+      "brier": 0.35593,
+      "ece": 0.279254,
+      "drawdown": 1.0,
+      "trades": 23258,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian_v2+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.453525,
+      "sharpe": -0.125623,
+      "brier": 0.449705,
+      "ece": 0.414972,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+goldilocks+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.453531,
+      "sharpe": -0.126765,
+      "brier": 0.51449,
+      "ece": 0.499433,
+      "drawdown": 1.0,
+      "trades": 24995,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+gaussian+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.421512,
+      "sharpe": -0.127994,
+      "brier": 0.449712,
+      "ece": 0.424101,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "gaussian+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.425098,
+      "sharpe": -0.12963,
+      "brier": 0.452656,
+      "ece": 0.434182,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+gaussian+persistence+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.443932,
+      "sharpe": -0.133487,
+      "brier": 0.427866,
+      "ece": 0.380401,
+      "drawdown": 1.0,
+      "trades": 30356,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+frontal_detector+goldilocks+pressure_delta+seasonal_regime",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.426651,
+      "sharpe": -0.15663,
+      "brier": 0.387512,
+      "ece": 0.326238,
+      "drawdown": 1.0,
+      "trades": 20675,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian+goldilocks+persistence+pressure_delta",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.444308,
+      "sharpe": -0.158964,
+      "brier": 0.349645,
+      "ece": 0.275472,
+      "drawdown": 1.0,
+      "trades": 20299,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+gaussian_v2+persistence+pressure_delta",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.451453,
+      "sharpe": -0.160085,
+      "brier": 0.438823,
+      "ece": 0.40472,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+frontal_detector+gaussian_v2+goldilocks+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.428517,
+      "sharpe": -0.164062,
+      "brier": 0.436613,
+      "ece": 0.391743,
+      "drawdown": 1.0,
+      "trades": 28643,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian+persistence",
+      "agreement": 3,
+      "num_signals": 3,
+      "accuracy": 0.489835,
+      "sharpe": -0.166066,
+      "brier": 0.473116,
+      "ece": 0.456816,
+      "drawdown": 1.0,
+      "trades": 6837,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian+seasonal_regime+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.404413,
+      "sharpe": -0.182022,
+      "brier": 0.477779,
+      "ece": 0.445862,
+      "drawdown": 1.0,
+      "trades": 23837,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian+gaussian_v2+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.411016,
+      "sharpe": -0.184733,
+      "brier": 0.446738,
+      "ece": 0.41587,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian_v2+persistence+pressure_delta+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.412451,
+      "sharpe": -0.186333,
+      "brier": 0.392072,
+      "ece": 0.326163,
+      "drawdown": 1.0,
+      "trades": 30343,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian_v2+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.39997,
+      "sharpe": -0.192697,
+      "brier": 0.484047,
+      "ece": 0.445865,
+      "drawdown": 1.0,
+      "trades": 26292,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+gaussian_v2+goldilocks+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.405346,
+      "sharpe": -0.194815,
+      "brier": 0.448478,
+      "ece": 0.400687,
+      "drawdown": 1.0,
+      "trades": 27574,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+gaussian+gaussian_v2+persistence",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.402494,
+      "sharpe": -0.196849,
+      "brier": 0.409383,
+      "ece": 0.344364,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian",
+        "gaussian_v2",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks+pressure_delta",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.403564,
+      "sharpe": -0.199368,
+      "brier": 0.490095,
+      "ece": 0.446713,
+      "drawdown": 1.0,
+      "trades": 28397,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian+gaussian_v2+pressure_delta",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.393828,
+      "sharpe": -0.199456,
+      "brier": 0.384987,
+      "ece": 0.324721,
+      "drawdown": 1.0,
+      "trades": 19506,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "gaussian+gaussian_v2+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.399172,
+      "sharpe": -0.201481,
+      "brier": 0.491949,
+      "ece": 0.467715,
+      "drawdown": 1.0,
+      "trades": 26565,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian+goldilocks+persistence+pressure_delta",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.398961,
+      "sharpe": -0.202075,
+      "brier": 0.364573,
+      "ece": 0.28962,
+      "drawdown": 1.0,
+      "trades": 30211,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian_v2+goldilocks",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.400336,
+      "sharpe": -0.207935,
+      "brier": 0.349991,
+      "ece": 0.275189,
+      "drawdown": 1.0,
+      "trades": 17273,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+gaussian+goldilocks+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.397914,
+      "sharpe": -0.210577,
+      "brier": 0.445999,
+      "ece": 0.401098,
+      "drawdown": 1.0,
+      "trades": 17544,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "gaussian_v2+goldilocks+persistence",
+      "agreement": 1,
+      "num_signals": 3,
+      "accuracy": 0.387326,
+      "sharpe": -0.229556,
+      "brier": 0.382723,
+      "ece": 0.327079,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian_v2",
+        "goldilocks",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian+goldilocks+persistence+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.374284,
+      "sharpe": -0.260669,
+      "brier": 0.357184,
+      "ece": 0.287833,
+      "drawdown": 1.0,
+      "trades": 24794,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.385345,
+      "sharpe": -0.260784,
+      "brier": 0.485947,
+      "ece": 0.451877,
+      "drawdown": 1.0,
+      "trades": 23719,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian_v2+seasonal_regime",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.376584,
+      "sharpe": -0.263605,
+      "brier": 0.478737,
+      "ece": 0.44037,
+      "drawdown": 1.0,
+      "trades": 18304,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian_v2+persistence+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.366179,
+      "sharpe": -0.268981,
+      "brier": 0.386912,
+      "ece": 0.361403,
+      "drawdown": 1.0,
+      "trades": 11904,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+gaussian+gaussian_v2+pressure_delta+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.366283,
+      "sharpe": -0.297726,
+      "brier": 0.48528,
+      "ece": 0.456661,
+      "drawdown": 1.0,
+      "trades": 18685,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian+persistence+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.322756,
+      "sharpe": -0.384079,
+      "brier": 0.441593,
+      "ece": 0.444646,
+      "drawdown": 1.0,
+      "trades": 10841,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian+pressure_delta",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.288993,
+      "sharpe": -0.45448,
+      "brier": 0.468056,
+      "ece": 0.415854,
+      "drawdown": 1.0,
+      "trades": 7450,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian_v2",
+      "agreement": 3,
+      "num_signals": 3,
+      "accuracy": 0.26429,
+      "sharpe": -0.545858,
+      "brier": 0.735083,
+      "ece": 0.735121,
+      "drawdown": 1.0,
+      "trades": 4741,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2"
+      ]
+    }
+  ],
+  "top_by_coverage": [
+    {
+      "combo": "gaussian_v2+goldilocks+persistence",
+      "agreement": 1,
+      "num_signals": 3,
+      "accuracy": 0.387326,
+      "sharpe": -0.229556,
+      "brier": 0.382723,
+      "ece": 0.327079,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian_v2",
+        "goldilocks",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.493864,
+      "sharpe": -0.031686,
+      "brier": 0.462156,
+      "ece": 0.44258,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian_v2+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.453525,
+      "sharpe": -0.125623,
+      "brier": 0.449705,
+      "ece": 0.414972,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "gaussian+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.425098,
+      "sharpe": -0.12963,
+      "brier": 0.452656,
+      "ece": 0.434182,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+gaussian+gaussian_v2+persistence",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.402494,
+      "sharpe": -0.196849,
+      "brier": 0.409383,
+      "ece": 0.344364,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "gaussian",
+        "gaussian_v2",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+gaussian+persistence+seasonal_regime",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.421512,
+      "sharpe": -0.127994,
+      "brier": 0.449712,
+      "ece": 0.424101,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian",
+        "persistence",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+gaussian_v2+persistence+pressure_delta",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.451453,
+      "sharpe": -0.160085,
+      "brier": 0.438823,
+      "ece": 0.40472,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+goldilocks+persistence+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.446649,
+      "sharpe": -0.111573,
+      "brier": 0.380969,
+      "ece": 0.321714,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+persistence+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.486428,
+      "sharpe": -0.056419,
+      "brier": 0.400662,
+      "ece": 0.345922,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian+gaussian_v2+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.411016,
+      "sharpe": -0.184733,
+      "brier": 0.446738,
+      "ece": 0.41587,
+      "drawdown": 1.0,
+      "trades": 30393,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+frontal_detector+persistence+pressure_delta+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.493465,
+      "sharpe": -0.0312,
+      "brier": 0.409983,
+      "ece": 0.355019,
+      "drawdown": 1.0,
+      "trades": 30375,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+gaussian+persistence+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 4,
+      "accuracy": 0.443932,
+      "sharpe": -0.133487,
+      "brier": 0.427866,
+      "ece": 0.380401,
+      "drawdown": 1.0,
+      "trades": 30356,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian_v2+persistence+pressure_delta+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.412451,
+      "sharpe": -0.186333,
+      "brier": 0.392072,
+      "ece": 0.326163,
+      "drawdown": 1.0,
+      "trades": 30343,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian+goldilocks+persistence+pressure_delta",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.398961,
+      "sharpe": -0.202075,
+      "brier": 0.364573,
+      "ece": 0.28962,
+      "drawdown": 1.0,
+      "trades": 30211,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+frontal_detector+gaussian_v2+goldilocks+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.428517,
+      "sharpe": -0.164062,
+      "brier": 0.436613,
+      "ece": 0.391743,
+      "drawdown": 1.0,
+      "trades": 28643,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks+pressure_delta",
+      "agreement": 1,
+      "num_signals": 6,
+      "accuracy": 0.403564,
+      "sharpe": -0.199368,
+      "brier": 0.490095,
+      "ece": 0.446713,
+      "drawdown": 1.0,
+      "trades": 28397,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+frontal_detector+gaussian_v2+goldilocks+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.405346,
+      "sharpe": -0.194815,
+      "brier": 0.448478,
+      "ece": 0.400687,
+      "drawdown": 1.0,
+      "trades": 27574,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "gaussian+gaussian_v2+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.399172,
+      "sharpe": -0.201481,
+      "brier": 0.491949,
+      "ece": 0.467715,
+      "drawdown": 1.0,
+      "trades": 26565,
+      "stations_tested": 20,
+      "signals": [
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian_v2+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.39997,
+      "sharpe": -0.192697,
+      "brier": 0.484047,
+      "ece": 0.445865,
+      "drawdown": 1.0,
+      "trades": 26292,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+frontal_detector+goldilocks+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.494536,
+      "sharpe": 0.008803,
+      "brier": 0.321815,
+      "ece": 0.233551,
+      "drawdown": 1.0,
+      "trades": 25529,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "frontal_detector+goldilocks+persistence+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.499665,
+      "sharpe": 0.010779,
+      "brier": 0.325961,
+      "ece": 0.237833,
+      "drawdown": 1.0,
+      "trades": 25343,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+goldilocks+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.453531,
+      "sharpe": -0.126765,
+      "brier": 0.51449,
+      "ece": 0.499433,
+      "drawdown": 1.0,
+      "trades": 24995,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian+goldilocks+persistence+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.374284,
+      "sharpe": -0.260669,
+      "brier": 0.357184,
+      "ece": 0.287833,
+      "drawdown": 1.0,
+      "trades": 24794,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector",
+      "agreement": 1,
+      "num_signals": 3,
+      "accuracy": 0.482449,
+      "sharpe": -0.047228,
+      "brier": 0.438143,
+      "ece": 0.409493,
+      "drawdown": 1.0,
+      "trades": 24243,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+frontal_detector+gaussian+seasonal_regime+wind_direction_shift",
+      "agreement": 1,
+      "num_signals": 5,
+      "accuracy": 0.404413,
+      "sharpe": -0.182022,
+      "brier": 0.477779,
+      "ece": 0.445862,
+      "drawdown": 1.0,
+      "trades": 23837,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+frontal_detector+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 4,
+      "accuracy": 0.488099,
+      "sharpe": -0.041672,
+      "brier": 0.465207,
+      "ece": 0.45076,
+      "drawdown": 1.0,
+      "trades": 23737,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "frontal_detector",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian+gaussian_v2+goldilocks",
+      "agreement": 2,
+      "num_signals": 6,
+      "accuracy": 0.385345,
+      "sharpe": -0.260784,
+      "brier": 0.485947,
+      "ece": 0.451877,
+      "drawdown": 1.0,
+      "trades": 23719,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+persistence+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.441483,
+      "sharpe": -0.121137,
+      "brier": 0.35593,
+      "ece": 0.279254,
+      "drawdown": 1.0,
+      "trades": 23258,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "persistence",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+pressure_delta+seasonal_regime+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.485179,
+      "sharpe": -0.071006,
+      "brier": 0.491364,
+      "ece": 0.467421,
+      "drawdown": 1.0,
+      "trades": 21017,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+frontal_detector+goldilocks+pressure_delta+seasonal_regime",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.426651,
+      "sharpe": -0.15663,
+      "brier": 0.387512,
+      "ece": 0.326238,
+      "drawdown": 1.0,
+      "trades": 20675,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "frontal_detector",
+        "goldilocks",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian+goldilocks+persistence+pressure_delta",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.444308,
+      "sharpe": -0.158964,
+      "brier": 0.349645,
+      "ece": 0.275472,
+      "drawdown": 1.0,
+      "trades": 20299,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "goldilocks",
+        "persistence",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta",
+      "agreement": 1,
+      "num_signals": 2,
+      "accuracy": 0.476592,
+      "sharpe": -0.115109,
+      "brier": 0.552137,
+      "ece": 0.559029,
+      "drawdown": 1.0,
+      "trades": 20057,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian+gaussian_v2+pressure_delta",
+      "agreement": 3,
+      "num_signals": 6,
+      "accuracy": 0.393828,
+      "sharpe": -0.199456,
+      "brier": 0.384987,
+      "ece": 0.324721,
+      "drawdown": 1.0,
+      "trades": 19506,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+gaussian+gaussian_v2+pressure_delta+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 5,
+      "accuracy": 0.366283,
+      "sharpe": -0.297726,
+      "brier": 0.48528,
+      "ece": 0.456661,
+      "drawdown": 1.0,
+      "trades": 18685,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "gaussian",
+        "gaussian_v2",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+corrected_pressure_delta+forecast_disagreement+gaussian_v2+seasonal_regime",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.376584,
+      "sharpe": -0.263605,
+      "brier": 0.478737,
+      "ece": 0.44037,
+      "drawdown": 1.0,
+      "trades": 18304,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "gaussian_v2",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+gaussian+goldilocks+seasonal_regime+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.397914,
+      "sharpe": -0.210577,
+      "brier": 0.445999,
+      "ece": 0.401098,
+      "drawdown": 1.0,
+      "trades": 17544,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "gaussian",
+        "goldilocks",
+        "seasonal_regime",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+pressure_delta+seasonal_regime",
+      "agreement": 2,
+      "num_signals": 3,
+      "accuracy": 0.506157,
+      "sharpe": 0.002065,
+      "brier": 0.493843,
+      "ece": 0.493843,
+      "drawdown": 1.0,
+      "trades": 17378,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "pressure_delta",
+        "seasonal_regime"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+frontal_detector+gaussian_v2+goldilocks",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.400336,
+      "sharpe": -0.207935,
+      "brier": 0.349991,
+      "ece": 0.275189,
+      "drawdown": 1.0,
+      "trades": 17273,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "frontal_detector",
+        "gaussian_v2",
+        "goldilocks"
+      ]
+    },
+    {
+      "combo": "forecast_disagreement+gaussian_v2+persistence+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.366179,
+      "sharpe": -0.268981,
+      "brier": 0.386912,
+      "ece": 0.361403,
+      "drawdown": 1.0,
+      "trades": 11904,
+      "stations_tested": 20,
+      "signals": [
+        "forecast_disagreement",
+        "gaussian_v2",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian+persistence+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 5,
+      "accuracy": 0.322756,
+      "sharpe": -0.384079,
+      "brier": 0.441593,
+      "ece": 0.444646,
+      "drawdown": 1.0,
+      "trades": 10841,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "persistence",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "corrected_pressure_delta+forecast_disagreement+pressure_delta+wind_direction_shift",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.518606,
+      "sharpe": -0.054478,
+      "brier": 0.392337,
+      "ece": 0.333532,
+      "drawdown": 1.0,
+      "trades": 9782,
+      "stations_tested": 20,
+      "signals": [
+        "corrected_pressure_delta",
+        "forecast_disagreement",
+        "pressure_delta",
+        "wind_direction_shift"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian+pressure_delta",
+      "agreement": 3,
+      "num_signals": 4,
+      "accuracy": 0.288993,
+      "sharpe": -0.45448,
+      "brier": 0.468056,
+      "ece": 0.415854,
+      "drawdown": 1.0,
+      "trades": 7450,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian",
+        "pressure_delta"
+      ]
+    },
+    {
+      "combo": "frontal_detector+gaussian+persistence",
+      "agreement": 3,
+      "num_signals": 3,
+      "accuracy": 0.489835,
+      "sharpe": -0.166066,
+      "brier": 0.473116,
+      "ece": 0.456816,
+      "drawdown": 1.0,
+      "trades": 6837,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "gaussian",
+        "persistence"
+      ]
+    },
+    {
+      "combo": "calendar_climatology+forecast_disagreement+gaussian_v2",
+      "agreement": 3,
+      "num_signals": 3,
+      "accuracy": 0.26429,
+      "sharpe": -0.545858,
+      "brier": 0.735083,
+      "ece": 0.735121,
+      "drawdown": 1.0,
+      "trades": 4741,
+      "stations_tested": 20,
+      "signals": [
+        "calendar_climatology",
+        "forecast_disagreement",
+        "gaussian_v2"
+      ]
+    },
+    {
+      "combo": "frontal_detector+wind_direction_shift",
+      "agreement": 2,
+      "num_signals": 2,
+      "accuracy": 0.612178,
+      "sharpe": 0.249527,
+      "brier": 0.36493,
+      "ece": 0.354845,
+      "drawdown": 0.06828,
+      "trades": 3334,
+      "stations_tested": 20,
+      "signals": [
+        "frontal_detector",
+        "wind_direction_shift"
+      ]
+    }
+  ],
+  "summary_by_signal_count": {
+    "2": {
+      "count": 2,
+      "mean_accuracy": 0.5444,
+      "max_accuracy": 0.6122,
+      "min_accuracy": 0.4766
+    },
+    "3": {
+      "count": 5,
+      "mean_accuracy": 0.426,
+      "max_accuracy": 0.5062,
+      "min_accuracy": 0.2643
+    },
+    "4": {
+      "count": 10,
+      "mean_accuracy": 0.4332,
+      "max_accuracy": 0.5186,
+      "min_accuracy": 0.289
+    },
+    "5": {
+      "count": 14,
+      "mean_accuracy": 0.4054,
+      "max_accuracy": 0.4852,
+      "min_accuracy": 0.3228
+    },
+    "6": {
+      "count": 14,
+      "mean_accuracy": 0.4357,
+      "max_accuracy": 0.4997,
+      "min_accuracy": 0.3853
+    }
+  }
+}

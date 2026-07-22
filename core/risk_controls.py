@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 2. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 3. [2026-07-16 T4: Enforce risk guardrails - kill switch, daily loss, drawdown, consecutive losses]
+# 4. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+#
+
 """
 Risk Management Controls — Phase 3.6 Real Implementation
 
@@ -14,12 +22,14 @@ Builds on the B1.5 baseline interface. Backward compatible.
 Version: v2.0 (Phase 3.6)
 """
 
+import os
+import sqlite3
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Union, List, Tuple, Optional
 from dataclasses import dataclass, field
-import logging
+from core.structured_logger import get_logger
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 @dataclass
@@ -158,7 +168,7 @@ class RiskManager:
         self.winning_trades = 0
         self.losing_trades = 0
         self._last_trade_date: Optional[str] = None
-        self._logger = logging.getLogger(f"{__name__}.RiskManager")
+        self._logger = get_logger(f"{__name__}.RiskManager")
 
     def _auto_reset_daily_if_needed(self, trade_date: str):
         """Reset daily state if the trading day has changed."""
@@ -338,7 +348,7 @@ class RiskManager:
                 consecutive_losses=self.consecutive_losses,
                 peak_balance=self.peak_capital,
                 current_balance=self.current_capital,
-                max_daily_loss_dollars=self.config.max_daily_loss_dollars,
+                max_daily_loss_dollars=self.config.max_daily_loss_percentage * self.config.initial_capital,
             ),
             checks=checks,
             halted=not all_pass,
@@ -416,6 +426,63 @@ def to_legacy_risk_state(risk_manager: RiskManager) -> 'RiskState':
     )
     compat.passed_checks = {k: v[0] for k, v in state.checks.items()}
     return compat
+
+
+# ─── Kill Switch Checks ──────────────────────────────────────────────────
+
+
+def check_kill_switches(db_path: str = None, risk_config: Any = None) -> Tuple[bool, List[str]]:
+    """
+    Check global kill-switch state.
+
+    Args:
+        db_path: Path to the paper trading database (may be None).
+        risk_config: RiskConfig or dict with risk configuration.
+
+    Returns:
+        (should_halt: bool, reasons: List[str])
+    """
+    reasons: List[str] = []
+
+    # 1. File-based kill switch
+    kill_switch_file = os.environ.get("KILL_SWITCH_FILE", "")
+    if kill_switch_file and os.path.exists(kill_switch_file):
+        reasons.append(f"Kill switch file present: {kill_switch_file}")
+
+    # 2. Environment variable kill switch
+    if os.environ.get("KILL_SWITCH_ACTIVE", "0") == "1":
+        reasons.append("KILL_SWITCH_ACTIVE env var is set to 1")
+
+    # 3. Database integrity check (if db_path provided)
+    if db_path and os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(str(db_path), timeout=5)
+            cur = conn.cursor()
+            # Quick integrity check
+            cur.execute("PRAGMA integrity_check")
+            integrity_result = cur.fetchone()
+            if integrity_result and integrity_result[0] != "ok":
+                reasons.append(f"Database integrity check failed: {integrity_result[0]}")
+            conn.close()
+        except Exception as e:
+            reasons.append(f"Database access error during kill switch check: {e}")
+
+    # 4. Check for alert backlog (if db_path provided)
+    if db_path and os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(str(db_path), timeout=5)
+            cur = conn.cursor()
+            # Check decision_output_log for recent entries
+            cur.execute("SELECT COUNT(*) FROM decision_output_log WHERE logged_at > datetime('now', '-1 hour')")
+            recent_alerts = cur.fetchone()[0]
+            if recent_alerts > 50:
+                reasons.append(f"Alert backlog: {recent_alerts} alerts in last hour")
+            conn.close()
+        except Exception:
+            pass
+
+    should_halt = len(reasons) > 0
+    return should_halt, reasons
 
 
 # ─── Self-test ───────────────────────────────────────────────────────────
