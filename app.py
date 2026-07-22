@@ -172,6 +172,18 @@ app = Flask(__name__)
 log = app.logger
 log.setLevel(logging.INFO)
 
+# Register Phase 17 Trading Dashboard Blueprint
+# Deprecates old dashboards (dashboard.py, confidence_dashboard.py, calibration_dashboard.py)
+try:
+    from core.trading_dashboard.routes import trading_bp
+    app.register_blueprint(trading_bp, url_prefix="/trading")
+    log.info("Trading Dashboard Blueprint registered at /trading")
+    log.info("  Old dashboards marked as deprecated: dashboard.py, confidence_dashboard.py, calibration_dashboard.py")
+except ImportError as e:
+    log.warning("Trading Dashboard Blueprint not available: %s", e)
+except Exception as e:
+    log.warning("Trading Dashboard Blueprint registration failed: %s", e)
+
 _autostart_fallback_done = False
 
 _MARKET_COVERAGE_OBSERVABILITY_MEMO = {}
