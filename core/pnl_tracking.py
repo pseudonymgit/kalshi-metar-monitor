@@ -5,6 +5,8 @@ Extracted from paper_trading_engine.py during Phase 20.1 monolith decomposition.
 """
 import json
 import logging
+import os
+import sqlite3
 import statistics
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple, Any
@@ -14,7 +16,7 @@ from .market_cost_model import MARKET_COST_MODEL
 
 # Default calibration report path
 CALIBRATION_REPORT_PATH = str(Path(__file__).resolve().parent.parent / "reports" / "paper_trading_calibration.json")
-__all__ = ['process_settlements_for_date', 'daily_reconciliation', 'calculate_calibration_metrics_for_date', 'get_current_balance', 'get_version_performance', 'generate_calibration_report', 'compute_sharpe', 'update_risk_metrics_on_trade']
+__all__ = ['process_settlements_for_date', 'daily_reconciliation', 'calculate_calibration_metrics_for_date', 'get_current_balance', 'get_version_performance', 'generate_calibration_report', 'compute_sharpe', 'update_risk_metrics_on_trade', '_get_strike_price']
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,6 +26,10 @@ def process_settlements_for_date(self, settlement_date):
     """
     Process settlements for a specific date. Updates trades with settlement results
     and calculates realized P/L.
+
+    Correct P&L calculation:
+      - HIGH contract: $1.00 if settlement_temp > strike_price, else $0.00
+      - LOW contract:  $1.00 if settlement_temp < strike_price, else $0.00
     """
     conn = get_sqlite_connection(self.paper_db)
     c = conn.cursor()
@@ -32,7 +38,7 @@ def process_settlements_for_date(self, settlement_date):
     # Get all open trades for which settlements are available
     c.execute("""
         SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
-               t.quantity,
+               t.quantity, t.market_type,
                p.settlement_bucket, p.prior_settlement_bucket
         FROM trades t
         JOIN (SELECT station, market_type, local_trading_date, settlement_bucket, prior_settlement_bucket
@@ -46,23 +52,43 @@ def process_settlements_for_date(self, settlement_date):
     unsettled_trades = c.fetchall()
 
     settled_count = 0
-    for trade_uuid, station, trade_type_str, filled_price, market_price, quantity, settlement_value, prior_settlement_value in unsettled_trades:
+    for trade_uuid, station, trade_type_str, filled_price, market_price, quantity, market_type, settlement_value, prior_settlement_value in unsettled_trades:
         # Convert trade type to enum
         try:
             trade_type = TradeType(trade_type_str)
         except ValueError:
             continue
 
-        # Calculate settlement return based on the trade type and settlement value.
-        # Long YES pays $1 when event occurs; long NO pays $1 when it does not.
-        # Short sides are represented as negative exposure with realized P&L mirrored.
-        # Settlement is directional: compare today's temp vs yesterday's temp
-        # If temp went up, UP predictions win ($1); if temp went down, DOWN predictions win ($1)
-        if prior_settlement_value is not None:
-            settlement_contract_value = 1.0 if settlement_value > prior_settlement_value else 0.0
+        # Get the strike price from Kalshi market metadata
+        strike_price = _get_strike_price(station, market_type, settlement_date, self.paper_db, self.metar_db)
+
+        # Calculate settlement payout based on actual temperature vs strike price.
+        # Kalshi binary options:
+        #   HIGH contract: pays $1.00 if settlement_temp > strike_price
+        #   LOW contract:  pays $1.00 if settlement_temp < strike_price
+        settlement_temp = settlement_value  # settlement_bucket = actual daily max/min temp in °F
+        if strike_price is not None:
+            if market_type == "HIGH":
+                settlement_contract_value = 1.0 if settlement_temp > strike_price else 0.0
+            elif market_type == "LOW":
+                settlement_contract_value = 1.0 if settlement_temp < strike_price else 0.0
+            else:
+                _LOGGER.warning(
+                    "Cannot settle trade %s: unknown market_type=%s",
+                    trade_uuid, market_type
+                )
+                continue
         else:
-            # Fallback: compare against 50°F midpoint if no prior data
-            settlement_contract_value = 1.0 if settlement_value > 50.0 else 0.0
+            # No strike price available — cannot determine strike-based settlement.
+            # Skipping is safer than falling back to direction-based or 50°F,
+            # which produce systematically wrong P&L (see Phase A.1 spec).
+            _LOGGER.warning(
+                "Cannot settle trade %s: no strike_price available for "
+                "station=%s market_type=%s date=%s. "
+                "Trade left open for manual resolution.",
+                trade_uuid, station, market_type, settlement_date
+            )
+            continue
         qty = quantity or 0
 
         if trade_type == TradeType.BUY_YES:
@@ -117,13 +143,14 @@ def process_settlements_for_date(self, settlement_date):
         if trade_row and HAS_CALIBRATION_PIPELINE and self._calibrator:
             orig_signal_direction, functionality, raw_confidence, raw_forecast_prob = trade_row
 
-            # Determine if the prediction was directionally correct
-            # Settlement goes UP if temperature rose vs yesterday
-            settlement_is_up = settlement_contract_value > 0.5
-            predicted_is_up = orig_signal_direction == "UP"  # Signal was UP/DOWN
+            # Determine if the prediction was correct (strike-based)
+            # settlement_contract_value = 1.0 means temp breached strike (ITM)
+            # Signal "UP" predicted strike breach; "DOWN" predicted no breach.
+            contract_is_itm = settlement_contract_value > 0.5
+            predicted_breach = orig_signal_direction == "UP"  # Signal was UP/DOWN
 
-            # If signal was "UP" and settlement went UP, or signal was "DOWN" and settlement went DOWN, then correct
-            was_correct = (predicted_is_up == settlement_is_up)
+            # For strike-based markets: correct if predicted breach matches actual breach
+            was_correct = (predicted_breach == contract_is_itm)
 
             # Extract signal name based on functionality
             if "calendar" in functionality:
@@ -599,3 +626,70 @@ def update_risk_metrics_on_trade(self, trade_pnl: float, trade_result: str):
             # Re-evaluate risk state
     risk_state = evaluate_risk_state(self._risk_manager)
     self._risk_metrics.risk_state = risk_state
+
+
+def _get_strike_price(station: str, market_type: str, date: str, paper_db: str, metar_db: str) -> Optional[int]:
+    """
+    Look up the Kalshi market strike price for a station+market_type+date.
+
+    Resolution order:
+      1. Live Kalshi API (via kalshi_price_fetcher.get_live_market_price)
+      2. market_cache table in the alerts DB
+      3. Fallback: None (caller uses directional fallback)
+
+    Returns the strike price in °F (integer), or None if unavailable.
+    """
+    # 1. Try live Kalshi API
+    try:
+        from .kalshi_price_fetcher import get_live_market_price
+        price, meta = get_live_market_price(station, market_type, date)
+        strike = meta.get("strike")
+        if strike is not None:
+            return int(strike)
+        # Also try floor_strike/cap_strike
+        strike_type = meta.get("strike_type")
+        if strike_type == "greater":
+            floor = meta.get("floor_strike")
+            if floor is not None:
+                return int(float(floor))
+        elif strike_type == "less":
+            cap = meta.get("cap_strike")
+            if cap is not None:
+                return int(float(cap))
+    except Exception as e:
+        _LOGGER.debug("strike_price_live_failed station=%s market=%s error=%s", station, market_type, e)
+
+    # 2. Try market_cache table in the alerts DB
+    try:
+        alert_db = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+        if os.path.exists(alert_db):
+            conn = sqlite3.connect(alert_db, timeout=1)
+            try:
+                row = conn.execute(
+                    """SELECT cache_json FROM market_cache
+                       WHERE station = ? ORDER BY updated_at DESC LIMIT 1""",
+                    (station,)
+                ).fetchone()
+                if row:
+                    cache = json.loads(row[0])
+                    # Look for the matching market_type in the cache
+                    if isinstance(cache, dict):
+                        strike = cache.get("strike")
+                        if strike is not None:
+                            return int(strike)
+                        strike_type = cache.get("strike_type")
+                        if strike_type == "greater":
+                            floor = cache.get("floor_strike")
+                            if floor is not None:
+                                return int(float(floor))
+                        elif strike_type == "less":
+                            cap = cache.get("cap_strike")
+                            if cap is not None:
+                                return int(float(cap))
+            finally:
+                conn.close()
+    except Exception as e:
+        _LOGGER.debug("strike_price_cache_failed station=%s error=%s", station, e)
+
+    # 3. Not available
+    return None

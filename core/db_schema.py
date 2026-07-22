@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS trades (
     trade_version TEXT NOT NULL,
     instance TEXT NOT NULL,
     trade_date TEXT NOT NULL,
+    strike_price INTEGER,
     created_at TEXT DEFAULT (datetime('now'))
 )
 """
