@@ -89,10 +89,15 @@ class EsdrSignal(BaseSignal):
         A high confidence indicates the existing prediction is likely wrong
         and positions should be reduced.
 
+        NOTE: ESDR requires the NWP-specific database which has a
+        `nwp_forecasts` table with `member_index` column (for ensemble
+        member data). The `conn` parameter (from METAR/historical DB) is
+        IGNORED — this signal always queries its own NWP database.
+
         Args:
             station: Station code
             date: ISO date string
-            conn: Optional SQLite connection
+            conn: Ignored (ESDR always uses its own NWP DB)
             market_type: 'HIGH' or 'LOW'
 
         Returns:
@@ -100,19 +105,18 @@ class EsdrSignal(BaseSignal):
             indicates positions should be reduced/closed.
             Returns (None, 0.0) if no divergence detected.
         """
-        # Check if full ensemble data is available
-        own_conn = conn is None
-        if own_conn:
-            try:
-                conn = sqlite3.connect(self.nwp_db_path) if os.path.exists(self.nwp_db_path) else None
-            except Exception:
-                conn = None
+        # ESDR always uses its own NWP database — never the passed-in conn
+        # (which may be a METAR/historical DB without ensemble member columns).
+        try:
+            nwp_conn = sqlite3.connect(self.nwp_db_path) if os.path.exists(self.nwp_db_path) else None
+        except Exception:
+            nwp_conn = None
 
-        if conn is None:
+        if nwp_conn is None:
             return None, 0.0
 
         try:
-            cur = conn.cursor()
+            cur = nwp_conn.cursor()
 
             # Check if we have multi-member ensemble data
             cur.execute("""
@@ -203,8 +207,8 @@ class EsdrSignal(BaseSignal):
             return None, 0.0
 
         finally:
-            if own_conn and conn:
-                conn.close()
+            if nwp_conn:
+                nwp_conn.close()
 
     def get_reduction_factor(self, station: str, date: str, conn: sqlite3.Connection = None) -> float:
         """
