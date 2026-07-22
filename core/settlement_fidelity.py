@@ -21,7 +21,6 @@ Usage:
     corrected = sf.apply_5min_bias_correction(station, temp_f, direction='max')
 """
 
-import sqlite3
 import math
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -77,7 +76,7 @@ class SettlementFidelity:
         Args:
             station: If None, runs for all stations
         """
-        conn = sqlite3.connect(self.db_path, timeout=10)
+        conn = get_sqlite_connection(self.db_path, timeout=10)
         c = conn.cursor()
 
         stations = [station] if station else list(AUTHORITATIVE_STATIONS.keys())
@@ -168,7 +167,7 @@ class SettlementFidelity:
 
         Returns: dict of {station: avg_interval_minutes}
         """
-        conn = sqlite3.connect(self.db_path, timeout=10)
+        conn = get_sqlite_connection(self.db_path, timeout=10)
         c = conn.cursor()
 
         stations = list(AUTHORITATIVE_STATIONS.keys())
@@ -219,6 +218,7 @@ class SettlementFidelity:
 
 if __name__ == '__main__':
     import sys
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
     sf = SettlementFidelity()
 

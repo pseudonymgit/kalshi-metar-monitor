@@ -21,7 +21,6 @@ as a σ multiplier on Edge 8's Gaussian model.
 Walk-forward only. No AI in the loop. $0 data cost.
 """
 
-import sqlite3
 import math
 from collections import defaultdict
 from datetime import datetime
@@ -295,8 +294,8 @@ def run_backtest():
     print("  3-day average cloud cover used for smoothing")
     print()
     
-    conn_metar = sqlite3.connect(METAR_DB, timeout=60)
-    conn_isd = sqlite3.connect(ISD_LITE_DB, timeout=60)
+    conn_metar = get_sqlite_connection(METAR_DB, timeout=60)
+    conn_isd = get_sqlite_connection(ISD_LITE_DB, timeout=60)
     
     # Run both configurations
     configs = [
@@ -388,8 +387,8 @@ def run_backtest():
     conn_isd.close()
     
     # Re-open for extreme analysis
-    conn_metar = sqlite3.connect(METAR_DB, timeout=60)
-    conn_isd = sqlite3.connect(ISD_LITE_DB, timeout=60)
+    conn_metar = get_sqlite_connection(METAR_DB, timeout=60)
+    conn_isd = get_sqlite_connection(ISD_LITE_DB, timeout=60)
     
     extreme_clear = {'correct': 0, 'total': 0}
     extreme_overcast = {'correct': 0, 'total': 0}
@@ -406,6 +405,7 @@ def run_backtest():
             # Get the cloud fraction for this date
             frac = None
             from datetime import timedelta
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             try:
                 dt = datetime.strptime(date, '%Y-%m-%d')
                 fracs = []

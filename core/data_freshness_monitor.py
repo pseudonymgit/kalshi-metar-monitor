@@ -145,7 +145,7 @@ class DataFreshnessMonitor:
             if now.tzinfo is None:
                 now = now.replace(tzinfo=timezone.utc)
             
-            conn = sqlite3.connect(self._metar_db_path, timeout=5.0)
+            conn = get_sqlite_connection(self._metar_db_path, timeout=5.0)
             try:
                 # Query latest timestamp from metar db tables
                 # Look for common table names used in existing system
@@ -269,7 +269,7 @@ class DataFreshnessMonitor:
             now = now.replace(tzinfo=timezone.utc)
             
         try:
-            conn = sqlite3.connect(self._nwp_db_path, timeout=5.0) 
+            conn = get_sqlite_connection(self._nwp_db_path, timeout=5.0) 
             try:
                 cursor = conn.cursor()
                 
@@ -545,6 +545,7 @@ def check_system_operational() -> bool:
 # Example usage:
 if __name__ == "__main__":
     import os
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     
     # Create monitor
     monitor = get_monitor()

@@ -25,7 +25,6 @@ import requests
 import statistics
 from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Tuple, Optional
-import sqlite3
 import json
 from dataclasses import dataclass
 import threading
@@ -322,6 +321,7 @@ class MockPolymarketClient(MarketAPIClient):
         for i in range(5):
             dt = since + timedelta(hours=i*2 + 1)  # Offset timing slightly to make it more realistic
             import random
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             base = self._simulate_divergent_price(self.simulated_data[market_id]['location'], self.simulated_data[market_id]['date'])
             fluctuation = random.uniform(-0.05, 0.05)
             price = max(0.02, min(0.98, base + fluctuation))
@@ -361,7 +361,7 @@ class CrossPlatformDivergenceTracker:
     
     def _init_db(self):
         """Initialize SQLite database for tracking historical divergences."""
-        conn = sqlite3.connect('/tmp/cross_platform_divergence.db')  # Temp location; in prod would use proper path
+        conn = get_sqlite_connection('/tmp/cross_platform_divergence.db')  # Temp location; in prod would use proper path
         cursor = conn.cursor()
         
         # Table for tracking historical divergences

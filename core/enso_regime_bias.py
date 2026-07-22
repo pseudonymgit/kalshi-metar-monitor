@@ -17,10 +17,10 @@ Climate indices used:
 - AO (Arctic Oscillation) - affects entire CONUS
 """
 
-import sqlite3
 import math
 import datetime
 import os
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 DB_PATH_ISD = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/isd_lite_raw.db"
 CLIMATE_DIR = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/climate_indices/"
@@ -273,7 +273,7 @@ def load_isd_daily_temps(station):
     Load daily highs and lows from ISD data.
     Returns: list of {'date': 'YYYY-MM-DD', 'high':temp, 'low':temp}
     """
-    conn = sqlite3.connect(DB_PATH_ISD, timeout=10)
+    conn = get_sqlite_connection(DB_PATH_ISD, timeout=10)
     cur = conn.cursor()
     
     # Group by day to get daily highs/lows, not hourly

@@ -179,7 +179,7 @@ class NightModeDigest:
     def _ensure_schema(self):
         """Create the digest_queue table."""
         os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
-        conn = sqlite3.connect(self._db_path)
+        conn = get_sqlite_connection(self._db_path)
         try:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS digest_queue (
@@ -224,7 +224,7 @@ class NightModeDigest:
         """
         now_iso = datetime.now(timezone.utc).isoformat()
         
-        conn = sqlite3.connect(self._db_path)
+        conn = get_sqlite_connection(self._db_path)
         try:
             conn.execute("""
                 INSERT INTO digest_queue
@@ -266,7 +266,7 @@ class NightModeDigest:
         Returns:
             List of pending digest entries
         """
-        conn = sqlite3.connect(self._db_path)
+        conn = get_sqlite_connection(self._db_path)
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute("""
@@ -291,7 +291,7 @@ class NightModeDigest:
         if not entry_ids:
             return 0
         
-        conn = sqlite3.connect(self._db_path)
+        conn = get_sqlite_connection(self._db_path)
         try:
             placeholders = ','.join('?' * len(entry_ids))
             conn.execute(f"""
@@ -408,7 +408,7 @@ class NightModeDigest:
             Number of entries deleted
         """
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
-        conn = sqlite3.connect(self._db_path)
+        conn = get_sqlite_connection(self._db_path)
         try:
             conn.execute("""
                 DELETE FROM digest_queue
@@ -428,7 +428,7 @@ class NightModeDigest:
         Returns:
             Dict with pending count, total entries, etc.
         """
-        conn = sqlite3.connect(self._db_path)
+        conn = get_sqlite_connection(self._db_path)
         try:
             total = conn.execute("SELECT COUNT(*) FROM digest_queue").fetchone()[0]
             pending = conn.execute("SELECT COUNT(*) FROM digest_queue WHERE sent = 0").fetchone()[0]
@@ -470,6 +470,7 @@ def build_morning_digest() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     import tempfile
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     
     # Test timezone helper
     now_et = _now_et()

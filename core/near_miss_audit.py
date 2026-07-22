@@ -48,12 +48,12 @@ from __future__ import annotations
 
 import os
 import json
-import sqlite3
 import threading
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional
 
 from core.metar_monitor import _now_utc_iso
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 # ─── Audit Lock ─────────────────────────────────────────────────────────────
 _AUDIT_LOCK = threading.Lock()
@@ -148,7 +148,7 @@ def _ensure_near_miss_audit_schema() -> None:
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
     with _AUDIT_LOCK:
-        conn = sqlite3.connect(db_path, timeout=1)
+        conn = get_sqlite_connection(db_path, timeout=1)
         try:
             conn.execute(
                 """
@@ -229,7 +229,7 @@ def log_near_miss(
     with _AUDIT_LOCK:
         _ensure_near_miss_audit_schema()
         
-        conn = sqlite3.connect(_get_alert_db_path(), timeout=1)
+        conn = get_sqlite_connection(_get_alert_db_path(), timeout=1)
         try:
             cursor = conn.execute(
                 """
@@ -311,7 +311,7 @@ def query_near_miss_log(
     with _AUDIT_LOCK:
         _ensure_near_miss_audit_schema()
         
-        conn = sqlite3.connect(_get_alert_db_path(), timeout=1)
+        conn = get_sqlite_connection(_get_alert_db_path(), timeout=1)
         try:
             rows = conn.execute(query, params).fetchall()
         finally:

@@ -17,30 +17,18 @@ SKIP_FILES = {
 
 def _find_import_insert_line(lines):
     """Find a good line to insert the sqlite_utils import."""
+    last_import = 0
     for i, line in enumerate(lines):
         stripped = line.strip()
-        # Skip docstrings, comments, shebang, encoding
-        if stripped.startswith('"""') or stripped.startswith("'''") or stripped.startswith('#') or stripped.startswith('from __future__'):
+        if stripped.startswith('"""') or stripped.startswith("'''"):
             continue
-        # Find the first actual import statement
+        if stripped.startswith('from __future__'):
+            continue
+        if stripped.startswith('# shebang') or stripped.startswith('#!'):
+            continue
         if stripped.startswith('import ') or stripped.startswith('from '):
-            # Find the last import line
             last_import = i
-            for j in range(i, min(i + 30, len(lines))):
-                ls = lines[j].strip()
-                if ls.startswith('import ') or ls.startswith('from ') or ls == '' or ls.startswith('#'):
-                    if ls.startswith('import ') or ls.startswith('from '):
-                        last_import = j
-                else:
-                    break
-            return last_import + 1
-    return 0
-
-
-def _file_has_connect_usage(content):
-    """Check if file has sqlite3.connect() usage in actual code (not just comments/docstrings)."""
-    # Simple check - if 'sqlite3.connect' appears in the file
-    return 'sqlite3.connect' in content
+    return last_import + 1
 
 
 def convert_file(filepath):
@@ -52,58 +40,51 @@ def convert_file(filepath):
     with open(filepath, 'r') as f:
         content = f.read()
 
-    if not _file_has_connect_usage(content):
+    if 'sqlite3.connect' not in content:
         return False
 
     original = content
 
-    # --- Step 1: Replace read-only URI patterns ---
-    # Pattern: sqlite3.connect(f"file:{EXPR}?mode=ro", uri=True, timeout=X)
-    # or sqlite3.connect(f"file:{EXPR}?mode=ro", uri=True)
-    # Need to handle nested braces inside f-strings carefully.
-    # We'll use a non-greedy approach.
-
-    # Match f"file:...?mode=ro" with optional timeout
-    content = re.sub(
-        r'sqlite3\.connect\(f"file:\{([^}]+)\}\?mode=ro",\s*uri=True(?:,\s*timeout=(\d+))?\)',
-        lambda m: f'get_readonly_sqlite_connection({m.group(1)}{", timeout=" + m.group(2) if m.group(2) else ""})',
-        content
+    # Step 1: Replace read-only URI patterns (f-string)
+    ro_pattern = re.compile(
+        r'sqlite3\.connect\(f"file:\{([^}]+)\}\?mode=ro",\s*uri=True(?:,\s*timeout=(\d+))?\)'
     )
+    def ro_replace(m):
+        expr = m.group(1)
+        timeout = m.group(2)
+        if timeout:
+            return f'get_readonly_sqlite_connection({expr}, timeout={timeout})'
+        return f'get_readonly_sqlite_connection({expr})'
 
-    # --- Step 2: Replace regular sqlite3.connect(...) calls ---
-    # Match: sqlite3.connect(EXPR, timeout=X) or sqlite3.connect(EXPR)
-    # The EXPR can contain dots, colons, underscores, string literals, etc.
-    # But NOT nested parentheses.
-    content = re.sub(
-        r'sqlite3\.connect\(([^()]+)\)',
-        lambda m: f'get_sqlite_connection({m.group(1)})',
-        content
-    )
+    content = ro_pattern.sub(ro_replace, content)
+
+    # Step 2: Replace regular sqlite3.connect(...) calls (handles one level of nesting)
+    reg_pattern = re.compile(r"sqlite3\.connect\(((?:[^()]|\([^()]*\))+)\)")
+    content = reg_pattern.sub(r'get_sqlite_connection(\1)', content)
 
     if content == original:
         return False
 
     lines = content.split('\n')
 
-    # --- Step 3: Add or update import ---
+    # Step 3: Add or update import
     has_existing_import = False
     for i, line in enumerate(lines):
         stripped = line.strip()
         if 'from .sqlite_utils import' in stripped or 'from core.sqlite_utils import' in stripped:
             has_existing_import = True
+            need_update = False
             if 'get_sqlite_connection' not in stripped:
-                # Add our functions to the existing import
-                if stripped.endswith(','):
-                    lines[i] = stripped + ' get_sqlite_connection, get_readonly_sqlite_connection'
-                else:
-                    lines[i] = stripped + ', get_sqlite_connection, get_readonly_sqlite_connection'
+                stripped = stripped.rstrip(',') + ', get_sqlite_connection, get_readonly_sqlite_connection'
+                need_update = True
             elif 'get_readonly_sqlite_connection' not in stripped:
-                # Add read-only function
-                if stripped.endswith(','):
-                    lines[i] = stripped + ' get_readonly_sqlite_connection'
-                else:
-                    lines[i] = stripped + ', get_readonly_sqlite_connection'
-            content = '\n'.join(lines)
+                stripped = stripped.rstrip(',') + ', get_readonly_sqlite_connection'
+                need_update = True
+            if need_update:
+                # Find indent
+                indent = ' ' * (len(line) - len(line.lstrip()))
+                lines[i] = indent + stripped
+                content = '\n'.join(lines)
             break
 
     if not has_existing_import:
@@ -112,15 +93,15 @@ def convert_file(filepath):
         lines.insert(insert_pos, import_line)
         content = '\n'.join(lines)
 
-    # --- Step 4: Clean up unused sqlite3 import (if sqlite3 is no longer used directly) ---
-    # Only remove if sqlite3 is not used for anything other than connect
+    # Step 4: Keep sqlite3 import if still needed for other uses
     has_other_sqlite3_usage = bool(re.search(r'(?<!\.)sqlite3\.(?!connect\b)\w+', content))
-    if not has_other_sqlite3_usage and 'import sqlite3' in content:
+    if not has_other_sqlite3_usage:
+        # Remove 'import sqlite3' lines
         lines = content.split('\n')
         new_lines = []
         for line in lines:
             stripped = line.strip()
-            if stripped == 'import sqlite3' or stripped.startswith('import sqlite3') or stripped.startswith('from sqlite3'):
+            if stripped == 'import sqlite3' or stripped.startswith('import sqlite3 as') or stripped.startswith('from sqlite3 import'):
                 continue
             new_lines.append(line)
         content = '\n'.join(new_lines)

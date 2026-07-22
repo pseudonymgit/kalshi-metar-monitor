@@ -22,10 +22,10 @@ actual market price decay. See DATA_GAP.md section below.
 Walk-forward only. No AI in the loop. No in-sample metrics.
 """
 
-import sqlite3
 import math
 from collections import defaultdict
 from datetime import datetime
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
 
@@ -222,7 +222,7 @@ def run_backtest():
     print("  Signal: Rapid temperature change in late afternoon → bet against (mean reversion)")
     print()
     
-    conn = sqlite3.connect(DB_PATH, timeout=60)
+    conn = get_sqlite_connection(DB_PATH, timeout=60)
     
     print(f"\n{'Station':<8} {'Trades':>8} {'Correct':>8} {'Accuracy':>10} {'Coverage':>10} {'Avg Conf':>10}")
     print("-" * 65)

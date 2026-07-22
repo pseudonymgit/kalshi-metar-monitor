@@ -37,7 +37,6 @@ Rules:
 
 import os
 import sys
-import sqlite3
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
@@ -263,6 +262,7 @@ def get_phase3_summary() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     import sys
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     
     if len(sys.argv) < 2:
         print("Usage: python p3_main.py <command> [args]")
@@ -308,7 +308,7 @@ if __name__ == "__main__":
     elif cmd == "health":
         try:
             db_path = p3db._resolve_db_path()
-            conn = sqlite3.connect(db_path, timeout=1)
+            conn = get_sqlite_connection(db_path, timeout=1)
             conn.execute("SELECT 1")
             conn.close()
             print("Health: OK")

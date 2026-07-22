@@ -1,6 +1,6 @@
-import sqlite3
 import math
 from datetime import datetime, timedelta
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 def modulate_confidence(station, date, metar_db_path, confidence):
@@ -56,7 +56,7 @@ def _get_most_recent_dpd(station, target_date, metar_db_path):
     start_time = target_date - timedelta(hours=6)
     
     try:
-        conn = sqlite3.connect(metar_db_path)
+        conn = get_sqlite_connection(metar_db_path)
         cursor = conn.cursor()
         
         # Query for most recent valid METAR record from given station within time range

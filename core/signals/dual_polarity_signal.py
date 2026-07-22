@@ -33,6 +33,7 @@ import logging
 
 from .base_signal import BaseSignal, _safe_get, validate_signal
 from core.station_effects import get_wind_delta_t, is_warming_wind
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 _logger = logging.getLogger(__name__)
 
@@ -425,7 +426,7 @@ class CorrectedPressureDeltaSignal(BaseSignal):
         """
         own_conn = conn is None
         if own_conn:
-            conn = sqlite3.connect(self.db_path) if self.db_path else None
+            conn = get_sqlite_connection(self.db_path) if self.db_path else None
             if conn is None:
                 return None, 0.0
 

@@ -33,6 +33,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from core.authoritative_state import immutable_public_state_snapshot
 from core.scoring_engine import score_settlement_epochs, serialize_epoch_scores
 from core.security_boundaries import (
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     detect_illegal_cross_layer_imports,
     verify_observability_read_only,
 )
@@ -61,7 +62,7 @@ def _query_rows_readonly(query: str, params: Tuple[Any, ...]) -> List[ReadOnlyRo
     if not os.path.exists(db_path):
         return []
 
-    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    conn = get_readonly_sqlite_connection(db_path)
     try:
         cur = conn.execute(query, params)
         return cur.fetchall()

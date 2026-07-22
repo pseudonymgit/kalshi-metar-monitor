@@ -36,6 +36,7 @@ from typing import Dict, List, Optional, Tuple
 import logging
 
 from .base_signal import BaseSignal, _safe_get, validate_signal, _window
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 _logger = logging.getLogger(__name__)
 
@@ -113,7 +114,7 @@ class FrontalDetectorSignal(BaseSignal):
         if own_conn:
             if not self.db_path:
                 return None
-            conn = sqlite3.connect(self.db_path)
+            conn = get_sqlite_connection(self.db_path)
 
         try:
             cur = conn.cursor()
@@ -336,7 +337,7 @@ class FrontalDetectorSignal(BaseSignal):
         if own_conn:
             if not self.db_path:
                 return None, 0.0
-            conn = sqlite3.connect(self.db_path)
+            conn = get_sqlite_connection(self.db_path)
 
         try:
             # Try intraday METAR window analysis

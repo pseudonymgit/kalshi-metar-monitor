@@ -44,6 +44,7 @@ from p3_trajectory_tracer import trace_all_trajectories
 from p3_calibration_engine import calculate_confidence
 from p3_output_formatter import create_prediction
 import p3_scheduler as p3sch
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 # =============================================================================
@@ -165,7 +166,7 @@ class Phase3BacktestEngine:
     def __init__(self, db_path: str):
         """Initialize backtest engine with database path."""
         self.db_path = db_path
-        self.conn = sqlite3.connect(db_path, timeout=10)
+        self.conn = get_sqlite_connection(db_path, timeout=10)
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
         
@@ -705,7 +706,7 @@ def main():
     for path in db_paths:
         if os.path.exists(path):
             try:
-                conn = sqlite3.connect(path)
+                conn = get_sqlite_connection(path)
                 cursor = conn.cursor()
                 cursor.execute("SELECT COUNT(*) FROM settlement_epochs")
                 count = cursor.fetchone()[0]

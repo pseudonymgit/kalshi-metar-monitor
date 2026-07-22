@@ -182,8 +182,7 @@ def get_latest_settlement_epoch(
     """
     db_path = _resolve_db_path()
     
-    import sqlite3
-    conn = sqlite3.connect(db_path, timeout=1)
+    conn = get_sqlite_connection(db_path, timeout=1)
     try:
         cursor = conn.cursor()
         cursor.execute(
@@ -220,8 +219,8 @@ def get_closed_epochs_for_station(
     """
     db_path = _resolve_db_path()
     
-    import sqlite3
-    conn = sqlite3.connect(db_path, timeout=1)
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+    conn = get_sqlite_connection(db_path, timeout=1)
     try:
         cursor = conn.cursor()
         cursor.execute(

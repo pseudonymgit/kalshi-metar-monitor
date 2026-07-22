@@ -7,8 +7,8 @@ signal, not a standalone prediction — it adjusts confidence based on
 whether the actual temperature is tracking toward the predicted direction.
 """
 from datetime import datetime, timezone, timedelta
-import sqlite3
 from typing import Optional, Tuple, Dict, Any
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 class IntradayMETARConfirmation:
@@ -24,7 +24,7 @@ class IntradayMETARConfirmation:
         Fetch all temperature observations for the current day 
         (14:00-20:00 UTC = 10AM-4PM Eastern)
         """
-        conn = sqlite3.connect(db_path)
+        conn = get_sqlite_connection(db_path)
         cursor = conn.cursor()
         
         # Convert target_date to UTC date range
@@ -78,7 +78,7 @@ class IntradayMETARConfirmation:
         """
         Fetch yesterday's high temperature for comparison with current temperatures
         """
-        conn = sqlite3.connect(db_path)
+        conn = get_sqlite_connection(db_path)
         cursor = conn.cursor()
         
         # Calculate yesterday's date

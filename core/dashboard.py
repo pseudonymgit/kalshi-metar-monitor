@@ -487,7 +487,7 @@ class DashboardApp:
         market_prob = 0.5
         if _dashboard_get_market_price is not None:
             try:
-                live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
+                live_price, _ = _dashboard_get_market_price(station, 'HIGH')
                 if live_price is not None and 0.01 <= live_price <= 0.99:
                     market_prob = live_price
             except Exception:
@@ -555,7 +555,7 @@ class DashboardApp:
             market_prob = 0.5
             if _dashboard_get_market_price is not None:
                 try:
-                    live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
+                    live_price, _ = _dashboard_get_market_price(station, 'HIGH')
                     if live_price is not None and 0.01 <= live_price <= 0.99:
                         market_prob = live_price
                 except Exception:

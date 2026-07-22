@@ -70,12 +70,12 @@ class ForecastDisagreementSignal(BaseSignal):
 
     def evaluate_for_station(self, station: str, date: str, conn=None) -> Tuple[Optional[str], float]:
         """DB-based evaluation for forecast disagreement signal."""
-        import sqlite3
         import math
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         
         own_conn = conn is None
         if own_conn:
-            conn = sqlite3.connect(self.db_path) if self.db_path else None
+            conn = get_sqlite_connection(self.db_path) if self.db_path else None
             if conn is None:
                 return None, 0.0
 

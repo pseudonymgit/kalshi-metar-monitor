@@ -24,7 +24,6 @@ Usage:
     #           'models': {...}, 'consensus_temp': float|None}
 """
 
-import sqlite3
 import math
 import os
 import argparse
@@ -52,11 +51,11 @@ METAR_DB.parent.mkdir(parents=True, exist_ok=True)
 # Ensure the databases exist by connecting once
 if not NWP_DB.exists():
     # Initialize with empty connection to create the file at least
-    init_db = sqlite3.connect(NWP_DB)
+    init_db = get_sqlite_connection(NWP_DB)
     init_db.close()
 if not METAR_DB.exists():
     # Initialize with empty connection to create the file at least
-    init_db = sqlite3.connect(METAR_DB)
+    init_db = get_sqlite_connection(METAR_DB)
     init_db.close()
 
 # ─── Config ─────────────────────────────────────────────────────────────────
@@ -99,7 +98,7 @@ class EnsembleAgreementGate:
 
     def _get_nwp_forecasts(self, station, target_date):
         """Get all model forecasts for a station on a target date."""
-        conn = sqlite3.connect(self.nwp_db, timeout=10)
+        conn = get_sqlite_connection(self.nwp_db, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT model, value FROM nwp_forecasts
@@ -113,7 +112,7 @@ class EnsembleAgreementGate:
         """Get previous day's actual high temp from daily_stats."""
         td = datetime.strptime(target_date, '%Y-%m-%d')
         prev = (td - timedelta(days=1)).strftime('%Y-%m-%d')
-        conn = sqlite3.connect(self.metar_db, timeout=10)
+        conn = get_sqlite_connection(self.metar_db, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT max_temp_f FROM daily_stats
@@ -234,8 +233,8 @@ class EnsembleAgreementGate:
 
         Returns summary stats: total days, coverage, accuracy on consensus days.
         """
-        conn_nwp = sqlite3.connect(self.nwp_db, timeout=10)
-        conn_metar = sqlite3.connect(self.metar_db, timeout=10)
+        conn_nwp = get_sqlite_connection(self.nwp_db, timeout=10)
+        conn_metar = get_sqlite_connection(self.metar_db, timeout=10)
         cn = conn_nwp.cursor()
         cm = conn_metar.cursor()
 
@@ -371,6 +370,7 @@ class EnsembleAgreementGate:
 
 if __name__ == '__main__':
     import sys
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
     gate = EnsembleAgreementGate()
 

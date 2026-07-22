@@ -40,6 +40,7 @@ import os
 from typing import Dict, List, Tuple, Optional
 import bisect
 from pathlib import Path
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 # DB Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -238,7 +239,7 @@ class ClimatologyPillar:
     
     def _execute_query(self, query, params=None):
         """Execute database query safely."""
-        conn = sqlite3.connect(self.db_path)
+        conn = get_sqlite_connection(self.db_path)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         

@@ -9,7 +9,7 @@ CALIBRATION DASHBOARD (v1.0) with UX Priority
 Interactive dashboard for observing and managing weather trading model calibration metrics.
 Combines metrics from:
 - Paper trading performance
-- Split backtest results  
+- Split backtest results
 - Calibration statistics (Brier, ECE, etc.)
 
 Core Features:
@@ -32,7 +32,7 @@ import json
 from datetime import datetime, timezone, timedelta
 import os
 import statistics
-import random  # Only needed for simulation data
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 # Configuration
@@ -50,7 +50,7 @@ app = Flask(__name__, static_folder=STATIC_FOLDER, template_folder=TEMPLATES_FOL
 
 def get_database_connection(db_path):
     """Get database connection with row factory."""
-    conn = sqlite3.connect(db_path)
+    conn = get_sqlite_connection(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -59,11 +59,11 @@ def fetch_paper_trading_metrics():
     try:
         conn = get_database_connection(PAPER_DB_PATH)
         cursor = conn.cursor()
-        
+
         # Overall performance metrics
         cursor.execute("""
-            SELECT 
-                date, 
+            SELECT
+                date,
                 closing_balance,
                 (closing_balance - opening_balance) as daily_pnl,
                 winning_trades,
@@ -74,33 +74,33 @@ def fetch_paper_trading_metrics():
             ORDER BY date DESC
             LIMIT 90
         """)
-        
+
         performance_data = cursor.fetchall()
-        
+
         # Calculate additional derived metrics
         overall_pnl = sum(row['daily_pnl'] for row in performance_data if row['daily_pnl'])
         win_rate = sum(row['winning_trades'] for row in performance_data) / sum(max(row['winning_trades'] + row['losing_trades'], 1) if row['winning_trades'] + row['losing_trades'] > 0 else 1 for row in performance_data)
-        
+
         # Get trade version performance
         cursor.execute("""
-            SELECT 
+            SELECT
                 trade_version,
                 COUNT(*) as total_trades,
                 SUM(CASE WHEN realized_pnl > 0 THEN 1 ELSE 0 END) as wins,
                 SUM(CASE WHEN realized_pnl < 0 THEN 1 ELSE 0 END) as losses,
                 SUM(realized_pnl) as total_pnl,
                 AVG(confidence_indicator) as avg_confidence
-            FROM trades 
+            FROM trades
             WHERE status = 'closed'
             GROUP BY trade_version
             ORDER BY total_pnl DESC
             LIMIT 10
         """)
         version_performance = cursor.fetchall()
-        
+
         # Close connection
         conn.close()
-        
+
         return {
             'performance_data': performance_data,
             'overall_pnl': overall_pnl,
@@ -110,60 +110,38 @@ def fetch_paper_trading_metrics():
     except Exception as e:
         # Simulation data if databases not available
         print(f"Simulating with dummy data due to: {e}")
-        
-        # Generate some simulation data
-        dates = [(datetime.now(timezone.utc) - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(90)]
-        performance_data = []
-        total_pnl = 0
-        
-        for i, date in enumerate(dates):
-            pnl = random.gauss(12.3, 25)  # Simulate daily P&L
-            total_pnl += pnl
-            winning = random.randint(1, 5)  # 1-5 winning trades
-            losing = random.randint(0, 4)   # 0-4 losing trades
-            performance_data.append({
-                'date': date,
-                'closing_balance': 10000 + total_pnl,
-                'daily_pnl': pnl,
-                'winning_trades': winning,
-                'losing_trades': losing,
-                'trade_count': winning + losing,
-                'avg_confidence': round(0.65, 3)
-            })
-        
+
+        # Graceful fallback when database is unavailable — return empty data
+        # with no random/fake values. Downstream components handle empty lists.
         return {
-            'performance_data': performance_data,
-            'overall_pnl': total_pnl,
-            'win_rate': (45*(90) / 90*5),  # Approximation
-            'version_performance': [
-                {'trade_version': 'v2.0_paper_trade', 'total_trades': 256, 'wins': 162, 'losses': 94, 'total_pnl': 832.45, 'avg_confidence': 0.68},
-                {'trade_version': 'v1.5_signal_integrated', 'total_trades': 198, 'wins': 121, 'losses': 77, 'total_pnl': 521.30, 'avg_confidence': 0.65},
-                {'trade_version': 'v1.2_temp_reversion', 'total_trades': 312, 'wins': 175, 'losses': 137, 'total_pnl': -10.25, 'avg_confidence': 0.72}
-            ]
+            'performance_data': [],
+            'overall_pnl': 0.0,
+            'win_rate': 0.0,
+            'version_performance': [],
         }
 
 def create_portfolio_performance_plot(data):
     """Create portfolio performance plot."""
     if not data or len(data) == 0:
         return go.Figure().to_html(full_html=False)
-        
+
     # Convert to dataframe
     df = pd.DataFrame([dict(row) for row in data])
     df['date'] = pd.to_datetime(df['date'])
     df = df.sort_values('date')
-    
+
     fig = go.Figure()
-    
+
     # Portfolio value over time
     fig.add_trace(go.Scatter(
-        x=df['date'], 
-        y=df['closing_balance'], 
-        mode='lines', 
+        x=df['date'],
+        y=df['closing_balance'],
+        mode='lines',
         name='Portfolio Balance',
         line=dict(width=2, color='#3498db'),
         hovertemplate='<b>%{x}</b><br>Bal: $%{y:,.2f}<extra></extra>'
     ))
-    
+
     # Layout
     fig.update_layout(
         title={'text': 'Portfolio Performance Over Time', 'font': {'size': 16}},
@@ -174,7 +152,7 @@ def create_portfolio_performance_plot(data):
         height=400,
         title_x=0,  # Left-align title
     )
-    
+
     return fig.to_html(full_html=False, div_classes="chart-container")
 
 
@@ -182,23 +160,23 @@ def create_daily_pnl_plot(data):
     """Create daily P&L histogram/bar chart."""
     if not data or len(data) == 0:
         return go.Figure().to_html(full_html=False)
-    
+
     # Convert to dataframe
     df = pd.DataFrame([dict(row) for row in data])
-    
+
     fig = go.Figure()
-    
+
     # Bar chart of daily pnl
     colors = df['daily_pnl'].apply(lambda x: '#e74c3c' if x < 0 else '#2ecc71')  # Red if loss, green if gain
-    
+
     fig.add_trace(go.Bar(
-        x=df['date'], 
+        x=df['date'],
         y=df['daily_pnl'],
         marker_color=colors,
         hovertemplate='<b>%{x}</b><br>Daily P&L: $%{y:,.2f}<extra></extra>',
         name='Daily P&L'
     ))
-    
+
     fig.update_layout(
         title={'text': 'Daily Profit & Loss', 'font': {'size': 16}},
         xaxis_title='Date',
@@ -207,7 +185,7 @@ def create_daily_pnl_plot(data):
         height=400,
         title_x=0,
     )
-    
+
     return fig.to_html(full_html=False, div_classes="chart-container")
 
 
@@ -215,25 +193,25 @@ def create_confidence_calibration_plot(data):
     """Create confidence calibration plot (actual outcomes vs predicted confidence)."""
     if not data or len(data) == 0:
         return go.Figure().to_html(full_html=False)
-    
+
     # If we had actual trade data with outcomes instead of aggregated daily data,
     # we would create a proper calibration plot, but for now let's simulate
     # with some representative calibration data
-    
+
     # For a real system, we'd query trade outcomes against predicted confidence levels
     # For now, create a simulated calibration plot
-    
+
     # Create confidence buckets: 0-10%, 10-20%, ..., 90-100%
     # And simulate accuracy within each bucket
     buckets = []
     accuracies = []
     sample_counts = []
-    
+
     for i in range(10):
         conf_low = i * 0.1
         conf_high = (i + 1) * 0.1
         mid_point = conf_low + 0.05
-        
+
         # Add some realistic values based on "model slightly overconfident"
         if conf_low < 0.3:
             # Lower confidence bands may have lower actual accuracy due to hedging
@@ -244,23 +222,23 @@ def create_confidence_calibration_plot(data):
         else:
             # Middle range more accurate
             actual = mid_point
-    
+
         buckets.append(f"{int(conf_low*100)}-{int(conf_high*100)}%")
         accuracies.append(actual)
         sample_counts.append(100 + (i * 10) % 150)  # Simulated sample sizes
-    
+
     fig = go.Figure()
-    
+
     # Perfect calibration diagonal line
     fig.add_trace(go.Scatter(
         x=[0, 1],
-        y=[0, 1], 
+        y=[0, 1],
         mode='lines',
         line=dict(color='red', dash='dash'),
         name='Perfect Calibration',
         hovertemplate='%{x:.0%}<extra>Perfect</extra>'
     ))
-    
+
     # Model calibration points
     fig.add_trace(go.Scatter(
         x=[i * 0.1 + 0.05 for i in range(10)],  # Midpoints of each bucket
@@ -276,7 +254,7 @@ def create_confidence_calibration_plot(data):
         hovertemplate='<b>%{customdata[0]}</b><br>Predicted: %{x:.0%}<br>Actual: %{y:.0%}<br>Count: %{customdata[1]}<extra></extra>',
         customdata=list(zip(buckets, sample_counts))
     ))
-    
+
     fig.update_layout(
         title={'text': 'Confidence Calibration Plot', 'font': {'size': 16}},
         xaxis_title='Predicted Confidence',
@@ -287,7 +265,7 @@ def create_confidence_calibration_plot(data):
         yaxis=dict(range=[0, 1]),
         xaxis=dict(range=[0, 1]),
     )
-    
+
     return fig.to_html(full_html=False, div_classes="chart-container")
 
 
@@ -309,10 +287,10 @@ def dashboard():
     portfolio_chart = create_portfolio_performance_plot(metrics['performance_data'])
     pnl_chart = create_daily_pnl_plot(metrics['performance_data'])
     calibration_chart = create_confidence_calibration_plot(metrics['performance_data'])
-    
+
     # Top Performing Versions Table
     version_table = metrics['version_performance'][:5] if metrics['version_performance'] else []
-    
+
     html = """
 <!DOCTYPE html>
 <html>
@@ -480,22 +458,22 @@ def dashboard():
         // Insert metrics dynamically
         var metrics_data = {{ cards|tojson }};
         var container = $('.metrics-grid')[0];
-        
+
         metrics_data.forEach(function(metric) {
             var card = document.createElement('div');
             card.className = 'metric-card';
             var colorClass = metric.color;
-            
+
             card.innerHTML = '<div class="metric-title">' + metric.title + '</div>' +
                             '<div class="metric-value ' + colorClass + '">' + metric.value + '</div>';
-                            
+
             container.appendChild(card);
         });
     </script>
 </body>
 </html>
     """
-    
+
     # Render with dynamic values
     context = {
         'cards': cards,
@@ -505,7 +483,7 @@ def dashboard():
         'version_table': version_table,
         'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
     }
-    
+
     return render_template_string(html, **context)
 
 
@@ -534,10 +512,10 @@ def main():
     print("Dashboard URL: http://localhost:8086/")
     print("Press Ctrl+C to stop the server")
     print("=" * 80)
-    
+
     os.makedirs(STATIC_FOLDER, exist_ok=True)
     os.makedirs(TEMPLATES_FOLDER, exist_ok=True)
-    
+
     # Start the Flask app
     app.run(host='0.0.0.0', port=8086, debug=False, threaded=True)
 

@@ -167,8 +167,8 @@ def track_ladder_change(station, series_ticker, ladder_before, ladder_after):
     Returns:
         Dict with tracking result
     """
-    import sqlite3
     import os
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     
     db_path = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -176,7 +176,7 @@ def track_ladder_change(station, series_ticker, ladder_before, ladder_after):
     diff = diff_market_ladders(ladder_before, ladder_after)
     
     # Create table if not exists
-    with sqlite3.connect(db_path, timeout=1) as conn:
+    with get_sqlite_connection(db_path, timeout=1) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS market_change_events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -191,7 +191,7 @@ def track_ladder_change(station, series_ticker, ladder_before, ladder_after):
         conn.commit()
     
     # Insert the change record
-    with sqlite3.connect(db_path, timeout=1) as conn:
+    with get_sqlite_connection(db_path, timeout=1) as conn:
         conn.execute(
             """
             INSERT INTO market_change_events 

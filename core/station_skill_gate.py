@@ -11,7 +11,6 @@ from typing import Dict, List, Optional
 import numpy as np
 from datetime import datetime, timezone, timedelta
 import os
-import sqlite3
 import sys
 from pathlib import Path
 
@@ -23,6 +22,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 try:
     from scripts.per_station_skill import (
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         compute_rolling_bss,
         brier_skill_score,
         block_bootstrap_ci,
@@ -120,7 +120,7 @@ class StationSkillGate:
         
         try:
             # Load database connection
-            conn = sqlite3.connect(self.metar_db_path)
+            conn = get_sqlite_connection(self.metar_db_path)
             
             # Get all unique stations from the settlement_epochs table
             cursor = conn.cursor()
@@ -144,7 +144,7 @@ class StationSkillGate:
                     
                     try:
                         # Establish new connection for this calculation
-                        conn = sqlite3.connect(self.metar_db_path)
+                        conn = get_sqlite_connection(self.metar_db_path)
                         
                         # Load the high/low data and market directions
                         days = load_daily_highs_lows(station, conn)

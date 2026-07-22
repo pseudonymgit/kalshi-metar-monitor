@@ -26,6 +26,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 from .base_signal import BaseSignal, validate_signal
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 logger = logging.getLogger(__name__)
 
@@ -165,7 +166,7 @@ class HrrrBiasCorrectedSignal(BaseSignal):
         """
         own_conn = conn is None
         if own_conn:
-            conn = sqlite3.connect(self.db_path) if self.db_path else None
+            conn = get_sqlite_connection(self.db_path) if self.db_path else None
             if conn is None:
                 return None, 0.0
 
@@ -173,7 +174,7 @@ class HrrrBiasCorrectedSignal(BaseSignal):
         hrrr_own_conn = False
         try:
             if os.path.exists(self.hrrr_db_path):
-                hrrr_conn = sqlite3.connect(self.hrrr_db_path)
+                hrrr_conn = get_sqlite_connection(self.hrrr_db_path)
                 hrrr_own_conn = True
             else:
                 logger.warning(f"HRRR DB not found at {self.hrrr_db_path}")

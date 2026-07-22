@@ -21,13 +21,13 @@ For live use, supports real GFS/NWS API calls (see live_forecast_disagreement())
 Walk-forward only. No AI in the loop. No in-sample metrics.
 """
 
-import sqlite3
 import math
 import json
 import urllib.request
 import urllib.error
 from collections import defaultdict
 from datetime import datetime, timedelta
+from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
 
@@ -178,7 +178,7 @@ def live_forecast_disagreement(station):
     nws_high = nws['temperature']
     
     # Get recent climatology from DB
-    conn = sqlite3.connect(DB_PATH, timeout=30)
+    conn = get_sqlite_connection(DB_PATH, timeout=30)
     cur = conn.cursor()
     cur.execute("""
         SELECT date_utc, MAX(temp_f) as high
@@ -284,7 +284,7 @@ def run_backtest():
     print("  Signal: bet in GFS direction when |diff| > 5°F")
     print()
     
-    conn = sqlite3.connect(DB_PATH, timeout=60)
+    conn = get_sqlite_connection(DB_PATH, timeout=60)
     
     print(f"\n{'Station':<8} {'Trades':>8} {'Correct':>8} {'Accuracy':>10} {'Coverage':>10} {'Avg Conf':>10}")
     print("-" * 65)
