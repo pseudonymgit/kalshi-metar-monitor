@@ -345,6 +345,18 @@ def main():
     for row in c.fetchall():
         print(f"  {row[0]}: {row[1]} distinct values")
 
+    # Check HRRR table if it exists
+    c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hrrr_forecasts'")
+    if c.fetchone():
+        c.execute("SELECT COUNT(*) FROM hrrr_forecasts")
+        hrrr_count = c.fetchone()[0]
+        c.execute("SELECT MIN(target_datetime), MAX(target_datetime) FROM hrrr_forecasts")
+        hrrr_minmax = c.fetchone()
+        c.execute("SELECT COUNT(DISTINCT station) FROM hrrr_forecasts")
+        hrrr_stations = c.fetchone()[0]
+        print(f"\nHRRR hourly data: {hrrr_count} rows, {hrrr_stations} stations, "
+              f"range: {hrrr_minmax[0]} to {hrrr_minmax[1]}")
+
     conn.close()
     print(f"\nDone at {datetime.now(timezone.utc).isoformat()}")
 
