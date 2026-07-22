@@ -79,13 +79,6 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .spatial_coherence import apply_spatial_coherence_gate, STATION_REGIONS as SPATIAL_REGIONS, STATION_TO_REGION
 from .ensemble_diversity import compute_diversity_score, apply_diversity_penalty
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
-from position_sizing import (
-    compute_position_size as _compute_confidence_weighted_size,
-    extract_confidence_from_signal_context as _extract_confidence,
-    classify_confidence as _classify_confidence,
-    ConfidenceTier as _ConfidenceTier,
-    KellyPositionSizingConfig,
-)
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from kalshi_price_fetcher import (
     get_live_market_price as _get_live_market_price,
@@ -142,11 +135,11 @@ except ImportError:
     HAS_LOW_LIQUIDITY_TRAP = False
 
 try:
-    from core.kelly_position_sizer import KellyPositionSizer
+    from core.fee_aware_kelly_position_sizing import KellyPositionSizer as FeeAwareKellyPositionSizer
     HAS_KELLY_SIZER = True
 except ImportError:
-    print("Warning: Kelly Position Sizer module not available. Advanced position sizing disabled.")
-    KellyPositionSizer = None
+    print("Warning: Fee-Aware Kelly Position Sizer module not available. Advanced position sizing disabled.")
+    FeeAwareKellyPositionSizer = None
     HAS_KELLY_SIZER = False
 
 try:
@@ -379,9 +372,10 @@ class PaperTrader:
         self._kelly_sizer = None
         if HAS_KELLY_SIZER:
             try:
-                self._kelly_sizer = KellyPositionSizer(bankroll=self.initial_balance)
+                from core.fee_aware_kelly_position_sizing import KellySizingConfig
+                self._kelly_sizer = FeeAwareKellyPositionSizer()
             except Exception as e:
-                print(f"Warning: Failed to initialize KellyPositionSizer: {e}")
+                print(f"Warning: Failed to initialize FeeAwareKellyPositionSizer: {e}")
                 self._kelly_sizer = None
 
         self._risk_budget = None
@@ -1614,19 +1608,19 @@ class PaperTrader:
         edge = abs(analytical_prob - market_price)
         win_rate = analytical_prob
 
-        # ── Step 1: Primary sizing via Kelly (corrected formula) ──
+        # ── Step 1: Primary sizing via Fee-Aware Kelly ──
         if self._kelly_sizer is not None and HAS_KELLY_SIZER:
             try:
                 position_size, kelly_details = self._kelly_sizer.compute_position_size(
-                    confidence=confidence,
                     win_rate=win_rate,
-                    edge=edge
+                    confidence=confidence,
+                    total_capital=current_balance
                 )
                 sizing_meta['kelly_computed'] = True
                 sizing_meta['kelly_details'] = kelly_details
-                _LOGGER.info(f"Kelly position computed: ${position_size:.2f}")
+                _LOGGER.info(f"Fee-aware Kelly position computed: ${position_size:.2f}")
             except Exception as e:
-                _LOGGER.error(f"Kelly sizer failed, falling back: {e}")
+                _LOGGER.error(f"Fee-aware Kelly sizer failed, falling back: {e}")
                 position_size = 0.0
                 sizing_meta['kelly_fallback'] = True
         else:
