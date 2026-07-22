@@ -14,3 +14,4 @@ data/isd_lite_raw.db
 core/__pycache__/
 data/isd_lite_raw.db
 data/*.db-journal
+data/tmp_cds_downloads/*.nc
