@@ -27,9 +27,9 @@ CORE_DIR = os.path.dirname(os.path.abspath(__file__))
 if CORE_DIR not in sys.path:
     sys.path.insert(0, CORE_DIR)
 
-from signals import SignalRegistry
-from signal_fusion import SignalFusionEngine, TimeDecaySignalManager
-from market_cost_model import MARKET_COST_MODEL
+from core.signals import SignalRegistry
+from core.signal_fusion import SignalFusionEngine, TimeDecaySignalManager
+from core.market_cost_model import MARKET_COST_MODEL
 
 # Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
 BACKTEST_SIGNALS = [
