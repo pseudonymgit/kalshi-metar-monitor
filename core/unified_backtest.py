@@ -16,6 +16,7 @@ import sqlite3
 import math
 import os
 import sys
+import statistics
 import numpy as np
 from collections import defaultdict
 from scipy.stats import binomtest
@@ -52,7 +53,16 @@ FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
 
 def load_station_data(station, conn):
-    """Load daily aggregated data and settlement market data for a station."""
+    """Load daily aggregated data and settlement market data for a station.
+
+    Returns (days, market) where market maps date -> {
+        'settlement_bucket': actual high temperature (int °F),
+        'reversion': whether a reversion occurred
+    }.
+
+    Direction is NOT computed here — callers must compare settlement_bucket
+    to the strike price to determine actual market outcome.
+    """
     cur = conn.cursor()
     cur.execute("""
         SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low,
@@ -73,18 +83,18 @@ def load_station_data(station, conn):
         })
 
     cur.execute("""
-        SELECT local_trading_date, settlement_bucket, prior_settlement_bucket, reversion_occurred
+        SELECT local_trading_date, settlement_bucket, reversion_occurred
         FROM settlement_epochs
         WHERE station=? AND market_type='HIGH' AND epoch_status='closed'
+           AND settlement_bucket IS NOT NULL
         ORDER BY local_trading_date ASC
     """, (station,))
     market = {}
     for r in cur.fetchall():
-        if r[2] is not None:
-            market[r[0]] = {
-                'direction': 'up' if r[1] > r[2] else 'down',
-                'reversion': r[3] if r[3] is not None else 0
-            }
+        market[r[0]] = {
+            'settlement_bucket': r[1],
+            'reversion': r[2] if r[2] is not None else 0
+        }
     return days, market
 
 
@@ -231,6 +241,18 @@ def run_backtest(
                 print(f"  {station}: insufficient data ({len(days)} days)")
             continue
 
+        # Compute strike price from training data (first train_days days)
+        # Strike is the median high temperature during training, which is the
+        # fixed threshold that determines market outcome (HIGH-YYYYMMDD-<strike>).
+        training_temps = [
+            market[d['date']]['settlement_bucket']
+            for d in days[:train_days]
+            if d['date'] in market and market[d['date']]['settlement_bucket'] is not None
+        ]
+        strike = statistics.median(training_temps) if training_temps else 50.0
+        if verbose:
+            print(f"  {station}: strike={strike} (from {len(training_temps)} training days)")
+
         # Walk-forward backtest
         start = train_days
         while start + test_days <= len(days):
@@ -239,6 +261,12 @@ def run_backtest(
                 actual = market.get(date)
                 if actual is None:
                     continue
+
+                # Determine actual market outcome: strike-based
+                # For a Kalshi HIGH binary market, 'up' means settlement > strike
+                if actual['settlement_bucket'] is None:
+                    continue
+                actual_direction = 'up' if actual['settlement_bucket'] > strike else 'down'
 
                 # Evaluate all signals
                 signal_outputs = []
@@ -285,8 +313,8 @@ def run_backtest(
                 if conf < min_conf:
                     continue
 
-                is_correct = (pred == actual['direction'])
-                all_results.append((pred, actual['direction'], conf))
+                is_correct = (pred == actual_direction)
+                all_results.append((pred, actual_direction, conf))
                 per_station_stats[station]['total'] += 1
                 per_station_stats[station]['correct'] += int(is_correct)
                 for sig_name, _, _ in signal_outputs:
@@ -296,7 +324,7 @@ def run_backtest(
                 # Update time-decay for each signal
                 if time_decay_mgr:
                     for sig_name, direction, _ in signal_outputs:
-                        was_correct = (direction == actual['direction'])
+                        was_correct = (direction == actual_direction)
                         time_decay_mgr.update(sig_name, station, date, was_correct)
 
             start += test_days
