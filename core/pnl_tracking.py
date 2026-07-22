@@ -11,6 +11,9 @@ from typing import Dict, List, Optional, Tuple, Any
 from pathlib import Path
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .market_cost_model import MARKET_COST_MODEL
+
+# Default calibration report path
+CALIBRATION_REPORT_PATH = str(Path(__file__).resolve().parent.parent / "reports" / "paper_trading_calibration.json")
 __all__ = ['process_settlements_for_date', 'daily_reconciliation', 'calculate_calibration_metrics_for_date', 'get_current_balance', 'get_version_performance', 'generate_calibration_report', 'compute_sharpe', 'update_risk_metrics_on_trade']
 
 
