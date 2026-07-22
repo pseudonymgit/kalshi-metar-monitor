@@ -28,6 +28,14 @@ from itertools import combinations
 from collections import defaultdict
 from typing import Optional, Tuple, List, Dict, Any
 
+# Suppress verbose signal loggers to avoid millions of log lines
+logging.getLogger('core.signals.frontal_detector_signal').setLevel(logging.WARNING)
+logging.getLogger('core.signals.calendar_climatology_signal').setLevel(logging.WARNING)
+logging.getLogger('core.signals.goldilocks_signal').setLevel(logging.WARNING)
+logging.getLogger('core.signals.wind_direction_shift').setLevel(logging.WARNING)
+logging.getLogger('core.signals.forecast_disagreement_signal').setLevel(logging.WARNING)
+logging.getLogger('core.signals.pressure_delta_signal').setLevel(logging.WARNING)
+
 # Ensure core/ and scripts/ are on sys.path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
