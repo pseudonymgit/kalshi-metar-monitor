@@ -84,6 +84,27 @@ except Exception:
 # Layer 4: Webhook signature verification and alert categorization
 import hmac
 import hashlib
+
+# ─── Shared module-level state from data_processor.py ───
+from .data_processor import (
+    _STATE_LOCK,
+    _STATE,
+    _ALERT_LOGGER,
+    _LAST_SETTLEMENT_UP_TS,
+    _LATEST_SIGNAL_RUNTIME,
+    _SIGNAL_OBSERVATION_WINDOWS,
+    _SIGNAL_STATION_LAST_EMIT,
+    _SIGNAL_BOUNDARY_LAST_EMIT,
+    _SIGNAL_EPOCH_COUNTER,
+    _SIGNAL_GOLDILOCKS_EPOCH_TRACKER,
+    _SIGNAL_LOCK,
+    _SIGNAL_MOMENTUM_WINDOW_SIZE,
+)
+
+# ─── Own module-level state ───
+_AUDIT_LOCK = threading.Lock()
+_TRANSITION_HISTORY: deque = deque(maxlen=500)
+_TRANSITION_LOCK = threading.Lock()
 __all__ = ['get_station_ingestion_runtime', 'get_station_ingestion_window_runtime', 'get_last_nws_fetch_diagnostic', 'get_alert_review_diagnostics', 'get_latest_station_market_evaluation_context', 'get_recent_alerts', 'get_retention_metrics', 'prune_old_alerts', 'run_replay_for_station_day', 'get_transition_history', 'get_persisted_transition_history', 'log_near_miss', 'log_near_miss_if_cooldown', 'log_near_miss_if_distance_to_boundary', 'log_near_miss_if_no_eligible_market', 'log_near_miss_if_epoch_alert_emitted']
 
 

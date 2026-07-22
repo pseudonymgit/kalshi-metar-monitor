@@ -84,6 +84,17 @@ except Exception:
 # Layer 4: Webhook signature verification and alert categorization
 import hmac
 import hashlib
+
+# ─── Shared module-level state from data_processor.py ───
+from .data_processor import (
+    _STATE_LOCK,
+    _STATE,
+    _ALERT_LOGGER,
+    _SCHEDULER_THREAD,
+    _SCHEDULER_LOCK,
+    _SCHEDULER_STOP,
+)
+
 __all__ = ['verify_webhook_signature', 'fetch_window', 'fetch_latest', 'fetch_now', 'get_latest_metar', 'set_watchlist', 'get_watchlist', 'get_metrics', 'set_live_station_universe_resolver', 'start_scheduler', 'ensure_scheduler_started', 'stop_scheduler', 'is_scheduler_running', 'log_near_miss', 'log_near_miss_if_cooldown', 'log_near_miss_if_distance_to_boundary', 'log_near_miss_if_no_eligible_market', 'log_near_miss_if_epoch_alert_emitted']
 
 

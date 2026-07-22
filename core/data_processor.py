@@ -84,6 +84,34 @@ except Exception:
 # Layer 4: Webhook signature verification and alert categorization
 import hmac
 import hashlib
+
+# ─── Module-level state (moved from metar_monitor.py monolith) ───
+_STATE_LOCK = state_lock()
+_STATE = state_ref()
+_SCHEDULER_THREAD = None
+_SCHEDULER_LOCK = threading.Lock()
+_SCHEDULER_STOP = threading.Event()
+_MISSING_LADDER_DEDUPE = {}
+_MISSING_LADDER_LOCK = threading.Lock()
+_KALSHI_RATE_LIMIT_LOCK = threading.Lock()
+_KALSHI_LAST_CALL_TS = {}
+_ALERT_LOGGER = logging.getLogger(__name__)
+_LAST_SETTLEMENT_UP_TS = {}
+_LAST_NWS_FETCH_DIAGNOSTIC = {}
+_SIGNAL_OBSERVATION_WINDOWS: Dict[str, deque] = {}
+_SIGNAL_STATION_LAST_EMIT: Dict[str, float] = {}
+_SIGNAL_BOUNDARY_LAST_EMIT: Dict[Tuple[str, int, int], float] = {}
+_SIGNAL_EPOCH_COUNTER: Dict[str, int] = {}
+_SIGNAL_GOLDILOCKS_EPOCH_TRACKER: Dict[Tuple[str, int], Dict[str, Any]] = {}
+_LATEST_SIGNAL_RUNTIME: Dict[str, Dict[str, Any]] = {}
+_SIGNAL_LOCK = threading.RLock()
+_SIGNAL_STATION_COOLDOWN_SECONDS = 300
+_SIGNAL_BOUNDARY_COOLDOWN_SECONDS = 900
+_SIGNAL_MOMENTUM_WINDOW_SIZE = 3
+_KALSHI_CALL_THROTTLE_SECONDS = 1.0
+_MISSING_LADDER_WARMUP_SECONDS = 3600
+_last_seen_iso = {}
+_last_obs = {}
 __all__ = ['reset_station_daily_state', 'get_default_config', 'ensure_state_loaded', 'get_state', 'get_latest_station_signal_runtime', 'log_near_miss', 'log_near_miss_if_cooldown', 'log_near_miss_if_distance_to_boundary', 'log_near_miss_if_no_eligible_market', 'log_near_miss_if_epoch_alert_emitted']
 
 

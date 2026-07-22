@@ -128,7 +128,7 @@ Fixes applied before dispatch: agreement threshold, signal registry, fee rates. 
 
 ### Not Yet Fixed (deferred):
 - [ ] Remove fake P&L from backtest engine (Phase 21.3 — new backtest runner)
-- [ ] Fix Pressure Delta direction mapping (Phase 23.5 — dual-polarity framework)
+- [x] Fix Pressure Delta direction mapping (Phase 23.5 — dual-polarity framework ✅)
 - [ ] Conflicting Flask apps consolidated (Phase 17 replaced old dashboards)
 - [ ] Cron jobs in ERROR state (independent — needs diagnosis)
 - [ ] Alert pipeline env var mismatch (already functionally correct)

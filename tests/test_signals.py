@@ -454,8 +454,8 @@ class TestPressureDeltaSignal(SignalTestBase):
                          'pressure': 1000 + i * 2.0,  # Pressure increasing
                          'date': f'2025-06-{i+1:02d}'})
         direction, confidence = sig.evaluate(9, days)
-        # Rising pressure should predict UP
-        assert direction in ('up', None)
+        # Rising pressure should predict DOWN (cold air advection)
+        assert direction in ('down', None)
 
     @pytest.mark.unit
     def test_pressure_falling(self):
@@ -468,8 +468,8 @@ class TestPressureDeltaSignal(SignalTestBase):
                          'pressure': 1020 - i * 2.0,  # Pressure decreasing
                          'date': f'2025-06-{i+1:02d}'})
         direction, confidence = sig.evaluate(9, days)
-        # Falling pressure should predict DOWN
-        assert direction in ('down', None)
+        # Falling pressure should predict UP (warm air advection)
+        assert direction in ('up', None)
 
     @pytest.mark.unit
     def test_exponential_weight_computation(self):
