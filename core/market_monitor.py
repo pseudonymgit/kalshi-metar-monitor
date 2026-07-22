@@ -37,7 +37,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
 # Cross-module imports (Phase 20 decomposition — originally shared via monolith namespace)
-from .order_manager import _current_kalshi_execution_domain
+from .order_manager import _current_kalshi_execution_domain, _persist_market_cache
 from .kalshi_price_fetcher import _kalshi_public_get
 
 _last_market_state = {}
@@ -736,7 +736,7 @@ def ensure_series_discovery_loaded():
             }
 
         record_connectivity_state = True
-        if _current_kalshi_execution_domain() != "production":
+        if _current_kalshi_execution_domain() != "prod":
             record_connectivity_state = False
         if has_request_context() and str(request.path or "").startswith("/observability/"):
             record_connectivity_state = False
