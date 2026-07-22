@@ -286,12 +286,11 @@ def compute_position_size(
     if kelly_fraction > 0:
         # Only size trades with positive Kelly fractions (positive edge)
         final_size = min(kelly_amount, max_amount_cap, current_balance * 0.25)
+        # Final clamping with config limits (only for positive edge trades)
+        final_size = min(config.max_size_usd, max(config.min_size_usd, final_size))
     else:
         # Do not take negative edge positions per Kelly theory
         final_size = 0.0
-    
-    # Final clamping with config limits
-    final_size = min(config.max_size_usd, max(config.min_size_usd, final_size))
     
     # Confidence tier classification  
     tier = classify_confidence(confidence, config)
