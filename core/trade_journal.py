@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+# CHANGELOG (last 10 broad changes):
+# 1. [2026-07-21 Phase 4.4: Adaptive confidence thresholds - rolling 30d accuracy-based threshold adjustment]
+# 2. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 3. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+#
+
 """
 Trade Journal v1.0 — Phase 3.3 Alert Decision Logging
 

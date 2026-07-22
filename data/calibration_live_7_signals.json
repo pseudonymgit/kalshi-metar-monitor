@@ -1,0 +1,1161 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-22T20:35:35.103998+00:00",
+    "script": "calibrate_live_signals.py",
+    "project_root": "/home/node/.openclaw/workspace/prototypes/weather-engine-source",
+    "metar_db": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db",
+    "nwp_db": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db",
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "date_range": "2026-07-15 to 2026-07-21 (7 days)",
+    "days_back": 7,
+    "db_status": {
+      "metar_db": "True",
+      "metar_obs_count": "861175",
+      "metar_date_range": "('2021-01-01', '2026-07-22')",
+      "nwp_db": "True",
+      "nwp_forecast_count": "240822",
+      "nwp_date_range": "('2025-01-01', '2026-07-28')",
+      "nwp_models": "['ERA5', 'ecmwf', 'ensemble', 'era5', 'gem', 'gfs', 'icon']",
+      "nwp_variables": "['advection_850hPa', 'cloud_cover', 'cloud_cover_daily_mean', 'dew_point_2m', 'dew_point_2m_daily_mean', 'geopotential_500hPa', 'geopotential_height_500hPa', 'geopotential_height_500hPa_daily_mean', 'precipitation_sum', 'temperature_2m_max', 'temperature_2m_min', 'temperature_850hPa', 'temperature_850hPa_daily_mean', 'wind_direction_10m', 'wind_direction_10m_daily_mean', 'wind_direction_850hPa_daily_mean', 'wind_speed_10m', 'wind_speed_10m_daily_mean', 'wind_speed_850hPa_daily_mean', 'wind_u_850hPa', 'wind_v_850hPa']",
+      "nwp_ensemble_members": "1",
+      "ai_forecasts_table": "False"
+    }
+  },
+  "diagnostics": {
+    "timestamp_parsing_issue": false,
+    "timestamp_sample": {},
+    "nwp_ensemble_members": 1,
+    "ai_forecasts_exists": false
+  },
+  "signal_results": [
+    {
+      "signal": "nwp_direct",
+      "total_attempts": 140,
+      "total_fired": 115,
+      "total_errors": 0,
+      "fire_rate_pct": 82.14,
+      "avg_confidence": 0.9101,
+      "max_confidence": 0.98,
+      "min_confidence": 0.7,
+      "data_source": "nwp_forecasts",
+      "error_types": {},
+      "per_station": {
+        "KATL": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.89
+        },
+        "KAUS": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9417
+        },
+        "KBOS": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.93
+        },
+        "KDCA": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.8817
+        },
+        "KDEN": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.88
+        },
+        "KDFW": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9417
+        },
+        "KHOU": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.8533
+        },
+        "KLAS": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.8443
+        },
+        "KLAX": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.8867
+        },
+        "KMDW": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.9329
+        },
+        "KMIA": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.82
+        },
+        "KMSP": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.9271
+        },
+        "KMSY": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.91
+        },
+        "KNYC": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9633
+        },
+        "KOKC": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9533
+        },
+        "KPHL": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.94
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.892
+        },
+        "KSAT": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.925
+        },
+        "KSEA": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.948
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.908
+        }
+      }
+    },
+    {
+      "signal": "nwp_dtdt_fusion",
+      "total_attempts": 140,
+      "total_fired": 128,
+      "total_errors": 0,
+      "fire_rate_pct": 91.43,
+      "avg_confidence": 0.644,
+      "max_confidence": 0.8075,
+      "min_confidence": 0.3,
+      "data_source": "nwp_forecasts + metar_observations",
+      "error_types": {},
+      "per_station": {
+        "KATL": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.5401
+        },
+        "KAUS": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.6766
+        },
+        "KBOS": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.6817
+        },
+        "KDCA": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.6187
+        },
+        "KDEN": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.5929
+        },
+        "KDFW": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.609
+        },
+        "KHOU": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.6353
+        },
+        "KLAS": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.6545
+        },
+        "KLAX": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.7391
+        },
+        "KMDW": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.6254
+        },
+        "KMIA": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.4948
+        },
+        "KMSP": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.6405
+        },
+        "KMSY": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.6705
+        },
+        "KNYC": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.7509
+        },
+        "KOKC": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.6092
+        },
+        "KPHL": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.7432
+        },
+        "KPHX": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.5738
+        },
+        "KSAT": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.693
+        },
+        "KSEA": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.741
+        },
+        "KSFO": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.5903
+        }
+      }
+    },
+    {
+      "signal": "hrrr_bias_corrected",
+      "total_attempts": 140,
+      "total_fired": 0,
+      "total_errors": 140,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "min_confidence": null,
+      "data_source": "metar_observations (intraday) + hrrr_forecasts",
+      "error_types": {
+        "no such table": 140
+      },
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        }
+      }
+    },
+    {
+      "signal": "intraday_metar_confirmation",
+      "total_attempts": 140,
+      "total_fired": 0,
+      "total_errors": 140,
+      "fire_rate_pct": 0.0,
+      "avg_confidence": null,
+      "max_confidence": null,
+      "min_confidence": null,
+      "data_source": "metar_observations (intraday)",
+      "error_types": {
+        "other": 140
+      },
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KBOS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDEN": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 7,
+          "errors": 7,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        }
+      },
+      "notes": [
+        "This signal uses 'observation_time' field (not 'timestamp_utc') and also has a time-window check: it only evaluates for today or yesterday. Historical evaluations will return None."
+      ]
+    },
+    {
+      "signal": "metar_dtdt",
+      "total_attempts": 140,
+      "total_fired": 78,
+      "total_errors": 0,
+      "fire_rate_pct": 55.71,
+      "avg_confidence": 0.8067,
+      "max_confidence": 0.85,
+      "min_confidence": 0.72,
+      "data_source": "metar_observations (intraday)",
+      "error_types": {},
+      "per_station": {
+        "KATL": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.8175
+        },
+        "KAUS": {
+          "fired": 2,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 28.57,
+          "avg_confidence": 0.85
+        },
+        "KBOS": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.824
+        },
+        "KDCA": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.8067
+        },
+        "KDEN": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.8067
+        },
+        "KDFW": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.785
+        },
+        "KHOU": {
+          "fired": 1,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 14.29,
+          "avg_confidence": 0.72
+        },
+        "KLAS": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.785
+        },
+        "KLAX": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.7633
+        },
+        "KMDW": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.8175
+        },
+        "KMIA": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.8314
+        },
+        "KMSP": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.798
+        },
+        "KMSY": {
+          "fired": 2,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 28.57,
+          "avg_confidence": 0.785
+        },
+        "KNYC": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.8175
+        },
+        "KOKC": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.8067
+        },
+        "KPHL": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.785
+        },
+        "KPHX": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.7633
+        },
+        "KSAT": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.8067
+        },
+        "KSEA": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.8175
+        },
+        "KSFO": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.8314
+        }
+      }
+    },
+    {
+      "signal": "pressure_tendency",
+      "total_attempts": 140,
+      "total_fired": 3,
+      "total_errors": 0,
+      "fire_rate_pct": 2.14,
+      "avg_confidence": 0.5268,
+      "max_confidence": 0.5644,
+      "min_confidence": 0.508,
+      "data_source": "metar_observations (intraday)",
+      "error_types": {},
+      "per_station": {
+        "KATL": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KAUS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KBOS": {
+          "fired": 2,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 28.57,
+          "avg_confidence": 0.508
+        },
+        "KDCA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KDEN": {
+          "fired": 1,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 14.29,
+          "avg_confidence": 0.5644
+        },
+        "KDFW": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KHOU": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KLAS": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KLAX": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMDW": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMIA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMSP": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KMSY": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KNYC": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KOKC": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KPHL": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KPHX": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSAT": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSEA": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        },
+        "KSFO": {
+          "fired": 0,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 0.0,
+          "avg_confidence": null
+        }
+      }
+    },
+    {
+      "signal": "ai_composite",
+      "total_attempts": 140,
+      "total_fired": 115,
+      "total_errors": 0,
+      "fire_rate_pct": 82.14,
+      "avg_confidence": 0.8857,
+      "max_confidence": 0.98,
+      "min_confidence": 0.71,
+      "data_source": "nwp_forecasts + ai_forecasts",
+      "error_types": {},
+      "per_station": {
+        "KATL": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.855
+        },
+        "KAUS": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9217
+        },
+        "KBOS": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.94
+        },
+        "KDCA": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.8517
+        },
+        "KDEN": {
+          "fired": 3,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 42.86,
+          "avg_confidence": 0.92
+        },
+        "KDFW": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9217
+        },
+        "KHOU": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.855
+        },
+        "KLAS": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.8071
+        },
+        "KLAX": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.8767
+        },
+        "KMDW": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.9214
+        },
+        "KMIA": {
+          "fired": 4,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 57.14,
+          "avg_confidence": 0.78
+        },
+        "KMSP": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.86
+        },
+        "KMSY": {
+          "fired": 7,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 100.0,
+          "avg_confidence": 0.8729
+        },
+        "KNYC": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9533
+        },
+        "KOKC": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.9033
+        },
+        "KPHL": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.944
+        },
+        "KPHX": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.842
+        },
+        "KSAT": {
+          "fired": 6,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 85.71,
+          "avg_confidence": 0.915
+        },
+        "KSEA": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.892
+        },
+        "KSFO": {
+          "fired": 5,
+          "total": 7,
+          "errors": 0,
+          "fire_rate_pct": 71.43,
+          "avg_confidence": 0.88
+        }
+      },
+      "notes": [
+        "ai_forecasts table does not exist in nwp_forecasts.db. The ai_composite signal queries the ai_forecasts table for AI model predictions (AIGFS, GraphCast, AIFS). Without this table, the signal falls back to classical NWP data only, but may still fire if classical models (GFS, ECMWF, ICON, GEM) have sufficient data."
+      ]
+    }
+  ],
+  "aggregate": {
+    "total_signals": 7,
+    "signals_with_trades": 5,
+    "signals_with_zero_trades": 2,
+    "signals_with_errors": 2,
+    "total_attempts": 980,
+    "total_fired": 439,
+    "overall_fire_rate_pct": 44.8,
+    "signals_with_trades_list": [
+      "ai_composite",
+      "metar_dtdt",
+      "nwp_direct",
+      "nwp_dtdt_fusion",
+      "pressure_tendency"
+    ],
+    "signals_with_zero_trades_list": [
+      "hrrr_bias_corrected",
+      "intraday_metar_confirmation"
+    ]
+  }
+}
