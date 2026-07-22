@@ -26,6 +26,8 @@ Import from core.metar_monitor continues to work for all existing consumers.
 
 from __future__ import annotations
 
+import datetime  # preserved for test mocks (patch('core.metar_monitor.datetime'))
+
 # =============================================================================
 # 1. Re-exports from data_collector.py
 # =============================================================================
@@ -165,6 +167,7 @@ from .health_monitor import (
     _mark_alert_delivery_queue_dead_letter,  # used by app.py, tests
     _update_alert_delivery_queue_attempt,    # used by tests
     _delete_alert_delivery_queue,     # used by tests
+    _ensure_alert_schema,             # used by app.py
     # Module-level state (used by tests directly)
     _TRANSITION_HISTORY,              # used by tests
     _TRANSITION_LOCK,                 # used by tests
