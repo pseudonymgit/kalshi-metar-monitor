@@ -19,6 +19,7 @@ Stands alone as a signal with:
 - Plateau/slope analysis for refined timing
 """
 
+import sqlite3
 import math
 import numpy as np
 from collections import defaultdict
@@ -584,11 +585,10 @@ def main():
     print(f"Slope changes: Detected with {SLOPE_ACCELERATION_WINDOW}h dynamic analysis")
     
     # Example usage for same-day signal generation
-    conn = get_sqlite_connection(DB_PATH, timeout=60)
+    conn = sqlite3.connect(DB_PATH, timeout=60)
     
     print("\nTesting same-day signal generation for sample station KATL...")
     import time
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     sample_date = datetime.now(timezone.utc)
     
     same_day_result = same_day_signal_wrapper(

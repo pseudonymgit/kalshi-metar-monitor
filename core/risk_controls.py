@@ -23,6 +23,7 @@ Version: v2.0 (Phase 3.6)
 """
 
 import os
+import sqlite3
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Union, List, Tuple, Optional
 from dataclasses import dataclass, field
@@ -415,7 +416,6 @@ def to_legacy_risk_state(risk_manager: RiskManager) -> 'RiskState':
     The new format has checks as Dict[str, Tuple[bool, str]].
     """
     from dataclasses import replace
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     state = risk_manager.evaluate()
     # Create a compat version with old-style dicts
     compat = RiskState(
@@ -456,7 +456,7 @@ def check_kill_switches(db_path: str = None, risk_config: Any = None) -> Tuple[b
     # 3. Database integrity check (if db_path provided)
     if db_path and os.path.exists(db_path):
         try:
-            conn = get_sqlite_connection(str(db_path), timeout=5)
+            conn = sqlite3.connect(str(db_path), timeout=5)
             cur = conn.cursor()
             # Quick integrity check
             cur.execute("PRAGMA integrity_check")
@@ -470,7 +470,7 @@ def check_kill_switches(db_path: str = None, risk_config: Any = None) -> Tuple[b
     # 4. Check for alert backlog (if db_path provided)
     if db_path and os.path.exists(db_path):
         try:
-            conn = get_sqlite_connection(str(db_path), timeout=5)
+            conn = sqlite3.connect(str(db_path), timeout=5)
             cur = conn.cursor()
             # Check decision_output_log for recent entries
             cur.execute("SELECT COUNT(*) FROM decision_output_log WHERE logged_at > datetime('now', '-1 hour')")

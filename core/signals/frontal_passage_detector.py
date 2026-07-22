@@ -17,9 +17,9 @@ Conditions (3/4+ required for detection):
 4. Temperature trend: >3°F temp change within 3 hours  
 """
 
+import sqlite3
 import math
 from datetime import datetime, timedelta
-from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 def get_wind_direction_change(current_wdir, previous_wdir):
@@ -51,7 +51,7 @@ def get_temperature_gradient_at_station(station_code, date, nwp_db_path):
     Returns None if no NWP data available.
     """
     try:
-        conn_nwp = get_sqlite_connection(nwp_db_path)
+        conn_nwp = sqlite3.connect(nwp_db_path)
         cursor = conn_nwp.cursor()
         
         date_start = date.strftime('%Y-%m-%d')
@@ -131,7 +131,7 @@ def evaluate(station, date, metar_db_path, nwp_db_path=None):
     date_end = (date + timedelta(days=1)).strftime('%Y-%m-%d')
     
     # Connect to METAR database
-    conn_metar = get_sqlite_connection(metar_db_path)
+    conn_metar = sqlite3.connect(metar_db_path)
     cursor_metar = conn_metar.cursor()
     
     # Query for hourly METAR observations
@@ -363,7 +363,7 @@ def get_frontal_conditions(station, date, metar_db_path, nwp_db_path=None):
         dict: Detailed information about all conditions
     """
     
-    conn_metar = get_sqlite_connection(metar_db_path)
+    conn_metar = sqlite3.connect(metar_db_path)
     cursor_metar = conn_metar.cursor()
     
     date_start = date.strftime('%Y-%m-%d')

@@ -36,6 +36,7 @@ Usage:
 
 import argparse
 import logging
+import sqlite3
 import os
 import sys
 import json
@@ -66,7 +67,6 @@ from core.signals.pressure_tendency_signal import PressureTendencySignal
 from core.signals.hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
 from core.signals.esdr_signal import EsdrSignal
 from core.signals.nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 # ── Configuration ──────────────────────────────────────────────
 
@@ -254,7 +254,7 @@ class IntradayTradingLoop:
             return None
 
         try:
-            conn = get_sqlite_connection(self.nwp_db_path)
+            conn = sqlite3.connect(self.nwp_db_path)
             cur = conn.cursor()
 
             # Get ensemble member values for the target date
@@ -575,7 +575,7 @@ class IntradayTradingLoop:
         if position.stage == 1:
             # Check if we have 2 METAR observations showing trajectory alignment
             try:
-                conn = get_sqlite_connection(self.metar_db_path)
+                conn = sqlite3.connect(self.metar_db_path)
                 cur = conn.cursor()
                 cur.execute("""
                     SELECT temp_f, timestamp_utc

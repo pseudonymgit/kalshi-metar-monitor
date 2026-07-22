@@ -266,11 +266,10 @@ def late_day_momentum_hourly(
 def main():
     """Quick CLI test of the signal on sample dates."""
     import sys
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     station = sys.argv[1] if len(sys.argv) > 1 else "KATL"
     date = sys.argv[2] if len(sys.argv) > 2 else "2024-06-15"
 
-    conn = get_sqlite_connection(METAR_DB, timeout=10)
+    conn = sqlite3.connect(METAR_DB, timeout=10)
     direction, conf, prob = late_day_momentum_hourly(station, date, conn)
 
     # Show the underlying data

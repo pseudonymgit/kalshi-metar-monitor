@@ -313,7 +313,7 @@ def load_advection_history(db_path: str, station: str, window: int = ROLLING_WIN
     """
     history = []
     try:
-        conn = get_sqlite_connection(db_path, timeout=10)
+        conn = sqlite3.connect(db_path, timeout=10)
         c = conn.cursor()
         # Query advection values from dedicated table
         c.execute("""
@@ -346,7 +346,7 @@ def store_advection(db_path: str, station: str, fetch_date: str, target_date: st
     """
     fetch_timestamp = datetime.now(timezone.utc).isoformat()
     try:
-        conn = get_sqlite_connection(db_path, timeout=10)
+        conn = sqlite3.connect(db_path, timeout=10)
         c = conn.cursor()
         c.execute("""
             INSERT OR REPLACE INTO nwp_forecasts
@@ -502,7 +502,6 @@ class TemperatureAdvectionSignal:
 # ── Standalone test ──────────────────────────────────────────────────
 if __name__ == "__main__":
     import sys
-from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     logging.basicConfig(level=logging.INFO)
 
     print("=" * 60)

@@ -27,7 +27,6 @@ import sqlite3
 from typing import Any, Dict, Optional, Tuple
 
 from core.station_time import parse_iso_utc, station_local_day_key
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 _SETTLEMENT_UP = "settlement_up"
@@ -126,7 +125,7 @@ def log_transition_for_settlement_epoch(
 
     db_path = _alert_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    conn = get_sqlite_connection(db_path, timeout=1)
+    conn = sqlite3.connect(db_path, timeout=1)
     try:
         conn.execute(
             """

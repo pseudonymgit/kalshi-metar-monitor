@@ -11,6 +11,7 @@ Part of Phase 7 - Kalshi API Integration.
 """
 
 import os
+import sqlite3
 import time
 import threading
 from datetime import datetime, timezone, timedelta
@@ -26,7 +27,7 @@ def init_order_tracking_db():
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     # Create orders table
@@ -195,7 +196,6 @@ def execute_multi_stage_order(
     
     # Calculate current strike price (for this example, assume daily market with strikes)
     from datetime import datetime, timezone
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     target_date = datetime.now(timezone.utc)
     strike_price = 80  # Placeholder strike for today - would be calculated based on forecast
     
@@ -377,7 +377,7 @@ def record_stage_attempt(order_id: str, station: str, market_type: str, stage: i
     Record an attempt for a specific stage of the multi-stage order.
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -399,7 +399,7 @@ def get_stage_status(order_id: str, stage_num: int) -> str:
     Get status of a specific stage for an order.
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -421,7 +421,7 @@ def record_order_status(order_id: str, station: str, market_type: str, direction
     Record current status of an active order.
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -443,7 +443,7 @@ def finalize_order_record(order_id: str, final_status: str, filled_qty: int, had
     Finalize an order record upon completion.
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     # Update final status for top-level order record
@@ -462,7 +462,7 @@ def get_active_orders() -> list:
     Get all active orders that are not yet completely filled or cancelled.
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -491,7 +491,7 @@ def cancel_order_if_unfilled(order_id: str) -> Dict[str, Any]:
     Cancel an order if still partially unfilled, marking the remaining balance as cancelled.
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     # Check current order status

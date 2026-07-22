@@ -304,8 +304,9 @@ async def health_check():
     
     try:
         # Check 1: Database connectivity
+        import sqlite3
         db_path = p3sch._resolve_db_path()
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         conn.execute("SELECT 1")
         conn.close()
         health["checks"]["database"] = {
@@ -442,7 +443,6 @@ async def debug_matches(
     Returns strong/weak matches and their scores.
     """
     import core.p3_match_engine as p3me
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     
     query_epoch = p3sch.get_latest_settlement_epoch(station, market_type)
     if not query_epoch:

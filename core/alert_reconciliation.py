@@ -80,7 +80,7 @@ class AlertReconciler:
     
     def _initialize_db(self):
         """Set up the reconciliation database schema"""
-        with get_sqlite_connection(self.reconcile_db_path) as conn:
+        with sqlite3.connect(self.reconcile_db_path) as conn:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS reconciliations (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -170,7 +170,7 @@ class AlertReconciler:
         # For now, simulate with DB lookup assuming we have settlement data stored
         # This would come from a dedicated settlement tracker in real implementation
         try:
-            with get_sqlite_connection(self.alerts_db_path) as conn:
+            with sqlite3.connect(self.alerts_db_path) as conn:
                 # Look for settlement data related to this event in our system
                 cursor = conn.cursor()
                 cursor.execute("SELECT metadata_json FROM alerts WHERE event_ticker = ? AND alert_type = 'settlement_data'", (event_ticker,))
@@ -194,7 +194,7 @@ class AlertReconciler:
     async def get_original_alert_data(self, alert_id: str) -> Optional[Dict[str, Any]]:
         """Retrieve the original alert details from the main alerts database"""
         try:
-            with get_sqlite_connection(self.alerts_db_path) as conn:
+            with sqlite3.connect(self.alerts_db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT * FROM alerts WHERE id = ?", (alert_id,))
                 row = cursor.fetchone()
@@ -215,7 +215,7 @@ class AlertReconciler:
     
     def get_reconciliation_record(self, alert_id: str) -> Optional[Dict[str, Any]]:
         """Get an existing reconciliation record from local DB"""
-        with get_sqlite_connection(self.reconcile_db_path) as conn:
+        with sqlite3.connect(self.reconcile_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT alert_id, market_id, outcome, actual_value, timing, 
@@ -239,7 +239,7 @@ class AlertReconciler:
             # Map Outcome enum to string
             outcome_str = match.actual_result.value if isinstance(match.actual_result, Outcome) else match.actual_result
             
-            with get_sqlite_connection(self.reconcile_db_path) as conn:
+            with sqlite3.connect(self.reconcile_db_path) as conn:
                 cursor = conn.cursor()
                 
                 # Check if record already exists to avoid duplicates
@@ -415,7 +415,6 @@ class AlertReconciler:
         # Since this is a placeholder without real settlement API integration,
         # simulate success rate based on prediction confidence
         import random
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         # Higher confidence should correlate with higher match rate
         chance_for_success = min(0.95, 0.5 + (original_confidence * 0.45))
         return random.random() < chance_for_success
@@ -473,7 +472,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         alert_ids = []
         
         try:
-            with get_sqlite_connection(self.alerts_db_path) as conn:
+            with sqlite3.connect(self.alerts_db_path) as conn:
                 cursor = conn.cursor()
                 # Get alert IDs newer than X days old that don't have reconciliation records yet
                 cursor.execute("""
@@ -505,7 +504,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         report.append("WEATHER ENGINE ALERT RECONCILIATION REPORT")
         report.append("="*60)
         
-        with get_sqlite_connection(self.reconcile_db_path) as conn:
+        with sqlite3.connect(self.reconcile_db_path) as conn:
             # Overall metrics
             cursor = conn.cursor()
             
@@ -608,7 +607,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     def get_accuracy_stats_by_confidence(self) -> Dict[str, Any]:
         """Get accuracy metrics broken down by confidence level."""
         stats = {}
-        with get_sqlite_connection(self.reconcile_db_path) as conn:
+        with sqlite3.connect(self.reconcile_db_path) as conn:
             cursor = conn.cursor()
             
             # Query grouped by confidence ranges

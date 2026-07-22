@@ -169,7 +169,7 @@ class NwpAnalogSignal:
             logger.warning("NWP DB not found at %s", self.nwp_db_path)
             return {}, [], []
 
-        conn = get_sqlite_connection(str(self.nwp_db_path), timeout=60)
+        conn = sqlite3.connect(str(self.nwp_db_path), timeout=60)
         cur  = conn.cursor()
 
         cur.execute("SELECT DISTINCT station FROM nwp_forecasts ORDER BY station")
@@ -211,7 +211,7 @@ class NwpAnalogSignal:
             return {}
 
         try:
-            conn = get_sqlite_connection(str(self.metar_db_path), timeout=30)
+            conn = sqlite3.connect(str(self.metar_db_path), timeout=30)
             cur  = conn.cursor()
             cur.execute("""
                 SELECT date_utc, max_temp_f
@@ -461,7 +461,6 @@ class NwpAnalogSignal:
                        ) -> Optional[Dict[str, Any]]:
         """Public dict-returning API (compatibility with existing callers)."""
         from datetime import datetime as dt
-from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         if target_date is None:
             target_date = dt.now().strftime('%Y-%m-%d')
         direction, confidence = self.evaluate_nwp_analog(station, target_date)

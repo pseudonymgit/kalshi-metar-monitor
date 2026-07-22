@@ -99,7 +99,7 @@ class TradeJournal:
     def _ensure_schema(self):
         """Create the trade_journal table if it doesn't exist."""
         os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS trade_journal (
@@ -190,7 +190,7 @@ class TradeJournal:
 
         metadata_json = json.dumps(metadata, sort_keys=True) if metadata else None
 
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             cur = conn.execute("""
                 INSERT INTO trade_journal
@@ -309,7 +309,7 @@ class TradeJournal:
             outcome: New outcome string
             metadata: Optional additional metadata to merge
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             if metadata:
                 # Read existing metadata, merge, rewrite
@@ -378,7 +378,7 @@ class TradeJournal:
 
         where_clause = " AND ".join(conditions) if conditions else "1=1"
 
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(f"""
@@ -393,7 +393,7 @@ class TradeJournal:
 
     def get_by_alert_id(self, alert_id: str) -> Optional[Dict[str, Any]]:
         """Get a single journal entry by alert_id."""
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
@@ -411,7 +411,7 @@ class TradeJournal:
         Returns:
             Dict with counts by outcome, station, lane, etc.
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             # Total entries
             total = conn.execute("SELECT COUNT(*) FROM trade_journal").fetchone()[0]
@@ -470,7 +470,7 @@ class TradeJournal:
         """
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
 
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             # Total decisions
             total = conn.execute(
@@ -522,7 +522,7 @@ class TradeJournal:
 
     def get_recent_trades(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get the most recent trades from the journal (limit=50 by requirement)."""
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute('''SELECT * FROM trade_journal  
@@ -538,7 +538,7 @@ class TradeJournal:
 
     def get_accuracy_by_signal(self) -> Dict[str, Dict[str, Any]]:
         """Get accuracy statistics grouped by signal type."""
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             # Get success rates by functionality (signal type)
             rows = conn.execute('''
@@ -593,7 +593,7 @@ class TradeJournal:
         """
         cutoff_date = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
         
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             # Get success rates by functionality (signal type) and station
             rows = conn.execute('''
@@ -641,7 +641,7 @@ class TradeJournal:
 
     def get_trade_counts_by_station(self) -> Dict[str, Dict[str, int]]:
         """Get trade counts (successful, skipped, total) by station."""
-        conn = get_sqlite_connection(self._db_path)  
+        conn = sqlite3.connect(self._db_path)  
         try:
             # Get counts by station and outcome category
             rows = conn.execute('''
@@ -673,7 +673,7 @@ class TradeJournal:
     
     def get_failure_breakdown(self) -> List[Dict[str, Any]]:
         """Get a breakdown of skip/failure reasons."""
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             rows = conn.execute("""
                 SELECT outcome, failure_mode, COUNT(*) as count
@@ -728,7 +728,6 @@ def record_decision(
 
 if __name__ == "__main__":
     import tempfile
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
     # Quick test
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:

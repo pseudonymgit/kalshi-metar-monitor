@@ -12,6 +12,7 @@ to run the actual ensemble backtest with real data - no simulation.
 This replaces the inline signal functions in comprehensive_split_backtest.py.
 """
 
+import sqlite3
 import math
 import os
 import sys
@@ -29,7 +30,6 @@ if CORE_DIR not in sys.path:
 from signals import SignalRegistry
 from signal_fusion import SignalFusionEngine, TimeDecaySignalManager
 from market_cost_model import MARKET_COST_MODEL
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 # Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
 BACKTEST_SIGNALS = [
@@ -215,7 +215,7 @@ def run_backtest(
         }
 
     registry = SignalRegistry(db_path)
-    conn = get_sqlite_connection(db_path)
+    conn = sqlite3.connect(db_path)
 
     # Initialize fusion engine if needed
     fusion_engine = None

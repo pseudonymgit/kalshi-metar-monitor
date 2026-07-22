@@ -536,7 +536,7 @@ class TestSignalFactoryEdgeCases:
         from core.signals import SignalRegistry, create_signal_registry
 
         registry = SignalRegistry(db_path=None)
-        assert len(registry.signals) == 22
+        assert len(registry.signals) == 23
         for name, sig in registry.signals.items():
             assert hasattr(sig, 'evaluate')
 
@@ -554,7 +554,7 @@ class TestSignalFactoryEdgeCases:
 
         registry = SignalRegistry(db_path="/tmp/test_get_all.db")
         signals = registry.get_all_signals()
-        assert len(signals) == 22
+        assert len(signals) == 23
 
     def test_add_signal_valid(self):
         """Adding a valid signal should work."""
@@ -570,7 +570,7 @@ class TestSignalFactoryEdgeCases:
         registry = SignalRegistry(db_path="/tmp/test_add.db")
         registry.add_signal("test_signal", TestSignal())
         assert registry.get_signal("test_signal") is not None
-        assert len(registry.signals) == 23
+        assert len(registry.signals) == 24
 
     def test_add_signal_invalid_type(self):
         """Adding a non-BaseSignal object should raise TypeError."""

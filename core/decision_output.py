@@ -20,6 +20,7 @@ Output: Structured decision reports comparing market prices (implied probabiliti
 to our analytical fair values with detailed confidence reasoning.
 """
 
+import sqlite3
 import json
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Tuple, Optional
@@ -28,7 +29,6 @@ from enum import Enum
 import os
 import logging
 from pathlib import Path
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 # Configuration path constants
@@ -83,7 +83,7 @@ def get_simple_climatology_prob(station, date_str):
     """
     Helper function to get basic climatology probability without circular imports.
     """
-    conn = get_sqlite_connection(METAR_DB_PATH)
+    conn = sqlite3.connect(METAR_DB_PATH)
     c = conn.cursor()
     
     # Get climatology - probability of temperature moving UP/DOWN on same date
@@ -155,7 +155,7 @@ class DecisionOutputGenerator:
         In production, this would come from real Kalshi/Polymarket APIs.
         Currently uses historical settlement data to simulate realistic prices.
         """
-        conn = get_sqlite_connection(self.metar_db)
+        conn = sqlite3.connect(self.metar_db)
         cur = conn.cursor()
         
         # Get the settlement data to simulate realistic market prices
@@ -198,7 +198,7 @@ class DecisionOutputGenerator:
         clim_prob, clim_conf = get_simple_climatology_prob(station, date)
         
         # Get recent data for signal analysis
-        conn = get_sqlite_connection(self.metar_db)
+        conn = sqlite3.connect(self.metar_db)
         cur = conn.cursor()
         
         # Get recent actuals for signals

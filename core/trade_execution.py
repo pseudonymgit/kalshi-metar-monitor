@@ -96,7 +96,7 @@ def place_paper_trade(self, station, market_type, signal_direction,
     # If this is a late_day_momentum_hourly signal, override analytical
     # probability and confidence with the signal's own computed values.
     if functionality == "late_day_momentum_hourly":
-        metar_conn = get_sqlite_connection(self.metar_db, timeout=10)
+        metar_conn = sqlite3.connect(self.metar_db, timeout=10)
         ldm_dir, ldm_conf, ldm_prob = _ldm_hourly_signal(station, date, metar_conn)
         metar_conn.close()
         if ldm_dir is not None:

@@ -663,7 +663,7 @@ def _get_strike_price(station: str, market_type: str, date: str, paper_db: str, 
     try:
         alert_db = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
         if os.path.exists(alert_db):
-            conn = get_sqlite_connection(alert_db, timeout=1)
+            conn = sqlite3.connect(alert_db, timeout=1)
             try:
                 row = conn.execute(
                     """SELECT cache_json FROM market_cache

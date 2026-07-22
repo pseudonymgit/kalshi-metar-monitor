@@ -56,7 +56,7 @@ class GoldilocksSignal(BaseSignal):
         self._signal_state = {}
         if db_path:
             try:
-                conn = get_sqlite_connection(db_path)
+                conn = sqlite3.connect(db_path)
                 cur = conn.cursor()
                 cur.execute("""
                     SELECT signal_name, signal_data FROM signal_state
@@ -79,7 +79,6 @@ class GoldilocksSignal(BaseSignal):
         """Parse signal state JSON string."""
         try:
             import json
-            from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             return json.loads(data)
         except Exception:
             return {}
@@ -179,7 +178,7 @@ class GoldilocksSignal(BaseSignal):
         """
         own_conn = conn is None
         if own_conn:
-            conn = get_sqlite_connection(self.db_path) if self.db_path else None
+            conn = sqlite3.connect(self.db_path) if self.db_path else None
             if conn is None:
                 return None, 0.0
         

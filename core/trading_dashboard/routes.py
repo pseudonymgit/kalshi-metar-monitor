@@ -53,14 +53,14 @@ trading_bp = Blueprint(
 
 def _get_paper_db():
     """Get a read-only connection to paper_trading.db."""
-    conn = get_readonly_sqlite_connection(PAPER_DB_PATH, timeout=2)
+    conn = sqlite3.connect(f"file:{PAPER_DB_PATH}?mode=ro", uri=True, timeout=2)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def _get_journal_db():
     """Get a read-only connection to trade_journal.db."""
-    conn = get_readonly_sqlite_connection(JOURNAL_DB_PATH, timeout=2)
+    conn = sqlite3.connect(f"file:{JOURNAL_DB_PATH}?mode=ro", uri=True, timeout=2)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -291,7 +291,6 @@ def api_portfolio():
         # Resolve cluster mapping
         try:
             from core.station_registry import get_cluster_for_station
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
             by_cluster = {}
             for station, exposure in by_station.items():
                 cluster = get_cluster_for_station(station) or "UNKNOWN"

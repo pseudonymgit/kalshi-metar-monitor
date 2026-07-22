@@ -22,14 +22,15 @@ CURRENTLY IMPLEMENTED: METAR-only version (stage 1 of 2)
 - Isotonic regression MOS calibration
 """
 
+import sqlite3
 import math
 import itertools
 from collections import defaultdict
 import numpy as np
 from scipy.optimize import minimize_scalar
+import sqlite3
 from datetime import datetime, timedelta
 import warnings
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
 
@@ -689,7 +690,7 @@ def run_rdae_walkforward_backtest():
     print(f"Walk-forward: 6-month train / 1-month test")
     print()
 
-    conn = get_sqlite_connection(DB_PATH, timeout=60)
+    conn = sqlite3.connect(DB_PATH, timeout=60)
 
     print(f"{'Station':<8} {'Trades':>8} {'Correct':>8} {'Accuracy':>10} {'Coverage':>10} {'Avg Conf':>10}")
     print("-" * 72)

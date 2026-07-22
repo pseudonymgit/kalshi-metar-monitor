@@ -27,6 +27,7 @@ Usage:
 
 import json
 import os
+import sqlite3
 from functools import lru_cache
 from typing import Optional
 
@@ -101,7 +102,7 @@ def _try_cache_file():
 def _try_settlement_epochs():
     """Load station list from settlement_epochs table in metar_backfill.db."""
     try:
-        conn = get_sqlite_connection(_DB_PATH)
+        conn = sqlite3.connect(_DB_PATH)
         c = conn.cursor()
         c.execute("SELECT DISTINCT station FROM settlement_epochs ORDER BY station")
         stations = [r[0] for r in c.fetchall()]
@@ -247,7 +248,6 @@ def validate_station_registry():
     """
     try:
         from kalshi_price_fetcher import STATION_TO_KALSHI_CODE
-        from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     except ImportError:
         return {"error": "kalshi_price_fetcher not available", "valid": False}
     

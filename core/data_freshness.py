@@ -27,7 +27,6 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Tuple, Any
 from pathlib import Path
 from enum import Enum
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -149,7 +148,7 @@ class DataFreshnessMonitor:
         METAR observation for this station.
         """
         try:
-            conn = get_sqlite_connection(self._metar_db_path, timeout=5)
+            conn = sqlite3.connect(self._metar_db_path, timeout=5)
             c = conn.cursor()
 
             # Get the most recent METAR observation timestamp for this station
@@ -199,7 +198,7 @@ class DataFreshnessMonitor:
             return FreshnessTier.GREEN  # No NWP data source = no degradation
 
         try:
-            conn = get_sqlite_connection(self._nwp_db_path, timeout=5)
+            conn = sqlite3.connect(self._nwp_db_path, timeout=5)
             c = conn.cursor()
 
             # Try common NWP table names
@@ -318,7 +317,7 @@ class DataFreshnessMonitor:
 
         # METAR age
         try:
-            conn = get_sqlite_connection(self._metar_db_path, timeout=5)
+            conn = sqlite3.connect(self._metar_db_path, timeout=5)
             c = conn.cursor()
             c.execute("""
                 SELECT MAX(timestamp_utc) FROM metar_observations
@@ -337,7 +336,7 @@ class DataFreshnessMonitor:
         # NWP age
         if self._nwp_db_path:
             try:
-                conn = get_sqlite_connection(self._nwp_db_path, timeout=5)
+                conn = sqlite3.connect(self._nwp_db_path, timeout=5)
                 c = conn.cursor()
                 for table in ["nwp_forecasts", "gfs_forecasts", "forecast_data"]:
                     try:

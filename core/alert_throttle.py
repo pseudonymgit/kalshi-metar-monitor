@@ -64,7 +64,7 @@ class AlertThrottle:
     def _ensure_schema(self):
         """Create the alert_throttle table if it doesn't exist."""
         os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             # Main throttle tracking table
             conn.execute("""
@@ -199,7 +199,7 @@ class AlertThrottle:
 
     def _get_throttle_entry(self, station: str, alert_type: str) -> Optional[Dict[str, Any]]:
         """Retrieve the current throttle entry for a station and alert type."""
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             conn.row_factory = sqlite3.Row
             row = conn.execute("""
@@ -217,7 +217,7 @@ class AlertThrottle:
         """Set initial throttle entry."""
         current_time = datetime.now(timezone.utc).isoformat()
         
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             conn.execute("""
                 INSERT INTO alert_throttle
@@ -236,7 +236,7 @@ class AlertThrottle:
         """Update an existing throttle entry."""
         current_time = datetime.now(timezone.utc).isoformat()
         
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             if not reset_count:
                 # Just update time and state, keep count
@@ -275,7 +275,7 @@ class AlertThrottle:
             today_date = current_time[:10]
             reset_daily_count = last_reset_date != today_date
             
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         try:
             if reset_daily_count:
                 conn.execute("""
@@ -412,5 +412,4 @@ if __name__ == "__main__":
         print("AlertThrottle tests complete.")
     finally:
         import os
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         os.unlink(test_path)

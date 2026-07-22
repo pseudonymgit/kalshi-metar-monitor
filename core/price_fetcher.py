@@ -15,6 +15,7 @@ import re
 
 # Layer 4: LOW market discovery regex
 LOW_TICKER_PATTERN = re.compile(r"^LOW-\d{6}$")
+import sqlite3
 import threading
 import time
 import requests
@@ -111,7 +112,7 @@ def _persist_rate_limit_entry(endpoint: str) -> None:
     try:
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             # Ensure schema exists
             _ensure_alert_schema()
@@ -149,7 +150,6 @@ def _parse_retry_after(header_value: str) -> int:
     try:
         # Parse HTTP-date format
         from email.utils import parsedate_to_datetime
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         expires_dt = parsedate_to_datetime(header_value)
         now_dt = datetime.now(timezone.utc)
         delta = expires_dt - now_dt
@@ -163,7 +163,7 @@ def _check_rate_limit(endpoint: str, max_requests: int = 10, window_seconds: int
     try:
         db_path = _alert_db_path()
         _ensure_alert_schema()
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             # Count recent requests in the window
             now_iso = _now_utc_iso()

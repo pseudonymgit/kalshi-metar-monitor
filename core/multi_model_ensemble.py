@@ -28,6 +28,7 @@ import math
 import random
 from collections import defaultdict
 from datetime import datetime, timedelta
+import sqlite3
 
 NWP_DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
 DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
@@ -86,7 +87,7 @@ def fetch_real_nwp_forecasts(station, target_date):
     Returns: dict of {model_name: forecast_temp} with newest forecasts for each model
     """
     try:
-        conn = get_sqlite_connection(NWP_DB_PATH)
+        conn = sqlite3.connect(NWP_DB_PATH)
         cur = conn.cursor()
         
         # Get the most recent forecast from each model for the target_date, station, and temperature_2m_max
@@ -259,7 +260,7 @@ def get_station_model_accuracy_weights(station):
     # This would normally come from a lookup table based on historical accuracy
     # by station, but currently use overall model MAEs
     try:
-        conn = get_sqlite_connection(NWP_DB_PATH)
+        conn = sqlite3.connect(NWP_DB_PATH)
         cur = conn.cursor()
         
         # Query for this station and get model-specific MAE, adjust weights accordingly
@@ -492,7 +493,7 @@ def live_multi_model_consensus(station, prev_day_high):
 
 def run_backtest():
     """Run standalone backtest of the multi-model consensus signal."""
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
+    import sqlite3
     
     print("=" * 90)
     print("EDGE 20: MULTI-MODEL FORECAST ENSEMBLE — STANDALONE BACKTEST")
@@ -508,7 +509,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     print(f"      Model biases: {MODEL_BIAS}")
     print()
     
-    conn = get_sqlite_connection(DB_PATH, timeout=60)
+    conn = sqlite3.connect(DB_PATH, timeout=60)
     rng = random.Random(42)
     
     cur = conn.cursor()

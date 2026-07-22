@@ -289,7 +289,7 @@ def generate_signals(self, date):
         available_stations = list(set(available_stations[:6]))  # Use first 6
 
     # Open METAR DB connection for hourly late-day momentum signal
-    metar_conn = get_sqlite_connection(self.metar_db, timeout=10)
+    metar_conn = sqlite3.connect(self.metar_db, timeout=10)
 
     for station in available_stations:
         # NOTE: reversion signal (Signal 1) REMOVED from ensemble per Phase 1 fix.

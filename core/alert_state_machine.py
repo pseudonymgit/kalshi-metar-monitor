@@ -109,7 +109,7 @@ class AlertStateMachine:
     def _ensure_schema(self):
         """Create the alert_state table and history table."""
         os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -184,7 +184,7 @@ class AlertStateMachine:
         alert_id = f"{station}_{market}_{direction}_{int(time.time())}"
 
         # Ensure uniqueness
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -257,7 +257,7 @@ class AlertStateMachine:
         Returns:
             (success: bool, message: str)
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -323,7 +323,7 @@ class AlertStateMachine:
         Returns:
             Dict with all alert state fields, or None if not found
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -346,7 +346,7 @@ class AlertStateMachine:
         Returns:
             List of transition records in chronological order
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -371,7 +371,7 @@ class AlertStateMachine:
         Returns:
             List of alert state records
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -394,7 +394,7 @@ class AlertStateMachine:
             List of alerts past due for acknowledgment
         """
         now = datetime.now(timezone.utc)
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -417,7 +417,7 @@ class AlertStateMachine:
             List of alerts that should be expired
         """
         now = datetime.now(timezone.utc)
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -462,7 +462,7 @@ class AlertStateMachine:
         Returns:
             Dict with counts by state, total alerts, etc.
         """
-        conn = get_sqlite_connection(self._db_path)
+        conn = sqlite3.connect(self._db_path)
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
         try:
@@ -835,7 +835,6 @@ def transition_alert(alert_id: str, target_state: AlertState, reason: str = None
 
 if __name__ == "__main__":
     import tempfile
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         test_path = f.name

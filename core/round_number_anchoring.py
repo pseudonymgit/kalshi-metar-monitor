@@ -13,6 +13,7 @@ Part of Phase 7 - Kalshi API Integration.
 import os
 import math
 import requests
+import sqlite3
 from datetime import datetime, timezone, timedelta
 from typing import Tuple, Optional
 
@@ -34,7 +35,7 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
     try:
         # Connect to historical METAR database
         db_path = os.getenv('METAR_DB_PATH', '/var/lib/weather/metars.db')
-        conn = get_sqlite_connection(db_path)
+        conn = sqlite3.connect(db_path)
         
         try:
             cursor = conn.cursor()
@@ -119,7 +120,6 @@ def get_kalshi_midpoint_price(series_ticker: str, market_type: str, threshold: i
         # Construct individual market ticker
         # Format: KXHIGHKATL-{YYYYMMDD}-{strike}
         from datetime import datetime, timezone
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         today = datetime.now(timezone.utc)
         date_str = today.strftime('%y%m%d')
         

@@ -19,6 +19,7 @@ import logging
 import aiohttp
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Optional, Union
+import sqlite3
 import time
 
 # Import delivery components
@@ -107,7 +108,7 @@ class HeartbeatManager:
         
         # Extract scheduler info from database if available
         try:
-            with get_sqlite_connection(self.db_path) as conn:
+            with sqlite3.connect(self.db_path) as conn:
                 latest_poll_log = conn.execute("""
                     SELECT created_utc, metadata_json 
                     FROM alerts 
@@ -149,7 +150,7 @@ class HeartbeatManager:
     def get_signal_counts(self) -> Dict[str, int]:
         """Count recent signals and alerts in the system"""
         try:
-            with get_sqlite_connection(self.db_path) as conn:
+            with sqlite3.connect(self.db_path) as conn:
                 # Total alerts count
                 total_alerts = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
                 
@@ -241,7 +242,7 @@ class HeartbeatManager:
         
         # Fall back to database trade tracking
         try:
-            with get_sqlite_connection(self.db_path) as conn:
+            with sqlite3.connect(self.db_path) as conn:
                 latest_trade = conn.execute("""
                     SELECT created_utc FROM alerts 
                     WHERE alert_type LIKE '%trade%' OR metadata_json LIKE '%"trade_id"%'
@@ -268,7 +269,7 @@ class HeartbeatManager:
             _LOGGER.debug(f"Could not get account balance: {e}")
             try:
                 # Look in database for balance information
-                with get_sqlite_connection(self.db_path) as conn:
+                with sqlite3.connect(self.db_path) as conn:
                     row = conn.execute("""
                         SELECT metadata_json 
                         FROM alerts 
@@ -470,5 +471,4 @@ async def main():
 
 if __name__ == "__main__":
     import traceback
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     asyncio.run(main())

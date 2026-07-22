@@ -355,7 +355,7 @@ def get_latest_station_market_evaluation_context(station: Optional[str] = None) 
             return latest_by_station
 
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 query = """
                     SELECT
@@ -421,7 +421,7 @@ def _audit_alert(
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 conn.execute(
                     """
@@ -478,7 +478,7 @@ def get_recent_alerts(limit: int = 100) -> List[Dict[str, Any]]:
             return []
 
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 rows = conn.execute(
                     """
@@ -537,7 +537,7 @@ def get_retention_metrics() -> Dict[str, Any]:
     newest_created_utc = None
     rows_last_24h = 0
 
-    conn = get_sqlite_connection(db_path, timeout=1)
+    conn = sqlite3.connect(db_path, timeout=1)
     try:
         total_rows = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
         oldest_created_utc, newest_created_utc = conn.execute(
@@ -579,7 +579,7 @@ def prune_old_alerts() -> Dict[str, Any]:
         }
 
     with _AUDIT_LOCK:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             if retention_days is None:
                 remaining_rows = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
@@ -619,7 +619,7 @@ def _run_alert_retention() -> None:
             return
 
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 conn.execute(
                     """
@@ -655,7 +655,7 @@ def _snapshot_alert_queue_stats() -> Dict[str, Any]:
         }
     
     try:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             rows = conn.execute(
                 "SELECT status, COUNT(*) as count FROM alert_delivery_queue GROUP BY status"
@@ -801,7 +801,7 @@ def run_replay_for_station_day(station: str, date_local: str) -> Dict[str, Any]:
             }
 
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 try:
                     rows = conn.execute(
@@ -891,7 +891,7 @@ def _log_transition_event(
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 conn.execute(
                     """
@@ -1068,7 +1068,7 @@ def _annotate_transition_history_market_eval(
             return
 
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 cur = conn.execute(
                     """
@@ -1203,7 +1203,7 @@ def _annotate_transition_history_alert_path_truth(
             return
 
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 cur = conn.execute(
                     """
@@ -1375,7 +1375,7 @@ def get_persisted_transition_history(station=None, day: Optional[str] = None, li
 
     try:
         with _AUDIT_LOCK:
-            conn = get_readonly_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1)
             try:
                 rows = conn.execute(query, tuple(params)).fetchall()
             finally:
@@ -1409,7 +1409,7 @@ def _prune_transition_events() -> None:
 
         cutoff = (datetime.utcnow() - timedelta(days=retention_days)).isoformat() + "Z"
         with _AUDIT_LOCK:
-            conn = get_sqlite_connection(db_path, timeout=1)
+            conn = sqlite3.connect(db_path, timeout=1)
             try:
                 conn.execute(
                     "DELETE FROM transition_events WHERE created_utc < ?",
@@ -1474,7 +1474,7 @@ def _get_alert_delivery_queue_entries(status: Optional[str] = None) -> List[Dict
     
     entries = []
     try:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             if status:
                 rows = conn.execute(
@@ -1526,7 +1526,7 @@ def _mark_alert_delivery_queue_dead_letter(alert_id: str, reason: str) -> None:
     _ensure_alert_schema()
     
     try:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             # First, get the entry_id from alert_id metadata
             now_iso = _now_utc_iso()
@@ -1550,7 +1550,7 @@ def _update_alert_delivery_queue_attempt(alert_id: str, error: str) -> None:
     _ensure_alert_schema()
     
     try:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             # Find the entry by alert_id in metadata and update
             now_iso = _now_utc_iso()
@@ -1588,7 +1588,7 @@ def _delete_alert_delivery_queue(alert_id: str) -> None:
     _ensure_alert_schema()
     
     try:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             conn.execute(
                 "DELETE FROM alert_delivery_queue WHERE alert_id = ?",
@@ -1604,14 +1604,13 @@ def _alert_db_path() -> str:
 def _ensure_alert_schema() -> None:
     """Ensure Layer 1 alert delivery queue and Layer 0 persistence schemas exist."""
     from core.alert_retry_queue import _ensure_alert_delivery_queue_schema as _ensure_schema
-from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
     _ensure_schema()
     
     db_path = _alert_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
     with _SIGNAL_LOCK:
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             # Signal layer state persistence (L0-T1)
             conn.execute(
@@ -1658,7 +1657,7 @@ def _persist_signal_state(signal_name: str, state_dict: Dict[str, Any]) -> None:
     try:
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             # Ensure schema exists
             _ensure_alert_schema()
@@ -1681,7 +1680,7 @@ def _load_signal_state(signal_name: str) -> Optional[Dict[str, Any]]:
     """Load signal state from SQLite."""
     try:
         db_path = _alert_db_path()
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             row = conn.execute(
                 "SELECT state_json FROM signal_layer_state WHERE signal_name = ?",
@@ -1700,7 +1699,7 @@ def _load_all_signal_state() -> Dict[str, Dict[str, Any]]:
     result = {}
     try:
         db_path = _alert_db_path()
-        conn = get_sqlite_connection(db_path, timeout=1)
+        conn = sqlite3.connect(db_path, timeout=1)
         try:
             rows = conn.execute(
                 "SELECT signal_name, state_json FROM signal_layer_state"

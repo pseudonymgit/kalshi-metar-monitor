@@ -20,13 +20,13 @@ Implements:
 - Temperature implications based on compass direction (North = colder air, South = warmer air)
 """
 
+import sqlite3
 import math
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, List, Dict
 import os
 
 from .base_signal import BaseSignal, validate_signal
-from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 
 class WindDirectionShiftSignal(BaseSignal):
@@ -76,7 +76,7 @@ class WindDirectionShiftSignal(BaseSignal):
         Retrieve historical wind direction and speed for the given station.
         Returns list of (date, wind_direction_degrees, wind_speed_kt) tuples.
         """
-        conn = get_sqlite_connection(self.db_path)
+        conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
         start_date = self._subtract_days(date_str, days_lookback)

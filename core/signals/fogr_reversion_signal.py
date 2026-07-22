@@ -24,7 +24,6 @@ import logging
 from datetime import datetime, timezone, timedelta
 
 from .base_signal import BaseSignal, validate_signal
-from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +101,7 @@ class FogrReversionSignal(BaseSignal):
 
         own_conn = conn is None
         if own_conn:
-            conn = get_sqlite_connection(self.db_path) if self.db_path else None
+            conn = sqlite3.connect(self.db_path) if self.db_path else None
             if conn is None:
                 return None, 0.0
 

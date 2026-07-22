@@ -143,7 +143,7 @@ class NwpDirectSignal:
             return None
 
         try:
-            conn = get_sqlite_connection(str(self.nwp_db_path), timeout=30)
+            conn = sqlite3.connect(str(self.nwp_db_path), timeout=30)
             cur = conn.cursor()
             # Model names in DB are lowercase
             cur.execute("""
@@ -169,7 +169,6 @@ class NwpDirectSignal:
     def compute_signal(self, station: str, target_date: str = None) -> Optional[Dict]:
         """Public dict-returning API (compatibility with NwpAnalogSignal callers)."""
         from datetime import datetime as dt
-        from ..sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
         if target_date is None:
             target_date = dt.now().strftime('%Y-%m-%d')
         direction, confidence = self.evaluate_for_station(station, target_date, market_type='HIGH')
