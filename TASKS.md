@@ -1,5 +1,15 @@
 # TASKS
 
+## Phase 20: Architecture Decomposition (2026-07-22 03:50 UTC)
+**Status:** ✅ COMPLETE
+
+### Completed:
+- [x] **20.1 — Monolith Extraction**: signal_fusion.py → facade re-exporting from fusion_logic.py + compatibility_checks.py. paper_trading_engine.py already a facade. Added __all__ exports to 14 modules (extracted + old monoliths).
+- [x] **20.2 — Mode Separation**: Verified trading_modes.py, paper_trader.py, live_trader.py complete with TradingMode enum, PaperTrader, LiveTrader classes, and __all__ exports.
+- [x] **20.3 — DB Connection Standardization**: Verified sqlite_utils.py with centralized connection pool, schema registry integration, migration testing. db_schema.py with 24+ tables in schema registry, version tracking (1.0.0).
+- [x] **20.4 — Import Path Standardization**: Created pyproject.toml with project metadata/dependencies/entry points. Updated core/__init__.py with comprehensive package documentation.
+- [x] Zero syntax errors in all modified files.
+
 ## Phase 24: Future Data Sources (2026-07-22 03:42 UTC)
 **Status:** ✅ COMPLETE
 
