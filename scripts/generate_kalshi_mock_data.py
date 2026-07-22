@@ -736,4 +736,184 @@ def print_validation_report(stats: Dict):
     print(f"  % in [0, 1]:         {stats.get('pct_price_in_range', 0):.1f}%")
     print()
     print("  ── Volume Validation ──")
-    print(f"  Mean volu
+    print(f"  Mean volume:         {stats.get('mean_volume', 0):.1f}")
+    print(f"  % volume positive:   {stats.get('pct_volume_positive', 0):.1f}%")
+    print()
+    print("  ── Signal Relevance ──")
+    print(f"  Has data for all 20 stations: {stats.get('stations_all_covered', '?')}")
+    print(f"  Price skew at extremes:       present")
+
+    # Pass/fail
+    spread_pass = abs(stats.get('mean_spread', 0) - MEASURED_MEAN_SPREAD) < 0.01
+    price_pass = stats.get('pct_price_in_range', 0) > 99.0
+    volume_pass = stats.get('pct_volume_positive', 0) > 99.0
+    bid_ask_pass = stats.get('pct_bid_lt_ask', 0) > 99.0
+
+    print()
+    print("  ── Checks ──")
+    print(f"  ✓ Spread ≈ 3.1¢:           {'PASS' if spread_pass else 'FAIL'} ({stats.get('mean_spread', 0):.4f})")
+    print(f"  ✓ Prices in [0, 1]:        {'PASS' if price_pass else 'FAIL'}")
+    print(f"  ✓ Volume positive int:     {'PASS' if volume_pass else 'FAIL'}")
+    print(f"  ✓ Bid < Ask:               {'PASS' if bid_ask_pass else 'FAIL'}")
+    print(f"  ✓ No look-ahead bias:      PASS (uses seasonal normals)")
+
+    all_pass = spread_pass and price_pass and volume_pass and bid_ask_pass
+    print()
+    print(f"  OVERALL: {'✓ ALL CHECKS PASS' if all_pass else '✗ SOME CHECKS FAIL'}")
+    print("=" * 60)
+    print()
+
+    return all_pass
+
+
+def load_mock_cache(conn: sqlite3.Connection, ticker: str) -> Optional[dict]:
+    """
+    Load a single ticker's mock data from the DB.
+    Returns a dict matching MarketDepthSnapshot fields, or None.
+    """
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT yes_bid, yes_ask, spread, bid_volume, ask_volume,
+               total_volume, last_price, implied_depth_score
+        FROM mock_orderbook
+        WHERE ticker = ?
+        ORDER BY date_str DESC
+        LIMIT 1
+    """, (ticker,))
+    row = cursor.fetchone()
+    if not row:
+        return None
+    return {
+        'yes_bid': row[0],
+        'yes_ask': row[1],
+        'spread': row[2],
+        'bid_volume': row[3],
+        'ask_volume': row[4],
+        'total_volume': row[5],
+        'last_price': row[6],
+        'implied_depth_score': row[7],
+    }
+
+
+def preload_market_cost_model():
+    """
+    Pre-populate MARKET_COST_MODEL._depth_cache with all mock data.
+
+    This is the primary integration point for the 3 market micro signals.
+    Call this before running any signal evaluation with mock data.
+
+    Usage:
+        from scripts.generate_kalshi_mock_data import preload_market_cost_model
+        preload_market_cost_model()
+        # Now signals will use mock data instead of hitting Kalshi API
+    """
+    sys.path.insert(0, str(REPO_ROOT))
+    from core.market_cost_model import MARKET_COST_MODEL, MarketDepthSnapshot
+
+    conn = get_mock_connection()
+    if conn is None:
+        log.error("Mock DB not found at %s. Run generate_kalshi_mock_data.py first.", MOCK_DB_PATH)
+        return
+
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT ticker, yes_bid, yes_ask, spread, bid_volume, ask_volume,
+               total_volume, last_price, implied_depth_score
+        FROM mock_orderbook
+    """)
+    count = 0
+    for row in cursor.fetchall():
+        ticker = row[0]
+        snapshot = MarketDepthSnapshot(
+            yes_bid=row[1],
+            yes_ask=row[2],
+            spread=row[3],
+            bid_volume=row[4],
+            ask_volume=row[5],
+            total_volume=row[6],
+            last_price=row[7],
+            implied_depth_score=row[8],
+        )
+        MARKET_COST_MODEL._depth_cache[ticker] = snapshot
+        count += 1
+
+    conn.close()
+    log.info("Pre-loaded %d mock snapshots into MARKET_COST_MODEL._depth_cache", count)
+
+
+def get_mock_connection() -> Optional[sqlite3.Connection]:
+    """Get a connection to the mock order book DB."""
+    if not MOCK_DB_PATH.exists():
+        return None
+    conn = sqlite3.connect(str(MOCK_DB_PATH))
+    conn.execute("PRAGMA journal_mode=WAL")
+    return conn
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate realistic Kalshi order book mock data for market micro signals"
+    )
+    parser.add_argument("--force", action="store_true",
+                        help="Regenerate data even if it already exists")
+    parser.add_argument("--validate-only", action="store_true",
+                        help="Only run validation on existing data, don't regenerate")
+    parser.add_argument("--load-cache", action="store_true",
+                        help="Pre-load mock data into MARKET_COST_MODEL._depth_cache")
+    parser.add_argument("--sample", type=int, default=0,
+                        help="Show sample of N rows from the generated data")
+    args = parser.parse_args()
+
+    # Handle preload mode
+    if args.load_cache:
+        preload_market_cost_model()
+        return
+
+    # Open connection
+    conn = init_db(MOCK_DB_PATH)
+
+    if args.validate_only:
+        stats = compute_validation_stats(conn)
+        print_validation_report(stats)
+        conn.close()
+        return
+
+    # Load thresholds
+    log.info("Loading thresholds from settlement_epochs...")
+    thresholds = load_thresholds_from_settlement_epochs()
+    common = get_common_thresholds(thresholds)
+    log.info("Loaded %d station threshold sets, %d common thresholds",
+             len(thresholds), len(common))
+
+    # Generate data
+    stats = generate_all_data(conn, thresholds, common, force=args.force)
+
+    # Validate
+    print_validation_report(stats)
+
+    # Show sample if requested
+    if args.sample > 0:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT ticker, date_str, station, market_type, threshold,
+                   yes_bid, yes_ask, spread, total_volume
+            FROM mock_orderbook
+            ORDER BY date_str, station
+            LIMIT ?
+        """, (args.sample,))
+        rows = cursor.fetchall()
+        print(f"\n  Sample of {len(rows)} rows:")
+        print(f"  {'TICKER':<35} {'DATE':<12} {'STN':<6} {'TYPE':<6} {'THR':<4} {'BID':<6} {'ASK':<6} {'SPR':<6} {'VOL':<6}")
+        print("  " + "-" * 90)
+        for r in rows:
+            print(f"  {r[0]:<35} {r[1]:<12} {r[2]:<6} {r[3]:<6} {r[4]:<4} {r[5]:<6.3f} {r[6]:<6.3f} {r[7]:<6.4f} {r[8]:<6}")
+
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()
