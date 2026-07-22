@@ -80,36 +80,75 @@ Fixes applied before dispatch: agreement threshold, signal registry, fee rates. 
 - 19 P0 items, 14 P1 items, 6 P2 items
 - Files: docs/plans/gray-room-round9/GRAY-ROOM-ROUND9-SYNTHESIS.md
 
+## Phase 0: P0 Bug Fixes (2026-07-22)
+**Status:** ✅ COMPLETE (8 commits, all verified)
+
+### Applied Fixes:
+- [x] Settlement price: directional compare (today vs yesterday temp)
+- [x] Spread assumption: centralized in market_cost_model.py (3.1¢ mean)
+- [x] fill_price includes spread from market_cost_model.py
+- [x] Risk controls wired: check_kill_switches() called before every trade
+- [x] Position sizing consolidated: only FeeAwareKellyPositionSizer used
+- [x] Kelly formula fixed: per-signal variance, not global
+- [x] NwpDirectSignal wired: replaces NwpAnalogSignal in pipeline
+- [x] 18 bare excepts → except Exception (with logging)
+- [x] 49+ naive datetime.now() → datetime.now(timezone.utc)
+- [x] market_prob no longer hardcoded to 0.5 — wired to live Kalshi price
+- [x] Random.uniform() removed from calibration dashboard
+- [x] Market_cost_model.py created — single source of truth for spread/fees
+
+### Not Yet Fixed (deferred):
+- [ ] Remove fake P&L from backtest engine (Phase 21.3 — new backtest runner)
+- [ ] Fix Pressure Delta direction mapping (Phase 23.5 — dual-polarity framework)
+- [ ] Conflicting Flask apps consolidated (Phase 17 replaced old dashboards)
+- [ ] Cron jobs in ERROR state (independent — needs diagnosis)
+- [ ] Alert pipeline env var mismatch (already functionally correct)
+
 ## Phase 17: Production Trading Dashboard (2026-07-22)
-**Status:** 🔄 PENDING (revised per Gray Room Round 8)
+**Status:** ✅ COMPLETE
 
-### Build Order (per Expert 3):
-- [ ] P1: P&L + Positions — /api/trading/pnl, /api/trading/positions, /api/trading/portfolio
-- [ ] P2: Alert Feed + Position Management — alert feed from trade_journal.db, open positions view
-- [ ] P3: Risk Dashboard — drawdown, daily loss, kill switch state
-- [ ] P4: Performance Analytics — signal accuracy, Sharpe, win rate by station/signal
-- [ ] P5: Short-Duration Mode — faster refresh, micro-P&L, close buttons
+### Built:
+- [x] `core/trading_dashboard/` package (6 files, 2511 lines)
+- [x] `/trading/` — Main P&L/Positions dashboard page
+- [x] `/trading/positions` — Full positions + risk + analytics page
+- [x] `/trading/api/pnl` — Total P&L, by city, daily time series
+- [x] `/trading/api/positions` — Open positions with MTM, unrealized P&L
+- [x] `/trading/api/portfolio` — Exposure by cluster and station
+- [x] `/trading/api/alerts` — Last 50 journal entries, color-coded, filterable
+- [x] `/trading/api/risk` — Risk state (OK/WARNING/KILL_SWITCH), drawdown gauge
+- [x] `/trading/api/stats` — Signal accuracy, win rate by station, rolling Sharpe
+- [x] `/trading/api/stream` — SSE endpoint, 30s real-time push
+- [x] Dark-themed Jinja2 templates (base.html, index.html, positions.html)
+- [x] Plotly.js charts (P&L cumulative, city breakdown, portfolio pie, win rate, Sharpe)
+- [x] Blueprint registered in app.py at /trading prefix
+- [x] Uses market_cost_model.py (3.1¢ spread), station_registry.py (cluster mapping)
+- [x] Old dashboards deprecated (dashboard.py, confidence_dashboard.py, calibration_dashboard.py)
+- [x] 0 new syntax errors
 
-### Architecture Decision:
-- Build NEW core/trading_dashboard/ package (don't extend existing)
-- Deprecate old dashboards (dashboard.py, confidence_dashboard.py, calibration_dashboard.py)
-- In-memory event buffer for real-time data
-- SQLite for persistence
+## Phase 18: Short-Duration Trading (Intraday Signals) 🔄 IN PROGRESS
 
-### P0 Fixes (from Gray Room Round 9, must be done before/during Phase 17):
-- [ ] Fix settlement price calculation (wrong threshold)
-- [ ] Fix spread assumption (0.5¢ → 3.1¢) and wire bid/ask from API
-- [ ] Fix fill_price to include spread/slippage
-- [ ] Wire risk_controls.py into paper_trading_engine.py
-- [ ] Fix all 3 conflicting position sizing systems
-- [ ] Fix Kelly formula (wrong variance)
-- [ ] Remove fake P&L from backtest
-- [ ] Fix 18 bare excepts
-- [ ] Fix 49+ naive datetime.now() calls
-- [ ] Fix NwpDirectSignal evaluate() (no-op)
-- [ ] Fix Pressure Delta direction mapping
-- [ ] Fix market_prob hardcoded to 0.5
-- [ ] Stop random data generation in calibration dashboard
-- [ ] Fix cron jobs in ERROR state
-- [ ] Fix alert pipeline env vars
-- [ ] Add structured logging
+### Phase A — METAR-based signals (existing data, no HRRR needed)
+- [ ] **FOGR Reversion** — Frost Occurrence Guidance Reversion: when overnight dewpoint depression is near 0, expect rapid morning warming
+- [ ] **METAR dT/dt** — 3-hour temperature change rate from raw METAR observations
+- [ ] **Pressure Tendency** — 3-hour pressure change from METAR
+
+### Phase B — HRRR Pipeline
+- [ ] Add HRRR collection endpoint to nwp_collect.py (Open-Meteo /v1/hrrr, 3km, hourly)
+- [ ] 0-48h forecasts, 20 stations
+
+### Phase C — Advanced Intraday Signals
+- [ ] **ESDR** (Ensemble Spread Divergence Rate) — from HGEFS 31-member ensemble
+- [ ] **NWP Trajectory + METAR dT/dt fusion** — GFS direction + METAR rate of change
+- [ ] **Lagrangian trajectory** — trace 850-mb air parcels backward 12h
+
+### Phase D — Entry/Exit Rules
+- [ ] Sequential trigger architecture (A→B→C→D), not majority-vote ensemble
+- [ ] Tiered confirmation: Stage 1 at 50% confidence, Stage 2 after METAR confirmation
+- [ ] Time-decay + confidence decay dual exit
+- [ ] Spread-based entry signal: widening spreads → avoid or increase edge requirement
+
+### Phase E — Intraday Trading Loop
+- [ ] Separate intraday trading mode, runs hourly
+- [ ] Evaluates daily contracts at multiple points during the day
+- [ ] Enters when edge/spread ratio is favorable
+- [ ] Refines prediction with more recent METAR data

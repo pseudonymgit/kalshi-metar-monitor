@@ -146,6 +146,68 @@ Ready for Phase 16 with:
 - Verified Phase 14 result: 69.67%
 - Alert pipeline root cause identified (variable name mismatch)
 - Priority items for Phase 16: fix .bashrc webhooks, register nwp_direct, remove nwp_analog, add div-by-zero guards
+## Phase 16: Gray Room Functionality Review (2026-07-22)
+
+### Round 8 (REJECTED by Dan)
+- 3 experts dispatched, rejected: wrong format (3 instead of 5-7), wrong premise, bugs not fixed
+- Replaced by Round 9
+
+### Round 9 (6 experts, independent analysis)
+- Fixes applied before dispatch: agreement threshold, signal registry, fee rates
+- **74 errors, 32 improvements, 20 ideas, 12 elephants** — all ADVANCE
+- Experts: Meteorology, Quant Finance, Architecture, Production Ops, Dashboard, Market Microstructure
+- Synthesis: `docs/plans/gray-room-round9/GRAY-ROOM-ROUND9-SYNTHESIS.md`
+- 19 P0 items identified, all dispositioned
+
+## Phase 0: P0 Bug Fixes (2026-07-22)
+
+### Applied (8 commits, all verified):
+- **Settlement price**: directional compare (today vs yesterday temp) — fixes hardcoded 50°F threshold
+- **Cost model**: `core/market_cost_model.py` — single source of truth, 3.1¢ mean spread (was 0.5¢ vs 2¢ vs 2.5¢ across 3 modules)
+- **Risk controls**: `check_kill_switches()` called before every trade — checks daily loss, drawdown, consecutive losses
+- **Position sizing**: consolidated to FeeAwareKellyPositionSizer only (was 3 conflicting systems)
+- **Kelly formula**: per-signal variance instead of global variance
+- **NWP signal**: `NwpDirectSignal` replaces `NwpAnalogSignal` in pipeline
+- **Bare excepts**: 18 `except:` → `except Exception:` with logging
+- **Datetime**: 49+ `datetime.now()` → `datetime.now(timezone.utc)`
+- **market_prob**: no longer hardcoded to 0.5 — wired to live Kalshi price
+- **Random data**: removed `random.uniform()` fallback from calibration dashboard
+
+### Deferred (need Phase 23/21):
+- Pressure Delta direction mapping (Phase 23.5 — dual-polarity framework)
+- Fake P&L from backtest (Phase 21.3 — new backtest runner)
+- Cron job errors (independent diagnosis needed)
+
+## Phase 17: Production Trading Dashboard (2026-07-22)
+
+### Built: `core/trading_dashboard/` package (6 files, 2511 lines)
+
+**Routes (9 endpoints):**
+- `/trading/` — Main P&L/Positions dashboard page
+- `/trading/positions` — Full positions + risk + analytics page
+- `/trading/api/pnl` — Total P&L, by city, daily time series, current balance
+- `/trading/api/positions` — Open positions with MTM, unrealized P&L
+- `/trading/api/portfolio` — Exposure by cluster and station
+- `/trading/api/alerts` — Last 50 journal entries, color-coded, filterable
+- `/trading/api/risk` — Risk state (OK/WARNING/KILL_SWITCH), drawdown, daily loss
+- `/trading/api/stats` — Signal accuracy, win rate by station, rolling Sharpe
+- `/trading/api/stream` — SSE endpoint, 30s real-time push
+
+**Templates (Jinja2, dark theme):**
+- `base.html`, `index.html`, `positions.html` — responsive grid, card layout, nav bar
+
+**JS:**
+- `dashboard.js` — SSE client, Plotly.js charts (P&L cumulative, city breakdown, portfolio pie, win rate, Sharpe)
+- Risk indicator, thermometer animations, alert feed with client-side filtering
+
+**Integration:**
+- Blueprint registered in `app.py` at /trading prefix
+- Uses `market_cost_model.py` (3.1¢ spread), `station_registry.py` (cluster mapping)
+- Old dashboards deprecated (dashboard.py, confidence_dashboard.py, calibration_dashboard.py)
+- 0 new syntax errors
+
+---
+
 ## Phase 16: Bug Fixes & Pipeline Corrections (2026-07-21)
 
 ### P0: Signal Registry Fixes
