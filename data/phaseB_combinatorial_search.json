@@ -1,0 +1,559 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-23T19:57:00.414931+00:00",
+    "phase": "B",
+    "signals_available": 22,
+    "signals_tested": [
+      "gaussian",
+      "gaussian_v2",
+      "goldilocks",
+      "persistence",
+      "pressure_delta",
+      "calendar_climatology",
+      "wind_direction_shift",
+      "forecast_disagreement",
+      "temperature_advection",
+      "frontal_detector",
+      "nwp_direct",
+      "intraday_metar_confirmation",
+      "fogr_reversion",
+      "metar_dtdt",
+      "pressure_tendency",
+      "hrrr_bias_corrected",
+      "esdr",
+      "nwp_dtdt_fusion",
+      "spread_based_entry",
+      "volume_momentum",
+      "settlement_arbitrage",
+      "seasonal_regime"
+    ],
+    "subsets_tested": [
+      "subset_a_core5",
+      "subset_b_core5_reversion",
+      "subset_c_core5_nwp",
+      "subset_d_all_pressure",
+      "subset_e_phase23",
+      "subset_f_full_22"
+    ],
+    "total_combinations": 2129,
+    "agreement_levels_tested": [
+      1,
+      2,
+      3,
+      5
+    ]
+  },
+  "best_per_subset": {
+    "subset_a_core5": {
+      "best_combo": [
+        "calendar_climatology",
+        "gaussian",
+        "goldilocks",
+        "pressure_delta",
+        "forecast_disagreement"
+      ],
+      "agreement_level": 3,
+      "accuracy": 0.6879,
+      "sharpe": 0.3945,
+      "brier": 0.3121,
+      "ece": 0.3121,
+      "trades": 6316,
+      "coverage": 0.2366
+    },
+    "subset_b_core5_reversion": {
+      "best_combo": [
+        "calendar_climatology",
+        "gaussian",
+        "goldilocks",
+        "pressure_delta",
+        "forecast_disagreement",
+        "fogr_reversion",
+        "metar_dtdt",
+        "nwp_dtdt_fusion",
+        "spread_based_entry",
+        "settlement_arbitrage",
+        "volume_momentum"
+      ],
+      "agreement_level": 3,
+      "accuracy": 0.6879,
+      "sharpe": 0.3945,
+      "brier": 0.3121,
+      "ece": 0.3121,
+      "trades": 6316,
+      "coverage": 0.2366
+    },
+    "subset_c_core5_nwp": {
+      "best_combo": [
+        "calendar_climatology",
+        "gaussian",
+        "goldilocks",
+        "pressure_delta",
+        "forecast_disagreement",
+        "nwp_direct",
+        "hrrr_bias_corrected",
+        "esdr",
+        "wind_direction_shift",
+        "temperature_advection",
+        "frontal_detector"
+      ],
+      "agreement_level": 3,
+      "accuracy": 0.6904,
+      "sharpe": 0.4007,
+      "brier": 0.3096,
+      "ece": 0.3096,
+      "trades": 2978,
+      "coverage": 0.1116
+    },
+    "subset_d_all_pressure": {
+      "best_combo": [
+        "pressure_delta",
+        "corrected_pressure_delta",
+        "pressure_tendency"
+      ],
+      "agreement_level": 1,
+      "accuracy": 0.4359,
+      "sharpe": -0.2053,
+      "brier": 0.4033,
+      "ece": 0.3889,
+      "trades": 15477,
+      "coverage": 0.5798
+    },
+    "subset_e_phase23": {
+      "best_combo": [
+        "corrected_pressure_delta",
+        "seasonal_regime",
+        "calendar_climatology"
+      ],
+      "agreement_level": 1,
+      "accuracy": 0.4911,
+      "sharpe": 0.0206,
+      "brier": 0.4054,
+      "ece": 0.3771,
+      "trades": 26693,
+      "coverage": 1.0
+    },
+    "subset_f_full_22": {
+      "best_combo": [
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks",
+        "persistence",
+        "pressure_delta",
+        "calendar_climatology",
+        "wind_direction_shift",
+        "forecast_disagreement",
+        "temperature_advection",
+        "frontal_detector",
+        "nwp_direct",
+        "intraday_metar_confirmation",
+        "fogr_reversion",
+        "metar_dtdt",
+        "pressure_tendency",
+        "hrrr_bias_corrected",
+        "esdr",
+        "nwp_dtdt_fusion",
+        "spread_based_entry",
+        "volume_momentum",
+        "settlement_arbitrage",
+        "seasonal_regime"
+      ],
+      "agreement_level": 1,
+      "accuracy": 0.6145,
+      "sharpe": 0.2564,
+      "brier": 0.2996,
+      "ece": 0.2191,
+      "trades": 26693,
+      "coverage": 1.0
+    }
+  },
+  "agreement_analysis": {
+    "level_1": {
+      "avg_accuracy": 0.6145,
+      "avg_sharpe": 0.2564,
+      "avg_trades": 26693,
+      "agreement_level": 1
+    },
+    "level_2": {
+      "avg_accuracy": 0.0,
+      "avg_sharpe": 0.0,
+      "avg_trades": 0,
+      "agreement_level": 2
+    },
+    "level_3": {
+      "avg_accuracy": 0.0,
+      "avg_sharpe": 0.0,
+      "avg_trades": 0,
+      "agreement_level": 3
+    },
+    "level_5": {
+      "avg_accuracy": 0.0,
+      "avg_sharpe": 0.0,
+      "avg_trades": 0,
+      "agreement_level": 5
+    }
+  },
+  "best_single_signals": [
+    {
+      "signal": "calendar_climatology",
+      "accuracy": 0.69,
+      "sharpe": 0.3997
+    },
+    {
+      "signal": "gaussian",
+      "accuracy": 0.6653,
+      "sharpe": 0.3395
+    },
+    {
+      "signal": "forecast_disagreement",
+      "accuracy": 0.6436,
+      "sharpe": 0.2891
+    },
+    {
+      "signal": "gaussian_v2",
+      "accuracy": 0.6395,
+      "sharpe": 0.2798
+    },
+    {
+      "signal": "pressure_delta",
+      "accuracy": 0.6086,
+      "sharpe": 0.212
+    },
+    {
+      "signal": "seasonal_regime",
+      "accuracy": 0.5498,
+      "sharpe": 0.0898
+    },
+    {
+      "signal": "persistence",
+      "accuracy": 0.5095,
+      "sharpe": 0.0087
+    },
+    {
+      "signal": "goldilocks",
+      "accuracy": 0.4985,
+      "sharpe": -0.0133
+    },
+    {
+      "signal": "wind_direction_shift",
+      "accuracy": 0.4972,
+      "sharpe": -0.0158
+    },
+    {
+      "signal": "frontal_detector",
+      "accuracy": 0.4677,
+      "sharpe": -0.075
+    }
+  ],
+  "best_pairs": [
+    {
+      "combo": [
+        "calendar_climatology",
+        "spread_based_entry"
+      ],
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "trades": 5948
+    },
+    {
+      "combo": [
+        "calendar_climatology",
+        "volume_momentum"
+      ],
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "trades": 5948
+    },
+    {
+      "combo": [
+        "calendar_climatology",
+        "settlement_arbitrage"
+      ],
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "trades": 5948
+    },
+    {
+      "combo": [
+        "calendar_climatology",
+        "nwp_direct"
+      ],
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "trades": 5948
+    },
+    {
+      "combo": [
+        "calendar_climatology",
+        "fogr_reversion"
+      ],
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "trades": 5948
+    },
+    {
+      "combo": [
+        "calendar_climatology",
+        "esdr"
+      ],
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "trades": 5948
+    },
+    {
+      "combo": [
+        "gaussian",
+        "calendar_climatology"
+      ],
+      "accuracy": 0.6653,
+      "sharpe": 0.3395,
+      "trades": 11391
+    },
+    {
+      "combo": [
+        "gaussian",
+        "fogr_reversion"
+      ],
+      "accuracy": 0.6653,
+      "sharpe": 0.3395,
+      "trades": 11391
+    },
+    {
+      "combo": [
+        "gaussian",
+        "spread_based_entry"
+      ],
+      "accuracy": 0.6653,
+      "sharpe": 0.3395,
+      "trades": 11391
+    },
+    {
+      "combo": [
+        "gaussian",
+        "metar_dtdt"
+      ],
+      "accuracy": 0.6653,
+      "sharpe": 0.3395,
+      "trades": 11391
+    }
+  ],
+  "single_signal_results": {
+    "gaussian": {
+      "accuracy": 0.6653,
+      "sharpe": 0.3395,
+      "brier": 0.3347,
+      "ece": 0.3347,
+      "trades": 11391,
+      "coverage": 0.4267
+    },
+    "gaussian_v2": {
+      "accuracy": 0.6395,
+      "sharpe": 0.2798,
+      "brier": 0.3605,
+      "ece": 0.3605,
+      "trades": 18260,
+      "coverage": 0.6841
+    },
+    "goldilocks": {
+      "accuracy": 0.4985,
+      "sharpe": -0.0133,
+      "brier": 0.5015,
+      "ece": 0.5015,
+      "trades": 15228,
+      "coverage": 0.5705
+    },
+    "persistence": {
+      "accuracy": 0.5095,
+      "sharpe": 0.0087,
+      "brier": 0.4905,
+      "ece": 0.4905,
+      "trades": 26693,
+      "coverage": 1.0
+    },
+    "pressure_delta": {
+      "accuracy": 0.6086,
+      "sharpe": 0.212,
+      "brier": 0.3914,
+      "ece": 0.3914,
+      "trades": 15477,
+      "coverage": 0.5798
+    },
+    "calendar_climatology": {
+      "accuracy": 0.69,
+      "sharpe": 0.3997,
+      "brier": 0.31,
+      "ece": 0.31,
+      "trades": 5948,
+      "coverage": 0.2228
+    },
+    "wind_direction_shift": {
+      "accuracy": 0.4972,
+      "sharpe": -0.0158,
+      "brier": 0.5028,
+      "ece": 0.5028,
+      "trades": 4113,
+      "coverage": 0.1541
+    },
+    "forecast_disagreement": {
+      "accuracy": 0.6436,
+      "sharpe": 0.2891,
+      "brier": 0.3564,
+      "ece": 0.3564,
+      "trades": 11336,
+      "coverage": 0.4247
+    },
+    "temperature_advection": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "frontal_detector": {
+      "accuracy": 0.4677,
+      "sharpe": -0.075,
+      "brier": 0.5323,
+      "ece": 0.5323,
+      "trades": 13701,
+      "coverage": 0.5133
+    },
+    "nwp_direct": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "intraday_metar_confirmation": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "fogr_reversion": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "metar_dtdt": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "pressure_tendency": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "hrrr_bias_corrected": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "esdr": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "nwp_dtdt_fusion": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "spread_based_entry": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "volume_momentum": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "settlement_arbitrage": {
+      "accuracy": 0.0,
+      "sharpe": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "trades": 0,
+      "coverage": 0.0
+    },
+    "seasonal_regime": {
+      "accuracy": 0.5498,
+      "sharpe": 0.0898,
+      "brier": 0.4502,
+      "ece": 0.4502,
+      "trades": 26693,
+      "coverage": 1.0
+    }
+  },
+  "phase23_integration": {
+    "corrected_pressure_delta+seasonal_regime": {
+      "accuracy": 0.4781,
+      "sharpe": -0.0145,
+      "brier": 0.4395,
+      "ece": 0.4193,
+      "trades": 26693,
+      "coverage": 1.0
+    },
+    "corrected_pressure_delta+seasonal_regime+calendar_climatology": {
+      "accuracy": 0.4911,
+      "sharpe": 0.0206,
+      "brier": 0.4054,
+      "ece": 0.3771,
+      "trades": 26693,
+      "coverage": 1.0
+    },
+    "corrected_pressure_delta+seasonal_regime+pressure_delta": {
+      "accuracy": 0.5498,
+      "sharpe": 0.0843,
+      "brier": 0.3835,
+      "ece": 0.3482,
+      "trades": 26693,
+      "coverage": 1.0
+    },
+    "corrected_pressure_delta+seasonal_regime+calendar_climatology+gaussian": {
+      "accuracy": 0.5344,
+      "sharpe": 0.079,
+      "brier": 0.392,
+      "ece": 0.3578,
+      "trades": 26693,
+      "coverage": 1.0
+    },
+    "corrected_pressure_delta+seasonal_regime+calendar_climatology+gaussian+forecast_disagreement": {
+      "accuracy": 0.564,
+      "sharpe": 0.1239,
+      "brier": 0.3725,
+      "ece": 0.3312,
+      "trades": 26693,
+      "coverage": 1.0
+    }
+  }
+}

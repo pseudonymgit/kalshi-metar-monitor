@@ -1,0 +1,5449 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-23T18:19:59.549667+00:00",
+    "phase": "B",
+    "training_period": "2024-01-01 to 2025-06-30",
+    "validation_period": "2025-07-01 to 2026-06-30",
+    "stations": 20,
+    "signals": 22
+  },
+  "settlement_price_audit": {
+    "total_epochs": 2308,
+    "high_markets": 1154,
+    "low_markets": 1154,
+    "direction_errors": 0,
+    "direction_total": 2308,
+    "direction_match_rate": 1.0,
+    "price_anomalies": [],
+    "settlement_price_match_rate": 1.0,
+    "validation_period": "2025-07-01 to 2026-06-30",
+    "status": "validated"
+  },
+  "backtest_to_reality_gap": {
+    "overall": {
+      "accuracy": 0.3682,
+      "avg_confidence": 0.6378,
+      "calibration_gap": 0.2695,
+      "profit_factor": 0.5538,
+      "max_consecutive_losses": 26695,
+      "avg_win": 0.6173,
+      "avg_loss": 0.6497,
+      "total_trades": 148840,
+      "confusion_matrix": {
+        "tp": 24047,
+        "fp": 34325,
+        "fn": 33013,
+        "tn": 30762,
+        "precision": 0.412,
+        "recall": 0.4214,
+        "f1": 0.4166,
+        "mcc": -0.1058
+      }
+    },
+    "per_signal_confusion": {
+      "calendar_climatology": {
+        "tp": 829,
+        "fp": 2159,
+        "fn": 2277,
+        "tn": 683,
+        "precision": 0.2774,
+        "recall": 0.2669,
+        "f1": 0.2721,
+        "mcc": -0.4923,
+        "accuracy": 0.2542,
+        "total_trades": 5948
+      },
+      "forecast_disagreement": {
+        "tp": 1723,
+        "fp": 3814,
+        "fn": 3028,
+        "tn": 2771,
+        "precision": 0.3112,
+        "recall": 0.3627,
+        "f1": 0.335,
+        "mcc": -0.2137,
+        "accuracy": 0.3964,
+        "total_trades": 11336
+      },
+      "frontal_detector": {
+        "tp": 3064,
+        "fp": 3975,
+        "fn": 2284,
+        "tn": 4378,
+        "precision": 0.4353,
+        "recall": 0.5729,
+        "f1": 0.4947,
+        "mcc": 0.0947,
+        "accuracy": 0.5432,
+        "total_trades": 13701
+      },
+      "gaussian": {
+        "tp": 1721,
+        "fp": 3451,
+        "fn": 4412,
+        "tn": 1807,
+        "precision": 0.3328,
+        "recall": 0.2806,
+        "f1": 0.3045,
+        "mcc": -0.3762,
+        "accuracy": 0.3097,
+        "total_trades": 11391
+      },
+      "gaussian_v2": {
+        "tp": 3248,
+        "fp": 5134,
+        "fn": 6266,
+        "tn": 3612,
+        "precision": 0.3875,
+        "recall": 0.3414,
+        "f1": 0.363,
+        "mcc": -0.2462,
+        "accuracy": 0.3757,
+        "total_trades": 18260
+      },
+      "goldilocks": {
+        "tp": 2861,
+        "fp": 4593,
+        "fn": 4063,
+        "tn": 3711,
+        "precision": 0.3838,
+        "recall": 0.4132,
+        "f1": 0.398,
+        "mcc": -0.1394,
+        "accuracy": 0.4316,
+        "total_trades": 15228
+      },
+      "persistence": {
+        "tp": 6699,
+        "fp": 5335,
+        "fn": 6984,
+        "tn": 7675,
+        "precision": 0.5567,
+        "recall": 0.4896,
+        "f1": 0.521,
+        "mcc": 0.0799,
+        "accuracy": 0.5385,
+        "total_trades": 26693
+      },
+      "pressure_delta": {
+        "tp": 3147,
+        "fp": 4481,
+        "fn": 3304,
+        "tn": 4545,
+        "precision": 0.4126,
+        "recall": 0.4878,
+        "f1": 0.447,
+        "mcc": -0.0085,
+        "accuracy": 0.497,
+        "total_trades": 15477
+      },
+      "seasonal_regime": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mcc": 0.0,
+        "accuracy": 0.0,
+        "total_trades": 26693
+      },
+      "wind_direction_shift": {
+        "tp": 755,
+        "fp": 1383,
+        "fn": 395,
+        "tn": 1580,
+        "precision": 0.3531,
+        "recall": 0.6565,
+        "f1": 0.4592,
+        "mcc": 0.1705,
+        "accuracy": 0.5677,
+        "total_trades": 4113
+      }
+    },
+    "station_month_gaps": {
+      "KATL.2022-01": {
+        "accuracy": 0.335,
+        "trades": 203,
+        "avg_confidence": 0.6267,
+        "calibration_gap": 0.2918
+      },
+      "KATL.2022-02": {
+        "accuracy": 0.5,
+        "trades": 172,
+        "avg_confidence": 0.6074,
+        "calibration_gap": 0.1074
+      },
+      "KATL.2022-03": {
+        "accuracy": 0.3613,
+        "trades": 191,
+        "avg_confidence": 0.6414,
+        "calibration_gap": 0.2801
+      },
+      "KATL.2022-04": {
+        "accuracy": 0.4176,
+        "trades": 170,
+        "avg_confidence": 0.5922,
+        "calibration_gap": 0.1746
+      },
+      "KATL.2022-05": {
+        "accuracy": 0.2784,
+        "trades": 176,
+        "avg_confidence": 0.6689,
+        "calibration_gap": 0.3905
+      },
+      "KATL.2022-06": {
+        "accuracy": 0.2564,
+        "trades": 156,
+        "avg_confidence": 0.6749,
+        "calibration_gap": 0.4185
+      },
+      "KATL.2022-07": {
+        "accuracy": 0.3796,
+        "trades": 108,
+        "avg_confidence": 0.598,
+        "calibration_gap": 0.2184
+      },
+      "KATL.2022-08": {
+        "accuracy": 0.5035,
+        "trades": 141,
+        "avg_confidence": 0.6517,
+        "calibration_gap": 0.1482
+      },
+      "KATL.2022-09": {
+        "accuracy": 0.4566,
+        "trades": 173,
+        "avg_confidence": 0.6373,
+        "calibration_gap": 0.1806
+      },
+      "KATL.2022-10": {
+        "accuracy": 0.3548,
+        "trades": 186,
+        "avg_confidence": 0.6554,
+        "calibration_gap": 0.3006
+      },
+      "KATL.2022-11": {
+        "accuracy": 0.3059,
+        "trades": 170,
+        "avg_confidence": 0.6169,
+        "calibration_gap": 0.311
+      },
+      "KATL.2022-12": {
+        "accuracy": 0.3316,
+        "trades": 193,
+        "avg_confidence": 0.6392,
+        "calibration_gap": 0.3076
+      },
+      "KATL.2023-01": {
+        "accuracy": 0.4656,
+        "trades": 189,
+        "avg_confidence": 0.598,
+        "calibration_gap": 0.1324
+      },
+      "KATL.2023-02": {
+        "accuracy": 0.4921,
+        "trades": 191,
+        "avg_confidence": 0.6212,
+        "calibration_gap": 0.1291
+      },
+      "KATL.2023-03": {
+        "accuracy": 0.375,
+        "trades": 208,
+        "avg_confidence": 0.6444,
+        "calibration_gap": 0.2694
+      },
+      "KATL.2023-04": {
+        "accuracy": 0.3895,
+        "trades": 172,
+        "avg_confidence": 0.579,
+        "calibration_gap": 0.1895
+      },
+      "KATL.2023-05": {
+        "accuracy": 0.3291,
+        "trades": 158,
+        "avg_confidence": 0.5835,
+        "calibration_gap": 0.2544
+      },
+      "KATL.2023-06": {
+        "accuracy": 0.2575,
+        "trades": 167,
+        "avg_confidence": 0.6663,
+        "calibration_gap": 0.4088
+      },
+      "KATL.2023-07": {
+        "accuracy": 0.22,
+        "trades": 150,
+        "avg_confidence": 0.6904,
+        "calibration_gap": 0.4704
+      },
+      "KATL.2023-08": {
+        "accuracy": 0.3893,
+        "trades": 149,
+        "avg_confidence": 0.6643,
+        "calibration_gap": 0.2751
+      },
+      "KATL.2023-09": {
+        "accuracy": 0.4942,
+        "trades": 172,
+        "avg_confidence": 0.6429,
+        "calibration_gap": 0.1487
+      },
+      "KATL.2023-10": {
+        "accuracy": 0.3353,
+        "trades": 167,
+        "avg_confidence": 0.6515,
+        "calibration_gap": 0.3161
+      },
+      "KATL.2023-11": {
+        "accuracy": 0.2718,
+        "trades": 195,
+        "avg_confidence": 0.615,
+        "calibration_gap": 0.3432
+      },
+      "KATL.2023-12": {
+        "accuracy": 0.3757,
+        "trades": 189,
+        "avg_confidence": 0.5879,
+        "calibration_gap": 0.2122
+      },
+      "KATL.2024-01": {
+        "accuracy": 0.3897,
+        "trades": 195,
+        "avg_confidence": 0.6338,
+        "calibration_gap": 0.2441
+      },
+      "KATL.2024-02": {
+        "accuracy": 0.5304,
+        "trades": 181,
+        "avg_confidence": 0.5873,
+        "calibration_gap": 0.0569
+      },
+      "KATL.2024-03": {
+        "accuracy": 0.4742,
+        "trades": 194,
+        "avg_confidence": 0.6227,
+        "calibration_gap": 0.1485
+      },
+      "KATL.2024-04": {
+        "accuracy": 0.2955,
+        "trades": 176,
+        "avg_confidence": 0.6019,
+        "calibration_gap": 0.3064
+      },
+      "KATL.2024-05": {
+        "accuracy": 0.2595,
+        "trades": 158,
+        "avg_confidence": 0.6594,
+        "calibration_gap": 0.4
+      },
+      "KATL.2024-06": {
+        "accuracy": 0.2453,
+        "trades": 159,
+        "avg_confidence": 0.6766,
+        "calibration_gap": 0.4313
+      },
+      "KATL.2024-07": {
+        "accuracy": 0.4397,
+        "trades": 141,
+        "avg_confidence": 0.6661,
+        "calibration_gap": 0.2264
+      },
+      "KATL.2024-08": {
+        "accuracy": 0.3212,
+        "trades": 137,
+        "avg_confidence": 0.6476,
+        "calibration_gap": 0.3264
+      },
+      "KATL.2024-09": {
+        "accuracy": 0.4438,
+        "trades": 178,
+        "avg_confidence": 0.6607,
+        "calibration_gap": 0.2169
+      },
+      "KATL.2024-10": {
+        "accuracy": 0.339,
+        "trades": 177,
+        "avg_confidence": 0.6273,
+        "calibration_gap": 0.2883
+      },
+      "KATL.2024-11": {
+        "accuracy": 0.345,
+        "trades": 171,
+        "avg_confidence": 0.5774,
+        "calibration_gap": 0.2324
+      },
+      "KATL.2024-12": {
+        "accuracy": 0.3382,
+        "trades": 207,
+        "avg_confidence": 0.6431,
+        "calibration_gap": 0.305
+      },
+      "KATL.2025-01": {
+        "accuracy": 0.3702,
+        "trades": 208,
+        "avg_confidence": 0.6537,
+        "calibration_gap": 0.2835
+      },
+      "KATL.2025-02": {
+        "accuracy": 0.4343,
+        "trades": 175,
+        "avg_confidence": 0.6178,
+        "calibration_gap": 0.1836
+      },
+      "KATL.2025-03": {
+        "accuracy": 0.4837,
+        "trades": 184,
+        "avg_confidence": 0.6228,
+        "calibration_gap": 0.1391
+      },
+      "KATL.2025-04": {
+        "accuracy": 0.3393,
+        "trades": 168,
+        "avg_confidence": 0.5901,
+        "calibration_gap": 0.2508
+      },
+      "KATL.2025-05": {
+        "accuracy": 0.3436,
+        "trades": 163,
+        "avg_confidence": 0.6045,
+        "calibration_gap": 0.2609
+      },
+      "KATL.2025-06": {
+        "accuracy": 0.1931,
+        "trades": 145,
+        "avg_confidence": 0.6958,
+        "calibration_gap": 0.5027
+      },
+      "KATL.2025-07": {
+        "accuracy": 0.2154,
+        "trades": 130,
+        "avg_confidence": 0.6773,
+        "calibration_gap": 0.462
+      },
+      "KATL.2025-08": {
+        "accuracy": 0.3806,
+        "trades": 134,
+        "avg_confidence": 0.6511,
+        "calibration_gap": 0.2705
+      },
+      "KAUS.2022-01": {
+        "accuracy": 0.2947,
+        "trades": 207,
+        "avg_confidence": 0.6304,
+        "calibration_gap": 0.3357
+      },
+      "KAUS.2022-02": {
+        "accuracy": 0.3979,
+        "trades": 191,
+        "avg_confidence": 0.6479,
+        "calibration_gap": 0.25
+      },
+      "KAUS.2022-03": {
+        "accuracy": 0.4948,
+        "trades": 194,
+        "avg_confidence": 0.6478,
+        "calibration_gap": 0.153
+      },
+      "KAUS.2022-04": {
+        "accuracy": 0.3905,
+        "trades": 169,
+        "avg_confidence": 0.5873,
+        "calibration_gap": 0.1968
+      },
+      "KAUS.2022-05": {
+        "accuracy": 0.2147,
+        "trades": 177,
+        "avg_confidence": 0.7139,
+        "calibration_gap": 0.4992
+      },
+      "KAUS.2022-06": {
+        "accuracy": 0.2517,
+        "trades": 143,
+        "avg_confidence": 0.7121,
+        "calibration_gap": 0.4603
+      },
+      "KAUS.2022-07": {
+        "accuracy": 0.2018,
+        "trades": 109,
+        "avg_confidence": 0.6489,
+        "calibration_gap": 0.4471
+      },
+      "KAUS.2022-08": {
+        "accuracy": 0.5154,
+        "trades": 130,
+        "avg_confidence": 0.675,
+        "calibration_gap": 0.1596
+      },
+      "KAUS.2022-09": {
+        "accuracy": 0.4841,
+        "trades": 126,
+        "avg_confidence": 0.6374,
+        "calibration_gap": 0.1533
+      },
+      "KAUS.2022-10": {
+        "accuracy": 0.4451,
+        "trades": 182,
+        "avg_confidence": 0.6748,
+        "calibration_gap": 0.2298
+      },
+      "KAUS.2022-11": {
+        "accuracy": 0.3226,
+        "trades": 186,
+        "avg_confidence": 0.6324,
+        "calibration_gap": 0.3098
+      },
+      "KAUS.2022-12": {
+        "accuracy": 0.392,
+        "trades": 199,
+        "avg_confidence": 0.65,
+        "calibration_gap": 0.2581
+      },
+      "KAUS.2023-01": {
+        "accuracy": 0.4541,
+        "trades": 185,
+        "avg_confidence": 0.6047,
+        "calibration_gap": 0.1507
+      },
+      "KAUS.2023-02": {
+        "accuracy": 0.4221,
+        "trades": 199,
+        "avg_confidence": 0.6447,
+        "calibration_gap": 0.2226
+      },
+      "KAUS.2023-03": {
+        "accuracy": 0.4034,
+        "trades": 176,
+        "avg_confidence": 0.6106,
+        "calibration_gap": 0.2071
+      },
+      "KAUS.2023-04": {
+        "accuracy": 0.3488,
+        "trades": 172,
+        "avg_confidence": 0.5838,
+        "calibration_gap": 0.2349
+      },
+      "KAUS.2023-05": {
+        "accuracy": 0.3308,
+        "trades": 130,
+        "avg_confidence": 0.6563,
+        "calibration_gap": 0.3255
+      },
+      "KAUS.2023-06": {
+        "accuracy": 0.1655,
+        "trades": 145,
+        "avg_confidence": 0.716,
+        "calibration_gap": 0.5505
+      },
+      "KAUS.2023-07": {
+        "accuracy": 0.1754,
+        "trades": 114,
+        "avg_confidence": 0.6662,
+        "calibration_gap": 0.4907
+      },
+      "KAUS.2023-08": {
+        "accuracy": 0.2098,
+        "trades": 143,
+        "avg_confidence": 0.7167,
+        "calibration_gap": 0.5069
+      },
+      "KAUS.2023-09": {
+        "accuracy": 0.5429,
+        "trades": 140,
+        "avg_confidence": 0.6153,
+        "calibration_gap": 0.0724
+      },
+      "KAUS.2023-10": {
+        "accuracy": 0.3889,
+        "trades": 198,
+        "avg_confidence": 0.6639,
+        "calibration_gap": 0.275
+      },
+      "KAUS.2023-11": {
+        "accuracy": 0.3046,
+        "trades": 197,
+        "avg_confidence": 0.6239,
+        "calibration_gap": 0.3193
+      },
+      "KAUS.2023-12": {
+        "accuracy": 0.3791,
+        "trades": 153,
+        "avg_confidence": 0.5375,
+        "calibration_gap": 0.1585
+      },
+      "KAUS.2024-01": {
+        "accuracy": 0.385,
+        "trades": 200,
+        "avg_confidence": 0.634,
+        "calibration_gap": 0.249
+      },
+      "KAUS.2024-02": {
+        "accuracy": 0.5059,
+        "trades": 170,
+        "avg_confidence": 0.5902,
+        "calibration_gap": 0.0843
+      },
+      "KAUS.2024-03": {
+        "accuracy": 0.3424,
+        "trades": 184,
+        "avg_confidence": 0.6097,
+        "calibration_gap": 0.2673
+      },
+      "KAUS.2024-04": {
+        "accuracy": 0.4192,
+        "trades": 167,
+        "avg_confidence": 0.5831,
+        "calibration_gap": 0.1639
+      },
+      "KAUS.2024-05": {
+        "accuracy": 0.2678,
+        "trades": 183,
+        "avg_confidence": 0.6828,
+        "calibration_gap": 0.4151
+      },
+      "KAUS.2024-06": {
+        "accuracy": 0.24,
+        "trades": 125,
+        "avg_confidence": 0.6716,
+        "calibration_gap": 0.4316
+      },
+      "KAUS.2024-07": {
+        "accuracy": 0.42,
+        "trades": 150,
+        "avg_confidence": 0.6788,
+        "calibration_gap": 0.2588
+      },
+      "KAUS.2024-08": {
+        "accuracy": 0.25,
+        "trades": 140,
+        "avg_confidence": 0.6792,
+        "calibration_gap": 0.4292
+      },
+      "KAUS.2024-09": {
+        "accuracy": 0.3611,
+        "trades": 108,
+        "avg_confidence": 0.5917,
+        "calibration_gap": 0.2306
+      },
+      "KAUS.2024-10": {
+        "accuracy": 0.442,
+        "trades": 138,
+        "avg_confidence": 0.6383,
+        "calibration_gap": 0.1962
+      },
+      "KAUS.2024-11": {
+        "accuracy": 0.3607,
+        "trades": 183,
+        "avg_confidence": 0.6181,
+        "calibration_gap": 0.2575
+      },
+      "KAUS.2024-12": {
+        "accuracy": 0.395,
+        "trades": 200,
+        "avg_confidence": 0.6049,
+        "calibration_gap": 0.2099
+      },
+      "KAUS.2025-01": {
+        "accuracy": 0.3317,
+        "trades": 199,
+        "avg_confidence": 0.6505,
+        "calibration_gap": 0.3188
+      },
+      "KAUS.2025-02": {
+        "accuracy": 0.4136,
+        "trades": 191,
+        "avg_confidence": 0.6731,
+        "calibration_gap": 0.2595
+      },
+      "KAUS.2025-03": {
+        "accuracy": 0.403,
+        "trades": 201,
+        "avg_confidence": 0.6026,
+        "calibration_gap": 0.1996
+      },
+      "KAUS.2025-04": {
+        "accuracy": 0.3071,
+        "trades": 140,
+        "avg_confidence": 0.56,
+        "calibration_gap": 0.2529
+      },
+      "KAUS.2025-05": {
+        "accuracy": 0.2683,
+        "trades": 164,
+        "avg_confidence": 0.6623,
+        "calibration_gap": 0.394
+      },
+      "KAUS.2025-06": {
+        "accuracy": 0.2925,
+        "trades": 106,
+        "avg_confidence": 0.6146,
+        "calibration_gap": 0.3221
+      },
+      "KAUS.2025-07": {
+        "accuracy": 0.3525,
+        "trades": 122,
+        "avg_confidence": 0.648,
+        "calibration_gap": 0.2955
+      },
+      "KAUS.2025-08": {
+        "accuracy": 0.181,
+        "trades": 105,
+        "avg_confidence": 0.6727,
+        "calibration_gap": 0.4917
+      },
+      "KBOS.2022-01": {
+        "accuracy": 0.3476,
+        "trades": 210,
+        "avg_confidence": 0.6844,
+        "calibration_gap": 0.3368
+      },
+      "KBOS.2022-02": {
+        "accuracy": 0.4439,
+        "trades": 196,
+        "avg_confidence": 0.7181,
+        "calibration_gap": 0.2743
+      },
+      "KBOS.2022-03": {
+        "accuracy": 0.5,
+        "trades": 204,
+        "avg_confidence": 0.6537,
+        "calibration_gap": 0.1537
+      },
+      "KBOS.2022-04": {
+        "accuracy": 0.4467,
+        "trades": 197,
+        "avg_confidence": 0.635,
+        "calibration_gap": 0.1883
+      },
+      "KBOS.2022-05": {
+        "accuracy": 0.3518,
+        "trades": 199,
+        "avg_confidence": 0.6131,
+        "calibration_gap": 0.2613
+      },
+      "KBOS.2022-06": {
+        "accuracy": 0.382,
+        "trades": 178,
+        "avg_confidence": 0.6308,
+        "calibration_gap": 0.2488
+      },
+      "KBOS.2022-07": {
+        "accuracy": 0.2659,
+        "trades": 173,
+        "avg_confidence": 0.6676,
+        "calibration_gap": 0.4017
+      },
+      "KBOS.2022-08": {
+        "accuracy": 0.4518,
+        "trades": 197,
+        "avg_confidence": 0.67,
+        "calibration_gap": 0.2183
+      },
+      "KBOS.2022-09": {
+        "accuracy": 0.5,
+        "trades": 198,
+        "avg_confidence": 0.6522,
+        "calibration_gap": 0.1522
+      },
+      "KBOS.2022-10": {
+        "accuracy": 0.3698,
+        "trades": 192,
+        "avg_confidence": 0.659,
+        "calibration_gap": 0.2892
+      },
+      "KBOS.2022-11": {
+        "accuracy": 0.3615,
+        "trades": 213,
+        "avg_confidence": 0.6596,
+        "calibration_gap": 0.2981
+      },
+      "KBOS.2022-12": {
+        "accuracy": 0.3426,
+        "trades": 216,
+        "avg_confidence": 0.6654,
+        "calibration_gap": 0.3229
+      },
+      "KBOS.2023-01": {
+        "accuracy": 0.4293,
+        "trades": 191,
+        "avg_confidence": 0.645,
+        "calibration_gap": 0.2157
+      },
+      "KBOS.2023-02": {
+        "accuracy": 0.4663,
+        "trades": 193,
+        "avg_confidence": 0.6648,
+        "calibration_gap": 0.1985
+      },
+      "KBOS.2023-03": {
+        "accuracy": 0.4693,
+        "trades": 179,
+        "avg_confidence": 0.624,
+        "calibration_gap": 0.1547
+      },
+      "KBOS.2023-04": {
+        "accuracy": 0.3681,
+        "trades": 182,
+        "avg_confidence": 0.638,
+        "calibration_gap": 0.2699
+      },
+      "KBOS.2023-05": {
+        "accuracy": 0.4,
+        "trades": 215,
+        "avg_confidence": 0.6172,
+        "calibration_gap": 0.2172
+      },
+      "KBOS.2023-06": {
+        "accuracy": 0.3543,
+        "trades": 175,
+        "avg_confidence": 0.636,
+        "calibration_gap": 0.2817
+      },
+      "KBOS.2023-07": {
+        "accuracy": 0.2558,
+        "trades": 172,
+        "avg_confidence": 0.6598,
+        "calibration_gap": 0.404
+      },
+      "KBOS.2023-08": {
+        "accuracy": 0.4671,
+        "trades": 167,
+        "avg_confidence": 0.6073,
+        "calibration_gap": 0.1402
+      },
+      "KBOS.2023-09": {
+        "accuracy": 0.401,
+        "trades": 192,
+        "avg_confidence": 0.6635,
+        "calibration_gap": 0.2624
+      },
+      "KBOS.2023-10": {
+        "accuracy": 0.3947,
+        "trades": 190,
+        "avg_confidence": 0.6607,
+        "calibration_gap": 0.266
+      },
+      "KBOS.2023-11": {
+        "accuracy": 0.2991,
+        "trades": 214,
+        "avg_confidence": 0.6671,
+        "calibration_gap": 0.368
+      },
+      "KBOS.2023-12": {
+        "accuracy": 0.381,
+        "trades": 189,
+        "avg_confidence": 0.6243,
+        "calibration_gap": 0.2433
+      },
+      "KBOS.2024-01": {
+        "accuracy": 0.3383,
+        "trades": 201,
+        "avg_confidence": 0.6918,
+        "calibration_gap": 0.3535
+      },
+      "KBOS.2024-02": {
+        "accuracy": 0.454,
+        "trades": 163,
+        "avg_confidence": 0.6542,
+        "calibration_gap": 0.2002
+      },
+      "KBOS.2024-03": {
+        "accuracy": 0.4951,
+        "trades": 206,
+        "avg_confidence": 0.6512,
+        "calibration_gap": 0.156
+      },
+      "KBOS.2024-04": {
+        "accuracy": 0.466,
+        "trades": 206,
+        "avg_confidence": 0.6751,
+        "calibration_gap": 0.2091
+      },
+      "KBOS.2024-05": {
+        "accuracy": 0.3532,
+        "trades": 201,
+        "avg_confidence": 0.6122,
+        "calibration_gap": 0.259
+      },
+      "KBOS.2024-06": {
+        "accuracy": 0.3333,
+        "trades": 192,
+        "avg_confidence": 0.6227,
+        "calibration_gap": 0.2894
+      },
+      "KBOS.2024-07": {
+        "accuracy": 0.3827,
+        "trades": 162,
+        "avg_confidence": 0.6333,
+        "calibration_gap": 0.2506
+      },
+      "KBOS.2024-08": {
+        "accuracy": 0.4686,
+        "trades": 175,
+        "avg_confidence": 0.6314,
+        "calibration_gap": 0.1629
+      },
+      "KBOS.2024-09": {
+        "accuracy": 0.5246,
+        "trades": 183,
+        "avg_confidence": 0.6395,
+        "calibration_gap": 0.1149
+      },
+      "KBOS.2024-10": {
+        "accuracy": 0.3971,
+        "trades": 209,
+        "avg_confidence": 0.6731,
+        "calibration_gap": 0.276
+      },
+      "KBOS.2024-11": {
+        "accuracy": 0.351,
+        "trades": 208,
+        "avg_confidence": 0.6495,
+        "calibration_gap": 0.2985
+      },
+      "KBOS.2024-12": {
+        "accuracy": 0.344,
+        "trades": 218,
+        "avg_confidence": 0.7056,
+        "calibration_gap": 0.3615
+      },
+      "KBOS.2025-01": {
+        "accuracy": 0.373,
+        "trades": 185,
+        "avg_confidence": 0.6849,
+        "calibration_gap": 0.3119
+      },
+      "KBOS.2025-02": {
+        "accuracy": 0.4251,
+        "trades": 167,
+        "avg_confidence": 0.667,
+        "calibration_gap": 0.2418
+      },
+      "KBOS.2025-03": {
+        "accuracy": 0.5227,
+        "trades": 220,
+        "avg_confidence": 0.6677,
+        "calibration_gap": 0.145
+      },
+      "KBOS.2025-04": {
+        "accuracy": 0.4163,
+        "trades": 221,
+        "avg_confidence": 0.6838,
+        "calibration_gap": 0.2675
+      },
+      "KBOS.2025-05": {
+        "accuracy": 0.355,
+        "trades": 200,
+        "avg_confidence": 0.6038,
+        "calibration_gap": 0.2488
+      },
+      "KBOS.2025-06": {
+        "accuracy": 0.3415,
+        "trades": 205,
+        "avg_confidence": 0.6518,
+        "calibration_gap": 0.3103
+      },
+      "KBOS.2025-07": {
+        "accuracy": 0.3421,
+        "trades": 190,
+        "avg_confidence": 0.6561,
+        "calibration_gap": 0.314
+      },
+      "KBOS.2025-08": {
+        "accuracy": 0.4444,
+        "trades": 153,
+        "avg_confidence": 0.6288,
+        "calibration_gap": 0.1844
+      },
+      "KDCA.2022-01": {
+        "accuracy": 0.317,
+        "trades": 224,
+        "avg_confidence": 0.6869,
+        "calibration_gap": 0.37
+      },
+      "KDCA.2022-02": {
+        "accuracy": 0.5,
+        "trades": 190,
+        "avg_confidence": 0.6807,
+        "calibration_gap": 0.1807
+      },
+      "KDCA.2022-03": {
+        "accuracy": 0.4131,
+        "trades": 213,
+        "avg_confidence": 0.6726,
+        "calibration_gap": 0.2594
+      },
+      "KDCA.2022-04": {
+        "accuracy": 0.4352,
+        "trades": 193,
+        "avg_confidence": 0.6413,
+        "calibration_gap": 0.2061
+      },
+      "KDCA.2022-05": {
+        "accuracy": 0.3053,
+        "trades": 190,
+        "avg_confidence": 0.6135,
+        "calibration_gap": 0.3082
+      },
+      "KDCA.2022-06": {
+        "accuracy": 0.3526,
+        "trades": 173,
+        "avg_confidence": 0.6487,
+        "calibration_gap": 0.2961
+      },
+      "KDCA.2022-07": {
+        "accuracy": 0.2621,
+        "trades": 145,
+        "avg_confidence": 0.6654,
+        "calibration_gap": 0.4033
+      },
+      "KDCA.2022-08": {
+        "accuracy": 0.38,
+        "trades": 150,
+        "avg_confidence": 0.6548,
+        "calibration_gap": 0.2748
+      },
+      "KDCA.2022-09": {
+        "accuracy": 0.4709,
+        "trades": 172,
+        "avg_confidence": 0.6623,
+        "calibration_gap": 0.1913
+      },
+      "KDCA.2022-10": {
+        "accuracy": 0.3228,
+        "trades": 189,
+        "avg_confidence": 0.6568,
+        "calibration_gap": 0.334
+      },
+      "KDCA.2022-11": {
+        "accuracy": 0.3646,
+        "trades": 192,
+        "avg_confidence": 0.6365,
+        "calibration_gap": 0.2719
+      },
+      "KDCA.2022-12": {
+        "accuracy": 0.3061,
+        "trades": 196,
+        "avg_confidence": 0.6512,
+        "calibration_gap": 0.3451
+      },
+      "KDCA.2023-01": {
+        "accuracy": 0.4722,
+        "trades": 180,
+        "avg_confidence": 0.5842,
+        "calibration_gap": 0.1119
+      },
+      "KDCA.2023-02": {
+        "accuracy": 0.462,
+        "trades": 184,
+        "avg_confidence": 0.6551,
+        "calibration_gap": 0.1931
+      },
+      "KDCA.2023-03": {
+        "accuracy": 0.4315,
+        "trades": 197,
+        "avg_confidence": 0.6459,
+        "calibration_gap": 0.2144
+      },
+      "KDCA.2023-04": {
+        "accuracy": 0.3483,
+        "trades": 201,
+        "avg_confidence": 0.6468,
+        "calibration_gap": 0.2986
+      },
+      "KDCA.2023-05": {
+        "accuracy": 0.35,
+        "trades": 160,
+        "avg_confidence": 0.5468,
+        "calibration_gap": 0.1968
+      },
+      "KDCA.2023-06": {
+        "accuracy": 0.3039,
+        "trades": 181,
+        "avg_confidence": 0.65,
+        "calibration_gap": 0.3461
+      },
+      "KDCA.2023-07": {
+        "accuracy": 0.2482,
+        "trades": 141,
+        "avg_confidence": 0.6795,
+        "calibration_gap": 0.4313
+      },
+      "KDCA.2023-08": {
+        "accuracy": 0.4568,
+        "trades": 162,
+        "avg_confidence": 0.6491,
+        "calibration_gap": 0.1923
+      },
+      "KDCA.2023-09": {
+        "accuracy": 0.4121,
+        "trades": 199,
+        "avg_confidence": 0.6869,
+        "calibration_gap": 0.2748
+      },
+      "KDCA.2023-10": {
+        "accuracy": 0.3121,
+        "trades": 173,
+        "avg_confidence": 0.6529,
+        "calibration_gap": 0.3407
+      },
+      "KDCA.2023-11": {
+        "accuracy": 0.2843,
+        "trades": 204,
+        "avg_confidence": 0.6492,
+        "calibration_gap": 0.3649
+      },
+      "KDCA.2023-12": {
+        "accuracy": 0.3647,
+        "trades": 170,
+        "avg_confidence": 0.5744,
+        "calibration_gap": 0.2097
+      },
+      "KDCA.2024-01": {
+        "accuracy": 0.3493,
+        "trades": 209,
+        "avg_confidence": 0.6664,
+        "calibration_gap": 0.3171
+      },
+      "KDCA.2024-02": {
+        "accuracy": 0.4527,
+        "trades": 148,
+        "avg_confidence": 0.5805,
+        "calibration_gap": 0.1278
+      },
+      "KDCA.2024-03": {
+        "accuracy": 0.4244,
+        "trades": 205,
+        "avg_confidence": 0.6669,
+        "calibration_gap": 0.2425
+      },
+      "KDCA.2024-04": {
+        "accuracy": 0.381,
+        "trades": 189,
+        "avg_confidence": 0.6369,
+        "calibration_gap": 0.256
+      },
+      "KDCA.2024-05": {
+        "accuracy": 0.3632,
+        "trades": 190,
+        "avg_confidence": 0.6334,
+        "calibration_gap": 0.2702
+      },
+      "KDCA.2024-06": {
+        "accuracy": 0.2616,
+        "trades": 172,
+        "avg_confidence": 0.6787,
+        "calibration_gap": 0.417
+      },
+      "KDCA.2024-07": {
+        "accuracy": 0.3742,
+        "trades": 163,
+        "avg_confidence": 0.6824,
+        "calibration_gap": 0.3082
+      },
+      "KDCA.2024-08": {
+        "accuracy": 0.474,
+        "trades": 173,
+        "avg_confidence": 0.6635,
+        "calibration_gap": 0.1896
+      },
+      "KDCA.2024-09": {
+        "accuracy": 0.512,
+        "trades": 166,
+        "avg_confidence": 0.6357,
+        "calibration_gap": 0.1236
+      },
+      "KDCA.2024-10": {
+        "accuracy": 0.3368,
+        "trades": 190,
+        "avg_confidence": 0.6515,
+        "calibration_gap": 0.3146
+      },
+      "KDCA.2024-11": {
+        "accuracy": 0.3547,
+        "trades": 203,
+        "avg_confidence": 0.6474,
+        "calibration_gap": 0.2927
+      },
+      "KDCA.2024-12": {
+        "accuracy": 0.3213,
+        "trades": 221,
+        "avg_confidence": 0.6784,
+        "calibration_gap": 0.3571
+      },
+      "KDCA.2025-01": {
+        "accuracy": 0.3819,
+        "trades": 199,
+        "avg_confidence": 0.6881,
+        "calibration_gap": 0.3062
+      },
+      "KDCA.2025-02": {
+        "accuracy": 0.4798,
+        "trades": 173,
+        "avg_confidence": 0.6721,
+        "calibration_gap": 0.1923
+      },
+      "KDCA.2025-03": {
+        "accuracy": 0.463,
+        "trades": 216,
+        "avg_confidence": 0.6736,
+        "calibration_gap": 0.2106
+      },
+      "KDCA.2025-04": {
+        "accuracy": 0.3873,
+        "trades": 204,
+        "avg_confidence": 0.6419,
+        "calibration_gap": 0.2547
+      },
+      "KDCA.2025-05": {
+        "accuracy": 0.3023,
+        "trades": 172,
+        "avg_confidence": 0.5927,
+        "calibration_gap": 0.2904
+      },
+      "KDCA.2025-06": {
+        "accuracy": 0.3048,
+        "trades": 187,
+        "avg_confidence": 0.6891,
+        "calibration_gap": 0.3843
+      },
+      "KDCA.2025-07": {
+        "accuracy": 0.2901,
+        "trades": 131,
+        "avg_confidence": 0.6291,
+        "calibration_gap": 0.339
+      },
+      "KDCA.2025-08": {
+        "accuracy": 0.507,
+        "trades": 142,
+        "avg_confidence": 0.6811,
+        "calibration_gap": 0.1741
+      },
+      "KDEN.2022-01": {
+        "accuracy": 0.375,
+        "trades": 200,
+        "avg_confidence": 0.6894,
+        "calibration_gap": 0.3144
+      },
+      "KDEN.2022-02": {
+        "accuracy": 0.4184,
+        "trades": 196,
+        "avg_confidence": 0.7056,
+        "calibration_gap": 0.2872
+      },
+      "KDEN.2022-03": {
+        "accuracy": 0.3919,
+        "trades": 222,
+        "avg_confidence": 0.7184,
+        "calibration_gap": 0.3266
+      },
+      "KDEN.2022-04": {
+        "accuracy": 0.3834,
+        "trades": 193,
+        "avg_confidence": 0.6726,
+        "calibration_gap": 0.2892
+      },
+      "KDEN.2022-05": {
+        "accuracy": 0.3088,
+        "trades": 217,
+        "avg_confidence": 0.6372,
+        "calibration_gap": 0.3284
+      },
+      "KDEN.2022-06": {
+        "accuracy": 0.3194,
+        "trades": 191,
+        "avg_confidence": 0.649,
+        "calibration_gap": 0.3296
+      },
+      "KDEN.2022-07": {
+        "accuracy": 0.3245,
+        "trades": 151,
+        "avg_confidence": 0.6389,
+        "calibration_gap": 0.3144
+      },
+      "KDEN.2022-08": {
+        "accuracy": 0.4459,
+        "trades": 148,
+        "avg_confidence": 0.6386,
+        "calibration_gap": 0.1927
+      },
+      "KDEN.2022-09": {
+        "accuracy": 0.451,
+        "trades": 153,
+        "avg_confidence": 0.6398,
+        "calibration_gap": 0.1889
+      },
+      "KDEN.2022-10": {
+        "accuracy": 0.3592,
+        "trades": 206,
+        "avg_confidence": 0.6862,
+        "calibration_gap": 0.327
+      },
+      "KDEN.2022-11": {
+        "accuracy": 0.3382,
+        "trades": 204,
+        "avg_confidence": 0.6819,
+        "calibration_gap": 0.3436
+      },
+      "KDEN.2022-12": {
+        "accuracy": 0.3881,
+        "trades": 201,
+        "avg_confidence": 0.6912,
+        "calibration_gap": 0.3031
+      },
+      "KDEN.2023-01": {
+        "accuracy": 0.3587,
+        "trades": 184,
+        "avg_confidence": 0.699,
+        "calibration_gap": 0.3403
+      },
+      "KDEN.2023-02": {
+        "accuracy": 0.4894,
+        "trades": 188,
+        "avg_confidence": 0.7121,
+        "calibration_gap": 0.2227
+      },
+      "KDEN.2023-03": {
+        "accuracy": 0.4451,
+        "trades": 182,
+        "avg_confidence": 0.6546,
+        "calibration_gap": 0.2096
+      },
+      "KDEN.2023-04": {
+        "accuracy": 0.3674,
+        "trades": 215,
+        "avg_confidence": 0.7031,
+        "calibration_gap": 0.3357
+      },
+      "KDEN.2023-05": {
+        "accuracy": 0.3049,
+        "trades": 164,
+        "avg_confidence": 0.5752,
+        "calibration_gap": 0.2703
+      },
+      "KDEN.2023-06": {
+        "accuracy": 0.3006,
+        "trades": 173,
+        "avg_confidence": 0.6017,
+        "calibration_gap": 0.3011
+      },
+      "KDEN.2023-07": {
+        "accuracy": 0.2611,
+        "trades": 180,
+        "avg_confidence": 0.6594,
+        "calibration_gap": 0.3983
+      },
+      "KDEN.2023-08": {
+        "accuracy": 0.3988,
+        "trades": 173,
+        "avg_confidence": 0.6311,
+        "calibration_gap": 0.2323
+      },
+      "KDEN.2023-09": {
+        "accuracy": 0.4403,
+        "trades": 159,
+        "avg_confidence": 0.6415,
+        "calibration_gap": 0.2013
+      },
+      "KDEN.2023-10": {
+        "accuracy": 0.3564,
+        "trades": 202,
+        "avg_confidence": 0.6709,
+        "calibration_gap": 0.3145
+      },
+      "KDEN.2023-11": {
+        "accuracy": 0.3,
+        "trades": 180,
+        "avg_confidence": 0.6424,
+        "calibration_gap": 0.3424
+      },
+      "KDEN.2023-12": {
+        "accuracy": 0.3906,
+        "trades": 192,
+        "avg_confidence": 0.6708,
+        "calibration_gap": 0.2802
+      },
+      "KDEN.2024-01": {
+        "accuracy": 0.4041,
+        "trades": 193,
+        "avg_confidence": 0.7081,
+        "calibration_gap": 0.304
+      },
+      "KDEN.2024-02": {
+        "accuracy": 0.4972,
+        "trades": 177,
+        "avg_confidence": 0.6452,
+        "calibration_gap": 0.148
+      },
+      "KDEN.2024-03": {
+        "accuracy": 0.4564,
+        "trades": 195,
+        "avg_confidence": 0.6897,
+        "calibration_gap": 0.2333
+      },
+      "KDEN.2024-04": {
+        "accuracy": 0.3828,
+        "trades": 209,
+        "avg_confidence": 0.674,
+        "calibration_gap": 0.2912
+      },
+      "KDEN.2024-05": {
+        "accuracy": 0.3777,
+        "trades": 188,
+        "avg_confidence": 0.5961,
+        "calibration_gap": 0.2185
+      },
+      "KDEN.2024-06": {
+        "accuracy": 0.2233,
+        "trades": 206,
+        "avg_confidence": 0.691,
+        "calibration_gap": 0.4677
+      },
+      "KDEN.2024-07": {
+        "accuracy": 0.3585,
+        "trades": 159,
+        "avg_confidence": 0.633,
+        "calibration_gap": 0.2745
+      },
+      "KDEN.2024-08": {
+        "accuracy": 0.3557,
+        "trades": 149,
+        "avg_confidence": 0.6154,
+        "calibration_gap": 0.2597
+      },
+      "KDEN.2024-09": {
+        "accuracy": 0.4437,
+        "trades": 151,
+        "avg_confidence": 0.6224,
+        "calibration_gap": 0.1787
+      },
+      "KDEN.2024-10": {
+        "accuracy": 0.4918,
+        "trades": 183,
+        "avg_confidence": 0.6483,
+        "calibration_gap": 0.1565
+      },
+      "KDEN.2024-11": {
+        "accuracy": 0.2843,
+        "trades": 204,
+        "avg_confidence": 0.671,
+        "calibration_gap": 0.3867
+      },
+      "KDEN.2024-12": {
+        "accuracy": 0.4464,
+        "trades": 168,
+        "avg_confidence": 0.6177,
+        "calibration_gap": 0.1712
+      },
+      "KDEN.2025-01": {
+        "accuracy": 0.3286,
+        "trades": 213,
+        "avg_confidence": 0.729,
+        "calibration_gap": 0.4003
+      },
+      "KDEN.2025-02": {
+        "accuracy": 0.4569,
+        "trades": 197,
+        "avg_confidence": 0.7264,
+        "calibration_gap": 0.2695
+      },
+      "KDEN.2025-03": {
+        "accuracy": 0.4421,
+        "trades": 190,
+        "avg_confidence": 0.6855,
+        "calibration_gap": 0.2434
+      },
+      "KDEN.2025-04": {
+        "accuracy": 0.35,
+        "trades": 200,
+        "avg_confidence": 0.6836,
+        "calibration_gap": 0.3336
+      },
+      "KDEN.2025-05": {
+        "accuracy": 0.3613,
+        "trades": 191,
+        "avg_confidence": 0.621,
+        "calibration_gap": 0.2597
+      },
+      "KDEN.2025-06": {
+        "accuracy": 0.209,
+        "trades": 177,
+        "avg_confidence": 0.6463,
+        "calibration_gap": 0.4373
+      },
+      "KDEN.2025-07": {
+        "accuracy": 0.3165,
+        "trades": 158,
+        "avg_confidence": 0.6454,
+        "calibration_gap": 0.329
+      },
+      "KDEN.2025-08": {
+        "accuracy": 0.4,
+        "trades": 150,
+        "avg_confidence": 0.6316,
+        "calibration_gap": 0.2316
+      },
+      "KDFW.2022-01": {
+        "accuracy": 0.3317,
+        "trades": 208,
+        "avg_confidence": 0.6505,
+        "calibration_gap": 0.3188
+      },
+      "KDFW.2022-02": {
+        "accuracy": 0.4171,
+        "trades": 199,
+        "avg_confidence": 0.671,
+        "calibration_gap": 0.254
+      },
+      "KDFW.2022-03": {
+        "accuracy": 0.4623,
+        "trades": 212,
+        "avg_confidence": 0.655,
+        "calibration_gap": 0.1927
+      },
+      "KDFW.2022-04": {
+        "accuracy": 0.4246,
+        "trades": 179,
+        "avg_confidence": 0.6011,
+        "calibration_gap": 0.1765
+      },
+      "KDFW.2022-05": {
+        "accuracy": 0.2646,
+        "trades": 189,
+        "avg_confidence": 0.704,
+        "calibration_gap": 0.4395
+      },
+      "KDFW.2022-06": {
+        "accuracy": 0.2675,
+        "trades": 157,
+        "avg_confidence": 0.6942,
+        "calibration_gap": 0.4266
+      },
+      "KDFW.2022-07": {
+        "accuracy": 0.246,
+        "trades": 126,
+        "avg_confidence": 0.6648,
+        "calibration_gap": 0.4187
+      },
+      "KDFW.2022-08": {
+        "accuracy": 0.5,
+        "trades": 136,
+        "avg_confidence": 0.6756,
+        "calibration_gap": 0.1756
+      },
+      "KDFW.2022-09": {
+        "accuracy": 0.4861,
+        "trades": 144,
+        "avg_confidence": 0.6396,
+        "calibration_gap": 0.1535
+      },
+      "KDFW.2022-10": {
+        "accuracy": 0.3969,
+        "trades": 194,
+        "avg_confidence": 0.6677,
+        "calibration_gap": 0.2708
+      },
+      "KDFW.2022-11": {
+        "accuracy": 0.3246,
+        "trades": 191,
+        "avg_confidence": 0.6263,
+        "calibration_gap": 0.3017
+      },
+      "KDFW.2022-12": {
+        "accuracy": 0.3798,
+        "trades": 208,
+        "avg_confidence": 0.6322,
+        "calibration_gap": 0.2524
+      },
+      "KDFW.2023-01": {
+        "accuracy": 0.4337,
+        "trades": 196,
+        "avg_confidence": 0.6253,
+        "calibration_gap": 0.1917
+      },
+      "KDFW.2023-02": {
+        "accuracy": 0.4158,
+        "trades": 202,
+        "avg_confidence": 0.6539,
+        "calibration_gap": 0.2381
+      },
+      "KDFW.2023-03": {
+        "accuracy": 0.4229,
+        "trades": 201,
+        "avg_confidence": 0.6502,
+        "calibration_gap": 0.2273
+      },
+      "KDFW.2023-04": {
+        "accuracy": 0.3873,
+        "trades": 173,
+        "avg_confidence": 0.5877,
+        "calibration_gap": 0.2004
+      },
+      "KDFW.2023-05": {
+        "accuracy": 0.3375,
+        "trades": 160,
+        "avg_confidence": 0.663,
+        "calibration_gap": 0.3255
+      },
+      "KDFW.2023-06": {
+        "accuracy": 0.1887,
+        "trades": 159,
+        "avg_confidence": 0.7067,
+        "calibration_gap": 0.518
+      },
+      "KDFW.2023-07": {
+        "accuracy": 0.2681,
+        "trades": 138,
+        "avg_confidence": 0.6592,
+        "calibration_gap": 0.391
+      },
+      "KDFW.2023-08": {
+        "accuracy": 0.2675,
+        "trades": 157,
+        "avg_confidence": 0.7077,
+        "calibration_gap": 0.4402
+      },
+      "KDFW.2023-09": {
+        "accuracy": 0.481,
+        "trades": 158,
+        "avg_confidence": 0.6502,
+        "calibration_gap": 0.1692
+      },
+      "KDFW.2023-10": {
+        "accuracy": 0.3498,
+        "trades": 203,
+        "avg_confidence": 0.6619,
+        "calibration_gap": 0.3121
+      },
+      "KDFW.2023-11": {
+        "accuracy": 0.2718,
+        "trades": 195,
+        "avg_confidence": 0.6198,
+        "calibration_gap": 0.348
+      },
+      "KDFW.2023-12": {
+        "accuracy": 0.3714,
+        "trades": 175,
+        "avg_confidence": 0.5645,
+        "calibration_gap": 0.193
+      },
+      "KDFW.2024-01": {
+        "accuracy": 0.3821,
+        "trades": 212,
+        "avg_confidence": 0.6524,
+        "calibration_gap": 0.2703
+      },
+      "KDFW.2024-02": {
+        "accuracy": 0.4921,
+        "trades": 191,
+        "avg_confidence": 0.6243,
+        "calibration_gap": 0.1322
+      },
+      "KDFW.2024-03": {
+        "accuracy": 0.3789,
+        "trades": 190,
+        "avg_confidence": 0.6257,
+        "calibration_gap": 0.2468
+      },
+      "KDFW.2024-04": {
+        "accuracy": 0.3889,
+        "trades": 180,
+        "avg_confidence": 0.5962,
+        "calibration_gap": 0.2073
+      },
+      "KDFW.2024-05": {
+        "accuracy": 0.2814,
+        "trades": 167,
+        "avg_confidence": 0.6665,
+        "calibration_gap": 0.385
+      },
+      "KDFW.2024-06": {
+        "accuracy": 0.2313,
+        "trades": 147,
+        "avg_confidence": 0.6873,
+        "calibration_gap": 0.456
+      },
+      "KDFW.2024-07": {
+        "accuracy": 0.3636,
+        "trades": 143,
+        "avg_confidence": 0.6876,
+        "calibration_gap": 0.3239
+      },
+      "KDFW.2024-08": {
+        "accuracy": 0.2667,
+        "trades": 135,
+        "avg_confidence": 0.6806,
+        "calibration_gap": 0.4139
+      },
+      "KDFW.2024-09": {
+        "accuracy": 0.4718,
+        "trades": 142,
+        "avg_confidence": 0.6347,
+        "calibration_gap": 0.1629
+      },
+      "KDFW.2024-10": {
+        "accuracy": 0.3767,
+        "trades": 146,
+        "avg_confidence": 0.6101,
+        "calibration_gap": 0.2334
+      },
+      "KDFW.2024-11": {
+        "accuracy": 0.3399,
+        "trades": 203,
+        "avg_confidence": 0.6258,
+        "calibration_gap": 0.2859
+      },
+      "KDFW.2024-12": {
+        "accuracy": 0.3365,
+        "trades": 211,
+        "avg_confidence": 0.6184,
+        "calibration_gap": 0.2819
+      },
+      "KDFW.2025-01": {
+        "accuracy": 0.3706,
+        "trades": 197,
+        "avg_confidence": 0.6509,
+        "calibration_gap": 0.2804
+      },
+      "KDFW.2025-02": {
+        "accuracy": 0.4286,
+        "trades": 210,
+        "avg_confidence": 0.6868,
+        "calibration_gap": 0.2582
+      },
+      "KDFW.2025-03": {
+        "accuracy": 0.4634,
+        "trades": 205,
+        "avg_confidence": 0.6327,
+        "calibration_gap": 0.1693
+      },
+      "KDFW.2025-04": {
+        "accuracy": 0.3742,
+        "trades": 155,
+        "avg_confidence": 0.5716,
+        "calibration_gap": 0.1974
+      },
+      "KDFW.2025-05": {
+        "accuracy": 0.2722,
+        "trades": 158,
+        "avg_confidence": 0.6299,
+        "calibration_gap": 0.3577
+      },
+      "KDFW.2025-06": {
+        "accuracy": 0.2518,
+        "trades": 139,
+        "avg_confidence": 0.6832,
+        "calibration_gap": 0.4314
+      },
+      "KDFW.2025-07": {
+        "accuracy": 0.216,
+        "trades": 125,
+        "avg_confidence": 0.694,
+        "calibration_gap": 0.478
+      },
+      "KDFW.2025-08": {
+        "accuracy": 0.25,
+        "trades": 100,
+        "avg_confidence": 0.6426,
+        "calibration_gap": 0.3926
+      },
+      "KHOU.2022-01": {
+        "accuracy": 0.3155,
+        "trades": 206,
+        "avg_confidence": 0.6184,
+        "calibration_gap": 0.3029
+      },
+      "KHOU.2022-02": {
+        "accuracy": 0.4208,
+        "trades": 183,
+        "avg_confidence": 0.6347,
+        "calibration_gap": 0.214
+      },
+      "KHOU.2022-03": {
+        "accuracy": 0.5079,
+        "trades": 189,
+        "avg_confidence": 0.6299,
+        "calibration_gap": 0.1219
+      },
+      "KHOU.2022-04": {
+        "accuracy": 0.4437,
+        "trades": 151,
+        "avg_confidence": 0.5591,
+        "calibration_gap": 0.1154
+      },
+      "KHOU.2022-05": {
+        "accuracy": 0.1977,
+        "trades": 172,
+        "avg_confidence": 0.7347,
+        "calibration_gap": 0.537
+      },
+      "KHOU.2022-06": {
+        "accuracy": 0.2308,
+        "trades": 143,
+        "avg_confidence": 0.7009,
+        "calibration_gap": 0.4701
+      },
+      "KHOU.2022-07": {
+        "accuracy": 0.3443,
+        "trades": 122,
+        "avg_confidence": 0.654,
+        "calibration_gap": 0.3098
+      },
+      "KHOU.2022-08": {
+        "accuracy": 0.4766,
+        "trades": 128,
+        "avg_confidence": 0.6441,
+        "calibration_gap": 0.1675
+      },
+      "KHOU.2022-09": {
+        "accuracy": 0.3966,
+        "trades": 116,
+        "avg_confidence": 0.605,
+        "calibration_gap": 0.2084
+      },
+      "KHOU.2022-10": {
+        "accuracy": 0.4034,
+        "trades": 176,
+        "avg_confidence": 0.6711,
+        "calibration_gap": 0.2677
+      },
+      "KHOU.2022-11": {
+        "accuracy": 0.3143,
+        "trades": 175,
+        "avg_confidence": 0.6229,
+        "calibration_gap": 0.3086
+      },
+      "KHOU.2022-12": {
+        "accuracy": 0.3881,
+        "trades": 201,
+        "avg_confidence": 0.6261,
+        "calibration_gap": 0.2381
+      },
+      "KHOU.2023-01": {
+        "accuracy": 0.4402,
+        "trades": 184,
+        "avg_confidence": 0.5835,
+        "calibration_gap": 0.1433
+      },
+      "KHOU.2023-02": {
+        "accuracy": 0.4474,
+        "trades": 190,
+        "avg_confidence": 0.65,
+        "calibration_gap": 0.2026
+      },
+      "KHOU.2023-03": {
+        "accuracy": 0.3729,
+        "trades": 177,
+        "avg_confidence": 0.6077,
+        "calibration_gap": 0.2348
+      },
+      "KHOU.2023-04": {
+        "accuracy": 0.3727,
+        "trades": 161,
+        "avg_confidence": 0.5627,
+        "calibration_gap": 0.19
+      },
+      "KHOU.2023-05": {
+        "accuracy": 0.3288,
+        "trades": 146,
+        "avg_confidence": 0.6594,
+        "calibration_gap": 0.3306
+      },
+      "KHOU.2023-06": {
+        "accuracy": 0.1583,
+        "trades": 139,
+        "avg_confidence": 0.7279,
+        "calibration_gap": 0.5696
+      },
+      "KHOU.2023-07": {
+        "accuracy": 0.2759,
+        "trades": 116,
+        "avg_confidence": 0.6585,
+        "calibration_gap": 0.3827
+      },
+      "KHOU.2023-08": {
+        "accuracy": 0.2,
+        "trades": 150,
+        "avg_confidence": 0.7023,
+        "calibration_gap": 0.5023
+      },
+      "KHOU.2023-09": {
+        "accuracy": 0.5333,
+        "trades": 135,
+        "avg_confidence": 0.6538,
+        "calibration_gap": 0.1205
+      },
+      "KHOU.2023-10": {
+        "accuracy": 0.3239,
+        "trades": 176,
+        "avg_confidence": 0.6507,
+        "calibration_gap": 0.3268
+      },
+      "KHOU.2023-11": {
+        "accuracy": 0.2746,
+        "trades": 193,
+        "avg_confidence": 0.6221,
+        "calibration_gap": 0.3475
+      },
+      "KHOU.2023-12": {
+        "accuracy": 0.3678,
+        "trades": 174,
+        "avg_confidence": 0.5567,
+        "calibration_gap": 0.1888
+      },
+      "KHOU.2024-01": {
+        "accuracy": 0.4103,
+        "trades": 195,
+        "avg_confidence": 0.616,
+        "calibration_gap": 0.2057
+      },
+      "KHOU.2024-02": {
+        "accuracy": 0.5486,
+        "trades": 175,
+        "avg_confidence": 0.6014,
+        "calibration_gap": 0.0528
+      },
+      "KHOU.2024-03": {
+        "accuracy": 0.3846,
+        "trades": 182,
+        "avg_confidence": 0.5818,
+        "calibration_gap": 0.1972
+      },
+      "KHOU.2024-04": {
+        "accuracy": 0.4177,
+        "trades": 158,
+        "avg_confidence": 0.5567,
+        "calibration_gap": 0.139
+      },
+      "KHOU.2024-05": {
+        "accuracy": 0.2754,
+        "trades": 167,
+        "avg_confidence": 0.6919,
+        "calibration_gap": 0.4164
+      },
+      "KHOU.2024-06": {
+        "accuracy": 0.2248,
+        "trades": 129,
+        "avg_confidence": 0.6737,
+        "calibration_gap": 0.4489
+      },
+      "KHOU.2024-07": {
+        "accuracy": 0.3581,
+        "trades": 148,
+        "avg_confidence": 0.6864,
+        "calibration_gap": 0.3283
+      },
+      "KHOU.2024-08": {
+        "accuracy": 0.2761,
+        "trades": 134,
+        "avg_confidence": 0.69,
+        "calibration_gap": 0.4139
+      },
+      "KHOU.2024-09": {
+        "accuracy": 0.3596,
+        "trades": 114,
+        "avg_confidence": 0.6164,
+        "calibration_gap": 0.2567
+      },
+      "KHOU.2024-10": {
+        "accuracy": 0.4184,
+        "trades": 141,
+        "avg_confidence": 0.6373,
+        "calibration_gap": 0.2189
+      },
+      "KHOU.2024-11": {
+        "accuracy": 0.3468,
+        "trades": 173,
+        "avg_confidence": 0.595,
+        "calibration_gap": 0.2482
+      },
+      "KHOU.2024-12": {
+        "accuracy": 0.3469,
+        "trades": 196,
+        "avg_confidence": 0.6188,
+        "calibration_gap": 0.2719
+      },
+      "KHOU.2025-01": {
+        "accuracy": 0.3349,
+        "trades": 212,
+        "avg_confidence": 0.6304,
+        "calibration_gap": 0.2955
+      },
+      "KHOU.2025-02": {
+        "accuracy": 0.4536,
+        "trades": 183,
+        "avg_confidence": 0.6323,
+        "calibration_gap": 0.1788
+      },
+      "KHOU.2025-03": {
+        "accuracy": 0.3812,
+        "trades": 181,
+        "avg_confidence": 0.5782,
+        "calibration_gap": 0.197
+      },
+      "KHOU.2025-04": {
+        "accuracy": 0.2667,
+        "trades": 135,
+        "avg_confidence": 0.5483,
+        "calibration_gap": 0.2816
+      },
+      "KHOU.2025-05": {
+        "accuracy": 0.2671,
+        "trades": 146,
+        "avg_confidence": 0.6626,
+        "calibration_gap": 0.3955
+      },
+      "KHOU.2025-06": {
+        "accuracy": 0.2909,
+        "trades": 110,
+        "avg_confidence": 0.6592,
+        "calibration_gap": 0.3683
+      },
+      "KHOU.2025-07": {
+        "accuracy": 0.2791,
+        "trades": 129,
+        "avg_confidence": 0.6696,
+        "calibration_gap": 0.3905
+      },
+      "KHOU.2025-08": {
+        "accuracy": 0.3136,
+        "trades": 118,
+        "avg_confidence": 0.6456,
+        "calibration_gap": 0.332
+      },
+      "KLAS.2022-01": {
+        "accuracy": 0.4934,
+        "trades": 152,
+        "avg_confidence": 0.5658,
+        "calibration_gap": 0.0724
+      },
+      "KLAS.2022-02": {
+        "accuracy": 0.5,
+        "trades": 180,
+        "avg_confidence": 0.6206,
+        "calibration_gap": 0.1206
+      },
+      "KLAS.2022-03": {
+        "accuracy": 0.4563,
+        "trades": 206,
+        "avg_confidence": 0.6445,
+        "calibration_gap": 0.1882
+      },
+      "KLAS.2022-04": {
+        "accuracy": 0.3204,
+        "trades": 181,
+        "avg_confidence": 0.5991,
+        "calibration_gap": 0.2786
+      },
+      "KLAS.2022-05": {
+        "accuracy": 0.3462,
+        "trades": 208,
+        "avg_confidence": 0.7015,
+        "calibration_gap": 0.3554
+      },
+      "KLAS.2022-06": {
+        "accuracy": 0.3184,
+        "trades": 179,
+        "avg_confidence": 0.6952,
+        "calibration_gap": 0.3768
+      },
+      "KLAS.2022-07": {
+        "accuracy": 0.2945,
+        "trades": 146,
+        "avg_confidence": 0.6931,
+        "calibration_gap": 0.3985
+      },
+      "KLAS.2022-08": {
+        "accuracy": 0.4444,
+        "trades": 144,
+        "avg_confidence": 0.6512,
+        "calibration_gap": 0.2068
+      },
+      "KLAS.2022-09": {
+        "accuracy": 0.44,
+        "trades": 150,
+        "avg_confidence": 0.6895,
+        "calibration_gap": 0.2495
+      },
+      "KLAS.2022-10": {
+        "accuracy": 0.4365,
+        "trades": 181,
+        "avg_confidence": 0.7025,
+        "calibration_gap": 0.266
+      },
+      "KLAS.2022-11": {
+        "accuracy": 0.2462,
+        "trades": 195,
+        "avg_confidence": 0.643,
+        "calibration_gap": 0.3968
+      },
+      "KLAS.2022-12": {
+        "accuracy": 0.3605,
+        "trades": 172,
+        "avg_confidence": 0.602,
+        "calibration_gap": 0.2415
+      },
+      "KLAS.2023-01": {
+        "accuracy": 0.3617,
+        "trades": 141,
+        "avg_confidence": 0.5557,
+        "calibration_gap": 0.1939
+      },
+      "KLAS.2023-02": {
+        "accuracy": 0.4837,
+        "trades": 184,
+        "avg_confidence": 0.6199,
+        "calibration_gap": 0.1362
+      },
+      "KLAS.2023-03": {
+        "accuracy": 0.4691,
+        "trades": 162,
+        "avg_confidence": 0.6253,
+        "calibration_gap": 0.1561
+      },
+      "KLAS.2023-04": {
+        "accuracy": 0.4323,
+        "trades": 229,
+        "avg_confidence": 0.6519,
+        "calibration_gap": 0.2196
+      },
+      "KLAS.2023-05": {
+        "accuracy": 0.2308,
+        "trades": 156,
+        "avg_confidence": 0.6625,
+        "calibration_gap": 0.4317
+      },
+      "KLAS.2023-06": {
+        "accuracy": 0.3307,
+        "trades": 127,
+        "avg_confidence": 0.6735,
+        "calibration_gap": 0.3428
+      },
+      "KLAS.2023-07": {
+        "accuracy": 0.1618,
+        "trades": 173,
+        "avg_confidence": 0.718,
+        "calibration_gap": 0.5561
+      },
+      "KLAS.2023-08": {
+        "accuracy": 0.4755,
+        "trades": 143,
+        "avg_confidence": 0.6672,
+        "calibration_gap": 0.1917
+      },
+      "KLAS.2023-09": {
+        "accuracy": 0.4795,
+        "trades": 146,
+        "avg_confidence": 0.6346,
+        "calibration_gap": 0.1552
+      },
+      "KLAS.2023-10": {
+        "accuracy": 0.3263,
+        "trades": 190,
+        "avg_confidence": 0.656,
+        "calibration_gap": 0.3297
+      },
+      "KLAS.2023-11": {
+        "accuracy": 0.241,
+        "trades": 195,
+        "avg_confidence": 0.6242,
+        "calibration_gap": 0.3831
+      },
+      "KLAS.2023-12": {
+        "accuracy": 0.3542,
+        "trades": 144,
+        "avg_confidence": 0.5656,
+        "calibration_gap": 0.2115
+      },
+      "KLAS.2024-01": {
+        "accuracy": 0.4286,
+        "trades": 168,
+        "avg_confidence": 0.6001,
+        "calibration_gap": 0.1715
+      },
+      "KLAS.2024-02": {
+        "accuracy": 0.4813,
+        "trades": 160,
+        "avg_confidence": 0.5899,
+        "calibration_gap": 0.1086
+      },
+      "KLAS.2024-03": {
+        "accuracy": 0.4848,
+        "trades": 165,
+        "avg_confidence": 0.6267,
+        "calibration_gap": 0.1419
+      },
+      "KLAS.2024-04": {
+        "accuracy": 0.3769,
+        "trades": 199,
+        "avg_confidence": 0.6241,
+        "calibration_gap": 0.2472
+      },
+      "KLAS.2024-05": {
+        "accuracy": 0.233,
+        "trades": 176,
+        "avg_confidence": 0.6803,
+        "calibration_gap": 0.4474
+      },
+      "KLAS.2024-06": {
+        "accuracy": 0.1941,
+        "trades": 170,
+        "avg_confidence": 0.6991,
+        "calibration_gap": 0.5049
+      },
+      "KLAS.2024-07": {
+        "accuracy": 0.298,
+        "trades": 151,
+        "avg_confidence": 0.6775,
+        "calibration_gap": 0.3795
+      },
+      "KLAS.2024-08": {
+        "accuracy": 0.5385,
+        "trades": 143,
+        "avg_confidence": 0.672,
+        "calibration_gap": 0.1336
+      },
+      "KLAS.2024-09": {
+        "accuracy": 0.4615,
+        "trades": 143,
+        "avg_confidence": 0.6352,
+        "calibration_gap": 0.1736
+      },
+      "KLAS.2024-10": {
+        "accuracy": 0.3515,
+        "trades": 165,
+        "avg_confidence": 0.6639,
+        "calibration_gap": 0.3124
+      },
+      "KLAS.2024-11": {
+        "accuracy": 0.2323,
+        "trades": 198,
+        "avg_confidence": 0.6365,
+        "calibration_gap": 0.4042
+      },
+      "KLAS.2024-12": {
+        "accuracy": 0.3793,
+        "trades": 145,
+        "avg_confidence": 0.5234,
+        "calibration_gap": 0.1441
+      },
+      "KLAS.2025-01": {
+        "accuracy": 0.3176,
+        "trades": 148,
+        "avg_confidence": 0.5596,
+        "calibration_gap": 0.242
+      },
+      "KLAS.2025-02": {
+        "accuracy": 0.5399,
+        "trades": 163,
+        "avg_confidence": 0.5925,
+        "calibration_gap": 0.0527
+      },
+      "KLAS.2025-03": {
+        "accuracy": 0.3949,
+        "trades": 195,
+        "avg_confidence": 0.633,
+        "calibration_gap": 0.2381
+      },
+      "KLAS.2025-04": {
+        "accuracy": 0.2781,
+        "trades": 187,
+        "avg_confidence": 0.605,
+        "calibration_gap": 0.3269
+      },
+      "KLAS.2025-05": {
+        "accuracy": 0.3299,
+        "trades": 194,
+        "avg_confidence": 0.6826,
+        "calibration_gap": 0.3527
+      },
+      "KLAS.2025-06": {
+        "accuracy": 0.2583,
+        "trades": 151,
+        "avg_confidence": 0.6853,
+        "calibration_gap": 0.4271
+      },
+      "KLAS.2025-07": {
+        "accuracy": 0.3191,
+        "trades": 141,
+        "avg_confidence": 0.6697,
+        "calibration_gap": 0.3505
+      },
+      "KLAS.2025-08": {
+        "accuracy": 0.3269,
+        "trades": 104,
+        "avg_confidence": 0.6616,
+        "calibration_gap": 0.3347
+      },
+      "KLAX.2022-01": {
+        "accuracy": 0.4038,
+        "trades": 156,
+        "avg_confidence": 0.5644,
+        "calibration_gap": 0.1606
+      },
+      "KLAX.2022-02": {
+        "accuracy": 0.2874,
+        "trades": 167,
+        "avg_confidence": 0.5827,
+        "calibration_gap": 0.2952
+      },
+      "KLAX.2022-03": {
+        "accuracy": 0.2744,
+        "trades": 164,
+        "avg_confidence": 0.5923,
+        "calibration_gap": 0.3179
+      },
+      "KLAX.2022-04": {
+        "accuracy": 0.2603,
+        "trades": 146,
+        "avg_confidence": 0.5758,
+        "calibration_gap": 0.3155
+      },
+      "KLAX.2022-05": {
+        "accuracy": 0.3475,
+        "trades": 118,
+        "avg_confidence": 0.4704,
+        "calibration_gap": 0.123
+      },
+      "KLAX.2022-06": {
+        "accuracy": 0.2376,
+        "trades": 101,
+        "avg_confidence": 0.483,
+        "calibration_gap": 0.2454
+      },
+      "KLAX.2022-07": {
+        "accuracy": 0.2182,
+        "trades": 110,
+        "avg_confidence": 0.5155,
+        "calibration_gap": 0.2973
+      },
+      "KLAX.2022-08": {
+        "accuracy": 0.25,
+        "trades": 124,
+        "avg_confidence": 0.6247,
+        "calibration_gap": 0.3747
+      },
+      "KLAX.2022-09": {
+        "accuracy": 0.277,
+        "trades": 148,
+        "avg_confidence": 0.6412,
+        "calibration_gap": 0.3642
+      },
+      "KLAX.2022-10": {
+        "accuracy": 0.4552,
+        "trades": 134,
+        "avg_confidence": 0.6409,
+        "calibration_gap": 0.1857
+      },
+      "KLAX.2022-11": {
+        "accuracy": 0.2938,
+        "trades": 160,
+        "avg_confidence": 0.5604,
+        "calibration_gap": 0.2667
+      },
+      "KLAX.2022-12": {
+        "accuracy": 0.2638,
+        "trades": 163,
+        "avg_confidence": 0.5911,
+        "calibration_gap": 0.3273
+      },
+      "KLAX.2023-01": {
+        "accuracy": 0.3916,
+        "trades": 166,
+        "avg_confidence": 0.5615,
+        "calibration_gap": 0.1699
+      },
+      "KLAX.2023-02": {
+        "accuracy": 0.36,
+        "trades": 150,
+        "avg_confidence": 0.5704,
+        "calibration_gap": 0.2104
+      },
+      "KLAX.2023-03": {
+        "accuracy": 0.4355,
+        "trades": 124,
+        "avg_confidence": 0.5908,
+        "calibration_gap": 0.1553
+      },
+      "KLAX.2023-04": {
+        "accuracy": 0.4222,
+        "trades": 135,
+        "avg_confidence": 0.5797,
+        "calibration_gap": 0.1575
+      },
+      "KLAX.2023-05": {
+        "accuracy": 0.4111,
+        "trades": 90,
+        "avg_confidence": 0.4155,
+        "calibration_gap": 0.0044
+      },
+      "KLAX.2023-06": {
+        "accuracy": 0.5,
+        "trades": 110,
+        "avg_confidence": 0.5406,
+        "calibration_gap": 0.0406
+      },
+      "KLAX.2023-07": {
+        "accuracy": 0.1884,
+        "trades": 138,
+        "avg_confidence": 0.5955,
+        "calibration_gap": 0.4071
+      },
+      "KLAX.2023-08": {
+        "accuracy": 0.3333,
+        "trades": 117,
+        "avg_confidence": 0.5453,
+        "calibration_gap": 0.2119
+      },
+      "KLAX.2023-09": {
+        "accuracy": 0.391,
+        "trades": 133,
+        "avg_confidence": 0.6389,
+        "calibration_gap": 0.2479
+      },
+      "KLAX.2023-10": {
+        "accuracy": 0.3546,
+        "trades": 141,
+        "avg_confidence": 0.6184,
+        "calibration_gap": 0.2638
+      },
+      "KLAX.2023-11": {
+        "accuracy": 0.3562,
+        "trades": 146,
+        "avg_confidence": 0.5453,
+        "calibration_gap": 0.1891
+      },
+      "KLAX.2023-12": {
+        "accuracy": 0.297,
+        "trades": 165,
+        "avg_confidence": 0.5958,
+        "calibration_gap": 0.2989
+      },
+      "KLAX.2024-01": {
+        "accuracy": 0.3289,
+        "trades": 152,
+        "avg_confidence": 0.5661,
+        "calibration_gap": 0.2372
+      },
+      "KLAX.2024-02": {
+        "accuracy": 0.3659,
+        "trades": 123,
+        "avg_confidence": 0.5375,
+        "calibration_gap": 0.1716
+      },
+      "KLAX.2024-03": {
+        "accuracy": 0.4397,
+        "trades": 116,
+        "avg_confidence": 0.5885,
+        "calibration_gap": 0.1488
+      },
+      "KLAX.2024-04": {
+        "accuracy": 0.3913,
+        "trades": 138,
+        "avg_confidence": 0.5953,
+        "calibration_gap": 0.204
+      },
+      "KLAX.2024-05": {
+        "accuracy": 0.4235,
+        "trades": 85,
+        "avg_confidence": 0.3923,
+        "calibration_gap": 0.0312
+      },
+      "KLAX.2024-06": {
+        "accuracy": 0.3179,
+        "trades": 151,
+        "avg_confidence": 0.6112,
+        "calibration_gap": 0.2933
+      },
+      "KLAX.2024-07": {
+        "accuracy": 0.2368,
+        "trades": 114,
+        "avg_confidence": 0.5058,
+        "calibration_gap": 0.2689
+      },
+      "KLAX.2024-08": {
+        "accuracy": 0.2258,
+        "trades": 124,
+        "avg_confidence": 0.6156,
+        "calibration_gap": 0.3898
+      },
+      "KLAX.2024-09": {
+        "accuracy": 0.3446,
+        "trades": 148,
+        "avg_confidence": 0.6739,
+        "calibration_gap": 0.3293
+      },
+      "KLAX.2024-10": {
+        "accuracy": 0.3504,
+        "trades": 117,
+        "avg_confidence": 0.603,
+        "calibration_gap": 0.2526
+      },
+      "KLAX.2024-11": {
+        "accuracy": 0.3121,
+        "trades": 157,
+        "avg_confidence": 0.5634,
+        "calibration_gap": 0.2513
+      },
+      "KLAX.2024-12": {
+        "accuracy": 0.303,
+        "trades": 165,
+        "avg_confidence": 0.5825,
+        "calibration_gap": 0.2795
+      },
+      "KLAX.2025-01": {
+        "accuracy": 0.3232,
+        "trades": 164,
+        "avg_confidence": 0.5741,
+        "calibration_gap": 0.2509
+      },
+      "KLAX.2025-02": {
+        "accuracy": 0.4065,
+        "trades": 123,
+        "avg_confidence": 0.5144,
+        "calibration_gap": 0.1079
+      },
+      "KLAX.2025-03": {
+        "accuracy": 0.3741,
+        "trades": 147,
+        "avg_confidence": 0.6013,
+        "calibration_gap": 0.2272
+      },
+      "KLAX.2025-04": {
+        "accuracy": 0.3761,
+        "trades": 117,
+        "avg_confidence": 0.5796,
+        "calibration_gap": 0.2036
+      },
+      "KLAX.2025-05": {
+        "accuracy": 0.3047,
+        "trades": 128,
+        "avg_confidence": 0.5117,
+        "calibration_gap": 0.207
+      },
+      "KLAX.2025-06": {
+        "accuracy": 0.25,
+        "trades": 100,
+        "avg_confidence": 0.4695,
+        "calibration_gap": 0.2195
+      },
+      "KLAX.2025-07": {
+        "accuracy": 0.2088,
+        "trades": 91,
+        "avg_confidence": 0.4473,
+        "calibration_gap": 0.2385
+      },
+      "KLAX.2025-08": {
+        "accuracy": 0.181,
+        "trades": 116,
+        "avg_confidence": 0.6149,
+        "calibration_gap": 0.4339
+      },
+      "KMDW.2022-01": {
+        "accuracy": 0.3255,
+        "trades": 212,
+        "avg_confidence": 0.7148,
+        "calibration_gap": 0.3893
+      },
+      "KMDW.2022-02": {
+        "accuracy": 0.4697,
+        "trades": 198,
+        "avg_confidence": 0.7108,
+        "calibration_gap": 0.2411
+      },
+      "KMDW.2022-03": {
+        "accuracy": 0.4831,
+        "trades": 236,
+        "avg_confidence": 0.698,
+        "calibration_gap": 0.2149
+      },
+      "KMDW.2022-04": {
+        "accuracy": 0.4328,
+        "trades": 201,
+        "avg_confidence": 0.6648,
+        "calibration_gap": 0.232
+      },
+      "KMDW.2022-05": {
+        "accuracy": 0.319,
+        "trades": 210,
+        "avg_confidence": 0.6433,
+        "calibration_gap": 0.3243
+      },
+      "KMDW.2022-06": {
+        "accuracy": 0.3253,
+        "trades": 166,
+        "avg_confidence": 0.6267,
+        "calibration_gap": 0.3014
+      },
+      "KMDW.2022-07": {
+        "accuracy": 0.3734,
+        "trades": 158,
+        "avg_confidence": 0.6507,
+        "calibration_gap": 0.2773
+      },
+      "KMDW.2022-08": {
+        "accuracy": 0.4211,
+        "trades": 152,
+        "avg_confidence": 0.6509,
+        "calibration_gap": 0.2298
+      },
+      "KMDW.2022-09": {
+        "accuracy": 0.4254,
+        "trades": 181,
+        "avg_confidence": 0.6547,
+        "calibration_gap": 0.2293
+      },
+      "KMDW.2022-10": {
+        "accuracy": 0.3857,
+        "trades": 210,
+        "avg_confidence": 0.6834,
+        "calibration_gap": 0.2977
+      },
+      "KMDW.2022-11": {
+        "accuracy": 0.366,
+        "trades": 194,
+        "avg_confidence": 0.6527,
+        "calibration_gap": 0.2867
+      },
+      "KMDW.2022-12": {
+        "accuracy": 0.3383,
+        "trades": 201,
+        "avg_confidence": 0.7034,
+        "calibration_gap": 0.3651
+      },
+      "KMDW.2023-01": {
+        "accuracy": 0.4144,
+        "trades": 181,
+        "avg_confidence": 0.646,
+        "calibration_gap": 0.2316
+      },
+      "KMDW.2023-02": {
+        "accuracy": 0.4792,
+        "trades": 192,
+        "avg_confidence": 0.6996,
+        "calibration_gap": 0.2204
+      },
+      "KMDW.2023-03": {
+        "accuracy": 0.4639,
+        "trades": 194,
+        "avg_confidence": 0.6494,
+        "calibration_gap": 0.1855
+      },
+      "KMDW.2023-04": {
+        "accuracy": 0.4079,
+        "trades": 228,
+        "avg_confidence": 0.6885,
+        "calibration_gap": 0.2806
+      },
+      "KMDW.2023-05": {
+        "accuracy": 0.4072,
+        "trades": 194,
+        "avg_confidence": 0.6166,
+        "calibration_gap": 0.2093
+      },
+      "KMDW.2023-06": {
+        "accuracy": 0.3011,
+        "trades": 176,
+        "avg_confidence": 0.6489,
+        "calibration_gap": 0.3477
+      },
+      "KMDW.2023-07": {
+        "accuracy": 0.3179,
+        "trades": 151,
+        "avg_confidence": 0.6348,
+        "calibration_gap": 0.3169
+      },
+      "KMDW.2023-08": {
+        "accuracy": 0.4389,
+        "trades": 180,
+        "avg_confidence": 0.6523,
+        "calibration_gap": 0.2134
+      },
+      "KMDW.2023-09": {
+        "accuracy": 0.474,
+        "trades": 173,
+        "avg_confidence": 0.6501,
+        "calibration_gap": 0.1761
+      },
+      "KMDW.2023-10": {
+        "accuracy": 0.3092,
+        "trades": 207,
+        "avg_confidence": 0.6671,
+        "calibration_gap": 0.358
+      },
+      "KMDW.2023-11": {
+        "accuracy": 0.2965,
+        "trades": 199,
+        "avg_confidence": 0.6507,
+        "calibration_gap": 0.3542
+      },
+      "KMDW.2023-12": {
+        "accuracy": 0.4011,
+        "trades": 187,
+        "avg_confidence": 0.6208,
+        "calibration_gap": 0.2197
+      },
+      "KMDW.2024-01": {
+        "accuracy": 0.3538,
+        "trades": 195,
+        "avg_confidence": 0.7019,
+        "calibration_gap": 0.348
+      },
+      "KMDW.2024-02": {
+        "accuracy": 0.4975,
+        "trades": 197,
+        "avg_confidence": 0.6664,
+        "calibration_gap": 0.1689
+      },
+      "KMDW.2024-03": {
+        "accuracy": 0.3641,
+        "trades": 206,
+        "avg_confidence": 0.6968,
+        "calibration_gap": 0.3327
+      },
+      "KMDW.2024-04": {
+        "accuracy": 0.375,
+        "trades": 200,
+        "avg_confidence": 0.6612,
+        "calibration_gap": 0.2862
+      },
+      "KMDW.2024-05": {
+        "accuracy": 0.3089,
+        "trades": 191,
+        "avg_confidence": 0.6177,
+        "calibration_gap": 0.3088
+      },
+      "KMDW.2024-06": {
+        "accuracy": 0.2796,
+        "trades": 186,
+        "avg_confidence": 0.6691,
+        "calibration_gap": 0.3895
+      },
+      "KMDW.2024-07": {
+        "accuracy": 0.404,
+        "trades": 151,
+        "avg_confidence": 0.6344,
+        "calibration_gap": 0.2304
+      },
+      "KMDW.2024-08": {
+        "accuracy": 0.431,
+        "trades": 174,
+        "avg_confidence": 0.6559,
+        "calibration_gap": 0.2248
+      },
+      "KMDW.2024-09": {
+        "accuracy": 0.4615,
+        "trades": 169,
+        "avg_confidence": 0.6407,
+        "calibration_gap": 0.1791
+      },
+      "KMDW.2024-10": {
+        "accuracy": 0.4423,
+        "trades": 208,
+        "avg_confidence": 0.6626,
+        "calibration_gap": 0.2203
+      },
+      "KMDW.2024-11": {
+        "accuracy": 0.3178,
+        "trades": 214,
+        "avg_confidence": 0.6466,
+        "calibration_gap": 0.3288
+      },
+      "KMDW.2024-12": {
+        "accuracy": 0.3571,
+        "trades": 210,
+        "avg_confidence": 0.6819,
+        "calibration_gap": 0.3248
+      },
+      "KMDW.2025-01": {
+        "accuracy": 0.3699,
+        "trades": 219,
+        "avg_confidence": 0.7126,
+        "calibration_gap": 0.3427
+      },
+      "KMDW.2025-02": {
+        "accuracy": 0.4341,
+        "trades": 182,
+        "avg_confidence": 0.6531,
+        "calibration_gap": 0.219
+      },
+      "KMDW.2025-03": {
+        "accuracy": 0.4537,
+        "trades": 227,
+        "avg_confidence": 0.6863,
+        "calibration_gap": 0.2326
+      },
+      "KMDW.2025-04": {
+        "accuracy": 0.4396,
+        "trades": 207,
+        "avg_confidence": 0.6687,
+        "calibration_gap": 0.2291
+      },
+      "KMDW.2025-05": {
+        "accuracy": 0.3246,
+        "trades": 191,
+        "avg_confidence": 0.6052,
+        "calibration_gap": 0.2806
+      },
+      "KMDW.2025-06": {
+        "accuracy": 0.2602,
+        "trades": 196,
+        "avg_confidence": 0.6651,
+        "calibration_gap": 0.4049
+      },
+      "KMDW.2025-07": {
+        "accuracy": 0.3681,
+        "trades": 144,
+        "avg_confidence": 0.6456,
+        "calibration_gap": 0.2775
+      },
+      "KMDW.2025-08": {
+        "accuracy": 0.5159,
+        "trades": 157,
+        "avg_confidence": 0.6591,
+        "calibration_gap": 0.1432
+      },
+      "KMIA.2022-01": {
+        "accuracy": 0.3059,
+        "trades": 170,
+        "avg_confidence": 0.5716,
+        "calibration_gap": 0.2657
+      },
+      "KMIA.2022-02": {
+        "accuracy": 0.4559,
+        "trades": 136,
+        "avg_confidence": 0.5605,
+        "calibration_gap": 0.1046
+      },
+      "KMIA.2022-03": {
+        "accuracy": 0.4444,
+        "trades": 144,
+        "avg_confidence": 0.551,
+        "calibration_gap": 0.1066
+      },
+      "KMIA.2022-04": {
+        "accuracy": 0.3333,
+        "trades": 132,
+        "avg_confidence": 0.5162,
+        "calibration_gap": 0.1829
+      },
+      "KMIA.2022-05": {
+        "accuracy": 0.1818,
+        "trades": 121,
+        "avg_confidence": 0.6458,
+        "calibration_gap": 0.4639
+      },
+      "KMIA.2022-06": {
+        "accuracy": 0.2368,
+        "trades": 114,
+        "avg_confidence": 0.6532,
+        "calibration_gap": 0.4164
+      },
+      "KMIA.2022-07": {
+        "accuracy": 0.1961,
+        "trades": 102,
+        "avg_confidence": 0.6644,
+        "calibration_gap": 0.4684
+      },
+      "KMIA.2022-08": {
+        "accuracy": 0.1624,
+        "trades": 117,
+        "avg_confidence": 0.6836,
+        "calibration_gap": 0.5212
+      },
+      "KMIA.2022-09": {
+        "accuracy": 0.3893,
+        "trades": 131,
+        "avg_confidence": 0.6436,
+        "calibration_gap": 0.2543
+      },
+      "KMIA.2022-10": {
+        "accuracy": 0.3407,
+        "trades": 135,
+        "avg_confidence": 0.6174,
+        "calibration_gap": 0.2767
+      },
+      "KMIA.2022-11": {
+        "accuracy": 0.281,
+        "trades": 121,
+        "avg_confidence": 0.5034,
+        "calibration_gap": 0.2224
+      },
+      "KMIA.2022-12": {
+        "accuracy": 0.2614,
+        "trades": 153,
+        "avg_confidence": 0.5735,
+        "calibration_gap": 0.312
+      },
+      "KMIA.2023-01": {
+        "accuracy": 0.3923,
+        "trades": 130,
+        "avg_confidence": 0.4871,
+        "calibration_gap": 0.0948
+      },
+      "KMIA.2023-02": {
+        "accuracy": 0.3905,
+        "trades": 105,
+        "avg_confidence": 0.5035,
+        "calibration_gap": 0.1131
+      },
+      "KMIA.2023-03": {
+        "accuracy": 0.2968,
+        "trades": 155,
+        "avg_confidence": 0.5753,
+        "calibration_gap": 0.2786
+      },
+      "KMIA.2023-04": {
+        "accuracy": 0.32,
+        "trades": 125,
+        "avg_confidence": 0.517,
+        "calibration_gap": 0.197
+      },
+      "KMIA.2023-05": {
+        "accuracy": 0.2269,
+        "trades": 119,
+        "avg_confidence": 0.6534,
+        "calibration_gap": 0.4265
+      },
+      "KMIA.2023-06": {
+        "accuracy": 0.2222,
+        "trades": 135,
+        "avg_confidence": 0.6945,
+        "calibration_gap": 0.4723
+      },
+      "KMIA.2023-07": {
+        "accuracy": 0.252,
+        "trades": 123,
+        "avg_confidence": 0.6785,
+        "calibration_gap": 0.4265
+      },
+      "KMIA.2023-08": {
+        "accuracy": 0.3146,
+        "trades": 89,
+        "avg_confidence": 0.6258,
+        "calibration_gap": 0.3111
+      },
+      "KMIA.2023-09": {
+        "accuracy": 0.4322,
+        "trades": 118,
+        "avg_confidence": 0.6607,
+        "calibration_gap": 0.2285
+      },
+      "KMIA.2023-10": {
+        "accuracy": 0.3786,
+        "trades": 140,
+        "avg_confidence": 0.6332,
+        "calibration_gap": 0.2546
+      },
+      "KMIA.2023-11": {
+        "accuracy": 0.2847,
+        "trades": 144,
+        "avg_confidence": 0.5302,
+        "calibration_gap": 0.2455
+      },
+      "KMIA.2023-12": {
+        "accuracy": 0.2796,
+        "trades": 186,
+        "avg_confidence": 0.58,
+        "calibration_gap": 0.3004
+      },
+      "KMIA.2024-01": {
+        "accuracy": 0.4246,
+        "trades": 179,
+        "avg_confidence": 0.576,
+        "calibration_gap": 0.1514
+      },
+      "KMIA.2024-02": {
+        "accuracy": 0.3643,
+        "trades": 140,
+        "avg_confidence": 0.5489,
+        "calibration_gap": 0.1847
+      },
+      "KMIA.2024-03": {
+        "accuracy": 0.4452,
+        "trades": 155,
+        "avg_confidence": 0.5592,
+        "calibration_gap": 0.1141
+      },
+      "KMIA.2024-04": {
+        "accuracy": 0.3717,
+        "trades": 113,
+        "avg_confidence": 0.4928,
+        "calibration_gap": 0.1211
+      },
+      "KMIA.2024-05": {
+        "accuracy": 0.1985,
+        "trades": 136,
+        "avg_confidence": 0.7036,
+        "calibration_gap": 0.5051
+      },
+      "KMIA.2024-06": {
+        "accuracy": 0.38,
+        "trades": 100,
+        "avg_confidence": 0.6169,
+        "calibration_gap": 0.2369
+      },
+      "KMIA.2024-07": {
+        "accuracy": 0.2075,
+        "trades": 106,
+        "avg_confidence": 0.6704,
+        "calibration_gap": 0.4628
+      },
+      "KMIA.2024-08": {
+        "accuracy": 0.3571,
+        "trades": 126,
+        "avg_confidence": 0.6694,
+        "calibration_gap": 0.3123
+      },
+      "KMIA.2024-09": {
+        "accuracy": 0.3333,
+        "trades": 108,
+        "avg_confidence": 0.6307,
+        "calibration_gap": 0.2974
+      },
+      "KMIA.2024-10": {
+        "accuracy": 0.2746,
+        "trades": 142,
+        "avg_confidence": 0.6332,
+        "calibration_gap": 0.3585
+      },
+      "KMIA.2024-11": {
+        "accuracy": 0.3273,
+        "trades": 110,
+        "avg_confidence": 0.4993,
+        "calibration_gap": 0.172
+      },
+      "KMIA.2024-12": {
+        "accuracy": 0.2925,
+        "trades": 147,
+        "avg_confidence": 0.5267,
+        "calibration_gap": 0.2342
+      },
+      "KMIA.2025-01": {
+        "accuracy": 0.3729,
+        "trades": 177,
+        "avg_confidence": 0.5696,
+        "calibration_gap": 0.1967
+      },
+      "KMIA.2025-02": {
+        "accuracy": 0.4667,
+        "trades": 120,
+        "avg_confidence": 0.5317,
+        "calibration_gap": 0.0651
+      },
+      "KMIA.2025-03": {
+        "accuracy": 0.3986,
+        "trades": 143,
+        "avg_confidence": 0.5132,
+        "calibration_gap": 0.1146
+      },
+      "KMIA.2025-04": {
+        "accuracy": 0.4673,
+        "trades": 107,
+        "avg_confidence": 0.5019,
+        "calibration_gap": 0.0347
+      },
+      "KMIA.2025-05": {
+        "accuracy": 0.2,
+        "trades": 145,
+        "avg_confidence": 0.7079,
+        "calibration_gap": 0.5079
+      },
+      "KMIA.2025-06": {
+        "accuracy": 0.2857,
+        "trades": 84,
+        "avg_confidence": 0.6163,
+        "calibration_gap": 0.3306
+      },
+      "KMIA.2025-07": {
+        "accuracy": 0.2672,
+        "trades": 116,
+        "avg_confidence": 0.6673,
+        "calibration_gap": 0.4001
+      },
+      "KMIA.2025-08": {
+        "accuracy": 0.2645,
+        "trades": 121,
+        "avg_confidence": 0.6865,
+        "calibration_gap": 0.4221
+      },
+      "KMSP.2022-01": {
+        "accuracy": 0.3697,
+        "trades": 211,
+        "avg_confidence": 0.7356,
+        "calibration_gap": 0.3659
+      },
+      "KMSP.2022-02": {
+        "accuracy": 0.4627,
+        "trades": 201,
+        "avg_confidence": 0.7425,
+        "calibration_gap": 0.2798
+      },
+      "KMSP.2022-03": {
+        "accuracy": 0.5215,
+        "trades": 209,
+        "avg_confidence": 0.6789,
+        "calibration_gap": 0.1574
+      },
+      "KMSP.2022-04": {
+        "accuracy": 0.4493,
+        "trades": 207,
+        "avg_confidence": 0.6625,
+        "calibration_gap": 0.2132
+      },
+      "KMSP.2022-05": {
+        "accuracy": 0.3257,
+        "trades": 218,
+        "avg_confidence": 0.6554,
+        "calibration_gap": 0.3297
+      },
+      "KMSP.2022-06": {
+        "accuracy": 0.3296,
+        "trades": 179,
+        "avg_confidence": 0.6423,
+        "calibration_gap": 0.3127
+      },
+      "KMSP.2022-07": {
+        "accuracy": 0.3896,
+        "trades": 154,
+        "avg_confidence": 0.6525,
+        "calibration_gap": 0.2629
+      },
+      "KMSP.2022-08": {
+        "accuracy": 0.4303,
+        "trades": 165,
+        "avg_confidence": 0.6191,
+        "calibration_gap": 0.1888
+      },
+      "KMSP.2022-09": {
+        "accuracy": 0.4577,
+        "trades": 201,
+        "avg_confidence": 0.6742,
+        "calibration_gap": 0.2165
+      },
+      "KMSP.2022-10": {
+        "accuracy": 0.3544,
+        "trades": 206,
+        "avg_confidence": 0.6893,
+        "calibration_gap": 0.335
+      },
+      "KMSP.2022-11": {
+        "accuracy": 0.3507,
+        "trades": 211,
+        "avg_confidence": 0.6722,
+        "calibration_gap": 0.3214
+      },
+      "KMSP.2022-12": {
+        "accuracy": 0.3351,
+        "trades": 194,
+        "avg_confidence": 0.7082,
+        "calibration_gap": 0.3731
+      },
+      "KMSP.2023-01": {
+        "accuracy": 0.4294,
+        "trades": 170,
+        "avg_confidence": 0.669,
+        "calibration_gap": 0.2396
+      },
+      "KMSP.2023-02": {
+        "accuracy": 0.462,
+        "trades": 184,
+        "avg_confidence": 0.7108,
+        "calibration_gap": 0.2489
+      },
+      "KMSP.2023-03": {
+        "accuracy": 0.5,
+        "trades": 168,
+        "avg_confidence": 0.6532,
+        "calibration_gap": 0.1532
+      },
+      "KMSP.2023-04": {
+        "accuracy": 0.3564,
+        "trades": 202,
+        "avg_confidence": 0.6709,
+        "calibration_gap": 0.3145
+      },
+      "KMSP.2023-05": {
+        "accuracy": 0.2893,
+        "trades": 197,
+        "avg_confidence": 0.6283,
+        "calibration_gap": 0.339
+      },
+      "KMSP.2023-06": {
+        "accuracy": 0.3013,
+        "trades": 156,
+        "avg_confidence": 0.6641,
+        "calibration_gap": 0.3628
+      },
+      "KMSP.2023-07": {
+        "accuracy": 0.3652,
+        "trades": 178,
+        "avg_confidence": 0.6488,
+        "calibration_gap": 0.2837
+      },
+      "KMSP.2023-08": {
+        "accuracy": 0.3898,
+        "trades": 177,
+        "avg_confidence": 0.6567,
+        "calibration_gap": 0.2669
+      },
+      "KMSP.2023-09": {
+        "accuracy": 0.5079,
+        "trades": 189,
+        "avg_confidence": 0.6628,
+        "calibration_gap": 0.1549
+      },
+      "KMSP.2023-10": {
+        "accuracy": 0.2754,
+        "trades": 207,
+        "avg_confidence": 0.6718,
+        "calibration_gap": 0.3965
+      },
+      "KMSP.2023-11": {
+        "accuracy": 0.3367,
+        "trades": 196,
+        "avg_confidence": 0.6744,
+        "calibration_gap": 0.3376
+      },
+      "KMSP.2023-12": {
+        "accuracy": 0.4045,
+        "trades": 178,
+        "avg_confidence": 0.6576,
+        "calibration_gap": 0.2531
+      },
+      "KMSP.2024-01": {
+        "accuracy": 0.3463,
+        "trades": 205,
+        "avg_confidence": 0.7208,
+        "calibration_gap": 0.3745
+      },
+      "KMSP.2024-02": {
+        "accuracy": 0.5217,
+        "trades": 184,
+        "avg_confidence": 0.6761,
+        "calibration_gap": 0.1544
+      },
+      "KMSP.2024-03": {
+        "accuracy": 0.3512,
+        "trades": 205,
+        "avg_confidence": 0.6865,
+        "calibration_gap": 0.3353
+      },
+      "KMSP.2024-04": {
+        "accuracy": 0.4105,
+        "trades": 190,
+        "avg_confidence": 0.6697,
+        "calibration_gap": 0.2592
+      },
+      "KMSP.2024-05": {
+        "accuracy": 0.3081,
+        "trades": 198,
+        "avg_confidence": 0.6122,
+        "calibration_gap": 0.3041
+      },
+      "KMSP.2024-06": {
+        "accuracy": 0.2849,
+        "trades": 172,
+        "avg_confidence": 0.62,
+        "calibration_gap": 0.3351
+      },
+      "KMSP.2024-07": {
+        "accuracy": 0.3373,
+        "trades": 166,
+        "avg_confidence": 0.6526,
+        "calibration_gap": 0.3153
+      },
+      "KMSP.2024-08": {
+        "accuracy": 0.407,
+        "trades": 172,
+        "avg_confidence": 0.6383,
+        "calibration_gap": 0.2313
+      },
+      "KMSP.2024-09": {
+        "accuracy": 0.372,
+        "trades": 164,
+        "avg_confidence": 0.6357,
+        "calibration_gap": 0.2638
+      },
+      "KMSP.2024-10": {
+        "accuracy": 0.4818,
+        "trades": 220,
+        "avg_confidence": 0.6721,
+        "calibration_gap": 0.1903
+      },
+      "KMSP.2024-11": {
+        "accuracy": 0.2443,
+        "trades": 221,
+        "avg_confidence": 0.6796,
+        "calibration_gap": 0.4353
+      },
+      "KMSP.2024-12": {
+        "accuracy": 0.3538,
+        "trades": 212,
+        "avg_confidence": 0.6998,
+        "calibration_gap": 0.3461
+      },
+      "KMSP.2025-01": {
+        "accuracy": 0.4252,
+        "trades": 214,
+        "avg_confidence": 0.7153,
+        "calibration_gap": 0.29
+      },
+      "KMSP.2025-02": {
+        "accuracy": 0.4462,
+        "trades": 195,
+        "avg_confidence": 0.7054,
+        "calibration_gap": 0.2593
+      },
+      "KMSP.2025-03": {
+        "accuracy": 0.4591,
+        "trades": 220,
+        "avg_confidence": 0.7023,
+        "calibration_gap": 0.2432
+      },
+      "KMSP.2025-04": {
+        "accuracy": 0.4133,
+        "trades": 196,
+        "avg_confidence": 0.6518,
+        "calibration_gap": 0.2385
+      },
+      "KMSP.2025-05": {
+        "accuracy": 0.2956,
+        "trades": 203,
+        "avg_confidence": 0.6364,
+        "calibration_gap": 0.3408
+      },
+      "KMSP.2025-06": {
+        "accuracy": 0.3545,
+        "trades": 189,
+        "avg_confidence": 0.6457,
+        "calibration_gap": 0.2912
+      },
+      "KMSP.2025-07": {
+        "accuracy": 0.3133,
+        "trades": 150,
+        "avg_confidence": 0.6395,
+        "calibration_gap": 0.3262
+      },
+      "KMSP.2025-08": {
+        "accuracy": 0.3894,
+        "trades": 113,
+        "avg_confidence": 0.6329,
+        "calibration_gap": 0.2435
+      },
+      "KMSY.2022-01": {
+        "accuracy": 0.3333,
+        "trades": 210,
+        "avg_confidence": 0.6318,
+        "calibration_gap": 0.2985
+      },
+      "KMSY.2022-02": {
+        "accuracy": 0.5,
+        "trades": 182,
+        "avg_confidence": 0.6257,
+        "calibration_gap": 0.1257
+      },
+      "KMSY.2022-03": {
+        "accuracy": 0.497,
+        "trades": 169,
+        "avg_confidence": 0.5987,
+        "calibration_gap": 0.1016
+      },
+      "KMSY.2022-04": {
+        "accuracy": 0.4268,
+        "trades": 164,
+        "avg_confidence": 0.5643,
+        "calibration_gap": 0.1375
+      },
+      "KMSY.2022-05": {
+        "accuracy": 0.2069,
+        "trades": 145,
+        "avg_confidence": 0.6955,
+        "calibration_gap": 0.4886
+      },
+      "KMSY.2022-06": {
+        "accuracy": 0.2292,
+        "trades": 144,
+        "avg_confidence": 0.7024,
+        "calibration_gap": 0.4733
+      },
+      "KMSY.2022-07": {
+        "accuracy": 0.3514,
+        "trades": 111,
+        "avg_confidence": 0.6523,
+        "calibration_gap": 0.301
+      },
+      "KMSY.2022-08": {
+        "accuracy": 0.4351,
+        "trades": 131,
+        "avg_confidence": 0.6668,
+        "calibration_gap": 0.2317
+      },
+      "KMSY.2022-09": {
+        "accuracy": 0.3071,
+        "trades": 140,
+        "avg_confidence": 0.6429,
+        "calibration_gap": 0.3357
+      },
+      "KMSY.2022-10": {
+        "accuracy": 0.3218,
+        "trades": 174,
+        "avg_confidence": 0.6547,
+        "calibration_gap": 0.3328
+      },
+      "KMSY.2022-11": {
+        "accuracy": 0.3204,
+        "trades": 181,
+        "avg_confidence": 0.5989,
+        "calibration_gap": 0.2785
+      },
+      "KMSY.2022-12": {
+        "accuracy": 0.3711,
+        "trades": 194,
+        "avg_confidence": 0.6181,
+        "calibration_gap": 0.2469
+      },
+      "KMSY.2023-01": {
+        "accuracy": 0.4475,
+        "trades": 181,
+        "avg_confidence": 0.5801,
+        "calibration_gap": 0.1326
+      },
+      "KMSY.2023-02": {
+        "accuracy": 0.4505,
+        "trades": 182,
+        "avg_confidence": 0.6228,
+        "calibration_gap": 0.1723
+      },
+      "KMSY.2023-03": {
+        "accuracy": 0.3716,
+        "trades": 183,
+        "avg_confidence": 0.6132,
+        "calibration_gap": 0.2416
+      },
+      "KMSY.2023-04": {
+        "accuracy": 0.3451,
+        "trades": 142,
+        "avg_confidence": 0.5155,
+        "calibration_gap": 0.1704
+      },
+      "KMSY.2023-05": {
+        "accuracy": 0.2662,
+        "trades": 139,
+        "avg_confidence": 0.6933,
+        "calibration_gap": 0.4271
+      },
+      "KMSY.2023-06": {
+        "accuracy": 0.2028,
+        "trades": 143,
+        "avg_confidence": 0.7081,
+        "calibration_gap": 0.5053
+      },
+      "KMSY.2023-07": {
+        "accuracy": 0.2925,
+        "trades": 106,
+        "avg_confidence": 0.6488,
+        "calibration_gap": 0.3563
+      },
+      "KMSY.2023-08": {
+        "accuracy": 0.2819,
+        "trades": 149,
+        "avg_confidence": 0.6872,
+        "calibration_gap": 0.4054
+      },
+      "KMSY.2023-09": {
+        "accuracy": 0.5802,
+        "trades": 131,
+        "avg_confidence": 0.6435,
+        "calibration_gap": 0.0634
+      },
+      "KMSY.2023-10": {
+        "accuracy": 0.3218,
+        "trades": 174,
+        "avg_confidence": 0.6491,
+        "calibration_gap": 0.3272
+      },
+      "KMSY.2023-11": {
+        "accuracy": 0.2857,
+        "trades": 189,
+        "avg_confidence": 0.6012,
+        "calibration_gap": 0.3155
+      },
+      "KMSY.2023-12": {
+        "accuracy": 0.3611,
+        "trades": 180,
+        "avg_confidence": 0.5755,
+        "calibration_gap": 0.2144
+      },
+      "KMSY.2024-01": {
+        "accuracy": 0.402,
+        "trades": 199,
+        "avg_confidence": 0.615,
+        "calibration_gap": 0.213
+      },
+      "KMSY.2024-02": {
+        "accuracy": 0.55,
+        "trades": 180,
+        "avg_confidence": 0.5995,
+        "calibration_gap": 0.0495
+      },
+      "KMSY.2024-03": {
+        "accuracy": 0.4457,
+        "trades": 175,
+        "avg_confidence": 0.5815,
+        "calibration_gap": 0.1357
+      },
+      "KMSY.2024-04": {
+        "accuracy": 0.4595,
+        "trades": 148,
+        "avg_confidence": 0.5829,
+        "calibration_gap": 0.1234
+      },
+      "KMSY.2024-05": {
+        "accuracy": 0.2086,
+        "trades": 163,
+        "avg_confidence": 0.7007,
+        "calibration_gap": 0.4921
+      },
+      "KMSY.2024-06": {
+        "accuracy": 0.2519,
+        "trades": 131,
+        "avg_confidence": 0.6639,
+        "calibration_gap": 0.412
+      },
+      "KMSY.2024-07": {
+        "accuracy": 0.4077,
+        "trades": 130,
+        "avg_confidence": 0.673,
+        "calibration_gap": 0.2653
+      },
+      "KMSY.2024-08": {
+        "accuracy": 0.2857,
+        "trades": 133,
+        "avg_confidence": 0.6868,
+        "calibration_gap": 0.4011
+      },
+      "KMSY.2024-09": {
+        "accuracy": 0.3551,
+        "trades": 138,
+        "avg_confidence": 0.6167,
+        "calibration_gap": 0.2616
+      },
+      "KMSY.2024-10": {
+        "accuracy": 0.3333,
+        "trades": 132,
+        "avg_confidence": 0.6095,
+        "calibration_gap": 0.2761
+      },
+      "KMSY.2024-11": {
+        "accuracy": 0.2901,
+        "trades": 162,
+        "avg_confidence": 0.5566,
+        "calibration_gap": 0.2665
+      },
+      "KMSY.2024-12": {
+        "accuracy": 0.3665,
+        "trades": 191,
+        "avg_confidence": 0.5946,
+        "calibration_gap": 0.2281
+      },
+      "KMSY.2025-01": {
+        "accuracy": 0.3555,
+        "trades": 211,
+        "avg_confidence": 0.6387,
+        "calibration_gap": 0.2832
+      },
+      "KMSY.2025-02": {
+        "accuracy": 0.4114,
+        "trades": 175,
+        "avg_confidence": 0.6289,
+        "calibration_gap": 0.2174
+      },
+      "KMSY.2025-03": {
+        "accuracy": 0.4815,
+        "trades": 162,
+        "avg_confidence": 0.5603,
+        "calibration_gap": 0.0788
+      },
+      "KMSY.2025-04": {
+        "accuracy": 0.3254,
+        "trades": 126,
+        "avg_confidence": 0.5415,
+        "calibration_gap": 0.2161
+      },
+      "KMSY.2025-05": {
+        "accuracy": 0.2245,
+        "trades": 147,
+        "avg_confidence": 0.6814,
+        "calibration_gap": 0.4569
+      },
+      "KMSY.2025-06": {
+        "accuracy": 0.2301,
+        "trades": 113,
+        "avg_confidence": 0.6502,
+        "calibration_gap": 0.4202
+      },
+      "KMSY.2025-07": {
+        "accuracy": 0.2824,
+        "trades": 131,
+        "avg_confidence": 0.6692,
+        "calibration_gap": 0.3868
+      },
+      "KMSY.2025-08": {
+        "accuracy": 0.3619,
+        "trades": 105,
+        "avg_confidence": 0.6367,
+        "calibration_gap": 0.2748
+      },
+      "KNYC.2022-01": {
+        "accuracy": 0.3465,
+        "trades": 228,
+        "avg_confidence": 0.6905,
+        "calibration_gap": 0.3441
+      },
+      "KNYC.2022-02": {
+        "accuracy": 0.4433,
+        "trades": 203,
+        "avg_confidence": 0.706,
+        "calibration_gap": 0.2626
+      },
+      "KNYC.2022-03": {
+        "accuracy": 0.463,
+        "trades": 216,
+        "avg_confidence": 0.6727,
+        "calibration_gap": 0.2097
+      },
+      "KNYC.2022-04": {
+        "accuracy": 0.4269,
+        "trades": 171,
+        "avg_confidence": 0.6334,
+        "calibration_gap": 0.2065
+      },
+      "KNYC.2022-05": {
+        "accuracy": 0.3333,
+        "trades": 201,
+        "avg_confidence": 0.6235,
+        "calibration_gap": 0.2901
+      },
+      "KNYC.2022-06": {
+        "accuracy": 0.3167,
+        "trades": 180,
+        "avg_confidence": 0.6469,
+        "calibration_gap": 0.3302
+      },
+      "KNYC.2022-07": {
+        "accuracy": 0.25,
+        "trades": 160,
+        "avg_confidence": 0.6741,
+        "calibration_gap": 0.4241
+      },
+      "KNYC.2022-08": {
+        "accuracy": 0.4211,
+        "trades": 152,
+        "avg_confidence": 0.6779,
+        "calibration_gap": 0.2568
+      },
+      "KNYC.2022-09": {
+        "accuracy": 0.5294,
+        "trades": 204,
+        "avg_confidence": 0.6574,
+        "calibration_gap": 0.128
+      },
+      "KNYC.2022-10": {
+        "accuracy": 0.3216,
+        "trades": 199,
+        "avg_confidence": 0.6539,
+        "calibration_gap": 0.3323
+      },
+      "KNYC.2022-11": {
+        "accuracy": 0.3416,
+        "trades": 202,
+        "avg_confidence": 0.6421,
+        "calibration_gap": 0.3006
+      },
+      "KNYC.2022-12": {
+        "accuracy": 0.3163,
+        "trades": 215,
+        "avg_confidence": 0.6792,
+        "calibration_gap": 0.3629
+      },
+      "KNYC.2023-01": {
+        "accuracy": 0.4793,
+        "trades": 169,
+        "avg_confidence": 0.591,
+        "calibration_gap": 0.1117
+      },
+      "KNYC.2023-02": {
+        "accuracy": 0.4355,
+        "trades": 186,
+        "avg_confidence": 0.6598,
+        "calibration_gap": 0.2243
+      },
+      "KNYC.2023-03": {
+        "accuracy": 0.4809,
+        "trades": 183,
+        "avg_confidence": 0.6356,
+        "calibration_gap": 0.1548
+      },
+      "KNYC.2023-04": {
+        "accuracy": 0.4184,
+        "trades": 196,
+        "avg_confidence": 0.6586,
+        "calibration_gap": 0.2402
+      },
+      "KNYC.2023-05": {
+        "accuracy": 0.3665,
+        "trades": 191,
+        "avg_confidence": 0.5978,
+        "calibration_gap": 0.2313
+      },
+      "KNYC.2023-06": {
+        "accuracy": 0.3232,
+        "trades": 164,
+        "avg_confidence": 0.6092,
+        "calibration_gap": 0.286
+      },
+      "KNYC.2023-07": {
+        "accuracy": 0.2626,
+        "trades": 179,
+        "avg_confidence": 0.6665,
+        "calibration_gap": 0.4039
+      },
+      "KNYC.2023-08": {
+        "accuracy": 0.4815,
+        "trades": 162,
+        "avg_confidence": 0.6514,
+        "calibration_gap": 0.1699
+      },
+      "KNYC.2023-09": {
+        "accuracy": 0.4229,
+        "trades": 201,
+        "avg_confidence": 0.6802,
+        "calibration_gap": 0.2574
+      },
+      "KNYC.2023-10": {
+        "accuracy": 0.3906,
+        "trades": 192,
+        "avg_confidence": 0.6721,
+        "calibration_gap": 0.2815
+      },
+      "KNYC.2023-11": {
+        "accuracy": 0.3119,
+        "trades": 218,
+        "avg_confidence": 0.6575,
+        "calibration_gap": 0.3455
+      },
+      "KNYC.2023-12": {
+        "accuracy": 0.3949,
+        "trades": 195,
+        "avg_confidence": 0.605,
+        "calibration_gap": 0.2101
+      },
+      "KNYC.2024-01": {
+        "accuracy": 0.3538,
+        "trades": 212,
+        "avg_confidence": 0.6609,
+        "calibration_gap": 0.3072
+      },
+      "KNYC.2024-02": {
+        "accuracy": 0.475,
+        "trades": 160,
+        "avg_confidence": 0.625,
+        "calibration_gap": 0.15
+      },
+      "KNYC.2024-03": {
+        "accuracy": 0.4757,
+        "trades": 206,
+        "avg_confidence": 0.6627,
+        "calibration_gap": 0.187
+      },
+      "KNYC.2024-04": {
+        "accuracy": 0.4053,
+        "trades": 190,
+        "avg_confidence": 0.6493,
+        "calibration_gap": 0.244
+      },
+      "KNYC.2024-05": {
+        "accuracy": 0.3016,
+        "trades": 189,
+        "avg_confidence": 0.6104,
+        "calibration_gap": 0.3088
+      },
+      "KNYC.2024-06": {
+        "accuracy": 0.2849,
+        "trades": 186,
+        "avg_confidence": 0.6716,
+        "calibration_gap": 0.3867
+      },
+      "KNYC.2024-07": {
+        "accuracy": 0.3904,
+        "trades": 146,
+        "avg_confidence": 0.6547,
+        "calibration_gap": 0.2643
+      },
+      "KNYC.2024-08": {
+        "accuracy": 0.4375,
+        "trades": 176,
+        "avg_confidence": 0.6422,
+        "calibration_gap": 0.2047
+      },
+      "KNYC.2024-09": {
+        "accuracy": 0.5119,
+        "trades": 168,
+        "avg_confidence": 0.6328,
+        "calibration_gap": 0.1209
+      },
+      "KNYC.2024-10": {
+        "accuracy": 0.3911,
+        "trades": 202,
+        "avg_confidence": 0.6766,
+        "calibration_gap": 0.2855
+      },
+      "KNYC.2024-11": {
+        "accuracy": 0.3192,
+        "trades": 213,
+        "avg_confidence": 0.6466,
+        "calibration_gap": 0.3274
+      },
+      "KNYC.2024-12": {
+        "accuracy": 0.3565,
+        "trades": 216,
+        "avg_confidence": 0.6833,
+        "calibration_gap": 0.3268
+      },
+      "KNYC.2025-01": {
+        "accuracy": 0.3812,
+        "trades": 202,
+        "avg_confidence": 0.671,
+        "calibration_gap": 0.2898
+      },
+      "KNYC.2025-02": {
+        "accuracy": 0.4489,
+        "trades": 176,
+        "avg_confidence": 0.6712,
+        "calibration_gap": 0.2224
+      },
+      "KNYC.2025-03": {
+        "accuracy": 0.5409,
+        "trades": 220,
+        "avg_confidence": 0.6731,
+        "calibration_gap": 0.1321
+      },
+      "KNYC.2025-04": {
+        "accuracy": 0.4312,
+        "trades": 218,
+        "avg_confidence": 0.67,
+        "calibration_gap": 0.2388
+      },
+      "KNYC.2025-05": {
+        "accuracy": 0.359,
+        "trades": 195,
+        "avg_confidence": 0.5855,
+        "calibration_gap": 0.2265
+      },
+      "KNYC.2025-06": {
+        "accuracy": 0.3269,
+        "trades": 208,
+        "avg_confidence": 0.6761,
+        "calibration_gap": 0.3491
+      },
+      "KNYC.2025-07": {
+        "accuracy": 0.3082,
+        "trades": 159,
+        "avg_confidence": 0.657,
+        "calibration_gap": 0.3489
+      },
+      "KNYC.2025-08": {
+        "accuracy": 0.4899,
+        "trades": 149,
+        "avg_confidence": 0.656,
+        "calibration_gap": 0.166
+      },
+      "KOKC.2022-01": {
+        "accuracy": 0.3288,
+        "trades": 222,
+        "avg_confidence": 0.6731,
+        "calibration_gap": 0.3443
+      },
+      "KOKC.2022-02": {
+        "accuracy": 0.41,
+        "trades": 200,
+        "avg_confidence": 0.7036,
+        "calibration_gap": 0.2936
+      },
+      "KOKC.2022-03": {
+        "accuracy": 0.4273,
+        "trades": 220,
+        "avg_confidence": 0.6907,
+        "calibration_gap": 0.2634
+      },
+      "KOKC.2022-04": {
+        "accuracy": 0.4055,
+        "trades": 217,
+        "avg_confidence": 0.6532,
+        "calibration_gap": 0.2477
+      },
+      "KOKC.2022-05": {
+        "accuracy": 0.2927,
+        "trades": 205,
+        "avg_confidence": 0.6671,
+        "calibration_gap": 0.3744
+      },
+      "KOKC.2022-06": {
+        "accuracy": 0.3148,
+        "trades": 162,
+        "avg_confidence": 0.6733,
+        "calibration_gap": 0.3584
+      },
+      "KOKC.2022-07": {
+        "accuracy": 0.2561,
+        "trades": 164,
+        "avg_confidence": 0.6987,
+        "calibration_gap": 0.4426
+      },
+      "KOKC.2022-08": {
+        "accuracy": 0.4577,
+        "trades": 142,
+        "avg_confidence": 0.6381,
+        "calibration_gap": 0.1803
+      },
+      "KOKC.2022-09": {
+        "accuracy": 0.519,
+        "trades": 158,
+        "avg_confidence": 0.6496,
+        "calibration_gap": 0.1306
+      },
+      "KOKC.2022-10": {
+        "accuracy": 0.3971,
+        "trades": 209,
+        "avg_confidence": 0.6953,
+        "calibration_gap": 0.2982
+      },
+      "KOKC.2022-11": {
+        "accuracy": 0.322,
+        "trades": 205,
+        "avg_confidence": 0.6621,
+        "calibration_gap": 0.3402
+      },
+      "KOKC.2022-12": {
+        "accuracy": 0.3805,
+        "trades": 205,
+        "avg_confidence": 0.6647,
+        "calibration_gap": 0.2842
+      },
+      "KOKC.2023-01": {
+        "accuracy": 0.4404,
+        "trades": 193,
+        "avg_confidence": 0.6339,
+        "calibration_gap": 0.1935
+      },
+      "KOKC.2023-02": {
+        "accuracy": 0.4049,
+        "trades": 205,
+        "avg_confidence": 0.6862,
+        "calibration_gap": 0.2813
+      },
+      "KOKC.2023-03": {
+        "accuracy": 0.4455,
+        "trades": 211,
+        "avg_confidence": 0.6788,
+        "calibration_gap": 0.2333
+      },
+      "KOKC.2023-04": {
+        "accuracy": 0.3695,
+        "trades": 203,
+        "avg_confidence": 0.6569,
+        "calibration_gap": 0.2874
+      },
+      "KOKC.2023-05": {
+        "accuracy": 0.2876,
+        "trades": 153,
+        "avg_confidence": 0.5768,
+        "calibration_gap": 0.2892
+      },
+      "KOKC.2023-06": {
+        "accuracy": 0.241,
+        "trades": 166,
+        "avg_confidence": 0.6847,
+        "calibration_gap": 0.4438
+      },
+      "KOKC.2023-07": {
+        "accuracy": 0.2611,
+        "trades": 157,
+        "avg_confidence": 0.6615,
+        "calibration_gap": 0.4003
+      },
+      "KOKC.2023-08": {
+        "accuracy": 0.3409,
+        "trades": 176,
+        "avg_confidence": 0.6762,
+        "calibration_gap": 0.3353
+      },
+      "KOKC.2023-09": {
+        "accuracy": 0.4967,
+        "trades": 151,
+        "avg_confidence": 0.6421,
+        "calibration_gap": 0.1454
+      },
+      "KOKC.2023-10": {
+        "accuracy": 0.3417,
+        "trades": 199,
+        "avg_confidence": 0.673,
+        "calibration_gap": 0.3313
+      },
+      "KOKC.2023-11": {
+        "accuracy": 0.2953,
+        "trades": 193,
+        "avg_confidence": 0.628,
+        "calibration_gap": 0.3326
+      },
+      "KOKC.2023-12": {
+        "accuracy": 0.3681,
+        "trades": 182,
+        "avg_confidence": 0.5983,
+        "calibration_gap": 0.2301
+      },
+      "KOKC.2024-01": {
+        "accuracy": 0.3692,
+        "trades": 214,
+        "avg_confidence": 0.695,
+        "calibration_gap": 0.3258
+      },
+      "KOKC.2024-02": {
+        "accuracy": 0.4976,
+        "trades": 211,
+        "avg_confidence": 0.652,
+        "calibration_gap": 0.1544
+      },
+      "KOKC.2024-03": {
+        "accuracy": 0.3972,
+        "trades": 214,
+        "avg_confidence": 0.6599,
+        "calibration_gap": 0.2627
+      },
+      "KOKC.2024-04": {
+        "accuracy": 0.3368,
+        "trades": 193,
+        "avg_confidence": 0.6254,
+        "calibration_gap": 0.2886
+      },
+      "KOKC.2024-05": {
+        "accuracy": 0.3254,
+        "trades": 169,
+        "avg_confidence": 0.6176,
+        "calibration_gap": 0.2922
+      },
+      "KOKC.2024-06": {
+        "accuracy": 0.2471,
+        "trades": 174,
+        "avg_confidence": 0.6879,
+        "calibration_gap": 0.4408
+      },
+      "KOKC.2024-07": {
+        "accuracy": 0.3861,
+        "trades": 158,
+        "avg_confidence": 0.6697,
+        "calibration_gap": 0.2836
+      },
+      "KOKC.2024-08": {
+        "accuracy": 0.3667,
+        "trades": 150,
+        "avg_confidence": 0.6562,
+        "calibration_gap": 0.2896
+      },
+      "KOKC.2024-09": {
+        "accuracy": 0.4863,
+        "trades": 146,
+        "avg_confidence": 0.6497,
+        "calibration_gap": 0.1634
+      },
+      "KOKC.2024-10": {
+        "accuracy": 0.426,
+        "trades": 169,
+        "avg_confidence": 0.6364,
+        "calibration_gap": 0.2104
+      },
+      "KOKC.2024-11": {
+        "accuracy": 0.2523,
+        "trades": 218,
+        "avg_confidence": 0.6503,
+        "calibration_gap": 0.398
+      },
+      "KOKC.2024-12": {
+        "accuracy": 0.3515,
+        "trades": 202,
+        "avg_confidence": 0.6308,
+        "calibration_gap": 0.2793
+      },
+      "KOKC.2025-01": {
+        "accuracy": 0.3615,
+        "trades": 213,
+        "avg_confidence": 0.6791,
+        "calibration_gap": 0.3176
+      },
+      "KOKC.2025-02": {
+        "accuracy": 0.3846,
+        "trades": 208,
+        "avg_confidence": 0.71,
+        "calibration_gap": 0.3253
+      },
+      "KOKC.2025-03": {
+        "accuracy": 0.4537,
+        "trades": 227,
+        "avg_confidence": 0.6664,
+        "calibration_gap": 0.2126
+      },
+      "KOKC.2025-04": {
+        "accuracy": 0.3876,
+        "trades": 178,
+        "avg_confidence": 0.6208,
+        "calibration_gap": 0.2331
+      },
+      "KOKC.2025-05": {
+        "accuracy": 0.3354,
+        "trades": 164,
+        "avg_confidence": 0.5894,
+        "calibration_gap": 0.254
+      },
+      "KOKC.2025-06": {
+        "accuracy": 0.2561,
+        "trades": 164,
+        "avg_confidence": 0.6736,
+        "calibration_gap": 0.4176
+      },
+      "KOKC.2025-07": {
+        "accuracy": 0.2117,
+        "trades": 137,
+        "avg_confidence": 0.6942,
+        "calibration_gap": 0.4825
+      },
+      "KOKC.2025-08": {
+        "accuracy": 0.3233,
+        "trades": 133,
+        "avg_confidence": 0.6545,
+        "calibration_gap": 0.3312
+      },
+      "KPHL.2022-01": {
+        "accuracy": 0.3167,
+        "trades": 221,
+        "avg_confidence": 0.7042,
+        "calibration_gap": 0.3874
+      },
+      "KPHL.2022-02": {
+        "accuracy": 0.4896,
+        "trades": 192,
+        "avg_confidence": 0.7001,
+        "calibration_gap": 0.2106
+      },
+      "KPHL.2022-03": {
+        "accuracy": 0.4155,
+        "trades": 219,
+        "avg_confidence": 0.671,
+        "calibration_gap": 0.2554
+      },
+      "KPHL.2022-04": {
+        "accuracy": 0.4511,
+        "trades": 184,
+        "avg_confidence": 0.6404,
+        "calibration_gap": 0.1893
+      },
+      "KPHL.2022-05": {
+        "accuracy": 0.3316,
+        "trades": 196,
+        "avg_confidence": 0.6358,
+        "calibration_gap": 0.3042
+      },
+      "KPHL.2022-06": {
+        "accuracy": 0.3216,
+        "trades": 171,
+        "avg_confidence": 0.657,
+        "calibration_gap": 0.3354
+      },
+      "KPHL.2022-07": {
+        "accuracy": 0.2625,
+        "trades": 160,
+        "avg_confidence": 0.6721,
+        "calibration_gap": 0.4096
+      },
+      "KPHL.2022-08": {
+        "accuracy": 0.4126,
+        "trades": 143,
+        "avg_confidence": 0.6613,
+        "calibration_gap": 0.2487
+      },
+      "KPHL.2022-09": {
+        "accuracy": 0.5579,
+        "trades": 190,
+        "avg_confidence": 0.6623,
+        "calibration_gap": 0.1044
+      },
+      "KPHL.2022-10": {
+        "accuracy": 0.3684,
+        "trades": 190,
+        "avg_confidence": 0.6494,
+        "calibration_gap": 0.281
+      },
+      "KPHL.2022-11": {
+        "accuracy": 0.3431,
+        "trades": 204,
+        "avg_confidence": 0.6543,
+        "calibration_gap": 0.3111
+      },
+      "KPHL.2022-12": {
+        "accuracy": 0.2941,
+        "trades": 204,
+        "avg_confidence": 0.6747,
+        "calibration_gap": 0.3806
+      },
+      "KPHL.2023-01": {
+        "accuracy": 0.4881,
+        "trades": 168,
+        "avg_confidence": 0.6006,
+        "calibration_gap": 0.1125
+      },
+      "KPHL.2023-02": {
+        "accuracy": 0.4571,
+        "trades": 175,
+        "avg_confidence": 0.6472,
+        "calibration_gap": 0.1901
+      },
+      "KPHL.2023-03": {
+        "accuracy": 0.4485,
+        "trades": 194,
+        "avg_confidence": 0.6348,
+        "calibration_gap": 0.1864
+      },
+      "KPHL.2023-04": {
+        "accuracy": 0.3381,
+        "trades": 210,
+        "avg_confidence": 0.655,
+        "calibration_gap": 0.317
+      },
+      "KPHL.2023-05": {
+        "accuracy": 0.3352,
+        "trades": 179,
+        "avg_confidence": 0.5704,
+        "calibration_gap": 0.2352
+      },
+      "KPHL.2023-06": {
+        "accuracy": 0.3429,
+        "trades": 175,
+        "avg_confidence": 0.6106,
+        "calibration_gap": 0.2678
+      },
+      "KPHL.2023-07": {
+        "accuracy": 0.2545,
+        "trades": 165,
+        "avg_confidence": 0.673,
+        "calibration_gap": 0.4185
+      },
+      "KPHL.2023-08": {
+        "accuracy": 0.4733,
+        "trades": 150,
+        "avg_confidence": 0.6207,
+        "calibration_gap": 0.1474
+      },
+      "KPHL.2023-09": {
+        "accuracy": 0.467,
+        "trades": 212,
+        "avg_confidence": 0.6709,
+        "calibration_gap": 0.2039
+      },
+      "KPHL.2023-10": {
+        "accuracy": 0.3616,
+        "trades": 177,
+        "avg_confidence": 0.6495,
+        "calibration_gap": 0.2879
+      },
+      "KPHL.2023-11": {
+        "accuracy": 0.3333,
+        "trades": 213,
+        "avg_confidence": 0.6481,
+        "calibration_gap": 0.3148
+      },
+      "KPHL.2023-12": {
+        "accuracy": 0.375,
+        "trades": 176,
+        "avg_confidence": 0.5946,
+        "calibration_gap": 0.2196
+      },
+      "KPHL.2024-01": {
+        "accuracy": 0.3463,
+        "trades": 205,
+        "avg_confidence": 0.6856,
+        "calibration_gap": 0.3392
+      },
+      "KPHL.2024-02": {
+        "accuracy": 0.4872,
+        "trades": 156,
+        "avg_confidence": 0.6145,
+        "calibration_gap": 0.1273
+      },
+      "KPHL.2024-03": {
+        "accuracy": 0.4563,
+        "trades": 206,
+        "avg_confidence": 0.6624,
+        "calibration_gap": 0.2061
+      },
+      "KPHL.2024-04": {
+        "accuracy": 0.4021,
+        "trades": 189,
+        "avg_confidence": 0.6372,
+        "calibration_gap": 0.2351
+      },
+      "KPHL.2024-05": {
+        "accuracy": 0.3333,
+        "trades": 198,
+        "avg_confidence": 0.6191,
+        "calibration_gap": 0.2858
+      },
+      "KPHL.2024-06": {
+        "accuracy": 0.3099,
+        "trades": 171,
+        "avg_confidence": 0.6756,
+        "calibration_gap": 0.3656
+      },
+      "KPHL.2024-07": {
+        "accuracy": 0.3804,
+        "trades": 163,
+        "avg_confidence": 0.6565,
+        "calibration_gap": 0.2761
+      },
+      "KPHL.2024-08": {
+        "accuracy": 0.4497,
+        "trades": 169,
+        "avg_confidence": 0.6587,
+        "calibration_gap": 0.209
+      },
+      "KPHL.2024-09": {
+        "accuracy": 0.5207,
+        "trades": 169,
+        "avg_confidence": 0.6338,
+        "calibration_gap": 0.1131
+      },
+      "KPHL.2024-10": {
+        "accuracy": 0.3979,
+        "trades": 191,
+        "avg_confidence": 0.6678,
+        "calibration_gap": 0.2699
+      },
+      "KPHL.2024-11": {
+        "accuracy": 0.3256,
+        "trades": 215,
+        "avg_confidence": 0.6539,
+        "calibration_gap": 0.3283
+      },
+      "KPHL.2024-12": {
+        "accuracy": 0.3396,
+        "trades": 212,
+        "avg_confidence": 0.6889,
+        "calibration_gap": 0.3493
+      },
+      "KPHL.2025-01": {
+        "accuracy": 0.3568,
+        "trades": 199,
+        "avg_confidence": 0.6813,
+        "calibration_gap": 0.3245
+      },
+      "KPHL.2025-02": {
+        "accuracy": 0.4598,
+        "trades": 174,
+        "avg_confidence": 0.6648,
+        "calibration_gap": 0.205
+      },
+      "KPHL.2025-03": {
+        "accuracy": 0.4978,
+        "trades": 227,
+        "avg_confidence": 0.6684,
+        "calibration_gap": 0.1706
+      },
+      "KPHL.2025-04": {
+        "accuracy": 0.3871,
+        "trades": 217,
+        "avg_confidence": 0.6741,
+        "calibration_gap": 0.287
+      },
+      "KPHL.2025-05": {
+        "accuracy": 0.3,
+        "trades": 190,
+        "avg_confidence": 0.5884,
+        "calibration_gap": 0.2884
+      },
+      "KPHL.2025-06": {
+        "accuracy": 0.2935,
+        "trades": 201,
+        "avg_confidence": 0.6755,
+        "calibration_gap": 0.382
+      },
+      "KPHL.2025-07": {
+        "accuracy": 0.2899,
+        "trades": 138,
+        "avg_confidence": 0.6344,
+        "calibration_gap": 0.3446
+      },
+      "KPHL.2025-08": {
+        "accuracy": 0.5074,
+        "trades": 136,
+        "avg_confidence": 0.6515,
+        "calibration_gap": 0.1442
+      },
+      "KPHX.2022-01": {
+        "accuracy": 0.5,
+        "trades": 128,
+        "avg_confidence": 0.5323,
+        "calibration_gap": 0.0323
+      },
+      "KPHX.2022-02": {
+        "accuracy": 0.4682,
+        "trades": 173,
+        "avg_confidence": 0.6125,
+        "calibration_gap": 0.1443
+      },
+      "KPHX.2022-03": {
+        "accuracy": 0.4947,
+        "trades": 190,
+        "avg_confidence": 0.6329,
+        "calibration_gap": 0.1382
+      },
+      "KPHX.2022-04": {
+        "accuracy": 0.2865,
+        "trades": 171,
+        "avg_confidence": 0.5661,
+        "calibration_gap": 0.2796
+      },
+      "KPHX.2022-05": {
+        "accuracy": 0.225,
+        "trades": 160,
+        "avg_confidence": 0.6862,
+        "calibration_gap": 0.4612
+      },
+      "KPHX.2022-06": {
+        "accuracy": 0.2556,
+        "trades": 133,
+        "avg_confidence": 0.6675,
+        "calibration_gap": 0.4119
+      },
+      "KPHX.2022-07": {
+        "accuracy": 0.3355,
+        "trades": 152,
+        "avg_confidence": 0.6832,
+        "calibration_gap": 0.3477
+      },
+      "KPHX.2022-08": {
+        "accuracy": 0.3902,
+        "trades": 123,
+        "avg_confidence": 0.65,
+        "calibration_gap": 0.2598
+      },
+      "KPHX.2022-09": {
+        "accuracy": 0.4173,
+        "trades": 127,
+        "avg_confidence": 0.6393,
+        "calibration_gap": 0.222
+      },
+      "KPHX.2022-10": {
+        "accuracy": 0.4033,
+        "trades": 181,
+        "avg_confidence": 0.6939,
+        "calibration_gap": 0.2906
+      },
+      "KPHX.2022-11": {
+        "accuracy": 0.239,
+        "trades": 159,
+        "avg_confidence": 0.5972,
+        "calibration_gap": 0.3582
+      },
+      "KPHX.2022-12": {
+        "accuracy": 0.323,
+        "trades": 161,
+        "avg_confidence": 0.597,
+        "calibration_gap": 0.274
+      },
+      "KPHX.2023-01": {
+        "accuracy": 0.3902,
+        "trades": 164,
+        "avg_confidence": 0.5831,
+        "calibration_gap": 0.1928
+      },
+      "KPHX.2023-02": {
+        "accuracy": 0.5287,
+        "trades": 174,
+        "avg_confidence": 0.6083,
+        "calibration_gap": 0.0795
+      },
+      "KPHX.2023-03": {
+        "accuracy": 0.4932,
+        "trades": 148,
+        "avg_confidence": 0.5819,
+        "calibration_gap": 0.0886
+      },
+      "KPHX.2023-04": {
+        "accuracy": 0.3781,
+        "trades": 201,
+        "avg_confidence": 0.6234,
+        "calibration_gap": 0.2453
+      },
+      "KPHX.2023-05": {
+        "accuracy": 0.25,
+        "trades": 152,
+        "avg_confidence": 0.6781,
+        "calibration_gap": 0.4281
+      },
+      "KPHX.2023-06": {
+        "accuracy": 0.2516,
+        "trades": 155,
+        "avg_confidence": 0.6774,
+        "calibration_gap": 0.4258
+      },
+      "KPHX.2023-07": {
+        "accuracy": 0.1644,
+        "trades": 146,
+        "avg_confidence": 0.7032,
+        "calibration_gap": 0.5388
+      },
+      "KPHX.2023-08": {
+        "accuracy": 0.4783,
+        "trades": 138,
+        "avg_confidence": 0.6826,
+        "calibration_gap": 0.2043
+      },
+      "KPHX.2023-09": {
+        "accuracy": 0.5616,
+        "trades": 146,
+        "avg_confidence": 0.6289,
+        "calibration_gap": 0.0672
+      },
+      "KPHX.2023-10": {
+        "accuracy": 0.3218,
+        "trades": 174,
+        "avg_confidence": 0.6533,
+        "calibration_gap": 0.3315
+      },
+      "KPHX.2023-11": {
+        "accuracy": 0.1939,
+        "trades": 165,
+        "avg_confidence": 0.597,
+        "calibration_gap": 0.403
+      },
+      "KPHX.2023-12": {
+        "accuracy": 0.3314,
+        "trades": 175,
+        "avg_confidence": 0.5903,
+        "calibration_gap": 0.2588
+      },
+      "KPHX.2024-01": {
+        "accuracy": 0.3779,
+        "trades": 172,
+        "avg_confidence": 0.5801,
+        "calibration_gap": 0.2022
+      },
+      "KPHX.2024-02": {
+        "accuracy": 0.535,
+        "trades": 157,
+        "avg_confidence": 0.5847,
+        "calibration_gap": 0.0497
+      },
+      "KPHX.2024-03": {
+        "accuracy": 0.503,
+        "trades": 165,
+        "avg_confidence": 0.5694,
+        "calibration_gap": 0.0664
+      },
+      "KPHX.2024-04": {
+        "accuracy": 0.3608,
+        "trades": 194,
+        "avg_confidence": 0.6217,
+        "calibration_gap": 0.2608
+      },
+      "KPHX.2024-05": {
+        "accuracy": 0.2059,
+        "trades": 136,
+        "avg_confidence": 0.6656,
+        "calibration_gap": 0.4597
+      },
+      "KPHX.2024-06": {
+        "accuracy": 0.1667,
+        "trades": 156,
+        "avg_confidence": 0.6919,
+        "calibration_gap": 0.5252
+      },
+      "KPHX.2024-07": {
+        "accuracy": 0.2857,
+        "trades": 126,
+        "avg_confidence": 0.6593,
+        "calibration_gap": 0.3736
+      },
+      "KPHX.2024-08": {
+        "accuracy": 0.4677,
+        "trades": 124,
+        "avg_confidence": 0.669,
+        "calibration_gap": 0.2013
+      },
+      "KPHX.2024-09": {
+        "accuracy": 0.4255,
+        "trades": 141,
+        "avg_confidence": 0.6619,
+        "calibration_gap": 0.2364
+      },
+      "KPHX.2024-10": {
+        "accuracy": 0.3529,
+        "trades": 153,
+        "avg_confidence": 0.6353,
+        "calibration_gap": 0.2824
+      },
+      "KPHX.2024-11": {
+        "accuracy": 0.2791,
+        "trades": 172,
+        "avg_confidence": 0.5845,
+        "calibration_gap": 0.3055
+      },
+      "KPHX.2024-12": {
+        "accuracy": 0.3485,
+        "trades": 132,
+        "avg_confidence": 0.5486,
+        "calibration_gap": 0.2001
+      },
+      "KPHX.2025-01": {
+        "accuracy": 0.2881,
+        "trades": 177,
+        "avg_confidence": 0.59,
+        "calibration_gap": 0.3018
+      },
+      "KPHX.2025-02": {
+        "accuracy": 0.5789,
+        "trades": 152,
+        "avg_confidence": 0.5945,
+        "calibration_gap": 0.0155
+      },
+      "KPHX.2025-03": {
+        "accuracy": 0.3626,
+        "trades": 182,
+        "avg_confidence": 0.5955,
+        "calibration_gap": 0.2329
+      },
+      "KPHX.2025-04": {
+        "accuracy": 0.2722,
+        "trades": 169,
+        "avg_confidence": 0.5802,
+        "calibration_gap": 0.308
+      },
+      "KPHX.2025-05": {
+        "accuracy": 0.2988,
+        "trades": 164,
+        "avg_confidence": 0.6711,
+        "calibration_gap": 0.3723
+      },
+      "KPHX.2025-06": {
+        "accuracy": 0.234,
+        "trades": 141,
+        "avg_confidence": 0.6899,
+        "calibration_gap": 0.4559
+      },
+      "KPHX.2025-07": {
+        "accuracy": 0.3309,
+        "trades": 136,
+        "avg_confidence": 0.6366,
+        "calibration_gap": 0.3057
+      },
+      "KPHX.2025-08": {
+        "accuracy": 0.2604,
+        "trades": 96,
+        "avg_confidence": 0.6389,
+        "calibration_gap": 0.3784
+      },
+      "KSAT.2022-01": {
+        "accuracy": 0.297,
+        "trades": 202,
+        "avg_confidence": 0.6184,
+        "calibration_gap": 0.3213
+      },
+      "KSAT.2022-02": {
+        "accuracy": 0.4171,
+        "trades": 187,
+        "avg_confidence": 0.6542,
+        "calibration_gap": 0.2371
+      },
+      "KSAT.2022-03": {
+        "accuracy": 0.4921,
+        "trades": 191,
+        "avg_confidence": 0.65,
+        "calibration_gap": 0.1579
+      },
+      "KSAT.2022-04": {
+        "accuracy": 0.4101,
+        "trades": 178,
+        "avg_confidence": 0.5786,
+        "calibration_gap": 0.1685
+      },
+      "KSAT.2022-05": {
+        "accuracy": 0.2407,
+        "trades": 162,
+        "avg_confidence": 0.6939,
+        "calibration_gap": 0.4532
+      },
+      "KSAT.2022-06": {
+        "accuracy": 0.3016,
+        "trades": 126,
+        "avg_confidence": 0.6573,
+        "calibration_gap": 0.3557
+      },
+      "KSAT.2022-07": {
+        "accuracy": 0.2447,
+        "trades": 94,
+        "avg_confidence": 0.6551,
+        "calibration_gap": 0.4104
+      },
+      "KSAT.2022-08": {
+        "accuracy": 0.5669,
+        "trades": 127,
+        "avg_confidence": 0.6767,
+        "calibration_gap": 0.1097
+      },
+      "KSAT.2022-09": {
+        "accuracy": 0.4583,
+        "trades": 120,
+        "avg_confidence": 0.6212,
+        "calibration_gap": 0.1629
+      },
+      "KSAT.2022-10": {
+        "accuracy": 0.4199,
+        "trades": 181,
+        "avg_confidence": 0.6725,
+        "calibration_gap": 0.2526
+      },
+      "KSAT.2022-11": {
+        "accuracy": 0.3065,
+        "trades": 186,
+        "avg_confidence": 0.6265,
+        "calibration_gap": 0.32
+      },
+      "KSAT.2022-12": {
+        "accuracy": 0.3802,
+        "trades": 192,
+        "avg_confidence": 0.6298,
+        "calibration_gap": 0.2496
+      },
+      "KSAT.2023-01": {
+        "accuracy": 0.4451,
+        "trades": 173,
+        "avg_confidence": 0.58,
+        "calibration_gap": 0.1349
+      },
+      "KSAT.2023-02": {
+        "accuracy": 0.3968,
+        "trades": 189,
+        "avg_confidence": 0.6483,
+        "calibration_gap": 0.2515
+      },
+      "KSAT.2023-03": {
+        "accuracy": 0.3548,
+        "trades": 186,
+        "avg_confidence": 0.622,
+        "calibration_gap": 0.2671
+      },
+      "KSAT.2023-04": {
+        "accuracy": 0.3216,
+        "trades": 171,
+        "avg_confidence": 0.5799,
+        "calibration_gap": 0.2582
+      },
+      "KSAT.2023-05": {
+        "accuracy": 0.3382,
+        "trades": 136,
+        "avg_confidence": 0.6158,
+        "calibration_gap": 0.2776
+      },
+      "KSAT.2023-06": {
+        "accuracy": 0.1373,
+        "trades": 153,
+        "avg_confidence": 0.6933,
+        "calibration_gap": 0.556
+      },
+      "KSAT.2023-07": {
+        "accuracy": 0.2277,
+        "trades": 101,
+        "avg_confidence": 0.6434,
+        "calibration_gap": 0.4156
+      },
+      "KSAT.2023-08": {
+        "accuracy": 0.2735,
+        "trades": 117,
+        "avg_confidence": 0.6731,
+        "calibration_gap": 0.3996
+      },
+      "KSAT.2023-09": {
+        "accuracy": 0.5794,
+        "trades": 126,
+        "avg_confidence": 0.6526,
+        "calibration_gap": 0.0732
+      },
+      "KSAT.2023-10": {
+        "accuracy": 0.3834,
+        "trades": 193,
+        "avg_confidence": 0.6514,
+        "calibration_gap": 0.268
+      },
+      "KSAT.2023-11": {
+        "accuracy": 0.298,
+        "trades": 198,
+        "avg_confidence": 0.6196,
+        "calibration_gap": 0.3216
+      },
+      "KSAT.2023-12": {
+        "accuracy": 0.3774,
+        "trades": 159,
+        "avg_confidence": 0.5288,
+        "calibration_gap": 0.1514
+      },
+      "KSAT.2024-01": {
+        "accuracy": 0.3817,
+        "trades": 186,
+        "avg_confidence": 0.6117,
+        "calibration_gap": 0.23
+      },
+      "KSAT.2024-02": {
+        "accuracy": 0.5241,
+        "trades": 166,
+        "avg_confidence": 0.5869,
+        "calibration_gap": 0.0628
+      },
+      "KSAT.2024-03": {
+        "accuracy": 0.3784,
+        "trades": 185,
+        "avg_confidence": 0.611,
+        "calibration_gap": 0.2326
+      },
+      "KSAT.2024-04": {
+        "accuracy": 0.3865,
+        "trades": 163,
+        "avg_confidence": 0.5805,
+        "calibration_gap": 0.194
+      },
+      "KSAT.2024-05": {
+        "accuracy": 0.2249,
+        "trades": 169,
+        "avg_confidence": 0.6838,
+        "calibration_gap": 0.4589
+      },
+      "KSAT.2024-06": {
+        "accuracy": 0.3106,
+        "trades": 132,
+        "avg_confidence": 0.6848,
+        "calibration_gap": 0.3742
+      },
+      "KSAT.2024-07": {
+        "accuracy": 0.4429,
+        "trades": 140,
+        "avg_confidence": 0.675,
+        "calibration_gap": 0.2322
+      },
+      "KSAT.2024-08": {
+        "accuracy": 0.2482,
+        "trades": 137,
+        "avg_confidence": 0.6854,
+        "calibration_gap": 0.4373
+      },
+      "KSAT.2024-09": {
+        "accuracy": 0.4159,
+        "trades": 113,
+        "avg_confidence": 0.5994,
+        "calibration_gap": 0.1835
+      },
+      "KSAT.2024-10": {
+        "accuracy": 0.418,
+        "trades": 122,
+        "avg_confidence": 0.6158,
+        "calibration_gap": 0.1978
+      },
+      "KSAT.2024-11": {
+        "accuracy": 0.3564,
+        "trades": 188,
+        "avg_confidence": 0.5968,
+        "calibration_gap": 0.2404
+      },
+      "KSAT.2024-12": {
+        "accuracy": 0.371,
+        "trades": 186,
+        "avg_confidence": 0.6043,
+        "calibration_gap": 0.2334
+      },
+      "KSAT.2025-01": {
+        "accuracy": 0.3365,
+        "trades": 211,
+        "avg_confidence": 0.632,
+        "calibration_gap": 0.2955
+      },
+      "KSAT.2025-02": {
+        "accuracy": 0.4396,
+        "trades": 182,
+        "avg_confidence": 0.6538,
+        "calibration_gap": 0.2142
+      },
+      "KSAT.2025-03": {
+        "accuracy": 0.4242,
+        "trades": 198,
+        "avg_confidence": 0.5965,
+        "calibration_gap": 0.1722
+      },
+      "KSAT.2025-04": {
+        "accuracy": 0.2612,
+        "trades": 134,
+        "avg_confidence": 0.5352,
+        "calibration_gap": 0.274
+      },
+      "KSAT.2025-05": {
+        "accuracy": 0.283,
+        "trades": 159,
+        "avg_confidence": 0.675,
+        "calibration_gap": 0.392
+      },
+      "KSAT.2025-06": {
+        "accuracy": 0.3333,
+        "trades": 90,
+        "avg_confidence": 0.6086,
+        "calibration_gap": 0.2753
+      },
+      "KSAT.2025-07": {
+        "accuracy": 0.28,
+        "trades": 125,
+        "avg_confidence": 0.69,
+        "calibration_gap": 0.41
+      },
+      "KSAT.2025-08": {
+        "accuracy": 0.1389,
+        "trades": 108,
+        "avg_confidence": 0.6948,
+        "calibration_gap": 0.5559
+      },
+      "KSEA.2022-01": {
+        "accuracy": 0.4971,
+        "trades": 171,
+        "avg_confidence": 0.6241,
+        "calibration_gap": 0.127
+      },
+      "KSEA.2022-02": {
+        "accuracy": 0.4296,
+        "trades": 142,
+        "avg_confidence": 0.5836,
+        "calibration_gap": 0.154
+      },
+      "KSEA.2022-03": {
+        "accuracy": 0.475,
+        "trades": 160,
+        "avg_confidence": 0.6468,
+        "calibration_gap": 0.1718
+      },
+      "KSEA.2022-04": {
+        "accuracy": 0.4,
+        "trades": 150,
+        "avg_confidence": 0.6455,
+        "calibration_gap": 0.2455
+      },
+      "KSEA.2022-05": {
+        "accuracy": 0.3444,
+        "trades": 151,
+        "avg_confidence": 0.5481,
+        "calibration_gap": 0.2037
+      },
+      "KSEA.2022-06": {
+        "accuracy": 0.3065,
+        "trades": 186,
+        "avg_confidence": 0.6159,
+        "calibration_gap": 0.3094
+      },
+      "KSEA.2022-07": {
+        "accuracy": 0.2647,
+        "trades": 170,
+        "avg_confidence": 0.5984,
+        "calibration_gap": 0.3337
+      },
+      "KSEA.2022-08": {
+        "accuracy": 0.404,
+        "trades": 151,
+        "avg_confidence": 0.5867,
+        "calibration_gap": 0.1827
+      },
+      "KSEA.2022-09": {
+        "accuracy": 0.4969,
+        "trades": 163,
+        "avg_confidence": 0.6432,
+        "calibration_gap": 0.1463
+      },
+      "KSEA.2022-10": {
+        "accuracy": 0.3439,
+        "trades": 189,
+        "avg_confidence": 0.659,
+        "calibration_gap": 0.3151
+      },
+      "KSEA.2022-11": {
+        "accuracy": 0.2737,
+        "trades": 179,
+        "avg_confidence": 0.6563,
+        "calibration_gap": 0.3826
+      },
+      "KSEA.2022-12": {
+        "accuracy": 0.3723,
+        "trades": 188,
+        "avg_confidence": 0.6613,
+        "calibration_gap": 0.289
+      },
+      "KSEA.2023-01": {
+        "accuracy": 0.4611,
+        "trades": 167,
+        "avg_confidence": 0.5974,
+        "calibration_gap": 0.1363
+      },
+      "KSEA.2023-02": {
+        "accuracy": 0.3662,
+        "trades": 142,
+        "avg_confidence": 0.6045,
+        "calibration_gap": 0.2383
+      },
+      "KSEA.2023-03": {
+        "accuracy": 0.4709,
+        "trades": 172,
+        "avg_confidence": 0.6699,
+        "calibration_gap": 0.1989
+      },
+      "KSEA.2023-04": {
+        "accuracy": 0.3403,
+        "trades": 144,
+        "avg_confidence": 0.629,
+        "calibration_gap": 0.2887
+      },
+      "KSEA.2023-05": {
+        "accuracy": 0.3368,
+        "trades": 190,
+        "avg_confidence": 0.6069,
+        "calibration_gap": 0.27
+      },
+      "KSEA.2023-06": {
+        "accuracy": 0.4049,
+        "trades": 163,
+        "avg_confidence": 0.5843,
+        "calibration_gap": 0.1794
+      },
+      "KSEA.2023-07": {
+        "accuracy": 0.3553,
+        "trades": 152,
+        "avg_confidence": 0.5777,
+        "calibration_gap": 0.2225
+      },
+      "KSEA.2023-08": {
+        "accuracy": 0.3951,
+        "trades": 162,
+        "avg_confidence": 0.613,
+        "calibration_gap": 0.2179
+      },
+      "KSEA.2023-09": {
+        "accuracy": 0.5089,
+        "trades": 169,
+        "avg_confidence": 0.6456,
+        "calibration_gap": 0.1367
+      },
+      "KSEA.2023-10": {
+        "accuracy": 0.3533,
+        "trades": 184,
+        "avg_confidence": 0.6646,
+        "calibration_gap": 0.3113
+      },
+      "KSEA.2023-11": {
+        "accuracy": 0.2743,
+        "trades": 175,
+        "avg_confidence": 0.6498,
+        "calibration_gap": 0.3755
+      },
+      "KSEA.2023-12": {
+        "accuracy": 0.4024,
+        "trades": 169,
+        "avg_confidence": 0.5914,
+        "calibration_gap": 0.189
+      },
+      "KSEA.2024-01": {
+        "accuracy": 0.3661,
+        "trades": 183,
+        "avg_confidence": 0.6394,
+        "calibration_gap": 0.2732
+      },
+      "KSEA.2024-02": {
+        "accuracy": 0.4604,
+        "trades": 139,
+        "avg_confidence": 0.5237,
+        "calibration_gap": 0.0632
+      },
+      "KSEA.2024-03": {
+        "accuracy": 0.3675,
+        "trades": 166,
+        "avg_confidence": 0.6501,
+        "calibration_gap": 0.2827
+      },
+      "KSEA.2024-04": {
+        "accuracy": 0.3833,
+        "trades": 180,
+        "avg_confidence": 0.6522,
+        "calibration_gap": 0.2689
+      },
+      "KSEA.2024-05": {
+        "accuracy": 0.3669,
+        "trades": 169,
+        "avg_confidence": 0.5753,
+        "calibration_gap": 0.2084
+      },
+      "KSEA.2024-06": {
+        "accuracy": 0.3413,
+        "trades": 167,
+        "avg_confidence": 0.5673,
+        "calibration_gap": 0.226
+      },
+      "KSEA.2024-07": {
+        "accuracy": 0.3176,
+        "trades": 170,
+        "avg_confidence": 0.6148,
+        "calibration_gap": 0.2972
+      },
+      "KSEA.2024-08": {
+        "accuracy": 0.4702,
+        "trades": 151,
+        "avg_confidence": 0.5817,
+        "calibration_gap": 0.1115
+      },
+      "KSEA.2024-09": {
+        "accuracy": 0.474,
+        "trades": 173,
+        "avg_confidence": 0.6779,
+        "calibration_gap": 0.2039
+      },
+      "KSEA.2024-10": {
+        "accuracy": 0.4064,
+        "trades": 187,
+        "avg_confidence": 0.66,
+        "calibration_gap": 0.2536
+      },
+      "KSEA.2024-11": {
+        "accuracy": 0.2626,
+        "trades": 179,
+        "avg_confidence": 0.6507,
+        "calibration_gap": 0.3881
+      },
+      "KSEA.2024-12": {
+        "accuracy": 0.4129,
+        "trades": 155,
+        "avg_confidence": 0.5566,
+        "calibration_gap": 0.1437
+      },
+      "KSEA.2025-01": {
+        "accuracy": 0.2986,
+        "trades": 144,
+        "avg_confidence": 0.6531,
+        "calibration_gap": 0.3545
+      },
+      "KSEA.2025-02": {
+        "accuracy": 0.4211,
+        "trades": 171,
+        "avg_confidence": 0.6838,
+        "calibration_gap": 0.2627
+      },
+      "KSEA.2025-03": {
+        "accuracy": 0.4067,
+        "trades": 150,
+        "avg_confidence": 0.6253,
+        "calibration_gap": 0.2187
+      },
+      "KSEA.2025-04": {
+        "accuracy": 0.3046,
+        "trades": 174,
+        "avg_confidence": 0.6453,
+        "calibration_gap": 0.3407
+      },
+      "KSEA.2025-05": {
+        "accuracy": 0.2948,
+        "trades": 173,
+        "avg_confidence": 0.5748,
+        "calibration_gap": 0.28
+      },
+      "KSEA.2025-06": {
+        "accuracy": 0.3598,
+        "trades": 164,
+        "avg_confidence": 0.5818,
+        "calibration_gap": 0.2221
+      },
+      "KSEA.2025-07": {
+        "accuracy": 0.3068,
+        "trades": 176,
+        "avg_confidence": 0.6107,
+        "calibration_gap": 0.3039
+      },
+      "KSEA.2025-08": {
+        "accuracy": 0.3451,
+        "trades": 142,
+        "avg_confidence": 0.6301,
+        "calibration_gap": 0.285
+      },
+      "KSFO.2022-01": {
+        "accuracy": 0.5141,
+        "trades": 142,
+        "avg_confidence": 0.5629,
+        "calibration_gap": 0.0488
+      },
+      "KSFO.2022-02": {
+        "accuracy": 0.3291,
+        "trades": 158,
+        "avg_confidence": 0.5892,
+        "calibration_gap": 0.2601
+      },
+      "KSFO.2022-03": {
+        "accuracy": 0.3931,
+        "trades": 173,
+        "avg_confidence": 0.623,
+        "calibration_gap": 0.23
+      },
+      "KSFO.2022-04": {
+        "accuracy": 0.3742,
+        "trades": 155,
+        "avg_confidence": 0.6273,
+        "calibration_gap": 0.2531
+      },
+      "KSFO.2022-05": {
+        "accuracy": 0.2941,
+        "trades": 153,
+        "avg_confidence": 0.5338,
+        "calibration_gap": 0.2396
+      },
+      "KSFO.2022-06": {
+        "accuracy": 0.3522,
+        "trades": 159,
+        "avg_confidence": 0.5583,
+        "calibration_gap": 0.2061
+      },
+      "KSFO.2022-07": {
+        "accuracy": 0.3254,
+        "trades": 126,
+        "avg_confidence": 0.4909,
+        "calibration_gap": 0.1656
+      },
+      "KSFO.2022-08": {
+        "accuracy": 0.232,
+        "trades": 125,
+        "avg_confidence": 0.509,
+        "calibration_gap": 0.277
+      },
+      "KSFO.2022-09": {
+        "accuracy": 0.4167,
+        "trades": 168,
+        "avg_confidence": 0.6521,
+        "calibration_gap": 0.2355
+      },
+      "KSFO.2022-10": {
+        "accuracy": 0.4359,
+        "trades": 156,
+        "avg_confidence": 0.6163,
+        "calibration_gap": 0.1804
+      },
+      "KSFO.2022-11": {
+        "accuracy": 0.3032,
+        "trades": 155,
+        "avg_confidence": 0.5642,
+        "calibration_gap": 0.261
+      },
+      "KSFO.2022-12": {
+        "accuracy": 0.2905,
+        "trades": 179,
+        "avg_confidence": 0.5953,
+        "calibration_gap": 0.3048
+      },
+      "KSFO.2023-01": {
+        "accuracy": 0.4444,
+        "trades": 180,
+        "avg_confidence": 0.5833,
+        "calibration_gap": 0.1388
+      },
+      "KSFO.2023-02": {
+        "accuracy": 0.3677,
+        "trades": 155,
+        "avg_confidence": 0.5726,
+        "calibration_gap": 0.2049
+      },
+      "KSFO.2023-03": {
+        "accuracy": 0.4266,
+        "trades": 143,
+        "avg_confidence": 0.6279,
+        "calibration_gap": 0.2013
+      },
+      "KSFO.2023-04": {
+        "accuracy": 0.3718,
+        "trades": 156,
+        "avg_confidence": 0.621,
+        "calibration_gap": 0.2492
+      },
+      "KSFO.2023-05": {
+        "accuracy": 0.374,
+        "trades": 123,
+        "avg_confidence": 0.4939,
+        "calibration_gap": 0.1199
+      },
+      "KSFO.2023-06": {
+        "accuracy": 0.3036,
+        "trades": 112,
+        "avg_confidence": 0.506,
+        "calibration_gap": 0.2024
+      },
+      "KSFO.2023-07": {
+        "accuracy": 0.2296,
+        "trades": 135,
+        "avg_confidence": 0.5365,
+        "calibration_gap": 0.3069
+      },
+      "KSFO.2023-08": {
+        "accuracy": 0.2581,
+        "trades": 155,
+        "avg_confidence": 0.5722,
+        "calibration_gap": 0.3141
+      },
+      "KSFO.2023-09": {
+        "accuracy": 0.4032,
+        "trades": 124,
+        "avg_confidence": 0.5907,
+        "calibration_gap": 0.1875
+      },
+      "KSFO.2023-10": {
+        "accuracy": 0.3657,
+        "trades": 175,
+        "avg_confidence": 0.655,
+        "calibration_gap": 0.2893
+      },
+      "KSFO.2023-11": {
+        "accuracy": 0.3778,
+        "trades": 135,
+        "avg_confidence": 0.535,
+        "calibration_gap": 0.1572
+      },
+      "KSFO.2023-12": {
+        "accuracy": 0.3205,
+        "trades": 156,
+        "avg_confidence": 0.5764,
+        "calibration_gap": 0.2559
+      },
+      "KSFO.2024-01": {
+        "accuracy": 0.3291,
+        "trades": 158,
+        "avg_confidence": 0.5584,
+        "calibration_gap": 0.2293
+      },
+      "KSFO.2024-02": {
+        "accuracy": 0.4167,
+        "trades": 144,
+        "avg_confidence": 0.5521,
+        "calibration_gap": 0.1354
+      },
+      "KSFO.2024-03": {
+        "accuracy": 0.4054,
+        "trades": 148,
+        "avg_confidence": 0.6191,
+        "calibration_gap": 0.2137
+      },
+      "KSFO.2024-04": {
+        "accuracy": 0.3675,
+        "trades": 166,
+        "avg_confidence": 0.6403,
+        "calibration_gap": 0.2728
+      },
+      "KSFO.2024-05": {
+        "accuracy": 0.3421,
+        "trades": 152,
+        "avg_confidence": 0.5478,
+        "calibration_gap": 0.2057
+      },
+      "KSFO.2024-06": {
+        "accuracy": 0.3158,
+        "trades": 133,
+        "avg_confidence": 0.5069,
+        "calibration_gap": 0.1911
+      },
+      "KSFO.2024-07": {
+        "accuracy": 0.3548,
+        "trades": 155,
+        "avg_confidence": 0.5377,
+        "calibration_gap": 0.1828
+      },
+      "KSFO.2024-08": {
+        "accuracy": 0.3,
+        "trades": 130,
+        "avg_confidence": 0.5194,
+        "calibration_gap": 0.2194
+      },
+      "KSFO.2024-09": {
+        "accuracy": 0.3551,
+        "trades": 138,
+        "avg_confidence": 0.6098,
+        "calibration_gap": 0.2548
+      },
+      "KSFO.2024-10": {
+        "accuracy": 0.3693,
+        "trades": 176,
+        "avg_confidence": 0.6447,
+        "calibration_gap": 0.2754
+      },
+      "KSFO.2024-11": {
+        "accuracy": 0.2933,
+        "trades": 150,
+        "avg_confidence": 0.554,
+        "calibration_gap": 0.2607
+      },
+      "KSFO.2024-12": {
+        "accuracy": 0.2806,
+        "trades": 139,
+        "avg_confidence": 0.5535,
+        "calibration_gap": 0.2729
+      },
+      "KSFO.2025-01": {
+        "accuracy": 0.3856,
+        "trades": 153,
+        "avg_confidence": 0.5505,
+        "calibration_gap": 0.1649
+      },
+      "KSFO.2025-02": {
+        "accuracy": 0.3835,
+        "trades": 133,
+        "avg_confidence": 0.5613,
+        "calibration_gap": 0.1778
+      },
+      "KSFO.2025-03": {
+        "accuracy": 0.3789,
+        "trades": 161,
+        "avg_confidence": 0.6333,
+        "calibration_gap": 0.2544
+      },
+      "KSFO.2025-04": {
+        "accuracy": 0.3311,
+        "trades": 148,
+        "avg_confidence": 0.6075,
+        "calibration_gap": 0.2764
+      },
+      "KSFO.2025-05": {
+        "accuracy": 0.3,
+        "trades": 150,
+        "avg_confidence": 0.5199,
+        "calibration_gap": 0.2199
+      },
+      "KSFO.2025-06": {
+        "accuracy": 0.3534,
+        "trades": 116,
+        "avg_confidence": 0.4974,
+        "calibration_gap": 0.1439
+      },
+      "KSFO.2025-07": {
+        "accuracy": 0.2735,
+        "trades": 117,
+        "avg_confidence": 0.4725,
+        "calibration_gap": 0.199
+      },
+      "KSFO.2025-08": {
+        "accuracy": 0.2581,
+        "trades": 124,
+        "avg_confidence": 0.5269,
+        "calibration_gap": 0.2688
+      }
+    },
+    "signals_above_mcc_015": 1
+  }
+}
