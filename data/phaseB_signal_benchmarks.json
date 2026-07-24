@@ -1,0 +1,1373 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-23T19:53:56.420810+00:00",
+    "phase": "B",
+    "signals_benchmarked": 17,
+    "stations": 20,
+    "train_days": 365,
+    "test_days": 90
+  },
+  "per_signal": {
+    "gaussian": {
+      "accuracy": 0.6653,
+      "coverage": 0.4267,
+      "brier": 0.3347,
+      "ece": 0.3347,
+      "sharpe": 0.3395,
+      "max_drawdown": 0.0839,
+      "station_consistency": 1.0,
+      "directional_symmetry": 0.1137,
+      "firing_rate": 0.4267,
+      "total_trades": 11391,
+      "pass": true,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe",
+        "directional_asymmetry"
+      ],
+      "up_accuracy": 0.6032,
+      "down_accuracy": 0.717,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.6639,
+          "trades": 598,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.6953,
+          "trades": 558,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.6901,
+          "trades": 568,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.6638,
+          "trades": 586,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.7067,
+          "trades": 549,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.6789,
+          "trades": 573,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.6741,
+          "trades": 580,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.5702,
+          "trades": 691,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.6864,
+          "trades": 472,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.6697,
+          "trades": 548,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.744,
+          "trades": 496,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.6714,
+          "trades": 560,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.6832,
+          "trades": 606,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.6391,
+          "trades": 593,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.6772,
+          "trades": 601,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.6499,
+          "trades": 597,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.6218,
+          "trades": 669,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.6938,
+          "trades": 529,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.5843,
+          "trades": 575,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.6968,
+          "trades": 442,
+          "status": "ok"
+        }
+      }
+    },
+    "gaussian_v2": {
+      "accuracy": 0.6395,
+      "coverage": 0.6841,
+      "brier": 0.3053,
+      "ece": 0.2557,
+      "sharpe": 0.2942,
+      "max_drawdown": 0.1196,
+      "station_consistency": 1.0,
+      "directional_symmetry": 0.0854,
+      "firing_rate": 0.6841,
+      "total_trades": 18260,
+      "pass": true,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe"
+      ],
+      "up_accuracy": 0.5933,
+      "down_accuracy": 0.6787,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.6319,
+          "trades": 910,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.6642,
+          "trades": 935,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.6722,
+          "trades": 903,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.6412,
+          "trades": 917,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.6663,
+          "trades": 914,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.6444,
+          "trades": 942,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.6536,
+          "trades": 947,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.5789,
+          "trades": 957,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.6356,
+          "trades": 859,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.6284,
+          "trades": 931,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.6946,
+          "trades": 848,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.6313,
+          "trades": 895,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.6578,
+          "trades": 944,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.6364,
+          "trades": 913,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.6408,
+          "trades": 941,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.6364,
+          "trades": 913,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.5928,
+          "trades": 970,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.6655,
+          "trades": 879,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.5871,
+          "trades": 913,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.6393,
+          "trades": 829,
+          "status": "ok"
+        }
+      }
+    },
+    "goldilocks": {
+      "accuracy": 0.4985,
+      "coverage": 0.5705,
+      "brier": 0.2652,
+      "ece": 0.1123,
+      "sharpe": 0.0166,
+      "max_drawdown": 0.9503,
+      "station_consistency": 0.5,
+      "directional_symmetry": 0.0704,
+      "firing_rate": 0.5705,
+      "total_trades": 15228,
+      "pass": false,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe",
+        "low_station_consistency"
+      ],
+      "up_accuracy": 0.4626,
+      "down_accuracy": 0.5329,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.497,
+          "trades": 827,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.4937,
+          "trades": 715,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.5175,
+          "trades": 974,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.5017,
+          "trades": 899,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.5262,
+          "trades": 956,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.4713,
+          "trades": 766,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.5529,
+          "trades": 718,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.4441,
+          "trades": 581,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.5227,
+          "trades": 528,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.4865,
+          "trades": 929,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.5465,
+          "trades": 441,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.4811,
+          "trades": 898,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.5347,
+          "trades": 692,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.5,
+          "trades": 904,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.4724,
+          "trades": 887,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.5005,
+          "trades": 951,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.4247,
+          "trades": 558,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.5087,
+          "trades": 686,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.4613,
+          "trades": 685,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.5261,
+          "trades": 633,
+          "status": "ok"
+        }
+      }
+    },
+    "persistence": {
+      "accuracy": 0.5095,
+      "coverage": 1.0,
+      "brier": 0.2938,
+      "ece": 0.2095,
+      "sharpe": 0.0087,
+      "max_drawdown": 1.0,
+      "station_consistency": 0.4,
+      "directional_symmetry": 0.0987,
+      "firing_rate": 1.0,
+      "total_trades": 26693,
+      "pass": false,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe",
+        "low_station_consistency"
+      ],
+      "up_accuracy": 0.4553,
+      "down_accuracy": 0.554,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.4974,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.4944,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.4906,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.4959,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.4824,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.5251,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.4704,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.5715,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.4936,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.5393,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.4742,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.5431,
+          "trades": 1333,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.4846,
+          "trades": 1333,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.5004,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.5258,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.4989,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.5889,
+          "trades": 1333,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.488,
+          "trades": 1334,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.5288,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.4966,
+          "trades": 1335,
+          "status": "ok"
+        }
+      }
+    },
+    "pressure_delta": {
+      "accuracy": 0.6086,
+      "coverage": 0.5798,
+      "brier": 0.2678,
+      "ece": 0.1727,
+      "sharpe": 0.215,
+      "max_drawdown": 0.1109,
+      "station_consistency": 1.0,
+      "directional_symmetry": 0.0732,
+      "firing_rate": 0.5798,
+      "total_trades": 15477,
+      "pass": true,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe"
+      ],
+      "up_accuracy": 0.5714,
+      "down_accuracy": 0.6447,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.6135,
+          "trades": 753,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.6156,
+          "trades": 718,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.6046,
+          "trades": 994,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.6261,
+          "trades": 928,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.6619,
+          "trades": 917,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.615,
+          "trades": 761,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.578,
+          "trades": 673,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.6577,
+          "trades": 777,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.515,
+          "trades": 468,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.6502,
+          "trades": 929,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.5678,
+          "trades": 435,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.61,
+          "trades": 964,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.5839,
+          "trades": 632,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.5701,
+          "trades": 956,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.6087,
+          "trades": 846,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.5864,
+          "trades": 938,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.6673,
+          "trades": 565,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.6037,
+          "trades": 704,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.595,
+          "trades": 884,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.5843,
+          "trades": 635,
+          "status": "ok"
+        }
+      }
+    },
+    "calendar_climatology": {
+      "accuracy": 0.69,
+      "coverage": 0.2228,
+      "brier": 0.2264,
+      "ece": 0.111,
+      "sharpe": 0.4008,
+      "max_drawdown": 0.0631,
+      "station_consistency": 1.0,
+      "directional_symmetry": 0.1282,
+      "firing_rate": 0.2228,
+      "total_trades": 5948,
+      "pass": true,
+      "warnings": [
+        "high_ece",
+        "low_sharpe",
+        "directional_asymmetry"
+      ],
+      "up_accuracy": 0.6262,
+      "down_accuracy": 0.7544,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.6955,
+          "trades": 312,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.6978,
+          "trades": 268,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.7178,
+          "trades": 326,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.6803,
+          "trades": 319,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.7355,
+          "trades": 276,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.6923,
+          "trades": 273,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.6842,
+          "trades": 285,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.6058,
+          "trades": 378,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.7265,
+          "trades": 223,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.6948,
+          "trades": 308,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.7339,
+          "trades": 248,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.6825,
+          "trades": 315,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.7343,
+          "trades": 286,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.6865,
+          "trades": 319,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.7621,
+          "trades": 290,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.6969,
+          "trades": 320,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.6295,
+          "trades": 386,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.6807,
+          "trades": 285,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.595,
+          "trades": 321,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.7571,
+          "trades": 210,
+          "status": "ok"
+        }
+      }
+    },
+    "wind_direction_shift": {
+      "accuracy": 0.4972,
+      "coverage": 0.1541,
+      "brier": 0.3306,
+      "ece": 0.2296,
+      "sharpe": -0.0571,
+      "max_drawdown": 1.0,
+      "station_consistency": 0.6,
+      "directional_symmetry": 0.1529,
+      "firing_rate": 0.1541,
+      "total_trades": 4113,
+      "pass": false,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe",
+        "directional_asymmetry"
+      ],
+      "up_accuracy": 0.4238,
+      "down_accuracy": 0.5767,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.5101,
+          "trades": 149,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.4153,
+          "trades": 118,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.5216,
+          "trades": 416,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.5114,
+          "trades": 176,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.3553,
+          "trades": 197,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.4377,
+          "trades": 329,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.5194,
+          "trades": 129,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.473,
+          "trades": 148,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.5385,
+          "trades": 52,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.5251,
+          "trades": 358,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.5714,
+          "trades": 70,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.4712,
+          "trades": 312,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.5839,
+          "trades": 137,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.5642,
+          "trades": 413,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.457,
+          "trades": 407,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.5109,
+          "trades": 229,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.6774,
+          "trades": 31,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.479,
+          "trades": 119,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.4576,
+          "trades": 59,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.5227,
+          "trades": 264,
+          "status": "ok"
+        }
+      }
+    },
+    "forecast_disagreement": {
+      "accuracy": 0.6436,
+      "coverage": 0.4247,
+      "brier": 0.2599,
+      "ece": 0.1508,
+      "sharpe": 0.2976,
+      "max_drawdown": 0.0735,
+      "station_consistency": 1.0,
+      "directional_symmetry": 0.0574,
+      "firing_rate": 0.4247,
+      "total_trades": 11336,
+      "pass": true,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe"
+      ],
+      "up_accuracy": 0.6142,
+      "down_accuracy": 0.6717,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.6481,
+          "trades": 557,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.666,
+          "trades": 500,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.66,
+          "trades": 753,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.6522,
+          "trades": 670,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.6577,
+          "trades": 783,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.6547,
+          "trades": 585,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.6652,
+          "trades": 460,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.5823,
+          "trades": 553,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.622,
+          "trades": 328,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.633,
+          "trades": 793,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.7407,
+          "trades": 162,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.6166,
+          "trades": 785,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.6658,
+          "trades": 407,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.6459,
+          "trades": 675,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.6293,
+          "trades": 696,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.6421,
+          "trades": 679,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.6218,
+          "trades": 513,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.6765,
+          "trades": 476,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.6261,
+          "trades": 567,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.6472,
+          "trades": 394,
+          "status": "ok"
+        }
+      }
+    },
+    "frontal_detector": {
+      "accuracy": 0.4677,
+      "coverage": 0.5133,
+      "brier": 0.3143,
+      "ece": 0.1962,
+      "sharpe": -0.0693,
+      "max_drawdown": 1.0,
+      "station_consistency": 0.15,
+      "directional_symmetry": 0.081,
+      "firing_rate": 0.5133,
+      "total_trades": 13701,
+      "pass": false,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe",
+        "low_station_consistency"
+      ],
+      "up_accuracy": 0.4283,
+      "down_accuracy": 0.5093,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.4474,
+          "trades": 751,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.4734,
+          "trades": 659,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.4345,
+          "trades": 893,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.436,
+          "trades": 867,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.4264,
+          "trades": 870,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.4923,
+          "trades": 717,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.4603,
+          "trades": 567,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.4588,
+          "trades": 595,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.4433,
+          "trades": 282,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.4569,
+          "trades": 939,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.5029,
+          "trades": 350,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.4727,
+          "trades": 952,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.4791,
+          "trades": 526,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.4721,
+          "trades": 915,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.4825,
+          "trades": 802,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.4571,
+          "trades": 897,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.5155,
+          "trades": 483,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.4983,
+          "trades": 596,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.5159,
+          "trades": 628,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.4976,
+          "trades": 412,
+          "status": "ok"
+        }
+      }
+    },
+    "fogr_reversion": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "metar_dtdt": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "pressure_tendency": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "nwp_dtdt_fusion": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "spread_based_entry": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "volume_momentum": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "settlement_arbitrage": {
+      "accuracy": 0.0,
+      "coverage": 0.0,
+      "brier": 1.0,
+      "ece": 1.0,
+      "sharpe": 0.0,
+      "max_drawdown": 0.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 0.0,
+      "total_trades": 0,
+      "pass": false,
+      "warnings": [
+        "no_trades"
+      ],
+      "per_station": {}
+    },
+    "seasonal_regime": {
+      "accuracy": 0.0,
+      "coverage": 1.0,
+      "brier": 0.3063,
+      "ece": 0.5991,
+      "sharpe": -2.4138,
+      "max_drawdown": 1.0,
+      "station_consistency": 0.0,
+      "directional_symmetry": 0.0,
+      "firing_rate": 1.0,
+      "total_trades": 26693,
+      "pass": false,
+      "warnings": [
+        "high_brier",
+        "high_ece",
+        "low_sharpe",
+        "low_station_consistency"
+      ],
+      "up_accuracy": 0.0,
+      "down_accuracy": 0.0,
+      "per_station": {
+        "KATL": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KAUS": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KBOS": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KDCA": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KDEN": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KDFW": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KHOU": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KLAS": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KLAX": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KMDW": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KMIA": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KMSP": {
+          "accuracy": 0.0,
+          "trades": 1333,
+          "status": "ok"
+        },
+        "KMSY": {
+          "accuracy": 0.0,
+          "trades": 1333,
+          "status": "ok"
+        },
+        "KNYC": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KOKC": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KPHL": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KPHX": {
+          "accuracy": 0.0,
+          "trades": 1333,
+          "status": "ok"
+        },
+        "KSAT": {
+          "accuracy": 0.0,
+          "trades": 1334,
+          "status": "ok"
+        },
+        "KSEA": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        },
+        "KSFO": {
+          "accuracy": 0.0,
+          "trades": 1335,
+          "status": "ok"
+        }
+      }
+    }
+  },
+  "summary": {
+    "signals_passing": 5,
+    "signals_failing": 5,
+    "avg_accuracy": 0.522,
+    "best_signal": {
+      "name": "calendar_climatology",
+      "accuracy": 0.69
+    },
+    "worst_signal": {
+      "name": "seasonal_regime",
+      "accuracy": 0.0
+    },
+    "signals_flagged_for_removal": [
+      "goldilocks"
+    ]
+  }
+}

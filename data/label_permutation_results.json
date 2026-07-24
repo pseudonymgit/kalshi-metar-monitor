@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-07-16T22:37:25.623104",
+    "timestamp": "2026-07-24T10:03:39.759347",
     "database": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/../data/metar_backfill.db",
     "signals_tested": "goldilocks+gaussian",
     "min_agreement": 2,
