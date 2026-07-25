@@ -108,7 +108,7 @@ except Exception:
         "KDEN": "DEN", "KLAX": "LAX", "KNYC": "NYC", "KPHL": "PHIL",
         "KMDW": "CHI", "KMIA": "MIA", "KAUS": "AUS",
     }
-__all__ = ['get_default_config', 'map_market_to_station', 'discover_kalshi_weather_markets', 'build_market_derived_station_universe', 'resolve_settlement_station', 'discover_market_derived_station_codes', 'build_market_polling_station_universe', 'get_discovered_weather_market_station_mapping', 'ensure_series_discovery_loaded', 'get_series_discovery_cache_snapshot', 'get_series_surface_snapshot', 'get_cached_series_markets', 'get_station_hydration_cache_probe', 'ensure_ladder_hydration_prerequisite', 'get_hydration_prerequisite_state_snapshot', 'get_kalshi_connectivity_snapshot', 'get_last_hydration_execution_snapshot', 'enqueue_station_hydration', 'hydration_queue_snapshot', 'process_hydration_queue_worker', 'hydrate_station_ladder_snapshot', 'classify_proximity', 'build_structured_snapshot', 'build_structured_snapshot_from_cache', 'get_state', 'get_metrics']
+__all__ = ['get_default_config', 'map_market_to_station', 'discover_kalshi_weather_markets', 'resolve_settlement_station', 'ensure_series_discovery_loaded', 'get_series_discovery_cache_snapshot', 'get_series_surface_snapshot', 'get_cached_series_markets', 'get_station_hydration_cache_probe', 'ensure_ladder_hydration_prerequisite', 'get_hydration_prerequisite_state_snapshot', 'get_kalshi_connectivity_snapshot', 'get_last_hydration_execution_snapshot', 'enqueue_station_hydration', 'hydration_queue_snapshot', 'process_hydration_queue_worker', 'hydrate_station_ladder_snapshot', 'classify_proximity', 'build_structured_snapshot', 'build_structured_snapshot_from_cache', 'get_state', 'get_metrics']
 
 
 
@@ -432,43 +432,12 @@ def discover_kalshi_weather_markets(max_pages=5, page_limit=200):
                 )
 
     return list(discovered_markets)
-def build_market_derived_station_universe(max_pages=5, page_limit=200):
-    city_tokens = set()
-    cursor = None
+# Market discovery functions live in kalshi_monitor.py — this file is deprecated
+# def build_market_derived_station_universe() removed — see kalshi_monitor.py
+# def discover_market_derived_station_codes() removed — see kalshi_monitor.py
+# def build_market_polling_station_universe() removed — see kalshi_monitor.py
+# def get_discovered_weather_market_station_mapping() removed — see kalshi_monitor.py
 
-    for _ in range(max_pages):
-        path = f"/markets?limit={int(page_limit)}&status=open"
-        if cursor:
-            path = f"{path}&cursor={cursor}"
-
-        data = _kalshi_public_get(path)
-        markets = data.get("markets") or []
-
-        for market in markets:
-            if str(market.get("status") or "").upper() != "OPEN":
-                continue
-
-            ticker = str(market.get("ticker") or "").strip().upper()
-            prefix = None
-            if ticker.startswith("KXHIGH"):
-                prefix = "KXHIGH"
-            elif ticker.startswith("KXLOW"):
-                prefix = "KXLOW"
-
-            if not prefix:
-                continue
-
-            remainder = ticker[len(prefix):]
-            city_token, _, _ = remainder.partition("-")
-            city_token = city_token.strip().upper()
-            if city_token:
-                city_tokens.add(city_token)
-
-        cursor = data.get("cursor")
-        if not cursor:
-            break
-
-    return sorted(city_tokens)
 def resolve_settlement_station(token: str) -> str | None:
     normalized_token = (token or "").strip().upper()
     if not normalized_token:
@@ -495,33 +464,6 @@ def resolve_settlement_station(token: str) -> str | None:
         return extracted
 
     return _EXPLICIT_SETTLEMENT_STATION_OVERRIDES.get(normalized_token)
-def discover_market_derived_station_codes(max_pages=5, page_limit=200):
-    stations = {
-        str(market.get("station") or "").strip().upper()
-        for market in discover_kalshi_weather_markets(max_pages=max_pages, page_limit=page_limit)
-        if str(market.get("station") or "").strip()
-    }
-    if stations:
-        return sorted(stations)
-
-    tokens = build_market_derived_station_universe(max_pages=max_pages, page_limit=page_limit)
-    for token in tokens:
-        try:
-            station = resolve_settlement_station(token)
-        except Exception:
-            continue
-        if station:
-            stations.add(station)
-
-    return sorted(stations)
-def build_market_polling_station_universe(max_pages=5, page_limit=200):
-    return discover_market_derived_station_codes(max_pages=max_pages, page_limit=page_limit)
-def get_discovered_weather_market_station_mapping() -> dict:
-    with _SERIES_LOCK:
-        return {
-            station: list(markets)
-            for station, markets in _DISCOVERED_WEATHER_MARKETS_BY_STATION.items()
-        }
 def _format_change(prev, curr):
     return f"{prev} → {curr}"
 def _parse_target_market_types(raw_types):

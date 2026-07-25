@@ -71,7 +71,7 @@ NEAR_MISS_TYPES = {
         "fields": ["boundary_level", "remaining_cooldown_seconds", "total_cooldown_seconds"],
     },
     "EPOCH_ALERT_ALREADY_EMITTED": {
-        "description": "Goldilocks epoch alert already fired this epoch",
+        "description": "Microstructure Spike epoch alert already fired this epoch (A3: formerly Goldilocks)",
         "fields": ["epoch_id", "signal_type"],
     },
     "NO_ELIGIBLE_MARKET": {
@@ -95,8 +95,8 @@ NEAR_MISS_TYPES = {
         "fields": ["market_direction", "expected_direction", "strike_distance"],
     },
     # Confidence/criteria close to threshold
-    "LOW_CONFIDENCE_GOLDILOCKS": {
-        "description": "Goldilocks pattern detected but confidence below threshold",
+    "LOW_CONFIDENCE_MICROSTRUCTURE_SPIKE": {
+        "description": "Microstructure Spike pattern detected but confidence below threshold (A3: formerly Goldilocks)",
         "fields": ["confidence", "confidence_threshold", "reversion_direction"],
     },
     "MOMENTUM_BELOW_THRESHOLD": {
@@ -144,6 +144,8 @@ def _ensure_near_miss_audit_schema() -> None:
 
     with _AUDIT_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.execute(
                 """
@@ -225,6 +227,8 @@ def log_near_miss(
         _ensure_near_miss_audit_schema()
         
         conn = sqlite3.connect(_get_alert_db_path(), timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             cursor = conn.execute(
                 """
@@ -307,6 +311,8 @@ def query_near_miss_log(
         _ensure_near_miss_audit_schema()
         
         conn = sqlite3.connect(_get_alert_db_path(), timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             rows = conn.execute(query, params).fetchall()
         finally:
@@ -515,7 +521,7 @@ def log_near_miss_if_no_eligible_market(
     # Determine the specific suppression reason
     if not hydration_valid:
         near_miss_type = "HYDRATION_CACHE_INVALID"
-        suppressed = "goldilocks_reversion_alert"
+        suppressed = "microstructure_spike_reversion"
     elif discovered_markets_count <= 0:
         near_miss_type = "NO_ELIGIBLE_MARKET"
         suppressed = "near_boundary_momentum_up"
@@ -541,7 +547,7 @@ def log_near_miss_if_epoch_alert_emitted(
     signal_type: str,
 ) -> bool:
     """
-    Log near-miss when goldilocks epoch alert already emitted.
+    Log near-miss when microstructure spike epoch alert already emitted (A3: renamed).
     
     Returns True if near-miss was logged.
     """
@@ -555,7 +561,7 @@ def log_near_miss_if_epoch_alert_emitted(
         near_miss_type="EPOCH_ALERT_ALREADY_EMITTED",
         severity="LOW",
         details=details,
-        suppressed_alert_type="goldilocks_reversion_alert",
+        suppressed_alert_type="microstructure_spike_reversion",
     )
     
     return True

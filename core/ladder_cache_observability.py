@@ -169,6 +169,8 @@ def track_ladder_change(station, series_ticker, ladder_before, ladder_after):
     
     # Create table if not exists
     with sqlite3.connect(db_path, timeout=1) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         conn.execute("""
             CREATE TABLE IF NOT EXISTS market_change_events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -184,6 +186,8 @@ def track_ladder_change(station, series_ticker, ladder_before, ladder_after):
     
     # Insert the change record
     with sqlite3.connect(db_path, timeout=1) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         conn.execute(
             """
             INSERT INTO market_change_events 

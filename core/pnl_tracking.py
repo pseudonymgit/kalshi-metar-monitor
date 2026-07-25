@@ -122,7 +122,7 @@ def process_settlements_for_date(self, settlement_date):
                 realized_pnl = ?, settlement_return_amount = ?,
                 status = 'closed'
             WHERE trade_uuid = ?
-        """, (settlement_value/100.0, settlement_date, profit, return_amount, trade_uuid))
+        """, (settlement_value, settlement_date, profit, return_amount, trade_uuid))
 
         # Update corresponding position (reduce by quantity)
         trade_qty = qty
@@ -157,8 +157,6 @@ def process_settlements_for_date(self, settlement_date):
                 signal_name = "calendar_climatology"
             elif "momentum" in functionality or "late_day" in functionality:
                 signal_name = "late_day_momentum"  # Using appropriate name for the late-day momentum signal
-            elif "nwp" in functionality or "direct" in functionality:
-                signal_name = "nwp_direct"
             elif "analysis" in functionality:
                 signal_name = "late_day_analysis"
             else:
@@ -194,7 +192,12 @@ def daily_reconciliation(self, reconcile_date=None):
     Includes:
     - Settlement processing for the date
     - Mark-to-market of all open positions (using current Kalshi prices)
-    - Both realized and unrealized P&L in daily P&L calculation
+    - BOTH paper P&L (unconfirmed) AND settlement-confirmed P&L tracked separately
+
+    B-Mode R8 Cycle 4.1:
+      - paper_pnl: includes unrealized MTM + unsettled positions (unconfirmed)
+      - settlement_confirmed_pnl: only trades that have actually settled against Kalshi data
+      - All existing P&L columns remain but are tagged as "PAPER P&L — unconfirmed"
     """
     if reconcile_date is None:
         reconcile_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
@@ -208,13 +211,16 @@ def daily_reconciliation(self, reconcile_date=None):
     # Get opening balance from previous day
     prev_balance = self.get_current_balance(reconcile_date)
 
+    # B-Mode R8 Cycle 4.1: Migrate settlement columns if not present
+    self._migrate_settlement_columns(reconcile_date)
+
     # Count trades and other details for this date
     conn = get_sqlite_connection(self.paper_db)
     c = conn.cursor()
 
     # Today's trades
     c.execute("""
-        SELECT trade_cost, realized_pnl FROM trades
+        SELECT trade_cost, realized_pnl, COALESCE(quantity, 0) FROM trades
         WHERE trade_date_utc = ?
         AND (status = 'open' OR status = 'closed')
     """, (reconcile_date,))
@@ -246,19 +252,30 @@ def daily_reconciliation(self, reconcile_date=None):
     winning_trade_count = sum(1 for pnl in settled_pnls if pnl > 0)
     losing_trade_count = sum(1 for pnl in settled_pnls if pnl < 0)
 
+    # B-Mode R8 Cycle 4.1: Separate settlement-confirmed P&L from paper P&L
+    # settlement_confirmed_pnl = only realized P&L from actually settled trades
+    settlement_confirmed_pnl = sum(pnl for pnl in settled_pnls)
+    # paper_pnl = unrealized MTM P&L from open positions (unconfirmed against settlement)
+    paper_pnl = total_unrealized_pnl
+
     # Today's new trade count
     c.execute("SELECT COUNT(*) FROM trades WHERE trade_date_utc = ?", (reconcile_date,))
     total_new_trades = c.fetchone()[0]
 
     # Calculate P&L components and fees
-    total_fees = sum(abs(t[0]) * self.fee_rate for t in today_all_trades)
+    # t[0]=trade_cost, t[1]=realized_pnl, t[2]=quantity
+    # Fee = quantity * round_trip_fraction per contract (from MARKET_COST_MODEL)
+    from core.market_cost_model import ROUND_TRIP_FEE
+    total_fees = sum(abs(t[2]) * ROUND_TRIP_FEE for t in today_all_trades)
     today_realized_pnl = sum(t[1] or 0 for t in today_all_trades)
 
     # Daily P&L = realized P&L (from settled trades today) + change in unrealized P&L
     # The unrealized P&L is already updated via mark_positions_to_market
+    # ⚠️ PAPER P&L — unconfirmed against settlement data
     total_daily_pnl = today_realized_pnl + total_unrealized_pnl
 
     # Closing balance = opening + realized P&L + unrealized P&L - fees
+    # ⚠️ Uses PAPER P&L — unconfirmed against settlement data
     closing_balance = prev_balance + today_realized_pnl + total_unrealized_pnl - total_fees
 
     # Track drawdown from peak - simplified implementation
@@ -270,21 +287,44 @@ def daily_reconciliation(self, reconcile_date=None):
     peak = c.fetchone()[0] or self.initial_balance
     max_drawdown = min(0.0, closing_balance - peak)
 
+    # B-Mode R8 Cycle 2.10: Add cost-adjusted P&L column
+    # Ensure the column exists (migration for existing databases)
+    try:
+        c.execute("ALTER TABLE daily_balances ADD COLUMN cost_adjusted_pnl REAL DEFAULT NULL")
+    except Exception:
+        pass  # Column already exists
+
+    # Cost-adjusted P&L = raw P&L minus total trading costs (fees + execution slippage)
+    # ⚠️ Uses PAPER P&L — unconfirmed against settlement data
+    cost_adjusted_pnl = total_daily_pnl - total_fees
+
+    # B-Mode R8 Cycle 4.1: Add settlement-confirmed P&L columns
+    try:
+        c.execute("ALTER TABLE daily_balances ADD COLUMN paper_pnl REAL DEFAULT NULL")
+    except Exception:
+        pass
+    try:
+        c.execute("ALTER TABLE daily_balances ADD COLUMN settlement_confirmed_pnl REAL DEFAULT NULL")
+    except Exception:
+        pass
+
     # Record daily reconciliation (INSERT OR REPLACE to allow re-runs)
     c.execute("""
         INSERT OR REPLACE INTO daily_balances (
             date_utc, opening_balance, closing_balance, pnl,
             trade_count, position_count, winning_trades, losing_trades,
             settled_trades, position_size_weight, total_fees_paid,
-            max_drawdown_since_high
+            max_drawdown_since_high, cost_adjusted_pnl,
+            paper_pnl, settlement_confirmed_pnl
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         reconcile_date, prev_balance, closing_balance, total_daily_pnl,
         len(today_all_trades), open_positions, winning_trade_count,
         losing_trade_count, len(settled_records),
         sum(abs(t[0]) for t in today_all_trades) / max(len(today_all_trades), 1),
-        total_fees, max_drawdown
+        total_fees, max_drawdown, cost_adjusted_pnl,
+        paper_pnl, settlement_confirmed_pnl
     ))
 
     conn.commit()
@@ -328,10 +368,56 @@ def daily_reconciliation(self, reconcile_date=None):
         'settled_trades': len(settled_records),
         'new_trades_today': total_new_trades,
         'total_fees': total_fees,
+        'cost_adjusted_pnl': cost_adjusted_pnl,  # B-Mode R8 Cycle 2.10
         'max_drawdown': max_drawdown,
         'skilled_stations_count': skilled_stations_count,
         'total_stations_count': total_stations_count
     }
+def _migrate_settlement_columns(self, for_date=None):
+    """
+    B-Mode R8 Cycle 4.1/4.2: Ensure settlement confirmation columns exist
+    in the trades and daily_balances tables.
+
+    SAFE TO RE-RUN: uses IF NOT EXISTS / try-except for all ALTER TABLE calls.
+    """
+    conn = get_sqlite_connection(self.paper_db)
+    c = conn.cursor()
+
+    # trades table: settlement_confirmed flag + settlement_outcome
+    try:
+        c.execute(
+            "ALTER TABLE trades ADD COLUMN settlement_confirmed INTEGER DEFAULT 0"
+        )
+    except Exception:
+        pass
+    try:
+        c.execute(
+            "ALTER TABLE trades ADD COLUMN settlement_outcome TEXT DEFAULT NULL"
+        )
+    except Exception:
+        pass
+
+    # daily_balances table: paper_pnl + settlement_confirmed_pnl
+    try:
+        c.execute(
+            "ALTER TABLE daily_balances ADD COLUMN paper_pnl REAL DEFAULT NULL"
+        )
+    except Exception:
+        pass
+    try:
+        c.execute(
+            "ALTER TABLE daily_balances ADD COLUMN settlement_confirmed_pnl REAL DEFAULT NULL"
+        )
+    except Exception:
+        pass
+
+    conn.commit()
+    conn.close()
+    _LOGGER.info("settlement_columns_migration: trades/settlement_confirmed, "
+                 "trades/settlement_outcome, daily_balances/paper_pnl, "
+                 "daily_balances/settlement_confirmed_pnl")
+
+
 def calculate_calibration_metrics_for_date(self, for_date):
     """Calculate and store calibration metrics for the dashboard."""
     conn = get_sqlite_connection(self.paper_db)
@@ -517,7 +603,7 @@ def compute_sharpe(self, trades: List[Dict[str, Any]] = None) -> float:
         trades = self._get_daily_trades()
 
     if len(trades) < 2:
-        return 1.0  # Default to 1.0 for insufficient data
+        return 0.0  # Default to 0.0 for insufficient data (B-Mode R8 Cycle 2.2)
 
     # Calculate returns
     returns = [t.get('pnl', 0) / max(abs(t.get('position_size_usd', 100)), 1) for t in trades]
@@ -664,6 +750,8 @@ def _get_strike_price(station: str, market_type: str, date: str, paper_db: str, 
         alert_db = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
         if os.path.exists(alert_db):
             conn = sqlite3.connect(alert_db, timeout=1)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             try:
                 row = conn.execute(
                     """SELECT cache_json FROM market_cache

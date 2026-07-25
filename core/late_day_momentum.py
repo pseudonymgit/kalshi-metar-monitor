@@ -581,6 +581,8 @@ def main():
     
     # Example usage for same-day signal generation
     conn = sqlite3.connect(DB_PATH, timeout=60)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     
     print("\nTesting same-day signal generation for sample station KATL...")
     import time

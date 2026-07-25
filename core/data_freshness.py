@@ -48,13 +48,13 @@ TIER_BOUNDS: Dict[FreshnessTier, Tuple[float, Optional[float]]] = {
 TIER_ACTIONS: Dict[FreshnessTier, Dict[str, Any]] = {
     FreshnessTier.GREEN: {
         "position_multiplier": 1.0,        # 100% normal sizing
-        "allowed_lanes": ["regular", "sure_thing", "goldilocks"],
+        "allowed_lanes": ["regular", "sure_thing", "spike_reversion", "goldilocks"],  # A3: added spike_reversion
         "halt": False,
         "log_level": "DEBUG",
     },
     FreshnessTier.YELLOW: {
         "position_multiplier": 1.0,        # 100% normal sizing
-        "allowed_lanes": ["regular", "sure_thing", "goldilocks"],
+        "allowed_lanes": ["regular", "sure_thing", "spike_reversion", "goldilocks"],  # A3: added spike_reversion
         "halt": False,
         "log_level": "WARNING",
     },
@@ -144,6 +144,8 @@ class DataFreshnessMonitor:
         """
         try:
             conn = sqlite3.connect(self._metar_db_path, timeout=5)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             c = conn.cursor()
 
             # Get the most recent METAR observation timestamp for this station
@@ -194,6 +196,8 @@ class DataFreshnessMonitor:
 
         try:
             conn = sqlite3.connect(self._nwp_db_path, timeout=5)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             c = conn.cursor()
 
             # Try common NWP table names
@@ -313,6 +317,8 @@ class DataFreshnessMonitor:
         # METAR age
         try:
             conn = sqlite3.connect(self._metar_db_path, timeout=5)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             c = conn.cursor()
             c.execute("""
                 SELECT MAX(timestamp_utc) FROM metar_observations
@@ -332,6 +338,8 @@ class DataFreshnessMonitor:
         if self._nwp_db_path:
             try:
                 conn = sqlite3.connect(self._nwp_db_path, timeout=5)
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=5000;")
                 c = conn.cursor()
                 for table in ["nwp_forecasts", "gfs_forecasts", "forecast_data"]:
                     try:

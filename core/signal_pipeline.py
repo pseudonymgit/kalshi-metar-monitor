@@ -290,6 +290,8 @@ def generate_signals(self, date):
 
     # Open METAR DB connection for hourly late-day momentum signal
     metar_conn = sqlite3.connect(self.metar_db, timeout=10)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
 
     for station in available_stations:
         # NOTE: reversion signal (Signal 1) REMOVED from ensemble per Phase 1 fix.
@@ -310,27 +312,7 @@ def generate_signals(self, date):
             market_side = MarketSide.UP if ldm_direction == "up" else MarketSide.DOWN
             signals.append((station, "HIGH", market_side, "late_day_momentum_hourly"))
 
-        # Signal 4: NWP Direct (uses real NWP forecast model data from DB)
-        if NWP_DIRECT_ENABLED:
-            # Lazy-initialize the NWP direct signal on first use
-            if self._nwp_direct is None:
-                try:
-                    self._nwp_direct = NwpDirectSignal()
-                    _LOGGER.info("NWP direct signal initialized (lazy load)")
-                except Exception as e:
-                    _LOGGER.warning(f"Failed to initialize NWP Direct Signal: {e}")
-            if self._nwp_direct is not None:
-                try:
-                    result = self._nwp_direct.compute_signal(station, date)
-                    if result and result.get('direction') is not None and result.get('confidence', 0) > 0:
-                        direction = result['direction']
-                        market_side = MarketSide.UP if direction == 1 else MarketSide.DOWN
-                        signals.append((station, "HIGH", market_side, "nwp_direct"))
-                        _LOGGER.info(f"NWP direct signal fired for {station} on {date}: direction={direction}, confidence={result.get('confidence', 0)}")
-                except Exception as e:
-                    _LOGGER.warning(f"Failed to compute NWP direct signal for {station} on {date}: {e}")
-
-        # Signal 5: Multi-Model Ensemble (using real NWP forecasts from database)
+        # Signal 4: Multi-Model Ensemble (using real NWP forecasts from database)
         if HAS_MULTI_MODEL_ENSEMBLE:
             try:
                 # Need to get previous day high temperature for comparison
@@ -361,16 +343,16 @@ def generate_signals(self, date):
                 except Exception as e:
                     _LOGGER.warning(f"Failed to compute Temperature Advection signal for {station} on {date}: {e}")
 
-        # Signal 7: Goldilocks (spike-reversion pattern) - added to signals like others
-        if HAS_GOLDILOCKS_SIGNAL and self._goldilocks_signal is not None:
+        # Signal 7: Spike Reversion (A3: renamed from Goldilocks)
+        if HAS_SPIKE_REVERSION_SIGNAL and self._spike_reversion_signal is not None:
             try:
-                direction, confidence = self._goldilocks_signal.evaluate_for_station(station, date, metar_conn)
+                direction, confidence = self._spike_reversion_signal.evaluate_for_station(station, date, metar_conn)
                 if direction is not None and confidence >= 0.25:
                     market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
-                    signals.append((station, "HIGH", market_side, "goldilocks_spike_reversion"))
-                    _LOGGER.info(f"Goldilocks signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
+                    signals.append((station, "HIGH", market_side, "spike_reversion"))
+                    _LOGGER.info(f"Spike Reversion signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
             except Exception as e:
-                _LOGGER.warning(f"Failed to compute Goldilocks signal for {station} on {date}: {e}")
+                _LOGGER.warning(f"Failed to compute Spike Reversion signal for {station} on {date}: {e}")
 
     metar_conn.close()
 
@@ -386,21 +368,21 @@ def generate_signals(self, date):
         signals = filtered_signals
         _LOGGER.info(f"Applied skill gate filter: {len(signals)} skilled out of {before_count} total signals")
 
-    # Separate goldilocks signals if separate lane is enabled
-    goldilocks_signals = []
+    # A3: Separate spike reversion signals if separate lane is enabled
+    spike_reversion_signals = []
     other_signals = []
-    
-    if GOLDILOCKS_SEPARATE_LANE:
+
+    if SPIKE_REVERSION_SEPARATE_LANE:
         for station, market_type, direction, reason in signals:
-            if reason == "goldilocks_spike_reversion":
-                goldilocks_signals.append((station, market_type, direction, reason))
+            if reason == "spike_reversion":
+                spike_reversion_signals.append((station, market_type, direction, reason))
             else:
                 other_signals.append((station, market_type, direction, reason))
         signals = other_signals
-        _LOGGER.info(f"Separated Goldilocks signals for independent processing. Other signals: {len(other_signals)}, Goldilocks: {len(goldilocks_signals)}")
+        _LOGGER.info(f"Separated Spike Reversion signals for independent processing. Other signals: {len(other_signals)}, Spike Reversion: {len(spike_reversion_signals)}")
     else:
         # All signals remain together when separate lane is disabled
-        goldilocks_signals = []
+        spike_reversion_signals = []
         other_signals = signals
         
     # Apply adaptive confidence thresholds BEFORE the agreement gate filtering (Phase 4.4)
@@ -420,13 +402,11 @@ def generate_signals(self, date):
                 base_confidence = 0.6 
             elif reason in ["late_day_momentum_hourly"]:
                 base_confidence = 0.7
-            elif reason in ["nwp_direct"]:
-                base_confidence = 0.75
             elif reason in ["multi_model_ensemble"]:
                 base_confidence = 0.75
             elif reason in ["temperature_advection"]:
                 base_confidence = 0.6
-            elif reason in ["goldilocks_spike_reversion"]:
+            elif reason in ["spike_reversion", "goldilocks_spike_reversion"]:
                 base_confidence = 0.65
             else:
                 base_confidence = 0.5
@@ -463,7 +443,7 @@ def generate_signals(self, date):
             _LOGGER.error(f"Error applying adaptive threshold filtering: {e}")
             # Continue without filtering if it fails
     
-    # Apply agreement gate filter ONLY to non-Goldilocks signals
+    # A3: Apply agreement gate filter ONLY to non-Spike-Reversion signals
     if other_signals:
         before_agreement_count = len(other_signals)
         
@@ -482,11 +462,11 @@ def generate_signals(self, date):
             final_other_signals.extend(agreed_signals)
         
         other_signals = final_other_signals
-        _LOGGER.info(f"Applied agreement gate: {len(other_signals)} non-Goldilocks signals passed consensus out of {before_agreement_count} post-skill-gate signals")
+        _LOGGER.info(f"Applied agreement gate: {len(other_signals)} non-Spike-Reversion signals passed consensus out of {before_agreement_count} post-skill-gate signals")
     
-    # Combine Goldilocks signals (unfiltered) with agreeing non-Goldilocks signals
-    all_final_signals = other_signals + goldilocks_signals
-    _LOGGER.info(f"Total final signals: {len(all_final_signals)} (non-Goldilocks passed agreement: {len(other_signals)}, Goldilocks (unfiltered): {len(goldilocks_signals)})")
+    # A3: Combine Spike Reversion signals (unfiltered) with agreeing non-Spike-Reversion signals
+    all_final_signals = other_signals + spike_reversion_signals
+    _LOGGER.info(f"Total final signals: {len(all_final_signals)} (non-Spike-Reversion passed agreement: {len(other_signals)}, Spike Reversion (unfiltered): {len(spike_reversion_signals)})")
     
     signals = all_final_signals
 

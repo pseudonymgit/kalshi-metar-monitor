@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS daily_balances (
     peak_balance REAL,
     drawdown_pct REAL,
     trade_version TEXT NOT NULL,
+    cost_adjusted_pnl REAL,
     recorded_at TEXT DEFAULT (datetime('now'))
 )
 """

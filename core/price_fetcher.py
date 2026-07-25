@@ -113,6 +113,8 @@ def _persist_rate_limit_entry(endpoint: str) -> None:
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Ensure schema exists
             _ensure_alert_schema()
@@ -164,6 +166,8 @@ def _check_rate_limit(endpoint: str, max_requests: int = 10, window_seconds: int
         db_path = _alert_db_path()
         _ensure_alert_schema()
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Count recent requests in the window
             now_iso = _now_utc_iso()

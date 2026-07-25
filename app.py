@@ -22,6 +22,10 @@ import logging
 import sqlite3
 from datetime import datetime, timezone
 from time import monotonic
+
+# Server start time for uptime tracking in health checks
+START_TIME = monotonic()
+
 from flask import Flask, request, jsonify, g, has_request_context
 from werkzeug.exceptions import HTTPException
 from core.station_time import station_local_day_key, to_station_local, parse_iso_utc
@@ -166,9 +170,11 @@ from core.alert_integrity_monitor import build_alert_integrity_findings
 from core.ladder_cache_observability import build_ladder_cache_snapshot
 from core.hydration_health_classifier import classify_hydration_health
 from core.station_time import station_local_day_key, to_station_local
+from core.trading_dashboard.routes import trading_bp
 from core.replay_parity_validator import validate_replay_parity
 
 app = Flask(__name__)
+app.register_blueprint(trading_bp, url_prefix='/trading')
 log = app.logger
 log.setLevel(logging.INFO)
 
@@ -3864,6 +3870,19 @@ def integrity_replay_parity():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+# ─── Health Check Endpoint ─────────────────────────────────────────────────
+
+@app.route("/healthz", methods=["GET"])
+def healthz():
+    """Simple health check endpoint for Render and monitoring."""
+    return jsonify({
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "uptime_seconds": int(monotonic() - START_TIME),
+    }), 200
+
+
 # Start collector daemon service on Render startup
 try:
     # Run weather data collection in background thread
@@ -3896,6 +3915,58 @@ except Exception as e:
     print(f"Error starting weather collector: {e}")
     import traceback
     traceback.print_exc()
+
+
+# ─── Paper Trading Engine (daemon thread) ──────────────────────────────────
+# Runs on a 5-minute cycle when PAPER_TRADING_ENABLED=1 (default).
+# Uses PAPER_TRADING_INSTANCE=PROD for production alert formatting.
+
+try:
+    if os.environ.get("PAPER_TRADING_ENABLED", "1") == "1":
+        import threading as _pt_threading
+        import time as _pt_time
+        from pathlib import Path as _Path
+
+        # Import the paper trading entry point
+        from core.paper_trading_engine import daily_paper_run
+
+        # Compute the prod DB path relative to this file
+        _pt_repo_root = _Path(__file__).resolve().parent
+        _pt_prod_db = str(_pt_repo_root / "data" / "paper_trading_prod.db")
+
+        def _paper_trading_loop():
+            """Background loop: run paper trading cycle every 300s."""
+            os.environ["PAPER_TRADING_INSTANCE"] = "PROD"
+            os.environ["PAPER_TRADING_DB_PATH"] = _pt_prod_db
+            while True:
+                try:
+                    print("[paper_trading] Running paper trading cycle...")
+                    daily_paper_run()
+                    print("[paper_trading] Cycle complete. Sleeping 300s...")
+                except Exception as pt_exc:
+                    print(f"[paper_trading] Error in cycle: {pt_exc}")
+                    import traceback as _pt_tb
+                    _pt_tb.print_exc()
+                _pt_time.sleep(300)
+
+        _pt_thread = _pt_threading.Thread(
+            target=_paper_trading_loop,
+            daemon=True,
+            name="paper-trading-daemon",
+        )
+        _pt_thread.start()
+        print("Paper trading engine started (5-minute cycle)")
+        print(f"  - DB: {_pt_prod_db}")
+        print(f"  - Instance: PROD")
+    else:
+        print("Paper trading engine disabled via PAPER_TRADING_ENABLED=0")
+except ImportError as pt_import_err:
+    print(f"Could not start paper trading engine: {pt_import_err}")
+except Exception as pt_start_err:
+    print(f"Error starting paper trading engine: {pt_start_err}")
+    import traceback as _pt_tb
+    _pt_tb.print_exc()
+
 
 # Render entry
 if __name__ == "__main__":

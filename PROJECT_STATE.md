@@ -18,7 +18,7 @@ Integer floor-cross alerts only
 
 No unchanged repeat alerts
 
-Station-local 11:00–19:00 window
+Station-local 24/7 operation (11:00–19:00 window removed)
 
 Station-local daily reset
 
@@ -26,7 +26,7 @@ Scheduler idempotent
 
 No duplicate threads
 
-No alert emission outside window
+Alert emission 24/7 (no time window restriction)
 
 3️⃣ Phase 2 (Kalshi Integration)
 

@@ -27,15 +27,30 @@ import core.p3_calibration_engine as p3ce
 import core.p3_output_formatter as p3of
 
 
-# Active stations - populated from Kalshi discovery, with fallback to 7 primary stations
+# Active stations - populated from Kalshi discovery, with fallback to 20 verified stations
+# Full list verified 2026-07-02 against Kalshi settlement API
+# HIGH and LOW markets both active for all stations
 ACTIVE_STATIONS = [
+    "KATL",  # Atlanta
+    "KAUS",  # Austin
+    "KBOS",  # Boston
+    "KDCA",  # Washington DC
     "KDEN",  # Denver
+    "KDFW",  # Dallas-Fort Worth
+    "KHOU",  # Houston
+    "KLAS",  # Las Vegas
     "KLAX",  # Los Angeles
-    "KNYC",  # New York (Central Park ASOS)
-    "KPHL",  # Philadelphia
     "KMDW",  # Chicago (Midway)
     "KMIA",  # Miami
-    "KAUS",  # Austin
+    "KMSP",  # Minneapolis
+    "KMSY",  # New Orleans
+    "KNYC",  # New York (Central Park ASOS)
+    "KOKC",  # Oklahoma City
+    "KPHL",  # Philadelphia
+    "KPHX",  # Phoenix
+    "KSAT",  # San Antonio
+    "KSEA",  # Seattle
+    "KSFO",  # San Francisco
 ]
 
 # Try to populate from Kalshi discovery (this will be updated at runtime)
@@ -177,6 +192,8 @@ def get_latest_settlement_epoch(
     
     import sqlite3
     conn = sqlite3.connect(db_path, timeout=1)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     try:
         cursor = conn.cursor()
         cursor.execute(
@@ -215,6 +232,8 @@ def get_closed_epochs_for_station(
     
     import sqlite3
     conn = sqlite3.connect(db_path, timeout=1)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     try:
         cursor = conn.cursor()
         cursor.execute(

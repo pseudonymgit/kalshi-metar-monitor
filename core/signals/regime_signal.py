@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-SIGNAL: Regime (DTR-scaled)
+SIGNAL: Regime (DTR-scaled) [DISABLED=True]
+
+[DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
+Signal has interface mismatch bug (evaluate_for_station signature) that
+prevents it from ever firing. Keeping code file for reference.
 
 Detects stable temperature regimes (low volatility, low slope) and trades
 reversion to the 30-day mean when temperature deviates significantly.

@@ -10,7 +10,7 @@ Core 9-signal model combining temperature-based, atmospheric, and meteorological
 1. pressure - station pressure relative to sea level (pressure anomaly)
 2. gaussian_v2 - 30-day volatility-adjusted z-score (mean reversion signal)
 3. calendar_climatology - time-of-year pattern recognition (regime detection)
-4. goldilocks - dewpoint-temperature relationship optimization band 
+4. spike_reversion (formerly goldilocks) - dewpoint-temperature relationship optimization band 
 5. wind_advection - wind direction/speed change (horizontal transport mechanism)
 6. cloud_cover_modulation - ceiling/visibility impact on thermal dynamics  
 7. forecast_disagreement - consensus forecast inconsistency signal
@@ -42,7 +42,7 @@ class NineSignalEnsemble:
     - pressure: ~0.12
     - gaussian_v2: ~0.14  
     - calendar_climatology: ~0.11
-    - goldilocks: ~0.13
+    - spike_reversion (formerly goldilocks): ~0.13
     - wind_advection: ~0.11
     - cloud_cover_modulation: ~0.13
     - forecast_disagreement: ~0.09
@@ -65,7 +65,8 @@ class NineSignalEnsemble:
             "pressure": 0.123,
             "gaussian_v2": 0.141, 
             "calendar_climatology": 0.108,
-            "goldilocks": 0.132,
+            "spike_reversion": 0.132,
+            "goldilocks": 0.132,  # A3: backward compat alias
             "wind_advection": 0.114,
             "cloud_cover_modulation": 0.130,
             "forecast_disagreement": 0.089,
@@ -136,20 +137,24 @@ class NineSignalEnsemble:
         else:
             signals["calendar_climatology"] = ('up', 0.25)  # Spring/fall mixed
         
-        # 4. goldilocks - dewpoint relationship (comfortable zone detection)
+        # 4. spike_reversion (formerly goldilocks) - dewpoint relationship (comfortable zone detection)
         dewpoint_c = features.get("dewpoint_c")
         temp_c = features.get("temp_c")
         if dewpoint_c is not None and temp_c is not None:
             dewpoint_diff = temp_c - dewpoint_c
             # Dewpoint difference and temperature in optimal ranges should signal stability
             if 10 <= dewpoint_diff <= 18 and 14 <= temp_c <= 28:
-                signals["goldilocks"] = ('up', 0.75)  # Comfortable weather often continues trend
+                signals["spike_reversion"] = ('up', 0.75)  # Comfortable weather often continues trend
+                signals["goldilocks"] = signals["spike_reversion"]  # A3: backward compat
             elif dewpoint_diff < 5 or dewpoint_diff > 22:
-                signals["goldilocks"] = ('down', 0.4)  # Extreme dryness/humidity may lead to reversal
+                signals["spike_reversion"] = ('down', 0.4)  # Extreme dryness/humidity may lead to reversal
+                signals["goldilocks"] = signals["spike_reversion"]  # A3: backward compat
             else:
-                signals["goldilocks"] = ('up', 0.2)  # Neutral upward bias
+                signals["spike_reversion"] = ('up', 0.2)  # Neutral upward bias
+                signals["goldilocks"] = signals["spike_reversion"]  # A3: backward compat
         else:
-            signals["goldilocks"] = (None, 0.1)
+            signals["spike_reversion"] = (None, 0.1)
+            signals["goldilocks"] = signals["spike_reversion"]  # A3: backward compat
         
         # 5. wind_advection - wind changes indicating air mass movement
         wind_kt = features.get("wind_kt")

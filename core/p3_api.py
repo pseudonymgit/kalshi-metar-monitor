@@ -300,6 +300,8 @@ async def health_check():
         import sqlite3
         db_path = p3sch._resolve_db_path()
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         conn.execute("SELECT 1")
         conn.close()
         health["checks"]["database"] = {
@@ -410,7 +412,8 @@ async def debug_features(
             "transition_count": features.transition_count,
             "settlement_bucket": features.settlement_bucket,
             "reversion_latency_seconds": features.reversion_latency_seconds,
-            "goldilocks_emitted": features.goldilocks_emitted,
+            "spike_reversion_emitted": features.goldilocks_emitted,  # A3: renamed field, same source
+            "goldilocks_emitted": features.goldilocks_emitted,  # backward compat
             "prior_settlement_bucket": features.prior_settlement_bucket,
             "local_trading_date_normalized": features.local_trading_date_normalized,
             "station_gate": features.station,

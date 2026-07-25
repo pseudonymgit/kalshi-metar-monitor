@@ -269,6 +269,8 @@ def load_isd_daily_temps(station):
     Returns: list of {'date': 'YYYY-MM-DD', 'high':temp, 'low':temp}
     """
     conn = sqlite3.connect(DB_PATH_ISD, timeout=10)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cur = conn.cursor()
     
     # Group by day to get daily highs/lows, not hourly

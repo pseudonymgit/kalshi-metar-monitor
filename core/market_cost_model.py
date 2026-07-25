@@ -38,6 +38,10 @@ MEASURED_MEAN_SPREAD = 0.031  # 3.1¢ measured mean across all markets
 DEFAULT_SLIPPAGE = 0.005       # 0.5¢ fallback slippage
 DEFAULT_COMMISSION = 0.0       # Kalshi charges no commission
 
+# ─── Round-trip fee (single source of truth) ───────────────────────────────────
+# Round-trip = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
+ROUND_TRIP_FEE = (MEASURED_MEAN_SPREAD / 2.0) + DEFAULT_COMMISSION + DEFAULT_SLIPPAGE
+
 # Slippage model parameters
 SLIPPAGE_SPREAD_FRACTION = 0.5  # Expected slippage = spread * this fraction
 PARTIAL_FILL_THRESHOLD_VOLUME = 100   # Below this many contracts, partial fills likely

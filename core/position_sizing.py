@@ -50,7 +50,8 @@ class PositionSizingConfig:
     # Kelly-specific fields (only used when use_kelly=True)
     use_kelly: bool = False
     fraction_kelly: float = 0.5        # 50% fractional Kelly (SH3)
-    fee_rate: float = 0.0            # 0% Kalshi commission - spread-only costs (SH3 update)
+    # Import ROUND_TRIP_FEE from MARKET_COST_MODEL via core.market_cost_model
+    fee_rate: float = 0.0205          # Kalshi round-trip cost (spread/2 + slippage)
     window_days: int = 30             # 30-day rolling win rate window (SH3)
 
     def __post_init__(self):
@@ -70,7 +71,7 @@ class KellyPositionSizer:
     Edge estimated from 30-day rolling win rate.
     """
     
-    def __init__(self, fee_rate: float = 0.05, fraction_kelly: float = 0.5,
+    def __init__(self, fee_rate: float = 0.0205, fraction_kelly: float = 0.5,
                  window_days: int = 30):
         self.fee_rate = fee_rate
         self.fraction_kelly = fraction_kelly
@@ -169,7 +170,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=100.0,
             max_size_usd=500.0,
             min_size_usd=25.0,
-            fee_rate=0.001,
+            fee_rate=0.0205,  # Kalshi round-trip cost
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -180,7 +181,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=50.0,
             max_size_usd=250.0,
             min_size_usd=10.0,
-            fee_rate=0.001,
+            fee_rate=0.0205,  # Kalshi round-trip cost
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -191,7 +192,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=10.0,
             max_size_usd=50.0,
             min_size_usd=5.0,
-            fee_rate=0.002,
+            fee_rate=0.0205,  # Kalshi round-trip cost
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -317,7 +318,7 @@ def extract_confidence_from_signal_context(signal_context: Dict[str, Any]) -> fl
         # Normalize momentum to 0-1 confidence
         return min(0.95, max(0.3, float(momentum) * 100))
     
-    # For goldilocks signals with confidence_factors
+    # For spike reversion signals with confidence_factors (A3: renamed from goldilocks)
     factors = signal_context.get("confidence_factors")
     if isinstance(factors, dict):
         is_daily_high = factors.get("is_daily_high", False)
@@ -369,8 +370,10 @@ def main():
         ("near_boundary_momentum_up", 0.55),
         ("near_boundary_momentum_down", 0.75),
         ("near_boundary_momentum_down", 0.45),
-        ("goldilocks_reversion_alert", 0.80),
-        ("goldilocks_momentum_down", 0.65),
+        ("microstructure_spike_reversion", 0.80),  # A3: renamed from goldilocks_reversion_alert
+        ("microstructure_spike_momentum_down", 0.65),  # A3: renamed from goldilocks_momentum_down
+        ("goldilocks_reversion_alert", 0.80),  # backward compat
+        ("goldilocks_momentum_down", 0.65),  # backward compat
         ("reversion_after_settlement", 0.60),
         ("late_day_momentum_hourly", 0.70),
     ]

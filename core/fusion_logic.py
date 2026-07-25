@@ -547,19 +547,45 @@ class SignalFusionEngine:
     def compute_fusion_weights(self, mi_matrix=None, recalibrate_accuracies=False):
         """
         Compute mutual information matrix and final fusion weights.
+
+        B-Mode R8 Cycle 2.9: Wired into live fuse_signals() path.
+        Uses MI-based decorrelation: redundant signals get lower weight.
+        Falls back to equal weights when MI matrix is not available.
         """
-        if mi_matrix is None:
-            _logger.info("Computing mutual information matrix and fusion weights...")
-            # We'd need the signal history here, for now use default approach
-            # This function assumes weights have been computed elsewhere or use defaults
-        
-        # Calculate weights using MI-based decorrelation
-        # For now just return equally distributed initial weights as placeholder
-        # until MI data is provided
         n = len(self.signal_names)
         if n == 0:
-            return []
-        return [1.0 / n] * n
+            self.current_weights = []
+            return self.current_weights
+
+        if mi_matrix is not None and len(mi_matrix) == n:
+            _logger.info("Computing fusion weights from MI matrix (size=%dx%d)", n, n)
+            # MI-based decorrelation: weight inversely proportional to average MI
+            # High MI with others = redundant = lower weight
+            try:
+                avg_mi = []
+                for i in range(n):
+                    row_mi = [mi_matrix[i][j] for j in range(n) if i != j]
+                    avg_mi.append(sum(row_mi) / max(len(row_mi), 1))
+                # Inverse weight: low avg_mi = more unique = higher weight
+                max_avg = max(avg_mi) if avg_mi else 0
+                inv_weights = [(max_avg + 0.01) / (a + 0.01) for a in avg_mi] if max_avg > 0 else [1.0] * n
+                total = sum(inv_weights)
+                self.current_weights = [w / total for w in inv_weights]
+                _logger.info(
+                    "fusion_weights_computed weights=%s",
+                    [round(w, 4) for w in self.current_weights]
+                )
+            except Exception as e:
+                _logger.warning("fusion_weights_failed error=%s fallback=equal", e)
+                self.current_weights = [1.0 / n] * n
+        else:
+            _logger.info(
+                "fusion_weights_no_mi_matrix using equal weights (n=%d mi=%s)",
+                n, mi_matrix is not None
+            )
+            self.current_weights = [1.0 / n] * n
+
+        return self.current_weights
 
     def fuse_signals(self, signals, city_code, use_ds_conflict=True):
         """
@@ -594,9 +620,21 @@ class SignalFusionEngine:
             return None, 0.0, 0.0
             
         # Layer 1 & 2: Compute weights and perform Log-Odds Linear Opinion Pooling
-        # For now, use equal or estimated weights since we need full training data for MI
-        n_signals = len(calibrated_signals)
-        equal_weights = [1.0 / n_signals if n_signals > 0 else 1.0 for _ in calibrated_signals]
+        # Use MI-based weights if available, fall back to equal weights
+        # B-Mode R8 Cycle 2.9: wire compute_fusion_weights() into live path
+        if self.current_weights is None or len(self.current_weights) != len(calibrated_signals):
+            # Compute fusion weights on first call using MI matrix
+            self.compute_fusion_weights(self.mi_matrix)
+        if self.current_weights is not None and len(self.current_weights) == len(calibrated_signals):
+            fusion_weights = self.current_weights
+            _logger.info(
+                "fusion_weights_mi signal_count=%d weights=%s",
+                len(calibrated_signals),
+                [round(w, 4) for w in fusion_weights]
+            )
+        else:
+            n_signals = len(calibrated_signals)
+            fusion_weights = [1.0 / n_signals if n_signals > 0 else 1.0 for _ in calibrated_signals]
         
         # Calculate log odds for each signal's directional probability
         log_odds = []
@@ -608,9 +646,9 @@ class SignalFusionEngine:
             log_odd = math.log(odds)
             log_odds.append(log_odd)
         
-        # Weighted log-odds combination (LLOP)
+        # Weighted log-odds combination (LLOP) using MI-based weights
         weighted_log_odds = 0.0
-        for w, lo in zip(equal_weights, log_odds):
+        for w, lo in zip(fusion_weights, log_odds):
             weighted_log_odds += w * lo  
         
         # Convert back to probability with sigmoid

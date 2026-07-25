@@ -457,6 +457,8 @@ def check_kill_switches(db_path: str = None, risk_config: Any = None) -> Tuple[b
     if db_path and os.path.exists(db_path):
         try:
             conn = sqlite3.connect(str(db_path), timeout=5)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             cur = conn.cursor()
             # Quick integrity check
             cur.execute("PRAGMA integrity_check")
@@ -471,6 +473,8 @@ def check_kill_switches(db_path: str = None, risk_config: Any = None) -> Tuple[b
     if db_path and os.path.exists(db_path):
         try:
             conn = sqlite3.connect(str(db_path), timeout=5)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             cur = conn.cursor()
             # Check decision_output_log for recent entries
             cur.execute("SELECT COUNT(*) FROM decision_output_log WHERE logged_at > datetime('now', '-1 hour')")

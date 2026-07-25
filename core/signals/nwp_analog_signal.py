@@ -36,10 +36,13 @@ METAR_DB_DEFAULT = "data/metar_backfill.db"
 # ── Global Enable Flag ─────────────────────────────────────────────────
 # Enabled for deterministic k-NN v2.0 (replaces disabled XGBoost version).
 # See docs/plans/GRAY-ROOM-ROUND3-EXPERT4-METEOROLOGY.md for architecture.
-NWP_ANALOG_ENABLED = True
+# ── B-Mode R8 Cycle 2.7: NWP Analog excluded from paper test ──
+# Set to False to exclude NWP analog signal from paper test trading decisions.
+# Can be overridden via environment variable.
+NWP_ANALOG_ENABLED = False
 _nwp_env = os.environ.get('NWP_ANALOG_ENABLED', '').lower()
-if _nwp_env in ('0', 'false', 'no'):
-    NWP_ANALOG_ENABLED = False
+if _nwp_env in ('1', 'true', 'yes'):
+    NWP_ANALOG_ENABLED = True
 
 
 class NwpAnalogSignal:

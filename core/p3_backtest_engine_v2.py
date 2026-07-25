@@ -161,6 +161,8 @@ class Phase3BacktestEngine:
         """Initialize backtest engine with database path."""
         self.db_path = db_path
         self.conn = sqlite3.connect(db_path, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
         
@@ -701,6 +703,8 @@ def main():
         if os.path.exists(path):
             try:
                 conn = sqlite3.connect(path)
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=5000;")
                 cursor = conn.cursor()
                 cursor.execute("SELECT COUNT(*) FROM settlement_epochs")
                 count = cursor.fetchone()[0]

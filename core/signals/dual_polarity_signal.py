@@ -286,20 +286,40 @@ class SeasonalRegimeClassifier(BaseSignal):
         """
         Evaluate seasonal regime for current date.
 
-        Returns regime name as direction, confidence as certainty.
+        Maps seasonal regime to directional bias:
+        - deep_winter / transition_cold: cold air advection → cooling → 'down'
+        - warm_season / transition_warm: warm air advection → warming → 'up'
+        - indeterminate: no clear direction → None
+
+        Returns:
+            (direction: 'up'|'down'|None, confidence: float)
         """
         if idx < 1:
-            return 'indeterminate', 0.3
+            return None, 0.0
 
         current_year, current_month = days[idx]['date'][:7].split('-')
         current_month = int(current_month)
         current_temp = _safe_get(days, idx, 'temp')
         
         if current_temp is None:
-            return 'indeterminate', 0.3
+            return None, 0.0
 
         regime, confidence, _ = self.classify_regime(current_temp, current_month)
-        return regime, confidence
+        direction = self._regime_to_direction(regime)
+        if direction is None:
+            return None, 0.0
+        return direction, confidence
+
+    @staticmethod
+    def _regime_to_direction(regime: str) -> Optional[str]:
+        """Map a seasonal regime label to a directional bias."""
+        mapping = {
+            'deep_winter': 'down',       # Cold air advection → cooling
+            'transition_cold': 'down',   # Cooling transition
+            'warm_season': 'up',         # Warm air advection → warming
+            'transition_warm': 'up',     # Warming transition
+        }
+        return mapping.get(regime)
 
 
 # ─── Physics-Corrected Pressure Signal ─────────────────────────────────────────

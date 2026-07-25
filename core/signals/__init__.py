@@ -1,11 +1,16 @@
 # CHANGELOG (last 10 broad changes):
-# 1. [2026-07-21 Phase 9: Full 11-signal combinatorial search + calibration + purged CV]
-# 2. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
-# 3. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
-# 4. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
-# 5. [2026-07-16 T2: Remove 4 dead signals from all code paths]
-# 6. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
-# 8. [2026-07-22 Phase 18: Add intraday signals — FOGR Reversion, METAR dT/dt, Pressure Tendency, HRRR Bias-Corrected, ESDR, NWP+METAR Fusion]
+# 1. [2026-07-25 B-Mode Cycle 3 post-fix: Removed 10 non-firing signals from registry.
+#     Correlation matrix proved 10 signals return ρ=0.000 — they never fire.
+#     Kept: 7 core signals + spike_reversion + frontal_passage_intraday = 9 active]
+# 2. [2026-07-25 B-Mode Cycle 3.1: Removed 6 dead signals (persistence, metar_dtdt,
+#     pressure_tendency, seasonal_regime, esdr, nwp_direct) from registry]
+# 3. [2026-07-21 Phase 9: Full 11-signal combinatorial search + calibration + purged CV]
+# 4. [2026-07-21 Phase 3-7: Agreement gate, signal enhancements, alert infra, production readiness, Kalshi API integration]
+# 5. [2026-07-19 Phase 2: Add 850-mb temperature advection signal + wire into engine]
+# 6. [2026-07-16 T9: Build 5 Tier 1 signals + combinatorial backtest harness]
+# 7. [2026-07-16 T2: Remove 4 dead signals from all code paths]
+# 8. [2026-07-12 B-MODE: Initial commit for full ensemble backtest suite scripts]
+# 9. [2026-07-22 Phase 18: Add intraday signals — FOGR Reversion, METAR dT/dt, Pressure Tendency, HRRR Bias-Corrected, ESDR, NWP+METAR Fusion]
 #
 
 
@@ -13,72 +18,62 @@
 Signal Registry for Weather Engine
 
 This module maintains a registry of all available signals for the ensemble.
-Each signal should implement the interface described by BaseSignal.
+Only signals that actually produce output are registered.
+Non-firing signals are DISABLED — kept in codebase, not in registry.
 
-The unified signal module imports all the specialized signal classes.
+Active signal count: 9 (after B-Mode Cycle 3 cleanup, verified by correlation matrix)
+  - 5 core signals that fire and produce accuracy (gaussian, gaussian_v2, pressure_delta,
+    forecast_disagreement, calendar_climatology)
+  - 2 orthogonal signals (wind_direction_shift, corrected_pressure_delta)
+  - 1 spike-reversion lane signal (spike_reversion/goldilocks — separate lane)
+  - 1 intraday frontal passage signal (frontal_passage_intraday — Sure Thing lane)
 
-S6 task: Updated to exclude dead signals (pressure_regime, dtr_trend, reversion, regime_signal), now includes Wind Direction Shift, NWP Analog, and Goldilocks.
+DISABLED (in codebase, removed from registry — need data infrastructure):
+  temperature_advection, intraday_metar_confirmation    — NWP / ERA5 backfill
+  fogr_reversion, hrrr_bias_corrected, nwp_dtdt_fusion  — HRRR / FOGR NWP data
+  spread_based_entry, volume_momentum, settlement_arbitrage — Kalshi API execution
+  frontal_detector                                       — deprecated
+  ai_composite                                           — ML pipeline not deployed
 """
 
-  
+
 from .wind_direction_shift import WindDirectionShiftSignal
-from .nwp_direct_signal import NwpDirectSignal
-from .goldilocks_signal import GoldilocksSignal
-from .persistence_signal import PersistenceSignal
+from .spike_reversion_signal import SpikeReversionSignal, GoldilocksSignal  # A3: renamed, alias preserved
 from .gaussian_signal import GaussianSignal
 from .gaussian_v2_signal import GaussianV2Signal
 from .pressure_delta_signal import PressureDeltaSignal
 from .forecast_disagreement_signal import ForecastDisagreementSignal
 from .calendar_climatology_signal import CalendarClimatologySignal
-from .temperature_advection_signal import TemperatureAdvectionSignal
-from .frontal_detector_signal import FrontalDetectorSignal
-from .intraday_metar_confirmation_signal import IntradayMetarConfirmationSignal
-from .fogr_reversion_signal import FogrReversionSignal
-from .metar_dtdt_signal import MetarDtdtSignal
-from .pressure_tendency_signal import PressureTendencySignal
-from .hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
-from .esdr_signal import EsdrSignal
-from .nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
-from .spread_based_entry_signal import SpreadBasedEntrySignal
-from .ai_composite_signal import AiCompositeSignal
-from .volume_momentum_signal import VolumeMomentumSignal
-from .settlement_arbitrage_signal import SettlementTimeArbitrageSignal
-from .dual_polarity_signal import SeasonalRegimeClassifier, CorrectedPressureDeltaSignal
+from .dual_polarity_signal import CorrectedPressureDeltaSignal
+from .frontal_passage_intraday_signal import FrontalPassageIntradaySignal
 
 
 class SignalRegistry:
     """
-    Registry containing all available signals for use in the ensemble.
+    Registry containing signals that actually produce output.
+    Verified by correlation matrix (2026-07-25) — only signals with non-zero
+    variance are registered here.
     """
+
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.signals = {
+            # Core meteorology signals (all fire, produce non-zero output)
             'wind_direction_shift': WindDirectionShiftSignal(db_path),
-            'nwp_direct': NwpDirectSignal(db_path),
-            'goldilocks': GoldilocksSignal(db_path),
-            'persistence': PersistenceSignal(db_path),
             'gaussian': GaussianSignal(db_path),
             'gaussian_v2': GaussianV2Signal(db_path),
             'pressure_delta': PressureDeltaSignal(db_path),
             'forecast_disagreement': ForecastDisagreementSignal(db_path),
             'calendar_climatology': CalendarClimatologySignal(db_path),
-            'temperature_advection': TemperatureAdvectionSignal(db_path),
-            'frontal_detector': FrontalDetectorSignal(db_path),
-            'intraday_metar_confirmation': IntradayMetarConfirmationSignal(db_path),
-            'fogr_reversion': FogrReversionSignal(db_path),
-            'metar_dtdt': MetarDtdtSignal(db_path),
-            'pressure_tendency': PressureTendencySignal(db_path),
-            'hrrr_bias_corrected': HrrrBiasCorrectedSignal(db_path),
-            'esdr': EsdrSignal(db_path),
-            'nwp_dtdt_fusion': NwpDtdtFusionSignal(db_path),
-            'spread_based_entry': SpreadBasedEntrySignal(db_path),
-            'volume_momentum': VolumeMomentumSignal(db_path),
-            'settlement_arbitrage': SettlementTimeArbitrageSignal(db_path),
-            'seasonal_regime': SeasonalRegimeClassifier(db_path),
             'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
-            'ai_composite': AiCompositeSignal(db_path),
-        }
 
+            # Spike reversion lane (Lane 2 — separate from forecasting)
+            'spike_reversion': SpikeReversionSignal(db_path),
+            'goldilocks': SpikeReversionSignal(db_path),  # A3: backward-compatible alias
+
+            # Intraday frontal passage (Lane 2 — Sure Thing)
+            'frontal_passage_intraday': FrontalPassageIntradaySignal(db_path),
+        }
 
     def get_signal(self, signal_name: str):
         """Get a signal by name."""

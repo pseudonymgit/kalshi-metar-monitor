@@ -78,64 +78,99 @@ class AlertCooldown:
     Lane cooldown periods:
       - regular:     4 hours
       - sure_thing:  8 hours
-      - goldilocks: 12 hours
+      - spike_reversion (A3: renamed from goldilocks): 12 hours
     """
 
     def __init__(self):
-        # station -> {lane -> {last_alert_time, signal_state}}
-        self._cooldowns: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        # station -> {lane -> {bucket -> {last_alert_time, signal_state}}}
+        # bucket is the trading bucket (temperature target), None if unknown
+        self._cooldowns: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {}
         self._cooldown_periods = {
             'regular': 4 * 3600,
             'sure_thing': 8 * 3600,
-            'goldilocks': 12 * 3600,
+            'spike_reversion': 12 * 3600,  # A3: renamed from goldilocks
+            'goldilocks': 12 * 3600,  # backward compat
         }
         self._logger = logging.getLogger(__name__)
 
+    def _key(self, station: str, lane: str, bucket: Optional[Any] = None) -> str:
+        """Build a composite cooldown key from station, lane, and bucket.
+
+        Bucket can be:
+        - int: temperature bucket (e.g., 70, 72 for 70°F, 72°F)
+        - str: Kalshi market ticker (e.g., "KXHIGHDEN-70")
+        - None: no bucket info available
+        """
+        lane = lane.lower()
+        if lane in ('regular', 'sure_thing', 'spike_reversion', 'goldilocks'):
+            lane_key = lane
+        else:
+            lane_map = {
+                'regular': 'regular',
+                'sure_thing': 'sure_thing',
+                'spike_reversion': 'spike_reversion',
+                'goldilocks': 'spike_reversion',  # A3: backward compat
+            }
+            lane_key = lane_map.get(lane, 'regular')
+
+        bucket_str = str(bucket) if bucket is not None else "none"
+        return f"{station}::{lane_key}::{bucket_str}"
+
+    def _lane_key(self, lane: str) -> str:
+        lane = lane.lower()
+        if lane in ('regular', 'sure_thing', 'spike_reversion', 'goldilocks'):
+            return lane
+        lane_map = {
+            'regular': 'regular',
+            'sure_thing': 'sure_thing',
+            'spike_reversion': 'spike_reversion',
+            'goldilocks': 'spike_reversion',  # A3: backward compat
+        }
+        return lane_map.get(lane, 'regular')
+
     def can_alert(self, station: str, lane: str,
+                  bucket: Optional[Any] = None,
                   current_signal_state: bool = True) -> Tuple[bool, str]:
         """
-        Check if an alert can be fired for this station/lane.
+        Check if an alert can be fired for this station/lane/bucket.
+
+        Each trading bucket gets its own independent cooldown, so changing
+        from the 70°F bucket to the 72°F bucket is treated as a new
+        opportunity — not blocked by the previous bucket's cooldown.
 
         Args:
             station: ICAO station code
             lane: Lane type string ('regular', 'sure_thing', 'goldilocks')
+            bucket: Trading bucket (temperature target, e.g. 70, 72)
             current_signal_state: True if signal is active, False if inactive
 
         Returns:
             (can_alert: bool, reason: str)
         """
         now = time.time()
-        lane = lane.lower()
-
-        # Normalize lane to known keys
-        lane_key = lane
-        if lane_key not in self._cooldown_periods:
-            # Map LaneType enum values to keys
-            lane_map = {
-                'regular': 'regular',
-                'sure_thing': 'sure_thing',
-                'goldilocks': 'goldilocks',
-            }
-            lane_key = lane_map.get(lane_key, 'regular')
-
+        lane_key = self._lane_key(lane)
         cooldown_sec = self._cooldown_periods.get(lane_key, 4 * 3600)
+        composite_key = self._key(station, lane, bucket)
 
-        # Initialize station entry if needed
+        # Initialize nested structure if needed
         if station not in self._cooldowns:
             self._cooldowns[station] = {}
-
-        # Initialize lane entry if needed
         if lane_key not in self._cooldowns[station]:
-            self._cooldowns[station][lane_key] = {
+            self._cooldowns[station][lane_key] = {}
+
+        # Check if this exact bucket has a cooldown entry
+        bucket_key = str(bucket) if bucket is not None else "none"
+        if bucket_key not in self._cooldowns[station][lane_key]:
+            self._cooldowns[station][lane_key][bucket_key] = {
                 'last_alert_time': 0.0,
                 'signal_state': current_signal_state,
             }
             self._logger.debug(
-                "AlertCooldown: new entry for %s/%s", station, lane_key
+                "AlertCooldown: new entry for %s", composite_key
             )
             return True, "new_entry"
 
-        entry = self._cooldowns[station][lane_key]
+        entry = self._cooldowns[station][lane_key][bucket_key]
         last_alert = entry['last_alert_time']
         last_state = entry['signal_state']
         elapsed = now - last_alert
@@ -144,11 +179,10 @@ class AlertCooldown:
         state_changed = (last_state != current_signal_state)
 
         if state_changed:
-            # State transition resets the cooldown — allow the alert
             entry['signal_state'] = current_signal_state
             self._logger.debug(
-                "AlertCooldown: state transition for %s/%s, allowing alert",
-                station, lane_key
+                "AlertCooldown: state transition for %s, allowing alert",
+                composite_key
             )
             return True, "state_transition_reset"
 
@@ -156,56 +190,59 @@ class AlertCooldown:
         if elapsed < cooldown_sec:
             remaining = cooldown_sec - elapsed
             self._logger.debug(
-                "AlertCooldown: %s/%s in cooldown (%.0fs remaining)",
-                station, lane_key, remaining
+                "AlertCooldown: %s in cooldown (%.0fs remaining)",
+                composite_key, remaining
             )
             return False, f"cooldown_active_{int(remaining)}s_remaining"
 
-        # Cooldown expired — allow
         return True, "cooldown_expired"
 
     def record_alert(self, station: str, lane: str,
+                     bucket: Optional[Any] = None,
                      signal_state: bool = True) -> None:
         """
-        Record that an alert was fired for this station/lane.
+        Record that an alert was fired for this station/lane/bucket.
 
-        Updates the last_alert_time to now, resetting the cooldown timer.
+        Updates the last_alert_time to now, resetting the cooldown timer
+        for this specific bucket only.
 
         Args:
             station: ICAO station code
             lane: Lane type string
+            bucket: Trading bucket (temperature target, e.g. 70, 72)
             signal_state: Current signal state (active/inactive)
         """
         now = time.time()
-        lane_key = lane.lower()
-        if lane_key not in {'regular', 'sure_thing', 'goldilocks'}:
-            lane_key = 'regular'
+        lane_key = self._lane_key(lane)
 
         if station not in self._cooldowns:
             self._cooldowns[station] = {}
+        if lane_key not in self._cooldowns[station]:
+            self._cooldowns[station][lane_key] = {}
 
-        self._cooldowns[station][lane_key] = {
+        bucket_key = str(bucket) if bucket is not None else "none"
+        self._cooldowns[station][lane_key][bucket_key] = {
             'last_alert_time': now,
             'signal_state': signal_state,
         }
 
         self._logger.debug(
-            "AlertCooldown: recorded alert for %s/%s", station, lane_key
+            "AlertCooldown: recorded alert for %s",
+            self._key(station, lane, bucket)
         )
 
     def get_cooldown_status(self, station: str,
-                            lane: str) -> Dict[str, Any]:
-        """Get current cooldown status for a station/lane."""
-        lane_key = lane.lower()
-        if lane_key not in {'regular', 'sure_thing', 'goldilocks'}:
-            lane_key = 'regular'
-
+                            lane: str,
+                            bucket: Optional[Any] = None) -> Dict[str, Any]:
+        """Get current cooldown status for a station/lane/bucket."""
+        lane_key = self._lane_key(lane)
         cooldown_sec = self._cooldown_periods.get(lane_key, 4 * 3600)
 
         if station not in self._cooldowns:
             return {
                 'station': station,
                 'lane': lane_key,
+                'bucket': bucket,
                 'in_cooldown': False,
                 'remaining_sec': 0,
                 'cooldown_period_sec': cooldown_sec,
@@ -213,11 +250,26 @@ class AlertCooldown:
                 'signal_state': None,
             }
 
-        entry = self._cooldowns[station].get(lane_key)
+        lane_entry = self._cooldowns[station].get(lane_key)
+        if lane_entry is None:
+            return {
+                'station': station,
+                'lane': lane_key,
+                'bucket': bucket,
+                'in_cooldown': False,
+                'remaining_sec': 0,
+                'cooldown_period_sec': cooldown_sec,
+                'last_alert_time': None,
+                'signal_state': None,
+            }
+
+        bucket_key = str(bucket) if bucket is not None else "none"
+        entry = lane_entry.get(bucket_key)
         if entry is None:
             return {
                 'station': station,
                 'lane': lane_key,
+                'bucket': bucket,
                 'in_cooldown': False,
                 'remaining_sec': 0,
                 'cooldown_period_sec': cooldown_sec,
@@ -232,6 +284,7 @@ class AlertCooldown:
         return {
             'station': station,
             'lane': lane_key,
+            'bucket': bucket,
             'in_cooldown': remaining > 0,
             'remaining_sec': int(remaining),
             'cooldown_period_sec': cooldown_sec,
@@ -264,7 +317,8 @@ def get_alert_cooldown() -> AlertCooldown:
 class LaneType(Enum):
     REGULAR = "regular"           # Standard signals (confidence 50-70%)
     SURE_THING = "sure_thing"     # High confidence (≥70%)
-    GOLDILOCKS = "goldilocks"     # Tier 1 protected signals
+    SPIKE_REVERSION = "spike_reversion"  # Tier 1 protected signals (A3: renamed from goldilocks)
+    GOLDILOCKS = "goldilocks"      # A3: backward compat alias — prefer SPIKE_REVERSION
 
 
 # Lane-specific configurations
@@ -283,8 +337,15 @@ LANE_CONFIG = {
         "position_multiplier": 1.5,
         "alert_format": "embed",
     },
-    LaneType.GOLDILOCKS: {
-        "label": "Goldilocks",
+    LaneType.SPIKE_REVERSION: {
+        "label": "Spike Reversion",
+        "min_confidence": 0.40,  # Can be lower for protected signals
+        "max_confidence": 0.85,
+        "position_multiplier": 1.2,
+        "alert_format": "embed",
+    },
+    LaneType.GOLDILOCKS: {  # A3: backward compat
+        "label": "Spike Reversion (legacy)",
         "min_confidence": 0.40,  # Can be lower for protected signals
         "max_confidence": 0.85,
         "position_multiplier": 1.2,
@@ -387,22 +448,25 @@ def compute_opportunity_grade(trade_confidence: float, market_prob: float,
 
 def classify_lane(trade_confidence: float, signal_type: str) -> LaneType:
     """
-    Classify signal into lane (Regular, Sure_Thing, Goldilocks).
+    Classify signal into lane (Regular, Sure_Thing, Spike_Reversion).
 
-    Goldilocks: Tier 1 protected signals (bypass market eligibility)
+    Spike_Reversion (A3: formerly Goldilocks): Tier 1 protected signals (bypass market eligibility)
     Sure_Thing: High confidence (≥70%)
     Regular: Standard confidence (50-70%)
     """
-    # Check for Goldilocks protected signals
-    goldilocks_signals = {
-        "goldilocks_reversion",
-        "goldilocks_reversion_alert",
-        "goldilocks_momentum_down",
+    # Check for Spike Reversion protected signals (A3: renamed from goldilocks)
+    spike_reversion_signals = {
+        "spike_reversion",
+        "microstructure_spike_reversion",
+        "microstructure_spike_momentum_down",
+        "goldilocks_reversion",       # backward compat
+        "goldilocks_reversion_alert",  # backward compat
+        "goldilocks_momentum_down",    # backward compat
         "reversion_after_settlement",
     }
 
-    if signal_type in goldilocks_signals:
-        return LaneType.GOLDILOCKS
+    if signal_type in spike_reversion_signals:
+        return LaneType.SPIKE_REVERSION
 
     if trade_confidence >= 0.70:
         return LaneType.SURE_THING
@@ -468,9 +532,20 @@ def build_paper_trade_alert(trade_result: Dict[str, Any], station: str,
     lane = classify_lane(trade_confidence, signal_type)
     lane_config = LANE_CONFIG[lane]
 
+    # Determine the bucket discriminator for cooldown tracking.
+    # Priority: market_ticker (most specific) > trading_bucket > analytical_prob %
+    # The market_ticker includes the strike price (e.g. "KXHIGHDEN-70"), so
+    # different strikes get independent cooldowns — same station/lane but
+    # different target = new opportunity.
+    bucket_key = (
+        trade_result.get('market_ticker')
+        or trading_bucket
+        or int(analytical_prob * 100)
+    )
+
     # Check frequency throttle cooldown before hard filters
     cooldown = get_alert_cooldown()
-    can_alert, cooldown_reason = cooldown.can_alert(station, lane.value)
+    can_alert, cooldown_reason = cooldown.can_alert(station, lane.value, bucket=bucket_key)
     if not can_alert:
         return {
             "content": None,
@@ -493,7 +568,7 @@ def build_paper_trade_alert(trade_result: Dict[str, Any], station: str,
         }
 
     # Record the alert in the cooldown tracker (only after all checks pass)
-    cooldown.record_alert(station, lane.value)
+    cooldown.record_alert(station, lane.value, bucket=bucket_key)
 
     # Build Discord embed
     edge_pct = f"{edge:+.2%}"

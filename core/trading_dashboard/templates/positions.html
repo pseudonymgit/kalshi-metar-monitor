@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block nav_positions %}active{% endblock %}
+{% block title %}Positions — Trading Dashboard{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>All Positions</h2>
+    <div class="overflow-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>UUID</th>
+                    <th>Station</th>
+                    <th>Type</th>
+                    <th>Side</th>
+                    <th>Qty</th>
+                    <th>Entry Price</th>
+                    <th>Market Price</th>
+                    <th>MTM Value</th>
+                    <th>Realized P&L</th>
+                    <th>Unrealized P&L</th>
+                    <th>Total P&L</th>
+                    <th>Opened</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="all-positions-body">
+                <tr><td colspan="13" class="loading">Loading positions...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Risk Dashboard -->
+<div class="grid grid-3 mt-2">
+    <div class="card">
+        <h2>Risk State</h2>
+        <div class="risk-gauge">
+            <div class="risk-indicator" id="risk-indicator">—</div>
+            <div>
+                <div id="risk-state-label" class="stat-label">Loading...</div>
+                <div id="risk-reasons" class="text-sm text-muted mt-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Drawdown</h2>
+        <div class="stat-value" id="drawdown-value">—</div>
+        <div class="thermometer-container mt-2">
+            <div class="thermometer-fill" id="drawdown-thermometer" style="width: 0%;"></div>
+        </div>
+        <div class="flex justify-between text-sm text-muted mt-2">
+            <span>Current: <span id="drawdown-current">0</span>%</span>
+            <span>Max: <span id="drawdown-max">0</span>%</span>
+            <span>Threshold: <span id="drawdown-threshold">15</span>%</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Daily Loss</h2>
+        <div class="stat-value" id="daily-pnl-value">—</div>
+        <div class="thermometer-container mt-2">
+            <div class="thermometer-fill" id="daily-loss-thermometer" style="width: 0%;"></div>
+        </div>
+        <div class="flex justify-between text-sm text-muted mt-2">
+            <span>Today: <span id="daily-pnl-amount">$0</span></span>
+            <span>Limit: <span id="daily-loss-limit">$500</span></span>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-2 mt-2">
+    <div class="card">
+        <h2>Signal Accuracy (Last 30d)</h2>
+        <div class="overflow-auto" style="max-height: 400px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Signal</th>
+                        <th>Total</th>
+                        <th>Placed</th>
+                        <th>Wins</th>
+                        <th>Losses</th>
+                        <th>Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody id="signal-accuracy-body">
+                    <tr><td colspan="6" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Win Rate by Station</h2>
+        <div class="chart-container" id="win-rate-chart" style="min-height: 300px;"><div class="loading">Loading...</div></div>
+    </div>
+</div>
+
+<div class="card mt-2">
+    <h2>Rolling Sharpe (Last 50 Trades)</h2>
+    <div class="chart-container" id="sharpe-chart" style="min-height: 250px;"><div class="loading">Loading...</div></div>
+</div>
+
+<div class="grid grid-3 mt-2">
+    <div class="card">
+        <h2>Total Trades</h2>
+        <div class="stat-value blue" id="stat-total-trades">—</div>
+    </div>
+    <div class="card">
+        <h2>Win Rate</h2>
+        <div class="stat-value" id="stat-win-rate">—</div>
+    </div>
+    <div class="card">
+        <h2>Avg Edge</h2>
+        <div class="stat-value" id="stat-avg-edge">—</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof loadPositionsPage === 'function') {
+            loadPositionsPage();
+        }
+    });
+</script>
+{% endblock %}

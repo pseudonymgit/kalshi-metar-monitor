@@ -193,66 +193,15 @@ class FrontalDetectorSignal(BaseSignal):
         if idx < self.min_lookback:
             return None, 0.0
 
-        # Check all four conditions
-        condition_a = self._check_pressure_change(idx, days)
-        condition_b = self._check_wind_shift(idx, days)
-        condition_c = self._check_temp_gradient_proxy(idx, days)
-        condition_d_result, front_type = self._check_temp_trend(idx, days)
-        condition_d = condition_d_result
-
-        # Count how many conditions are met
-        conditions_met = sum([
-            condition_a, 
-            condition_b, 
-            condition_c, 
-            condition_d
-        ])
-
-        _logger.debug(
-            f"FrontalDetector: {conditions_met}/4 conditions "
-            f"(P={condition_a}, W={condition_b}, Tg={condition_c}, Tt={condition_d})"
+        # ─── DEPRECATION WARNING (B-Mode R8 Cycle 2.6) ───
+        # Daily FrontalDetectorSignal is deprecated in favor of the intraday
+        # FrontalPassageIntradaySignal which provides more accurate front
+        # detection using sub-daily METAR data. Log a warning and fall through.
+        _logger.warning(
+            "FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal "
+            "for intraday frontal passage detection. This signal will not generate trades."
         )
-
-        # Need at least 2 conditions to consider a frontal passage
-        if conditions_met < 2:
-            return None, 0.0
-
-        # Determine direction based on front type from temp trend
-        if front_type:
-            direction = 'up' if front_type == 'warm' else 'down'  # Warm fronts often up, cold fronts often down
-        else:
-            # If temperature trend doesn't give us direction, 
-            # fallback to pressure tendency: falling pressure suggests warming (up)
-            current_pressure = _safe_get(days, idx - 1, 'pressure')
-            previous_pressure = _safe_get(days, idx - 2, 'pressure')
-            
-            if current_pressure is not None and previous_pressure is not None:
-                if current_pressure < previous_pressure:  # Falling pressure usually means warming
-                    direction = 'up'
-                elif current_pressure > previous_pressure:  # Rising often means cooling
-                    direction = 'down' 
-                else:
-                    # Indeterminate if no pressure trend either
-                    _logger.warning("FrontalDetector: Conditions met but unable to determine direction")
-                    return None, 0.0
-            else:
-                # Without pressure data, we can't determine direction safely
-                _logger.warning("FrontalDetector: Insufficient pressure data to determine direction")
-                return None, 0.0
-
-        # Map conditions met to confidence level
-        if conditions_met == 2:
-            confidence = CONFIDENCE_2_CONDITIONS
-        elif conditions_met == 3:
-            confidence = CONFIDENCE_3_CONDITIONS
-        else:  # 4 conditions
-            confidence = CONFIDENCE_4_CONDITIONS
-
-        _logger.info(
-            f"FrontalDetector: {direction} @ {confidence:.3f}, {conditions_met}/4 conditions"
-        )
-
-        return direction, confidence
+        return None, 0.0
 
 
 def test_signal():

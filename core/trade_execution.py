@@ -14,6 +14,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .market_cost_model import MARKET_COST_MODEL
 from .station_registry import get_cluster_for_station as _get_cluster_for_station
 from .kalshi_price_fetcher import get_live_market_price as _get_live_market_price
+from .execution_simulator import EXECUTION_SIMULATOR
 from core.structured_logger import get_logger
 __all__ = ['TradeType', 'MarketSide', 'place_paper_trade', 'mark_positions_to_market']
 
@@ -97,6 +98,8 @@ def place_paper_trade(self, station, market_type, signal_direction,
     # probability and confidence with the signal's own computed values.
     if functionality == "late_day_momentum_hourly":
         metar_conn = sqlite3.connect(self.metar_db, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         ldm_dir, ldm_conf, ldm_prob = _ldm_hourly_signal(station, date, metar_conn)
         metar_conn.close()
         if ldm_dir is not None:
@@ -132,8 +135,6 @@ def place_paper_trade(self, station, market_type, signal_direction,
                 signal_name = "calendar_climatology"
             elif "momentum" in functionality or "late_day" in functionality:
                 signal_name = "late_day_momentum"
-            elif "nwp" in functionality or "direct" in functionality:
-                signal_name = "nwp_direct"
             elif "analysis" in functionality:
                 signal_name = "late_day_analysis"
             else:
@@ -447,8 +448,28 @@ def place_paper_trade(self, station, market_type, signal_direction,
 
     confidence_factor = 0.5 + (confidence * 0.3)  # Legacy factor retained for compatibility
 
-    # Fill the trade at market price (add fee impact)
-    fill_price = market_price
+    # Fill the trade using ExecutionSimulator for realistic spread/slippage (B-Mode R8 Cycle 2.8)
+    # Construct a synthetic ticker for the simulator; falls back to market_price if unavailable
+    _ticker = f"KX{market_type.upper()}{station}-{date.replace('-', '')}"
+    _requested_qty = max(1, abs(round(position_size / 0.50)) if position_size > 0 else 1)
+    _direction = "LONG" if signal_direction.upper() == "UP" else "SHORT"
+    try:
+        _sim_result = EXECUTION_SIMULATOR.simulate_trade(
+            ticker=_ticker,
+            direction=_direction,
+            requested_size_contracts=_requested_qty,
+            signal_price=market_price,
+            model_fair_value=analytical_prob if 'analytical_prob' in dir() else market_price,
+            market_price=market_price,
+        )
+        fill_price = _sim_result.monte_carlo.expected_fill_price
+        _LOGGER.info(
+            "exec_sim_fill station=%s ticker=%s market_price=%.4f sim_fill=%.4f spread=%.4f",
+            station, _ticker, market_price, fill_price, _sim_result.initial_spread
+        )
+    except Exception as _e:
+        _LOGGER.warning("exec_sim_fallback station=%s error=%s", station, _e)
+        fill_price = market_price
     # Fetch current market price for mark-to-market immediately after fill
     # to avoid using stale fill_price for P&L calculations
     current_market_price = self._fetch_current_market_price(station, market_type, date)
@@ -457,7 +478,9 @@ def place_paper_trade(self, station, market_type, signal_direction,
     effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
     quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
 
-    fee_cost = abs(position_size * self.fee_rate)
+    # fee_rate is MARKET_COST_MODEL.round_trip_fraction() = 0.0205 per contract
+    # fee_cost uses QUANTITY (contracts), not dollar notional
+    fee_cost = abs(quantity * self.fee_rate)
     net_cost = position_size + fee_cost * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 
     # Record the trade in our log with enhanced analytics

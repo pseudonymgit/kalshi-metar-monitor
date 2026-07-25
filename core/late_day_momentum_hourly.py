@@ -263,6 +263,8 @@ def main():
     date = sys.argv[2] if len(sys.argv) > 2 else "2024-06-15"
 
     conn = sqlite3.connect(METAR_DB, timeout=10)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     direction, conf, prob = late_day_momentum_hourly(station, date, conn)
 
     # Show the underlying data

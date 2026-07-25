@@ -22,12 +22,12 @@ ALERT_TYPE_CATEGORIES = {
         "instant_down",
         "settlement_up",
         "reversion_after_settlement",
-        "goldilocks_reversion",
+        "goldilocks_reversion",  # A3: legacy, new name is microstructure_spike_reversion
     ],
     "signal": [
         "near_boundary_momentum_up",
         "near_boundary_momentum_down",
-        "goldilocks_momentum_down",
+        "goldilocks_momentum_down",  # A3: legacy, new name is microstructure_spike_momentum_down
     ],
     "ladder_missing": [
         "missing_ladder",
@@ -50,10 +50,12 @@ ALERT_TYPE_DIRECTION = {
     "instant_down": "DOWN",
     "settlement_up": "UP",
     "reversion_after_settlement": "REVERSAL",
-    "goldilocks_reversion": "REVERSAL",
+    "goldilocks_reversion": "REVERSAL",  # A3: legacy
     "near_boundary_momentum_up": "UP",
     "near_boundary_momentum_down": "DOWN",
-    "goldilocks_momentum_down": "DOWN",
+    "goldilocks_momentum_down": "DOWN",  # A3: legacy
+    "microstructure_spike_reversion": "REVERSAL",  # A3: new name
+    "microstructure_spike_momentum_down": "DOWN",  # A3: new name
     "missing_ladder": "N/A",
     "missing_directional_ladder": "N/A",
 }

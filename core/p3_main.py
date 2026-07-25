@@ -303,6 +303,8 @@ if __name__ == "__main__":
         try:
             db_path = p3db._resolve_db_path()
             conn = sqlite3.connect(db_path, timeout=1)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             conn.execute("SELECT 1")
             conn.close()
             print("Health: OK")

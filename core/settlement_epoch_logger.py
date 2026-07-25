@@ -119,6 +119,8 @@ def log_transition_for_settlement_epoch(
     db_path = _alert_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = sqlite3.connect(db_path, timeout=1)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     try:
         conn.execute(
             """

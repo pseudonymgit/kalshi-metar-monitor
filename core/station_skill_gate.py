@@ -114,6 +114,8 @@ class StationSkillGate:
         try:
             # Load database connection
             conn = sqlite3.connect(self.metar_db_path)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             
             # Get all unique stations from the settlement_epochs table
             cursor = conn.cursor()
@@ -138,6 +140,8 @@ class StationSkillGate:
                     try:
                         # Establish new connection for this calculation
                         conn = sqlite3.connect(self.metar_db_path)
+                        conn.execute("PRAGMA journal_mode=WAL;")
+                        conn.execute("PRAGMA busy_timeout=5000;")
                         
                         # Load the high/low data and market directions
                         days = load_daily_highs_lows(station, conn)

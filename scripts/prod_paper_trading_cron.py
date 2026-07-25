@@ -37,9 +37,29 @@ from instance_config import (
 )
 
 
+# ─── Halt file check ───
+def _check_halt_before_start() -> bool:
+    """Check for halt file before starting. Returns True if halted."""
+    halt_path = REPO_ROOT / "data" / ".halt"
+    if halt_path.exists():
+        reason = ""
+        try:
+            reason = halt_path.read_text().strip()
+        except Exception:
+            reason = "unknown"
+        print(f"[HALT] HALTED — {reason}")
+        return True
+    return False
+
+
 def main():
     instance_name = "PROD"
     cfg = INSTANCE_CONFIGS[instance_name]
+    
+    # Check halt file before proceeding
+    if _check_halt_before_start():
+        print("[HALT] Cron skipped due to halt file")
+        sys.exit(0)
     
     logger = setup_instance_logger(instance_name)
     logger.info("PROD paper trading cron started")
