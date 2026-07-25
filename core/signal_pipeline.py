@@ -11,7 +11,7 @@ from pathlib import Path
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .agreement_gate import AgreementGate, SimpleAgreementChecker
 from .adaptive_thresholds import filter_signals_by_adaptive_threshold, get_adaptive_threshold
-from .spatial_coherence import apply_spatial_coherence_gate, STATION_REGIONS as SPATIAL_REGIONS, STATION_TO_REGION
+from .spatial_coherence import SpatialCoherenceGate
 from .ensemble_diversity import compute_diversity_score, apply_diversity_penalty
 from .station_skill_gate import StationSkillGate
 from .station_time import is_within_entry_window as _is_within_entry_window

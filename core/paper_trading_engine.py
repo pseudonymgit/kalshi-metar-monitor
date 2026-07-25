@@ -64,7 +64,7 @@ from core.signals.intraday_metar_confirmation import get_intraday_confirmation
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_skill_gate import StationSkillGate
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
-from .spatial_coherence import apply_spatial_coherence_gate, STATION_REGIONS as SPATIAL_REGIONS, STATION_TO_REGION
+from .spatial_coherence import SpatialCoherenceGate
 from .ensemble_diversity import compute_diversity_score, apply_diversity_penalty
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from position_sizing import (
@@ -452,6 +452,10 @@ class PaperTrader:
                 settlement_return_amount REAL,  -- Dollar amount from settlement event
                 status TEXT DEFAULT 'open',  -- open, closed
                 notes TEXT,
+
+                -- B-Mode R8 Cycle 4.2: Settlement confirmation tracking
+                settlement_confirmed INTEGER DEFAULT 0,  -- 1 if validated against Kalshi settlement
+                settlement_outcome TEXT,  -- 'correct' or 'incorrect' vs actual settlement bucket
 
                 -- Market analytics and calibration
                 implied_prob REAL,    -- Market-implied probability (typically market_price)
@@ -2881,7 +2885,20 @@ def daily_paper_run(run_date=None):
     
     if SPATIAL_COHERENCE_ENABLED:
         print("Applying spatial coherence gate...")
-        signals_with_conf = apply_spatial_coherence_gate(signals, run_date, trader.metar_db)
+        try:
+            # Old batch API was replaced by SpatialCoherenceGate class
+            from .spatial_coherence import SpatialCoherenceGate
+            _sc_gate = SpatialCoherenceGate()
+            signals_with_conf = []
+            for sig in signals:
+                station = sig[0]
+                direction = sig[1]
+                confidence = sig[-1]
+                adj_conf, _ = _sc_gate.apply_to_confidence(station, direction, confidence, run_date)
+                signals_with_conf.append((sig[0], sig[1], sig[2], sig[3], adj_conf))
+        except Exception as e:
+            print(f"  Spatial coherence gate failed: {e}")
+            signals_with_conf = list(signals)
         
         # Count signal adjustments for logging
         conf_modified = 0
