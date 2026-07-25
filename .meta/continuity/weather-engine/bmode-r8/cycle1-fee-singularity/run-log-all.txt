@@ -1,0 +1,55 @@
+# B-Mode Cycle 1 — Fee Singularity Run Log
+# 2026-07-25 04:37-04:39 UTC
+# Operator: Gilfoyle subagent + Donna cleanup
+
+## Status: ✅ ALL 10 ITEMS COMPLETE, 11/11 TESTS PASSING
+
+### Items Completed
+
+1. ✅ ROUND_TRIP_FEE constant exported from market_cost_model.py
+2. ✅ fee_aware_kelly_position_sizing.py: fee_rate default 0.0→0.0205, hardcoded 0.95→1.0-ROUND_TRIP_FEE
+3. ✅ position_sizing.py: PositionSizingConfig.fee_rate default 0.0→0.0205
+4. ✅ trade_execution.py: fee_cost notional bug fixed (quantity-based now)
+5. ✅ paper_trading_engine.py: fee_cost notional bug fixed (quantity-based now)
+6. ✅ pnl_tracking.py: fee calculation uses COALESCE(quantity,0) × ROUND_TRIP_FEE
+7. ✅ kelly_position_sizer.py: DEFAULT_COST_FRACTION 0.031→0.0205
+8. ✅ fee_aware_filter.py: FEE_RATE→COMMISSION_RATE rename
+9. ✅ instance_config*.py: all fee_rate=0.0→0.0205
+10. ✅ tests/test_fee_consistency.py: 11 tests, all passing
+
+### Verification
+
+Gate check 1 (fee_rate=0.0 in core/): PASS — zero occurrences of `fee_rate=0.0` assignment
+Gate check 2 (notional fee calc): PASS — zero occurrences of `abs(position_size * self.fee_rate)`
+Test suite: 11/11 PASSING
+
+### Remaining low-priority items (not blocking)
+
+- decision_output.py has `fee_rate=0.001` in test data factory (not production code)
+- alert_formatter.py has `fee_rate: float = 0.001` default param (separate module, formatting only)
+- cross_platform_divergence.py has `fee_rate: float` type annotation with no default value (fine)
+
+None of these are fee_rate=0.0. All are either type annotations or non-zero values in non-critical paths.
+
+### How to verify
+
+```bash
+cd prototypes/weather-engine-source
+python3 -m pytest tests/test_fee_consistency.py -v
+# Should show 11/11 passed
+```
+
+### Files changed
+
+core/market_cost_model.py
+core/fee_aware_kelly_position_sizing.py
+core/position_sizing.py
+core/trade_execution.py
+core/paper_trading_engine.py
+core/pnl_tracking.py
+core/kelly_position_sizer.py
+core/fee_aware_filter.py
+core/instance_config.py
+core/instance_config_fixed.py
+core/instance_config_test_write.py
+tests/test_fee_consistency.py

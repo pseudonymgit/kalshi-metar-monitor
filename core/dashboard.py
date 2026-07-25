@@ -485,12 +485,16 @@ class DashboardApp:
         model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
 
         # Market probability: try live Kalshi price, fallback to 0.5
+        # Market probability: try live Kalshi price, fallback to 0.5
+        # B-Mode R8 Cycle 4.3: Use stats latest_date instead of undefined 'date' variable
         market_prob = 0.5
         if _dashboard_get_market_price is not None:
             try:
-                live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
-                if live_price is not None and 0.01 <= live_price <= 0.99:
-                    market_prob = live_price
+                live_date = stats.get("latest_date")
+                if live_date:
+                    live_price, _ = _dashboard_get_market_price(station, 'HIGH', live_date)
+                    if live_price is not None and 0.01 <= live_price <= 0.99:
+                        market_prob = live_price
             except Exception:
                 pass
 
@@ -553,12 +557,15 @@ class DashboardApp:
 
             z = (latest - mean) / std if std > 0 else 0.0
             model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
+            # B-Mode R8 Cycle 4.3: Use stats latest_date instead of undefined 'date' variable
             market_prob = 0.5
             if _dashboard_get_market_price is not None:
                 try:
-                    live_price, _ = _dashboard_get_market_price(station, 'HIGH', date)
-                    if live_price is not None and 0.01 <= live_price <= 0.99:
-                        market_prob = live_price
+                    live_date = stats.get("latest_date")
+                    if live_date:
+                        live_price, _ = _dashboard_get_market_price(station, 'HIGH', live_date)
+                        if live_price is not None and 0.01 <= live_price <= 0.99:
+                            market_prob = live_price
                 except Exception:
                     pass
             discrepancy = model_prob - market_prob

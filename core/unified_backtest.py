@@ -354,6 +354,17 @@ def run_backtest(
     ece = compute_ece(all_results)
     dd = max_drawdown(all_results)
 
+    # ⚠️ B-Mode R8 Cycle 4.1: PAPER ACCURACY — unconfirmed against settlement data
+    # These accuracy numbers are computed from directional predictions compared
+    # against METAR observations, NOT against actual Kalshi settlement buckets.
+    # Paper accuracy systematically differs from settlement-validated accuracy.
+    # See docs/weather-engine/BACKTEST-SETTLEMENT-VALIDATION.md for the delta.
+    if not hasattr(run_backtest, '_cycle4_warning_printed'):
+        print("\n⚠️  WARNING: All accuracy numbers below are PAPER accuracy.")
+        print("   These have NOT been validated against Kalshi settlement data.")
+        print("   Settlement-validated accuracy will differ (see Cycle 4.4).\n")
+        run_backtest._cycle4_warning_printed = True
+
     return {
         'accuracy': accuracy,
         'fee_adjusted_accuracy': accuracy - (0.5 + FEE_RATE),
@@ -362,6 +373,7 @@ def run_backtest(
         'ece': ece,
         'drawdown': dd,
         'trades': n,
+        'accuracy_type': 'PAPER_ACCURACY_UNCONFIRMED',  # B-Mode R8 Cycle 4.1
         'per_signal_stats': {
             sig: {
                 'accuracy': stats['correct'] / stats['total'] if stats['total'] > 0 else 0,

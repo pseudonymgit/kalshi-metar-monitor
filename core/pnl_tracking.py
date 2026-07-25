@@ -38,7 +38,7 @@ def process_settlements_for_date(self, settlement_date):
     # Get all open trades for which settlements are available
     c.execute("""
         SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
-               t.quantity, t.market_type,
+               t.quantity, t.market_type, t.signal_direction,
                p.settlement_bucket, p.prior_settlement_bucket
         FROM trades t
         JOIN (SELECT station, market_type, local_trading_date, settlement_bucket, prior_settlement_bucket
@@ -52,7 +52,8 @@ def process_settlements_for_date(self, settlement_date):
     unsettled_trades = c.fetchall()
 
     settled_count = 0
-    for trade_uuid, station, trade_type_str, filled_price, market_price, quantity, market_type, settlement_value, prior_settlement_value in unsettled_trades:
+    for row in unsettled_trades:
+        trade_uuid, station, trade_type_str, filled_price, market_price, quantity, market_type, signal_direction, settlement_value, prior_settlement_value = row
         # Convert trade type to enum
         try:
             trade_type = TradeType(trade_type_str)
@@ -114,15 +115,33 @@ def process_settlements_for_date(self, settlement_date):
         else:
             continue
 
+        # B-Mode R8 Cycle 4.2: Determine settlement outcome direction
+        # settlement_contract_value = 1.0 means temp breached strike (ITM)
+        # For HIGH: temp breached strike = temp > strike = UP outcome
+        # For LOW: temp breached strike = temp < strike = DOWN outcome
+        contract_is_itm = settlement_contract_value > 0.5
+        if market_type == "HIGH":
+            actual_settlement_direction = "UP" if contract_is_itm else "DOWN"
+        else:
+            # LOW market: temp < strike = ITM = DOWN outcome
+            actual_settlement_direction = "DOWN" if contract_is_itm else "UP"
+
+        # Compare signal_direction to actual settlement direction
+        predicted_correctly = (signal_direction == actual_settlement_direction)
+        settlement_outcome = "correct" if predicted_correctly else "incorrect"
+
         # Update the trade with settlement data
         realized_pnl = profit
         c.execute("""
             UPDATE trades
             SET settled_value = ?, settlement_date_utc = ?,
                 realized_pnl = ?, settlement_return_amount = ?,
-                status = 'closed'
+                status = 'closed',
+                settlement_confirmed = 1,
+                settlement_outcome = ?
             WHERE trade_uuid = ?
-        """, (settlement_value, settlement_date, profit, return_amount, trade_uuid))
+        """, (settlement_value, settlement_date, profit, return_amount,
+              settlement_outcome, trade_uuid))
 
         # Update corresponding position (reduce by quantity)
         trade_qty = qty
@@ -416,6 +435,85 @@ def _migrate_settlement_columns(self, for_date=None):
     _LOGGER.info("settlement_columns_migration: trades/settlement_confirmed, "
                  "trades/settlement_outcome, daily_balances/paper_pnl, "
                  "daily_balances/settlement_confirmed_pnl")
+
+
+def compute_settlement_accuracy(self, for_date=None) -> dict:
+    """
+    B-Mode R8 Cycle 4.2: Calculate settlement-validated accuracy metric.
+
+    settlement_accuracy = correct_settlement_predictions / total_settled_trades
+
+    Compares predicted direction (signal_direction) against actual Kalshi
+    settlement bucket outcome for every settled trade.
+
+    Returns dict with:
+      - settlement_accuracy: float 0-1
+      - total_settled: int
+      - correct_predictions: int
+      - incorrect_predictions: int
+      - accuracy_by_type: dict of accuracy per market_type (HIGH/LOW)
+    """
+    import statistics
+
+    conn = get_sqlite_connection(self.paper_db)
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT settlement_confirmed, settlement_outcome, market_type
+        FROM trades
+        WHERE settlement_confirmed = 1
+          AND settlement_outcome IS NOT NULL
+    """)
+
+    records = c.fetchall()
+    conn.close()
+
+    total = len(records)
+    if total == 0:
+        return {
+            "settlement_accuracy": 0.0,
+            "total_settled": 0,
+            "correct_predictions": 0,
+            "incorrect_predictions": 0,
+            "accuracy_by_type": {},
+            "note": "No settlement-confirmed trades yet"
+        }
+
+    correct = sum(1 for _, outcome, _ in records if outcome == "correct")
+    incorrect = total - correct
+
+    # Per market type
+    from collections import defaultdict
+    by_type = defaultdict(lambda: {"correct": 0, "total": 0})
+    for _, outcome, mtype in records:
+        by_type[mtype]["total"] += 1
+        if outcome == "correct":
+            by_type[mtype]["correct"] += 1
+
+    accuracy_by_type = {}
+    for mtype, stats in by_type.items():
+        accuracy_by_type[mtype] = {
+            "accuracy": stats["correct"] / stats["total"] if stats["total"] > 0 else 0.0,
+            "correct": stats["correct"],
+            "total": stats["total"]
+        }
+
+    accuracy = correct / total if total > 0 else 0.0
+
+    # Also compute paper accuracy for comparison (from same trades' pre-settlement P&L)
+    # This is stored separately to show the paper-vs-settlement delta
+    _LOGGER.info(
+        "settlement_accuracy: %.4f (%d/%d correct) across %d trades",
+        accuracy, correct, total, total
+    )
+
+    return {
+        "settlement_accuracy": accuracy,
+        "total_settled": total,
+        "correct_predictions": correct,
+        "incorrect_predictions": incorrect,
+        "accuracy_by_type": accuracy_by_type
+    }
 
 
 def calculate_calibration_metrics_for_date(self, for_date):
