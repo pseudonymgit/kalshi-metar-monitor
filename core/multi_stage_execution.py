@@ -23,6 +23,8 @@ def init_order_tracking_db():
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     # Create orders table
@@ -373,6 +375,8 @@ def record_stage_attempt(order_id: str, station: str, market_type: str, stage: i
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -395,6 +399,8 @@ def get_stage_status(order_id: str, stage_num: int) -> str:
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -417,6 +423,8 @@ def record_order_status(order_id: str, station: str, market_type: str, direction
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -439,6 +447,8 @@ def finalize_order_record(order_id: str, final_status: str, filled_qty: int, had
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     # Update final status for top-level order record
@@ -458,6 +468,8 @@ def get_active_orders() -> list:
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -487,6 +499,8 @@ def cancel_order_if_unfilled(order_id: str) -> Dict[str, Any]:
     """
     db_path = os.getenv("ORDER_TRACKING_DB", "/var/data/order_tracking.db")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     cursor = conn.cursor()
     
     # Check current order status

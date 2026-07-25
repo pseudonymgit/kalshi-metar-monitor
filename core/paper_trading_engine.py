@@ -210,14 +210,18 @@ except ImportError as e:
     TemperatureAdvectionSignal = None
     TEMPERATURE_ADVECTION_ENABLED = False
 
-# Import Goldilocks Signal (spike-reversion pattern)
+# Import Spike Reversion Signal (A3: renamed from Goldilocks)
 try:
-    from core.signals.goldilocks_signal import GoldilocksSignal
-    HAS_GOLDILOCKS_SIGNAL = True
+    from core.signals.spike_reversion_signal import SpikeReversionSignal
+    HAS_SPIKE_REVERSION_SIGNAL = True
 except ImportError as e:
-    print(f"Warning: GoldilocksSignal import failed: {e}")
-    GoldilocksSignal = None
-    HAS_GOLDILOCKS_SIGNAL = False
+    print(f"Warning: SpikeReversionSignal import failed: {e}")
+    SpikeReversionSignal = None
+    HAS_SPIKE_REVERSION_SIGNAL = False
+
+# A3: backward-compatible aliases (remove after full migration)
+HAS_GOLDILOCKS_SIGNAL = HAS_SPIKE_REVERSION_SIGNAL
+GoldilocksSignal = SpikeReversionSignal
 
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
@@ -237,15 +241,17 @@ DIVERSITY_MAX_WEIGHT = 1.0    # Max weight when diversity = 1
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
 
-# Configuration flag for Goldilocks lane separation
+# A3: Configuration flag for Spike Reversion lane separation
+# (backward-compatible alias name; rename to SPIKE_REVERSION_SEPARATE_LANE after full migration)
 GOLDILOCKS_SEPARATE_LANE = True
+SPIKE_REVERSION_SEPARATE_LANE = GOLDILOCKS_SEPARATE_LANE
 _LOGGER = logging.getLogger(__name__)
 
 # Alert builder integration - export alert builder functions
 # Alert builder provides:
 # - build_paper_trade_alert(): Build slim alert with S/A/B/C/D/F grade + Edge
 # - compute_opportunity_grade(): Calculate grade from confidence, market_prob, Sharpe
-# - classify_lane(): Classify signal into Regular/Sure_Thing/Goldilocks
+# - classify_lane(): Classify signal into Regular/Sure_Thing/Spike_Reversion (A3: renamed from Goldilocks)
 # - format_alert_for_discord(): Format for Discord webhook
 
 # Risk controls configuration (Marty's Phase 1 B1.5)
@@ -280,7 +286,7 @@ class PaperTrader:
                  paper_db=PAPER_DB_PATH,
                  metar_db=METAR_DB_PATH,
                  initial_balance=10000.0,
-                 fee_rate=0.0):  # Very low fee for now, adjustable
+                 fee_rate=0.0205):  # Realistic fee matching MARKET_COST_MODEL.round_trip_fraction()
         self.paper_db = paper_db
         self.metar_db = metar_db
         self.initial_balance = initial_balance
@@ -315,17 +321,19 @@ class PaperTrader:
         # Temperature Advection Signal - lazy-loaded when first needed
         self._temp_advection = None
 
-        # Goldilocks Signal (spike-reversion pattern)
-        self._goldilocks_signal = None
-        if HAS_GOLDILOCKS_SIGNAL:
+        # Spike Reversion Signal (A3: renamed from Goldilocks)
+        self._spike_reversion_signal = None
+        if HAS_SPIKE_REVERSION_SIGNAL:
             try:
-                self._goldilocks_signal = GoldilocksSignal(self.metar_db)
-                _LOGGER.info("Goldilocks signal initialized")
+                self._spike_reversion_signal = SpikeReversionSignal(self.metar_db)
+                _LOGGER.info("Spike Reversion signal initialized")
             except Exception as e:
-                _LOGGER.warning(f"Failed to initialize Goldilocks Signal: {e}")
-                self._goldilocks_signal = None
+                _LOGGER.warning(f"Failed to initialize Spike Reversion Signal: {e}")
+                self._spike_reversion_signal = None
         else:
-            _LOGGER.warning("Goldilocks signal not imported")
+            _LOGGER.warning("Spike Reversion signal not imported")
+        # A3: backward-compatible alias
+        self._goldilocks_signal = self._spike_reversion_signal
 
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
@@ -498,6 +506,7 @@ class PaperTrader:
                 position_size_weight REAL NOT NULL, -- Average position size for the day
                 total_fees_paid REAL NOT NULL,     -- Fees paid during the day
                 max_drawdown_since_high REAL NOT NULL,  -- Maximum drawdown from peak,
+                cost_adjusted_pnl REAL,                   -- B-Mode R8 Cycle 2.10: Pmax_drawdown_since_high REAL NOT NULL,  -- Maximum drawdown from peak,L after fees+execution costs
 
                 created_at_utc TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
@@ -565,6 +574,7 @@ class PaperTrader:
                 position_size_weight REAL NOT NULL, -- Average position size for the day
                 total_fees_paid REAL NOT NULL,     -- Fees paid during the day
                 max_drawdown_since_high REAL NOT NULL,  -- Maximum drawdown from peak,
+                cost_adjusted_pnl REAL,                   -- B-Mode R8 Cycle 2.10: Pmax_drawdown_since_high REAL NOT NULL,  -- Maximum drawdown from peak,L after fees+execution costs
 
                 created_at_utc TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
@@ -899,6 +909,8 @@ class PaperTrader:
 
         # Open METAR DB connection for hourly late-day momentum signal
         metar_conn = sqlite3.connect(self.metar_db, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
 
         for station in available_stations:
             # NOTE: reversion signal (Signal 1) REMOVED from ensemble per Phase 1 fix.
@@ -970,16 +982,16 @@ class PaperTrader:
                     except Exception as e:
                         _LOGGER.warning(f"Failed to compute Temperature Advection signal for {station} on {date}: {e}")
 
-            # Signal 7: Goldilocks (spike-reversion pattern) - added to signals like others
-            if HAS_GOLDILOCKS_SIGNAL and self._goldilocks_signal is not None:
+            # Signal 7: Spike Reversion (A3: renamed from Goldilocks)
+            if HAS_SPIKE_REVERSION_SIGNAL and self._spike_reversion_signal is not None:
                 try:
-                    direction, confidence = self._goldilocks_signal.evaluate_for_station(station, date, metar_conn)
+                    direction, confidence = self._spike_reversion_signal.evaluate_for_station(station, date, metar_conn)
                     if direction is not None and confidence >= 0.25:
                         market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
-                        signals.append((station, "HIGH", market_side, "goldilocks_spike_reversion"))
-                        _LOGGER.info(f"Goldilocks signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
+                        signals.append((station, "HIGH", market_side, "spike_reversion"))
+                        _LOGGER.info(f"Spike Reversion signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
                 except Exception as e:
-                    _LOGGER.warning(f"Failed to compute Goldilocks signal for {station} on {date}: {e}")
+                    _LOGGER.warning(f"Failed to compute Spike Reversion signal for {station} on {date}: {e}")
 
         metar_conn.close()
 
@@ -995,21 +1007,21 @@ class PaperTrader:
             signals = filtered_signals
             _LOGGER.info(f"Applied skill gate filter: {len(signals)} skilled out of {before_count} total signals")
 
-        # Separate goldilocks signals if separate lane is enabled
-        goldilocks_signals = []
+        # A3: Separate spike reversion signals if separate lane is enabled
+        spike_reversion_signals = []
         other_signals = []
-        
-        if GOLDILOCKS_SEPARATE_LANE:
+
+        if SPIKE_REVERSION_SEPARATE_LANE:
             for station, market_type, direction, reason in signals:
-                if reason == "goldilocks_spike_reversion":
-                    goldilocks_signals.append((station, market_type, direction, reason))
+                if reason == "spike_reversion":
+                    spike_reversion_signals.append((station, market_type, direction, reason))
                 else:
                     other_signals.append((station, market_type, direction, reason))
             signals = other_signals
-            _LOGGER.info(f"Separated Goldilocks signals for independent processing. Other signals: {len(other_signals)}, Goldilocks: {len(goldilocks_signals)}")
+            _LOGGER.info(f"Separated Spike Reversion signals for independent processing. Other signals: {len(other_signals)}, Spike Reversion: {len(spike_reversion_signals)}")
         else:
             # All signals remain together when separate lane is disabled
-            goldilocks_signals = []
+            spike_reversion_signals = []
             other_signals = signals
             
         # Apply adaptive confidence thresholds BEFORE the agreement gate filtering (Phase 4.4)
@@ -1035,7 +1047,7 @@ class PaperTrader:
                     base_confidence = 0.75
                 elif reason in ["temperature_advection"]:
                     base_confidence = 0.6
-                elif reason in ["goldilocks_spike_reversion"]:
+                elif reason in ["spike_reversion", "goldilocks_spike_reversion"]:
                     base_confidence = 0.65
                 else:
                     base_confidence = 0.5
@@ -1072,7 +1084,7 @@ class PaperTrader:
                 _LOGGER.error(f"Error applying adaptive threshold filtering: {e}")
                 # Continue without filtering if it fails
         
-        # Apply agreement gate filter ONLY to non-Goldilocks signals
+        # A3: Apply agreement gate filter ONLY to non-Spike-Reversion signals
         if other_signals:
             before_agreement_count = len(other_signals)
             
@@ -1091,11 +1103,11 @@ class PaperTrader:
                 final_other_signals.extend(agreed_signals)
             
             other_signals = final_other_signals
-            _LOGGER.info(f"Applied agreement gate: {len(other_signals)} non-Goldilocks signals passed consensus out of {before_agreement_count} post-skill-gate signals")
+            _LOGGER.info(f"Applied agreement gate: {len(other_signals)} non-Spike-Reversion signals passed consensus out of {before_agreement_count} post-skill-gate signals")
         
-        # Combine Goldilocks signals (unfiltered) with agreeing non-Goldilocks signals
-        all_final_signals = other_signals + goldilocks_signals
-        _LOGGER.info(f"Total final signals: {len(all_final_signals)} (non-Goldilocks passed agreement: {len(other_signals)}, Goldilocks (unfiltered): {len(goldilocks_signals)})")
+        # A3: Combine Spike Reversion signals (unfiltered) with agreeing non-Spike-Reversion signals
+        all_final_signals = other_signals + spike_reversion_signals
+        _LOGGER.info(f"Total final signals: {len(all_final_signals)} (non-Spike-Reversion passed agreement: {len(other_signals)}, Spike Reversion (unfiltered): {len(spike_reversion_signals)})")
         
         signals = all_final_signals
 
@@ -1362,6 +1374,10 @@ class PaperTrader:
 
         # Get market price - in real world this comes from API
         market_price = self._get_market_price(station, date, market_type)
+        # Extract the market ticker (includes strike) for cooldown discrimination
+        market_ticker = None
+        if hasattr(self, '_last_market_price_meta') and self._last_market_price_meta:
+            market_ticker = self._last_market_price_meta.get('market_ticker')
 
         # Calculate analytical probability using historical deterministics
         analytical_prob, confidence, metadata = self._get_analytical_probability(
@@ -1372,6 +1388,8 @@ class PaperTrader:
         # probability and confidence with the signal's own computed values.
         if functionality == "late_day_momentum_hourly":
             metar_conn = sqlite3.connect(self.metar_db, timeout=10)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             ldm_dir, ldm_conf, ldm_prob = _ldm_hourly_signal(station, date, metar_conn)
             metar_conn.close()
             if ldm_dir is not None:
@@ -1719,7 +1737,7 @@ class PaperTrader:
         effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
         quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
 
-        fee_cost = abs(position_size * self.fee_rate)
+        fee_cost = abs(quantity * self.fee_rate)  # quantity (contracts), not dollar notional
         net_cost = position_size + fee_cost * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 
         # Record the trade in our log with enhanced analytics
@@ -1856,6 +1874,7 @@ class PaperTrader:
             'sharpe': Sharpe,  # Sharpe ratio for alert grading
             'hit_rate': hit_rate,  # Directional accuracy from BSS matrix
             'hit_rate_n': hit_rate_n,  # Sample count for hit rate
+            'market_ticker': market_ticker,  # Kalshi market ticker (includes strike, e.g. KXHIGHDEN-70)
             'risk_state': self._risk_metrics.risk_state,
             'risk_reasons': [],  # risk_report provides checks, not kill_switch_reasons
             'detailed_risk_state': risk_state_after_execution  # Detailed risk state from the risk manager
@@ -2837,7 +2856,9 @@ def daily_paper_run(run_date=None):
     print("=" * 70)
 
     # Increased initial balance for more realistic trading
-    trader = PaperTrader(initial_balance=10000.0, fee_rate=0.0)  # 0.1% fee
+    # Support PAPER_TRADING_DB_PATH env var for instance-specific DB (used by production deployment)
+    _pt_db_path = os.environ.get("PAPER_TRADING_DB_PATH") or PAPER_DB_PATH
+    trader = PaperTrader(paper_db=_pt_db_path, initial_balance=10000.0, fee_rate=0.0205)  # Kalshi round-trip cost
 
     # Marty's Phase 1 B1.5: Check kill switches before trading
     should_halt, kill_reasons = trader.check_kill_switches()

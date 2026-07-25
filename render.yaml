@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: kalshi-metar-monitor
+    runtime: python
+    buildCommand: ""
+    startCommand: python app.py
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PAPER_TRADING_ENABLED
+        value: "1"

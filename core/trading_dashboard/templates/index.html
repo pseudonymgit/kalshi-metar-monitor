@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block nav_pnl %}active{% endblock %}
+{% block title %}P&L / Positions — Trading Dashboard{% endblock %}
+
+{% block content %}
+<!-- P&L Summary Cards -->
+<div class="grid grid-4 mb-2">
+    <div class="card">
+        <h2>Total P&L</h2>
+        <div class="stat-value" id="total-pnl">—</div>
+        <div class="stat-label">Realized since inception</div>
+    </div>
+    <div class="card">
+        <h2>Current Balance</h2>
+        <div class="stat-value blue" id="current-balance">—</div>
+        <div class="stat-label">Account Value</div>
+    </div>
+    <div class="card">
+        <h2>Open Positions</h2>
+        <div class="stat-value" id="open-positions">—</div>
+        <div class="stat-label">Active positions</div>
+    </div>
+    <div class="card">
+        <h2>Total Exposure</h2>
+        <div class="stat-value" id="total-exposure">—</div>
+        <div class="stat-label">Mark-to-market value</div>
+    </div>
+</div>
+
+<!-- P&L Chart + Portfolio -->
+<div class="grid grid-2 mt-2">
+    <div class="card">
+        <h2>Cumulative P&L Over Time</h2>
+        <div class="chart-container" id="pnl-chart"><div class="loading">Loading P&L chart...</div></div>
+    </div>
+    <div class="card">
+        <h2>Portfolio by Cluster</h2>
+        <div class="chart-container" id="portfolio-cluster-chart"><div class="loading">Loading...</div></div>
+    </div>
+</div>
+
+<!-- P&L by City -->
+<div class="card mt-2">
+    <h2>P&L by Station</h2>
+    <div class="chart-container" id="pnl-city-chart" style="min-height: 200px;"><div class="loading">Loading...</div></div>
+</div>
+
+<!-- Positions Table -->
+<div class="card mt-2">
+    <h2>Open Positions</h2>
+    <div class="overflow-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>Side</th>
+                    <th>Qty</th>
+                    <th>Entry Price</th>
+                    <th>Market Price</th>
+                    <th>MTM Value</th>
+                    <th>Realized P&L</th>
+                    <th>Unrealized P&L</th>
+                    <th>Total P&L</th>
+                    <th>Opened</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="positions-table-body">
+                <tr><td colspan="11" class="loading">Loading positions...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Alert Feed -->
+<div class="card mt-2">
+    <div class="flex items-center justify-between mb-2">
+        <h2 style="margin-bottom: 0;">Recent Alerts</h2>
+        <div class="filter-bar" style="margin-bottom: 0;">
+            <input type="text" id="alert-station-filter" placeholder="Filter station..." size="10">
+            <select id="alert-outcome-filter">
+                <option value="">All outcomes</option>
+                <option value="EXECUTED">Executed</option>
+                <option value="SETTLED_WIN">Settled Win</option>
+                <option value="SETTLED_LOSS">Settled Loss</option>
+                <option value="SKIPPED_EDGE">Skipped Edge</option>
+                <option value="SKIPPED_RISK">Skipped Risk</option>
+                <option value="ERROR">Error</option>
+            </select>
+        </div>
+    </div>
+    <div id="alert-feed"><div class="loading">Loading alerts...</div></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Dashboard-specific initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof loadDashboardData === 'function') {
+            loadDashboardData();
+        }
+    });
+</script>
+{% endblock %}

@@ -100,6 +100,8 @@ class TradeJournal:
         """Create the trade_journal table if it doesn't exist."""
         os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS trade_journal (
@@ -173,7 +175,7 @@ class TradeJournal:
             confidence: Signal confidence (0.0-1.0)
             edge: Edge value (confidence - market_prob)
             market_prob: Market-implied probability (0.0-1.0)
-            lane: Lane type (regular, sure_thing, goldilocks)
+            lane: Lane type (regular, sure_thing, spike_reversion, goldilocks)
             alert_id: Unique alert identifier for traceability
             failure_mode: Reason for failure/skip (if applicable)
             position_size: Position size in USD (if executed)
@@ -191,6 +193,8 @@ class TradeJournal:
         metadata_json = json.dumps(metadata, sort_keys=True) if metadata else None
 
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             cur = conn.execute("""
                 INSERT INTO trade_journal
@@ -310,6 +314,8 @@ class TradeJournal:
             metadata: Optional additional metadata to merge
         """
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             if metadata:
                 # Read existing metadata, merge, rewrite
@@ -379,6 +385,8 @@ class TradeJournal:
         where_clause = " AND ".join(conditions) if conditions else "1=1"
 
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(f"""
@@ -394,6 +402,8 @@ class TradeJournal:
     def get_by_alert_id(self, alert_id: str) -> Optional[Dict[str, Any]]:
         """Get a single journal entry by alert_id."""
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
@@ -412,6 +422,8 @@ class TradeJournal:
             Dict with counts by outcome, station, lane, etc.
         """
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Total entries
             total = conn.execute("SELECT COUNT(*) FROM trade_journal").fetchone()[0]
@@ -471,6 +483,8 @@ class TradeJournal:
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
 
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Total decisions
             total = conn.execute(
@@ -523,6 +537,8 @@ class TradeJournal:
     def get_recent_trades(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get the most recent trades from the journal (limit=50 by requirement)."""
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             conn.row_factory = sqlite3.Row
             rows = conn.execute('''SELECT * FROM trade_journal  
@@ -539,6 +555,8 @@ class TradeJournal:
     def get_accuracy_by_signal(self) -> Dict[str, Dict[str, Any]]:
         """Get accuracy statistics grouped by signal type."""
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Get success rates by functionality (signal type)
             rows = conn.execute('''
@@ -594,6 +612,8 @@ class TradeJournal:
         cutoff_date = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
         
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Get success rates by functionality (signal type) and station
             rows = conn.execute('''
@@ -642,6 +662,8 @@ class TradeJournal:
     def get_trade_counts_by_station(self) -> Dict[str, Dict[str, int]]:
         """Get trade counts (successful, skipped, total) by station."""
         conn = sqlite3.connect(self._db_path)  
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Get counts by station and outcome category
             rows = conn.execute('''
@@ -674,6 +696,8 @@ class TradeJournal:
     def get_failure_breakdown(self) -> List[Dict[str, Any]]:
         """Get a breakdown of skip/failure reasons."""
         conn = sqlite3.connect(self._db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             rows = conn.execute("""
                 SELECT outcome, failure_mode, COUNT(*) as count

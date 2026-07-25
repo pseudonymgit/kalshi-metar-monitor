@@ -2,6 +2,9 @@
 """
 METAR dT/dt Signal — Intraday Temperature Trend Signal
 
+[DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
+Near-coin-flip accuracy (~50.6%). Keeping code file for reference.
+
 Calculates the 3-hour temperature change rate from raw METAR observations
 and uses the recent trend as a directional predictor.
 

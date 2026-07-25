@@ -73,6 +73,8 @@ class SettlementFidelity:
             station: If None, runs for all stations
         """
         conn = sqlite3.connect(self.db_path, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         c = conn.cursor()
 
         stations = [station] if station else list(AUTHORITATIVE_STATIONS.keys())
@@ -164,6 +166,8 @@ class SettlementFidelity:
         Returns: dict of {station: avg_interval_minutes}
         """
         conn = sqlite3.connect(self.db_path, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         c = conn.cursor()
 
         stations = list(AUTHORITATIVE_STATIONS.keys())

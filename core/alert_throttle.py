@@ -6,7 +6,7 @@ SQLite-backed alert throttling system to enforce per-station cooldown
 timer:
 - 4h Regular
 - 8h Sure Thing
-- 12h Goldilocks
+- 12h Spike Reversion (A3: renamed from Goldilocks)
 
 Cooldown resets only on signal state transition (e.g., direction change,
 confidence crossing threshold). Tracks last_alerted_at, last_state,
@@ -35,7 +35,7 @@ class AlertThrottle:
     Cooldown periods:
     - Regular: 4 hours
     - Sure Thing: 8 hours  
-    - Goldilocks: 12 hours
+    - Spike Reversion (formerly Goldilocks): 12 hours
 
     Throttling resets only on signal state transition.
     """
@@ -51,7 +51,8 @@ class AlertThrottle:
         self._cooldows_periods = {
             'regular': 4 * 3600,      # 4 hours
             'sure_thing': 8 * 3600,   # 8 hours
-            'goldilocks': 12 * 3600,  # 12 hours
+            'spike_reversion': 12 * 3600,  # 12 hours (A3: renamed from goldilocks)
+            'goldilocks': 12 * 3600,  # 12 hours (backward compat)
         }
         self._ensure_schema()
         self._logger = logging.getLogger(f"{__name__}.AlertThrottle")
@@ -110,9 +111,11 @@ class AlertThrottle:
             'sure_thing': 'sure_thing',
             'Sure Thing': 'sure_thing',
             'SURE_THING': 'sure_thing',
-            'goldilocks': 'goldilocks',
-            'Goldilocks': 'goldilocks',
-            'GOLDILOCKS': 'goldilocks',
+            'spike_reversion': 'spike_reversion',
+            'goldilocks': 'spike_reversion',  # A3: backward compat
+            'Goldilocks': 'spike_reversion',
+            'GOLDILOCKS': 'spike_reversion',
+            'Goldilocks': 'spike_reversion',  # duplicate removed after migration
         }
         return alert_map.get(alert_type, 'regular')
 
@@ -122,7 +125,7 @@ class AlertThrottle:
 
         Args:
             station: Station ICAO code
-            alert_type: 'regular', 'sure_thing', or 'goldilocks'
+            alert_type: 'regular', 'sure_thing', or 'spike_reversion'
             current_state: Any object representing the current signal state (converted to string)
 
         Returns:
@@ -376,7 +379,8 @@ if __name__ == "__main__":
         throttle._cooldows_periods = {
             'regular': 5,  # 5 seconds
             'sure_thing': 10,  # 10 seconds
-            'goldilocks': 15,  # 15 seconds
+            'spike_reversion': 15,  # 15 seconds (A3: renamed from goldilocks)
+            'goldilocks': 15,  # backward compat
         }
         
         # Test basic functionality

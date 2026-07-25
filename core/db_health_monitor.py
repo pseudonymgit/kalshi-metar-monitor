@@ -59,6 +59,8 @@ class DatabaseHealthCheck:
         """
         try:
             conn = sqlite3.connect(self.db_path, timeout=timeout_s)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             conn.execute("SELECT 1")
             conn.close()
             return True
@@ -83,6 +85,8 @@ class DatabaseHealthCheck:
         """
         try:
             conn = sqlite3.connect(self.db_path, timeout=DEFAULT_BUSY_TIMEOUT_MS)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             # Set a reasonable busy timeout
             conn.execute("PRAGMA busy_timeout = ?", (DEFAULT_BUSY_TIMEOUT_MS,))
             cursor = conn.execute("PRAGMA integrity_check")
@@ -145,6 +149,8 @@ class DatabaseHealthCheck:
         try:
             # Step 1: VACUUM
             conn = sqlite3.connect(self.db_path, timeout=DEFAULT_BUSY_TIMEOUT_MS)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             conn.execute("VACUUM")
             conn.close()
 

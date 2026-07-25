@@ -234,7 +234,7 @@ def main():
     print("=" * 90)
     print(f"Database: {DB_PATH}")
     print(f"Signals: goldilocks + gaussian (min_agreement=2)")
-    print(f"Method: Walk-forward (180d train, 30d test), 10 shuffles")
+    print(f"Method: Walk-forward (180d train, 30d test), 1000 shuffles")
     print()
 
     if not os.path.exists(DB_PATH):
@@ -249,7 +249,7 @@ def main():
     # ─── Per-station results ───────────────────────────────────────────
     station_results = {}
     all_real_results = []  # Aggregate across all stations (real)
-    all_shuffle_results = [[] for _ in range(10)]  # 10 lists, one per shuffle
+    all_shuffle_results = [[] for _ in range(1000)]  # 1000 lists, one per shuffle
 
     print(f"{'Station':<8} {'Real Acc':>10} {'Real Trades':>12} | {'Shuffle Avg':>12} {'Shuffle SD':>12} {'Best Shuf':>10} {'Above 55%':>10}")
     print("-" * 90)
@@ -266,13 +266,13 @@ def main():
         real_acc, real_n = compute_accuracy(real_results)
         all_real_results.extend(real_results)
 
-        # ── Run against 10 shuffled label sets ──
+        # ── Run against 1000 shuffled label sets ──
         shuffle_accs = []
         # Collect all label-date pairs
         label_dates = sorted(real_labels.keys())
         label_values = [real_labels[d] for d in label_dates]
 
-        for shuffle_idx in range(10):
+        for shuffle_idx in range(1000):
             # Create a permuted copy of the label values
             shuffled_labels = label_values.copy()
             random.shuffle(shuffled_labels)
@@ -303,7 +303,7 @@ def main():
         }
 
         print(f"{station:<8} {real_acc:>10.2%} {real_n:>12} | "
-              f"{mean_shuffle:>12.2%} {std_shuffle:>12.4f} {best_shuffle:>10.2%} {above_55:>10}/10")
+              f"{mean_shuffle:>12.2%} {std_shuffle:>12.4f} {best_shuffle:>10.2%} {above_55:>10}/1000")
 
     # ─── Aggregate across all stations ──────────────────────────────────
     real_correct = sum(1 for p, a in all_real_results if p == a)
@@ -311,7 +311,7 @@ def main():
     real_agg_acc = real_correct / real_total if real_total > 0 else 0
 
     shuffle_agg_accs = []
-    for shuf_idx in range(10):
+    for shuf_idx in range(1000):
         shuf_correct = sum(1 for p, a in all_shuffle_results[shuf_idx] if p == a)
         shuf_total = len(all_shuffle_results[shuf_idx])
         shuf_acc = shuf_correct / shuf_total if shuf_total > 0 else 0
@@ -330,7 +330,7 @@ def main():
     print(f"  Shuffle mean accuracy:    {agg_mean_shuffle:.2%}")
     print(f"  Shuffle std deviation:    {agg_std_shuffle:.4f}")
     print(f"  Best shuffle accuracy:    {agg_best_shuffle:.2%}")
-    print(f"  Shuffles above 55%:       {agg_above_55}/10")
+    print(f"  Shuffles above 55%:       {agg_above_55}/1000")
 
     # Significance check
     print()
@@ -343,7 +343,7 @@ def main():
     perm_p_value = (n_exceed_real + 1) / (len(shuffle_agg_accs) + 1)
 
     print(f"  Real accuracy:     {real_agg_acc:.2%}")
-    print(f"  Shuffles that exceeded real accuracy: {n_exceed_real}/10")
+    print(f"  Shuffles that exceeded real accuracy: {n_exceed_real}/1000")
     print(f"  Permutation p-value (approximate):    {perm_p_value:.4f}")
     print(f"  Null hypothesis rejected?              {'✓ YES' if perm_p_value < 0.05 else '✗ NO — model cannot distinguish from chance'}")
 
@@ -360,7 +360,7 @@ def main():
             'signals_tested': 'goldilocks+gaussian',
             'min_agreement': 2,
             'walk_forward_params': {'train_days': 180, 'test_days': 30, 'test_windows': 4},
-            'num_shuffles': 10,
+            'num_shuffles': 1000,
             'num_stations': len(ALL_STATIONS),
             'reproducible_seed': 42
         },

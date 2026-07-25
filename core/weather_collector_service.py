@@ -1,9 +1,9 @@
 """
-Weather Data Collector Service Module (v1.1 — 2026-07-05)
+Weather Data Collector Service Module (v1.2 — 2026-07-23)
 
-Tightened collection cadence per Dan's directive:
-  - METAR: every 3 min during peak hours (12:00-24:00 UTC), every 5 min off-peak
-  - Kalshi: every 5 min during trading windows (13:00-01:00 UTC), every 15 min off-hours
+24/7 collection cadence (no peak/off-peak window):
+  - METAR: every 3 min
+  - Kalshi: every 5 min
   - NWP: daily at 06:00 UTC
 
 Runs on Render to provide 24/7 data for all instances (PROD/DEV/SBOX).
@@ -37,48 +37,21 @@ console_handler.setLevel(logging.INFO)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# ─── PEAK HOUR DEFINITIONS ─────────────────────────────────────────────
+# ─── COLLECTION INTERVALS ───────────────────────────────────────────────
 
-# METAR peak: 12:00-24:00 UTC (covers US daylight hours when markets trade)
-METAR_PEAK_START_UTC = 12
-METAR_PEAK_END_UTC = 24
+# 24/7 polling at consistent intervals
+METAR_INTERVAL_SECONDS = 3 * 60   # 3 minutes
+KALSHI_INTERVAL_SECONDS = 5 * 60   # 5 minutes
 
-# Kalshi trading window: 13:00 UTC - 01:00 UTC next day (covers Kalshi market hours)
-KALSHI_TRADE_START_UTC = 13
-KALSHI_TRADE_END_UTC = 25  # 01:00 next day, expressed as 25 for comparison
-
-
-def _is_metar_peak_hour() -> bool:
-    """Check if current UTC hour is within METAR peak collection window."""
-    hour = datetime.now(timezone.utc).hour
-    return METAR_PEAK_START_UTC <= hour < METAR_PEAK_END_UTC
-
-
-def _is_kalshi_trading_window() -> bool:
-    """Check if current UTC time is within Kalshi trading window."""
-    hour = datetime.now(timezone.utc).hour
-    # Trading window spans 13:00-01:00 UTC (wraps midnight)
-    if hour >= KALSHI_TRADE_START_UTC or hour < (KALSHI_TRADE_END_UTC - 24):
-        return True
-    return False
-
-
-# ─── DYNAMIC INTERVAL CALCULATION ──────────────────────────────────────
 
 def _metar_interval() -> int:
-    """Return METAR collection interval in seconds based on current time."""
-    if _is_metar_peak_hour():
-        return 3 * 60   # 3 minutes during peak
-    else:
-        return 5 * 60   # 5 minutes off-peak
+    """Return METAR collection interval."""
+    return METAR_INTERVAL_SECONDS
 
 
 def _kalshi_interval() -> int:
-    """Return Kalshi collection interval in seconds based on trading window."""
-    if _is_kalshi_trading_window():
-        return 5 * 60   # 5 minutes during trading
-    else:
-        return 15 * 60  # 15 minutes off-hours
+    """Return Kalshi collection interval."""
+    return KALSHI_INTERVAL_SECONDS
 
 
 # ─── COLLECTION FUNCTIONS ───────────────────────────────────────────────
@@ -211,15 +184,13 @@ class WeatherCollectorService:
         metar_interval = _metar_interval()
         kalshi_interval = _kalshi_interval()
         
-        # Log interval changes
+        # Log current intervals (static since 24/7)
         if metar_interval != self._current_metar_interval:
-            mode = "peak" if metar_interval == 180 else "off-peak"
-            logger.info(f"METAR interval changed to {metar_interval}s ({mode})")
+            logger.info(f"METAR interval: {metar_interval}s")
             self._current_metar_interval = metar_interval
         
         if kalshi_interval != self._current_kalshi_interval:
-            mode = "trading" if kalshi_interval == 300 else "off-hours"
-            logger.info(f"Kalshi interval changed to {kalshi_interval}s ({mode})")
+            logger.info(f"Kalshi interval: {kalshi_interval}s")
             self._current_kalshi_interval = kalshi_interval
         
         # Run METAR
@@ -246,9 +217,10 @@ class WeatherCollectorService:
         """Start the perpetual collection service."""
         logger.info("=" * 60)
         logger.info("Weather Collector Service v1.1 Starting (Render)")
-        logger.info(f"- METAR: 3min peak (12-24 UTC), 5min off-peak")
+        logger.info(f"- METAR: 3min (24/7)")
         logger.info(f"- NWP: daily at 06:00 UTC")
-        logger.info(f"- Kalshi: 5min trading (13-01 UTC), 15min off-hours")
+        logger.info(f"- Kalshi: 5min (24/7)")
+        logger.info("- 11:00-19:00 alert window removed — alerts fire 24/7")
         logger.info("- Shared cache for PROD/DEV/SBOX")
         logger.info("=" * 60)
         

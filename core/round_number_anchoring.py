@@ -31,6 +31,8 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
         # Connect to historical METAR database
         db_path = os.getenv('METAR_DB_PATH', '/var/lib/weather/metars.db')
         conn = sqlite3.connect(db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         
         try:
             cursor = conn.cursor()

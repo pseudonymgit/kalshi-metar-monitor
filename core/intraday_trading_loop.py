@@ -62,10 +62,7 @@ NWP_DB = PROJECT_ROOT / "data" / "nwp_forecasts.db"
 
 # Intraday signal imports
 from core.signals.fogr_reversion_signal import FogrReversionSignal
-from core.signals.metar_dtdt_signal import MetarDtdtSignal
-from core.signals.pressure_tendency_signal import PressureTendencySignal
 from core.signals.hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
-from core.signals.esdr_signal import EsdrSignal
 from core.signals.nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 
 # ── Configuration ──────────────────────────────────────────────
@@ -89,7 +86,7 @@ SPREAD_WIDENING_FULL_CLOSE = 0.75 # 75% spread widening = full close
 EDGE_SPREAD_MULTIPLIER = 2.0      # Edge requirement = 2x spread
 
 # Stage sequence
-STAGE_A_SIGNALS = ['fogr_reversion', 'metar_dtdt', 'pressure_tendency']
+STAGE_A_SIGNALS = ['fogr_reversion']
 STAGE_B_SIGNALS = ['hrrr_bias_corrected']
 STAGE_C_SIGNALS = ['nwp_dtdt_fusion']
 
@@ -151,10 +148,7 @@ class IntradayTradingLoop:
 
         # Initialize signals
         self.fogr = FogrReversionSignal(db_path=self.metar_db_path)
-        self.metar_dtdt = MetarDtdtSignal(db_path=self.metar_db_path)
-        self.pressure_tendency = PressureTendencySignal(db_path=self.metar_db_path)
         self.hrrr = HrrrBiasCorrectedSignal(db_path=self.metar_db_path)
-        self.esdr = EsdrSignal(db_path=self.metar_db_path, nwp_db_path=self.nwp_db_path)
         self.fusion = NwpDtdtFusionSignal(db_path=self.metar_db_path, nwp_db_path=self.nwp_db_path)
 
         # Risk controls
@@ -186,16 +180,6 @@ class IntradayTradingLoop:
             d, c = self.fogr.evaluate_for_station(station, date, market_type=market_type)
             if d is not None:
                 signals.append(('fogr', d, c))
-
-        # A2: METAR dT/dt
-        d, c = self.metar_dtdt.evaluate_for_station(station, date, market_type=market_type)
-        if d is not None:
-            signals.append(('metar_dtdt', d, c))
-
-        # A3: Pressure Tendency
-        d, c = self.pressure_tendency.evaluate_for_station(station, date, market_type=market_type)
-        if d is not None:
-            signals.append(('pressure_tendency', d, c))
 
         if not signals:
             return None, 0.0
@@ -255,6 +239,8 @@ class IntradayTradingLoop:
 
         try:
             conn = sqlite3.connect(self.nwp_db_path)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             cur = conn.cursor()
 
             # Get ensemble member values for the target date
@@ -538,24 +524,6 @@ class IntradayTradingLoop:
                 hour=21, tzinfo=timezone.utc
             )
 
-            # ESDR check
-            esdr_dir, esdr_conf = self.esdr.evaluate_for_station(station, date, market_type=market_type)
-            if esdr_dir is None and esdr_conf > 0.5:
-                # Spread divergence detected — apply confidence decay
-                reduction, reason = self.check_confidence_decay(
-                    position, self.check_ensemble_spread(station, date) or 0
-                )
-                if reduction > 0:
-                    result['exit_decision'] = {
-                        'action': 'reduce',
-                        'reduction': reduction,
-                        'reason': f'esdr_{reason}',
-                        'esdr_confidence': esdr_conf,
-                    }
-                    position.stage = 0 if reduction >= 1.0 else position.stage
-                    self.positions[key] = position
-                    return result
-
             # Time decay
             reduction, reason = self.check_time_decay(position, current_time, settlement_time)
             if reduction > 0:
@@ -576,6 +544,8 @@ class IntradayTradingLoop:
             # Check if we have 2 METAR observations showing trajectory alignment
             try:
                 conn = sqlite3.connect(self.metar_db_path)
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=5000;")
                 cur = conn.cursor()
                 cur.execute("""
                     SELECT temp_f, timestamp_utc

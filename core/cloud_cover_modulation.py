@@ -291,7 +291,11 @@ def run_backtest():
     print()
     
     conn_metar = sqlite3.connect(METAR_DB, timeout=60)
+    conn_metar.execute("PRAGMA journal_mode=WAL;")
+    conn_metar.execute("PRAGMA busy_timeout=5000;")
     conn_isd = sqlite3.connect(ISD_LITE_DB, timeout=60)
+    conn_isd.execute("PRAGMA journal_mode=WAL;")
+    conn_isd.execute("PRAGMA busy_timeout=5000;")
     
     # Run both configurations
     configs = [
@@ -384,7 +388,11 @@ def run_backtest():
     
     # Re-open for extreme analysis
     conn_metar = sqlite3.connect(METAR_DB, timeout=60)
+    conn_metar.execute("PRAGMA journal_mode=WAL;")
+    conn_metar.execute("PRAGMA busy_timeout=5000;")
     conn_isd = sqlite3.connect(ISD_LITE_DB, timeout=60)
+    conn_isd.execute("PRAGMA journal_mode=WAL;")
+    conn_isd.execute("PRAGMA busy_timeout=5000;")
     
     extreme_clear = {'correct': 0, 'total': 0}
     extreme_overcast = {'correct': 0, 'total': 0}

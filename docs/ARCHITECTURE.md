@@ -205,3 +205,92 @@ Tracks per-station deterministic settlement epoch state after `settlement_up`:
 - alert emitted flag
 
 Alert emits once per epoch after spike+reversion are both observed, subject to station cooldown and hydration/eligibility suppression checks.
+
+---
+
+## Phase 10-14 Modules (added 2026-07-24/25)
+
+### `core/dual_hypothesis_engine.py` — H1 vs H2 Hypothesis Testing
+
+Introduced in Phase 10 to replace the old monolithic GoldilocksSignal interpretation. Tests two competing hypotheses for every detected structural event:
+- **H1 (Overreaction):** The observed spike is a transient overreaction that will revert within the settlement window
+- **H2 (Underreaction):** The observed spike represents a genuine regime shift that will persist
+
+Runs in shadow mode — produces signals for ensemble but does not independently execute trades.
+
+### `core/metar_qc_parser.py` — Quality Control Parsing
+
+Parses METAR observation quality-control flags to filter observations with known instrumental errors, human transcription mistakes, or automated sensor faults. Applied as a pre-filter in the Goldilocks detection path (`goldilocks_qc_filter`).
+
+### `core/settlement_execution_gate.py` — Trade Gating
+
+Scenario-classification gate that determines whether a signal should produce a trade or be suppressed based on settlement window proximity, expected volatility, and risk parameters. Prevents stale or premature entries.
+
+### `core/station_rank_selective.py` — Per-Station Selection
+
+Applies station-ranking logic to activate Goldilocks and related signals only on major hub stations. This prevents thin-market issues on low-volume stations while conserving system resources. Selection is deterministically derived from market volume and station rank.
+
+### `core/rolling_calibration.py` — Rolling 30-Day Calibration
+
+Maintains a rolling 30-day calibration window for each active signal and station. Calibration parameters (thresholds, baselines) are continuously updated from the most recent 30 days of performance data. The window preserves Phase 1 determinism through strict timestamp-based edge alignment.
+
+### `core/signal_fusion.py` — Bayesian Log-Odds Fusion
+
+Implements MI-decorrelation + log-odds fusion to combine signals into a single coherent ensemble prediction. Steps:
+1. Mutual information matrix computed across active signals
+2. Signals decorrelated by weighting inversely to MI overlap
+3. Log-odds aggregated into consensus prediction
+4. Variance-weighted position sizing derived from consensus confidence
+
+Replaces the previous equal-weighted ensemble.
+
+### `core/lane_manager.py` — Three-Lane Architecture Manager
+
+Formalizes the three-lane operational architecture:
+- **Lane 1: Core Execution** — Alert engine, transition detection, METAR ingestion (Phase 1 semantics, always running)
+- **Lane 2: Signal Layer** — All active signals, fusion, calibration (deterministic, replay-safe)
+- **Lane 3: Trading Execution** — Paper test trades, settlement verification, P&L tracking (B-mode only)
+
+Lanes are process-aware: Lane 3 cannot modify Lane 1 or Lane 2 state. Each lane has independent failure boundaries.
+
+### `core/spatial_coherence.py` — Cross-Station Correlation
+
+Computes and tracks spatial correlation between stations to prevent cluster-trading on correlated observations. Maintains a real-time correlation matrix of active stations and flags situations where multiple positions would be taken on highly correlated signals (e.g., two nearby stations both triggering on the same weather front).
+
+### `core/paper_test_controller.py` — 30-Day Paper Test Controller
+
+Orchestrates the three-phase paper test rollout:
+- **Smoke Phase:** Single station, $100 capital, 24-hour validation
+- **Stabilization Phase:** Expand to 5 stations, $500 capital, 7-day stability check
+- **Autonomous Phase:** All active stations, $2,500 capital, 22-day unsupervised run
+
+Manages graduation conditions, phase transition verification, and abort triggers.
+
+### `core/production_gate.py` — Production Gates
+
+Enforces the three production-allocation gates for real-money trading:
+- **Gate 1:** Accuracy ≥ 60% (30-day rolling)
+- **Gate 2:** Shadow mode minimum 30 days
+- **Gate 3:** Sharpe ratio ≥ 0.30
+
+All three gates must pass before any real-money allocation is permitted. Gate state is auditable and non-bypassable.
+
+### `core/pnl_tracking.py` — P&L Tracking
+
+Settlement-confirmed profit and loss tracking. Records every paper trade with:
+- Entry and exit timestamps (settlement-confirmed)
+- Signal and station identifiers
+- Capital allocation and fee-adjusted P&L
+- Rolling win rate, average return, and Sharpe ratio
+
+All metrics are derived from committed settlement data, not estimated. Used by the production gate for accuracy and Sharpe verification.
+
+### `core/risk_controls.py` — Risk Management
+
+Implements skew-aware position limits and loss-distribution controls:
+- Maximum position size per station
+- Maximum correlated exposure across stations (from spatial coherence)
+- Maximum daily drawdown (percentage-based stop)
+- Skew-aware position sizing (penalizes heavy-tail loss distributions)
+
+Runs as a pre-trade sanity check in Lane 3. Also includes StopLossMonitor integration for real-time stop-loss enforcement.

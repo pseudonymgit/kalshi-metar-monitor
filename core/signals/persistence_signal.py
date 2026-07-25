@@ -1,6 +1,9 @@
 """
 Persistence Signal - Predicts same direction as yesterday
 
+[DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
+Near-coin-flip accuracy (~51.0%). Keeping code file for reference.
+
 Based on approach_persistence from ensemble_v7_sharpe_opt.py
 Yesterday's direction → predict same direction today
 """

@@ -82,6 +82,8 @@ def fetch_real_nwp_forecasts(station, target_date):
     """
     try:
         conn = sqlite3.connect(NWP_DB_PATH)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         cur = conn.cursor()
         
         # Get the most recent forecast from each model for the target_date, station, and temperature_2m_max
@@ -255,6 +257,8 @@ def get_station_model_accuracy_weights(station):
     # by station, but currently use overall model MAEs
     try:
         conn = sqlite3.connect(NWP_DB_PATH)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         cur = conn.cursor()
         
         # Query for this station and get model-specific MAE, adjust weights accordingly
@@ -504,6 +508,8 @@ def run_backtest():
     print()
     
     conn = sqlite3.connect(DB_PATH, timeout=60)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     rng = random.Random(42)
     
     cur = conn.cursor()

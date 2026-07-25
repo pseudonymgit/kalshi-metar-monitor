@@ -34,11 +34,10 @@ _LOGGER = logging.getLogger(__name__)
 MAX_BANKROLL_PCT = 0.08         # 8% cap per position
 MAX_DRAWDOWN_PCT = 0.10          # 10% trailing drawdown
 
-# Default cost fraction (spread as fraction of contract value)
-# Kalshi: 0 commission, use live bid-ask spread
-# Mean spread across all markets: ~3.1¢
-# Set via constructor or update_cost()
-DEFAULT_COST_FRACTION = 0.031    # 3.1¢ mean spread
+# Default cost fraction — import from MARKET_COST_MODEL (single source of truth)
+# Round-trip = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
+# This is the per-contract cost, not raw spread (which was 3.1¢)
+from core.market_cost_model import ROUND_TRIP_FEE as DEFAULT_COST_FRACTION
 
 # Adaptive scaling thresholds
 CONFIDENCE_TIERS = [

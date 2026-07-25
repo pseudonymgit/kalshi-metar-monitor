@@ -18,7 +18,27 @@ echo "[bootstrap] Checking Python version..."
 python3 --version
 
 echo "[bootstrap] Checking dependencies..."
-python3 -c "import sys; sys.path.insert(0, '.'); import flask; import gunicorn; import requests; import sqlite3; import numpy; import scipy; print('Dependencies: OK')"
+python3 -c "
+import sys
+sys.path.insert(0, '.')
+deps = ['flask', 'requests', 'numpy', 'scipy']
+optional = ['gunicorn']
+missing = []
+for d in deps:
+    try:
+        __import__(d)
+    except ImportError:
+        missing.append(d)
+if missing:
+    print(f'ERROR: Missing required dependencies: {missing}')
+    exit(1)
+for d in optional:
+    try:
+        __import__(d)
+    except ImportError:
+        print(f'WARNING: Optional dependency {d} not installed')
+print('Dependencies: OK')
+"
 
 # ─── 2. Environment variables check ────────────────────────────────────────
 echo "[bootstrap] Checking environment variables..."

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# [DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
+# Redundant with NWP dT/dt fusion already in ensemble. Keeping code file.
 # CHANGELOG (last 10 broad changes):
 # 1. [File history unavailable - check git blame]
 #

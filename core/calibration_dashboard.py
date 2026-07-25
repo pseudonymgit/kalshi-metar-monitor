@@ -27,7 +27,7 @@ import json
 from datetime import datetime, timedelta
 import os
 import statistics
-import random  # Only needed for simulation data
+# Simulation data removed — Phase B: using real data only
 
 
 # Configuration
@@ -46,6 +46,8 @@ app = Flask(__name__, static_folder=STATIC_FOLDER, template_folder=TEMPLATES_FOL
 def get_database_connection(db_path):
     """Get database connection with row factory."""
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -103,38 +105,12 @@ def fetch_paper_trading_metrics():
             'version_performance': version_performance
         }
     except Exception as e:
-        # Simulation data if databases not available
-        print(f"Simulating with dummy data due to: {e}")
-        
-        # Generate some simulation data
-        dates = [(datetime.now() - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(90)]
-        performance_data = []
-        total_pnl = 0
-        
-        for i, date in enumerate(dates):
-            pnl = random.gauss(12.3, 25)  # Simulate daily P&L
-            total_pnl += pnl
-            winning = random.randint(1, 5)  # 1-5 winning trades
-            losing = random.randint(0, 4)   # 0-4 losing trades
-            performance_data.append({
-                'date': date,
-                'closing_balance': 10000 + total_pnl,
-                'daily_pnl': pnl,
-                'winning_trades': winning,
-                'losing_trades': losing,
-                'trade_count': winning + losing,
-                'avg_confidence': round(random.uniform(0.45, 0.85), 3)
-            })
-        
+        print(f"ERROR: Cannot connect to paper trading database: {e}")
         return {
-            'performance_data': performance_data,
-            'overall_pnl': total_pnl,
-            'win_rate': (45*(90) / 90*5),  # Approximation
-            'version_performance': [
-                {'trade_version': 'v2.0_paper_trade', 'total_trades': 256, 'wins': 162, 'losses': 94, 'total_pnl': 832.45, 'avg_confidence': 0.68},
-                {'trade_version': 'v1.5_signal_integrated', 'total_trades': 198, 'wins': 121, 'losses': 77, 'total_pnl': 521.30, 'avg_confidence': 0.65},
-                {'trade_version': 'v1.2_temp_reversion', 'total_trades': 312, 'wins': 175, 'losses': 137, 'total_pnl': -10.25, 'avg_confidence': 0.72}
-            ]
+            'performance_data': [],
+            'overall_pnl': 0.0,
+            'win_rate': 0.0,
+            'version_performance': []
         }
 
 def create_portfolio_performance_plot(data):
@@ -207,83 +183,58 @@ def create_daily_pnl_plot(data):
 
 
 def create_confidence_calibration_plot(data):
-    """Create confidence calibration plot (actual outcomes vs predicted confidence)."""
-    if not data or len(data) == 0:
-        return go.Figure().to_html(full_html=False)
-    
-    # If we had actual trade data with outcomes instead of aggregated daily data,
-    # we would create a proper calibration plot, but for now let's simulate
-    # with some representative calibration data
-    
-    # For a real system, we'd query trade outcomes against predicted confidence levels
-    # For now, create a simulated calibration plot
-    
-    # Create confidence buckets: 0-10%, 10-20%, ..., 90-100%
-    # And simulate accuracy within each bucket
-    buckets = []
-    accuracies = []
-    sample_counts = []
-    
-    for i in range(10):
-        conf_low = i * 0.1
-        conf_high = (i + 1) * 0.1
-        mid_point = conf_low + 0.05
-        
-        # Add some realistic values based on "model slightly overconfident"
-        if conf_low < 0.3:
-            # Lower confidence bands may have lower actual accuracy due to hedging
-            actual = min(mid_point + random.uniform(-0.1, 0.05), 1.0)
-        elif conf_low > 0.7:
-            # Higher confidence bands often overestimate actual accuracy
-            actual = max(mid_point - random.uniform(0.0, 0.15), 0.0)
-        else:
-            # Middle range more accurate
-            actual = mid_point + random.uniform(-0.05, 0.05)
-    
-        buckets.append(f"{int(conf_low*100)}-{int(conf_high*100)}%")
-        accuracies.append(actual)
-        sample_counts.append(random.randint(40, 200))  # Simulated sample sizes
-    
-    fig = go.Figure()
-    
-    # Perfect calibration diagonal line
-    fig.add_trace(go.Scatter(
-        x=[0, 1],
-        y=[0, 1], 
-        mode='lines',
-        line=dict(color='red', dash='dash'),
-        name='Perfect Calibration',
-        hovertemplate='%{x:.0%}<extra>Perfect</extra>'
-    ))
-    
-    # Model calibration points
-    fig.add_trace(go.Scatter(
-        x=[i * 0.1 + 0.05 for i in range(10)],  # Midpoints of each bucket
-        y=accuracies,
-        mode='markers',
-        marker=dict(
-            size=[count/20 for count in sample_counts],  # Vary size based on sample count
-            color='#3498db',
-            opacity=0.7,
-            line=dict(width=1, color='DarkSlateGrey')
-        ),
-        name='Model Performance',
-        hovertemplate='<b>%{customdata[0]}</b><br>Predicted: %{x:.0%}<br>Actual: %{y:.0%}<br>Count: %{customdata[1]}<extra></extra>',
-        customdata=list(zip(buckets, sample_counts))
-    ))
-    
-    fig.update_layout(
-        title={'text': 'Confidence Calibration Plot', 'font': {'size': 16}},
-        xaxis_title='Predicted Confidence',
-        yaxis_title='Actual Accuracy',
-        font=dict(size=12),
-        height=500,
-        title_x=0,
-        yaxis=dict(range=[0, 1]),
-        xaxis=dict(range=[0, 1]),
-    )
-    
-    return fig.to_html(full_html=False, div_classes="chart-container")
+    """Create confidence calibration plot from real calibration results."""
+    # Try to load real calibration results
+    try:
+        cal_path = '/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phaseB_calibration_results.json'
+        if os.path.exists(cal_path):
+            with open(cal_path, 'r') as f:
+                cal_data = json.load(f)
+            per_signal = cal_data.get('per_signal', {})
+            if per_signal:
+                # Build reliability diagram from per-signal accuracy
+                accuracies = []
+                confidences = []
+                signal_names = []
+                for sig, metrics in per_signal.items():
+                    if metrics.get('total_trades', 0) > 50:
+                        accuracies.append(metrics.get('calibrated_accuracy', 0.5))
+                        confidences.append(metrics.get('calibrated_accuracy', 0.5))
+                        signal_names.append(sig)
+
+                fig = go.Figure()
+                # Perfect calibration diagonal
+                fig.add_trace(go.Scatter(
+                    x=[0, 1], y=[0, 1],
+                    mode='lines',
+                    line=dict(color='red', dash='dash'),
+                    name='Perfect Calibration'
+                ))
+                # Signal accuracy points
+                fig.add_trace(go.Scatter(
+                    x=confidences, y=accuracies,
+                    mode='markers',
+                    marker=dict(size=10, color='#3498db', opacity=0.7),
+                    text=signal_names,
+                    name='Signal Accuracy',
+                    hovertemplate='<b>%{text}</b><br>Confidence: %{x:.2%}<br>Accuracy: %{y:.2%}<extra></extra>'
+                ))
+                fig.update_layout(
+                    title={'text': 'Signal Calibration (from Phase B results)', 'font': {'size': 16}},
+                    xaxis_title='Calibrated Confidence',
+                    yaxis_title='Actual Accuracy',
+                    height=500,
+                    yaxis=dict(range=[0, 1]),
+                    xaxis=dict(range=[0, 1]),
+                )
+                return fig.to_html(full_html=False, div_classes="chart-container")
+    except Exception as e:
+        print(f"Could not load calibration data: {e}")
+
+    # Fallback: show empty state
+    return go.Figure().update_layout(
+        title="No calibration data available — run Phase B calibration first"
+    ).to_html(full_html=False)
 
 
 def create_performance_metrics_cards(metrics):

@@ -52,6 +52,8 @@ def ensure_phase3_index():
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
     conn = sqlite3.connect(db_path, timeout=1)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     try:
         cursor = conn.cursor()
         
@@ -116,6 +118,8 @@ def verify_index():
     db_path = _resolve_db_path()
     
     conn = sqlite3.connect(db_path, timeout=1)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     try:
         cursor = conn.cursor()
         
@@ -149,6 +153,8 @@ def drop_index():
     db_path = _resolve_db_path()
     
     conn = sqlite3.connect(db_path, timeout=1)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     try:
         cursor = conn.cursor()
         cursor.execute("DROP INDEX IF EXISTS idx_settlement_epochs_station_date")

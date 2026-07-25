@@ -13,7 +13,7 @@ Features (14 dimensions):
 7. transition_count (int) - weight 1
 8. settlement_bucket (int) - weight 1 (exact gate for market_type, not for station)
 9. reversion_latency_seconds (float) - weight 2
-10. goldilocks_emitted (binary) - weight 2
+10. spike_reversion_emitted (binary) - weight 2  (A3: renamed from goldilocks_emitted)
 11. prior_settlement_bucket (int) - weight 1
 12. station (exact gate - weight ∞) - NOT included in numeric vector
 13. market_type (exact gate - weight ∞) - NOT included in numeric vector
@@ -58,7 +58,8 @@ WEIGHTS = {
     "transition_count": 1,
     "settlement_bucket": 1,
     "reversion_latency_seconds": 2,  # Key behavioral signature
-    "goldilocks_emitted": 2,  # High-signal discriminator
+    "spike_reversion_emitted": 2,  # High-signal discriminator (A3: renamed from goldilocks_emitted)
+    "goldilocks_emitted": 2,  # backward compat
     "prior_settlement_bucket": 1,
     "local_trading_date_normalized": 1,
 }
@@ -76,7 +77,8 @@ class FeatureVector:
     transition_count: int
     settlement_bucket: int
     reversion_latency_seconds: float
-    goldilocks_emitted: int  # 0 or 1
+    spike_reversion_emitted: int  # 0 or 1 (A3: renamed from goldilocks_emitted)
+    goldilocks_emitted: int  # backward compat alias
     prior_settlement_bucket: Optional[int]
     local_trading_date_normalized: float  # 0.0 to 1.0, seasonal phase
     station: Optional[str] = None  # Gate - not part of numeric vector
@@ -94,7 +96,7 @@ class FeatureVector:
             float(self.transition_count),
             float(self.settlement_bucket),
             self.reversion_latency_seconds,
-            float(self.goldilocks_emitted),
+            float(self.spike_reversion_emitted),
             float(self.prior_settlement_bucket or 0),
             self.local_trading_date_normalized,
         ]
@@ -177,8 +179,9 @@ def extract_features_from_epoch(epoch_data: Dict[str, Any]) -> FeatureVector:
         except (ValueError, TypeError):
             reversion_latency = 0.0
     
-    # Goldilocks emitted - check metadata or assume not tracked
-    goldilocks = 0  # Default: not tracked in this version
+    # Spike reversion emitted - check metadata or assume not tracked (A3: renamed)
+    spike_reversion = 0  # Default: not tracked in this version
+    goldilocks = 0  # backward compat
     
     # Normalize date to seasonal phase
     local_date = epoch_data.get("local_trading_date", "")
@@ -194,7 +197,8 @@ def extract_features_from_epoch(epoch_data: Dict[str, Any]) -> FeatureVector:
         transition_count=transition_count,
         settlement_bucket=settlement_bucket,
         reversion_latency_seconds=reversion_latency,
-        goldilocks_emitted=goldilocks,
+        spike_reversion_emitted=spike_reversion,
+        goldilocks_emitted=spike_reversion,  # backward compat
         prior_settlement_bucket=prior_bucket if isinstance(prior_bucket, int) else None,
         local_trading_date_normalized=date_normalized,
         station=epoch_data.get("station"),
@@ -271,11 +275,12 @@ def calculate_distance_vector(
         MAX_RANGES["reversion_latency_seconds"],
     )
     
-    # goldilocks_emitted (binary)
-    distances["goldilocks_emitted"] = binary_distance(
-        features_a.goldilocks_emitted,
-        features_b.goldilocks_emitted,
+    # spike_reversion_emitted (binary) (A3: renamed from goldilocks_emitted)
+    distances["spike_reversion_emitted"] = binary_distance(
+        features_a.spike_reversion_emitted,
+        features_b.spike_reversion_emitted,
     )
+    distances["goldilocks_emitted"] = distances["spike_reversion_emitted"]  # backward compat
     
     # prior_settlement_bucket (int)
     distances["prior_settlement_bucket"] = integer_distance(
@@ -379,6 +384,7 @@ def extract_features_for_query(
         transition_count=0,
         settlement_bucket=settlement_bucket,
         reversion_latency_seconds=0.0,
+        spike_reversion_emitted=0,
         goldilocks_emitted=0,
         prior_settlement_bucket=None,
         local_trading_date_normalized=normalize_local_trading_date(local_trading_date),

@@ -19,7 +19,6 @@ SIGNAL_ACCURACY = {
     'pressure_delta': 0.6074,
     'forecast_disagreement': 0.6495,
     'wind_direction_shift': 0.5886,
-    'persistence': 0.5095,
     # Other signals not used in ensemble, excluded for performance
 }
 

@@ -102,7 +102,12 @@ _SIGNAL_OBSERVATION_WINDOWS: Dict[str, deque] = {}
 _SIGNAL_STATION_LAST_EMIT: Dict[str, float] = {}
 _SIGNAL_BOUNDARY_LAST_EMIT: Dict[Tuple[str, int, int], float] = {}
 _SIGNAL_EPOCH_COUNTER: Dict[str, int] = {}
-_SIGNAL_GOLDILOCKS_EPOCH_TRACKER: Dict[Tuple[str, int], Dict[str, Any]] = {}
+_SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER: Dict[Tuple[str, int], Dict[str, Any]] = {}
+
+# A3: Backward-compatible aliases (remove after full migration)
+_SIGNAL_GOLDILOCKS_EPOCH_TRACKER = _SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER
+_compute_goldilocks_confidence = _compute_microstructure_spike_confidence
+
 _LATEST_SIGNAL_RUNTIME: Dict[str, Dict[str, Any]] = {}
 _SIGNAL_LOCK = threading.RLock()
 _SIGNAL_STATION_COOLDOWN_SECONDS = 300
@@ -116,8 +121,8 @@ __all__ = ['reset_station_daily_state', 'get_default_config', 'ensure_state_load
 
 
 # Layer 4: Webhook signature verification
-def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = False) -> Tuple[float, Dict[str, Any]]:
-    """Compute confidence score for goldilocks signal based on epoch tracker data.
+def _compute_microstructure_spike_confidence(tracker: Dict[str, Any], is_down: bool = False) -> Tuple[float, Dict[str, Any]]:
+    """Compute confidence score for Microstructure Spike (formerly Goldilocks) signal based on epoch tracker data.
     
     R4-1.5: Asymmetric confidence split for up vs down reversion.
     
@@ -131,8 +136,8 @@ def _compute_goldilocks_confidence(tracker: Dict[str, Any], is_down: bool = Fals
       sustained if ground remains wet. Lower confidence base + discount.
     
     Args:
-        tracker: Goldilocks epoch tracker dict with confidence data points
-        is_down: True if this is a goldilocks_momentum_down signal (downward reversion)
+        tracker: Microstructure Spike epoch tracker dict with confidence data points
+        is_down: True if this is a microstructure_spike_momentum_down signal (downward reversion)
         
     Returns:
         Tuple of (confidence_score, confidence_factors_dict)
@@ -587,20 +592,20 @@ def _evaluate_deterministic_signal_layer(
             pending_runtime_record = runtime
             early_exit = True
         elif int(eligible_markets_count) <= 0:
-            # Tier 1 bypass: goldilocks/reversion alerts are protected side features
+            # Tier 1 bypass: microstructure spike/reversion alerts are protected side features
             # that fire regardless of market eligibility. Check them before early-exit.
             epoch_key = (station, int(epoch_id))
-            tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+            tracker = _SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER.get(epoch_key)
             if isinstance(tracker, dict) and not bool(tracker.get("alert_emitted")):
                 old_bucket = tracker.get("previous_settlement_bucket") or tracker.get("settlement_bucket_at_up")
                 if bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
-                    confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker)
+                    confidence_score, confidence_factors = _compute_microstructure_spike_confidence(tracker)
                     pending_signal_context = {
-                        "signal_type": "goldilocks_reversion_alert",
+                        "signal_type": "microstructure_spike_reversion",
                         "signal_version": 1,
                         "station": station,
                         "obs_time": obs_time,
-                        "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
+                        "dedupe_key": f"microstructure_spike_reversion:{station}:{epoch_id}",
                         "cooldown_applied": False,
                         "cooldown_seconds": 0,
                         "settlement_bucket_at_up": int(tracker.get("previous_settlement_bucket") or tracker.get("settlement_bucket_at_up") or settlement_bucket),
@@ -612,9 +617,9 @@ def _evaluate_deterministic_signal_layer(
                         "tier_1_bypass": True,
                     }
                     tracker["alert_emitted"] = True
-                    runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
+                    runtime.update({"signal_type": "microstructure_spike_reversion", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                     _ALERT_LOGGER.info(
-                        "tier_1_bypass station=%s signal=goldilocks_reversion_alert "
+                        "tier_1_bypass station=%s signal=microstructure_spike_reversion "
                         "reason=no_eligible_market_but_tier_1_protected"
                     )
             if pending_signal_context is None and runtime.get("signal_type") is None:
@@ -746,7 +751,7 @@ def _evaluate_deterministic_signal_layer(
 
             if pending_signal_context is None:
                 epoch_key = (station, int(epoch_id))
-                tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+                tracker = _SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER.get(epoch_key)
                 if transition_type == "settlement_up":
                     # Store the OLD settlement bucket for proper "exceeded by one or more" calculation
                     old_bucket = int(previous_settlement_bucket) if previous_settlement_bucket is not None else settlement_bucket
@@ -780,20 +785,20 @@ def _evaluate_deterministic_signal_layer(
                         "reverted_below_settlement": float(now_f) <= float(old_bucket) - 0.2,
                         "alert_emitted": False,
                         "settlement_up_obs_time": obs_time,
-                        # NEW: Confidence data points for goldilocks
+                        # A3: Confidence data points for microstructure spike
                         "is_daily_high": False,  # Will be updated on each observation
                         "daily_high_margin": 0.0,  # Will be updated on each observation
                         "observations_since_spike": 0,
                         "day_fraction_at_spike": day_fraction_at_spike,
                         "running_daily_max_at_spike": running_daily_max_at_spike,
-                        # Fields for goldilocks_momentum_down variant
+                        # Fields for microstructure_spike_momentum_down variant
                         "is_daily_low": False,  # Will be updated on each observation
                         "daily_low_margin": 0.0,  # Will be updated on each observation
                     }
-                    _SIGNAL_GOLDILOCKS_EPOCH_TRACKER[epoch_key] = tracker
+                    _SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER[epoch_key] = tracker
                     # Persist epoch tracker
                     _persist_signal_state(
-                        f"goldilocks_tracker:{station}:{epoch_id}",
+                        f"microstructure_spike_tracker:{station}:{epoch_id}",
                         tracker,
                     )
                 elif isinstance(tracker, dict):
@@ -810,7 +815,7 @@ def _evaluate_deterministic_signal_layer(
                     
                     # Check if current spike is the daily high (within 0.1°F tolerance)
                     if current_running_daily_max is not None:
-                        # For goldilocks_reversion (up) signal: is this spike the daily high?
+                        # For microstructure_spike_reversion (up) signal: is this spike the daily high?
                         tracker["is_daily_high"] = curr_max_temp >= current_running_daily_max - 0.1
                         # Compute margin above previous daily high
                         if running_daily_max_at_spike is not None:
@@ -829,7 +834,7 @@ def _evaluate_deterministic_signal_layer(
                         float(now_f) <= float(old_bucket) - 0.2
                     )
                     
-                    # Check for goldilocks_momentum_down variant
+                    # Check for microstructure_spike_momentum_down variant
                     # For downward momentum, check if we've reached the daily low
                     if current_running_daily_max is not None:
                         # Note: running_daily_max is actually the running max, not low
@@ -851,7 +856,7 @@ def _evaluate_deterministic_signal_layer(
                         log_near_miss_if_epoch_alert_emitted(
                             station=station,
                             epoch_id=epoch_id,
-                            signal_type="goldilocks_reversion_alert",
+                            signal_type="microstructure_spike_reversion",
                         )
                     elif station_cooldown_active:
                         runtime["suppression_reason"] = "STATION_COOLDOWN_ACTIVE"
@@ -861,15 +866,15 @@ def _evaluate_deterministic_signal_layer(
                             "reason_detail=market_exists_but_station_in_cooldown"
                         )
                     elif bool(tracker.get("exceeded_by_one_or_more")) and bool(tracker.get("reverted_below_settlement")):
-                        # Compute confidence score for goldilocks reversion
-                        confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker)
+                        # Compute confidence score for microstructure spike reversion
+                        confidence_score, confidence_factors = _compute_microstructure_spike_confidence(tracker)
                         
                         pending_signal_context = {
-                            "signal_type": "goldilocks_reversion_alert",
+                            "signal_type": "microstructure_spike_reversion",
                             "signal_version": 1,
                             "station": station,
                             "obs_time": obs_time,
-                            "dedupe_key": f"goldilocks_reversion_alert:{station}:{epoch_id}",
+                            "dedupe_key": f"microstructure_spike_reversion:{station}:{epoch_id}",
                             "cooldown_applied": True,
                             "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
                             # Use stored previous settlement bucket
@@ -888,7 +893,7 @@ def _evaluate_deterministic_signal_layer(
                             f"station_cooldown:{station}",
                             {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
                         )
-                        runtime.update({"signal_type": "goldilocks_reversion_alert", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
+                        runtime.update({"signal_type": "microstructure_spike_reversion", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                         runtime["cooldown_state"]["station_active"] = True
 
                 # LOW momentum detection (downward temperature trend)
@@ -991,25 +996,25 @@ def _evaluate_deterministic_signal_layer(
                         runtime["cooldown_state"]["station_active"] = True
                         runtime["cooldown_state"]["boundary_active"] = True
 
-                    # Check goldilocks_momentum_down
+                    # Check microstructure_spike_momentum_down
                     if pending_signal_context is None:
                         epoch_key = (station, int(epoch_id))
-                        tracker = _SIGNAL_GOLDILOCKS_EPOCH_TRACKER.get(epoch_key)
+                        tracker = _SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER.get(epoch_key)
                         if isinstance(tracker, dict):
-                            current_goldilocks = tracker.get("momentum_down_observed", False)
-                            if not current_goldilocks and tracker.get("exceeded_by_one_or_more"):
+                            current_momentum_down = tracker.get("momentum_down_observed", False)
+                            if not current_momentum_down and tracker.get("exceeded_by_one_or_more"):
                                 # Check if temperature has dropped below the settlement bucket threshold
                                 if float(now_f) <= float(tracker.get("settlement_bucket_at_up") or settlement_bucket) - 0.2:
-                                    # Compute confidence score for goldilocks momentum down
+                                    # Compute confidence score for microstructure spike momentum down
                                     # For momentum_down, is_daily_low is actually tracking whether we hit the daily high (inverted)
                                     # The logic is inverted: we want to know if the reversion point was at the daily high
-                                    confidence_score, confidence_factors = _compute_goldilocks_confidence(tracker, is_down=True)
+                                    confidence_score, confidence_factors = _compute_microstructure_spike_confidence(tracker, is_down=True)
                                     
-                                    # Near-miss audit: goldilocks confidence below threshold
-                                    if confidence_score < 0.30:  # Threshold for goldilocks
+                                    # Near-miss audit: microstructure spike confidence below threshold
+                                    if confidence_score < 0.30:  # Threshold for microstructure spike
                                         log_near_miss(
                                             station=station,
-                                            near_miss_type="LOW_CONFIDENCE_GOLDILOCKS",
+                                            near_miss_type="LOW_CONFIDENCE_MICROSTRUCTURE_SPIKE",
                                             severity="MEDIUM",
                                             details={
                                                 "confidence": confidence_score,
@@ -1017,15 +1022,15 @@ def _evaluate_deterministic_signal_layer(
                                                 "confidence_deficit": 0.30 - confidence_score,
                                                 "reversion_direction": "down",
                                             },
-                                            suppressed_alert_type="goldilocks_momentum_down",
+                                            suppressed_alert_type="microstructure_spike_momentum_down",
                                         )
                                     
                                     pending_signal_context = {
-                                        "signal_type": "goldilocks_momentum_down",
+                                        "signal_type": "microstructure_spike_momentum_down",
                                         "signal_version": 1,
                                         "station": station,
                                         "obs_time": obs_time,
-                                        "dedupe_key": f"goldilocks_momentum_down:{station}:{epoch_id}",
+                                        "dedupe_key": f"microstructure_spike_momentum_down:{station}:{epoch_id}",
                                         "cooldown_applied": True,
                                         "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS,
                                         "settlement_bucket_at_up": int(tracker.get("settlement_bucket_at_up") or settlement_bucket),
@@ -1044,7 +1049,7 @@ def _evaluate_deterministic_signal_layer(
                                         f"station_cooldown:{station}",
                                         {"last_emit": obs_seconds, "cooldown_seconds": _SIGNAL_STATION_COOLDOWN_SECONDS},
                                     )
-                                    runtime.update({"signal_type": "goldilocks_momentum_down", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
+                                    runtime.update({"signal_type": "microstructure_spike_momentum_down", "signal_emitted": True, "suppression_reason": None, "outcome_classification": OUTCOME_ALERT_SENT})
                                     runtime["cooldown_state"]["station_active"] = True
 
                 if runtime["signal_type"] is None and runtime["suppression_reason"] is None:
@@ -1152,7 +1157,7 @@ def _process_temperature_event(
             ).total_seconds()
             if delta_seconds <= 300:
                 emit_transition_if_changed(
-                    transition_type="goldilocks_reversion",
+                    transition_type="microstructure_spike_reversion",
                     instant_changed=instant_changed,
                     settlement_changed=settlement_changed,
                     station=icao,

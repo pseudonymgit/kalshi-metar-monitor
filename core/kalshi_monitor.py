@@ -353,6 +353,8 @@ def _persist_rate_limit_entry(endpoint: str) -> None:
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Ensure schema exists
             _ensure_alert_schema()
@@ -406,6 +408,8 @@ def _check_rate_limit(endpoint: str, max_requests: int = 10, window_seconds: int
         db_path = _alert_db_path()
         _ensure_alert_schema()
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Count recent requests in the window
             now_iso = _now_utc_iso()
@@ -490,6 +494,8 @@ def _persist_signal_state(signal_name: str, state_dict: Dict[str, Any]) -> None:
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Ensure schema exists
             _ensure_alert_schema()
@@ -514,6 +520,8 @@ def _load_signal_state(signal_name: str) -> Optional[Dict[str, Any]]:
     try:
         db_path = _alert_db_path()
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             row = conn.execute(
                 "SELECT state_json FROM signal_layer_state WHERE signal_name = ?",
@@ -537,6 +545,8 @@ def _persist_market_cache(market_id: str, station: str, cache_dict: Dict[str, An
         db_path = _alert_db_path()
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Ensure schema exists
             _ensure_alert_schema()
@@ -567,6 +577,8 @@ def _load_market_cache(market_id: str) -> Optional[Dict[str, Any]]:
     try:
         db_path = _alert_db_path()
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             row = conn.execute(
                 "SELECT station, cache_json FROM market_cache WHERE market_id = ?",
@@ -591,6 +603,8 @@ def _load_all_market_cache() -> Dict[str, Dict[str, Any]]:
     try:
         db_path = _alert_db_path()
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             rows = conn.execute(
                 "SELECT market_id, station, cache_json, last_hydrated_utc FROM market_cache"
@@ -654,6 +668,8 @@ def _ensure_alert_schema() -> None:
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     with _SERIES_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Kalshi rate limit counter (L1-T4)
             conn.execute(
@@ -717,6 +733,7 @@ def _load_current_epoch_context(station: str, market_type: str, obs_time_utc: st
 
     try:
         conn = sqlite3.connect(f"file:{_alert_db_path()}?mode=ro", uri=True, timeout=1)
+        conn.execute("PRAGMA busy_timeout=5000;")
     except Exception:
         return {}
 

@@ -216,7 +216,7 @@ def run_7_day_validation():
                 coverage = f"{len(STATIONS)}/{len(STATIONS)}"
 
                 # Get market price from the trade record
-                market_odds = r.get('market_price', 0.5)
+                market_odds = r.get('market_price', None)
                 confidence = r.get('confidence', 0.5)
                 position_size = r.get('position_size_usd', r.get('cost', 0))
                 direction = r.get('signal_direction', r.get('signal_direction', 'UP'))

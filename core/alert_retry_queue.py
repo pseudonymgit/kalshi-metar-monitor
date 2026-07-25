@@ -45,6 +45,8 @@ def _ensure_alert_delivery_queue_schema() -> None:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Create alert delivery queue table
             conn.execute(
@@ -111,6 +113,8 @@ def _queue_alert_for_delivery(
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Extract alert_id from metadata for the UNIQUE column
             alert_id_value = (metadata or {}).get("alert_id") or f"auto:{now_iso}"
@@ -183,6 +187,8 @@ def _retry_delivery_batch(batch_size: int = 10, immediate: bool = False) -> Dict
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Get pending entries that need retry
             # If immediate=True, process all pending entries regardless of next_retry_at
@@ -343,6 +349,8 @@ def _process_dead_letter_queue() -> Dict[str, List[Dict[str, Any]]]:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             rows = conn.execute(
                 """
@@ -400,6 +408,8 @@ def _purge_completed_entries(days_old: int = 7) -> int:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             cursor = conn.execute(
                 """
@@ -436,6 +446,8 @@ def _get_queue_stats() -> Dict[str, Any]:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             # Count by status
             rows = conn.execute(
@@ -485,6 +497,8 @@ def _get_entry_details(entry_id: int) -> Optional[Dict[str, Any]]:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             row = conn.execute(
                 """
@@ -537,6 +551,8 @@ def _retry_entry(entry_id: int) -> Dict[str, Any]:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             row = conn.execute(
                 "SELECT webhook_url, alert_payload_json, attempt_count, last_error FROM alert_delivery_queue WHERE id = ?",
@@ -588,6 +604,8 @@ def _clear_queue(status_filter: Optional[str] = None) -> int:
     
     with _RETRY_LOCK:
         conn = sqlite3.connect(db_path, timeout=1)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         try:
             if status_filter:
                 cursor = conn.execute(

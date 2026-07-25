@@ -79,6 +79,8 @@ def get_simple_climatology_prob(station, date_str):
     Helper function to get basic climatology probability without circular imports.
     """
     conn = sqlite3.connect(METAR_DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     c = conn.cursor()
     
     # Get climatology - probability of temperature moving UP/DOWN on same date
@@ -144,41 +146,52 @@ class DecisionOutputGenerator:
         self.logger = logging.getLogger(self.__class__.__name__)
         Path(DEVELOPMENTS_PATH).mkdir(exist_ok=True)
     
-    def _get_market_implied_prob(self, station: str, date: str, market_type: str = "HIGH") -> float:
+    def _get_market_implied_prob(self, station: str, date: str, market_type: str = "HIGH") -> Optional[float]:
         """
         Get market-implied probability for a given weather market.
-        In production, this would come from real Kalshi/Polymarket APIs.
-        Currently uses historical settlement data to simulate realistic prices.
+        Priority order: live Kalshi API -> settlement-based estimate -> None
+
+        Returns None if no data is available (caller must handle None).
         """
+        # First try: live Kalshi API price
+        try:
+            from core.round_number_anchoring import get_kalshi_midpoint_price
+            station_code = station[1:]  # Remove leading 'K' for Kalshi ticker
+            threshold = 0  # Default threshold
+            market_prob = get_kalshi_midpoint_price(
+                f"KX{market_type}{station_code}",
+                market_type,
+                threshold
+            )
+            if market_prob is not None:
+                return market_prob
+        except (ImportError, Exception) as e:
+            self.logger.warning(f"Failed to get Kalshi price for {station} {market_type}: {e}")
+
+        # Second try: estimate from settlement data
         conn = sqlite3.connect(self.metar_db)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         cur = conn.cursor()
-        
-        # Get the settlement data to simulate realistic market prices
-        # In production, we'd query the live market price from exchanges
         cur.execute("""
             SELECT settlement_bucket, prior_settlement_bucket 
             FROM settlement_epochs 
             WHERE station = ? AND local_trading_date < ?
             AND market_type = ? AND epoch_status = 'closed'
-            ORDER BY local_trading_date DESC 
-            LIMIT 1
+            ORDER BY local_trading_date DESC LIMIT 1
         """, (station, date, market_type))
-        
         row = cur.fetchone()
         conn.close()
-        
+
         if row:
             settlement, prior = row
-            # Use the movement from prior to settlement as basis to simulate a realistic current price
-            # Normal distribution around recent patterns would be more realistic but this works as a placeholder
             recent_movement = settlement - prior
-            # Simulate a reasonable market price based on recent behavior
-            # This is placeholder logic - would come from live API in production
-            base_healthy_price = 0.55 if market_type == "HIGH" else 0.45  # Bias for HIGH/LOW markets
-            simulated_price = min(0.95, max(0.05, base_healthy_price + (recent_movement / 50.0)))
-            return simulated_price
-        else:
-            return 0.5  # Neutral default if no data available
+            base_price = 0.55 if market_type == "HIGH" else 0.45
+            return max(0.05, min(0.95, base_price + (recent_movement / 50.0)))
+
+        # No data available — return None instead of 0.5
+        # Caller must handle None as "cannot compute edge"
+        return None
     
     def _get_analytical_estimate(self, station: str, date: str, market_type: str = "HIGH") -> AnalyticalEstimate:
         """
@@ -194,6 +207,8 @@ class DecisionOutputGenerator:
         
         # Get recent data for signal analysis
         conn = sqlite3.connect(self.metar_db)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         cur = conn.cursor()
         
         # Get recent actuals for signals
@@ -270,6 +285,34 @@ class DecisionOutputGenerator:
         price_difference = analytical_estimate.analytical_prob - market_prob
         absolute_difference = abs(price_difference)
         
+        # Handle None market_prob (no data available)
+        if market_prob is None:
+            decision_type = "NO_DATA"
+            strength = 0.0
+            self.logger.warning(f"No market data for {station} {date} {market_type}")
+            market_data = MarketDataPoint(
+                symbol=f"{station}_{market_type}_{date}",
+                marketplace="kalshi",
+                market_implied_prob=0.5,
+                current_price=0.5,
+                expiration_date=date,
+                liquidity_score=0.0,
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                volume=0.0,
+                fee_rate=0.001
+            )
+            return DecisionOutput(
+                symbol=market_data.symbol,
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                market_data=market_data,
+                analytical_estimate=analytical_estimate,
+                price_difference=0.0,
+                absolute_difference=0.0,
+                decision_type=decision_type,
+                recommendation_strength=strength,
+                reasoning_notes=[f"No market data for {station} {date} {market_type}"]
+            )
+
         # Determine recommendation based on divergence and confidence
         if absolute_difference < 0.05:
             decision_type = "HOLD"  # Too small a difference to justify trade

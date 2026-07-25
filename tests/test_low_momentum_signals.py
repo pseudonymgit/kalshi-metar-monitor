@@ -7,14 +7,14 @@ from core import metar_monitor
 
 
 class LowMomentumSignalTests(unittest.TestCase):
-    """Test LOW momentum signal emissions (near_boundary_momentum_down, goldilocks_momentum_down)."""
+    """Test LOW momentum signal emissions (near_boundary_momentum_down, microstructure_spike_momentum_down)."""
 
     def setUp(self):
         metar_monitor._SIGNAL_OBSERVATION_WINDOWS.clear()
         metar_monitor._SIGNAL_STATION_LAST_EMIT.clear()
         metar_monitor._SIGNAL_BOUNDARY_LAST_EMIT.clear()
         metar_monitor._SIGNAL_EPOCH_COUNTER.clear()
-        metar_monitor._SIGNAL_GOLDILOCKS_EPOCH_TRACKER.clear()
+        metar_monitor._SIGNAL_MICROSTRUCTURE_SPIKE_TRACKER.clear()
         metar_monitor._LATEST_SIGNAL_RUNTIME.clear()
         metar_monitor._LAST_SETTLEMENT_UP_TS.clear()
         metar_monitor._MISSING_LADDER_DEDUPE.clear()
@@ -104,8 +104,8 @@ class LowMomentumSignalTests(unittest.TestCase):
         print(f"Emitted signals: {signal_types}")
         self.assertIn("near_boundary_momentum_down", signal_types)
 
-    def test_goldilocks_momentum_down_emits_for_reversion_after_settlement(self):
-        """L2-T1b: goldilocks_reversion_alert should emit after settlement up followed by downward reversion."""
+    def test_microstructure_spike_momentum_down_emits_for_reversion_after_settlement(self):
+        """L2-T1b: microstructure_spike_reversion should emit after settlement up followed by downward reversion."""
         # Need to set up initial state to have a previous settlement bucket
         initial_state = {
             "last_settlement_bucket": 70,
@@ -123,8 +123,8 @@ class LowMomentumSignalTests(unittest.TestCase):
         
         signal_types = [row["signal_type"] for row in emitted]
         print(f"First sequence signals: {signal_types}")
-        # goldilocks_reversion_alert should emit after reversion below threshold
-        self.assertIn("goldilocks_reversion_alert", signal_types)
+        # microstructure_spike_reversion should emit after reversion below threshold
+        self.assertIn("microstructure_spike_reversion", signal_types)
 
     def test_low_momentum_signal_cooldown_per_signal_type(self):
         """L2-T4: Cooldown should reset per signal type, not globally."""
@@ -181,8 +181,8 @@ class LowMomentumSignalTests(unittest.TestCase):
         # Should NOT emit near_boundary_momentum_down since 68.85 is 0.15 from 68
         self.assertNotIn("near_boundary_momentum_down", signal_types)
 
-    def test_goldilocks_momentum_down_tracker_state(self):
-        """Test goldilocks_momentum_down tracker state and confidence scoring."""
+    def test_microstructure_spike_momentum_down_tracker_state(self):
+        """Test microstructure_spike_momentum_down tracker state and confidence scoring."""
         # Set up initial state with previous settlement bucket
         initial_state = {
             "last_settlement_bucket": 69,
@@ -195,20 +195,20 @@ class LowMomentumSignalTests(unittest.TestCase):
                 (70.5, "2025-01-01T12:00:10+00:00"),  # Still above, max_temp_after_up = 70.5
                 (70.0, "2025-01-01T12:00:20+00:00"),  # Still above
                 (69.1, "2025-01-01T12:00:30+00:00"),  # floor=69, reversion_after_settlement
-                (68.5, "2025-01-01T12:00:40+00:00"),  # floor=68, goldilocks_momentum_down
+                (68.5, "2025-01-01T12:00:40+00:00"),  # floor=68, microstructure_spike_momentum_down
             ],
             initial_state=initial_state,
         )
         
         signal_types = [row["signal_type"] for row in emitted]
         print(f"Tracker test signals: {signal_types}")
-        # goldilocks_momentum_down should emit when reversion happens with momentum
-        self.assertIn("goldilocks_momentum_down", signal_types)
+        # microstructure_spike_momentum_down should emit when reversion happens with momentum
+        self.assertIn("microstructure_spike_momentum_down", signal_types)
         
         # Also verify that confidence scoring data is included in the signal context
         # by checking the last emitted signal
         last_signal = emitted[-1]
-        self.assertEqual(last_signal["signal_type"], "goldilocks_momentum_down")
+        self.assertEqual(last_signal["signal_type"], "microstructure_spike_momentum_down")
         self.assertIn("confidence", last_signal)
         self.assertIn("confidence_factors", last_signal)
 

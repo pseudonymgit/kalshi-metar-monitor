@@ -19,9 +19,16 @@ Usage:
 """
 
 # ─── Configuration ──────────────────────────────────────────────────────────
+#
+# All cost references derive from core.market_cost_model.MARKET_COST_MODEL
+#   - ROUND_TRIP_FEE = spread/2 + commission + slippage = 0.0205
+#   - spread = MARKET_COST_MODEL.spread = 0.031 (3.1¢ measured mean)
+#   - commission = MARKET_COST_MODEL.commission = 0.0 (Kalshi charges no commission)
+#   - slippage = MARKET_COST_MODEL.slippage = 0.005 (0.5¢ fallback)
 
-# Kalshi fee structure (approximate)
-FEE_RATE = 0.0            # 0% commission charged by Kalshi (updated from 0.05)
+# Kalshi commission structure: 0% (no commission on weather markets)
+# The spread parameter below is the real cost; it feeds into MARKET_COST_MODEL
+COMMISSION_RATE = 0.0            # Kalshi charges 0% commission
 DEFAULT_SPREAD = 0.02     # 2 cents average bid-ask spread for liquid markets
 
 # Entry thresholds
@@ -39,10 +46,10 @@ class FeeAwareEntryFilter:
     or with prices in the penny-contract danger zone.
     """
 
-    def __init__(self, fee_rate=FEE_RATE, spread=DEFAULT_SPREAD,
+    def __init__(self, commission_rate=COMMISSION_RATE, spread=DEFAULT_SPREAD,
                  min_edge=MIN_DOLLAR_EDGE, min_price=MIN_PRICE_FLOOR,
                  max_price=MAX_PRICE_CEILING):
-        self.fee_rate = fee_rate
+        self.commission_rate = commission_rate
         self.spread = spread
         self.min_edge = min_edge
         self.min_price = min_price
@@ -105,7 +112,7 @@ class FeeAwareEntryFilter:
         if expected_value < self.min_edge:
             return self._reject(
                 f"Dollar edge ${expected_value:.2f} below minimum ${self.min_edge:.2f} "
-                f"(after {self.fee_rate*100:.0f}% fees + {self.spread:.2f} spread)",
+                f"(commission {self.commission_rate*100:.0f}%, spread {self.spread:.2f})",
                 model_prob, market_price, stake, ev=expected_value,
                 fee=fee_amount, net_profit=net_profit, net_loss=net_loss)
 

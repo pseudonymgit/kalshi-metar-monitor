@@ -103,6 +103,8 @@ class HeartbeatManager:
         # Extract scheduler info from database if available
         try:
             with sqlite3.connect(self.db_path) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=5000;")
                 latest_poll_log = conn.execute("""
                     SELECT created_utc, metadata_json 
                     FROM alerts 
@@ -145,6 +147,8 @@ class HeartbeatManager:
         """Count recent signals and alerts in the system"""
         try:
             with sqlite3.connect(self.db_path) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=5000;")
                 # Total alerts count
                 total_alerts = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
                 
@@ -237,6 +241,8 @@ class HeartbeatManager:
         # Fall back to database trade tracking
         try:
             with sqlite3.connect(self.db_path) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=5000;")
                 latest_trade = conn.execute("""
                     SELECT created_utc FROM alerts 
                     WHERE alert_type LIKE '%trade%' OR metadata_json LIKE '%"trade_id"%'
@@ -264,6 +270,8 @@ class HeartbeatManager:
             try:
                 # Look in database for balance information
                 with sqlite3.connect(self.db_path) as conn:
+                    conn.execute("PRAGMA journal_mode=WAL;")
+                    conn.execute("PRAGMA busy_timeout=5000;")
                     row = conn.execute("""
                         SELECT metadata_json 
                         FROM alerts 

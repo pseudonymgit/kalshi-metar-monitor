@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-ESDR Signal — Ensemble Spread Divergence Rate
+ESDR Signal — Ensemble Spread Divergence Rate [DISABLED=True]
+
+[DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
+Requires full ensemble member data (31 members) not currently available.
+Stub code kept for reference.
 
 ESDR (Ensemble Spread Divergence Rate) measures the rate at which ensemble
 member forecasts diverge over time. Widening spread at hour 2 predicts

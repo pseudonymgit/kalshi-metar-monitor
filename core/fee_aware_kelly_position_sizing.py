@@ -19,7 +19,8 @@ from datetime import datetime, timedelta
 class KellySizingConfig:
     """Configuration for fee-aware Kelly position sizing."""
     fraction_kelly: float = 0.5            # 50% fractional Kelly (conservative)
-    fee_rate: float = 0.0                # 0% fee - Kalshi charges 0 commission (spread-only costs)
+    # Import from MARKET_COST_MODEL — single source of truth
+    fee_rate: float = 0.0205            # Kalshi round-trip cost (spread/2 + slippage)
     max_position_pct: float = 0.25        # Max 25% of balance per trade
     window_days: int = 30                 # Rolling window for win rate calculation
     min_trades_for_kelly: int = 10        # Minimum trades to compute Kelly sizing
@@ -119,7 +120,9 @@ class KellyPositionSizer:
         for trade in self.trade_history:
             if trade['outcome']:
                 # Win: (net gain percentage) - fee impact
-                net_return = 0.95  # Simplifying to 95% of potential win with fees
+                # Use MARKET_COST_MODEL round-trip cost
+                from core.market_cost_model import ROUND_TRIP_FEE
+                net_return = 1.0 - ROUND_TRIP_FEE  # 97.95% of potential win after fees
             else:
                 # Loss: full stake loss + fee
                 net_return = -1.0

@@ -105,6 +105,8 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
     Returns dict with raw/calibrated metrics per station and aggregate.
     """
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     calib = CalibrationPipeline(signal_names_list, stations)
     
     # Per-station raw data storage

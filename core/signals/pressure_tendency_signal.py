@@ -2,6 +2,9 @@
 """
 Pressure Tendency Signal — Intraday 3-Hour Pressure Change Signal
 
+[DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
+Near-coin-flip accuracy (~54.0%). Keeping code file for reference.
+
 Calculates the 3-hour pressure change rate from raw METAR observations
 and uses barometric tendency as a short-term directional predictor.
 

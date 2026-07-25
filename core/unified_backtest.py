@@ -16,7 +16,6 @@ import sqlite3
 import math
 import os
 import sys
-import statistics
 import numpy as np
 from collections import defaultdict
 from scipy.stats import binomtest
@@ -33,13 +32,12 @@ from core.market_cost_model import MARKET_COST_MODEL
 
 # Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
 BACKTEST_SIGNALS = [
-    'gaussian', 'gaussian_v2', 'goldilocks', 'persistence',
+    # Core signals (verified firing, non-zero variance per correlation matrix 2026-07-25)
+    'gaussian', 'gaussian_v2', 'spike_reversion', 'goldilocks',
     'pressure_delta', 'calendar_climatology', 'wind_direction_shift',
-    'forecast_disagreement', 'temperature_advection', 'frontal_detector',
-    'nwp_direct', 'intraday_metar_confirmation', 'fogr_reversion',
-    'metar_dtdt', 'pressure_tendency', 'hrrr_bias_corrected',
-    'esdr', 'nwp_dtdt_fusion', 'spread_based_entry', 'volume_momentum',
-    'settlement_arbitrage', 'seasonal_regime',
+    'forecast_disagreement', 'corrected_pressure_delta',
+    # Spike-reversion + Sure Thing lanes (separate from forecasting ensemble)
+    'frontal_passage_intraday',
 ]
 
 FULL_ENSEMBLE = BACKTEST_SIGNALS
@@ -90,11 +88,14 @@ def load_station_data(station, conn):
         ORDER BY local_trading_date ASC
     """, (station,))
     market = {}
+    prev_bucket = None
     for r in cur.fetchall():
         market[r[0]] = {
             'settlement_bucket': r[1],
-            'reversion': r[2] if r[2] is not None else 0
+            'reversion': r[2] if r[2] is not None else 0,
+            'prev_bucket': prev_bucket
         }
+        prev_bucket = r[1]
     return days, market
 
 
@@ -243,17 +244,11 @@ def run_backtest(
                 print(f"  {station}: insufficient data ({len(days)} days)")
             continue
 
-        # Compute strike price from training data (first train_days days)
-        # Strike is the median high temperature during training, which is the
-        # fixed threshold that determines market outcome (HIGH-YYYYMMDD-<strike>).
-        training_temps = [
-            market[d['date']]['settlement_bucket']
-            for d in days[:train_days]
-            if d['date'] in market and market[d['date']]['settlement_bucket'] is not None
-        ]
-        strike = statistics.median(training_temps) if training_temps else 50.0
+        # Direction is determined by comparing today's settlement to yesterday's.
+        # All signals predict directional change (today vs yesterday), not
+        # strike level (above/below median). See docs/plans/BACKTEST-AUDIT-FINDINGS.md
         if verbose:
-            print(f"  {station}: strike={strike} (from {len(training_temps)} training days)")
+            print(f"  {station}: using day-over-day directional validation")
 
         # Walk-forward backtest
         start = train_days
@@ -264,11 +259,17 @@ def run_backtest(
                 if actual is None:
                     continue
 
-                # Determine actual market outcome: strike-based
-                # For a Kalshi HIGH binary market, 'up' means settlement > strike
+                # Determine actual market outcome: directional change
+                # All signals predict 'up' = temp will be warmer than yesterday,
+                # 'down' = temp will be cooler than yesterday.
+                # This matches Phase 8/9 behavior documented at line 89-115 of
+                # scripts/phase8_combinatorial_search.py
                 if actual['settlement_bucket'] is None:
                     continue
-                actual_direction = 'up' if actual['settlement_bucket'] > strike else 'down'
+                prev_bucket = actual.get('prev_bucket')
+                if prev_bucket is None:
+                    continue  # No previous day to compare
+                actual_direction = 'up' if actual['settlement_bucket'] > prev_bucket else 'down'
 
                 # Evaluate all signals
                 signal_outputs = []
@@ -340,7 +341,7 @@ def run_backtest(
     # Compute aggregate metrics
     if not all_results:
         return {
-            'accuracy': 0.0, 'sharpe': 0.0, 'brier': 1.0, 'ece': 1.0,
+            'accuracy': 0.0, 'fee_adjusted_accuracy': 0.0, 'sharpe': 0.0, 'brier': 1.0, 'ece': 1.0,
             'drawdown': 0.0, 'trades': 0,
             'per_signal_stats': {}, 'per_station_stats': {}
         }
@@ -355,6 +356,7 @@ def run_backtest(
 
     return {
         'accuracy': accuracy,
+        'fee_adjusted_accuracy': accuracy - (0.5 + FEE_RATE),
         'sharpe': sharpe,
         'brier': brier,
         'ece': ece,
@@ -363,6 +365,7 @@ def run_backtest(
         'per_signal_stats': {
             sig: {
                 'accuracy': stats['correct'] / stats['total'] if stats['total'] > 0 else 0,
+                'fee_adjusted_accuracy': (stats['correct'] / stats['total'] if stats['total'] > 0 else 0) - (0.5 + FEE_RATE),
                 'total': stats['total']
             }
             for sig, stats in per_signal_stats.items()
@@ -370,6 +373,7 @@ def run_backtest(
         'per_station_stats': {
             st: {
                 'accuracy': stats['correct'] / stats['total'] if stats['total'] > 0 else 0,
+                'fee_adjusted_accuracy': (stats['correct'] / stats['total'] if stats['total'] > 0 else 0) - (0.5 + FEE_RATE),
                 'total': stats['total']
             }
             for st, stats in per_station_stats.items()

@@ -574,8 +574,7 @@ class TestSeasonalRegimeClassifier(SignalTestBase):
         sig = self._get_sig()
         bad_days = [{'date': '2025-06-01'} for _ in range(100)]
         direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
-        # SeasonalRegimeClassifier can return 'indeterminate' as valid direction
-        assert direction is None or direction in ('up', 'down', 'indeterminate')
+        assert direction is None or direction in ('up', 'down')
         assert confidence >= 0.0 and confidence <= 1.0
 
     @pytest.mark.unit
@@ -585,7 +584,7 @@ class TestSeasonalRegimeClassifier(SignalTestBase):
                       'low': 50, 'dewpoint': 40, 'temp': 55,
                       'wind_dir': 180, 'wind_speed': 10} for _ in range(100)]
         direction, confidence = sig.evaluate(len(bad_days) - 1, bad_days)
-        assert direction is None or direction in ('up', 'down', 'indeterminate')
+        assert direction is None or direction in ('up', 'down')
 
     @pytest.mark.unit
     def test_return_type(self, long_days):
@@ -597,8 +596,7 @@ class TestSeasonalRegimeClassifier(SignalTestBase):
         assert isinstance(result, tuple)
         assert len(result) == 2
         direction, confidence = result
-        # SeasonalRegimeClassifier can return 'indeterminate' as valid direction
-        assert direction is None or direction in ('up', 'down', 'indeterminate')
+        assert direction is None or direction in ('up', 'down')
         assert isinstance(confidence, float)
         assert 0.0 <= confidence <= 1.0
 

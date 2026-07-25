@@ -141,6 +141,8 @@ class DataFreshnessMonitor:
                 now = now.replace(tzinfo=timezone.utc)
             
             conn = sqlite3.connect(self._metar_db_path, timeout=5.0)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             try:
                 # Query latest timestamp from metar db tables
                 # Look for common table names used in existing system
@@ -265,6 +267,8 @@ class DataFreshnessMonitor:
             
         try:
             conn = sqlite3.connect(self._nwp_db_path, timeout=5.0) 
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             try:
                 cursor = conn.cursor()
                 
@@ -440,7 +444,7 @@ class DataFreshnessMonitor:
             # normal or warning state
             trading_policy = {
                 "position_multiplier": 1.0,  # Full sizing
-                "allowed_lanes": ["regular", "sure_thing", "goldilocks"],  # All normal lanes
+                "allowed_lanes": ["regular", "sure_thing", "spike_reversion", "goldilocks"],  # A3: added spike_reversion, goldilocks backward compat
                 "operation": "NORMAL" if system_state == "normal" else "WARN_NORMAL"
             }
 

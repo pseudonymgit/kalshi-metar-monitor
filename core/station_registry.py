@@ -103,6 +103,8 @@ def _try_settlement_epochs():
     """Load station list from settlement_epochs table in metar_backfill.db."""
     try:
         conn = sqlite3.connect(_DB_PATH)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         c = conn.cursor()
         c.execute("SELECT DISTINCT station FROM settlement_epochs ORDER BY station")
         stations = [r[0] for r in c.fetchall()]

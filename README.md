@@ -31,7 +31,7 @@ Detection and surfacing of these events is a live trading reliability requiremen
 ### Phase 1 — METAR Monitoring (Frozen v1.0 semantics)
 Phase 1 alert semantics remain fixed:
 - Integer floor-cross detection.
-- Station-local alert window enforcement (11:00–19:00 local time) for live polling.
+- 24/7 alert emission (no station-local window restriction).
 - Station-local daily reset of alert memory.
 - Scheduler lifecycle idempotency and thread isolation.
 
@@ -43,7 +43,7 @@ Phase 2 enriches temperature-cross events with current Kalshi weather ladder con
 
 ## Alert Routing Policy (Production)
 
-Within station-local alert window (11:00–19:00):
+24/7 operation (no time window restriction):
 
 | Condition | Result |
 |---|---|
