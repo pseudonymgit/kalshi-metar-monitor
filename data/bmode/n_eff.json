@@ -1,0 +1,1149 @@
+{
+  "n_stations": 20,
+  "n_pairwise": 190,
+  "avg_pairwise_correlation": 0.22,
+  "n_eff": 3.86,
+  "n_eff_ratio": 0.193,
+  "pairwise_correlations": {
+    "KATL-KAUS": {
+      "station_a": "KATL",
+      "station_b": "KAUS",
+      "correlation": 0.6261,
+      "n_common": 1723
+    },
+    "KATL-KBOS": {
+      "station_a": "KATL",
+      "station_b": "KBOS",
+      "correlation": 0.4443,
+      "n_common": 1723
+    },
+    "KATL-KDCA": {
+      "station_a": "KATL",
+      "station_b": "KDCA",
+      "correlation": 0.3,
+      "n_common": 1723
+    },
+    "KATL-KDEN": {
+      "station_a": "KATL",
+      "station_b": "KDEN",
+      "correlation": 0.5775,
+      "n_common": 1722
+    },
+    "KATL-KDFW": {
+      "station_a": "KATL",
+      "station_b": "KDFW",
+      "correlation": 0.0953,
+      "n_common": 1723
+    },
+    "KATL-KHOU": {
+      "station_a": "KATL",
+      "station_b": "KHOU",
+      "correlation": 0.0967,
+      "n_common": 1723
+    },
+    "KATL-KLAS": {
+      "station_a": "KATL",
+      "station_b": "KLAS",
+      "correlation": 0.5122,
+      "n_common": 1723
+    },
+    "KATL-KLAX": {
+      "station_a": "KATL",
+      "station_b": "KLAX",
+      "correlation": 0.1122,
+      "n_common": 1723
+    },
+    "KATL-KMDW": {
+      "station_a": "KATL",
+      "station_b": "KMDW",
+      "correlation": 0.1243,
+      "n_common": 1723
+    },
+    "KATL-KMIA": {
+      "station_a": "KATL",
+      "station_b": "KMIA",
+      "correlation": 0.5663,
+      "n_common": 1723
+    },
+    "KATL-KMSP": {
+      "station_a": "KATL",
+      "station_b": "KMSP",
+      "correlation": 0.0022,
+      "n_common": 1721
+    },
+    "KATL-KMSY": {
+      "station_a": "KATL",
+      "station_b": "KMSY",
+      "correlation": 0.3001,
+      "n_common": 1721
+    },
+    "KATL-KNYC": {
+      "station_a": "KATL",
+      "station_b": "KNYC",
+      "correlation": 0.178,
+      "n_common": 1723
+    },
+    "KATL-KOKC": {
+      "station_a": "KATL",
+      "station_b": "KOKC",
+      "correlation": 0.5226,
+      "n_common": 1723
+    },
+    "KATL-KPHL": {
+      "station_a": "KATL",
+      "station_b": "KPHL",
+      "correlation": 0.4314,
+      "n_common": 1723
+    },
+    "KATL-KPHX": {
+      "station_a": "KATL",
+      "station_b": "KPHX",
+      "correlation": 0.5946,
+      "n_common": 1721
+    },
+    "KATL-KSAT": {
+      "station_a": "KATL",
+      "station_b": "KSAT",
+      "correlation": 0.3072,
+      "n_common": 1723
+    },
+    "KATL-KSEA": {
+      "station_a": "KATL",
+      "station_b": "KSEA",
+      "correlation": 0.0239,
+      "n_common": 1723
+    },
+    "KATL-KSFO": {
+      "station_a": "KATL",
+      "station_b": "KSFO",
+      "correlation": 0.5988,
+      "n_common": 1723
+    },
+    "KAUS-KBOS": {
+      "station_a": "KAUS",
+      "station_b": "KBOS",
+      "correlation": 0.2594,
+      "n_common": 1723
+    },
+    "KAUS-KDCA": {
+      "station_a": "KAUS",
+      "station_b": "KDCA",
+      "correlation": 0.0087,
+      "n_common": 1723
+    },
+    "KAUS-KDEN": {
+      "station_a": "KAUS",
+      "station_b": "KDEN",
+      "correlation": 0.1896,
+      "n_common": 1722
+    },
+    "KAUS-KDFW": {
+      "station_a": "KAUS",
+      "station_b": "KDFW",
+      "correlation": 0.0928,
+      "n_common": 1723
+    },
+    "KAUS-KHOU": {
+      "station_a": "KAUS",
+      "station_b": "KHOU",
+      "correlation": 0.3724,
+      "n_common": 1723
+    },
+    "KAUS-KLAS": {
+      "station_a": "KAUS",
+      "station_b": "KLAS",
+      "correlation": 0.133,
+      "n_common": 1723
+    },
+    "KAUS-KLAX": {
+      "station_a": "KAUS",
+      "station_b": "KLAX",
+      "correlation": 0.119,
+      "n_common": 1723
+    },
+    "KAUS-KMDW": {
+      "station_a": "KAUS",
+      "station_b": "KMDW",
+      "correlation": 0.0088,
+      "n_common": 1723
+    },
+    "KAUS-KMIA": {
+      "station_a": "KAUS",
+      "station_b": "KMIA",
+      "correlation": 0.547,
+      "n_common": 1723
+    },
+    "KAUS-KMSP": {
+      "station_a": "KAUS",
+      "station_b": "KMSP",
+      "correlation": 0.0047,
+      "n_common": 1721
+    },
+    "KAUS-KMSY": {
+      "station_a": "KAUS",
+      "station_b": "KMSY",
+      "correlation": 0.3936,
+      "n_common": 1721
+    },
+    "KAUS-KNYC": {
+      "station_a": "KAUS",
+      "station_b": "KNYC",
+      "correlation": 0.0421,
+      "n_common": 1723
+    },
+    "KAUS-KOKC": {
+      "station_a": "KAUS",
+      "station_b": "KOKC",
+      "correlation": 0.1007,
+      "n_common": 1723
+    },
+    "KAUS-KPHL": {
+      "station_a": "KAUS",
+      "station_b": "KPHL",
+      "correlation": 0.2059,
+      "n_common": 1723
+    },
+    "KAUS-KPHX": {
+      "station_a": "KAUS",
+      "station_b": "KPHX",
+      "correlation": 0.3464,
+      "n_common": 1721
+    },
+    "KAUS-KSAT": {
+      "station_a": "KAUS",
+      "station_b": "KSAT",
+      "correlation": 0.4735,
+      "n_common": 1723
+    },
+    "KAUS-KSEA": {
+      "station_a": "KAUS",
+      "station_b": "KSEA",
+      "correlation": 0.1432,
+      "n_common": 1723
+    },
+    "KAUS-KSFO": {
+      "station_a": "KAUS",
+      "station_b": "KSFO",
+      "correlation": 0.2512,
+      "n_common": 1723
+    },
+    "KBOS-KDCA": {
+      "station_a": "KBOS",
+      "station_b": "KDCA",
+      "correlation": 0.1894,
+      "n_common": 1723
+    },
+    "KBOS-KDEN": {
+      "station_a": "KBOS",
+      "station_b": "KDEN",
+      "correlation": 0.5817,
+      "n_common": 1722
+    },
+    "KBOS-KDFW": {
+      "station_a": "KBOS",
+      "station_b": "KDFW",
+      "correlation": 0.293,
+      "n_common": 1723
+    },
+    "KBOS-KHOU": {
+      "station_a": "KBOS",
+      "station_b": "KHOU",
+      "correlation": 0.2911,
+      "n_common": 1723
+    },
+    "KBOS-KLAS": {
+      "station_a": "KBOS",
+      "station_b": "KLAS",
+      "correlation": 0.2095,
+      "n_common": 1723
+    },
+    "KBOS-KLAX": {
+      "station_a": "KBOS",
+      "station_b": "KLAX",
+      "correlation": 0.1266,
+      "n_common": 1723
+    },
+    "KBOS-KMDW": {
+      "station_a": "KBOS",
+      "station_b": "KMDW",
+      "correlation": 0.1577,
+      "n_common": 1723
+    },
+    "KBOS-KMIA": {
+      "station_a": "KBOS",
+      "station_b": "KMIA",
+      "correlation": 0.2111,
+      "n_common": 1723
+    },
+    "KBOS-KMSP": {
+      "station_a": "KBOS",
+      "station_b": "KMSP",
+      "correlation": 0.0724,
+      "n_common": 1721
+    },
+    "KBOS-KMSY": {
+      "station_a": "KBOS",
+      "station_b": "KMSY",
+      "correlation": 0.2686,
+      "n_common": 1721
+    },
+    "KBOS-KNYC": {
+      "station_a": "KBOS",
+      "station_b": "KNYC",
+      "correlation": 0.6282,
+      "n_common": 1723
+    },
+    "KBOS-KOKC": {
+      "station_a": "KBOS",
+      "station_b": "KOKC",
+      "correlation": 0.3262,
+      "n_common": 1723
+    },
+    "KBOS-KPHL": {
+      "station_a": "KBOS",
+      "station_b": "KPHL",
+      "correlation": 0.6203,
+      "n_common": 1723
+    },
+    "KBOS-KPHX": {
+      "station_a": "KBOS",
+      "station_b": "KPHX",
+      "correlation": 0.5597,
+      "n_common": 1721
+    },
+    "KBOS-KSAT": {
+      "station_a": "KBOS",
+      "station_b": "KSAT",
+      "correlation": 0.1036,
+      "n_common": 1723
+    },
+    "KBOS-KSEA": {
+      "station_a": "KBOS",
+      "station_b": "KSEA",
+      "correlation": 0.0263,
+      "n_common": 1723
+    },
+    "KBOS-KSFO": {
+      "station_a": "KBOS",
+      "station_b": "KSFO",
+      "correlation": 0.4028,
+      "n_common": 1723
+    },
+    "KDCA-KDEN": {
+      "station_a": "KDCA",
+      "station_b": "KDEN",
+      "correlation": 0.0115,
+      "n_common": 1722
+    },
+    "KDCA-KDFW": {
+      "station_a": "KDCA",
+      "station_b": "KDFW",
+      "correlation": 0.2939,
+      "n_common": 1723
+    },
+    "KDCA-KHOU": {
+      "station_a": "KDCA",
+      "station_b": "KHOU",
+      "correlation": 0.0075,
+      "n_common": 1723
+    },
+    "KDCA-KLAS": {
+      "station_a": "KDCA",
+      "station_b": "KLAS",
+      "correlation": 0.006,
+      "n_common": 1723
+    },
+    "KDCA-KLAX": {
+      "station_a": "KDCA",
+      "station_b": "KLAX",
+      "correlation": 0.0912,
+      "n_common": 1723
+    },
+    "KDCA-KMDW": {
+      "station_a": "KDCA",
+      "station_b": "KMDW",
+      "correlation": 0.5291,
+      "n_common": 1723
+    },
+    "KDCA-KMIA": {
+      "station_a": "KDCA",
+      "station_b": "KMIA",
+      "correlation": 0.2135,
+      "n_common": 1723
+    },
+    "KDCA-KMSP": {
+      "station_a": "KDCA",
+      "station_b": "KMSP",
+      "correlation": 0.1571,
+      "n_common": 1721
+    },
+    "KDCA-KMSY": {
+      "station_a": "KDCA",
+      "station_b": "KMSY",
+      "correlation": 0.0056,
+      "n_common": 1721
+    },
+    "KDCA-KNYC": {
+      "station_a": "KDCA",
+      "station_b": "KNYC",
+      "correlation": 0.0296,
+      "n_common": 1723
+    },
+    "KDCA-KOKC": {
+      "station_a": "KDCA",
+      "station_b": "KOKC",
+      "correlation": 0.0027,
+      "n_common": 1723
+    },
+    "KDCA-KPHL": {
+      "station_a": "KDCA",
+      "station_b": "KPHL",
+      "correlation": 0.3558,
+      "n_common": 1723
+    },
+    "KDCA-KPHX": {
+      "station_a": "KDCA",
+      "station_b": "KPHX",
+      "correlation": 0.0293,
+      "n_common": 1721
+    },
+    "KDCA-KSAT": {
+      "station_a": "KDCA",
+      "station_b": "KSAT",
+      "correlation": 0.2028,
+      "n_common": 1723
+    },
+    "KDCA-KSEA": {
+      "station_a": "KDCA",
+      "station_b": "KSEA",
+      "correlation": 0.0205,
+      "n_common": 1723
+    },
+    "KDCA-KSFO": {
+      "station_a": "KDCA",
+      "station_b": "KSFO",
+      "correlation": 0.0926,
+      "n_common": 1723
+    },
+    "KDEN-KDFW": {
+      "station_a": "KDEN",
+      "station_b": "KDFW",
+      "correlation": 0.2392,
+      "n_common": 1722
+    },
+    "KDEN-KHOU": {
+      "station_a": "KDEN",
+      "station_b": "KHOU",
+      "correlation": 0.2874,
+      "n_common": 1722
+    },
+    "KDEN-KLAS": {
+      "station_a": "KDEN",
+      "station_b": "KLAS",
+      "correlation": 0.7055,
+      "n_common": 1722
+    },
+    "KDEN-KLAX": {
+      "station_a": "KDEN",
+      "station_b": "KLAX",
+      "correlation": 0.1126,
+      "n_common": 1722
+    },
+    "KDEN-KMDW": {
+      "station_a": "KDEN",
+      "station_b": "KMDW",
+      "correlation": 0.0594,
+      "n_common": 1722
+    },
+    "KDEN-KMIA": {
+      "station_a": "KDEN",
+      "station_b": "KMIA",
+      "correlation": 0.0284,
+      "n_common": 1722
+    },
+    "KDEN-KMSP": {
+      "station_a": "KDEN",
+      "station_b": "KMSP",
+      "correlation": 0.0474,
+      "n_common": 1720
+    },
+    "KDEN-KMSY": {
+      "station_a": "KDEN",
+      "station_b": "KMSY",
+      "correlation": 0.2786,
+      "n_common": 1720
+    },
+    "KDEN-KNYC": {
+      "station_a": "KDEN",
+      "station_b": "KNYC",
+      "correlation": 0.144,
+      "n_common": 1722
+    },
+    "KDEN-KOKC": {
+      "station_a": "KDEN",
+      "station_b": "KOKC",
+      "correlation": 0.8551,
+      "n_common": 1722
+    },
+    "KDEN-KPHL": {
+      "station_a": "KDEN",
+      "station_b": "KPHL",
+      "correlation": 0.0828,
+      "n_common": 1722
+    },
+    "KDEN-KPHX": {
+      "station_a": "KDEN",
+      "station_b": "KPHX",
+      "correlation": 0.8718,
+      "n_common": 1720
+    },
+    "KDEN-KSAT": {
+      "station_a": "KDEN",
+      "station_b": "KSAT",
+      "correlation": 0.1569,
+      "n_common": 1722
+    },
+    "KDEN-KSEA": {
+      "station_a": "KDEN",
+      "station_b": "KSEA",
+      "correlation": 0.0704,
+      "n_common": 1722
+    },
+    "KDEN-KSFO": {
+      "station_a": "KDEN",
+      "station_b": "KSFO",
+      "correlation": 0.8706,
+      "n_common": 1722
+    },
+    "KDFW-KHOU": {
+      "station_a": "KDFW",
+      "station_b": "KHOU",
+      "correlation": 0.6225,
+      "n_common": 1723
+    },
+    "KDFW-KLAS": {
+      "station_a": "KDFW",
+      "station_b": "KLAS",
+      "correlation": 0.2061,
+      "n_common": 1723
+    },
+    "KDFW-KLAX": {
+      "station_a": "KDFW",
+      "station_b": "KLAX",
+      "correlation": 0.1167,
+      "n_common": 1723
+    },
+    "KDFW-KMDW": {
+      "station_a": "KDFW",
+      "station_b": "KMDW",
+      "correlation": 0.1479,
+      "n_common": 1723
+    },
+    "KDFW-KMIA": {
+      "station_a": "KDFW",
+      "station_b": "KMIA",
+      "correlation": 0.1804,
+      "n_common": 1723
+    },
+    "KDFW-KMSP": {
+      "station_a": "KDFW",
+      "station_b": "KMSP",
+      "correlation": 0.0214,
+      "n_common": 1721
+    },
+    "KDFW-KMSY": {
+      "station_a": "KDFW",
+      "station_b": "KMSY",
+      "correlation": 0.0095,
+      "n_common": 1721
+    },
+    "KDFW-KNYC": {
+      "station_a": "KDFW",
+      "station_b": "KNYC",
+      "correlation": 0.4808,
+      "n_common": 1723
+    },
+    "KDFW-KOKC": {
+      "station_a": "KDFW",
+      "station_b": "KOKC",
+      "correlation": 0.1088,
+      "n_common": 1723
+    },
+    "KDFW-KPHL": {
+      "station_a": "KDFW",
+      "station_b": "KPHL",
+      "correlation": 0.0938,
+      "n_common": 1723
+    },
+    "KDFW-KPHX": {
+      "station_a": "KDFW",
+      "station_b": "KPHX",
+      "correlation": 0.0547,
+      "n_common": 1721
+    },
+    "KDFW-KSAT": {
+      "station_a": "KDFW",
+      "station_b": "KSAT",
+      "correlation": 0.4059,
+      "n_common": 1723
+    },
+    "KDFW-KSEA": {
+      "station_a": "KDFW",
+      "station_b": "KSEA",
+      "correlation": 0.0363,
+      "n_common": 1723
+    },
+    "KDFW-KSFO": {
+      "station_a": "KDFW",
+      "station_b": "KSFO",
+      "correlation": 0.2332,
+      "n_common": 1723
+    },
+    "KHOU-KLAS": {
+      "station_a": "KHOU",
+      "station_b": "KLAS",
+      "correlation": 0.1765,
+      "n_common": 1723
+    },
+    "KHOU-KLAX": {
+      "station_a": "KHOU",
+      "station_b": "KLAX",
+      "correlation": 0.0993,
+      "n_common": 1723
+    },
+    "KHOU-KMDW": {
+      "station_a": "KHOU",
+      "station_b": "KMDW",
+      "correlation": 0.0082,
+      "n_common": 1723
+    },
+    "KHOU-KMIA": {
+      "station_a": "KHOU",
+      "station_b": "KMIA",
+      "correlation": 0.1322,
+      "n_common": 1723
+    },
+    "KHOU-KMSP": {
+      "station_a": "KHOU",
+      "station_b": "KMSP",
+      "correlation": 0.0144,
+      "n_common": 1721
+    },
+    "KHOU-KMSY": {
+      "station_a": "KHOU",
+      "station_b": "KMSY",
+      "correlation": 0.2563,
+      "n_common": 1721
+    },
+    "KHOU-KNYC": {
+      "station_a": "KHOU",
+      "station_b": "KNYC",
+      "correlation": 0.321,
+      "n_common": 1723
+    },
+    "KHOU-KOKC": {
+      "station_a": "KHOU",
+      "station_b": "KOKC",
+      "correlation": 0.0945,
+      "n_common": 1723
+    },
+    "KHOU-KPHL": {
+      "station_a": "KHOU",
+      "station_b": "KPHL",
+      "correlation": 0.0453,
+      "n_common": 1723
+    },
+    "KHOU-KPHX": {
+      "station_a": "KHOU",
+      "station_b": "KPHX",
+      "correlation": 0.2285,
+      "n_common": 1721
+    },
+    "KHOU-KSAT": {
+      "station_a": "KHOU",
+      "station_b": "KSAT",
+      "correlation": 0.4984,
+      "n_common": 1723
+    },
+    "KHOU-KSEA": {
+      "station_a": "KHOU",
+      "station_b": "KSEA",
+      "correlation": 0.0269,
+      "n_common": 1723
+    },
+    "KHOU-KSFO": {
+      "station_a": "KHOU",
+      "station_b": "KSFO",
+      "correlation": 0.169,
+      "n_common": 1723
+    },
+    "KLAS-KLAX": {
+      "station_a": "KLAS",
+      "station_b": "KLAX",
+      "correlation": 0.1229,
+      "n_common": 1723
+    },
+    "KLAS-KMDW": {
+      "station_a": "KLAS",
+      "station_b": "KMDW",
+      "correlation": 0.0469,
+      "n_common": 1723
+    },
+    "KLAS-KMIA": {
+      "station_a": "KLAS",
+      "station_b": "KMIA",
+      "correlation": 0.2252,
+      "n_common": 1723
+    },
+    "KLAS-KMSP": {
+      "station_a": "KLAS",
+      "station_b": "KMSP",
+      "correlation": 0.0045,
+      "n_common": 1721
+    },
+    "KLAS-KMSY": {
+      "station_a": "KLAS",
+      "station_b": "KMSY",
+      "correlation": 0.0339,
+      "n_common": 1721
+    },
+    "KLAS-KNYC": {
+      "station_a": "KLAS",
+      "station_b": "KNYC",
+      "correlation": 0.0339,
+      "n_common": 1723
+    },
+    "KLAS-KOKC": {
+      "station_a": "KLAS",
+      "station_b": "KOKC",
+      "correlation": 0.7712,
+      "n_common": 1723
+    },
+    "KLAS-KPHL": {
+      "station_a": "KLAS",
+      "station_b": "KPHL",
+      "correlation": 0.009,
+      "n_common": 1723
+    },
+    "KLAS-KPHX": {
+      "station_a": "KLAS",
+      "station_b": "KPHX",
+      "correlation": 0.657,
+      "n_common": 1721
+    },
+    "KLAS-KSAT": {
+      "station_a": "KLAS",
+      "station_b": "KSAT",
+      "correlation": 0.5376,
+      "n_common": 1723
+    },
+    "KLAS-KSEA": {
+      "station_a": "KLAS",
+      "station_b": "KSEA",
+      "correlation": 0.1381,
+      "n_common": 1723
+    },
+    "KLAS-KSFO": {
+      "station_a": "KLAS",
+      "station_b": "KSFO",
+      "correlation": 0.6698,
+      "n_common": 1723
+    },
+    "KLAX-KMDW": {
+      "station_a": "KLAX",
+      "station_b": "KMDW",
+      "correlation": 0.1118,
+      "n_common": 1723
+    },
+    "KLAX-KMIA": {
+      "station_a": "KLAX",
+      "station_b": "KMIA",
+      "correlation": 0.0968,
+      "n_common": 1723
+    },
+    "KLAX-KMSP": {
+      "station_a": "KLAX",
+      "station_b": "KMSP",
+      "correlation": 0.0813,
+      "n_common": 1721
+    },
+    "KLAX-KMSY": {
+      "station_a": "KLAX",
+      "station_b": "KMSY",
+      "correlation": 0.0965,
+      "n_common": 1721
+    },
+    "KLAX-KNYC": {
+      "station_a": "KLAX",
+      "station_b": "KNYC",
+      "correlation": 0.287,
+      "n_common": 1723
+    },
+    "KLAX-KOKC": {
+      "station_a": "KLAX",
+      "station_b": "KOKC",
+      "correlation": 0.0706,
+      "n_common": 1723
+    },
+    "KLAX-KPHL": {
+      "station_a": "KLAX",
+      "station_b": "KPHL",
+      "correlation": 0.1325,
+      "n_common": 1723
+    },
+    "KLAX-KPHX": {
+      "station_a": "KLAX",
+      "station_b": "KPHX",
+      "correlation": 0.1263,
+      "n_common": 1721
+    },
+    "KLAX-KSAT": {
+      "station_a": "KLAX",
+      "station_b": "KSAT",
+      "correlation": 0.1469,
+      "n_common": 1723
+    },
+    "KLAX-KSEA": {
+      "station_a": "KLAX",
+      "station_b": "KSEA",
+      "correlation": 0.2193,
+      "n_common": 1723
+    },
+    "KLAX-KSFO": {
+      "station_a": "KLAX",
+      "station_b": "KSFO",
+      "correlation": 0.1214,
+      "n_common": 1723
+    },
+    "KMDW-KMIA": {
+      "station_a": "KMDW",
+      "station_b": "KMIA",
+      "correlation": 0.1767,
+      "n_common": 1723
+    },
+    "KMDW-KMSP": {
+      "station_a": "KMDW",
+      "station_b": "KMSP",
+      "correlation": 0.8692,
+      "n_common": 1721
+    },
+    "KMDW-KMSY": {
+      "station_a": "KMDW",
+      "station_b": "KMSY",
+      "correlation": 0.0448,
+      "n_common": 1721
+    },
+    "KMDW-KNYC": {
+      "station_a": "KMDW",
+      "station_b": "KNYC",
+      "correlation": 0.0316,
+      "n_common": 1723
+    },
+    "KMDW-KOKC": {
+      "station_a": "KMDW",
+      "station_b": "KOKC",
+      "correlation": 0.0154,
+      "n_common": 1723
+    },
+    "KMDW-KPHL": {
+      "station_a": "KMDW",
+      "station_b": "KPHL",
+      "correlation": 0.5055,
+      "n_common": 1723
+    },
+    "KMDW-KPHX": {
+      "station_a": "KMDW",
+      "station_b": "KPHX",
+      "correlation": 0.1574,
+      "n_common": 1721
+    },
+    "KMDW-KSAT": {
+      "station_a": "KMDW",
+      "station_b": "KSAT",
+      "correlation": 0.1371,
+      "n_common": 1723
+    },
+    "KMDW-KSEA": {
+      "station_a": "KMDW",
+      "station_b": "KSEA",
+      "correlation": 0.0284,
+      "n_common": 1723
+    },
+    "KMDW-KSFO": {
+      "station_a": "KMDW",
+      "station_b": "KSFO",
+      "correlation": 0.0602,
+      "n_common": 1723
+    },
+    "KMIA-KMSP": {
+      "station_a": "KMIA",
+      "station_b": "KMSP",
+      "correlation": 0.2252,
+      "n_common": 1721
+    },
+    "KMIA-KMSY": {
+      "station_a": "KMIA",
+      "station_b": "KMSY",
+      "correlation": 0.2252,
+      "n_common": 1721
+    },
+    "KMIA-KNYC": {
+      "station_a": "KMIA",
+      "station_b": "KNYC",
+      "correlation": 0.2179,
+      "n_common": 1723
+    },
+    "KMIA-KOKC": {
+      "station_a": "KMIA",
+      "station_b": "KOKC",
+      "correlation": 0.0493,
+      "n_common": 1723
+    },
+    "KMIA-KPHL": {
+      "station_a": "KMIA",
+      "station_b": "KPHL",
+      "correlation": 0.4222,
+      "n_common": 1723
+    },
+    "KMIA-KPHX": {
+      "station_a": "KMIA",
+      "station_b": "KPHX",
+      "correlation": 0.1732,
+      "n_common": 1721
+    },
+    "KMIA-KSAT": {
+      "station_a": "KMIA",
+      "station_b": "KSAT",
+      "correlation": 0.4393,
+      "n_common": 1723
+    },
+    "KMIA-KSEA": {
+      "station_a": "KMIA",
+      "station_b": "KSEA",
+      "correlation": 0.0186,
+      "n_common": 1723
+    },
+    "KMIA-KSFO": {
+      "station_a": "KMIA",
+      "station_b": "KSFO",
+      "correlation": 0.234,
+      "n_common": 1723
+    },
+    "KMSP-KMSY": {
+      "station_a": "KMSP",
+      "station_b": "KMSY",
+      "correlation": 0.0029,
+      "n_common": 1721
+    },
+    "KMSP-KNYC": {
+      "station_a": "KMSP",
+      "station_b": "KNYC",
+      "correlation": 0.0282,
+      "n_common": 1721
+    },
+    "KMSP-KOKC": {
+      "station_a": "KMSP",
+      "station_b": "KOKC",
+      "correlation": 0.0024,
+      "n_common": 1721
+    },
+    "KMSP-KPHL": {
+      "station_a": "KMSP",
+      "station_b": "KPHL",
+      "correlation": 0.3832,
+      "n_common": 1721
+    },
+    "KMSP-KPHX": {
+      "station_a": "KMSP",
+      "station_b": "KPHX",
+      "correlation": 0.1328,
+      "n_common": 1721
+    },
+    "KMSP-KSAT": {
+      "station_a": "KMSP",
+      "station_b": "KSAT",
+      "correlation": 0.0081,
+      "n_common": 1721
+    },
+    "KMSP-KSEA": {
+      "station_a": "KMSP",
+      "station_b": "KSEA",
+      "correlation": 0.0216,
+      "n_common": 1721
+    },
+    "KMSP-KSFO": {
+      "station_a": "KMSP",
+      "station_b": "KSFO",
+      "correlation": 0.0352,
+      "n_common": 1721
+    },
+    "KMSY-KNYC": {
+      "station_a": "KMSY",
+      "station_b": "KNYC",
+      "correlation": 0.03,
+      "n_common": 1721
+    },
+    "KMSY-KOKC": {
+      "station_a": "KMSY",
+      "station_b": "KOKC",
+      "correlation": 0.0174,
+      "n_common": 1721
+    },
+    "KMSY-KPHL": {
+      "station_a": "KMSY",
+      "station_b": "KPHL",
+      "correlation": 0.2797,
+      "n_common": 1721
+    },
+    "KMSY-KPHX": {
+      "station_a": "KMSY",
+      "station_b": "KPHX",
+      "correlation": 0.1685,
+      "n_common": 1721
+    },
+    "KMSY-KSAT": {
+      "station_a": "KMSY",
+      "station_b": "KSAT",
+      "correlation": 0.1387,
+      "n_common": 1721
+    },
+    "KMSY-KSEA": {
+      "station_a": "KMSY",
+      "station_b": "KSEA",
+      "correlation": 0.2721,
+      "n_common": 1721
+    },
+    "KMSY-KSFO": {
+      "station_a": "KMSY",
+      "station_b": "KSFO",
+      "correlation": 0.213,
+      "n_common": 1721
+    },
+    "KNYC-KOKC": {
+      "station_a": "KNYC",
+      "station_b": "KOKC",
+      "correlation": 0.0364,
+      "n_common": 1723
+    },
+    "KNYC-KPHL": {
+      "station_a": "KNYC",
+      "station_b": "KPHL",
+      "correlation": 0.6547,
+      "n_common": 1723
+    },
+    "KNYC-KPHX": {
+      "station_a": "KNYC",
+      "station_b": "KPHX",
+      "correlation": 0.0322,
+      "n_common": 1721
+    },
+    "KNYC-KSAT": {
+      "station_a": "KNYC",
+      "station_b": "KSAT",
+      "correlation": 0.058,
+      "n_common": 1723
+    },
+    "KNYC-KSEA": {
+      "station_a": "KNYC",
+      "station_b": "KSEA",
+      "correlation": 0.0867,
+      "n_common": 1723
+    },
+    "KNYC-KSFO": {
+      "station_a": "KNYC",
+      "station_b": "KSFO",
+      "correlation": 0.1663,
+      "n_common": 1723
+    },
+    "KOKC-KPHL": {
+      "station_a": "KOKC",
+      "station_b": "KPHL",
+      "correlation": 0.0039,
+      "n_common": 1723
+    },
+    "KOKC-KPHX": {
+      "station_a": "KOKC",
+      "station_b": "KPHX",
+      "correlation": 0.8263,
+      "n_common": 1721
+    },
+    "KOKC-KSAT": {
+      "station_a": "KOKC",
+      "station_b": "KSAT",
+      "correlation": 0.1855,
+      "n_common": 1723
+    },
+    "KOKC-KSEA": {
+      "station_a": "KOKC",
+      "station_b": "KSEA",
+      "correlation": 0.0774,
+      "n_common": 1723
+    },
+    "KOKC-KSFO": {
+      "station_a": "KOKC",
+      "station_b": "KSFO",
+      "correlation": 0.6438,
+      "n_common": 1723
+    },
+    "KPHL-KPHX": {
+      "station_a": "KPHL",
+      "station_b": "KPHX",
+      "correlation": 0.1013,
+      "n_common": 1721
+    },
+    "KPHL-KSAT": {
+      "station_a": "KPHL",
+      "station_b": "KSAT",
+      "correlation": 0.1367,
+      "n_common": 1723
+    },
+    "KPHL-KSEA": {
+      "station_a": "KPHL",
+      "station_b": "KSEA",
+      "correlation": 0.0343,
+      "n_common": 1723
+    },
+    "KPHL-KSFO": {
+      "station_a": "KPHL",
+      "station_b": "KSFO",
+      "correlation": 0.1488,
+      "n_common": 1723
+    },
+    "KPHX-KSAT": {
+      "station_a": "KPHX",
+      "station_b": "KSAT",
+      "correlation": 0.1859,
+      "n_common": 1721
+    },
+    "KPHX-KSEA": {
+      "station_a": "KPHX",
+      "station_b": "KSEA",
+      "correlation": 0.1627,
+      "n_common": 1721
+    },
+    "KPHX-KSFO": {
+      "station_a": "KPHX",
+      "station_b": "KSFO",
+      "correlation": 0.6056,
+      "n_common": 1721
+    },
+    "KSAT-KSEA": {
+      "station_a": "KSAT",
+      "station_b": "KSEA",
+      "correlation": 0.0401,
+      "n_common": 1723
+    },
+    "KSAT-KSFO": {
+      "station_a": "KSAT",
+      "station_b": "KSFO",
+      "correlation": 0.2389,
+      "n_common": 1723
+    },
+    "KSEA-KSFO": {
+      "station_a": "KSEA",
+      "station_b": "KSFO",
+      "correlation": 0.0548,
+      "n_common": 1723
+    }
+  }
+}

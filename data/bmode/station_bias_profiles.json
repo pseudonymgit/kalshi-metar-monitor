@@ -1,0 +1,3482 @@
+{
+  "KATL": {
+    "station": "KATL",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 45.1,
+            "obs_count": 3684
+          }
+        ],
+        "avg_diurnal_range": 17.1,
+        "avg_wind_speed": 7.753515543973864,
+        "avg_pressure": 1020.0788551081903,
+        "settlement_bias": -8.56
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 52.1,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 18.9,
+        "avg_wind_speed": 7.7074060189123825,
+        "avg_pressure": 1019.7623097582809,
+        "settlement_bias": -9.47
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 58.4,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 20.1,
+        "avg_wind_speed": 7.999528645161138,
+        "avg_pressure": 1017.8241407307144,
+        "settlement_bias": -10.05
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 64.4,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 19.7,
+        "avg_wind_speed": 7.295231519999898,
+        "avg_pressure": 1017.3390878567438,
+        "settlement_bias": -9.86
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 71.5,
+            "obs_count": 3716
+          }
+        ],
+        "avg_diurnal_range": 17.2,
+        "avg_wind_speed": 7.044746079655392,
+        "avg_pressure": 1016.0235723951292,
+        "settlement_bias": -8.57
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 78.6,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 17.0,
+        "avg_wind_speed": 6.2064072864683295,
+        "avg_pressure": 1015.4376714245741,
+        "settlement_bias": -8.52
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 356.8,
+            "obs_count": 4551
+          }
+        ],
+        "avg_diurnal_range": 2261.4,
+        "avg_wind_speed": 6.654273387524539,
+        "avg_pressure": 1016.9580304653056,
+        "settlement_bias": -8.13
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 79.5,
+            "obs_count": 3574
+          }
+        ],
+        "avg_diurnal_range": 15.6,
+        "avg_wind_speed": 6.084425875769372,
+        "avg_pressure": 1016.5633061109555,
+        "settlement_bias": -7.82
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.5,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 15.8,
+        "avg_wind_speed": 6.447676783333325,
+        "avg_pressure": 1016.0860684357554,
+        "settlement_bias": -7.91
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.3,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 18.6,
+        "avg_wind_speed": 6.4193095215053475,
+        "avg_pressure": 1018.123600809169,
+        "settlement_bias": -9.28
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 55.9,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 17.5,
+        "avg_wind_speed": 7.273673794444439,
+        "avg_pressure": 1020.5693998604323,
+        "settlement_bias": -8.75
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 50.0,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 16.0,
+        "avg_wind_speed": 6.9234930215053545,
+        "avg_pressure": 1021.6996942934771,
+        "settlement_bias": -8.02
+      }
+    }
+  },
+  "KAUS": {
+    "station": "KAUS",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 49.7,
+            "obs_count": 3717
+          }
+        ],
+        "avg_diurnal_range": 23.5,
+        "avg_wind_speed": 6.245936617377141,
+        "avg_pressure": 1020.878229082048,
+        "settlement_bias": -11.74
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 52.5,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 23.8,
+        "avg_wind_speed": 7.611899413618736,
+        "avg_pressure": 1019.5040512362239,
+        "settlement_bias": -11.9
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 63.5,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 25.1,
+        "avg_wind_speed": 7.560478473298867,
+        "avg_pressure": 1015.1921138211386,
+        "settlement_bias": -12.54
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.1,
+            "obs_count": 3598
+          }
+        ],
+        "avg_diurnal_range": 22.3,
+        "avg_wind_speed": 7.929460832305026,
+        "avg_pressure": 1013.6016545148626,
+        "settlement_bias": -11.15
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 76.6,
+            "obs_count": 3717
+          }
+        ],
+        "avg_diurnal_range": 20.1,
+        "avg_wind_speed": 6.996924808707391,
+        "avg_pressure": 1011.5069723277271,
+        "settlement_bias": -10.06
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 83.1,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 21.2,
+        "avg_wind_speed": 6.595323834505988,
+        "avg_pressure": 1011.8452287946442,
+        "settlement_bias": -10.62
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 170.7,
+            "obs_count": 4491
+          }
+        ],
+        "avg_diurnal_range": 920.5,
+        "avg_wind_speed": 7.396198312523136,
+        "avg_pressure": 1014.6654362865205,
+        "settlement_bias": -10.62
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 85.5,
+            "obs_count": 3605
+          }
+        ],
+        "avg_diurnal_range": 23.4,
+        "avg_wind_speed": 5.368102010083971,
+        "avg_pressure": 1013.7286551339276,
+        "settlement_bias": -11.71
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 81.1,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 24.9,
+        "avg_wind_speed": 5.01043162412345,
+        "avg_pressure": 1013.322969675842,
+        "settlement_bias": -12.48
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.1,
+            "obs_count": 2966
+          }
+        ],
+        "avg_diurnal_range": 26.1,
+        "avg_wind_speed": 5.658073726129826,
+        "avg_pressure": 1016.0502876480537,
+        "settlement_bias": -13.04
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 60.0,
+            "obs_count": 2870
+          }
+        ],
+        "avg_diurnal_range": 22.2,
+        "avg_wind_speed": 5.647018776998628,
+        "avg_pressure": 1019.1255871012978,
+        "settlement_bias": -11.12
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.3,
+            "obs_count": 2975
+          }
+        ],
+        "avg_diurnal_range": 22.1,
+        "avg_wind_speed": 5.64468808108111,
+        "avg_pressure": 1019.41919294676,
+        "settlement_bias": -11.07
+      }
+    }
+  },
+  "KBOS": {
+    "station": "KBOS",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 31.8,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 11.5,
+        "avg_wind_speed": 10.342765887035977,
+        "avg_pressure": 1014.6492162162182,
+        "settlement_bias": -5.77
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 33.1,
+            "obs_count": 3380
+          }
+        ],
+        "avg_diurnal_range": 13.3,
+        "avg_wind_speed": 10.015924673572046,
+        "avg_pressure": 1017.4323397913568,
+        "settlement_bias": -6.67
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 41.4,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 14.4,
+        "avg_wind_speed": 10.864382123722393,
+        "avg_pressure": 1014.7985127095673,
+        "settlement_bias": -7.21
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 49.9,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 14.5,
+        "avg_wind_speed": 10.366336733333323,
+        "avg_pressure": 1014.6822315202254,
+        "settlement_bias": -7.25
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 59.7,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 15.2,
+        "avg_wind_speed": 9.513993652501357,
+        "avg_pressure": 1015.5861920172593,
+        "settlement_bias": -7.61
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.3,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 15.2,
+        "avg_wind_speed": 8.641340720000025,
+        "avg_pressure": 1013.6547227640008,
+        "settlement_bias": -7.59
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 569.8,
+            "obs_count": 4453
+          }
+        ],
+        "avg_diurnal_range": 2653.8,
+        "avg_wind_speed": 9.618860828033377,
+        "avg_pressure": 1014.0705050665018,
+        "settlement_bias": -7.22
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 73.2,
+            "obs_count": 3604
+          }
+        ],
+        "avg_diurnal_range": 13.8,
+        "avg_wind_speed": 8.010573269700282,
+        "avg_pressure": 1016.0311854951161,
+        "settlement_bias": -6.87
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 66.9,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 12.1,
+        "avg_wind_speed": 8.423509149999964,
+        "avg_pressure": 1017.0472435450109,
+        "settlement_bias": -6.06
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.8,
+            "obs_count": 2974
+          }
+        ],
+        "avg_diurnal_range": 12.9,
+        "avg_wind_speed": 8.524725353059873,
+        "avg_pressure": 1016.252700877787,
+        "settlement_bias": -6.44
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 46.6,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 13.3,
+        "avg_wind_speed": 9.67485615000007,
+        "avg_pressure": 1017.0308977035468,
+        "settlement_bias": -6.63
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 38.2,
+            "obs_count": 2972
+          }
+        ],
+        "avg_diurnal_range": 12.0,
+        "avg_wind_speed": 9.483087537012086,
+        "avg_pressure": 1018.9942392409329,
+        "settlement_bias": -5.98
+      }
+    }
+  },
+  "KDCA": {
+    "station": "KDCA",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 38.3,
+            "obs_count": 3711
+          }
+        ],
+        "avg_diurnal_range": 12.8,
+        "avg_wind_speed": 7.748593569388208,
+        "avg_pressure": 1018.1660098522159,
+        "settlement_bias": -6.38
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 42.0,
+            "obs_count": 3382
+          }
+        ],
+        "avg_diurnal_range": 15.7,
+        "avg_wind_speed": 7.909911432288443,
+        "avg_pressure": 1019.5788919000275,
+        "settlement_bias": -7.82
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 50.9,
+            "obs_count": 3717
+          }
+        ],
+        "avg_diurnal_range": 18.4,
+        "avg_wind_speed": 8.640510113085536,
+        "avg_pressure": 1017.2101227830823,
+        "settlement_bias": -9.19
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 59.6,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 18.2,
+        "avg_wind_speed": 8.29353729813833,
+        "avg_pressure": 1016.0593105397003,
+        "settlement_bias": -9.07
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 66.6,
+            "obs_count": 3717
+          }
+        ],
+        "avg_diurnal_range": 16.6,
+        "avg_wind_speed": 7.047283579967601,
+        "avg_pressure": 1016.0219858156045,
+        "settlement_bias": -8.3
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 76.3,
+            "obs_count": 3591
+          }
+        ],
+        "avg_diurnal_range": 16.7,
+        "avg_wind_speed": 7.2059687402452255,
+        "avg_pressure": 1014.6437641083544,
+        "settlement_bias": -8.37
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 182.3,
+            "obs_count": 4527
+          }
+        ],
+        "avg_diurnal_range": 540.8,
+        "avg_wind_speed": 7.485765013333234,
+        "avg_pressure": 1014.9885888456207,
+        "settlement_bias": -7.67
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 78.5,
+            "obs_count": 3602
+          }
+        ],
+        "avg_diurnal_range": 15.2,
+        "avg_wind_speed": 6.432161701749442,
+        "avg_pressure": 1016.5251766035597,
+        "settlement_bias": -7.61
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.5,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 15.0,
+        "avg_wind_speed": 6.744631919416442,
+        "avg_pressure": 1017.2868765475773,
+        "settlement_bias": -7.5
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.1,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 16.3,
+        "avg_wind_speed": 6.546547435483811,
+        "avg_pressure": 1017.5488956846758,
+        "settlement_bias": -8.15
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 51.2,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 16.5,
+        "avg_wind_speed": 6.761332478442271,
+        "avg_pressure": 1020.3348023784534,
+        "settlement_bias": -8.23
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 43.6,
+            "obs_count": 2975
+          }
+        ],
+        "avg_diurnal_range": 14.4,
+        "avg_wind_speed": 6.306470351596596,
+        "avg_pressure": 1021.1757586089327,
+        "settlement_bias": -7.21
+      }
+    }
+  },
+  "KDEN": {
+    "station": "KDEN",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 28.5,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 22.7,
+        "avg_wind_speed": 7.889878780317179,
+        "avg_pressure": 1018.1054486310651,
+        "settlement_bias": -11.35
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 30.8,
+            "obs_count": 3382
+          }
+        ],
+        "avg_diurnal_range": 25.0,
+        "avg_wind_speed": 8.627327484328724,
+        "avg_pressure": 1015.7025441484586,
+        "settlement_bias": -12.52
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 40.4,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 26.8,
+        "avg_wind_speed": 9.256727194833084,
+        "avg_pressure": 1012.0353917301429,
+        "settlement_bias": -13.41
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 48.5,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 29.2,
+        "avg_wind_speed": 9.576601281423747,
+        "avg_pressure": 1011.2777746557998,
+        "settlement_bias": -14.59
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.2,
+            "obs_count": 3714
+          }
+        ],
+        "avg_diurnal_range": 25.9,
+        "avg_wind_speed": 9.081706337732216,
+        "avg_pressure": 1010.6829155313342,
+        "settlement_bias": -12.93
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.6,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 28.2,
+        "avg_wind_speed": 8.577288649972148,
+        "avg_pressure": 1010.0773876404479,
+        "settlement_bias": -14.08
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 579.4,
+            "obs_count": 4172
+          }
+        ],
+        "avg_diurnal_range": 2539.6,
+        "avg_wind_speed": 8.747015871060832,
+        "avg_pressure": 1013.646852535388,
+        "settlement_bias": -14.28
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.4,
+            "obs_count": 3607
+          }
+        ],
+        "avg_diurnal_range": 27.3,
+        "avg_wind_speed": 8.447251347596527,
+        "avg_pressure": 1013.2207388748947,
+        "settlement_bias": -13.64
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 68.6,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 29.4,
+        "avg_wind_speed": 8.156220166898468,
+        "avg_pressure": 1012.9129020979035,
+        "settlement_bias": -14.71
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 54.4,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 28.0,
+        "avg_wind_speed": 8.069059522689034,
+        "avg_pressure": 1014.5649170335244,
+        "settlement_bias": -14.0
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 40.7,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 25.5,
+        "avg_wind_speed": 8.165478357763075,
+        "avg_pressure": 1016.4374250440926,
+        "settlement_bias": -12.77
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 36.4,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 26.1,
+        "avg_wind_speed": 8.747737374117596,
+        "avg_pressure": 1014.4998988195624,
+        "settlement_bias": -13.06
+      }
+    }
+  },
+  "KDFW": {
+    "station": "KDFW",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 46.0,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 20.5,
+        "avg_wind_speed": 9.207465037116664,
+        "avg_pressure": 1020.0028679653688,
+        "settlement_bias": -10.26
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 49.0,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 21.8,
+        "avg_wind_speed": 10.08504860992906,
+        "avg_pressure": 1018.8585387585405,
+        "settlement_bias": -10.91
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 61.0,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 21.6,
+        "avg_wind_speed": 10.674389800968202,
+        "avg_pressure": 1014.505328644847,
+        "settlement_bias": -10.81
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 67.3,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 19.4,
+        "avg_wind_speed": 10.927890511111064,
+        "avg_pressure": 1013.3898404701931,
+        "settlement_bias": -9.7
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.9,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 17.9,
+        "avg_wind_speed": 9.117440658241376,
+        "avg_pressure": 1011.5709528965862,
+        "settlement_bias": -8.93
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 83.5,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 17.9,
+        "avg_wind_speed": 8.790812510141738,
+        "avg_pressure": 1011.6485507246375,
+        "settlement_bias": -8.94
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 181.4,
+            "obs_count": 4480
+          }
+        ],
+        "avg_diurnal_range": 776.3,
+        "avg_wind_speed": 10.30159040286601,
+        "avg_pressure": 1014.0467810648466,
+        "settlement_bias": -9.33
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 87.8,
+            "obs_count": 3605
+          }
+        ],
+        "avg_diurnal_range": 18.7,
+        "avg_wind_speed": 7.930370992230765,
+        "avg_pressure": 1013.5108671484153,
+        "settlement_bias": -9.34
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 81.1,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 20.0,
+        "avg_wind_speed": 6.970933199860951,
+        "avg_pressure": 1013.6661533076671,
+        "settlement_bias": -10.02
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 71.4,
+            "obs_count": 2975
+          }
+        ],
+        "avg_diurnal_range": 20.7,
+        "avg_wind_speed": 8.733283305518158,
+        "avg_pressure": 1015.7376988155675,
+        "settlement_bias": -10.33
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.9,
+            "obs_count": 2878
+          }
+        ],
+        "avg_diurnal_range": 19.0,
+        "avg_wind_speed": 8.173178540653169,
+        "avg_pressure": 1018.618178646196,
+        "settlement_bias": -9.52
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 54.2,
+            "obs_count": 2968
+          }
+        ],
+        "avg_diurnal_range": 19.0,
+        "avg_wind_speed": 8.409072797843601,
+        "avg_pressure": 1018.4078564172023,
+        "settlement_bias": -9.51
+      }
+    }
+  },
+  "KHOU": {
+    "station": "KHOU",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 53.3,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 18.7,
+        "avg_wind_speed": 7.145963419354764,
+        "avg_pressure": 1020.5466396761158,
+        "settlement_bias": -9.34
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 56.8,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 19.4,
+        "avg_wind_speed": 7.604469810874628,
+        "avg_pressure": 1019.3550118623972,
+        "settlement_bias": -9.7
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.5,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 20.1,
+        "avg_wind_speed": 7.9515548007528105,
+        "avg_pressure": 1015.9696144513347,
+        "settlement_bias": -10.04
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 71.2,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 17.5,
+        "avg_wind_speed": 8.834182988607905,
+        "avg_pressure": 1014.7822710826621,
+        "settlement_bias": -8.74
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 77.9,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 15.9,
+        "avg_wind_speed": 7.6994875354837955,
+        "avg_pressure": 1012.8469508904461,
+        "settlement_bias": -7.97
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 83.9,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 16.9,
+        "avg_wind_speed": 6.2527933244444,
+        "avg_pressure": 1013.1866834875264,
+        "settlement_bias": -8.46
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 175.3,
+            "obs_count": 4499
+          }
+        ],
+        "avg_diurnal_range": 875.6,
+        "avg_wind_speed": 6.460453862239124,
+        "avg_pressure": 1015.6705737417005,
+        "settlement_bias": -8.48
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 86.1,
+            "obs_count": 3606
+          }
+        ],
+        "avg_diurnal_range": 18.2,
+        "avg_wind_speed": 5.371758176372642,
+        "avg_pressure": 1014.7628316112811,
+        "settlement_bias": -9.1
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 80.9,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 19.9,
+        "avg_wind_speed": 5.373478646752378,
+        "avg_pressure": 1013.9120334844793,
+        "settlement_bias": -9.93
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.9,
+            "obs_count": 2975
+          }
+        ],
+        "avg_diurnal_range": 21.0,
+        "avg_wind_speed": 6.136196501512584,
+        "avg_pressure": 1016.6420892494951,
+        "settlement_bias": -10.5
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.7,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 18.6,
+        "avg_wind_speed": 6.278738188888891,
+        "avg_pressure": 1019.228367560039,
+        "settlement_bias": -9.3
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 60.3,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 17.5,
+        "avg_wind_speed": 6.346653934789878,
+        "avg_pressure": 1019.7439393939438,
+        "settlement_bias": -8.73
+      }
+    }
+  },
+  "KLAS": {
+    "station": "KLAS",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 48.4,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 17.6,
+        "avg_wind_speed": 5.1963615251411035,
+        "avg_pressure": 1019.753557951482,
+        "settlement_bias": -8.83
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 53.2,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 19.2,
+        "avg_wind_speed": 6.292693164496965,
+        "avg_pressure": 1017.0509629629638,
+        "settlement_bias": -9.62
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 58.3,
+            "obs_count": 3711
+          }
+        ],
+        "avg_diurnal_range": 19.4,
+        "avg_wind_speed": 7.482499985979912,
+        "avg_pressure": 1013.6153450608965,
+        "settlement_bias": -9.67
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.4,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 22.6,
+        "avg_wind_speed": 7.520332523676737,
+        "avg_pressure": 1010.8642337807609,
+        "settlement_bias": -11.29
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 79.1,
+            "obs_count": 3714
+          }
+        ],
+        "avg_diurnal_range": 22.0,
+        "avg_wind_speed": 7.2965692558766495,
+        "avg_pressure": 1008.2097289972894,
+        "settlement_bias": -10.98
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 90.3,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 22.4,
+        "avg_wind_speed": 7.051142919520911,
+        "avg_pressure": 1006.7957363253881,
+        "settlement_bias": -11.18
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 213.7,
+            "obs_count": 4451
+          }
+        ],
+        "avg_diurnal_range": 1364.7,
+        "avg_wind_speed": 7.677657160787143,
+        "avg_pressure": 1008.9029035286061,
+        "settlement_bias": -10.72
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 92.6,
+            "obs_count": 3605
+          }
+        ],
+        "avg_diurnal_range": 19.9,
+        "avg_wind_speed": 6.0189944881976585,
+        "avg_pressure": 1009.7702377622377,
+        "settlement_bias": -9.97
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 85.4,
+            "obs_count": 2877
+          }
+        ],
+        "avg_diurnal_range": 21.6,
+        "avg_wind_speed": 5.163791290997937,
+        "avg_pressure": 1009.9639538945163,
+        "settlement_bias": -10.79
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.2,
+            "obs_count": 2975
+          }
+        ],
+        "avg_diurnal_range": 21.2,
+        "avg_wind_speed": 5.055358432323264,
+        "avg_pressure": 1013.3772374197919,
+        "settlement_bias": -10.58
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.2,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 19.2,
+        "avg_wind_speed": 5.394291176634244,
+        "avg_pressure": 1018.0519498607222,
+        "settlement_bias": -9.58
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 50.8,
+            "obs_count": 2959
+          }
+        ],
+        "avg_diurnal_range": 17.6,
+        "avg_wind_speed": 4.000342575194343,
+        "avg_pressure": 1018.4621273712759,
+        "settlement_bias": -8.81
+      }
+    }
+  },
+  "KLAX": {
+    "station": "KLAX",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 56.7,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 15.7,
+        "avg_wind_speed": 5.408307510621067,
+        "avg_pressure": 1018.6715290933685,
+        "settlement_bias": -7.85
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.0,
+            "obs_count": 3382
+          }
+        ],
+        "avg_diurnal_range": 14.7,
+        "avg_wind_speed": 6.297616151434426,
+        "avg_pressure": 1017.6431055155884,
+        "settlement_bias": -7.36
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.0,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 12.8,
+        "avg_wind_speed": 7.454017479967645,
+        "avg_pressure": 1016.9810181424328,
+        "settlement_bias": -6.4
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 59.7,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 12.2,
+        "avg_wind_speed": 7.292885618014966,
+        "avg_pressure": 1015.4486750348691,
+        "settlement_bias": -6.09
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 61.7,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 9.3,
+        "avg_wind_speed": 7.059934863905268,
+        "avg_pressure": 1014.1391928494043,
+        "settlement_bias": -4.63
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.0,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 9.3,
+        "avg_wind_speed": 6.972114974159417,
+        "avg_pressure": 1012.5233929569612,
+        "settlement_bias": -4.68
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 68.0,
+            "obs_count": 4494
+          }
+        ],
+        "avg_diurnal_range": 10.0,
+        "avg_wind_speed": 8.592645944872997,
+        "avg_pressure": 1013.6215469228055,
+        "settlement_bias": -4.84
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.7,
+            "obs_count": 3608
+          }
+        ],
+        "avg_diurnal_range": 10.3,
+        "avg_wind_speed": 6.699729024390169,
+        "avg_pressure": 1012.9169033695341,
+        "settlement_bias": -5.13
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.8,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 11.0,
+        "avg_wind_speed": 6.530694949999997,
+        "avg_pressure": 1012.143664921467,
+        "settlement_bias": -5.48
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.9,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 12.8,
+        "avg_wind_speed": 5.74412558064517,
+        "avg_pressure": 1014.0747457627112,
+        "settlement_bias": -6.4
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 61.6,
+            "obs_count": 2877
+          }
+        ],
+        "avg_diurnal_range": 16.5,
+        "avg_wind_speed": 5.258164899548171,
+        "avg_pressure": 1017.0010854341728,
+        "settlement_bias": -8.27
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 57.2,
+            "obs_count": 2964
+          }
+        ],
+        "avg_diurnal_range": 13.4,
+        "avg_wind_speed": 5.0512277110061055,
+        "avg_pressure": 1018.1450766609915,
+        "settlement_bias": -6.72
+      }
+    }
+  },
+  "KMDW": {
+    "station": "KMDW",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 27.6,
+            "obs_count": 3714
+          }
+        ],
+        "avg_diurnal_range": 10.8,
+        "avg_wind_speed": 9.173260445880489,
+        "avg_pressure": 1019.4087442113856,
+        "settlement_bias": -5.4
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 30.8,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 15.1,
+        "avg_wind_speed": 9.497301243498775,
+        "avg_pressure": 1019.6927445732963,
+        "settlement_bias": -7.56
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 43.2,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 17.1,
+        "avg_wind_speed": 10.118052976344119,
+        "avg_pressure": 1015.8815064794832,
+        "settlement_bias": -8.54
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 52.0,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 17.6,
+        "avg_wind_speed": 9.760776577777767,
+        "avg_pressure": 1014.5565995525724,
+        "settlement_bias": -8.78
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.9,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 18.0,
+        "avg_wind_speed": 8.488258094623609,
+        "avg_pressure": 1014.9331265173984,
+        "settlement_bias": -9.0
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.5,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 18.1,
+        "avg_wind_speed": 8.094994485134722,
+        "avg_pressure": 1012.7399552947713,
+        "settlement_bias": -9.06
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 190.3,
+            "obs_count": 4475
+          }
+        ],
+        "avg_diurnal_range": 1167.4,
+        "avg_wind_speed": 8.489030352103892,
+        "avg_pressure": 1014.4905837431645,
+        "settlement_bias": -7.64
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 76.2,
+            "obs_count": 3605
+          }
+        ],
+        "avg_diurnal_range": 15.0,
+        "avg_wind_speed": 7.299971382907797,
+        "avg_pressure": 1015.540016825575,
+        "settlement_bias": -7.52
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 70.5,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 16.2,
+        "avg_wind_speed": 7.370663311111073,
+        "avg_pressure": 1016.1160987482608,
+        "settlement_bias": -8.09
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 58.6,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 15.4,
+        "avg_wind_speed": 8.240091908602128,
+        "avg_pressure": 1016.3199325463723,
+        "settlement_bias": -7.72
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 44.2,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 14.1,
+        "avg_wind_speed": 8.912631308093122,
+        "avg_pressure": 1018.6639160839154,
+        "settlement_bias": -7.05
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 36.0,
+            "obs_count": 2957
+          }
+        ],
+        "avg_diurnal_range": 11.4,
+        "avg_wind_speed": 8.933972783226194,
+        "avg_pressure": 1018.3127384196209,
+        "settlement_bias": -5.7
+      }
+    }
+  },
+  "KMIA": {
+    "station": "KMIA",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 69.1,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 13.8,
+        "avg_wind_speed": 6.164615166621699,
+        "avg_pressure": 1019.4017008639305,
+        "settlement_bias": -6.89
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.9,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 12.4,
+        "avg_wind_speed": 7.0207705136094125,
+        "avg_pressure": 1019.0062165377765,
+        "settlement_bias": -6.2
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.9,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 12.8,
+        "avg_wind_speed": 7.765740135556718,
+        "avg_pressure": 1017.7812990527734,
+        "settlement_bias": -6.4
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 77.3,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 11.7,
+        "avg_wind_speed": 8.350779896522962,
+        "avg_pressure": 1017.0551367950876,
+        "settlement_bias": -5.87
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 81.3,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 11.6,
+        "avg_wind_speed": 7.358090714016674,
+        "avg_pressure": 1015.7433207138998,
+        "settlement_bias": -5.8
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 82.5,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 11.3,
+        "avg_wind_speed": 6.40110026592489,
+        "avg_pressure": 1015.8521166246123,
+        "settlement_bias": -5.68
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 260.1,
+            "obs_count": 4474
+          }
+        ],
+        "avg_diurnal_range": 1659.0,
+        "avg_wind_speed": 6.495902146660474,
+        "avg_pressure": 1017.8015843457866,
+        "settlement_bias": -5.54
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 84.9,
+            "obs_count": 3605
+          }
+        ],
+        "avg_diurnal_range": 11.3,
+        "avg_wind_speed": 6.0646944790451345,
+        "avg_pressure": 1015.9960515261815,
+        "settlement_bias": -5.66
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 83.2,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 12.1,
+        "avg_wind_speed": 4.834777826026466,
+        "avg_pressure": 1013.8210822206582,
+        "settlement_bias": -6.04
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 80.4,
+            "obs_count": 2975
+          }
+        ],
+        "avg_diurnal_range": 10.6,
+        "avg_wind_speed": 6.153292841963704,
+        "avg_pressure": 1014.462288993924,
+        "settlement_bias": -5.29
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 76.3,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 11.1,
+        "avg_wind_speed": 6.643005705555532,
+        "avg_pressure": 1016.3238062042527,
+        "settlement_bias": -5.57
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.3,
+            "obs_count": 2960
+          }
+        ],
+        "avg_diurnal_range": 12.0,
+        "avg_wind_speed": 6.262585432148903,
+        "avg_pressure": 1019.2307979626462,
+        "settlement_bias": -5.99
+      }
+    }
+  },
+  "KMSP": {
+    "station": "KMSP",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 18.4,
+            "obs_count": 3628
+          }
+        ],
+        "avg_diurnal_range": 13.1,
+        "avg_wind_speed": 7.597263964718792,
+        "avg_pressure": 1019.6695725062871,
+        "settlement_bias": -6.56
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 20.0,
+            "obs_count": 3318
+          }
+        ],
+        "avg_diurnal_range": 16.3,
+        "avg_wind_speed": 8.017490522001122,
+        "avg_pressure": 1019.8339323789223,
+        "settlement_bias": -8.14
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 34.8,
+            "obs_count": 3016
+          }
+        ],
+        "avg_diurnal_range": 16.7,
+        "avg_wind_speed": 8.885204986737357,
+        "avg_pressure": 1015.8322386058929,
+        "settlement_bias": -8.35
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 47.3,
+            "obs_count": 2583
+          }
+        ],
+        "avg_diurnal_range": 16.9,
+        "avg_wind_speed": 9.97805230840756,
+        "avg_pressure": 1013.9044383346422,
+        "settlement_bias": -8.47
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.5,
+            "obs_count": 2925
+          }
+        ],
+        "avg_diurnal_range": 19.6,
+        "avg_wind_speed": 8.105580203760573,
+        "avg_pressure": 1013.7554674025497,
+        "settlement_bias": -9.78
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 72.3,
+            "obs_count": 3030
+          }
+        ],
+        "avg_diurnal_range": 18.3,
+        "avg_wind_speed": 7.696977284015767,
+        "avg_pressure": 1011.5046225473873,
+        "settlement_bias": -9.15
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 418.6,
+            "obs_count": 3479
+          }
+        ],
+        "avg_diurnal_range": 734.9,
+        "avg_wind_speed": 7.514115513523032,
+        "avg_pressure": 1014.6421791894037,
+        "settlement_bias": -8.63
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 73.1,
+            "obs_count": 2662
+          }
+        ],
+        "avg_diurnal_range": 16.5,
+        "avg_wind_speed": 7.192427147688819,
+        "avg_pressure": 1015.6908746686858,
+        "settlement_bias": -8.24
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 68.7,
+            "obs_count": 1857
+          }
+        ],
+        "avg_diurnal_range": 18.4,
+        "avg_wind_speed": 7.237323511039345,
+        "avg_pressure": 1015.7512723335147,
+        "settlement_bias": -9.19
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 54.0,
+            "obs_count": 2069
+          }
+        ],
+        "avg_diurnal_range": 16.8,
+        "avg_wind_speed": 7.9788572179797415,
+        "avg_pressure": 1015.8850535540429,
+        "settlement_bias": -8.39
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 37.4,
+            "obs_count": 2711
+          }
+        ],
+        "avg_diurnal_range": 13.6,
+        "avg_wind_speed": 8.308607439321275,
+        "avg_pressure": 1016.9036046079536,
+        "settlement_bias": -6.78
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 25.7,
+            "obs_count": 2882
+          }
+        ],
+        "avg_diurnal_range": 12.5,
+        "avg_wind_speed": 7.98930380569046,
+        "avg_pressure": 1017.4007795889455,
+        "settlement_bias": -6.26
+      }
+    }
+  },
+  "KMSY": {
+    "station": "KMSY",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 54.3,
+            "obs_count": 3713
+          }
+        ],
+        "avg_diurnal_range": 16.5,
+        "avg_wind_speed": 7.530939148247935,
+        "avg_pressure": 1021.059035159444,
+        "settlement_bias": -8.24
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 59.1,
+            "obs_count": 3364
+          }
+        ],
+        "avg_diurnal_range": 16.7,
+        "avg_wind_speed": 7.578085101725104,
+        "avg_pressure": 1020.0409118357462,
+        "settlement_bias": -8.38
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 66.0,
+            "obs_count": 3709
+          }
+        ],
+        "avg_diurnal_range": 16.3,
+        "avg_wind_speed": 8.075013478683145,
+        "avg_pressure": 1017.5637035010941,
+        "settlement_bias": -8.14
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 71.4,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 14.4,
+        "avg_wind_speed": 8.229102701861576,
+        "avg_pressure": 1016.7827392646669,
+        "settlement_bias": -7.2
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 78.6,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 13.8,
+        "avg_wind_speed": 6.9591773021253145,
+        "avg_pressure": 1014.9524905251754,
+        "settlement_bias": -6.89
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 83.6,
+            "obs_count": 3595
+          }
+        ],
+        "avg_diurnal_range": 13.9,
+        "avg_wind_speed": 5.732136919565725,
+        "avg_pressure": 1014.7507445911784,
+        "settlement_bias": -6.93
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 243.4,
+            "obs_count": 4478
+          }
+        ],
+        "avg_diurnal_range": 1105.2,
+        "avg_wind_speed": 5.455031643151985,
+        "avg_pressure": 1016.8910215409938,
+        "settlement_bias": -6.74
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 84.9,
+            "obs_count": 3562
+          }
+        ],
+        "avg_diurnal_range": 14.3,
+        "avg_wind_speed": 4.9609417707864765,
+        "avg_pressure": 1015.6257078142665,
+        "settlement_bias": -7.16
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 80.7,
+            "obs_count": 2878
+          }
+        ],
+        "avg_diurnal_range": 13.5,
+        "avg_wind_speed": 5.4171271179130756,
+        "avg_pressure": 1014.4466971187605,
+        "settlement_bias": -6.72
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 73.1,
+            "obs_count": 2973
+          }
+        ],
+        "avg_diurnal_range": 15.5,
+        "avg_wind_speed": 6.1772005274133805,
+        "avg_pressure": 1017.3409044886923,
+        "settlement_bias": -7.75
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 64.3,
+            "obs_count": 2877
+          }
+        ],
+        "avg_diurnal_range": 13.9,
+        "avg_wind_speed": 6.6905675104311495,
+        "avg_pressure": 1019.7938746937359,
+        "settlement_bias": -6.93
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 60.1,
+            "obs_count": 2958
+          }
+        ],
+        "avg_diurnal_range": 14.7,
+        "avg_wind_speed": 6.383851818796478,
+        "avg_pressure": 1021.0800205973184,
+        "settlement_bias": -7.34
+      }
+    }
+  },
+  "KNYC": {
+    "station": "KNYC",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 36.2,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 9.6,
+        "avg_wind_speed": 10.612435782678789,
+        "avg_pressure": 1016.0343995662809,
+        "settlement_bias": -4.8
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 37.5,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 12.4,
+        "avg_wind_speed": 9.972691900709137,
+        "avg_pressure": 1018.4134569377966,
+        "settlement_bias": -6.18
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 45.4,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 14.5,
+        "avg_wind_speed": 10.823236290478702,
+        "avg_pressure": 1015.8662496600475,
+        "settlement_bias": -7.23
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 53.9,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 14.9,
+        "avg_wind_speed": 9.946692472353401,
+        "avg_pressure": 1015.162961926091,
+        "settlement_bias": -7.46
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 63.2,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 15.1,
+        "avg_wind_speed": 8.713880866899649,
+        "avg_pressure": 1015.5826949198577,
+        "settlement_bias": -7.53
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 73.1,
+            "obs_count": 3598
+          }
+        ],
+        "avg_diurnal_range": 14.9,
+        "avg_wind_speed": 8.221503155086104,
+        "avg_pressure": 1013.9503921568619,
+        "settlement_bias": -7.44
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 101.4,
+            "obs_count": 4240
+          }
+        ],
+        "avg_diurnal_range": 427.8,
+        "avg_wind_speed": 7.266367514408775,
+        "avg_pressure": 1014.3478130661904,
+        "settlement_bias": -6.83
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 77.1,
+            "obs_count": 3604
+          }
+        ],
+        "avg_diurnal_range": 12.5,
+        "avg_wind_speed": 7.827961831806794,
+        "avg_pressure": 1015.9632373497323,
+        "settlement_bias": -6.27
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 70.7,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 11.8,
+        "avg_wind_speed": 8.673617984022234,
+        "avg_pressure": 1016.9297864893252,
+        "settlement_bias": -5.92
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 61.6,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 12.1,
+        "avg_wind_speed": 8.190533896435783,
+        "avg_pressure": 1016.393830947514,
+        "settlement_bias": -6.07
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 50.3,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 11.6,
+        "avg_wind_speed": 9.276552725251877,
+        "avg_pressure": 1018.5005586592156,
+        "settlement_bias": -5.79
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 41.7,
+            "obs_count": 2969
+          }
+        ],
+        "avg_diurnal_range": 10.0,
+        "avg_wind_speed": 9.516959455708982,
+        "avg_pressure": 1019.886850152907,
+        "settlement_bias": -5.02
+      }
+    }
+  },
+  "KOKC": {
+    "station": "KOKC",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 37.1,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 21.7,
+        "avg_wind_speed": 9.754019726734718,
+        "avg_pressure": 1020.3522022838499,
+        "settlement_bias": -10.83
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 39.9,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 23.7,
+        "avg_wind_speed": 10.735809938534238,
+        "avg_pressure": 1019.2603412152088,
+        "settlement_bias": -11.84
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 53.0,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 24.4,
+        "avg_wind_speed": 11.865322811625388,
+        "avg_pressure": 1014.1798449612386,
+        "settlement_bias": -12.23
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 60.5,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 22.8,
+        "avg_wind_speed": 12.006912751528576,
+        "avg_pressure": 1013.4983422309642,
+        "settlement_bias": -11.38
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 68.6,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 18.9,
+        "avg_wind_speed": 9.406971027201587,
+        "avg_pressure": 1012.0885348583874,
+        "settlement_bias": -9.47
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 77.6,
+            "obs_count": 3598
+          }
+        ],
+        "avg_diurnal_range": 20.0,
+        "avg_wind_speed": 8.652602285396322,
+        "avg_pressure": 1012.0573678290218,
+        "settlement_bias": -9.99
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 233.5,
+            "obs_count": 4484
+          }
+        ],
+        "avg_diurnal_range": 1113.0,
+        "avg_wind_speed": 8.937082967266077,
+        "avg_pressure": 1014.4015117668271,
+        "settlement_bias": -10.78
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 81.8,
+            "obs_count": 3606
+          }
+        ],
+        "avg_diurnal_range": 22.4,
+        "avg_wind_speed": 8.226691470147156,
+        "avg_pressure": 1014.274846796657,
+        "settlement_bias": -11.2
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 75.7,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 24.6,
+        "avg_wind_speed": 7.9962294111921635,
+        "avg_pressure": 1014.4611130434798,
+        "settlement_bias": -12.32
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 64.3,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 23.5,
+        "avg_wind_speed": 9.441769928067112,
+        "avg_pressure": 1016.1653274814306,
+        "settlement_bias": -11.75
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 50.4,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 21.5,
+        "avg_wind_speed": 9.367296766932823,
+        "avg_pressure": 1018.8097826086934,
+        "settlement_bias": -10.76
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 45.1,
+            "obs_count": 2951
+          }
+        ],
+        "avg_diurnal_range": 21.7,
+        "avg_wind_speed": 9.46683026440674,
+        "avg_pressure": 1018.322146040453,
+        "settlement_bias": -10.83
+      }
+    }
+  },
+  "KPHL": {
+    "station": "KPHL",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 35.9,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 12.1,
+        "avg_wind_speed": 8.492513998384807,
+        "avg_pressure": 1017.2741725447645,
+        "settlement_bias": -6.04
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 38.7,
+            "obs_count": 3380
+          }
+        ],
+        "avg_diurnal_range": 14.8,
+        "avg_wind_speed": 8.106790471005771,
+        "avg_pressure": 1019.1276551312675,
+        "settlement_bias": -7.41
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 47.5,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 18.2,
+        "avg_wind_speed": 9.152507935483769,
+        "avg_pressure": 1016.6657823497573,
+        "settlement_bias": -9.08
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 56.2,
+            "obs_count": 3598
+          }
+        ],
+        "avg_diurnal_range": 18.2,
+        "avg_wind_speed": 8.791851095052708,
+        "avg_pressure": 1015.7142937062936,
+        "settlement_bias": -9.11
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 64.8,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 18.3,
+        "avg_wind_speed": 7.425322450120901,
+        "avg_pressure": 1015.8967497291462,
+        "settlement_bias": -9.13
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.4,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 17.5,
+        "avg_wind_speed": 7.23662936447032,
+        "avg_pressure": 1014.4825770308123,
+        "settlement_bias": -8.76
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 218.7,
+            "obs_count": 4543
+          }
+        ],
+        "avg_diurnal_range": 1552.3,
+        "avg_wind_speed": 7.2861299419059256,
+        "avg_pressure": 1014.6718524137806,
+        "settlement_bias": -7.83
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 77.6,
+            "obs_count": 3605
+          }
+        ],
+        "avg_diurnal_range": 15.4,
+        "avg_wind_speed": 6.568010987791233,
+        "avg_pressure": 1016.3471771939637,
+        "settlement_bias": -7.72
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 71.1,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 15.2,
+        "avg_wind_speed": 7.028196499999993,
+        "avg_pressure": 1017.1793767506967,
+        "settlement_bias": -7.61
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 60.8,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 16.4,
+        "avg_wind_speed": 6.804876978494592,
+        "avg_pressure": 1016.9982408660345,
+        "settlement_bias": -8.2
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 49.3,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 16.2,
+        "avg_wind_speed": 7.501237374088201,
+        "avg_pressure": 1019.5435253054135,
+        "settlement_bias": -8.1
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 41.7,
+            "obs_count": 2949
+          }
+        ],
+        "avg_diurnal_range": 13.7,
+        "avg_wind_speed": 7.15654786300436,
+        "avg_pressure": 1020.6699931647299,
+        "settlement_bias": -6.85
+      }
+    }
+  },
+  "KPHX": {
+    "station": "KPHX",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 55.4,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 21.1,
+        "avg_wind_speed": 4.747372917944564,
+        "avg_pressure": 1017.1782679296344,
+        "settlement_bias": -10.57
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 60.6,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 23.3,
+        "avg_wind_speed": 5.522447716228135,
+        "avg_pressure": 1014.9247921615205,
+        "settlement_bias": -11.64
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.0,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 23.3,
+        "avg_wind_speed": 6.076408288326944,
+        "avg_pressure": 1012.9180438905447,
+        "settlement_bias": -11.67
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 75.6,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 25.8,
+        "avg_wind_speed": 6.273478727474836,
+        "avg_pressure": 1009.7000842223483,
+        "settlement_bias": -12.91
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 84.2,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 25.0,
+        "avg_wind_speed": 6.665709843084245,
+        "avg_pressure": 1007.4674260916748,
+        "settlement_bias": -12.5
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 94.3,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 24.2,
+        "avg_wind_speed": 6.572105186751952,
+        "avg_pressure": 1006.0305532153889,
+        "settlement_bias": -12.12
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 277.8,
+            "obs_count": 4475
+          }
+        ],
+        "avg_diurnal_range": 1818.8,
+        "avg_wind_speed": 7.612476638093392,
+        "avg_pressure": 1008.4156232829031,
+        "settlement_bias": -10.35
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 96.2,
+            "obs_count": 3565
+          }
+        ],
+        "avg_diurnal_range": 20.2,
+        "avg_wind_speed": 6.393880224592822,
+        "avg_pressure": 1008.4299914796908,
+        "settlement_bias": -10.11
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 91.3,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 22.0,
+        "avg_wind_speed": 5.660108040319819,
+        "avg_pressure": 1008.0195789473669,
+        "settlement_bias": -10.99
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 79.6,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 23.6,
+        "avg_wind_speed": 5.202891944873985,
+        "avg_pressure": 1010.5931594988191,
+        "settlement_bias": -11.8
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.6,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 23.4,
+        "avg_wind_speed": 4.369384895066045,
+        "avg_pressure": 1014.7265434251805,
+        "settlement_bias": -11.73
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 58.6,
+            "obs_count": 2963
+          }
+        ],
+        "avg_diurnal_range": 21.4,
+        "avg_wind_speed": 3.8414481297297574,
+        "avg_pressure": 1016.3867572156188,
+        "settlement_bias": -10.69
+      }
+    }
+  },
+  "KSAT": {
+    "station": "KSAT",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 51.8,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 21.3,
+        "avg_wind_speed": 6.701388399999889,
+        "avg_pressure": 1019.5466539196955,
+        "settlement_bias": -10.63
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 54.5,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 22.0,
+        "avg_wind_speed": 7.513768765957356,
+        "avg_pressure": 1018.1685312593464,
+        "settlement_bias": -11.0
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 65.4,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 23.7,
+        "avg_wind_speed": 8.446141561290217,
+        "avg_pressure": 1014.1895579061553,
+        "settlement_bias": -11.85
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 71.4,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 20.7,
+        "avg_wind_speed": 9.032671791053053,
+        "avg_pressure": 1012.6365736827294,
+        "settlement_bias": -10.33
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 78.2,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 19.1,
+        "avg_wind_speed": 8.523043051102695,
+        "avg_pressure": 1010.7343784378435,
+        "settlement_bias": -9.54
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 83.9,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 19.3,
+        "avg_wind_speed": 8.531399797721651,
+        "avg_pressure": 1011.4272962856326,
+        "settlement_bias": -9.64
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 136.5,
+            "obs_count": 4563
+          }
+        ],
+        "avg_diurnal_range": 827.0,
+        "avg_wind_speed": 9.362083356234796,
+        "avg_pressure": 1014.4772955560294,
+        "settlement_bias": -9.34
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 86.4,
+            "obs_count": 3606
+          }
+        ],
+        "avg_diurnal_range": 20.2,
+        "avg_wind_speed": 7.370307958945768,
+        "avg_pressure": 1013.399078726969,
+        "settlement_bias": -10.11
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 82.8,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 20.9,
+        "avg_wind_speed": 6.212458644444409,
+        "avg_pressure": 1012.8484276729602,
+        "settlement_bias": -10.46
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 74.1,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 21.1,
+        "avg_wind_speed": 6.78227011226887,
+        "avg_pressure": 1015.3578644067811,
+        "settlement_bias": -10.55
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.0,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 19.2,
+        "avg_wind_speed": 6.381048091698493,
+        "avg_pressure": 1018.0493511048775,
+        "settlement_bias": -9.6
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 58.9,
+            "obs_count": 2948
+          }
+        ],
+        "avg_diurnal_range": 18.9,
+        "avg_wind_speed": 6.003543573803869,
+        "avg_pressure": 1018.2950344827566,
+        "settlement_bias": -9.44
+      }
+    }
+  },
+  "KSEA": {
+    "station": "KSEA",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 41.8,
+            "obs_count": 3717
+          }
+        ],
+        "avg_diurnal_range": 9.2,
+        "avg_wind_speed": 6.220602113654587,
+        "avg_pressure": 1019.8093234323401,
+        "settlement_bias": -4.62
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 41.6,
+            "obs_count": 3384
+          }
+        ],
+        "avg_diurnal_range": 10.1,
+        "avg_wind_speed": 7.627920052024695,
+        "avg_pressure": 1018.928940258181,
+        "settlement_bias": -5.03
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 45.7,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 13.4,
+        "avg_wind_speed": 6.848402409897709,
+        "avg_pressure": 1016.3512301804259,
+        "settlement_bias": -6.71
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 49.7,
+            "obs_count": 3584
+          }
+        ],
+        "avg_diurnal_range": 16.0,
+        "avg_wind_speed": 7.314579836962541,
+        "avg_pressure": 1019.1302926967902,
+        "settlement_bias": -8.02
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 55.8,
+            "obs_count": 3719
+          }
+        ],
+        "avg_diurnal_range": 17.5,
+        "avg_wind_speed": 6.859516331539186,
+        "avg_pressure": 1018.7209778748967,
+        "settlement_bias": -8.77
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.0,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 19.2,
+        "avg_wind_speed": 6.790045381494786,
+        "avg_pressure": 1017.3575211267593,
+        "settlement_bias": -9.63
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 77.0,
+            "obs_count": 4494
+          }
+        ],
+        "avg_diurnal_range": 265.1,
+        "avg_wind_speed": 8.08085481795621,
+        "avg_pressure": 1018.2068978530582,
+        "settlement_bias": -11.4
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 67.8,
+            "obs_count": 3608
+          }
+        ],
+        "avg_diurnal_range": 20.5,
+        "avg_wind_speed": 6.378814757281486,
+        "avg_pressure": 1017.4477138849929,
+        "settlement_bias": -10.27
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.0,
+            "obs_count": 2880
+          }
+        ],
+        "avg_diurnal_range": 17.7,
+        "avg_wind_speed": 6.050776500695429,
+        "avg_pressure": 1016.8498064061956,
+        "settlement_bias": -8.86
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 54.1,
+            "obs_count": 2973
+          }
+        ],
+        "avg_diurnal_range": 13.8,
+        "avg_wind_speed": 6.392295921911803,
+        "avg_pressure": 1017.8766300617724,
+        "settlement_bias": -6.9
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 45.1,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 9.7,
+        "avg_wind_speed": 6.902356101565182,
+        "avg_pressure": 1018.629455445547,
+        "settlement_bias": -4.86
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 41.4,
+            "obs_count": 2957
+          }
+        ],
+        "avg_diurnal_range": 8.1,
+        "avg_wind_speed": 7.465542011498059,
+        "avg_pressure": 1015.4879655172432,
+        "settlement_bias": -4.04
+      }
+    }
+  },
+  "KSFO": {
+    "station": "KSFO",
+    "month_count": 12,
+    "months": {
+      "01": {
+        "month": 1,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 52.9,
+            "obs_count": 3720
+          }
+        ],
+        "avg_diurnal_range": 11.8,
+        "avg_wind_speed": 6.07042420645151,
+        "avg_pressure": 1020.0907497303142,
+        "settlement_bias": -5.89
+      },
+      "02": {
+        "month": 2,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 52.9,
+            "obs_count": 3382
+          }
+        ],
+        "avg_diurnal_range": 14.3,
+        "avg_wind_speed": 7.632589492607805,
+        "avg_pressure": 1019.0844286560091,
+        "settlement_bias": -7.17
+      },
+      "03": {
+        "month": 3,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 53.8,
+            "obs_count": 3718
+          }
+        ],
+        "avg_diurnal_range": 13.3,
+        "avg_wind_speed": 9.472325000537783,
+        "avg_pressure": 1017.7199784598794,
+        "settlement_bias": -6.63
+      },
+      "04": {
+        "month": 4,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 55.8,
+            "obs_count": 3599
+          }
+        ],
+        "avg_diurnal_range": 14.5,
+        "avg_wind_speed": 11.139785709363672,
+        "avg_pressure": 1017.5926883514024,
+        "settlement_bias": -7.25
+      },
+      "05": {
+        "month": 5,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 58.4,
+            "obs_count": 3711
+          }
+        ],
+        "avg_diurnal_range": 14.8,
+        "avg_wind_speed": 12.221939832929069,
+        "avg_pressure": 1015.4592913172839,
+        "settlement_bias": -7.39
+      },
+      "06": {
+        "month": 6,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 61.1,
+            "obs_count": 3600
+          }
+        ],
+        "avg_diurnal_range": 14.5,
+        "avg_wind_speed": 12.024208604612332,
+        "avg_pressure": 1013.7210233592891,
+        "settlement_bias": -7.28
+      },
+      "07": {
+        "month": 7,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 1169.8,
+            "obs_count": 4491
+          }
+        ],
+        "avg_diurnal_range": 4524.8,
+        "avg_wind_speed": 11.424651718331267,
+        "avg_pressure": 1014.4554731723158,
+        "settlement_bias": -7.12
+      },
+      "08": {
+        "month": 8,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 63.7,
+            "obs_count": 3608
+          }
+        ],
+        "avg_diurnal_range": 14.8,
+        "avg_wind_speed": 10.68982662156909,
+        "avg_pressure": 1014.0551207327248,
+        "settlement_bias": -7.41
+      },
+      "09": {
+        "month": 9,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 63.5,
+            "obs_count": 2879
+          }
+        ],
+        "avg_diurnal_range": 15.9,
+        "avg_wind_speed": 9.514080655783147,
+        "avg_pressure": 1013.2823018080676,
+        "settlement_bias": -7.96
+      },
+      "10": {
+        "month": 10,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 62.1,
+            "obs_count": 2976
+          }
+        ],
+        "avg_diurnal_range": 16.1,
+        "avg_wind_speed": 7.836104999999947,
+        "avg_pressure": 1015.7119111709285,
+        "settlement_bias": -8.07
+      },
+      "11": {
+        "month": 11,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 56.8,
+            "obs_count": 2877
+          }
+        ],
+        "avg_diurnal_range": 13.9,
+        "avg_wind_speed": 5.770441398679195,
+        "avg_pressure": 1019.1445024356295,
+        "settlement_bias": -6.94
+      },
+      "12": {
+        "month": 12,
+        "hourly_temps": [
+          {
+            "hour": 0,
+            "avg_temp_f": 52.8,
+            "obs_count": 2944
+          }
+        ],
+        "avg_diurnal_range": 10.2,
+        "avg_wind_speed": 5.767935831521751,
+        "avg_pressure": 1018.8498466780243,
+        "settlement_bias": -5.12
+      }
+    }
+  }
+}

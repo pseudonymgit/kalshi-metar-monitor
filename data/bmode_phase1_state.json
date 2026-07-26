@@ -1,0 +1,43 @@
+{
+  "last_completed": "fee_aware_kelly",
+  "step_status": {
+    "regime_classifier": "completed",
+    "speci_parsing": "completed",
+    "retest_signals": "completed",
+    "fix_evaluate_stubs": "completed",
+    "station_bias_profiles": "completed",
+    "n_eff_computation": "completed",
+    "fee_aware_kelly": "completed",
+    "multi_leg_spread": "failed",
+    "spatial_coherence_gate": "pending",
+    "wind_conditional_corr": "pending",
+    "full_validation_backtest": "pending"
+  },
+  "started_at": "2026-07-26T20:55:05.526672Z",
+  "completed_at": null,
+  "errors": [
+    {
+      "step": "station_bias_profiles",
+      "error": "TypeError: unsupported operand type(s) for /: 'str' and 'float'",
+      "timestamp": "2026-07-26T20:56:06.411429Z"
+    },
+    {
+      "step": "station_bias_profiles",
+      "error": "AttributeError: module 'datetime' has no attribute 'strptime'",
+      "timestamp": "2026-07-26T21:47:59.417462Z"
+    },
+    {
+      "step": "station_bias_profiles",
+      "error": "NameError: name 'dt_module' is not defined",
+      "timestamp": "2026-07-26T21:49:22.533560Z"
+    },
+    {
+      "step": "multi_leg_spread",
+      "error": "RuntimeError: Step multi_leg_spread verification failed: {'test_narrow_spread': {'spread_type': 'narrow', 'center_bucket': 85, 'bucket_span': 1, 'legs': [85], 'num_legs': 1, 'type': 'HIGH'}, 'error': 'Expected [84, 85, 86], got [85]'}",
+      "timestamp": "2026-07-26T21:51:33.280281Z"
+    }
+  ],
+  "steps_completed": [
+    "retest_signals"
+  ]
+}

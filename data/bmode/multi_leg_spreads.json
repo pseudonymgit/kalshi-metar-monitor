@@ -1,0 +1,326 @@
+{
+  "spread_types": {
+    "single_bucket": {
+      "description": "Single temperature bucket",
+      "legs": 1,
+      "bucket_span": 1,
+      "confidence_threshold": 0.7
+    },
+    "narrow_spread": {
+      "description": "Two adjacent buckets (3\u00b0F range)",
+      "legs": 2,
+      "bucket_span": 2,
+      "confidence_threshold": 0.65
+    },
+    "medium_spread": {
+      "description": "Three adjacent buckets (5\u00b0F range)",
+      "legs": 3,
+      "bucket_span": 3,
+      "confidence_threshold": 0.6
+    },
+    "wide_spread": {
+      "description": "Four adjacent buckets (7\u00b0F range)",
+      "legs": 4,
+      "bucket_span": 4,
+      "confidence_threshold": 0.55
+    }
+  },
+  "examples": {
+    "75_single_bucket": {
+      "spread_type": "single_bucket",
+      "center_bucket": 75,
+      "bucket_span": 1,
+      "legs": [
+        75
+      ],
+      "num_legs": 1,
+      "type": "HIGH"
+    },
+    "75_narrow_spread": {
+      "spread_type": "narrow_spread",
+      "center_bucket": 75,
+      "bucket_span": 3,
+      "legs": [
+        74,
+        75,
+        76
+      ],
+      "num_legs": 3,
+      "type": "HIGH"
+    },
+    "75_medium_spread": {
+      "spread_type": "medium_spread",
+      "center_bucket": 75,
+      "bucket_span": 4,
+      "legs": [
+        73,
+        74,
+        75,
+        76
+      ],
+      "num_legs": 4,
+      "type": "HIGH"
+    },
+    "75_wide_spread": {
+      "spread_type": "wide_spread",
+      "center_bucket": 75,
+      "bucket_span": 5,
+      "legs": [
+        73,
+        74,
+        75,
+        76,
+        77
+      ],
+      "num_legs": 5,
+      "type": "HIGH"
+    },
+    "80_single_bucket": {
+      "spread_type": "single_bucket",
+      "center_bucket": 80,
+      "bucket_span": 1,
+      "legs": [
+        80
+      ],
+      "num_legs": 1,
+      "type": "HIGH"
+    },
+    "80_narrow_spread": {
+      "spread_type": "narrow_spread",
+      "center_bucket": 80,
+      "bucket_span": 3,
+      "legs": [
+        79,
+        80,
+        81
+      ],
+      "num_legs": 3,
+      "type": "HIGH"
+    },
+    "80_medium_spread": {
+      "spread_type": "medium_spread",
+      "center_bucket": 80,
+      "bucket_span": 4,
+      "legs": [
+        78,
+        79,
+        80,
+        81
+      ],
+      "num_legs": 4,
+      "type": "HIGH"
+    },
+    "80_wide_spread": {
+      "spread_type": "wide_spread",
+      "center_bucket": 80,
+      "bucket_span": 5,
+      "legs": [
+        78,
+        79,
+        80,
+        81,
+        82
+      ],
+      "num_legs": 5,
+      "type": "HIGH"
+    },
+    "85_single_bucket": {
+      "spread_type": "single_bucket",
+      "center_bucket": 85,
+      "bucket_span": 1,
+      "legs": [
+        85
+      ],
+      "num_legs": 1,
+      "type": "HIGH"
+    },
+    "85_narrow_spread": {
+      "spread_type": "narrow_spread",
+      "center_bucket": 85,
+      "bucket_span": 3,
+      "legs": [
+        84,
+        85,
+        86
+      ],
+      "num_legs": 3,
+      "type": "HIGH"
+    },
+    "85_medium_spread": {
+      "spread_type": "medium_spread",
+      "center_bucket": 85,
+      "bucket_span": 4,
+      "legs": [
+        83,
+        84,
+        85,
+        86
+      ],
+      "num_legs": 4,
+      "type": "HIGH"
+    },
+    "85_wide_spread": {
+      "spread_type": "wide_spread",
+      "center_bucket": 85,
+      "bucket_span": 5,
+      "legs": [
+        83,
+        84,
+        85,
+        86,
+        87
+      ],
+      "num_legs": 5,
+      "type": "HIGH"
+    },
+    "90_single_bucket": {
+      "spread_type": "single_bucket",
+      "center_bucket": 90,
+      "bucket_span": 1,
+      "legs": [
+        90
+      ],
+      "num_legs": 1,
+      "type": "HIGH"
+    },
+    "90_narrow_spread": {
+      "spread_type": "narrow_spread",
+      "center_bucket": 90,
+      "bucket_span": 3,
+      "legs": [
+        89,
+        90,
+        91
+      ],
+      "num_legs": 3,
+      "type": "HIGH"
+    },
+    "90_medium_spread": {
+      "spread_type": "medium_spread",
+      "center_bucket": 90,
+      "bucket_span": 4,
+      "legs": [
+        88,
+        89,
+        90,
+        91
+      ],
+      "num_legs": 4,
+      "type": "HIGH"
+    },
+    "90_wide_spread": {
+      "spread_type": "wide_spread",
+      "center_bucket": 90,
+      "bucket_span": 5,
+      "legs": [
+        88,
+        89,
+        90,
+        91,
+        92
+      ],
+      "num_legs": 5,
+      "type": "HIGH"
+    },
+    "95_single_bucket": {
+      "spread_type": "single_bucket",
+      "center_bucket": 95,
+      "bucket_span": 1,
+      "legs": [
+        95
+      ],
+      "num_legs": 1,
+      "type": "HIGH"
+    },
+    "95_narrow_spread": {
+      "spread_type": "narrow_spread",
+      "center_bucket": 95,
+      "bucket_span": 3,
+      "legs": [
+        94,
+        95,
+        96
+      ],
+      "num_legs": 3,
+      "type": "HIGH"
+    },
+    "95_medium_spread": {
+      "spread_type": "medium_spread",
+      "center_bucket": 95,
+      "bucket_span": 4,
+      "legs": [
+        93,
+        94,
+        95,
+        96
+      ],
+      "num_legs": 4,
+      "type": "HIGH"
+    },
+    "95_wide_spread": {
+      "spread_type": "wide_spread",
+      "center_bucket": 95,
+      "bucket_span": 5,
+      "legs": [
+        93,
+        94,
+        95,
+        96,
+        97
+      ],
+      "num_legs": 5,
+      "type": "HIGH"
+    },
+    "100_single_bucket": {
+      "spread_type": "single_bucket",
+      "center_bucket": 100,
+      "bucket_span": 1,
+      "legs": [
+        100
+      ],
+      "num_legs": 1,
+      "type": "HIGH"
+    },
+    "100_narrow_spread": {
+      "spread_type": "narrow_spread",
+      "center_bucket": 100,
+      "bucket_span": 3,
+      "legs": [
+        99,
+        100,
+        101
+      ],
+      "num_legs": 3,
+      "type": "HIGH"
+    },
+    "100_medium_spread": {
+      "spread_type": "medium_spread",
+      "center_bucket": 100,
+      "bucket_span": 4,
+      "legs": [
+        98,
+        99,
+        100,
+        101
+      ],
+      "num_legs": 4,
+      "type": "HIGH"
+    },
+    "100_wide_spread": {
+      "spread_type": "wide_spread",
+      "center_bucket": 100,
+      "bucket_span": 5,
+      "legs": [
+        98,
+        99,
+        100,
+        101,
+        102
+      ],
+      "num_legs": 5,
+      "type": "HIGH"
+    }
+  },
+  "fee_per_leg": 0.0205,
+  "total_cost_per_contract": "fee * num_legs"
+}
