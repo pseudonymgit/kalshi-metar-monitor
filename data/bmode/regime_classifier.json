@@ -1,0 +1,453 @@
+{
+  "classifier_type": "metar_cloud_wind_pressure",
+  "regimes": {
+    "stable": "High pressure, light/variable wind, clear/few clouds",
+    "advective": "Strong pressure gradient, persistent wind direction, solid cloud deck",
+    "transient": "Falling pressure, shifting wind, scattered/broken clouds",
+    "calm": "No significant pressure change, calm wind, any cloud cover"
+  },
+  "per_station": {
+    "KATL": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 413,
+          "pct": 24.0
+        },
+        "calm": {
+          "count": 52,
+          "pct": 3.0
+        },
+        "stable": {
+          "count": 807,
+          "pct": 46.8
+        },
+        "transient": {
+          "count": 451,
+          "pct": 26.2
+        }
+      }
+    },
+    "KAUS": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 332,
+          "pct": 19.3
+        },
+        "calm": {
+          "count": 186,
+          "pct": 10.8
+        },
+        "stable": {
+          "count": 836,
+          "pct": 48.5
+        },
+        "transient": {
+          "count": 369,
+          "pct": 21.4
+        }
+      }
+    },
+    "KBOS": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 660,
+          "pct": 38.3
+        },
+        "calm": {
+          "count": 9,
+          "pct": 0.5
+        },
+        "stable": {
+          "count": 421,
+          "pct": 24.4
+        },
+        "transient": {
+          "count": 633,
+          "pct": 36.7
+        }
+      }
+    },
+    "KDCA": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 535,
+          "pct": 31.1
+        },
+        "calm": {
+          "count": 47,
+          "pct": 2.7
+        },
+        "stable": {
+          "count": 596,
+          "pct": 34.6
+        },
+        "transient": {
+          "count": 545,
+          "pct": 31.6
+        }
+      }
+    },
+    "KDEN": {
+      "days_classified": 1721,
+      "regime_distribution": {
+        "advective": {
+          "count": 596,
+          "pct": 34.6
+        },
+        "calm": {
+          "count": 1,
+          "pct": 0.1
+        },
+        "stable": {
+          "count": 430,
+          "pct": 25.0
+        },
+        "transient": {
+          "count": 694,
+          "pct": 40.3
+        }
+      }
+    },
+    "KDFW": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 476,
+          "pct": 27.6
+        },
+        "calm": {
+          "count": 19,
+          "pct": 1.1
+        },
+        "stable": {
+          "count": 681,
+          "pct": 39.5
+        },
+        "transient": {
+          "count": 547,
+          "pct": 31.7
+        }
+      }
+    },
+    "KHOU": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 343,
+          "pct": 19.9
+        },
+        "calm": {
+          "count": 77,
+          "pct": 4.5
+        },
+        "stable": {
+          "count": 930,
+          "pct": 54.0
+        },
+        "transient": {
+          "count": 373,
+          "pct": 21.6
+        }
+      }
+    },
+    "KLAS": {
+      "days_classified": 1722,
+      "regime_distribution": {
+        "advective": {
+          "count": 317,
+          "pct": 18.4
+        },
+        "calm": {
+          "count": 225,
+          "pct": 13.1
+        },
+        "stable": {
+          "count": 887,
+          "pct": 51.5
+        },
+        "transient": {
+          "count": 293,
+          "pct": 17.0
+        }
+      }
+    },
+    "KLAX": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 309,
+          "pct": 17.9
+        },
+        "calm": {
+          "count": 11,
+          "pct": 0.6
+        },
+        "stable": {
+          "count": 1070,
+          "pct": 62.1
+        },
+        "transient": {
+          "count": 333,
+          "pct": 19.3
+        }
+      }
+    },
+    "KMDW": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 577,
+          "pct": 33.5
+        },
+        "calm": {
+          "count": 9,
+          "pct": 0.5
+        },
+        "stable": {
+          "count": 509,
+          "pct": 29.5
+        },
+        "transient": {
+          "count": 628,
+          "pct": 36.4
+        }
+      }
+    },
+    "KMIA": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 224,
+          "pct": 13.0
+        },
+        "calm": {
+          "count": 85,
+          "pct": 4.9
+        },
+        "stable": {
+          "count": 1175,
+          "pct": 68.2
+        },
+        "transient": {
+          "count": 239,
+          "pct": 13.9
+        }
+      }
+    },
+    "KMSP": {
+      "days_classified": 1721,
+      "regime_distribution": {
+        "advective": {
+          "count": 545,
+          "pct": 31.7
+        },
+        "calm": {
+          "count": 47,
+          "pct": 2.7
+        },
+        "stable": {
+          "count": 512,
+          "pct": 29.8
+        },
+        "transient": {
+          "count": 617,
+          "pct": 35.9
+        }
+      }
+    },
+    "KMSY": {
+      "days_classified": 1721,
+      "regime_distribution": {
+        "advective": {
+          "count": 296,
+          "pct": 17.2
+        },
+        "calm": {
+          "count": 121,
+          "pct": 7.0
+        },
+        "stable": {
+          "count": 948,
+          "pct": 55.1
+        },
+        "transient": {
+          "count": 356,
+          "pct": 20.7
+        }
+      }
+    },
+    "KNYC": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 653,
+          "pct": 37.9
+        },
+        "calm": {
+          "count": 13,
+          "pct": 0.8
+        },
+        "stable": {
+          "count": 434,
+          "pct": 25.2
+        },
+        "transient": {
+          "count": 623,
+          "pct": 36.2
+        }
+      }
+    },
+    "KOKC": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 548,
+          "pct": 31.8
+        },
+        "calm": {
+          "count": 8,
+          "pct": 0.5
+        },
+        "stable": {
+          "count": 561,
+          "pct": 32.6
+        },
+        "transient": {
+          "count": 606,
+          "pct": 35.2
+        }
+      }
+    },
+    "KPHL": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 546,
+          "pct": 31.7
+        },
+        "calm": {
+          "count": 51,
+          "pct": 3.0
+        },
+        "stable": {
+          "count": 577,
+          "pct": 33.5
+        },
+        "transient": {
+          "count": 549,
+          "pct": 31.9
+        }
+      }
+    },
+    "KPHX": {
+      "days_classified": 1721,
+      "regime_distribution": {
+        "advective": {
+          "count": 273,
+          "pct": 15.9
+        },
+        "calm": {
+          "count": 91,
+          "pct": 5.3
+        },
+        "stable": {
+          "count": 1064,
+          "pct": 61.8
+        },
+        "transient": {
+          "count": 293,
+          "pct": 17.0
+        }
+      }
+    },
+    "KSAT": {
+      "days_classified": 1722,
+      "regime_distribution": {
+        "advective": {
+          "count": 403,
+          "pct": 23.4
+        },
+        "calm": {
+          "count": 28,
+          "pct": 1.6
+        },
+        "stable": {
+          "count": 884,
+          "pct": 51.3
+        },
+        "transient": {
+          "count": 407,
+          "pct": 23.6
+        }
+      }
+    },
+    "KSEA": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 465,
+          "pct": 27.0
+        },
+        "calm": {
+          "count": 46,
+          "pct": 2.7
+        },
+        "stable": {
+          "count": 718,
+          "pct": 41.7
+        },
+        "transient": {
+          "count": 494,
+          "pct": 28.7
+        }
+      }
+    },
+    "KSFO": {
+      "days_classified": 1723,
+      "regime_distribution": {
+        "advective": {
+          "count": 393,
+          "pct": 22.8
+        },
+        "calm": {
+          "count": 69,
+          "pct": 4.0
+        },
+        "stable": {
+          "count": 841,
+          "pct": 48.8
+        },
+        "transient": {
+          "count": 420,
+          "pct": 24.4
+        }
+      }
+    }
+  },
+  "overall": {
+    "stations_classified": 20,
+    "total_days": 34450,
+    "regime_distribution": {
+      "advective": {
+        "count": 8904,
+        "pct": 25.8
+      },
+      "calm": {
+        "count": 1195,
+        "pct": 3.5
+      },
+      "stable": {
+        "count": 14881,
+        "pct": 43.2
+      },
+      "transient": {
+        "count": 9470,
+        "pct": 27.5
+      }
+    }
+  }
+}

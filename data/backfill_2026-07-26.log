@@ -1,0 +1,411 @@
+[2026-07-26T16:23:22Z] ============================================================
+[2026-07-26T16:23:22Z] BACKFILL MISSING STATIONS — v1.0
+[2026-07-26T16:23:22Z] Started: 2026-07-26T16:23:22.376458+00:00
+[2026-07-26T16:23:22Z] Database: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db
+[2026-07-26T16:23:22Z] Stations: 9
+[2026-07-26T16:23:22Z] Years: 2021-2026
+[2026-07-26T16:23:22Z] ============================================================
+[2026-07-26T16:23:22Z] 
+[2026-07-26T16:23:22Z] Processing KBNA (Nashville)...
+[2026-07-26T16:23:22Z]   [KBNA] Nashville (723270-13897)
+[2026-07-26T16:23:22Z]     Year 2021...
+[2026-07-26T16:23:23Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:23:23Z]     Year 2022...
+[2026-07-26T16:23:24Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:23:24Z]     Year 2023...
+[2026-07-26T16:23:25Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:23:25Z]     Year 2024...
+[2026-07-26T16:23:26Z]       → 8782 parsed, 8782 inserted, 366 days
+[2026-07-26T16:23:26Z]     Year 2025...
+[2026-07-26T16:23:27Z]       → 5717 parsed, 5717 inserted, 239 days
+[2026-07-26T16:23:27Z]     Year 2026...
+[2026-07-26T16:23:27Z]       → No data
+[2026-07-26T16:23:27Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:23:57Z] ============================================================
+[2026-07-26T16:23:57Z] BACKFILL MISSING STATIONS — v1.0
+[2026-07-26T16:23:57Z] Started: 2026-07-26T16:23:57.675530+00:00
+[2026-07-26T16:23:57Z] Database: /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db
+[2026-07-26T16:23:57Z] Stations: 9
+[2026-07-26T16:23:57Z] Years: 2021-2026
+[2026-07-26T16:23:57Z] ============================================================
+[2026-07-26T16:23:57Z] 
+[2026-07-26T16:23:57Z] Processing KBNA (Nashville)...
+[2026-07-26T16:23:57Z]   [KBNA] Nashville (723270-13897)
+[2026-07-26T16:23:57Z]     Year 2021...
+[2026-07-26T16:23:58Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:23:58Z]     Year 2022...
+[2026-07-26T16:23:59Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:23:59Z]     Year 2023...
+[2026-07-26T16:24:00Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:00Z]     Year 2024...
+[2026-07-26T16:24:00Z]       → 8782 parsed, 8782 inserted, 366 days
+[2026-07-26T16:24:01Z]     Year 2025...
+[2026-07-26T16:24:01Z]       → 5717 parsed, 5717 inserted, 239 days
+[2026-07-26T16:24:01Z]     Year 2026...
+[2026-07-26T16:24:02Z]       → No data
+[2026-07-26T16:24:02Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:24:02Z]     → daily_stats rebuilt
+[2026-07-26T16:24:02Z] Processing KCLT (Charlotte)...
+[2026-07-26T16:24:02Z]   [KCLT] Charlotte (723140-13881)
+[2026-07-26T16:24:02Z]     Year 2021...
+[2026-07-26T16:24:03Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:03Z]     Year 2022...
+[2026-07-26T16:24:04Z]       → 8697 parsed, 8697 inserted, 365 days
+[2026-07-26T16:24:04Z]     Year 2023...
+[2026-07-26T16:24:04Z]       → 8749 parsed, 8749 inserted, 365 days
+[2026-07-26T16:24:05Z]     Year 2024...
+[2026-07-26T16:24:05Z]       → 8771 parsed, 8771 inserted, 366 days
+[2026-07-26T16:24:06Z]     Year 2025...
+[2026-07-26T16:24:06Z]       → 5715 parsed, 5715 inserted, 239 days
+[2026-07-26T16:24:06Z]     Year 2026...
+[2026-07-26T16:24:07Z]       → No data
+[2026-07-26T16:24:07Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:24:07Z]     → daily_stats rebuilt
+[2026-07-26T16:24:07Z] Processing KDTW (Detroit)...
+[2026-07-26T16:24:07Z]   [KDTW] Detroit (725370-94847)
+[2026-07-26T16:24:07Z]     Year 2021...
+[2026-07-26T16:24:08Z]       → 8184 parsed, 8184 inserted, 365 days
+[2026-07-26T16:24:08Z]     Year 2022...
+[2026-07-26T16:24:09Z]       → 8143 parsed, 8143 inserted, 365 days
+[2026-07-26T16:24:09Z]     Year 2023...
+[2026-07-26T16:24:10Z]       → 8161 parsed, 8161 inserted, 365 days
+[2026-07-26T16:24:10Z]     Year 2024...
+[2026-07-26T16:24:11Z]       → 8251 parsed, 8251 inserted, 366 days
+[2026-07-26T16:24:11Z]     Year 2025...
+[2026-07-26T16:24:11Z]       → 5389 parsed, 5389 inserted, 239 days
+[2026-07-26T16:24:12Z]     Year 2026...
+[2026-07-26T16:24:12Z]       → No data
+[2026-07-26T16:24:12Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:24:12Z]     → daily_stats rebuilt
+[2026-07-26T16:24:13Z] Processing KJFK (New York JFK)...
+[2026-07-26T16:24:13Z]   [KJFK] New York JFK (744860-94789)
+[2026-07-26T16:24:13Z]     Year 2021...
+[2026-07-26T16:24:13Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:14Z]     Year 2022...
+[2026-07-26T16:24:14Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:15Z]     Year 2023...
+[2026-07-26T16:24:15Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:15Z]     Year 2024...
+[2026-07-26T16:24:16Z]       → 8764 parsed, 8764 inserted, 366 days
+[2026-07-26T16:24:16Z]     Year 2025...
+[2026-07-26T16:24:17Z]       → 5713 parsed, 5713 inserted, 239 days
+[2026-07-26T16:24:17Z]     Year 2026...
+[2026-07-26T16:24:17Z]       → No data
+[2026-07-26T16:24:17Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:24:17Z]     → daily_stats rebuilt
+[2026-07-26T16:24:18Z] Processing KORD (Chicago O'Hare)...
+[2026-07-26T16:24:18Z]   [KORD] Chicago O'Hare (725300-94846)
+[2026-07-26T16:24:18Z]     Year 2021...
+[2026-07-26T16:24:18Z]       → 8758 parsed, 8758 inserted, 365 days
+[2026-07-26T16:24:19Z]     Year 2022...
+[2026-07-26T16:24:19Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:20Z]     Year 2023...
+[2026-07-26T16:24:20Z]       → 8756 parsed, 8756 inserted, 365 days
+[2026-07-26T16:24:20Z]     Year 2024...
+[2026-07-26T16:24:21Z]       → 8765 parsed, 8765 inserted, 366 days
+[2026-07-26T16:24:21Z]     Year 2025...
+[2026-07-26T16:24:22Z]       → 5674 parsed, 5674 inserted, 237 days
+[2026-07-26T16:24:22Z]     Year 2026...
+[2026-07-26T16:24:22Z]       → No data
+[2026-07-26T16:24:22Z]     Rebuilding daily_stats for 1698 days...
+[2026-07-26T16:24:22Z]     → daily_stats rebuilt
+[2026-07-26T16:24:23Z] Processing KPDX (Portland)...
+[2026-07-26T16:24:23Z]   [KPDX] Portland (726980-24229)
+[2026-07-26T16:24:23Z]     Year 2021...
+[2026-07-26T16:24:24Z]       → 8758 parsed, 8758 inserted, 365 days
+[2026-07-26T16:24:24Z]     Year 2022...
+[2026-07-26T16:24:25Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:25Z]     Year 2023...
+[2026-07-26T16:24:25Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:26Z]     Year 2024...
+[2026-07-26T16:24:26Z]       → 8757 parsed, 8757 inserted, 366 days
+[2026-07-26T16:24:26Z]     Year 2025...
+[2026-07-26T16:24:27Z]       → 5720 parsed, 5720 inserted, 239 days
+[2026-07-26T16:24:27Z]     Year 2026...
+[2026-07-26T16:24:27Z]       → No data
+[2026-07-26T16:24:28Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:24:28Z]     → daily_stats rebuilt
+[2026-07-26T16:24:28Z] Processing KSLC (Salt Lake City)...
+[2026-07-26T16:24:28Z]   [KSLC] Salt Lake City (725720-24127)
+[2026-07-26T16:24:28Z]     Year 2021...
+[2026-07-26T16:24:29Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:29Z]     Year 2022...
+[2026-07-26T16:24:30Z]       → 8758 parsed, 8758 inserted, 365 days
+[2026-07-26T16:24:30Z]     Year 2023...
+[2026-07-26T16:24:30Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:31Z]     Year 2024...
+[2026-07-26T16:24:31Z]       → 8761 parsed, 8761 inserted, 366 days
+[2026-07-26T16:24:32Z]     Year 2025...
+[2026-07-26T16:24:32Z]       → 5675 parsed, 5675 inserted, 237 days
+[2026-07-26T16:24:32Z]     Year 2026...
+[2026-07-26T16:24:33Z]       → No data
+[2026-07-26T16:24:33Z]     Rebuilding daily_stats for 1698 days...
+[2026-07-26T16:24:33Z]     → daily_stats rebuilt
+[2026-07-26T16:24:33Z] Processing KTPA (Tampa)...
+[2026-07-26T16:24:33Z]   [KTPA] Tampa (722110-12842)
+[2026-07-26T16:24:33Z]     Year 2021...
+[2026-07-26T16:24:34Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:34Z]     Year 2022...
+[2026-07-26T16:24:35Z]       → 8721 parsed, 8721 inserted, 364 days
+[2026-07-26T16:24:35Z]     Year 2023...
+[2026-07-26T16:24:36Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:36Z]     Year 2024...
+[2026-07-26T16:24:36Z]       → 8705 parsed, 8705 inserted, 366 days
+[2026-07-26T16:24:37Z]     Year 2025...
+[2026-07-26T16:24:37Z]       → 5713 parsed, 5713 inserted, 239 days
+[2026-07-26T16:24:38Z]     Year 2026...
+[2026-07-26T16:24:38Z]       → No data
+[2026-07-26T16:24:38Z]     Rebuilding daily_stats for 1699 days...
+[2026-07-26T16:24:38Z]     → daily_stats rebuilt
+[2026-07-26T16:24:39Z] Processing PHNL (Honolulu)...
+[2026-07-26T16:24:39Z]   [PHNL] Honolulu (911820-22521)
+[2026-07-26T16:24:39Z]     Year 2021...
+[2026-07-26T16:24:39Z]       → 8759 parsed, 8759 inserted, 365 days
+[2026-07-26T16:24:39Z]     Year 2022...
+[2026-07-26T16:24:40Z]       → 8760 parsed, 8760 inserted, 365 days
+[2026-07-26T16:24:40Z]     Year 2023...
+[2026-07-26T16:24:41Z]       → 8753 parsed, 8753 inserted, 365 days
+[2026-07-26T16:24:41Z]     Year 2024...
+[2026-07-26T16:24:42Z]       → 8765 parsed, 8765 inserted, 366 days
+[2026-07-26T16:24:42Z]     Year 2025...
+[2026-07-26T16:24:42Z]       → 5722 parsed, 5722 inserted, 239 days
+[2026-07-26T16:24:43Z]     Year 2026...
+[2026-07-26T16:24:43Z]       → No data
+[2026-07-26T16:24:43Z]     Rebuilding daily_stats for 1700 days...
+[2026-07-26T16:24:43Z]     → daily_stats rebuilt
+[2026-07-26T16:24:44Z] 
+[2026-07-26T16:24:44Z] ============================================================
+[2026-07-26T16:24:44Z] BACKFILL COMPLETE
+[2026-07-26T16:24:44Z] ============================================================
+[2026-07-26T16:24:44Z] Elapsed: 46.6s
+[2026-07-26T16:24:44Z] Total parsed: 363949
+[2026-07-26T16:24:44Z] Total inserted: 363949
+[2026-07-26T16:24:44Z] Total unique days across all stations: (see per-station below)
+[2026-07-26T16:24:44Z] 
+[2026-07-26T16:24:44Z]   KBNA (Nashville): 40778 parsed, 40778 inserted, 1700 unique days
+[2026-07-26T16:24:44Z]   KCLT (Charlotte): 40692 parsed, 40692 inserted, 1700 unique days
+[2026-07-26T16:24:44Z]   KDTW (Detroit): 38128 parsed, 38128 inserted, 1700 unique days
+[2026-07-26T16:24:44Z]   KJFK (New York JFK): 40756 parsed, 40756 inserted, 1700 unique days
+[2026-07-26T16:24:44Z]   KORD (Chicago O'Hare): 40713 parsed, 40713 inserted, 1698 unique days
+[2026-07-26T16:24:44Z]   KPDX (Portland): 40754 parsed, 40754 inserted, 1700 unique days
+[2026-07-26T16:24:44Z]   KSLC (Salt Lake City): 40712 parsed, 40712 inserted, 1698 unique days
+[2026-07-26T16:24:44Z]   KTPA (Tampa): 40657 parsed, 40657 inserted, 1699 unique days
+[2026-07-26T16:24:44Z]   PHNL (Honolulu): 40759 parsed, 40759 inserted, 1700 unique days
+[2026-07-26T16:24:44Z] 
+[2026-07-26T16:24:44Z] Post-backfill verification:
+[2026-07-26T16:24:44Z]   KBNA: 2021-01-01 → 2025-08-27, 40778 obs
+[2026-07-26T16:24:44Z]     Days with data: 1700
+[2026-07-26T16:24:44Z]   KCLT: 2021-01-01 → 2025-08-27, 40692 obs
+[2026-07-26T16:24:44Z]     Days with data: 1700
+[2026-07-26T16:24:44Z]   KDTW: 2021-01-01 → 2025-08-27, 38128 obs
+[2026-07-26T16:24:44Z]     Days with data: 1700
+[2026-07-26T16:24:44Z]   KJFK: 2021-01-01 → 2025-08-27, 40756 obs
+[2026-07-26T16:24:44Z]     Days with data: 1700
+[2026-07-26T16:24:44Z]   KORD: 2021-01-01 → 2025-08-25, 40713 obs
+[2026-07-26T16:24:44Z]     Days with data: 1698
+[2026-07-26T16:24:44Z]   KPDX: 2021-01-01 → 2025-08-27, 40754 obs
+[2026-07-26T16:24:44Z]     Days with data: 1700
+[2026-07-26T16:24:44Z]   KSLC: 2021-01-01 → 2025-08-25, 40712 obs
+[2026-07-26T16:24:44Z]     Days with data: 1698
+[2026-07-26T16:24:44Z]   KTPA: 2021-01-01 → 2025-08-27, 40657 obs
+[2026-07-26T16:24:44Z]     Days with data: 1699
+[2026-07-26T16:24:44Z]   PHNL: 2021-01-01 → 2025-08-27, 40759 obs
+[2026-07-26T16:24:44Z]     Days with data: 1700
+[2026-07-26T16:24:44Z] 
+[2026-07-26T16:24:44Z] All 20 research stations:
+[2026-07-26T16:24:44Z]   ✓ KATL: 41534 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KBOS: 41494 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KDFW: 41521 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KDEN: 41219 obs, 1722 days
+[2026-07-26T16:24:44Z]   ✓ KJFK: 40756 obs, 1700 days
+[2026-07-26T16:24:44Z]   ✓ KLAX: 41535 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KMIA: 41508 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KORD: 40713 obs, 1698 days
+[2026-07-26T16:24:44Z]   ✓ KSEA: 41509 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KSFO: 41498 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KBNA: 40778 obs, 1700 days
+[2026-07-26T16:24:44Z]   ✓ KHOU: 41552 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KDCA: 41551 obs, 1723 days
+[2026-07-26T16:24:44Z]   ✓ KPDX: 40754 obs, 1700 days
+[2026-07-26T16:24:44Z]   ✓ KSLC: 40712 obs, 1698 days
+[2026-07-26T16:24:44Z]   ✓ PHNL: 40759 obs, 1700 days
+[2026-07-26T16:24:44Z]   ✓ KTPA: 40657 obs, 1699 days
+[2026-07-26T16:24:44Z]   ✓ KDTW: 38128 obs, 1700 days
+[2026-07-26T16:24:44Z]   ✓ KCLT: 40692 obs, 1700 days
+[2026-07-26T16:24:44Z]   ✓ KMSP: 34155 obs, 1721 days
+[2026-07-26T16:24:44Z] 
+[2026-07-26T16:24:44Z] Done at 2026-07-26T16:24:44.388227+00:00
+[2026-07-26T16:28:07Z] 
+============================================================
+[2026-07-26T16:28:07Z] RECENT GAP BACKFILL — v1.0
+[2026-07-26T16:28:07Z] Started: 2026-07-26T16:28:07.977431+00:00
+[2026-07-26T16:28:07Z] Stations: 9
+[2026-07-26T16:28:07Z] ============================================================
+[2026-07-26T16:28:07Z] 
+Processing KBNA...
+[2026-07-26T16:28:07Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:08Z]   NWS API: 500 obs from KBNA
+[2026-07-26T16:28:08Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:09Z]   Updating daily_stats for 3 dates...
+[2026-07-26T16:28:09Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:09Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:29Z] 
+============================================================
+[2026-07-26T16:28:29Z] RECENT GAP BACKFILL — v1.0
+[2026-07-26T16:28:29Z] Started: 2026-07-26T16:28:29.084941+00:00
+[2026-07-26T16:28:29Z] Stations: 9
+[2026-07-26T16:28:29Z] ============================================================
+[2026-07-26T16:28:29Z] 
+Processing KBNA...
+[2026-07-26T16:28:29Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:29Z]   NWS API: 500 obs from KBNA
+[2026-07-26T16:28:29Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:29Z]   Updating daily_stats for 3 dates...
+[2026-07-26T16:28:29Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:29Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:29Z]   ✓ Current obs: 82.4°F
+[2026-07-26T16:28:30Z] 
+Processing KCLT...
+[2026-07-26T16:28:30Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:31Z]   NWS API: 500 obs from KCLT
+[2026-07-26T16:28:31Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:31Z]   Updating daily_stats for 8 dates...
+[2026-07-26T16:28:31Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:31Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:32Z]   ✓ Current obs: 77.0°F
+[2026-07-26T16:28:32Z] 
+Processing KDTW...
+[2026-07-26T16:28:32Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:33Z]   NWS API: 500 obs from KDTW
+[2026-07-26T16:28:33Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:33Z]   Updating daily_stats for 2 dates...
+[2026-07-26T16:28:33Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:33Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:33Z]   ✓ Current obs: 78.8°F
+[2026-07-26T16:28:34Z] 
+Processing KJFK...
+[2026-07-26T16:28:34Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:35Z]   NWS API: 500 obs from KJFK
+[2026-07-26T16:28:35Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:35Z]   Updating daily_stats for 2 dates...
+[2026-07-26T16:28:35Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:35Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:35Z]   ✓ Current obs: 78.8°F
+[2026-07-26T16:28:36Z] 
+Processing KORD...
+[2026-07-26T16:28:36Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:37Z]   NWS API: 500 obs from KORD
+[2026-07-26T16:28:37Z]   Latest existing data: 2025-08-25
+[2026-07-26T16:28:37Z]   Updating daily_stats for 2 dates...
+[2026-07-26T16:28:37Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:37Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:37Z]   ✓ Current obs: 84.2°F
+[2026-07-26T16:28:38Z] 
+Processing KPDX...
+[2026-07-26T16:28:38Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:39Z]   NWS API: 500 obs from KPDX
+[2026-07-26T16:28:39Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:39Z]   Updating daily_stats for 2 dates...
+[2026-07-26T16:28:39Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:39Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:39Z]   ✓ Current obs: 68.0°F
+[2026-07-26T16:28:40Z] 
+Processing KSLC...
+[2026-07-26T16:28:40Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:41Z]   NWS API: 500 obs from KSLC
+[2026-07-26T16:28:41Z]   Latest existing data: 2025-08-25
+[2026-07-26T16:28:41Z]   Updating daily_stats for 2 dates...
+[2026-07-26T16:28:41Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:41Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:42Z]   ✓ Current obs: 91.4°F
+[2026-07-26T16:28:42Z] 
+Processing KTPA...
+[2026-07-26T16:28:42Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:43Z]   NWS API: 500 obs from KTPA
+[2026-07-26T16:28:43Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:43Z]   Updating daily_stats for 2 dates...
+[2026-07-26T16:28:43Z]   ✓ 500 obs from NWS API
+[2026-07-26T16:28:43Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:44Z]   ✓ Current obs: 89.6°F
+[2026-07-26T16:28:44Z] 
+Processing PHNL...
+[2026-07-26T16:28:44Z]   Fetching NWS API data (60 days)...
+[2026-07-26T16:28:45Z]   NWS API: 168 obs from PHNL
+[2026-07-26T16:28:45Z]   Latest existing data: 2025-08-27
+[2026-07-26T16:28:45Z]   Updating daily_stats for 8 dates...
+[2026-07-26T16:28:45Z]   ✓ 98 obs from NWS API
+[2026-07-26T16:28:45Z]   Fetching AWC live METAR...
+[2026-07-26T16:28:45Z]   ✓ Current obs: 77.0°F
+[2026-07-26T16:28:46Z] 
+============================================================
+[2026-07-26T16:28:46Z] RECENT GAP BACKFILL COMPLETE
+[2026-07-26T16:28:46Z] Elapsed: 17.2s
+[2026-07-26T16:28:46Z] Total inserted: 4107
+[2026-07-26T16:28:46Z] 
+Verification:
+[2026-07-26T16:28:46Z]   KBNA: 2021-01-01 → 2026-07-26, 41279 obs
+[2026-07-26T16:28:46Z]   KCLT: 2021-01-01 → 2026-07-26, 41193 obs
+[2026-07-26T16:28:46Z]   KDTW: 2021-01-01 → 2026-07-26, 38629 obs
+[2026-07-26T16:28:46Z]   KJFK: 2021-01-01 → 2026-07-26, 41257 obs
+[2026-07-26T16:28:46Z]   KORD: 2021-01-01 → 2026-07-26, 41214 obs
+[2026-07-26T16:28:46Z]   KPDX: 2021-01-01 → 2026-07-26, 41255 obs
+[2026-07-26T16:28:46Z]   KSLC: 2021-01-01 → 2026-07-26, 41213 obs
+[2026-07-26T16:28:46Z]   KTPA: 2021-01-01 → 2026-07-26, 41158 obs
+[2026-07-26T16:28:46Z]   PHNL: 2021-01-01 → 2026-07-26, 40858 obs
+[2026-07-26T16:28:46Z] Done at 2026-07-26T16:28:46.331268+00:00
+[2026-07-26T16:29:18Z] 
+============================================================
+[2026-07-26T16:29:18Z] SETTLEMENT EPOCH GENERATOR — New Stations
+[2026-07-26T16:29:18Z] ============================================================
+[2026-07-26T16:29:18Z] 
+KBNA:
+[2026-07-26T16:29:18Z]   HIGH: 1703 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1703 epochs inserted
+[2026-07-26T16:29:18Z] 
+KCLT:
+[2026-07-26T16:29:18Z]   HIGH: 1708 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1708 epochs inserted
+[2026-07-26T16:29:18Z] 
+KDTW:
+[2026-07-26T16:29:18Z]   HIGH: 1702 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1702 epochs inserted
+[2026-07-26T16:29:18Z] 
+KJFK:
+[2026-07-26T16:29:18Z]   HIGH: 1702 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1702 epochs inserted
+[2026-07-26T16:29:18Z] 
+KORD:
+[2026-07-26T16:29:18Z]   HIGH: 1700 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1700 epochs inserted
+[2026-07-26T16:29:18Z] 
+KPDX:
+[2026-07-26T16:29:18Z]   HIGH: 1702 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1702 epochs inserted
+[2026-07-26T16:29:18Z] 
+KSLC:
+[2026-07-26T16:29:18Z]   HIGH: 1700 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1700 epochs inserted
+[2026-07-26T16:29:18Z] 
+KTPA:
+[2026-07-26T16:29:18Z]   HIGH: 1701 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1701 epochs inserted
+[2026-07-26T16:29:18Z] 
+PHNL:
+[2026-07-26T16:29:18Z]   HIGH: 1708 epochs inserted
+[2026-07-26T16:29:18Z]   LOW: 1708 epochs inserted
+[2026-07-26T16:29:18Z] 
+============================================================
+[2026-07-26T16:29:18Z] Total epochs inserted: 30652
+[2026-07-26T16:29:18Z] 
+Verification:
+[2026-07-26T16:29:18Z]   KBNA: 3406 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KCLT: 3416 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KDTW: 3404 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KJFK: 3404 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KORD: 3400 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KPDX: 3404 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KSLC: 3400 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   KTPA: 3402 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z]   PHNL: 3416 epochs (2021-01-01 → 2026-07-26)
+[2026-07-26T16:29:18Z] 
+Done at 2026-07-26T16:29:18Z
