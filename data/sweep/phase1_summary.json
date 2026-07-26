@@ -1,0 +1,298 @@
+{
+  "top_individual_signals": [
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.6",
+      "accuracy": 0.7015,
+      "trades": 2204
+    },
+    {
+      "signal": "forecast_disagreement",
+      "conf_threshold": "conf_0.9",
+      "accuracy": 0.7003,
+      "trades": 1902
+    },
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.0",
+      "accuracy": 0.6925,
+      "trades": 3606
+    },
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.1",
+      "accuracy": 0.6925,
+      "trades": 3606
+    },
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.2",
+      "accuracy": 0.6925,
+      "trades": 3606
+    },
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.3",
+      "accuracy": 0.6925,
+      "trades": 3606
+    },
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.4",
+      "accuracy": 0.6925,
+      "trades": 3606
+    },
+    {
+      "signal": "calendar_climatology",
+      "conf_threshold": "conf_0.5",
+      "accuracy": 0.6925,
+      "trades": 3606
+    },
+    {
+      "signal": "forecast_disagreement",
+      "conf_threshold": "conf_0.8",
+      "accuracy": 0.6849,
+      "trades": 3123
+    },
+    {
+      "signal": "gaussian_v2",
+      "conf_threshold": "conf_0.9",
+      "accuracy": 0.6807,
+      "trades": 7441
+    }
+  ],
+  "best_pairs_by_marginal_contribution": [
+    {
+      "pair": "gaussian_v2+pressure_delta",
+      "conf_threshold": "conf_0.0",
+      "marginal_contribution_pp": -0.0112,
+      "pair_accuracy": 0.6324,
+      "trades": 14273
+    },
+    {
+      "pair": "gaussian_v2+pressure_delta",
+      "conf_threshold": "conf_0.2",
+      "marginal_contribution_pp": -0.0112,
+      "pair_accuracy": 0.6324,
+      "trades": 14273
+    },
+    {
+      "pair": "gaussian_v2+pressure_delta",
+      "conf_threshold": "conf_0.4",
+      "marginal_contribution_pp": -0.0112,
+      "pair_accuracy": 0.6324,
+      "trades": 14273
+    },
+    {
+      "pair": "gaussian_v2+forecast_disagreement",
+      "conf_threshold": "conf_0.0",
+      "marginal_contribution_pp": -0.0161,
+      "pair_accuracy": 0.6337,
+      "trades": 12602
+    },
+    {
+      "pair": "gaussian_v2+forecast_disagreement",
+      "conf_threshold": "conf_0.2",
+      "marginal_contribution_pp": -0.0161,
+      "pair_accuracy": 0.6337,
+      "trades": 12602
+    },
+    {
+      "pair": "gaussian_v2+forecast_disagreement",
+      "conf_threshold": "conf_0.4",
+      "marginal_contribution_pp": -0.0161,
+      "pair_accuracy": 0.6337,
+      "trades": 12602
+    },
+    {
+      "pair": "gaussian+calendar_climatology",
+      "conf_threshold": "conf_0.0",
+      "marginal_contribution_pp": -0.0183,
+      "pair_accuracy": 0.6742,
+      "trades": 6863
+    },
+    {
+      "pair": "gaussian+calendar_climatology",
+      "conf_threshold": "conf_0.2",
+      "marginal_contribution_pp": -0.0183,
+      "pair_accuracy": 0.6742,
+      "trades": 6863
+    },
+    {
+      "pair": "gaussian+calendar_climatology",
+      "conf_threshold": "conf_0.4",
+      "marginal_contribution_pp": -0.0183,
+      "pair_accuracy": 0.6742,
+      "trades": 6863
+    },
+    {
+      "pair": "gaussian+forecast_disagreement",
+      "conf_threshold": "conf_0.0",
+      "marginal_contribution_pp": -0.0237,
+      "pair_accuracy": 0.6505,
+      "trades": 9803
+    }
+  ],
+  "strike_distance_performance": {
+    "beyond": [
+      {
+        "signal": "forecast_disagreement",
+        "conf": "conf_0.9",
+        "accuracy": 0.6805,
+        "trades": 1205
+      },
+      {
+        "signal": "forecast_disagreement",
+        "conf": "conf_0.8",
+        "accuracy": 0.6653,
+        "trades": 1927
+      },
+      {
+        "signal": "gaussian_v2",
+        "conf": "conf_0.9",
+        "accuracy": 0.6579,
+        "trades": 4098
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.0",
+        "accuracy": 0.6573,
+        "trades": 1996
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.1",
+        "accuracy": 0.6573,
+        "trades": 1996
+      }
+    ],
+    "within_10": [
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.6",
+        "accuracy": 0.7678,
+        "trades": 435
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.0",
+        "accuracy": 0.7559,
+        "trades": 721
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.1",
+        "accuracy": 0.7559,
+        "trades": 721
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.2",
+        "accuracy": 0.7559,
+        "trades": 721
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.3",
+        "accuracy": 0.7559,
+        "trades": 721
+      }
+    ],
+    "within_2": [
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.6",
+        "accuracy": 0.8122,
+        "trades": 213
+      },
+      {
+        "signal": "forecast_disagreement",
+        "conf": "conf_0.9",
+        "accuracy": 0.7557,
+        "trades": 131
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.0",
+        "accuracy": 0.7452,
+        "trades": 361
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.1",
+        "accuracy": 0.7452,
+        "trades": 361
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.2",
+        "accuracy": 0.7452,
+        "trades": 361
+      }
+    ],
+    "within_3": [
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.6",
+        "accuracy": 0.7167,
+        "trades": 120
+      },
+      {
+        "signal": "forecast_disagreement",
+        "conf": "conf_0.7",
+        "accuracy": 0.7117,
+        "trades": 163
+      },
+      {
+        "signal": "forecast_disagreement",
+        "conf": "conf_0.6",
+        "accuracy": 0.6776,
+        "trades": 214
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.0",
+        "accuracy": 0.6754,
+        "trades": 191
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.1",
+        "accuracy": 0.6754,
+        "trades": 191
+      }
+    ],
+    "within_5": [
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.6",
+        "accuracy": 0.729,
+        "trades": 214
+      },
+      {
+        "signal": "forecast_disagreement",
+        "conf": "conf_0.9",
+        "accuracy": 0.723,
+        "trades": 148
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.0",
+        "accuracy": 0.7181,
+        "trades": 337
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.1",
+        "accuracy": 0.7181,
+        "trades": 337
+      },
+      {
+        "signal": "calendar_climatology",
+        "conf": "conf_0.2",
+        "accuracy": 0.7181,
+        "trades": 337
+      }
+    ]
+  }
+}
