@@ -1,0 +1,202 @@
+===========================================================================
+  WEATHER ENGINE — PHASE 2 FULL SWEEP FINAL REPORT
+===========================================================================
+  Generated: 2026-07-27 10:46 UTC
+  Total configs in sweep: 30,000
+  Valid (>100 trades):    29071
+  Insufficient trades:    929
+
+───────────────────────────────────────────────────────────────────────────
+  TOP 15 BY DIRECTIONAL ACCURACY
+───────────────────────────────────────────────────────────────────────────
+   1. 73.03%  T= 2306  S=0.542  PF=2.89  DD=7.38%
+      min_conf=0.796  agree=4  train=318d  test=31d  off=16.0°F  decay=0.802  win=17d
+      Fee-adj=70.98%  Edge=0.2098  Brier=0.2278  ECE=0.1727  F1=0.7371  MCC=0.4614
+
+   2. 73.01%  T= 2297  S=0.542  PF=2.89  DD=7.38%
+      min_conf=0.795  agree=4  train=323d  test=30d  off=13.4°F  decay=0.909  win=23d
+      Fee-adj=70.96%  Edge=0.2096  Brier=0.2278  ECE=0.1725  F1=0.7357  MCC=0.4611
+
+   3. 72.96%  T= 2363  S=0.542  PF=2.89  DD=7.38%
+      min_conf=0.788  agree=4  train=318d  test=33d  off=13.2°F  decay=0.624  win=75d
+      Fee-adj=70.91%  Edge=0.2091  Brier=0.2268  ECE=0.1697  F1=0.7350  MCC=0.4603
+
+   4. 72.91%  T= 2514  S=0.539  PF=2.88  DD=6.78%
+      min_conf=0.795  agree=4  train=109d  test=51d  off=3.7°F  decay=0.875  win=20d
+      Fee-adj=70.86%  Edge=0.2086  Brier=0.2277  ECE=0.1710  F1=0.7351  MCC=0.4595
+
+   5. 72.91%  T= 2381  S=0.540  PF=2.88  DD=7.28%
+      min_conf=0.787  agree=4  train=318d  test=45d  off=16.5°F  decay=0.915  win=25d
+      Fee-adj=70.86%  Edge=0.2086  Brier=0.2275  ECE=0.1708  F1=0.7342  MCC=0.4593
+
+   6. 72.88%  T= 2279  S=0.538  PF=2.87  DD=7.60%
+      min_conf=0.800  agree=4  train=318d  test=33d  off=20.8°F  decay=0.853  win=11d
+      Fee-adj=70.83%  Edge=0.2083  Brier=0.2288  ECE=0.1731  F1=0.7363  MCC=0.4586
+
+   7. 72.87%  T= 2370  S=0.540  PF=2.88  DD=7.22%
+      min_conf=0.787  agree=4  train=317d  test=59d  off=15.7°F  decay=0.717  win=76d
+      Fee-adj=70.82%  Edge=0.2082  Brier=0.2269  ECE=0.1689  F1=0.7335  MCC=0.4587
+
+   8. 72.86%  T= 2314  S=0.540  PF=2.88  DD=7.67%
+      min_conf=0.787  agree=4  train=343d  test=30d  off=10.7°F  decay=0.981  win=66d
+      Fee-adj=70.81%  Edge=0.2081  Brier=0.2276  ECE=0.1703  F1=0.7298  MCC=0.4582
+
+   9. 72.86%  T= 2314  S=0.539  PF=2.88  DD=7.32%
+      min_conf=0.796  agree=4  train=310d  test=34d  off=5.3°F  decay=0.700  win=72d
+      Fee-adj=70.81%  Edge=0.2081  Brier=0.2279  ECE=0.1708  F1=0.7355  MCC=0.4583
+
+  10. 72.86%  T= 2517  S=0.538  PF=2.87  DD=6.78%
+      min_conf=0.796  agree=4  train=101d  test=59d  off=3.3°F  decay=0.530  win=26d
+      Fee-adj=70.81%  Edge=0.2081  Brier=0.2281  ECE=0.1715  F1=0.7348  MCC=0.4585
+
+  11. 72.86%  T= 2502  S=0.538  PF=2.87  DD=6.92%
+      min_conf=0.797  agree=4  train=106d  test=43d  off=20.2°F  decay=0.766  win=41d
+      Fee-adj=70.81%  Edge=0.2081  Brier=0.2280  ECE=0.1712  F1=0.7351  MCC=0.4584
+
+  12. 72.86%  T= 2299  S=0.530  PF=2.82  DD=11.40%
+      min_conf=0.581  agree=5  train=107d  test=30d  off=8.0°F  decay=0.879  win=18d
+      Fee-adj=70.81%  Edge=0.2081  Brier=0.2277  ECE=0.1669  F1=0.7564  MCC=0.4644
+
+  13. 72.85%  T= 2276  S=0.537  PF=2.87  DD=7.60%
+      min_conf=0.798  agree=4  train=326d  test=30d  off=8.1°F  decay=0.768  win=70d
+      Fee-adj=70.80%  Edge=0.2080  Brier=0.2291  ECE=0.1735  F1=0.7334  MCC=0.4580
+
+  14. 72.85%  T= 2368  S=0.538  PF=2.88  DD=7.28%
+      min_conf=0.787  agree=4  train=322d  test=46d  off=24.0°F  decay=0.816  win=27d
+      Fee-adj=70.80%  Edge=0.2080  Brier=0.2278  ECE=0.1706  F1=0.7324  MCC=0.4580
+
+  15. 72.81%  T= 2424  S=0.538  PF=2.87  DD=7.21%
+      min_conf=0.796  agree=4  train=172d  test=44d  off=4.9°F  decay=0.527  win=81d
+      Fee-adj=70.76%  Edge=0.2076  Brier=0.2275  ECE=0.1695  F1=0.7390  MCC=0.4577
+
+───────────────────────────────────────────────────────────────────────────
+  TOP 15 BY SHARPE RATIO
+───────────────────────────────────────────────────────────────────────────
+   1. S=0.542  72.96%  T= 2363  PF=2.89
+      min_conf=0.788  agree=4  train=318d  off=13.2°F
+
+   2. S=0.542  73.03%  T= 2306  PF=2.89
+      min_conf=0.796  agree=4  train=318d  off=16.0°F
+
+   3. S=0.542  73.01%  T= 2297  PF=2.89
+      min_conf=0.795  agree=4  train=323d  off=13.4°F
+
+   4. S=0.540  72.91%  T= 2381  PF=2.88
+      min_conf=0.787  agree=4  train=318d  off=16.5°F
+
+   5. S=0.540  72.87%  T= 2370  PF=2.88
+      min_conf=0.787  agree=4  train=317d  off=15.7°F
+
+   6. S=0.540  72.86%  T= 2314  PF=2.88
+      min_conf=0.787  agree=4  train=343d  off=10.7°F
+
+   7. S=0.540  72.78%  T= 2469  PF=2.88
+      min_conf=0.788  agree=4  train=189d  off=19.8°F
+
+   8. S=0.539  72.91%  T= 2514  PF=2.88
+      min_conf=0.795  agree=4  train=109d  off=3.7°F
+
+   9. S=0.539  72.86%  T= 2314  PF=2.88
+      min_conf=0.796  agree=4  train=310d  off=5.3°F
+
+  10. S=0.539  72.77%  T= 2479  PF=2.88
+      min_conf=0.788  agree=4  train=184d  off=19.6°F
+
+  11. S=0.539  72.77%  T= 2479  PF=2.88
+      min_conf=0.788  agree=4  train=182d  off=21.6°F
+
+  12. S=0.538  72.85%  T= 2368  PF=2.88
+      min_conf=0.787  agree=4  train=322d  off=24.0°F
+
+  13. S=0.538  72.81%  T= 2405  PF=2.88
+      min_conf=0.797  agree=4  train=203d  off=5.3°F
+
+  14. S=0.538  72.88%  T= 2279  PF=2.87
+      min_conf=0.800  agree=4  train=318d  off=20.8°F
+
+  15. S=0.538  72.77%  T= 2361  PF=2.87
+      min_conf=0.790  agree=4  train=314d  off=21.7°F
+
+───────────────────────────────────────────────────────────────────────────
+  TOP 15 BY PROFIT FACTOR
+───────────────────────────────────────────────────────────────────────────
+   1. PF=2.89  72.96%  T= 2363  S=0.542
+      min_conf=0.788  agree=4  train=318d  off=13.2°F
+
+   2. PF=2.89  73.03%  T= 2306  S=0.542
+      min_conf=0.796  agree=4  train=318d  off=16.0°F
+
+   3. PF=2.89  73.01%  T= 2297  S=0.542
+      min_conf=0.795  agree=4  train=323d  off=13.4°F
+
+   4. PF=2.88  72.78%  T= 2469  S=0.540
+      min_conf=0.788  agree=4  train=189d  off=19.8°F
+
+   5. PF=2.88  72.87%  T= 2370  S=0.540
+      min_conf=0.787  agree=4  train=317d  off=15.7°F
+
+   6. PF=2.88  72.91%  T= 2381  S=0.540
+      min_conf=0.787  agree=4  train=318d  off=16.5°F
+
+   7. PF=2.88  72.91%  T= 2514  S=0.539
+      min_conf=0.795  agree=4  train=109d  off=3.7°F
+
+   8. PF=2.88  72.86%  T= 2314  S=0.540
+      min_conf=0.787  agree=4  train=343d  off=10.7°F
+
+   9. PF=2.88  72.77%  T= 2479  S=0.539
+      min_conf=0.788  agree=4  train=184d  off=19.6°F
+
+  10. PF=2.88  72.77%  T= 2479  S=0.539
+      min_conf=0.788  agree=4  train=182d  off=21.6°F
+
+  11. PF=2.88  72.81%  T= 2405  S=0.538
+      min_conf=0.797  agree=4  train=203d  off=5.3°F
+
+  12. PF=2.88  72.86%  T= 2314  S=0.539
+      min_conf=0.796  agree=4  train=310d  off=5.3°F
+
+  13. PF=2.88  72.85%  T= 2368  S=0.538
+      min_conf=0.787  agree=4  train=322d  off=24.0°F
+
+  14. PF=2.87  72.79%  T= 2576  S=0.538
+      min_conf=0.787  agree=4  train=114d  off=10.7°F
+
+  15. PF=2.87  72.81%  T= 2424  S=0.538
+      min_conf=0.796  agree=4  train=172d  off=4.9°F
+
+───────────────────────────────────────────────────────────────────────────
+  SUMMARY STATISTICS
+───────────────────────────────────────────────────────────────────────────
+  Directional accuracy:  mean=66.58%  median=66.41%  max=73.03%  min=62.28%
+  Sharpe:                mean=0.371  median=0.368  max=0.542  min=0.259
+  Trades:                mean=13147  median=12768  max=29125  min=1800
+  Profit factor:         mean=2.138  median=2.110  max=2.894  min=1.712
+  Max drawdown:          mean=8.92%  median=8.24%  max=18.86%  min=4.19%
+  Max cons. losses:      mean=7.9  median=8  max=15  min=4
+
+───────────────────────────────────────────────────────────────────────────
+  ANALYSIS
+───────────────────────────────────────────────────────────────────────────
+  Configs with accuracy >= 70%:     4631
+  Configs with Sharpe >= 1.0:      0
+  Configs with PF >= 2.0:          19446
+  Configs with S>=0.5 + PF>=2 + 1000+ trades: 1043
+
+  BEST ALL-ROUNDERS (Sharpe × Acc × log(Trades)):
+  1. 72.91%  T= 2514  S=0.539  PF=2.88  DD=6.78%
+      min_conf=0.795  agree=4  train=109d  off=3.7°F
+  2. 72.79%  T= 2576  S=0.538  PF=2.87  DD=6.78%
+      min_conf=0.787  agree=4  train=114d  off=10.7°F
+  3. 72.96%  T= 2363  S=0.542  PF=2.89  DD=7.38%
+      min_conf=0.788  agree=4  train=318d  off=13.2°F
+
+  NOTE: Sharpe 0.54 is the honest max. No config hits the 1.2 target.
+  Best config recommended: min_conf~0.79, min_agreement=4, ~318 train days
+  This gives ~73% accuracy with 2,300+ trades, which is the real edge.
+  The next levers (spatial coherence, trajectory, NWP-based signals)
+  are expected to push Sharpe toward 1.0+.
+
+===========================================================================
+  END REPORT
+===========================================================================

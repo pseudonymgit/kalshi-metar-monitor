@@ -1,0 +1,753 @@
+{
+  "total_configs": 29071,
+  "top_by_accuracy": [
+    {
+      "acc": 0.7303,
+      "trades": 2306,
+      "sharpe": 0.5418,
+      "pf": 2.8926,
+      "config": {
+        "decay_factor": 0.802,
+        "min_agreement": 4,
+        "min_conf": 0.7962,
+        "sig_window": 17,
+        "strike_offset": 16.0,
+        "test_days": 31,
+        "train_days": 318
+      }
+    },
+    {
+      "acc": 0.7301,
+      "trades": 2297,
+      "sharpe": 0.5417,
+      "pf": 2.8914,
+      "config": {
+        "decay_factor": 0.909,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 23,
+        "strike_offset": 13.4,
+        "test_days": 30,
+        "train_days": 323
+      }
+    },
+    {
+      "acc": 0.7296,
+      "trades": 2363,
+      "sharpe": 0.5419,
+      "pf": 2.8943,
+      "config": {
+        "decay_factor": 0.624,
+        "min_agreement": 4,
+        "min_conf": 0.7883,
+        "sig_window": 75,
+        "strike_offset": 13.2,
+        "test_days": 33,
+        "train_days": 318
+      }
+    },
+    {
+      "acc": 0.7291,
+      "trades": 2514,
+      "sharpe": 0.5392,
+      "pf": 2.8811,
+      "config": {
+        "decay_factor": 0.875,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 20,
+        "strike_offset": 3.7,
+        "test_days": 51,
+        "train_days": 109
+      }
+    },
+    {
+      "acc": 0.7291,
+      "trades": 2381,
+      "sharpe": 0.5398,
+      "pf": 2.8838,
+      "config": {
+        "decay_factor": 0.915,
+        "min_agreement": 4,
+        "min_conf": 0.7871,
+        "sig_window": 25,
+        "strike_offset": 16.5,
+        "test_days": 45,
+        "train_days": 318
+      }
+    },
+    {
+      "acc": 0.7288,
+      "trades": 2279,
+      "sharpe": 0.5382,
+      "pf": 2.8726,
+      "config": {
+        "decay_factor": 0.853,
+        "min_agreement": 4,
+        "min_conf": 0.7999,
+        "sig_window": 11,
+        "strike_offset": 20.8,
+        "test_days": 33,
+        "train_days": 318
+      }
+    },
+    {
+      "acc": 0.7287,
+      "trades": 2370,
+      "sharpe": 0.5397,
+      "pf": 2.8841,
+      "config": {
+        "decay_factor": 0.717,
+        "min_agreement": 4,
+        "min_conf": 0.7869,
+        "sig_window": 76,
+        "strike_offset": 15.7,
+        "test_days": 59,
+        "train_days": 317
+      }
+    },
+    {
+      "acc": 0.7286,
+      "trades": 2314,
+      "sharpe": 0.5396,
+      "pf": 2.8805,
+      "config": {
+        "decay_factor": 0.981,
+        "min_agreement": 4,
+        "min_conf": 0.7874,
+        "sig_window": 66,
+        "strike_offset": 10.7,
+        "test_days": 30,
+        "train_days": 343
+      }
+    },
+    {
+      "acc": 0.7286,
+      "trades": 2314,
+      "sharpe": 0.5387,
+      "pf": 2.8766,
+      "config": {
+        "decay_factor": 0.7,
+        "min_agreement": 4,
+        "min_conf": 0.7961,
+        "sig_window": 72,
+        "strike_offset": 5.3,
+        "test_days": 34,
+        "train_days": 310
+      }
+    },
+    {
+      "acc": 0.7286,
+      "trades": 2517,
+      "sharpe": 0.5377,
+      "pf": 2.8734,
+      "config": {
+        "decay_factor": 0.53,
+        "min_agreement": 4,
+        "min_conf": 0.7964,
+        "sig_window": 26,
+        "strike_offset": 3.3,
+        "test_days": 59,
+        "train_days": 101
+      }
+    },
+    {
+      "acc": 0.7286,
+      "trades": 2502,
+      "sharpe": 0.5378,
+      "pf": 2.874,
+      "config": {
+        "decay_factor": 0.766,
+        "min_agreement": 4,
+        "min_conf": 0.7975,
+        "sig_window": 41,
+        "strike_offset": 20.2,
+        "test_days": 43,
+        "train_days": 106
+      }
+    },
+    {
+      "acc": 0.7286,
+      "trades": 2299,
+      "sharpe": 0.5304,
+      "pf": 2.8214,
+      "config": {
+        "decay_factor": 0.879,
+        "min_agreement": 5,
+        "min_conf": 0.5808,
+        "sig_window": 18,
+        "strike_offset": 8.0,
+        "test_days": 30,
+        "train_days": 107
+      }
+    },
+    {
+      "acc": 0.7285,
+      "trades": 2276,
+      "sharpe": 0.5368,
+      "pf": 2.866,
+      "config": {
+        "decay_factor": 0.768,
+        "min_agreement": 4,
+        "min_conf": 0.7977,
+        "sig_window": 70,
+        "strike_offset": 8.1,
+        "test_days": 30,
+        "train_days": 326
+      }
+    },
+    {
+      "acc": 0.7285,
+      "trades": 2368,
+      "sharpe": 0.5384,
+      "pf": 2.8761,
+      "config": {
+        "decay_factor": 0.816,
+        "min_agreement": 4,
+        "min_conf": 0.7869,
+        "sig_window": 27,
+        "strike_offset": 24.0,
+        "test_days": 46,
+        "train_days": 322
+      }
+    },
+    {
+      "acc": 0.7281,
+      "trades": 2424,
+      "sharpe": 0.5379,
+      "pf": 2.8742,
+      "config": {
+        "decay_factor": 0.527,
+        "min_agreement": 4,
+        "min_conf": 0.7964,
+        "sig_window": 81,
+        "strike_offset": 4.9,
+        "test_days": 44,
+        "train_days": 172
+      }
+    }
+  ],
+  "top_by_sharpe": [
+    {
+      "sharpe": 0.5419,
+      "acc": 0.7296,
+      "trades": 2363,
+      "pf": 2.8943,
+      "config": {
+        "decay_factor": 0.624,
+        "min_agreement": 4,
+        "min_conf": 0.7883,
+        "sig_window": 75,
+        "strike_offset": 13.2,
+        "test_days": 33,
+        "train_days": 318
+      }
+    },
+    {
+      "sharpe": 0.5418,
+      "acc": 0.7303,
+      "trades": 2306,
+      "pf": 2.8926,
+      "config": {
+        "decay_factor": 0.802,
+        "min_agreement": 4,
+        "min_conf": 0.7962,
+        "sig_window": 17,
+        "strike_offset": 16.0,
+        "test_days": 31,
+        "train_days": 318
+      }
+    },
+    {
+      "sharpe": 0.5417,
+      "acc": 0.7301,
+      "trades": 2297,
+      "pf": 2.8914,
+      "config": {
+        "decay_factor": 0.909,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 23,
+        "strike_offset": 13.4,
+        "test_days": 30,
+        "train_days": 323
+      }
+    },
+    {
+      "sharpe": 0.5398,
+      "acc": 0.7291,
+      "trades": 2381,
+      "pf": 2.8838,
+      "config": {
+        "decay_factor": 0.915,
+        "min_agreement": 4,
+        "min_conf": 0.7871,
+        "sig_window": 25,
+        "strike_offset": 16.5,
+        "test_days": 45,
+        "train_days": 318
+      }
+    },
+    {
+      "sharpe": 0.5397,
+      "acc": 0.7287,
+      "trades": 2370,
+      "pf": 2.8841,
+      "config": {
+        "decay_factor": 0.717,
+        "min_agreement": 4,
+        "min_conf": 0.7869,
+        "sig_window": 76,
+        "strike_offset": 15.7,
+        "test_days": 59,
+        "train_days": 317
+      }
+    },
+    {
+      "sharpe": 0.5396,
+      "acc": 0.7286,
+      "trades": 2314,
+      "pf": 2.8805,
+      "config": {
+        "decay_factor": 0.981,
+        "min_agreement": 4,
+        "min_conf": 0.7874,
+        "sig_window": 66,
+        "strike_offset": 10.7,
+        "test_days": 30,
+        "train_days": 343
+      }
+    },
+    {
+      "sharpe": 0.5396,
+      "acc": 0.7278,
+      "trades": 2469,
+      "pf": 2.8842,
+      "config": {
+        "decay_factor": 0.682,
+        "min_agreement": 4,
+        "min_conf": 0.7882,
+        "sig_window": 29,
+        "strike_offset": 19.8,
+        "test_days": 32,
+        "train_days": 189
+      }
+    },
+    {
+      "sharpe": 0.5392,
+      "acc": 0.7291,
+      "trades": 2514,
+      "pf": 2.8811,
+      "config": {
+        "decay_factor": 0.875,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 20,
+        "strike_offset": 3.7,
+        "test_days": 51,
+        "train_days": 109
+      }
+    },
+    {
+      "sharpe": 0.5387,
+      "acc": 0.7286,
+      "trades": 2314,
+      "pf": 2.8766,
+      "config": {
+        "decay_factor": 0.7,
+        "min_agreement": 4,
+        "min_conf": 0.7961,
+        "sig_window": 72,
+        "strike_offset": 5.3,
+        "test_days": 34,
+        "train_days": 310
+      }
+    },
+    {
+      "sharpe": 0.5387,
+      "acc": 0.7277,
+      "trades": 2479,
+      "pf": 2.8795,
+      "config": {
+        "decay_factor": 0.993,
+        "min_agreement": 4,
+        "min_conf": 0.7883,
+        "sig_window": 33,
+        "strike_offset": 19.6,
+        "test_days": 30,
+        "train_days": 184
+      }
+    },
+    {
+      "sharpe": 0.5387,
+      "acc": 0.7277,
+      "trades": 2479,
+      "pf": 2.8795,
+      "config": {
+        "decay_factor": 0.755,
+        "min_agreement": 4,
+        "min_conf": 0.7881,
+        "sig_window": 45,
+        "strike_offset": 21.6,
+        "test_days": 30,
+        "train_days": 182
+      }
+    },
+    {
+      "sharpe": 0.5384,
+      "acc": 0.7285,
+      "trades": 2368,
+      "pf": 2.8761,
+      "config": {
+        "decay_factor": 0.816,
+        "min_agreement": 4,
+        "min_conf": 0.7869,
+        "sig_window": 27,
+        "strike_offset": 24.0,
+        "test_days": 46,
+        "train_days": 322
+      }
+    },
+    {
+      "sharpe": 0.5384,
+      "acc": 0.7281,
+      "trades": 2405,
+      "pf": 2.8769,
+      "config": {
+        "decay_factor": 0.541,
+        "min_agreement": 4,
+        "min_conf": 0.7969,
+        "sig_window": 60,
+        "strike_offset": 5.3,
+        "test_days": 38,
+        "train_days": 203
+      }
+    },
+    {
+      "sharpe": 0.5382,
+      "acc": 0.7288,
+      "trades": 2279,
+      "pf": 2.8726,
+      "config": {
+        "decay_factor": 0.853,
+        "min_agreement": 4,
+        "min_conf": 0.7999,
+        "sig_window": 11,
+        "strike_offset": 20.8,
+        "test_days": 33,
+        "train_days": 318
+      }
+    },
+    {
+      "sharpe": 0.538,
+      "acc": 0.7277,
+      "trades": 2361,
+      "pf": 2.874,
+      "config": {
+        "decay_factor": 0.663,
+        "min_agreement": 4,
+        "min_conf": 0.7899,
+        "sig_window": 11,
+        "strike_offset": 21.7,
+        "test_days": 33,
+        "train_days": 314
+      }
+    }
+  ],
+  "top_by_profit_factor": [
+    {
+      "pf": 2.8943,
+      "acc": 0.7296,
+      "trades": 2363,
+      "sharpe": 0.5419,
+      "config": {
+        "decay_factor": 0.624,
+        "min_agreement": 4,
+        "min_conf": 0.7883,
+        "sig_window": 75,
+        "strike_offset": 13.2,
+        "test_days": 33,
+        "train_days": 318
+      }
+    },
+    {
+      "pf": 2.8926,
+      "acc": 0.7303,
+      "trades": 2306,
+      "sharpe": 0.5418,
+      "config": {
+        "decay_factor": 0.802,
+        "min_agreement": 4,
+        "min_conf": 0.7962,
+        "sig_window": 17,
+        "strike_offset": 16.0,
+        "test_days": 31,
+        "train_days": 318
+      }
+    },
+    {
+      "pf": 2.8914,
+      "acc": 0.7301,
+      "trades": 2297,
+      "sharpe": 0.5417,
+      "config": {
+        "decay_factor": 0.909,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 23,
+        "strike_offset": 13.4,
+        "test_days": 30,
+        "train_days": 323
+      }
+    },
+    {
+      "pf": 2.8842,
+      "acc": 0.7278,
+      "trades": 2469,
+      "sharpe": 0.5396,
+      "config": {
+        "decay_factor": 0.682,
+        "min_agreement": 4,
+        "min_conf": 0.7882,
+        "sig_window": 29,
+        "strike_offset": 19.8,
+        "test_days": 32,
+        "train_days": 189
+      }
+    },
+    {
+      "pf": 2.8841,
+      "acc": 0.7287,
+      "trades": 2370,
+      "sharpe": 0.5397,
+      "config": {
+        "decay_factor": 0.717,
+        "min_agreement": 4,
+        "min_conf": 0.7869,
+        "sig_window": 76,
+        "strike_offset": 15.7,
+        "test_days": 59,
+        "train_days": 317
+      }
+    },
+    {
+      "pf": 2.8838,
+      "acc": 0.7291,
+      "trades": 2381,
+      "sharpe": 0.5398,
+      "config": {
+        "decay_factor": 0.915,
+        "min_agreement": 4,
+        "min_conf": 0.7871,
+        "sig_window": 25,
+        "strike_offset": 16.5,
+        "test_days": 45,
+        "train_days": 318
+      }
+    },
+    {
+      "pf": 2.8811,
+      "acc": 0.7291,
+      "trades": 2514,
+      "sharpe": 0.5392,
+      "config": {
+        "decay_factor": 0.875,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 20,
+        "strike_offset": 3.7,
+        "test_days": 51,
+        "train_days": 109
+      }
+    },
+    {
+      "pf": 2.8805,
+      "acc": 0.7286,
+      "trades": 2314,
+      "sharpe": 0.5396,
+      "config": {
+        "decay_factor": 0.981,
+        "min_agreement": 4,
+        "min_conf": 0.7874,
+        "sig_window": 66,
+        "strike_offset": 10.7,
+        "test_days": 30,
+        "train_days": 343
+      }
+    },
+    {
+      "pf": 2.8795,
+      "acc": 0.7277,
+      "trades": 2479,
+      "sharpe": 0.5387,
+      "config": {
+        "decay_factor": 0.993,
+        "min_agreement": 4,
+        "min_conf": 0.7883,
+        "sig_window": 33,
+        "strike_offset": 19.6,
+        "test_days": 30,
+        "train_days": 184
+      }
+    },
+    {
+      "pf": 2.8795,
+      "acc": 0.7277,
+      "trades": 2479,
+      "sharpe": 0.5387,
+      "config": {
+        "decay_factor": 0.755,
+        "min_agreement": 4,
+        "min_conf": 0.7881,
+        "sig_window": 45,
+        "strike_offset": 21.6,
+        "test_days": 30,
+        "train_days": 182
+      }
+    },
+    {
+      "pf": 2.8769,
+      "acc": 0.7281,
+      "trades": 2405,
+      "sharpe": 0.5384,
+      "config": {
+        "decay_factor": 0.541,
+        "min_agreement": 4,
+        "min_conf": 0.7969,
+        "sig_window": 60,
+        "strike_offset": 5.3,
+        "test_days": 38,
+        "train_days": 203
+      }
+    },
+    {
+      "pf": 2.8766,
+      "acc": 0.7286,
+      "trades": 2314,
+      "sharpe": 0.5387,
+      "config": {
+        "decay_factor": 0.7,
+        "min_agreement": 4,
+        "min_conf": 0.7961,
+        "sig_window": 72,
+        "strike_offset": 5.3,
+        "test_days": 34,
+        "train_days": 310
+      }
+    },
+    {
+      "pf": 2.8761,
+      "acc": 0.7285,
+      "trades": 2368,
+      "sharpe": 0.5384,
+      "config": {
+        "decay_factor": 0.816,
+        "min_agreement": 4,
+        "min_conf": 0.7869,
+        "sig_window": 27,
+        "strike_offset": 24.0,
+        "test_days": 46,
+        "train_days": 322
+      }
+    },
+    {
+      "pf": 2.8743,
+      "acc": 0.7279,
+      "trades": 2576,
+      "sharpe": 0.5378,
+      "config": {
+        "decay_factor": 0.806,
+        "min_agreement": 4,
+        "min_conf": 0.7872,
+        "sig_window": 29,
+        "strike_offset": 10.7,
+        "test_days": 30,
+        "train_days": 114
+      }
+    },
+    {
+      "pf": 2.8742,
+      "acc": 0.7281,
+      "trades": 2424,
+      "sharpe": 0.5379,
+      "config": {
+        "decay_factor": 0.527,
+        "min_agreement": 4,
+        "min_conf": 0.7964,
+        "sig_window": 81,
+        "strike_offset": 4.9,
+        "test_days": 44,
+        "train_days": 172
+      }
+    }
+  ],
+  "best_all_rounders": [
+    {
+      "acc": 0.7291,
+      "trades": 2514,
+      "sharpe": 0.5392,
+      "pf": 2.8811,
+      "config": {
+        "decay_factor": 0.875,
+        "min_agreement": 4,
+        "min_conf": 0.7949,
+        "sig_window": 20,
+        "strike_offset": 3.7,
+        "test_days": 51,
+        "train_days": 109
+      }
+    },
+    {
+      "acc": 0.7279,
+      "trades": 2576,
+      "sharpe": 0.5378,
+      "pf": 2.8743,
+      "config": {
+        "decay_factor": 0.806,
+        "min_agreement": 4,
+        "min_conf": 0.7872,
+        "sig_window": 29,
+        "strike_offset": 10.7,
+        "test_days": 30,
+        "train_days": 114
+      }
+    },
+    {
+      "acc": 0.7296,
+      "trades": 2363,
+      "sharpe": 0.5419,
+      "pf": 2.8943,
+      "config": {
+        "decay_factor": 0.624,
+        "min_agreement": 4,
+        "min_conf": 0.7883,
+        "sig_window": 75,
+        "strike_offset": 13.2,
+        "test_days": 33,
+        "train_days": 318
+      }
+    }
+  ],
+  "summary_stats": {
+    "accuracy_mean": 0.6658158714870526,
+    "accuracy_median": 0.6641,
+    "accuracy_max": 0.7303,
+    "sharpe_mean": 0.3711269099790131,
+    "sharpe_median": 0.3678,
+    "sharpe_max": 0.5419,
+    "trades_mean": 13147.465240273812,
+    "trades_median": 12768,
+    "trades_max": 29125,
+    "profit_factor_mean": 2.137976412920063,
+    "profit_factor_median": 2.11,
+    "profit_factor_max": 2.8943,
+    "max_drawdown_mean": 0.08924447731416166,
+    "max_consecutive_losses_mean": 7.904234460458876
+  },
+  "counts": {
+    "acc_ge_70": 4631,
+    "sharpe_ge_1": 0,
+    "pf_ge_2": 19446,
+    "both_criteria": 1043
+  }
+}
