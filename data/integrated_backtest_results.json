@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-07-27T01:47:48.132776",
+  "results": {
+    "baseline (cc)": {
+      "accuracy": 0.7007,
+      "trades": 6639
+    },
+    "cc + regime": {
+      "accuracy": 0.7023,
+      "trades": 5919
+    },
+    "cc + bias": {
+      "accuracy": 0.7007,
+      "trades": 6639
+    },
+    "cc + all": {
+      "accuracy": 0.7023,
+      "trades": 5919
+    }
+  }
+}

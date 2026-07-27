@@ -1,5 +1,5 @@
 {
-  "last_completed": "fee_aware_kelly",
+  "last_completed": "full_validation_backtest",
   "step_status": {
     "regime_classifier": "completed",
     "speci_parsing": "completed",
@@ -8,13 +8,13 @@
     "station_bias_profiles": "completed",
     "n_eff_computation": "completed",
     "fee_aware_kelly": "completed",
-    "multi_leg_spread": "failed",
-    "spatial_coherence_gate": "pending",
-    "wind_conditional_corr": "pending",
-    "full_validation_backtest": "pending"
+    "multi_leg_spread": "completed",
+    "spatial_coherence_gate": "completed",
+    "wind_conditional_corr": "completed",
+    "full_validation_backtest": "completed"
   },
   "started_at": "2026-07-26T20:55:05.526672Z",
-  "completed_at": null,
+  "completed_at": "2026-07-27T00:08:28.692513Z",
   "errors": [
     {
       "step": "station_bias_profiles",
@@ -35,6 +35,11 @@
       "step": "multi_leg_spread",
       "error": "RuntimeError: Step multi_leg_spread verification failed: {'test_narrow_spread': {'spread_type': 'narrow', 'center_bucket': 85, 'bucket_span': 1, 'legs': [85], 'num_legs': 1, 'type': 'HIGH'}, 'error': 'Expected [84, 85, 86], got [85]'}",
       "timestamp": "2026-07-26T21:51:33.280281Z"
+    },
+    {
+      "step": "multi_leg_spread",
+      "error": "RuntimeError: Step multi_leg_spread verification failed: {'test_narrow_spread': {'spread_type': 'narrow', 'center_bucket': 85, 'bucket_span': 1, 'legs': [85], 'num_legs': 1, 'type': 'HIGH'}, 'error': 'Expected [84, 85, 86], got [85]'}",
+      "timestamp": "2026-07-27T00:04:48.845883Z"
     }
   ],
   "steps_completed": [

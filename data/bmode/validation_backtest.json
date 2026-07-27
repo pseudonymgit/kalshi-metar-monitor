@@ -1,0 +1,186 @@
+{
+  "mode": "phase1_validation",
+  "features_included": [
+    "regime_classifier",
+    "station_bias_profiles",
+    "n_eff",
+    "fee_aware_kelly",
+    "multi_leg_spreads",
+    "spatial_coherence_gate",
+    "wind_conditional_corr"
+  ],
+  "stations": [
+    "KATL",
+    "KAUS",
+    "KBOS",
+    "KDCA",
+    "KDEN",
+    "KDFW",
+    "KHOU",
+    "KLAS",
+    "KLAX",
+    "KMDW",
+    "KMIA",
+    "KMSP",
+    "KMSY",
+    "KNYC",
+    "KOKC",
+    "KPHL",
+    "KPHX",
+    "KSAT",
+    "KSEA",
+    "KSFO"
+  ],
+  "n_stations": 20,
+  "results": {
+    "KATL": {
+      "station": "KATL",
+      "persistence_accuracy": 0.7308,
+      "n_trades": 364,
+      "n_correct": 266,
+      "n_wrong": 98
+    },
+    "KAUS": {
+      "station": "KAUS",
+      "persistence_accuracy": 0.5852,
+      "n_trades": 364,
+      "n_correct": 213,
+      "n_wrong": 151
+    },
+    "KBOS": {
+      "station": "KBOS",
+      "persistence_accuracy": 0.7198,
+      "n_trades": 364,
+      "n_correct": 262,
+      "n_wrong": 102
+    },
+    "KDCA": {
+      "station": "KDCA",
+      "persistence_accuracy": 0.7005,
+      "n_trades": 364,
+      "n_correct": 255,
+      "n_wrong": 109
+    },
+    "KDEN": {
+      "station": "KDEN",
+      "persistence_accuracy": 0.5934,
+      "n_trades": 364,
+      "n_correct": 216,
+      "n_wrong": 148
+    },
+    "KDFW": {
+      "station": "KDFW",
+      "persistence_accuracy": 0.6429,
+      "n_trades": 364,
+      "n_correct": 234,
+      "n_wrong": 130
+    },
+    "KHOU": {
+      "station": "KHOU",
+      "persistence_accuracy": 0.6264,
+      "n_trades": 364,
+      "n_correct": 228,
+      "n_wrong": 136
+    },
+    "KLAS": {
+      "station": "KLAS",
+      "persistence_accuracy": 0.6126,
+      "n_trades": 364,
+      "n_correct": 223,
+      "n_wrong": 141
+    },
+    "KLAX": {
+      "station": "KLAX",
+      "persistence_accuracy": 0.6071,
+      "n_trades": 364,
+      "n_correct": 221,
+      "n_wrong": 143
+    },
+    "KMDW": {
+      "station": "KMDW",
+      "persistence_accuracy": 0.717,
+      "n_trades": 364,
+      "n_correct": 261,
+      "n_wrong": 103
+    },
+    "KMIA": {
+      "station": "KMIA",
+      "persistence_accuracy": 0.6923,
+      "n_trades": 364,
+      "n_correct": 252,
+      "n_wrong": 112
+    },
+    "KMSP": {
+      "station": "KMSP",
+      "persistence_accuracy": 0.6566,
+      "n_trades": 364,
+      "n_correct": 239,
+      "n_wrong": 125
+    },
+    "KMSY": {
+      "station": "KMSY",
+      "persistence_accuracy": 0.6868,
+      "n_trades": 364,
+      "n_correct": 250,
+      "n_wrong": 114
+    },
+    "KNYC": {
+      "station": "KNYC",
+      "persistence_accuracy": 0.717,
+      "n_trades": 364,
+      "n_correct": 261,
+      "n_wrong": 103
+    },
+    "KOKC": {
+      "station": "KOKC",
+      "persistence_accuracy": 0.6676,
+      "n_trades": 364,
+      "n_correct": 243,
+      "n_wrong": 121
+    },
+    "KPHL": {
+      "station": "KPHL",
+      "persistence_accuracy": 0.6841,
+      "n_trades": 364,
+      "n_correct": 249,
+      "n_wrong": 115
+    },
+    "KPHX": {
+      "station": "KPHX",
+      "persistence_accuracy": 0.6209,
+      "n_trades": 364,
+      "n_correct": 226,
+      "n_wrong": 138
+    },
+    "KSAT": {
+      "station": "KSAT",
+      "persistence_accuracy": 0.6456,
+      "n_trades": 364,
+      "n_correct": 235,
+      "n_wrong": 129
+    },
+    "KSEA": {
+      "station": "KSEA",
+      "persistence_accuracy": 0.6841,
+      "n_trades": 364,
+      "n_correct": 249,
+      "n_wrong": 115
+    },
+    "KSFO": {
+      "station": "KSFO",
+      "persistence_accuracy": 0.6456,
+      "n_trades": 364,
+      "n_correct": 235,
+      "n_wrong": 129
+    }
+  },
+  "summary": {
+    "stations_validated": 20,
+    "total_trades": 7280,
+    "total_correct": 4818,
+    "overall_accuracy": 0.6618,
+    "mean_accuracy": 0.6618,
+    "min_accuracy": 0.5852,
+    "max_accuracy": 0.7308
+  }
+}

@@ -1,0 +1,338 @@
+{
+  "groups_analyzed": 6,
+  "avg_correlation": 0.3319,
+  "min_correlation": 0.2148,
+  "max_correlation": 0.413,
+  "groups": {
+    "northeast": {
+      "stations": [
+        "KBOS",
+        "KNYC",
+        "KPHL",
+        "KDCA"
+      ],
+      "pairwise_count": 6,
+      "avg_correlation": 0.413,
+      "coherence_threshold": 0.5,
+      "pairwise": {
+        "KBOS-KNYC": {
+          "station_a": "KBOS",
+          "station_b": "KNYC",
+          "correlation": 0.6282,
+          "mean_abs_diff_f": 52.33,
+          "n_common": 1723
+        },
+        "KBOS-KPHL": {
+          "station_a": "KBOS",
+          "station_b": "KPHL",
+          "correlation": 0.6203,
+          "mean_abs_diff_f": 48.79,
+          "n_common": 1723
+        },
+        "KBOS-KDCA": {
+          "station_a": "KBOS",
+          "station_b": "KDCA",
+          "correlation": 0.1894,
+          "mean_abs_diff_f": 55.73,
+          "n_common": 1723
+        },
+        "KNYC-KPHL": {
+          "station_a": "KNYC",
+          "station_b": "KPHL",
+          "correlation": 0.6547,
+          "mean_abs_diff_f": 12.1,
+          "n_common": 1723
+        },
+        "KNYC-KDCA": {
+          "station_a": "KNYC",
+          "station_b": "KDCA",
+          "correlation": 0.0296,
+          "mean_abs_diff_f": 12.71,
+          "n_common": 1723
+        },
+        "KPHL-KDCA": {
+          "station_a": "KPHL",
+          "station_b": "KDCA",
+          "correlation": 0.3558,
+          "mean_abs_diff_f": 15.21,
+          "n_common": 1723
+        }
+      }
+    },
+    "southeast": {
+      "stations": [
+        "KATL",
+        "KMIA",
+        "KMSY",
+        "KHOU"
+      ],
+      "pairwise_count": 6,
+      "avg_correlation": 0.2629,
+      "coherence_threshold": 0.5,
+      "pairwise": {
+        "KATL-KMIA": {
+          "station_a": "KATL",
+          "station_b": "KMIA",
+          "correlation": 0.5647,
+          "mean_abs_diff_f": 39.91,
+          "n_common": 1723
+        },
+        "KATL-KMSY": {
+          "station_a": "KATL",
+          "station_b": "KMSY",
+          "correlation": 0.3005,
+          "mean_abs_diff_f": 41.8,
+          "n_common": 1721
+        },
+        "KATL-KHOU": {
+          "station_a": "KATL",
+          "station_b": "KHOU",
+          "correlation": 0.0969,
+          "mean_abs_diff_f": 43.18,
+          "n_common": 1723
+        },
+        "KMIA-KMSY": {
+          "station_a": "KMIA",
+          "station_b": "KMSY",
+          "correlation": 0.2261,
+          "mean_abs_diff_f": 31.86,
+          "n_common": 1721
+        },
+        "KMIA-KHOU": {
+          "station_a": "KMIA",
+          "station_b": "KHOU",
+          "correlation": 0.1328,
+          "mean_abs_diff_f": 30.25,
+          "n_common": 1723
+        },
+        "KMSY-KHOU": {
+          "station_a": "KMSY",
+          "station_b": "KHOU",
+          "correlation": 0.2563,
+          "mean_abs_diff_f": 19.22,
+          "n_common": 1721
+        }
+      }
+    },
+    "midwest": {
+      "stations": [
+        "KMDW",
+        "KMSP",
+        "KOKC",
+        "KDEN"
+      ],
+      "pairwise_count": 6,
+      "avg_correlation": 0.3049,
+      "coherence_threshold": 0.5,
+      "pairwise": {
+        "KMDW-KMSP": {
+          "station_a": "KMDW",
+          "station_b": "KMSP",
+          "correlation": 0.8692,
+          "mean_abs_diff_f": 28.37,
+          "n_common": 1721
+        },
+        "KMDW-KOKC": {
+          "station_a": "KMDW",
+          "station_b": "KOKC",
+          "correlation": 0.0154,
+          "mean_abs_diff_f": 50.23,
+          "n_common": 1723
+        },
+        "KMDW-KDEN": {
+          "station_a": "KMDW",
+          "station_b": "KDEN",
+          "correlation": 0.0583,
+          "mean_abs_diff_f": 85.81,
+          "n_common": 1722
+        },
+        "KMSP-KOKC": {
+          "station_a": "KMSP",
+          "station_b": "KOKC",
+          "correlation": 0.0024,
+          "mean_abs_diff_f": 69.12,
+          "n_common": 1721
+        },
+        "KMSP-KDEN": {
+          "station_a": "KMSP",
+          "station_b": "KDEN",
+          "correlation": 0.0465,
+          "mean_abs_diff_f": 99.51,
+          "n_common": 1720
+        },
+        "KOKC-KDEN": {
+          "station_a": "KOKC",
+          "station_b": "KDEN",
+          "correlation": 0.8375,
+          "mean_abs_diff_f": 53.54,
+          "n_common": 1722
+        }
+      }
+    },
+    "southwest": {
+      "stations": [
+        "KPHX",
+        "KLAS",
+        "KLAX",
+        "KSFO"
+      ],
+      "pairwise_count": 6,
+      "avg_correlation": 0.385,
+      "coherence_threshold": 0.5,
+      "pairwise": {
+        "KPHX-KLAS": {
+          "station_a": "KPHX",
+          "station_b": "KLAS",
+          "correlation": 0.657,
+          "mean_abs_diff_f": 29.02,
+          "n_common": 1721
+        },
+        "KPHX-KLAX": {
+          "station_a": "KPHX",
+          "station_b": "KLAX",
+          "correlation": 0.1265,
+          "mean_abs_diff_f": 39.62,
+          "n_common": 1721
+        },
+        "KPHX-KSFO": {
+          "station_a": "KPHX",
+          "station_b": "KSFO",
+          "correlation": 0.603,
+          "mean_abs_diff_f": 172.42,
+          "n_common": 1721
+        },
+        "KLAS-KLAX": {
+          "station_a": "KLAS",
+          "station_b": "KLAX",
+          "correlation": 0.1243,
+          "mean_abs_diff_f": 31.49,
+          "n_common": 1723
+        },
+        "KLAS-KSFO": {
+          "station_a": "KLAS",
+          "station_b": "KSFO",
+          "correlation": 0.6767,
+          "mean_abs_diff_f": 163.03,
+          "n_common": 1723
+        },
+        "KLAX-KSFO": {
+          "station_a": "KLAX",
+          "station_b": "KSFO",
+          "correlation": 0.1223,
+          "mean_abs_diff_f": 170.16,
+          "n_common": 1723
+        }
+      }
+    },
+    "texas": {
+      "stations": [
+        "KDFW",
+        "KAUS",
+        "KSAT",
+        "KHOU"
+      ],
+      "pairwise_count": 6,
+      "avg_correlation": 0.4109,
+      "coherence_threshold": 0.5,
+      "pairwise": {
+        "KDFW-KAUS": {
+          "station_a": "KDFW",
+          "station_b": "KAUS",
+          "correlation": 0.0928,
+          "mean_abs_diff_f": 18.73,
+          "n_common": 1723
+        },
+        "KDFW-KSAT": {
+          "station_a": "KDFW",
+          "station_b": "KSAT",
+          "correlation": 0.4059,
+          "mean_abs_diff_f": 12.04,
+          "n_common": 1723
+        },
+        "KDFW-KHOU": {
+          "station_a": "KDFW",
+          "station_b": "KHOU",
+          "correlation": 0.6225,
+          "mean_abs_diff_f": 13.97,
+          "n_common": 1723
+        },
+        "KAUS-KSAT": {
+          "station_a": "KAUS",
+          "station_b": "KSAT",
+          "correlation": 0.4735,
+          "mean_abs_diff_f": 11.03,
+          "n_common": 1723
+        },
+        "KAUS-KHOU": {
+          "station_a": "KAUS",
+          "station_b": "KHOU",
+          "correlation": 0.3724,
+          "mean_abs_diff_f": 14.29,
+          "n_common": 1723
+        },
+        "KSAT-KHOU": {
+          "station_a": "KSAT",
+          "station_b": "KHOU",
+          "correlation": 0.4984,
+          "mean_abs_diff_f": 9.75,
+          "n_common": 1723
+        }
+      }
+    },
+    "west_coast": {
+      "stations": [
+        "KSEA",
+        "KSFO",
+        "KLAX",
+        "KPHX"
+      ],
+      "pairwise_count": 6,
+      "avg_correlation": 0.2148,
+      "coherence_threshold": 0.5,
+      "pairwise": {
+        "KSEA-KSFO": {
+          "station_a": "KSEA",
+          "station_b": "KSFO",
+          "correlation": 0.0547,
+          "mean_abs_diff_f": 172.24,
+          "n_common": 1723
+        },
+        "KSEA-KLAX": {
+          "station_a": "KSEA",
+          "station_b": "KLAX",
+          "correlation": 0.2194,
+          "mean_abs_diff_f": 11.37,
+          "n_common": 1723
+        },
+        "KSEA-KPHX": {
+          "station_a": "KSEA",
+          "station_b": "KPHX",
+          "correlation": 0.1627,
+          "mean_abs_diff_f": 46.9,
+          "n_common": 1721
+        },
+        "KSFO-KLAX": {
+          "station_a": "KSFO",
+          "station_b": "KLAX",
+          "correlation": 0.1223,
+          "mean_abs_diff_f": 170.16,
+          "n_common": 1723
+        },
+        "KSFO-KPHX": {
+          "station_a": "KSFO",
+          "station_b": "KPHX",
+          "correlation": 0.603,
+          "mean_abs_diff_f": 172.42,
+          "n_common": 1721
+        },
+        "KLAX-KPHX": {
+          "station_a": "KLAX",
+          "station_b": "KPHX",
+          "correlation": 0.1265,
+          "mean_abs_diff_f": 39.62,
+          "n_common": 1721
+        }
+      }
+    }
+  }
+}

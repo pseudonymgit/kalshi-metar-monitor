@@ -1,0 +1,18 @@
+{
+  "step_status": {
+    "wire_config": "completed",
+    "paper_trading": "completed",
+    "kelly_spreads": "completed",
+    "validation_bt": "completed",
+    "deploy_prod": "completed"
+  },
+  "last_completed": "deploy_prod",
+  "errors": [],
+  "steps_completed": [
+    "wire_config",
+    "paper_trading",
+    "kelly_spreads",
+    "validation_bt",
+    "deploy_prod"
+  ]
+}
