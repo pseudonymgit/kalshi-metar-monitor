@@ -1,0 +1,2644 @@
+{
+  "analysis_metadata": {
+    "generated": "2026-07-27T10:48:00Z",
+    "tool": "scikit-learn 1.9.0",
+    "engine_dir": "/home/node/.openclaw/workspace/prototypes/weather-engine-source",
+    "description": "Independent scikit-learn validation of weather engine backtest results"
+  },
+  "calibration_comparison": {
+    "method": "Calibration Comparison",
+    "description": "Compare hand-rolled calibration (0pp) vs sklearn IsotonicRegression and Platt scaling",
+    "by_signal": {
+      "individual": {
+        "gaussian": {
+          "total_trades": 129910,
+          "test_trades": 38973,
+          "bucket_count": 10,
+          "raw_confidence": {
+            "accuracy": 0.4968,
+            "brier": 0.3336,
+            "ece": 0.2784,
+            "roc_auc": 0.4995,
+            "mcc": -0.0046,
+            "log_loss": 0.9896
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6669,
+            "brier": 0.2222,
+            "ece": 0.0046,
+            "roc_auc": 0.4984,
+            "mcc": 0.0,
+            "log_loss": 0.6364,
+            "improvement_over_raw": {
+              "brier_delta": 0.1115,
+              "ece_delta": 0.2738,
+              "accuracy_delta": 0.1701
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6669,
+            "brier": 0.2222,
+            "ece": 0.0046,
+            "roc_auc": 0.4995,
+            "mcc": 0.0,
+            "log_loss": 0.6364,
+            "improvement_over_raw": {
+              "brier_delta": 0.1115,
+              "ece_delta": 0.2738,
+              "accuracy_delta": 0.1701
+            }
+          }
+        },
+        "gaussian_v2": {
+          "total_trades": 190741,
+          "test_trades": 57223,
+          "bucket_count": 10,
+          "raw_confidence": {
+            "accuracy": 0.4945,
+            "brier": 0.3321,
+            "ece": 0.2651,
+            "roc_auc": 0.5119,
+            "mcc": 0.0165,
+            "log_loss": 0.9781
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6464,
+            "brier": 0.2284,
+            "ece": 0.0011,
+            "roc_auc": 0.513,
+            "mcc": 0.0,
+            "log_loss": 0.6493,
+            "improvement_over_raw": {
+              "brier_delta": 0.1037,
+              "ece_delta": 0.264,
+              "accuracy_delta": 0.1519
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6464,
+            "brier": 0.2285,
+            "ece": 0.0009,
+            "roc_auc": 0.5119,
+            "mcc": 0.0,
+            "log_loss": 0.6495,
+            "improvement_over_raw": {
+              "brier_delta": 0.1036,
+              "ece_delta": 0.2641,
+              "accuracy_delta": 0.1519
+            }
+          }
+        },
+        "pressure_delta": {
+          "total_trades": 151528,
+          "test_trades": 45459,
+          "bucket_count": 9,
+          "raw_confidence": {
+            "accuracy": 0.4827,
+            "brier": 0.3313,
+            "ece": 0.2535,
+            "roc_auc": 0.5021,
+            "mcc": -0.0029,
+            "log_loss": 0.9572
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6108,
+            "brier": 0.2377,
+            "ece": 0.0027,
+            "roc_auc": 0.5016,
+            "mcc": 0.0,
+            "log_loss": 0.6684,
+            "improvement_over_raw": {
+              "brier_delta": 0.0936,
+              "ece_delta": 0.2508,
+              "accuracy_delta": 0.1281
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6108,
+            "brier": 0.2377,
+            "ece": 0.0027,
+            "roc_auc": 0.5021,
+            "mcc": 0.0,
+            "log_loss": 0.6684,
+            "improvement_over_raw": {
+              "brier_delta": 0.0936,
+              "ece_delta": 0.2507,
+              "accuracy_delta": 0.1281
+            }
+          }
+        },
+        "forecast_disagreement": {
+          "total_trades": 103938,
+          "test_trades": 31182,
+          "bucket_count": 10,
+          "raw_confidence": {
+            "accuracy": 0.4737,
+            "brier": 0.3398,
+            "ece": 0.2806,
+            "roc_auc": 0.5151,
+            "mcc": 0.0192,
+            "log_loss": 0.9943
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6532,
+            "brier": 0.2264,
+            "ece": 0.0024,
+            "roc_auc": 0.5116,
+            "mcc": 0.0,
+            "log_loss": 0.6451,
+            "improvement_over_raw": {
+              "brier_delta": 0.1134,
+              "ece_delta": 0.2782,
+              "accuracy_delta": 0.1795
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6532,
+            "brier": 0.2264,
+            "ece": 0.0019,
+            "roc_auc": 0.5151,
+            "mcc": 0.0,
+            "log_loss": 0.6452,
+            "improvement_over_raw": {
+              "brier_delta": 0.1134,
+              "ece_delta": 0.2786,
+              "accuracy_delta": 0.1795
+            }
+          }
+        },
+        "calendar_climatology": {
+          "total_trades": 45452,
+          "test_trades": 13636,
+          "bucket_count": 7,
+          "raw_confidence": {
+            "accuracy": 0.4042,
+            "brier": 0.3781,
+            "ece": 0.3546,
+            "roc_auc": 0.5031,
+            "mcc": -0.0033,
+            "log_loss": 1.1027
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6869,
+            "brier": 0.2152,
+            "ece": 0.0021,
+            "roc_auc": 0.4982,
+            "mcc": 0.0,
+            "log_loss": 0.6342,
+            "improvement_over_raw": {
+              "brier_delta": 0.1629,
+              "ece_delta": 0.3525,
+              "accuracy_delta": 0.2827
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6869,
+            "brier": 0.2151,
+            "ece": 0.0014,
+            "roc_auc": 0.5031,
+            "mcc": 0.0,
+            "log_loss": 0.6215,
+            "improvement_over_raw": {
+              "brier_delta": 0.1631,
+              "ece_delta": 0.3532,
+              "accuracy_delta": 0.2827
+            }
+          }
+        }
+      },
+      "pairs": {
+        "gaussian+gaussian_v2": {
+          "total_trades": 62523,
+          "test_trades": 18757,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3616,
+            "brier": 0.4101,
+            "ece": 0.3876,
+            "roc_auc": 0.4927,
+            "mcc": 0.0,
+            "log_loss": 1.2657
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6384,
+            "brier": 0.2309,
+            "ece": 0.0006,
+            "roc_auc": 0.4942,
+            "mcc": 0.0,
+            "log_loss": 0.6544,
+            "improvement_over_raw": {
+              "brier_delta": 0.1792,
+              "ece_delta": 0.387,
+              "accuracy_delta": 0.2769
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6384,
+            "brier": 0.2309,
+            "ece": 0.0006,
+            "roc_auc": 0.4927,
+            "mcc": 0.0,
+            "log_loss": 0.6544,
+            "improvement_over_raw": {
+              "brier_delta": 0.1792,
+              "ece_delta": 0.387,
+              "accuracy_delta": 0.2769
+            }
+          }
+        },
+        "gaussian+pressure_delta": {
+          "total_trades": 68202,
+          "test_trades": 20461,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3696,
+            "brier": 0.4051,
+            "ece": 0.3797,
+            "roc_auc": 0.4959,
+            "mcc": 0.0,
+            "log_loss": 1.2483
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6304,
+            "brier": 0.233,
+            "ece": 0.0015,
+            "roc_auc": 0.4968,
+            "mcc": 0.0,
+            "log_loss": 0.6587,
+            "improvement_over_raw": {
+              "brier_delta": 0.1721,
+              "ece_delta": 0.3783,
+              "accuracy_delta": 0.2608
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6304,
+            "brier": 0.233,
+            "ece": 0.0015,
+            "roc_auc": 0.5041,
+            "mcc": 0.0,
+            "log_loss": 0.6587,
+            "improvement_over_raw": {
+              "brier_delta": 0.1721,
+              "ece_delta": 0.3782,
+              "accuracy_delta": 0.2608
+            }
+          }
+        },
+        "gaussian+forecast_disagreement": {
+          "total_trades": 55548,
+          "test_trades": 16665,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3594,
+            "brier": 0.4135,
+            "ece": 0.3925,
+            "roc_auc": 0.492,
+            "mcc": 0.0,
+            "log_loss": 1.2777
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6406,
+            "brier": 0.2304,
+            "ece": 0.0031,
+            "roc_auc": 0.4973,
+            "mcc": 0.0,
+            "log_loss": 0.6534,
+            "improvement_over_raw": {
+              "brier_delta": 0.1832,
+              "ece_delta": 0.3894,
+              "accuracy_delta": 0.2811
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6406,
+            "brier": 0.2303,
+            "ece": 0.0032,
+            "roc_auc": 0.492,
+            "mcc": 0.0,
+            "log_loss": 0.6532,
+            "improvement_over_raw": {
+              "brier_delta": 0.1832,
+              "ece_delta": 0.3893,
+              "accuracy_delta": 0.2811
+            }
+          }
+        },
+        "gaussian+calendar_climatology": {
+          "total_trades": 38973,
+          "test_trades": 11692,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3334,
+            "brier": 0.4259,
+            "ece": 0.4166,
+            "roc_auc": 0.4905,
+            "mcc": 0.0,
+            "log_loss": 1.3138
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6655,
+            "brier": 0.2225,
+            "ece": 0.0041,
+            "roc_auc": 0.4897,
+            "mcc": -0.015,
+            "log_loss": 0.6371,
+            "improvement_over_raw": {
+              "brier_delta": 0.2034,
+              "ece_delta": 0.4125,
+              "accuracy_delta": 0.3321
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6666,
+            "brier": 0.2223,
+            "ece": 0.0041,
+            "roc_auc": 0.4905,
+            "mcc": 0.0,
+            "log_loss": 0.6367,
+            "improvement_over_raw": {
+              "brier_delta": 0.2036,
+              "ece_delta": 0.4124,
+              "accuracy_delta": 0.3332
+            }
+          }
+        },
+        "gaussian_v2+pressure_delta": {
+          "total_trades": 78411,
+          "test_trades": 23524,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3653,
+            "brier": 0.4068,
+            "ece": 0.3839,
+            "roc_auc": 0.4978,
+            "mcc": 0.0,
+            "log_loss": 1.2514
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6347,
+            "brier": 0.2319,
+            "ece": 0.0057,
+            "roc_auc": 0.4976,
+            "mcc": 0.0,
+            "log_loss": 0.6565,
+            "improvement_over_raw": {
+              "brier_delta": 0.1749,
+              "ece_delta": 0.3782,
+              "accuracy_delta": 0.2694
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6347,
+            "brier": 0.2319,
+            "ece": 0.0056,
+            "roc_auc": 0.5022,
+            "mcc": 0.0,
+            "log_loss": 0.6565,
+            "improvement_over_raw": {
+              "brier_delta": 0.175,
+              "ece_delta": 0.3783,
+              "accuracy_delta": 0.2694
+            }
+          }
+        },
+        "gaussian_v2+forecast_disagreement": {
+          "total_trades": 69840,
+          "test_trades": 20952,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3715,
+            "brier": 0.4037,
+            "ece": 0.3777,
+            "roc_auc": 0.497,
+            "mcc": 0.0,
+            "log_loss": 1.2418
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6285,
+            "brier": 0.2335,
+            "ece": 0.0012,
+            "roc_auc": 0.4987,
+            "mcc": 0.0,
+            "log_loss": 0.6597,
+            "improvement_over_raw": {
+              "brier_delta": 0.1702,
+              "ece_delta": 0.3765,
+              "accuracy_delta": 0.257
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6285,
+            "brier": 0.2335,
+            "ece": 0.0012,
+            "roc_auc": 0.503,
+            "mcc": 0.0,
+            "log_loss": 0.6598,
+            "improvement_over_raw": {
+              "brier_delta": 0.1702,
+              "ece_delta": 0.3765,
+              "accuracy_delta": 0.257
+            }
+          }
+        },
+        "gaussian_v2+calendar_climatology": {
+          "total_trades": 62523,
+          "test_trades": 18757,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3616,
+            "brier": 0.4101,
+            "ece": 0.3876,
+            "roc_auc": 0.4927,
+            "mcc": 0.0,
+            "log_loss": 1.2657
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6384,
+            "brier": 0.2309,
+            "ece": 0.0006,
+            "roc_auc": 0.4942,
+            "mcc": 0.0,
+            "log_loss": 0.6544,
+            "improvement_over_raw": {
+              "brier_delta": 0.1792,
+              "ece_delta": 0.387,
+              "accuracy_delta": 0.2769
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6384,
+            "brier": 0.2309,
+            "ece": 0.0006,
+            "roc_auc": 0.4927,
+            "mcc": 0.0,
+            "log_loss": 0.6544,
+            "improvement_over_raw": {
+              "brier_delta": 0.1792,
+              "ece_delta": 0.387,
+              "accuracy_delta": 0.2769
+            }
+          }
+        },
+        "pressure_delta+forecast_disagreement": {
+          "total_trades": 64980,
+          "test_trades": 19494,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3802,
+            "brier": 0.4001,
+            "ece": 0.3692,
+            "roc_auc": 0.4955,
+            "mcc": 0.0,
+            "log_loss": 1.2353
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6198,
+            "brier": 0.2357,
+            "ece": 0.0019,
+            "roc_auc": 0.4976,
+            "mcc": 0.0,
+            "log_loss": 0.6643,
+            "improvement_over_raw": {
+              "brier_delta": 0.1644,
+              "ece_delta": 0.3673,
+              "accuracy_delta": 0.2396
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6198,
+            "brier": 0.2357,
+            "ece": 0.0011,
+            "roc_auc": 0.4955,
+            "mcc": 0.0,
+            "log_loss": 0.6642,
+            "improvement_over_raw": {
+              "brier_delta": 0.1645,
+              "ece_delta": 0.3681,
+              "accuracy_delta": 0.2396
+            }
+          }
+        },
+        "pressure_delta+calendar_climatology": {
+          "total_trades": 60171,
+          "test_trades": 18052,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.3797,
+            "brier": 0.4016,
+            "ece": 0.37,
+            "roc_auc": 0.4938,
+            "mcc": 0.0,
+            "log_loss": 1.2409
+          },
+          "isotonic_regression": {
+            "accuracy": 0.6203,
+            "brier": 0.2357,
+            "ece": 0.0013,
+            "roc_auc": 0.495,
+            "mcc": 0.0,
+            "log_loss": 0.6644,
+            "improvement_over_raw": {
+              "brier_delta": 0.1658,
+              "ece_delta": 0.3687,
+              "accuracy_delta": 0.2405
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.6203,
+            "brier": 0.2356,
+            "ece": 0.0013,
+            "roc_auc": 0.4938,
+            "mcc": 0.0,
+            "log_loss": 0.664,
+            "improvement_over_raw": {
+              "brier_delta": 0.166,
+              "ece_delta": 0.3687,
+              "accuracy_delta": 0.2405
+            }
+          }
+        },
+        "forecast_disagreement+calendar_climatology": {
+          "total_trades": 44685,
+          "test_trades": 13406,
+          "bucket_count": 3,
+          "raw_confidence": {
+            "accuracy": 0.349,
+            "brier": 0.4185,
+            "ece": 0.4032,
+            "roc_auc": 0.498,
+            "mcc": 0.0,
+            "log_loss": 1.2929
+          },
+          "isotonic_regression": {
+            "accuracy": 0.651,
+            "brier": 0.2273,
+            "ece": 0.0043,
+            "roc_auc": 0.5018,
+            "mcc": 0.0,
+            "log_loss": 0.6471,
+            "improvement_over_raw": {
+              "brier_delta": 0.1912,
+              "ece_delta": 0.3989,
+              "accuracy_delta": 0.302
+            }
+          },
+          "platt_scaling": {
+            "accuracy": 0.651,
+            "brier": 0.2272,
+            "ece": 0.0042,
+            "roc_auc": 0.498,
+            "mcc": 0.0,
+            "log_loss": 0.6469,
+            "improvement_over_raw": {
+              "brier_delta": 0.1912,
+              "ece_delta": 0.3989,
+              "accuracy_delta": 0.302
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "signals_analyzed": 15,
+      "isotonic_regression_avg": {
+        "brier_improvement": 0.1579,
+        "ece_improvement": 0.3509,
+        "accuracy_improvement": 0.2432
+      },
+      "platt_scaling_avg": {
+        "brier_improvement": 0.158,
+        "ece_improvement": 0.351,
+        "accuracy_improvement": 0.2433
+      },
+      "best_calibration_method": "platt_scaling",
+      "note": "Positive delta = improvement over raw confidence."
+    },
+    "limitations": "Calibration comparison uses synthetic trade-level data generated by adding uniform noise (eps=0.045) within each confidence bucket to spread aggregated confidence values. This artificial dispersion inflates the Brier/ECE of raw confidence, making sklearn calibration methods appear more beneficial than they actually are. The real raw calibration from the sweep: Brier=0.2278, ECE=0.1727 for the best config."
+  },
+  "nwp_feature_importance": {
+    "method": "NWP Feature Importance",
+    "description": "GradientBoosting and RandomForest on NWP features to predict model agreement",
+    "feature_importance": {
+      "gradient_boosting": {
+        "accuracy": 0.9539,
+        "roc_auc": 0.892,
+        "mcc": 0.2894,
+        "f1": 0.9762,
+        "top_features": [
+          {
+            "feature": "gfs_temperature_2m_max",
+            "importance": 0.2015
+          },
+          {
+            "feature": "ecmwf_temperature_2m_max",
+            "importance": 0.1472
+          },
+          {
+            "feature": "ecmwf_cloud_cover_daily_mean",
+            "importance": 0.074
+          },
+          {
+            "feature": "icon_temperature_2m_min",
+            "importance": 0.065
+          },
+          {
+            "feature": "gfs_wind_speed_10m_daily_mean",
+            "importance": 0.0572
+          },
+          {
+            "feature": "ecmwf_dew_point_2m_daily_mean",
+            "importance": 0.0568
+          },
+          {
+            "feature": "gem_dew_point_2m_daily_mean",
+            "importance": 0.0544
+          },
+          {
+            "feature": "icon_temperature_2m_max",
+            "importance": 0.039
+          },
+          {
+            "feature": "ecmwf_wind_speed_10m_daily_mean",
+            "importance": 0.0376
+          },
+          {
+            "feature": "icon_dew_point_2m_daily_mean",
+            "importance": 0.0369
+          },
+          {
+            "feature": "gem_temperature_2m_max",
+            "importance": 0.0362
+          },
+          {
+            "feature": "icon_wind_speed_10m_daily_mean",
+            "importance": 0.0348
+          },
+          {
+            "feature": "gfs_cloud_cover_daily_mean",
+            "importance": 0.0303
+          },
+          {
+            "feature": "icon_cloud_cover_daily_mean",
+            "importance": 0.0298
+          },
+          {
+            "feature": "gfs_dew_point_2m_daily_mean",
+            "importance": 0.0201
+          },
+          {
+            "feature": "gfs_temperature_2m_min",
+            "importance": 0.018
+          },
+          {
+            "feature": "gem_temperature_2m_min",
+            "importance": 0.0155
+          },
+          {
+            "feature": "ecmwf_precipitation_sum",
+            "importance": 0.0129
+          },
+          {
+            "feature": "gem_wind_speed_10m_daily_mean",
+            "importance": 0.0128
+          },
+          {
+            "feature": "ecmwf_temperature_2m_min",
+            "importance": 0.0061
+          }
+        ],
+        "all_features": [
+          {
+            "feature": "gfs_temperature_2m_max",
+            "importance": 0.2015
+          },
+          {
+            "feature": "ecmwf_temperature_2m_max",
+            "importance": 0.1472
+          },
+          {
+            "feature": "ecmwf_cloud_cover_daily_mean",
+            "importance": 0.074
+          },
+          {
+            "feature": "icon_temperature_2m_min",
+            "importance": 0.065
+          },
+          {
+            "feature": "gfs_wind_speed_10m_daily_mean",
+            "importance": 0.0572
+          },
+          {
+            "feature": "ecmwf_dew_point_2m_daily_mean",
+            "importance": 0.0568
+          },
+          {
+            "feature": "gem_dew_point_2m_daily_mean",
+            "importance": 0.0544
+          },
+          {
+            "feature": "icon_temperature_2m_max",
+            "importance": 0.039
+          },
+          {
+            "feature": "ecmwf_wind_speed_10m_daily_mean",
+            "importance": 0.0376
+          },
+          {
+            "feature": "icon_dew_point_2m_daily_mean",
+            "importance": 0.0369
+          },
+          {
+            "feature": "gem_temperature_2m_max",
+            "importance": 0.0362
+          },
+          {
+            "feature": "icon_wind_speed_10m_daily_mean",
+            "importance": 0.0348
+          },
+          {
+            "feature": "gfs_cloud_cover_daily_mean",
+            "importance": 0.0303
+          },
+          {
+            "feature": "icon_cloud_cover_daily_mean",
+            "importance": 0.0298
+          },
+          {
+            "feature": "gfs_dew_point_2m_daily_mean",
+            "importance": 0.0201
+          },
+          {
+            "feature": "gfs_temperature_2m_min",
+            "importance": 0.018
+          },
+          {
+            "feature": "gem_temperature_2m_min",
+            "importance": 0.0155
+          },
+          {
+            "feature": "ecmwf_precipitation_sum",
+            "importance": 0.0129
+          },
+          {
+            "feature": "gem_wind_speed_10m_daily_mean",
+            "importance": 0.0128
+          },
+          {
+            "feature": "ecmwf_temperature_2m_min",
+            "importance": 0.0061
+          },
+          {
+            "feature": "gfs_precipitation_sum",
+            "importance": 0.0052
+          },
+          {
+            "feature": "gem_cloud_cover_daily_mean",
+            "importance": 0.0042
+          },
+          {
+            "feature": "gem_precipitation_sum",
+            "importance": 0.0029
+          },
+          {
+            "feature": "icon_precipitation_sum",
+            "importance": 0.0015
+          }
+        ]
+      },
+      "random_forest": {
+        "accuracy": 0.9583,
+        "roc_auc": 0.9066,
+        "mcc": 0.3021,
+        "f1": 0.9786,
+        "top_features": [
+          {
+            "feature": "ecmwf_temperature_2m_max",
+            "importance": 0.1005
+          },
+          {
+            "feature": "ecmwf_cloud_cover_daily_mean",
+            "importance": 0.0878
+          },
+          {
+            "feature": "gfs_temperature_2m_max",
+            "importance": 0.0757
+          },
+          {
+            "feature": "gem_temperature_2m_max",
+            "importance": 0.0529
+          },
+          {
+            "feature": "gem_dew_point_2m_daily_mean",
+            "importance": 0.0515
+          },
+          {
+            "feature": "ecmwf_dew_point_2m_daily_mean",
+            "importance": 0.0513
+          },
+          {
+            "feature": "icon_cloud_cover_daily_mean",
+            "importance": 0.0494
+          },
+          {
+            "feature": "icon_temperature_2m_max",
+            "importance": 0.0488
+          },
+          {
+            "feature": "ecmwf_wind_speed_10m_daily_mean",
+            "importance": 0.046
+          },
+          {
+            "feature": "gfs_dew_point_2m_daily_mean",
+            "importance": 0.046
+          },
+          {
+            "feature": "icon_dew_point_2m_daily_mean",
+            "importance": 0.0424
+          },
+          {
+            "feature": "gfs_wind_speed_10m_daily_mean",
+            "importance": 0.04
+          },
+          {
+            "feature": "icon_wind_speed_10m_daily_mean",
+            "importance": 0.0361
+          },
+          {
+            "feature": "icon_temperature_2m_min",
+            "importance": 0.036
+          },
+          {
+            "feature": "gfs_cloud_cover_daily_mean",
+            "importance": 0.0333
+          },
+          {
+            "feature": "gfs_temperature_2m_min",
+            "importance": 0.0327
+          },
+          {
+            "feature": "ecmwf_temperature_2m_min",
+            "importance": 0.0322
+          },
+          {
+            "feature": "gem_temperature_2m_min",
+            "importance": 0.0253
+          },
+          {
+            "feature": "gem_wind_speed_10m_daily_mean",
+            "importance": 0.0235
+          },
+          {
+            "feature": "ecmwf_precipitation_sum",
+            "importance": 0.0223
+          }
+        ]
+      }
+    },
+    "cross_validation": {
+      "gradient_boosting": {
+        "cv_scores": [
+          0.9474,
+          0.9507,
+          0.9342,
+          0.9572,
+          0.9309
+        ],
+        "mean": 0.9441,
+        "std": 0.01
+      },
+      "random_forest": {
+        "cv_scores": [
+          0.9539,
+          0.9539,
+          0.9474,
+          0.9539,
+          0.9507
+        ],
+        "mean": 0.952,
+        "std": 0.0026
+      }
+    },
+    "comparison": {
+      "nwp_samples": 1520,
+      "nwp_features": 24,
+      "nwp_stations": 20,
+      "target_variable": "model_agreement (std temp_2m_max across models < 2\u00b0C)",
+      "current_best_accuracy": 0.7303,
+      "nwp_gb_accuracy": 0.9539,
+      "nwp_rf_accuracy": 0.9583
+    }
+  },
+  "regime_clustering": {
+    "method": "Regime Clustering",
+    "description": "KMeans and GaussianMixture on station-month climate features",
+    "clustering": {
+      "kmeans_3": {
+        "n_clusters": 3,
+        "inertia": 179.52,
+        "silhouette_score": 0.867,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 235,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 62.2,
+              "std_high": 0.0,
+              "avg_max": 74.6,
+              "avg_min": 54.28,
+              "avg_mean": 62.17,
+              "std_max": 41.74
+            }
+          },
+          {
+            "cluster": 1,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            }
+          },
+          {
+            "cluster": 2,
+            "size": 16,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 268.27,
+              "std_high": 0.0,
+              "avg_max": 1475.13,
+              "avg_min": 87.17,
+              "avg_mean": 287.07,
+              "std_max": 7343.14
+            }
+          }
+        ]
+      },
+      "kmeans_4": {
+        "n_clusters": 4,
+        "inertia": 107.58,
+        "silhouette_score": 0.8528,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 234,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 62.04,
+              "std_high": 0.0,
+              "avg_max": 72.78,
+              "avg_min": 54.2,
+              "avg_mean": 62.03,
+              "std_max": 21.47
+            }
+          },
+          {
+            "cluster": 1,
+            "size": 3,
+            "stations": [
+              "KATL",
+              "KBOS",
+              "KDEN"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 483.2,
+              "std_high": 0.0,
+              "avg_max": 2660.65,
+              "avg_min": 68.26,
+              "avg_mean": 558.17,
+              "std_max": 10682.78
+            }
+          },
+          {
+            "cluster": 2,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            }
+          },
+          {
+            "cluster": 3,
+            "size": 14,
+            "stations": [
+              "KAUS",
+              "KDCA",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 210.31,
+              "std_high": 0.0,
+              "avg_max": 1151.5,
+              "avg_min": 90.22,
+              "avg_mean": 215.18,
+              "std_max": 6444.86
+            }
+          }
+        ]
+      },
+      "kmeans_5": {
+        "n_clusters": 5,
+        "inertia": 79.25,
+        "silhouette_score": 0.5377,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 116,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 49.3,
+              "std_high": 0.0,
+              "avg_max": 59.1,
+              "avg_min": 41.8,
+              "avg_mean": 49.29,
+              "std_max": 9.35
+            }
+          },
+          {
+            "cluster": 1,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            }
+          },
+          {
+            "cluster": 2,
+            "size": 3,
+            "stations": [
+              "KATL",
+              "KBOS",
+              "KDEN"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 483.2,
+              "std_high": 0.0,
+              "avg_max": 2660.65,
+              "avg_min": 68.26,
+              "avg_mean": 558.17,
+              "std_max": 10682.78
+            }
+          },
+          {
+            "cluster": 3,
+            "size": 14,
+            "stations": [
+              "KAUS",
+              "KDCA",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 210.31,
+              "std_high": 0.0,
+              "avg_max": 1151.5,
+              "avg_min": 90.22,
+              "avg_mean": 215.18,
+              "std_max": 6444.86
+            }
+          },
+          {
+            "cluster": 4,
+            "size": 118,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 74.56,
+              "std_high": 0.0,
+              "avg_max": 86.23,
+              "avg_min": 66.39,
+              "avg_mean": 74.55,
+              "std_max": 33.38
+            }
+          }
+        ]
+      },
+      "kmeans_6": {
+        "n_clusters": 6,
+        "inertia": 57.64,
+        "silhouette_score": 0.542,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 7,
+            "stations": [
+              "KAUS",
+              "KDCA",
+              "KDFW",
+              "KHOU",
+              "KNYC",
+              "KSAT",
+              "KSEA"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 146.74,
+              "std_high": 0.0,
+              "avg_max": 733.21,
+              "avg_min": 73.3,
+              "avg_mean": 137.99,
+              "std_max": 4644.8
+            }
+          },
+          {
+            "cluster": 1,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            }
+          },
+          {
+            "cluster": 2,
+            "size": 117,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 74.54,
+              "std_high": 0.0,
+              "avg_max": 84.21,
+              "avg_min": 66.46,
+              "avg_mean": 74.53,
+              "std_max": 6.06
+            }
+          },
+          {
+            "cluster": 3,
+            "size": 9,
+            "stations": [
+              "KATL",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KOKC",
+              "KPHL",
+              "KPHX"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 259.2,
+              "std_high": 0.0,
+              "avg_max": 1514.7,
+              "avg_min": 97.93,
+              "avg_mean": 275.46,
+              "std_max": 7939.87
+            }
+          },
+          {
+            "cluster": 4,
+            "size": 2,
+            "stations": [
+              "KBOS",
+              "KDEN"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 555.52,
+              "std_high": 0.0,
+              "avg_max": 2829.89,
+              "avg_min": 65.7,
+              "avg_mean": 659.67,
+              "std_max": 10766.56
+            }
+          },
+          {
+            "cluster": 5,
+            "size": 116,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 49.3,
+              "std_high": 0.0,
+              "avg_max": 59.1,
+              "avg_min": 41.8,
+              "avg_mean": 49.29,
+              "std_max": 9.35
+            }
+          }
+        ]
+      },
+      "gmm_3": {
+        "n_components": 3,
+        "aic": -10891.55,
+        "bic": -10598.61,
+        "converged": true,
+        "silhouette_score": 0.8561,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 233,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 61.97,
+              "std_high": 0.0,
+              "avg_max": 71.71,
+              "avg_min": 54.18,
+              "avg_mean": 61.96,
+              "std_max": 7.7
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 1,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 2,
+            "size": 18,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 248.39,
+              "std_high": 0.0,
+              "avg_max": 1356.92,
+              "avg_min": 84.77,
+              "avg_mean": 264.69,
+              "std_max": 6972.53
+            },
+            "avg_assignment_prob": 1.0
+          }
+        ]
+      },
+      "gmm_4": {
+        "n_components": 4,
+        "aic": -11005.5,
+        "bic": -10613.73,
+        "converged": true,
+        "silhouette_score": 0.3319,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 30,
+            "stations": [
+              "KBOS",
+              "KDCA",
+              "KMDW",
+              "KMSP",
+              "KNYC",
+              "KPHL",
+              "KSEA"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              9,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 40.02,
+              "std_high": 0.0,
+              "avg_max": 47.41,
+              "avg_min": 34.14,
+              "avg_mean": 39.96,
+              "std_max": 9.41
+            },
+            "avg_assignment_prob": 0.8859
+          },
+          {
+            "cluster": 1,
+            "size": 18,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 248.39,
+              "std_high": 0.0,
+              "avg_max": 1356.92,
+              "avg_min": 84.77,
+              "avg_mean": 264.69,
+              "std_max": 6972.53
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 2,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 3,
+            "size": 203,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 65.22,
+              "std_high": 0.0,
+              "avg_max": 75.3,
+              "avg_min": 57.15,
+              "avg_mean": 65.22,
+              "std_max": 7.45
+            },
+            "avg_assignment_prob": 0.9595
+          }
+        ]
+      },
+      "gmm_5": {
+        "n_components": 5,
+        "aic": -11093.59,
+        "bic": -10603.0,
+        "converged": true,
+        "silhouette_score": 0.3386,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 30,
+            "stations": [
+              "KBOS",
+              "KDCA",
+              "KMDW",
+              "KMSP",
+              "KNYC",
+              "KPHL",
+              "KSEA"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              9,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 40.02,
+              "std_high": 0.0,
+              "avg_max": 47.41,
+              "avg_min": 34.14,
+              "avg_mean": 39.96,
+              "std_max": 9.41
+            },
+            "avg_assignment_prob": 0.8859
+          },
+          {
+            "cluster": 1,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 2,
+            "size": 3,
+            "stations": [
+              "KATL",
+              "KBOS",
+              "KDEN"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 483.2,
+              "std_high": 0.0,
+              "avg_max": 2660.65,
+              "avg_min": 68.26,
+              "avg_mean": 558.17,
+              "std_max": 10682.78
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 3,
+            "size": 15,
+            "stations": [
+              "KAUS",
+              "KDCA",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 201.43,
+              "std_high": 0.0,
+              "avg_max": 1096.18,
+              "avg_min": 88.08,
+              "avg_mean": 205.99,
+              "std_max": 6230.48
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 4,
+            "size": 203,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 65.22,
+              "std_high": 0.0,
+              "avg_max": 75.3,
+              "avg_min": 57.15,
+              "avg_mean": 65.22,
+              "std_max": 7.45
+            },
+            "avg_assignment_prob": 0.9594
+          }
+        ]
+      },
+      "gmm_6": {
+        "n_components": 6,
+        "aic": -11146.79,
+        "bic": -10557.37,
+        "converged": true,
+        "silhouette_score": 0.3329,
+        "clusters": [
+          {
+            "cluster": 0,
+            "size": 203,
+            "stations": [
+              "KATL",
+              "KAUS",
+              "KBOS",
+              "KDAL",
+              "KDCA",
+              "KDEN",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KLAX",
+              "KMDW",
+              "KMIA",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KPHL",
+              "KPHX",
+              "KSAT",
+              "KSEA",
+              "KSFO"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 65.22,
+              "std_high": 0.0,
+              "avg_max": 75.3,
+              "avg_min": 57.15,
+              "avg_mean": 65.22,
+              "std_max": 7.45
+            },
+            "avg_assignment_prob": 0.9596
+          },
+          {
+            "cluster": 1,
+            "size": 1,
+            "stations": [
+              "KSFO"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 1021.42,
+              "std_high": 0.0,
+              "avg_max": 5411.77,
+              "avg_min": 630.5,
+              "avg_mean": 1694.22,
+              "std_max": 16039.43
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 2,
+            "size": 12,
+            "stations": [
+              "KAUS",
+              "KDCA",
+              "KDFW",
+              "KHOU",
+              "KLAS",
+              "KMDW",
+              "KMSP",
+              "KMSY",
+              "KNYC",
+              "KOKC",
+              "KSAT",
+              "KSEA"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 190.4,
+              "std_high": 0.0,
+              "avg_max": 931.68,
+              "avg_min": 89.96,
+              "avg_mean": 195.15,
+              "std_max": 5618.31
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 3,
+            "size": 2,
+            "stations": [
+              "KBOS",
+              "KDEN"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 555.52,
+              "std_high": 0.0,
+              "avg_max": 2829.89,
+              "avg_min": 65.7,
+              "avg_mean": 659.67,
+              "std_max": 10766.56
+            },
+            "avg_assignment_prob": 1.0
+          },
+          {
+            "cluster": 4,
+            "size": 30,
+            "stations": [
+              "KBOS",
+              "KDCA",
+              "KMDW",
+              "KMSP",
+              "KNYC",
+              "KPHL",
+              "KSEA"
+            ],
+            "months": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              9,
+              11,
+              12
+            ],
+            "mean_features": {
+              "mean_high": 40.02,
+              "std_high": 0.0,
+              "avg_max": 47.41,
+              "avg_min": 34.14,
+              "avg_mean": 39.96,
+              "std_max": 9.41
+            },
+            "avg_assignment_prob": 0.8856
+          },
+          {
+            "cluster": 5,
+            "size": 4,
+            "stations": [
+              "KATL",
+              "KMIA",
+              "KPHL",
+              "KPHX"
+            ],
+            "months": [
+              7
+            ],
+            "mean_features": {
+              "mean_high": 268.79,
+              "std_high": 0.0,
+              "avg_max": 1896.16,
+              "avg_min": 78.74,
+              "avg_mean": 275.82,
+              "std_max": 9138.16
+            },
+            "avg_assignment_prob": 1.0
+          }
+        ]
+      }
+    },
+    "regime_analysis": {
+      "taxonomy": {
+        "cluster_0": {
+          "regime": "Mild_Low_Variability",
+          "stations": [
+            "KATL",
+            "KAUS",
+            "KBOS",
+            "KDAL",
+            "KDCA",
+            "KDEN",
+            "KDFW",
+            "KHOU",
+            "KLAS",
+            "KLAX",
+            "KMDW",
+            "KMIA",
+            "KMSP",
+            "KMSY",
+            "KNYC",
+            "KOKC",
+            "KPHL",
+            "KPHX",
+            "KSAT",
+            "KSEA",
+            "KSFO"
+          ],
+          "months": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "mean_temperature": 62.04,
+          "temperature_std": 0.0,
+          "size": 234
+        },
+        "cluster_1": {
+          "regime": "Hot_Low_Variability",
+          "stations": [
+            "KATL",
+            "KBOS",
+            "KDEN"
+          ],
+          "months": [
+            7
+          ],
+          "mean_temperature": 483.2,
+          "temperature_std": 0.0,
+          "size": 3
+        },
+        "cluster_2": {
+          "regime": "Hot_Low_Variability",
+          "stations": [
+            "KSFO"
+          ],
+          "months": [
+            7
+          ],
+          "mean_temperature": 1021.42,
+          "temperature_std": 0.0,
+          "size": 1
+        },
+        "cluster_3": {
+          "regime": "Hot_Low_Variability",
+          "stations": [
+            "KAUS",
+            "KDCA",
+            "KDFW",
+            "KHOU",
+            "KLAS",
+            "KMDW",
+            "KMIA",
+            "KMSP",
+            "KMSY",
+            "KNYC",
+            "KOKC",
+            "KPHL",
+            "KPHX",
+            "KSAT"
+          ],
+          "months": [
+            7
+          ],
+          "mean_temperature": 210.31,
+          "temperature_std": 0.0,
+          "size": 14
+        }
+      },
+      "n_regimes": 4,
+      "n_stations": 21,
+      "n_station_months": 252,
+      "interpretation": "Regimes defined by temperature and variability. Compares to current broken regime classifier."
+    },
+    "data_quality_note": "Station climatology data has quality issues: std_high is 0.0 for all stations, and July mean_high for KATL is 338.56\u00b0F (likely corrupted). This affects clustering quality. The regime taxonomy should be re-run after data quality fixes."
+  },
+  "statistical_validation": {
+    "method": "Statistical Validation",
+    "description": "Independent sklearn.metrics validation of top configs",
+    "top_configs_validation": [
+      {
+        "config": {
+          "decay_factor": 0.802,
+          "min_agreement": 4,
+          "min_conf": 0.7962,
+          "sig_window": 17,
+          "strike_offset": 16.0,
+          "test_days": 31,
+          "train_days": 318
+        },
+        "reported_accuracy": 0.7303,
+        "reported_sharpe": 0.5418,
+        "reported_profit_factor": 2.8926,
+        "trades": 2306,
+        "sklearn_metrics": {
+          "cohen_kappa": -0.0105,
+          "matthews_corrcoef": -0.0105,
+          "f1_score": 0.7274,
+          "precision": 0.7274,
+          "recall": 0.7274,
+          "confusion_matrix": [
+            [
+              163,
+              459
+            ],
+            [
+              459,
+              1225
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.909,
+          "min_agreement": 4,
+          "min_conf": 0.7949,
+          "sig_window": 23,
+          "strike_offset": 13.4,
+          "test_days": 30,
+          "train_days": 323
+        },
+        "reported_accuracy": 0.7301,
+        "reported_sharpe": 0.5417,
+        "reported_profit_factor": 2.8914,
+        "trades": 2297,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0257,
+          "matthews_corrcoef": 0.0257,
+          "f1_score": 0.737,
+          "precision": 0.737,
+          "recall": 0.737,
+          "confusion_matrix": [
+            [
+              179,
+              441
+            ],
+            [
+              441,
+              1236
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.624,
+          "min_agreement": 4,
+          "min_conf": 0.7883,
+          "sig_window": 75,
+          "strike_offset": 13.2,
+          "test_days": 33,
+          "train_days": 318
+        },
+        "reported_accuracy": 0.7296,
+        "reported_sharpe": 0.5419,
+        "reported_profit_factor": 2.8943,
+        "trades": 2363,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0133,
+          "matthews_corrcoef": 0.0133,
+          "f1_score": 0.7332,
+          "precision": 0.7332,
+          "recall": 0.7332,
+          "confusion_matrix": [
+            [
+              179,
+              460
+            ],
+            [
+              460,
+              1264
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.875,
+          "min_agreement": 4,
+          "min_conf": 0.7949,
+          "sig_window": 20,
+          "strike_offset": 3.7,
+          "test_days": 51,
+          "train_days": 109
+        },
+        "reported_accuracy": 0.7291,
+        "reported_sharpe": 0.5392,
+        "reported_profit_factor": 2.8811,
+        "trades": 2514,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0227,
+          "matthews_corrcoef": 0.0227,
+          "f1_score": 0.7351,
+          "precision": 0.7353,
+          "recall": 0.7349,
+          "confusion_matrix": [
+            [
+              196,
+              485
+            ],
+            [
+              486,
+              1347
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.915,
+          "min_agreement": 4,
+          "min_conf": 0.7871,
+          "sig_window": 25,
+          "strike_offset": 16.5,
+          "test_days": 45,
+          "train_days": 318
+        },
+        "reported_accuracy": 0.7291,
+        "reported_sharpe": 0.5398,
+        "reported_profit_factor": 2.8838,
+        "trades": 2381,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0064,
+          "matthews_corrcoef": 0.0064,
+          "f1_score": 0.7306,
+          "precision": 0.7308,
+          "recall": 0.7304,
+          "confusion_matrix": [
+            [
+              178,
+              467
+            ],
+            [
+              468,
+              1268
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.853,
+          "min_agreement": 4,
+          "min_conf": 0.7999,
+          "sig_window": 11,
+          "strike_offset": 20.8,
+          "test_days": 33,
+          "train_days": 318
+        },
+        "reported_accuracy": 0.7288,
+        "reported_sharpe": 0.5382,
+        "reported_profit_factor": 2.8726,
+        "trades": 2279,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0159,
+          "matthews_corrcoef": 0.0159,
+          "f1_score": 0.7329,
+          "precision": 0.7331,
+          "recall": 0.7327,
+          "confusion_matrix": [
+            [
+              175,
+              443
+            ],
+            [
+              444,
+              1217
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.717,
+          "min_agreement": 4,
+          "min_conf": 0.7869,
+          "sig_window": 76,
+          "strike_offset": 15.7,
+          "test_days": 59,
+          "train_days": 317
+        },
+        "reported_accuracy": 0.7287,
+        "reported_sharpe": 0.5397,
+        "reported_profit_factor": 2.8841,
+        "trades": 2370,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0076,
+          "matthews_corrcoef": 0.0076,
+          "f1_score": 0.7307,
+          "precision": 0.7307,
+          "recall": 0.7307,
+          "confusion_matrix": [
+            [
+              178,
+              465
+            ],
+            [
+              465,
+              1262
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.981,
+          "min_agreement": 4,
+          "min_conf": 0.7874,
+          "sig_window": 66,
+          "strike_offset": 10.7,
+          "test_days": 30,
+          "train_days": 343
+        },
+        "reported_accuracy": 0.7286,
+        "reported_sharpe": 0.5396,
+        "reported_profit_factor": 2.8805,
+        "trades": 2314,
+        "sklearn_metrics": {
+          "cohen_kappa": -0.0059,
+          "matthews_corrcoef": -0.0059,
+          "f1_score": 0.7268,
+          "precision": 0.727,
+          "recall": 0.7266,
+          "confusion_matrix": [
+            [
+              168,
+              460
+            ],
+            [
+              461,
+              1225
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.7,
+          "min_agreement": 4,
+          "min_conf": 0.7961,
+          "sig_window": 72,
+          "strike_offset": 5.3,
+          "test_days": 34,
+          "train_days": 310
+        },
+        "reported_accuracy": 0.7286,
+        "reported_sharpe": 0.5387,
+        "reported_profit_factor": 2.8766,
+        "trades": 2314,
+        "sklearn_metrics": {
+          "cohen_kappa": -0.0059,
+          "matthews_corrcoef": -0.0059,
+          "f1_score": 0.7268,
+          "precision": 0.727,
+          "recall": 0.7266,
+          "confusion_matrix": [
+            [
+              168,
+              460
+            ],
+            [
+              461,
+              1225
+            ]
+          ]
+        }
+      },
+      {
+        "config": {
+          "decay_factor": 0.53,
+          "min_agreement": 4,
+          "min_conf": 0.7964,
+          "sig_window": 26,
+          "strike_offset": 3.3,
+          "test_days": 59,
+          "train_days": 101
+        },
+        "reported_accuracy": 0.7286,
+        "reported_sharpe": 0.5377,
+        "reported_profit_factor": 2.8734,
+        "trades": 2517,
+        "sklearn_metrics": {
+          "cohen_kappa": 0.0309,
+          "matthews_corrcoef": 0.0309,
+          "f1_score": 0.7368,
+          "precision": 0.737,
+          "recall": 0.7366,
+          "confusion_matrix": [
+            [
+              201,
+              482
+            ],
+            [
+              483,
+              1351
+            ]
+          ]
+        }
+      }
+    ],
+    "distribution_analysis": {
+      "top_configs_count": 10,
+      "accuracy": {
+        "mean": 0.7292,
+        "std": 0.0006,
+        "min": 0.7286,
+        "max": 0.7303
+      },
+      "sharpe": {
+        "mean": 0.5398,
+        "std": 0.0014,
+        "min": 0.5377,
+        "max": 0.5419
+      },
+      "profit_factor": {
+        "mean": 2.883,
+        "std": 0.0074
+      }
+    },
+    "comparison": {
+      "full_sweep_summary": {
+        "accuracy_mean": 0.6658158714870526,
+        "accuracy_median": 0.6641,
+        "accuracy_max": 0.7303,
+        "sharpe_mean": 0.3711269099790131,
+        "sharpe_max": 0.5419,
+        "profit_factor_mean": 2.137976412920063,
+        "profit_factor_max": 2.8943
+      },
+      "counts": {
+        "acc_ge_70": 4631,
+        "sharpe_ge_1": 0,
+        "pf_ge_2": 19446,
+        "both_criteria": 1043
+      }
+    },
+    "sweep_reported_metrics": [
+      {
+        "config": "best_by_accuracy (conf=0.796, agree=4, train=318d, test=31d, off=16.0F, decay=0.802, win=17d)",
+        "accuracy": 0.7303,
+        "sharpe": 0.5418,
+        "profit_factor": 2.8926,
+        "mcc": 0.4614,
+        "f1": 0.7371,
+        "brier": 0.2278,
+        "ece": 0.1727,
+        "precision": 0.7371,
+        "recall": 0.7371,
+        "fee_adjusted_accuracy": 0.7098
+      },
+      {
+        "config": "best_by_sharpe (conf=0.788, agree=4, train=318d, test=33d, off=13.2F, decay=0.624, win=75d)",
+        "accuracy": 0.7296,
+        "sharpe": 0.5419,
+        "profit_factor": 2.8943,
+        "mcc": 0.4603,
+        "f1": 0.735,
+        "brier": 0.2268,
+        "ece": 0.1697,
+        "precision": 0.735,
+        "recall": 0.735,
+        "fee_adjusted_accuracy": 0.7091
+      },
+      {
+        "config": "best_all_rounder (conf=0.795, agree=4, train=109d, test=51d, off=3.7F, decay=0.875, win=20d)",
+        "accuracy": 0.7291,
+        "sharpe": 0.5392,
+        "profit_factor": 2.8811,
+        "mcc": 0.4595,
+        "f1": 0.7351,
+        "brier": 0.2277,
+        "ece": 0.171,
+        "precision": 0.7351,
+        "recall": 0.7351,
+        "fee_adjusted_accuracy": 0.7086
+      }
+    ],
+    "limitations": "Sklearn per-config metrics (Kappa, MCC) are computed from synthetic trade-level data generated by random shuffling of aggregated bucket counts. This does NOT preserve the actual prediction-outcome correlation structure. The correct MCC values are reported in sweep_reported_metrics above (MCC=0.46 for best config). Per-trade data from the actual backtest engine would be needed for proper sklearn metrics."
+  }
+}
