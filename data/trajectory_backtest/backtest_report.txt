@@ -1,0 +1,162 @@
+TRAJECTORY MODULE BACKTEST RESULTS
+============================================================
+DB: data/metar_backfill.db
+Date range: 2021-01-01 to 2026-07-27
+Holdout: 90 days
+Top-K analogs: 10
+Stations tested: 20/20
+
+AGGREGATE RESULTS
+------------------------------------------------------------
+
+T+1:
+  Weighted accuracy:  69.9%
+  Mean accuracy:      69.9%  (60.6% - 86.1%)
+  Mean RMSE:          3.45 buckets
+  Total predictions:  12369
+  Stations:           20
+
+T+3:
+  Weighted accuracy:  80.2%
+  Mean accuracy:      80.2%  (69.7% - 94.0%)
+  Mean RMSE:          4.27 buckets
+  Total predictions:  10614
+  Stations:           20
+
+T+6:
+  Weighted accuracy:  86.4%
+  Mean accuracy:      86.4%  (73.5% - 96.6%)
+  Mean RMSE:          5.38 buckets
+  Total predictions:  8829
+  Stations:           20
+
+T+12:
+  Weighted accuracy:  85.0%
+  Mean accuracy:      85.0%  (74.0% - 95.9%)
+  Mean RMSE:          6.41 buckets
+  Total predictions:  5259
+  Stations:           20
+
+
+PER-STATION RESULTS
+------------------------------------------------------------
+
+KATL:
+  T+1: acc=67.6%  rmse=3.69  n=627
+  T+3: acc=74.0%  rmse=5.42  n=539
+  T+6: acc=83.3%  rmse=6.46  n=449
+  T+12: acc=78.4%  rmse=8.21  n=269
+
+KBOS:
+  T+1: acc=62.3%  rmse=3.95  n=605
+  T+3: acc=75.1%  rmse=4.66  n=522
+  T+6: acc=73.5%  rmse=6.35  n=434
+  T+12: acc=78.1%  rmse=8.65  n=260
+
+KCLT:
+  T+1: acc=70.9%  rmse=3.41  n=629
+  T+3: acc=77.2%  rmse=4.33  n=539
+  T+6: acc=88.0%  rmse=5.78  n=449
+  T+12: acc=74.0%  rmse=7.44  n=269
+
+KDCA:
+  T+1: acc=67.5%  rmse=3.59  n=627
+  T+3: acc=70.6%  rmse=4.73  n=538
+  T+6: acc=77.5%  rmse=6.34  n=448
+  T+12: acc=80.6%  rmse=7.97  n=268
+
+KDEN:
+  T+1: acc=64.4%  rmse=5.53  n=596
+  T+3: acc=83.2%  rmse=6.71  n=505
+  T+6: acc=91.5%  rmse=8.19  n=422
+  T+12: acc=85.7%  rmse=9.31  n=244
+
+KDFW:
+  T+1: acc=75.2%  rmse=2.92  n=618
+  T+3: acc=91.9%  rmse=3.41  n=531
+  T+6: acc=95.0%  rmse=4.15  n=442
+  T+12: acc=91.3%  rmse=4.83  n=264
+
+KDTW:
+  T+1: acc=65.1%  rmse=3.54  n=628
+  T+3: acc=75.7%  rmse=4.77  n=539
+  T+6: acc=84.6%  rmse=6.24  n=449
+  T+12: acc=77.3%  rmse=7.56  n=269
+
+KHOU:
+  T+1: acc=71.7%  rmse=3.35  n=619
+  T+3: acc=80.2%  rmse=4.08  n=531
+  T+6: acc=90.3%  rmse=5.07  n=442
+  T+12: acc=81.9%  rmse=6.05  n=265
+
+KJFK:
+  T+1: acc=69.5%  rmse=3.06  n=629
+  T+3: acc=73.9%  rmse=4.14  n=540
+  T+6: acc=77.6%  rmse=5.65  n=450
+  T+12: acc=88.9%  rmse=7.50  n=270
+
+KLAX:
+  T+1: acc=72.7%  rmse=2.42  n=623
+  T+3: acc=82.0%  rmse=2.57  n=533
+  T+6: acc=87.6%  rmse=2.87  n=443
+  T+12: acc=92.5%  rmse=2.90  n=266
+
+KMIA:
+  T+1: acc=75.9%  rmse=3.04  n=622
+  T+3: acc=78.6%  rmse=3.17  n=533
+  T+6: acc=81.0%  rmse=3.90  n=443
+  T+12: acc=92.1%  rmse=4.79  n=265
+
+KMSP:
+  T+1: acc=61.4%  rmse=4.37  n=599
+  T+3: acc=78.6%  rmse=4.56  n=515
+  T+6: acc=90.9%  rmse=5.41  n=429
+  T+12: acc=86.6%  rmse=6.04  n=253
+
+KORD:
+  T+1: acc=62.5%  rmse=4.03  n=624
+  T+3: acc=69.7%  rmse=4.97  n=535
+  T+6: acc=82.7%  rmse=6.43  n=445
+  T+12: acc=77.0%  rmse=7.97  n=265
+
+KPDX:
+  T+1: acc=86.1%  rmse=3.26  n=624
+  T+3: acc=94.0%  rmse=4.17  n=535
+  T+6: acc=96.4%  rmse=5.33  n=445
+  T+12: acc=89.5%  rmse=5.67  n=267
+
+KPHL:
+  T+1: acc=65.4%  rmse=3.69  n=621
+  T+3: acc=72.2%  rmse=4.67  n=533
+  T+6: acc=79.5%  rmse=6.30  n=443
+  T+12: acc=82.2%  rmse=8.24  n=264
+
+KPHX:
+  T+1: acc=80.7%  rmse=3.05  n=616
+  T+3: acc=91.7%  rmse=3.79  n=529
+  T+6: acc=95.7%  rmse=4.49  n=439
+  T+12: acc=84.9%  rmse=4.34  n=259
+
+KSEA:
+  T+1: acc=74.4%  rmse=3.71  n=621
+  T+3: acc=88.0%  rmse=4.46  n=533
+  T+6: acc=92.5%  rmse=5.21  n=443
+  T+12: acc=85.3%  rmse=5.75  n=265
+
+KSFO:
+  T+1: acc=60.6%  rmse=2.26  n=591
+  T+3: acc=79.4%  rmse=2.91  n=509
+  T+6: acc=84.5%  rmse=3.57  n=419
+  T+12: acc=95.0%  rmse=4.13  n=242
+
+KSLC:
+  T+1: acc=68.9%  rmse=3.60  n=621
+  T+3: acc=93.3%  rmse=4.72  n=536
+  T+6: acc=96.6%  rmse=5.79  n=446
+  T+12: acc=95.9%  rmse=5.41  n=266
+
+KTPA:
+  T+1: acc=74.9%  rmse=2.52  n=629
+  T+3: acc=74.6%  rmse=3.10  n=539
+  T+6: acc=80.2%  rmse=4.09  n=449
+  T+12: acc=84.0%  rmse=5.43  n=269
