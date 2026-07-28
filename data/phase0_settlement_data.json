@@ -1,0 +1,858 @@
+{
+  "KDCA": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 97.0,
+      "nws_cli": 96.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 98.0,
+      "nws_cli": 96.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 55891.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 89.0,
+      "nws_cli": 87.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 87.0,
+      "nws_cli": 86.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 92.0,
+      "nws_cli": 37896.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 92.0,
+      "nws_cli": 91.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 83.0,
+      "nws_cli": 84.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 82.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 82.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 85.0,
+      "nws_cli": 84.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 90.0,
+      "nws_cli": 89.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": 82.4,
+      "nws_cli_source": "nws_db"
+    }
+  },
+  "KDFW": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 90.0,
+      "nws_cli": 37891.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 94.0,
+      "nws_cli": 30678.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 32478.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 98.0,
+      "nws_cli": 96.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 100.0,
+      "nws_cli": 100.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 106.0,
+      "nws_cli": 105.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 106.0,
+      "nws_cli": 105.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 98.0,
+      "nws_cli": 98.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 98.0,
+      "nws_cli": 98.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 99.0,
+      "nws_cli": 98.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 100.0,
+      "nws_cli": 100.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": 96.8,
+      "nws_cli_source": "nws_db"
+    }
+  },
+  "KHOU": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 87.0,
+      "nws_cli": 45080.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 92.0,
+      "nws_cli": 91.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 91.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 95.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 96.0,
+      "nws_cli": 95.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 98.0,
+      "nws_cli": 96.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 102.0,
+      "nws_cli": 102.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 90.0,
+      "nws_cli": 7280.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 94.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 92.0,
+      "nws_cli": 91.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": 89.6,
+      "nws_cli_source": "nws_db"
+    }
+  },
+  "KLAX": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 81.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 84.0,
+      "nws_cli": 82.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 86.0,
+      "nws_cli": 86.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 78.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 78.0,
+      "nws_cli": 77.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 83.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 81.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 77.0,
+      "nws_cli": 77.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 80.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 78.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 80.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": 75.2,
+      "nws_cli_source": "nws_db"
+    }
+  },
+  "KMDW": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 91.0,
+      "nws_cli": 89.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 94.0,
+      "nws_cli": 41486.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 91.0,
+      "nws_cli": 64878.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 82.0,
+      "nws_cli": 30682.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 86.0,
+      "nws_cli": 61282.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 73.0,
+      "nws_cli": 7284.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 77.0,
+      "nws_cli": 75.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 77.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 91.0,
+      "nws_cli": 84.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 88.0,
+      "nws_cli_source": "kalshi"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": null,
+      "nws_cli_source": "missing"
+    }
+  },
+  "KNYC": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 10882.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 85.0,
+      "nws_cli": 84.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 86.0,
+      "nws_cli": 86.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 76.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 63082.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 81.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 81.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 85.0,
+      "nws_cli": 84.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 83.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 81.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 85.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 83.0,
+      "nws_cli_source": "kalshi"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": null,
+      "nws_cli_source": "missing"
+    }
+  },
+  "KOKC": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 87.0,
+      "nws_cli": 25278.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 86.0,
+      "nws_cli": 37907.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 88.0,
+      "nws_cli": 28904.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 91.0,
+      "nws_cli": 89.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 94.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 98.0,
+      "nws_cli": 96.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 104.0,
+      "nws_cli": 102.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 94.0,
+      "nws_cli": 96.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 90.0,
+      "nws_cli": 89.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 102.0,
+      "nws_cli": 43278.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 102.0,
+      "nws_cli": 95.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 103.0,
+      "nws_cli_source": "kalshi"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": null,
+      "nws_cli_source": "missing"
+    }
+  },
+  "KPHX": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 109.0,
+      "nws_cli": 107.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 102.0,
+      "nws_cli": 34278.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 21678.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 96.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 105.0,
+      "nws_cli": 104.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 107.0,
+      "nws_cli": 105.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 101.0,
+      "nws_cli": 16278.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 107.0,
+      "nws_cli": 105.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 114.0,
+      "nws_cli": 113.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 117.0,
+      "nws_cli": 116.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 117.0,
+      "nws_cli": 10895.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 110.0,
+      "nws_cli": 7291.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 113.0,
+      "nws_cli_source": "kalshi"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": null,
+      "nws_cli_source": "missing"
+    }
+  },
+  "KSEA": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 83.0,
+      "nws_cli": 84.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 65.0,
+      "nws_cli": 82.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 72.0,
+      "nws_cli": 71.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 75.0,
+      "nws_cli": 73.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 78.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 82.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 93.0,
+      "nws_cli": 91.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 95.0,
+      "nws_cli": 93.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 76.0,
+      "nws_cli": 89.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 82.0,
+      "nws_cli": 80.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 73.0,
+      "nws_cli": 82.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 74.0,
+      "nws_cli": 71.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 79.0,
+      "nws_cli": 78.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": 78.8,
+      "nws_cli_source": "nws_db"
+    }
+  },
+  "KSFO": {
+    "2026-07-15": {
+      "cached": false,
+      "kalshi_temp": 74.0,
+      "nws_cli": 54082.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-16": {
+      "cached": false,
+      "kalshi_temp": 69.0,
+      "nws_cli": 55880.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-17": {
+      "cached": false,
+      "kalshi_temp": 68.0,
+      "nws_cli": 48686.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-18": {
+      "cached": false,
+      "kalshi_temp": 72.0,
+      "nws_cli": 55880.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-19": {
+      "cached": false,
+      "kalshi_temp": 66.0,
+      "nws_cli": 55882.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-20": {
+      "cached": false,
+      "kalshi_temp": 72.0,
+      "nws_cli": 55880.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-21": {
+      "cached": false,
+      "kalshi_temp": 92.0,
+      "nws_cli": 91.4,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-22": {
+      "cached": false,
+      "kalshi_temp": 74.0,
+      "nws_cli": 48678.8,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-23": {
+      "cached": false,
+      "kalshi_temp": 70.0,
+      "nws_cli": 52284.2,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-24": {
+      "cached": false,
+      "kalshi_temp": 71.0,
+      "nws_cli": 52286.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-25": {
+      "cached": false,
+      "kalshi_temp": 71.0,
+      "nws_cli": 52286.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-26": {
+      "cached": false,
+      "kalshi_temp": 69.0,
+      "nws_cli": 50480.6,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-27": {
+      "cached": false,
+      "kalshi_temp": 70.0,
+      "nws_cli": 52286.0,
+      "nws_cli_source": "kalshi_and_nws"
+    },
+    "2026-07-28": {
+      "cached": false,
+      "kalshi_temp": null,
+      "nws_cli": 52278.8,
+      "nws_cli_source": "nws_db"
+    }
+  }
+}
