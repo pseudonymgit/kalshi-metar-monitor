@@ -1,0 +1,92 @@
+[
+  {
+    "station": "KLAX",
+    "event_ticker": "KXHIGHLAX-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 79.0,
+    "kalshi_bucket_2f": 79,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KNYC",
+    "event_ticker": "KXHIGHNY-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 83.0,
+    "kalshi_bucket_2f": 83,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KDFW",
+    "event_ticker": "KXHIGHTDAL-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 100.0,
+    "kalshi_bucket_2f": 100,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KDCA",
+    "event_ticker": "KXHIGHTDC-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 90.0,
+    "kalshi_bucket_2f": 90,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 113.0,
+    "kalshi_bucket_2f": 113,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 79.0,
+    "kalshi_bucket_2f": 79,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 70.0,
+    "kalshi_bucket_2f": 70,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 103.0,
+    "kalshi_bucket_2f": 103,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 95.0,
+    "kalshi_bucket_2f": 95,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  },
+  {
+    "station": "KORD",
+    "event_ticker": "KXHIGHCHI-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 88.0,
+    "kalshi_bucket_2f": 88,
+    "fetched_at": "2026-07-28T17:18:30Z",
+    "markets_found": 6
+  }
+]

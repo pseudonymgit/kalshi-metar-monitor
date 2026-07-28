@@ -1,0 +1,5393 @@
+[
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KLAX",
+    "series": "KXHIGHLAX",
+    "event_ticker": "KXHIGHLAX-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 100.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KNYC",
+    "series": "KXHIGHNY",
+    "event_ticker": "KXHIGHNY-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 100.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 99.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 106.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 106.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 100.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 101.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 101.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 100.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 99.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 99.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDFW",
+    "series": "KXHIGHTDAL",
+    "event_ticker": "KXHIGHTDAL-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 100.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 99.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KDCA",
+    "series": "KXHIGHTDC",
+    "event_ticker": "KXHIGHTDC-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 113.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 117.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 117.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 114.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 101.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 105.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 109.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 109.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 109.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 111.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 113.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 113.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 113.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 113.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 101.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 104.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 112.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 109.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 106.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 105.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 112.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 110.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 106.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 104.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 105.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 108.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 107.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 104.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 99.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KPHX",
+    "series": "KXHIGHTPHX",
+    "event_ticker": "KXHIGHTPHX-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 65.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 64.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 64.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 64.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 65.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 66.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 63.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 62.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 65.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 62.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 63.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 63.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSEA",
+    "series": "KXHIGHTSEA",
+    "event_ticker": "KXHIGHTSEA-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 60.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 66.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 66.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 65.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 62.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 69.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 68.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 65.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 64.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 70.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 65.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KSFO",
+    "series": "KXHIGHTSFO",
+    "event_ticker": "KXHIGHTSFO-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 63.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 103.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 104.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 100.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 97.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KOKC",
+    "series": "KXHIGHTOKC",
+    "event_ticker": "KXHIGHTOKC-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 102.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 99.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 98.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 90.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KHOU",
+    "series": "KXHIGHTHOU",
+    "event_ticker": "KXHIGHTHOU-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL27",
+    "target_date": "2026-07-27",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL26",
+    "target_date": "2026-07-26",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL25",
+    "target_date": "2026-07-25",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL24",
+    "target_date": "2026-07-24",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL23",
+    "target_date": "2026-07-23",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL22",
+    "target_date": "2026-07-22",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL21",
+    "target_date": "2026-07-21",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL20",
+    "target_date": "2026-07-20",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL19",
+    "target_date": "2026-07-19",
+    "kalshi_temp": 79.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL18",
+    "target_date": "2026-07-18",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL17",
+    "target_date": "2026-07-17",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL16",
+    "target_date": "2026-07-16",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL15",
+    "target_date": "2026-07-15",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL14",
+    "target_date": "2026-07-14",
+    "kalshi_temp": 96.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL13",
+    "target_date": "2026-07-13",
+    "kalshi_temp": 92.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL12",
+    "target_date": "2026-07-12",
+    "kalshi_temp": 86.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL11",
+    "target_date": "2026-07-11",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL10",
+    "target_date": "2026-07-10",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL09",
+    "target_date": "2026-07-09",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL08",
+    "target_date": "2026-07-08",
+    "kalshi_temp": 89.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL07",
+    "target_date": "2026-07-07",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL06",
+    "target_date": "2026-07-06",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL05",
+    "target_date": "2026-07-05",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL04",
+    "target_date": "2026-07-04",
+    "kalshi_temp": 85.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL03",
+    "target_date": "2026-07-03",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL02",
+    "target_date": "2026-07-02",
+    "kalshi_temp": 95.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUL01",
+    "target_date": "2026-07-01",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN30",
+    "target_date": "2026-06-30",
+    "kalshi_temp": 94.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN29",
+    "target_date": "2026-06-29",
+    "kalshi_temp": 93.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN28",
+    "target_date": "2026-06-28",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN27",
+    "target_date": "2026-06-27",
+    "kalshi_temp": 78.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN26",
+    "target_date": "2026-06-26",
+    "kalshi_temp": 67.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN25",
+    "target_date": "2026-06-25",
+    "kalshi_temp": 80.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN24",
+    "target_date": "2026-06-24",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN23",
+    "target_date": "2026-06-23",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN22",
+    "target_date": "2026-06-22",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN21",
+    "target_date": "2026-06-21",
+    "kalshi_temp": 72.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN20",
+    "target_date": "2026-06-20",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN19",
+    "target_date": "2026-06-19",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN18",
+    "target_date": "2026-06-18",
+    "kalshi_temp": 73.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN17",
+    "target_date": "2026-06-17",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN16",
+    "target_date": "2026-06-16",
+    "kalshi_temp": 77.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN15",
+    "target_date": "2026-06-15",
+    "kalshi_temp": 76.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN14",
+    "target_date": "2026-06-14",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN13",
+    "target_date": "2026-06-13",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN12",
+    "target_date": "2026-06-12",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN11",
+    "target_date": "2026-06-11",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN10",
+    "target_date": "2026-06-10",
+    "kalshi_temp": 91.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN09",
+    "target_date": "2026-06-09",
+    "kalshi_temp": 88.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN08",
+    "target_date": "2026-06-08",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN07",
+    "target_date": "2026-06-07",
+    "kalshi_temp": 83.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN06",
+    "target_date": "2026-06-06",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN05",
+    "target_date": "2026-06-05",
+    "kalshi_temp": 81.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN04",
+    "target_date": "2026-06-04",
+    "kalshi_temp": 87.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN03",
+    "target_date": "2026-06-03",
+    "kalshi_temp": 82.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN02",
+    "target_date": "2026-06-02",
+    "kalshi_temp": 75.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26JUN01",
+    "target_date": "2026-06-01",
+    "kalshi_temp": 71.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26MAY31",
+    "target_date": "2026-05-31",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26MAY30",
+    "target_date": "2026-05-30",
+    "kalshi_temp": 74.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  },
+  {
+    "station": "KMDW",
+    "series": "KXHIGHCHI",
+    "event_ticker": "KXHIGHCHI-26MAY29",
+    "target_date": "2026-05-29",
+    "kalshi_temp": 84.0,
+    "markets_found": 6,
+    "finalized_count": 6
+  }
+]
