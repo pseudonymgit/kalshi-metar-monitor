@@ -1,0 +1,510 @@
+{
+  "metadata": {
+    "db": "data/metar_backfill.db",
+    "stations": [
+      "KATL",
+      "KBOS",
+      "KCLT",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KDTW",
+      "KHOU",
+      "KJFK",
+      "KLAX",
+      "KMIA",
+      "KMSP",
+      "KORD",
+      "KPDX",
+      "KPHL",
+      "KPHX",
+      "KSEA",
+      "KSFO",
+      "KSLC",
+      "KTPA"
+    ],
+    "date_range": "2021-01-01 to 2026-07-27",
+    "holdout_days": 90,
+    "analog_top_k": 10
+  },
+  "aggregate": {
+    "T+1": {
+      "mean_accuracy": 0.6989,
+      "weighted_accuracy": 0.6994,
+      "min_accuracy": 0.6058,
+      "max_accuracy": 0.8606,
+      "mean_rmse": 3.449,
+      "total_trades": 12369,
+      "n_stations": 20
+    },
+    "T+3": {
+      "mean_accuracy": 0.802,
+      "weighted_accuracy": 0.8018,
+      "min_accuracy": 0.6972,
+      "max_accuracy": 0.9402,
+      "mean_rmse": 4.267,
+      "total_trades": 10614,
+      "n_stations": 20
+    },
+    "T+6": {
+      "mean_accuracy": 0.8644,
+      "weighted_accuracy": 0.8642,
+      "min_accuracy": 0.735,
+      "max_accuracy": 0.9664,
+      "mean_rmse": 5.38,
+      "total_trades": 8829,
+      "n_stations": 20
+    },
+    "T+12": {
+      "mean_accuracy": 0.8505,
+      "weighted_accuracy": 0.85,
+      "min_accuracy": 0.7398,
+      "max_accuracy": 0.9586,
+      "mean_rmse": 6.41,
+      "total_trades": 5259,
+      "n_stations": 20
+    }
+  },
+  "per_station": {
+    "KATL": {
+      "T+1": {
+        "accuracy": 0.6762,
+        "rmse_buckets": 3.692,
+        "n": 627
+      },
+      "T+3": {
+        "accuracy": 0.7403,
+        "rmse_buckets": 5.424,
+        "n": 539
+      },
+      "T+6": {
+        "accuracy": 0.833,
+        "rmse_buckets": 6.46,
+        "n": 449
+      },
+      "T+12": {
+        "accuracy": 0.7844,
+        "rmse_buckets": 8.207,
+        "n": 269
+      }
+    },
+    "KBOS": {
+      "T+1": {
+        "accuracy": 0.6231,
+        "rmse_buckets": 3.953,
+        "n": 605
+      },
+      "T+3": {
+        "accuracy": 0.751,
+        "rmse_buckets": 4.658,
+        "n": 522
+      },
+      "T+6": {
+        "accuracy": 0.735,
+        "rmse_buckets": 6.348,
+        "n": 434
+      },
+      "T+12": {
+        "accuracy": 0.7808,
+        "rmse_buckets": 8.652,
+        "n": 260
+      }
+    },
+    "KCLT": {
+      "T+1": {
+        "accuracy": 0.7091,
+        "rmse_buckets": 3.409,
+        "n": 629
+      },
+      "T+3": {
+        "accuracy": 0.7718,
+        "rmse_buckets": 4.331,
+        "n": 539
+      },
+      "T+6": {
+        "accuracy": 0.8797,
+        "rmse_buckets": 5.775,
+        "n": 449
+      },
+      "T+12": {
+        "accuracy": 0.7398,
+        "rmse_buckets": 7.444,
+        "n": 269
+      }
+    },
+    "KDCA": {
+      "T+1": {
+        "accuracy": 0.6746,
+        "rmse_buckets": 3.587,
+        "n": 627
+      },
+      "T+3": {
+        "accuracy": 0.7063,
+        "rmse_buckets": 4.73,
+        "n": 538
+      },
+      "T+6": {
+        "accuracy": 0.7746,
+        "rmse_buckets": 6.336,
+        "n": 448
+      },
+      "T+12": {
+        "accuracy": 0.806,
+        "rmse_buckets": 7.973,
+        "n": 268
+      }
+    },
+    "KDEN": {
+      "T+1": {
+        "accuracy": 0.6443,
+        "rmse_buckets": 5.531,
+        "n": 596
+      },
+      "T+3": {
+        "accuracy": 0.8317,
+        "rmse_buckets": 6.709,
+        "n": 505
+      },
+      "T+6": {
+        "accuracy": 0.9147,
+        "rmse_buckets": 8.188,
+        "n": 422
+      },
+      "T+12": {
+        "accuracy": 0.8566,
+        "rmse_buckets": 9.314,
+        "n": 244
+      }
+    },
+    "KDFW": {
+      "T+1": {
+        "accuracy": 0.7524,
+        "rmse_buckets": 2.922,
+        "n": 618
+      },
+      "T+3": {
+        "accuracy": 0.919,
+        "rmse_buckets": 3.413,
+        "n": 531
+      },
+      "T+6": {
+        "accuracy": 0.9502,
+        "rmse_buckets": 4.148,
+        "n": 442
+      },
+      "T+12": {
+        "accuracy": 0.9129,
+        "rmse_buckets": 4.829,
+        "n": 264
+      }
+    },
+    "KDTW": {
+      "T+1": {
+        "accuracy": 0.6513,
+        "rmse_buckets": 3.54,
+        "n": 628
+      },
+      "T+3": {
+        "accuracy": 0.757,
+        "rmse_buckets": 4.771,
+        "n": 539
+      },
+      "T+6": {
+        "accuracy": 0.8463,
+        "rmse_buckets": 6.239,
+        "n": 449
+      },
+      "T+12": {
+        "accuracy": 0.7732,
+        "rmse_buckets": 7.564,
+        "n": 269
+      }
+    },
+    "KHOU": {
+      "T+1": {
+        "accuracy": 0.7173,
+        "rmse_buckets": 3.349,
+        "n": 619
+      },
+      "T+3": {
+        "accuracy": 0.8023,
+        "rmse_buckets": 4.078,
+        "n": 531
+      },
+      "T+6": {
+        "accuracy": 0.9027,
+        "rmse_buckets": 5.07,
+        "n": 442
+      },
+      "T+12": {
+        "accuracy": 0.8189,
+        "rmse_buckets": 6.055,
+        "n": 265
+      }
+    },
+    "KJFK": {
+      "T+1": {
+        "accuracy": 0.6948,
+        "rmse_buckets": 3.06,
+        "n": 629
+      },
+      "T+3": {
+        "accuracy": 0.7389,
+        "rmse_buckets": 4.14,
+        "n": 540
+      },
+      "T+6": {
+        "accuracy": 0.7756,
+        "rmse_buckets": 5.649,
+        "n": 450
+      },
+      "T+12": {
+        "accuracy": 0.8889,
+        "rmse_buckets": 7.504,
+        "n": 270
+      }
+    },
+    "KLAX": {
+      "T+1": {
+        "accuracy": 0.7271,
+        "rmse_buckets": 2.416,
+        "n": 623
+      },
+      "T+3": {
+        "accuracy": 0.8199,
+        "rmse_buckets": 2.568,
+        "n": 533
+      },
+      "T+6": {
+        "accuracy": 0.8758,
+        "rmse_buckets": 2.873,
+        "n": 443
+      },
+      "T+12": {
+        "accuracy": 0.9248,
+        "rmse_buckets": 2.898,
+        "n": 266
+      }
+    },
+    "KMIA": {
+      "T+1": {
+        "accuracy": 0.7588,
+        "rmse_buckets": 3.037,
+        "n": 622
+      },
+      "T+3": {
+        "accuracy": 0.7861,
+        "rmse_buckets": 3.171,
+        "n": 533
+      },
+      "T+6": {
+        "accuracy": 0.8104,
+        "rmse_buckets": 3.901,
+        "n": 443
+      },
+      "T+12": {
+        "accuracy": 0.9208,
+        "rmse_buckets": 4.794,
+        "n": 265
+      }
+    },
+    "KMSP": {
+      "T+1": {
+        "accuracy": 0.6144,
+        "rmse_buckets": 4.368,
+        "n": 599
+      },
+      "T+3": {
+        "accuracy": 0.7864,
+        "rmse_buckets": 4.556,
+        "n": 515
+      },
+      "T+6": {
+        "accuracy": 0.9091,
+        "rmse_buckets": 5.411,
+        "n": 429
+      },
+      "T+12": {
+        "accuracy": 0.8656,
+        "rmse_buckets": 6.038,
+        "n": 253
+      }
+    },
+    "KORD": {
+      "T+1": {
+        "accuracy": 0.625,
+        "rmse_buckets": 4.025,
+        "n": 624
+      },
+      "T+3": {
+        "accuracy": 0.6972,
+        "rmse_buckets": 4.966,
+        "n": 535
+      },
+      "T+6": {
+        "accuracy": 0.827,
+        "rmse_buckets": 6.429,
+        "n": 445
+      },
+      "T+12": {
+        "accuracy": 0.7698,
+        "rmse_buckets": 7.97,
+        "n": 265
+      }
+    },
+    "KPDX": {
+      "T+1": {
+        "accuracy": 0.8606,
+        "rmse_buckets": 3.263,
+        "n": 624
+      },
+      "T+3": {
+        "accuracy": 0.9402,
+        "rmse_buckets": 4.174,
+        "n": 535
+      },
+      "T+6": {
+        "accuracy": 0.964,
+        "rmse_buckets": 5.33,
+        "n": 445
+      },
+      "T+12": {
+        "accuracy": 0.8951,
+        "rmse_buckets": 5.667,
+        "n": 267
+      }
+    },
+    "KPHL": {
+      "T+1": {
+        "accuracy": 0.6538,
+        "rmse_buckets": 3.686,
+        "n": 621
+      },
+      "T+3": {
+        "accuracy": 0.7223,
+        "rmse_buckets": 4.667,
+        "n": 533
+      },
+      "T+6": {
+        "accuracy": 0.7946,
+        "rmse_buckets": 6.296,
+        "n": 443
+      },
+      "T+12": {
+        "accuracy": 0.822,
+        "rmse_buckets": 8.244,
+        "n": 264
+      }
+    },
+    "KPHX": {
+      "T+1": {
+        "accuracy": 0.8068,
+        "rmse_buckets": 3.053,
+        "n": 616
+      },
+      "T+3": {
+        "accuracy": 0.9168,
+        "rmse_buckets": 3.793,
+        "n": 529
+      },
+      "T+6": {
+        "accuracy": 0.9567,
+        "rmse_buckets": 4.488,
+        "n": 439
+      },
+      "T+12": {
+        "accuracy": 0.8494,
+        "rmse_buckets": 4.339,
+        "n": 259
+      }
+    },
+    "KSEA": {
+      "T+1": {
+        "accuracy": 0.744,
+        "rmse_buckets": 3.71,
+        "n": 621
+      },
+      "T+3": {
+        "accuracy": 0.8799,
+        "rmse_buckets": 4.461,
+        "n": 533
+      },
+      "T+6": {
+        "accuracy": 0.9255,
+        "rmse_buckets": 5.214,
+        "n": 443
+      },
+      "T+12": {
+        "accuracy": 0.8528,
+        "rmse_buckets": 5.745,
+        "n": 265
+      }
+    },
+    "KSFO": {
+      "T+1": {
+        "accuracy": 0.6058,
+        "rmse_buckets": 2.261,
+        "n": 591
+      },
+      "T+3": {
+        "accuracy": 0.7937,
+        "rmse_buckets": 2.908,
+        "n": 509
+      },
+      "T+6": {
+        "accuracy": 0.8449,
+        "rmse_buckets": 3.57,
+        "n": 419
+      },
+      "T+12": {
+        "accuracy": 0.9504,
+        "rmse_buckets": 4.131,
+        "n": 242
+      }
+    },
+    "KSLC": {
+      "T+1": {
+        "accuracy": 0.6892,
+        "rmse_buckets": 3.601,
+        "n": 621
+      },
+      "T+3": {
+        "accuracy": 0.9328,
+        "rmse_buckets": 4.719,
+        "n": 536
+      },
+      "T+6": {
+        "accuracy": 0.9664,
+        "rmse_buckets": 5.793,
+        "n": 446
+      },
+      "T+12": {
+        "accuracy": 0.9586,
+        "rmse_buckets": 5.41,
+        "n": 266
+      }
+    },
+    "KTPA": {
+      "T+1": {
+        "accuracy": 0.7488,
+        "rmse_buckets": 2.518,
+        "n": 629
+      },
+      "T+3": {
+        "accuracy": 0.7458,
+        "rmse_buckets": 3.1,
+        "n": 539
+      },
+      "T+6": {
+        "accuracy": 0.8018,
+        "rmse_buckets": 4.088,
+        "n": 449
+      },
+      "T+12": {
+        "accuracy": 0.8401,
+        "rmse_buckets": 5.427,
+        "n": 269
+      }
+    }
+  }
+}
