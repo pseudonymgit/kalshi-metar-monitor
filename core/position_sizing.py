@@ -221,9 +221,14 @@ def compute_position_size(
     market_price: float = 0.5,
     kelly_sizer: KellyPositionSizer = None,
     config: Any = None,
+    kelly_multiplier: float = 1.0,
 ) -> Tuple[float, ConfidenceTier, Dict[str, Any]]:
     """
     Compute SH3 fee-aware Kelly position size with confidence adjustment.
+    
+    Applies B-Mode Cycle 6 disagreement-based kelly_multiplier:
+    - When signals disagree: kelly_multiplier < 1.0, reducing position size
+    - When signals agree: kelly_multiplier = 1.0, full position
     
     Args:
         signal_type: One of the 8 signal types
@@ -232,6 +237,7 @@ def compute_position_size(
         market_price: Current market price (0.0-1.0)
         kelly_sizer: KellyPositionSizer instance
         config: PositionSizingConfig (defaults to SH3-enhanced)
+        kelly_multiplier: Disagreement-based multiplier (default 1.0 = full)
     
     Returns:
         Tuple of (position_size_usd, confidence_tier, metadata_dict)
@@ -252,9 +258,9 @@ def compute_position_size(
     # Calculate Kelly fraction with fee awareness
     kelly_fraction = kelly_sizer.calculate_kelly_fraction(edge, current_win_rate)
     
-    # Size is Kelly fraction of balance, modulated by confidence
+    # Size is Kelly fraction of balance, modulated by confidence and disagreement-based kelly_multiplier
     # But also ensure it doesn't exceed 25% of balance per requirements
-    kelly_amount = current_balance * abs(kelly_fraction) * confidence
+    kelly_amount = current_balance * abs(kelly_fraction) * confidence * kelly_multiplier
     
     # Maximum per-trade cap (25% of balance as required in SH3)
     max_amount_cap = current_balance * config.max_position_fraction
@@ -282,6 +288,7 @@ def compute_position_size(
         "calculated_edge": edge,
         "raw_kelly_fraction": kelly_fraction,
         "adjusted_size_by_confidence": kelly_amount,
+        "kelly_multiplier": kelly_multiplier,
         "position_size": final_size,
         "max_position_allowed": max_amount_cap,
         "max_config_cap": config.max_size_usd,
@@ -344,6 +351,152 @@ def extract_confidence_from_signal_context(signal_context: Dict[str, Any]) -> fl
         return 0.7  # Validated signal with known accuracy
     
     return 0.5  # Default neutral
+
+
+# ─── Disagreement-Based Kelly Multiplier (B-Mode Cycle 6) ──────────────
+
+def compute_disagreement(signal_directions: list, signal_confidences: list = None) -> float:
+    """
+    Compute normalized vote variance (disagreement) across ensemble signals.
+    
+    When signals disagree about direction, confidence should be reduced
+    proportionally. When they all agree, full confidence is used.
+    
+    Formula: disagreement = vote_variance / max_possible_variance
+    where vote_variance = variance of direction votes weighted by confidence
+    
+    Args:
+        signal_directions: List of 'up'/'down' strings, or 1.0/-1.0 floats
+        signal_confidences: Optional list of confidence values (0-1) for each signal.
+                           If None, treats all as equal weight (1.0).
+    
+    Returns:
+        disagreement in [0.0, 1.0]: 0.0 = total agreement, 1.0 = total disagreement
+    """
+    if not signal_directions or len(signal_directions) < 2:
+        return 0.0  # No disagreement possible with < 2 signals
+
+    if signal_confidences is None:
+        signal_confidences = [1.0] * len(signal_directions)
+    
+    n = len(signal_directions)
+    
+    # Convert directions to numeric: 'up' = 1.0, 'down' = -1.0
+    numeric_dirs = []
+    weights = []
+    for i, d in enumerate(signal_directions):
+        if isinstance(d, (int, float)):
+            numeric_dirs.append(1.0 if d > 0 else -1.0)
+        elif isinstance(d, str):
+            numeric_dirs.append(1.0 if d.lower() == 'up' else -1.0)
+        else:
+            continue
+        weights.append(signal_confidences[i] if i < len(signal_confidences) else 1.0)
+    
+    if len(numeric_dirs) < 2:
+        return 0.0
+    
+    # Compute weighted mean direction
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return 0.0
+    weighted_mean = sum(d * w for d, w in zip(numeric_dirs, weights)) / total_weight
+    
+    # Compute weighted variance (normalized by sum of weights)
+    variance = sum(w * (d - weighted_mean) ** 2 for d, w in zip(numeric_dirs, weights)) / total_weight
+    
+    # Max possible variance: when half vote up (+1) and half down (-1)
+    # with equal weights, mean = 0, variance = 1.0
+    max_variance = 1.0  # maximum when split evenly between +1 and -1
+    
+    disagreement = min(1.0, variance / max_variance) if max_variance > 0 else 0.0
+    
+    return disagreement
+
+
+def compute_kelly_multiplier_from_disagreement(
+    signal_directions: list,
+    signal_confidences: list = None,
+    base_multiplier: float = 1.0,
+    min_multiplier: float = 0.1,
+) -> float:
+    """
+    Compute Kelly position multiplier based on ensemble disagreement.
+    
+    Formula: kelly_multiplier = base_multiplier * (1.0 - disagreement)
+    
+    When signals all agree (disagreement ~ 0): full multiplier (1.0)
+    When signals split (disagreement ~ 1.0): reduced to min_multiplier
+    
+    This directly addresses the skew issue where the best config (bayesian_log_odds,
+    conf=0.80, gate=1) achieves 67% strike accuracy but skew=0.03, while coverage
+    config skew=-0.54. Disagreement-based scaling smooths the position sizing.
+    
+    Args:
+        signal_directions: List of signal direction strings ('up'/'down') or floats
+        signal_confidences: Optional confidences for weighted disagreement
+        base_multiplier: Base Kelly multiplier (default 1.0)
+        min_multiplier: Floor for Kelly multiplier (default 0.1)
+    
+    Returns:
+        kelly_multiplier: [min_multiplier, base_multiplier]
+    """
+    disagreement = compute_disagreement(signal_directions, signal_confidences)
+    
+    # Linear reduction: 1.0 - disagreement
+    # At full agreement (0): multiplier = base_multiplier
+    # At full disagreement (1): multiplier = base_multiplier * min_multiplier
+    scaled_multiplier = base_multiplier * max(min_multiplier, 1.0 - disagreement)
+    
+    return scaled_multiplier
+
+
+def compute_vote_distribution(signal_directions: list, signal_confidences: list = None) -> dict:
+    """
+    Compute detailed vote distribution statistics for logging/debugging.
+    
+    Args:
+        signal_directions: List of 'up'/'down' strings or numeric
+        signal_confidences: Optional confidences
+    
+    Returns:
+        dict with up_votes, down_votes, total, ratio, disagreement, kelly_multiplier
+    """
+    n = len(signal_directions)
+    if n == 0:
+        return {"error": "no signals"}
+    
+    if signal_confidences is None:
+        signal_confidences = [1.0] * n
+    
+    up_votes = 0
+    down_votes = 0
+    up_weighted = 0.0
+    down_weighted = 0.0
+    
+    for i, d in enumerate(signal_directions):
+        w = signal_confidences[i] if i < len(signal_confidences) else 1.0
+        is_up = (d == 'up' or d == 1.0 or (isinstance(d, (int, float)) and d > 0))
+        if is_up:
+            up_votes += 1
+            up_weighted += w
+        else:
+            down_votes += 1
+            down_weighted += w
+    
+    disagreement = compute_disagreement(signal_directions, signal_confidences)
+    kelly_mult = compute_kelly_multiplier_from_disagreement(signal_directions, signal_confidences)
+    
+    return {
+        "up_votes": up_votes,
+        "down_votes": down_votes,
+        "total": n,
+        "ratio": up_votes / n if n > 0 else 0.5,
+        "up_weighted": up_weighted,
+        "down_weighted": down_weighted,
+        "disagreement": round(disagreement, 4),
+        "kelly_multiplier": round(kelly_mult, 4),
+    }
 
 
 # ─── Testing Functions ───────────────────────────────────────────────────────────
