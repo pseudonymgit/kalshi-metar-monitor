@@ -1,0 +1,95 @@
+Source: auto → operational (2021+)
+Note: checking operational bucket availability for 2021-02-11 to 2026-07-28
+========================================================================
+  GEFS Historical Ensemble Forecast Backfill
+========================================================================
+  Database:  /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db
+  Date range: 2021-02-11 to 2026-07-28
+  Stations:   20
+  Workers:    4
+========================================================================
+
+
+########################################################################
+  Source: OPERATIONAL — 2021-02-11 to 2026-07-28
+########################################################################
+
+  Operational members: gec00, gep01, gep02, gep03, gep04, gep05
+  Forecast step: f024 (24h, predicting next day's max temp)
+  Parallel workers: 4
+  Expected records per date: 120 (6 members × 20 stations)
+
+  2021-02-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 10 dates processed (1200 total records) ---
+
+  2021-03-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 20 dates processed (2400 total records) ---
+
+  2021-03-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 30 dates processed (3600 total records) ---
+
+  2021-04-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 40 dates processed (4800 total records) ---
+
+  2021-05-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 50 dates processed (6000 total records) ---
+
+  2021-05-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-07: downloading 6 members (f024) ... 
