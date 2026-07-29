@@ -1,31 +1,260 @@
 {
-  "version": "1.0",
-  "generated_at": "2026-07-29T06:55:00+00:00",
-  "method": "Initial template — computed from first pass GEFS vs settlement comparison",
-  "bias_correction_source": "GEFS 31-member ensemble mean vs Kalshi NWS CLI temperature (settlement)",
-  "description": "Bias = GEFS_mean - actual. Positive = GEFS overpredicts. 20 stations × 4 seasons.",
+  "version": "2.0",
+  "generated_at": "2026-07-29T15:31:45.069851+00:00",
+  "method": "REAL bias: GEFS 31-member f024 ensemble mean (C\u2192F) vs Kalshi settlement HIGH temp",
+  "training_data": "Dates < 2025-01-01",
+  "matched_pairs": 29000,
+  "bias_formula": "bias = GEFS_mean_TMAX_F - actual_HIGH_temp_F",
+  "description": "Positive = GEFS overpredicts, Negative = GEFS underpredicts",
+  "min_samples": 10,
   "bias_table": {
-    "KATL": [1.2, 0.8, -0.5, 0.3],
-    "KAUS": [1.5, 1.0, -0.3, 0.5],
-    "KBOS": [0.5, -0.2, -1.0, 0.0],
-    "KDCA": [0.8, 0.3, -0.8, 0.2],
-    "KDEN": [2.5, 3.0, 2.0, 2.8],
-    "KDFW": [1.0, 0.5, -0.5, 0.5],
-    "KHOU": [0.8, 0.5, -0.3, 0.3],
-    "KLAS": [1.0, 0.5, 0.0, 0.8],
-    "KLAX": [0.3, -0.5, -1.5, -0.3],
-    "KMDW": [2.0, 1.5, 0.5, 1.8],
-    "KMIA": [0.5, -0.2, -1.0, 0.0],
-    "KMSP": [2.0, 1.5, 0.8, 1.5],
-    "KMSY": [1.8, 1.2, 0.0, 1.0],
-    "KNYC": [0.5, 0.0, -0.8, 0.2],
-    "KOKC": [1.5, 1.0, 0.0, 1.0],
-    "KPHL": [0.8, 0.3, -0.5, 0.3],
-    "KPHX": [0.5, 0.0, -1.0, 0.0],
-    "KSAT": [1.2, 0.8, -0.3, 0.5],
-    "KSEA": [0.5, 0.0, -1.0, 0.0],
-    "KSFO": [0.3, -0.3, -1.2, 0.0]
+    "KATL": [
+      -3.42,
+      -1.74,
+      1.83,
+      -0.57
+    ],
+    "KAUS": [
+      -3.79,
+      -1.62,
+      1.72,
+      -1.01
+    ],
+    "KBOS": [
+      -2.16,
+      -1.23,
+      0.58,
+      -0.55
+    ],
+    "KDCA": [
+      -3.56,
+      -3.3,
+      -0.68,
+      -1.91
+    ],
+    "KDEN": [
+      -3.75,
+      -3.66,
+      -1.71,
+      -2.3
+    ],
+    "KDFW": [
+      -3.89,
+      -1.91,
+      1.88,
+      -0.42
+    ],
+    "KHOU": [
+      -2.15,
+      0.53,
+      1.72,
+      -0.08
+    ],
+    "KLAS": [
+      -6.13,
+      -7.89,
+      -6.65,
+      -5.63
+    ],
+    "KLAX": [
+      -1.56,
+      0.7,
+      4.87,
+      0.96
+    ],
+    "KMDW": [
+      -4.48,
+      -5.37,
+      -2.38,
+      -2.12
+    ],
+    "KMIA": [
+      -2.14,
+      -2.5,
+      -1.7,
+      -1.81
+    ],
+    "KMSP": [
+      -4.61,
+      -3.95,
+      0.55,
+      -0.61
+    ],
+    "KMSY": [
+      -2.41,
+      -0.55,
+      0.74,
+      -0.49
+    ],
+    "KNYC": [
+      -3.0,
+      -2.41,
+      -0.11,
+      -0.96
+    ],
+    "KOKC": [
+      -2.54,
+      -1.17,
+      3.17,
+      0.93
+    ],
+    "KPHL": [
+      -3.24,
+      -3.6,
+      -1.3,
+      -1.78
+    ],
+    "KPHX": [
+      -4.69,
+      -5.32,
+      -4.18,
+      -4.34
+    ],
+    "KSAT": [
+      -3.17,
+      -2.01,
+      0.3,
+      -1.44
+    ],
+    "KSEA": [
+      -2.2,
+      -0.79,
+      1.38,
+      0.12
+    ],
+    "KSFO": [
+      -3.16,
+      -6.91,
+      -6.36,
+      -5.49
+    ]
   },
-  "season_order": ["DJF", "MAM", "JJA", "SON"],
-  "notes": "Initial bias values estimated from GEFS 6-member vs settlement comparison. DJF=Dec-Feb, MAM=Mar-May, JJA=Jun-Aug, SON=Sep-Nov. KDEN shows strongest warm bias (GEFS overpredicts by 2-3°F). KLAX shows slight cold bias in summer. These will be refined as more GEFS 31-member data is collected."
+  "season_order": [
+    "DJF",
+    "MAM",
+    "JJA",
+    "SON"
+  ],
+  "sample_counts": {
+    "KATL": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KAUS": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KBOS": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KDCA": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KDEN": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KDFW": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KHOU": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KLAS": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KLAX": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KMDW": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KMIA": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KMSP": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KMSY": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KNYC": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KOKC": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KPHL": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KPHX": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KSAT": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KSEA": [
+      358,
+      365,
+      365,
+      362
+    ],
+    "KSFO": [
+      358,
+      365,
+      365,
+      362
+    ]
+  }
 }
