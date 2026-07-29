@@ -485,3 +485,12 @@
 2026-07-29 07:07:01,609 [INFO] ============================================================
 2026-07-29 07:07:01,609 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
 2026-07-29 07:07:01,613 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 19:03:59,446 [INFO] ============================================================
+2026-07-29 19:03:59,446 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 19:03:59,446 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 19:04:03,619 [INFO] ============================================================
+2026-07-29 19:04:03,619 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 19:04:03,619 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 19:04:06,277 [INFO] ============================================================
+2026-07-29 19:04:06,277 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 19:04:06,277 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
