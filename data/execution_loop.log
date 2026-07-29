@@ -1,0 +1,9 @@
+
+=== P0-P4 Execution Log ===
+[2026-07-29 16:35 UTC] P0: P&L direction bug FIXED — entry_price now direction-aware
+  Result: 56.58% accuracy, $554,127.60 P&L (was $1.75M inflated)
+[2026-07-29 16:35 UTC] P1: Calibration curves VERIFIED — real bin-level curves, all 20 stations
+[2026-07-29 16:35 UTC] P2: Trajectory confirmation gate BUILT
+  Validation: CONFIRMED=75.81%, CONTRADICTED=29.55%, Blended=68.99% (+16.5pp)
+[2026-07-29 16:35 UTC] P3: ECMWF backtest BUILT — API verified (51 members), date gap documented
+[2026-07-29 16:35 UTC] P4: Real Kalshi prices INTEGRATED — ticker mapping complete, fallback wired
