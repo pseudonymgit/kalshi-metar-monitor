@@ -1,13 +1,29 @@
 {
   "metadata": {
-    "timestamp": "2026-07-29T07:05:56.816498+00:00",
+    "timestamp": "2026-07-29T14:48:03.983335+00:00",
     "version": "2.0",
     "method": "GEFS ensemble mean directional prediction",
     "stations": [
-      "KNYC",
-      "KLAX",
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
       "KDEN",
-      "KATL"
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
     ],
     "n_members_required": 31,
     "initial_bankroll": 10000.0,
@@ -15,28 +31,142 @@
     "min_temp_diff": 1.0
   },
   "stats": {
-    "n_trades": 200,
-    "n_correct": 119,
-    "directional_accuracy": 0.595,
-    "total_pnl": 1676.53,
-    "final_bankroll": 11676.53,
-    "sharpe": 1.7927,
-    "max_drawdown": 0.1041,
-    "profit_factor": 1.2004,
-    "mean_ensemble_fraction": 0.3965,
-    "n_trading_days": 116
+    "n_trades": 54253,
+    "n_correct": 30103,
+    "directional_accuracy": 0.5549,
+    "total_pnl": -902727.84,
+    "final_bankroll": -892727.84,
+    "sharpe": -13.274,
+    "max_drawdown": 89.4318,
+    "profit_factor": 0.6372,
+    "mean_ensemble_fraction": 0.6448,
+    "n_trading_days": 1682
   },
   "per_station": {
+    "KATL": {
+      "n_trades": 2706,
+      "accuracy": 0.5588,
+      "total_pnl": -51934.83,
+      "mean_frac": 0.7204
+    },
+    "KAUS": {
+      "n_trades": 2723,
+      "accuracy": 0.5494,
+      "total_pnl": -54204.18,
+      "mean_frac": 0.7219
+    },
+    "KBOS": {
+      "n_trades": 2759,
+      "accuracy": 0.5872,
+      "total_pnl": -12863.8,
+      "mean_frac": 0.6255
+    },
+    "KDCA": {
+      "n_trades": 2781,
+      "accuracy": 0.5548,
+      "total_pnl": -46352.43,
+      "mean_frac": 0.6174
+    },
+    "KDEN": {
+      "n_trades": 2890,
+      "accuracy": 0.5571,
+      "total_pnl": -3374.58,
+      "mean_frac": 0.5523
+    },
+    "KDFW": {
+      "n_trades": 2728,
+      "accuracy": 0.5466,
+      "total_pnl": -56377.66,
+      "mean_frac": 0.7316
+    },
+    "KHOU": {
+      "n_trades": 2577,
+      "accuracy": 0.5545,
+      "total_pnl": -57448.67,
+      "mean_frac": 0.7852
+    },
+    "KLAS": {
+      "n_trades": 2857,
+      "accuracy": 0.5222,
+      "total_pnl": -78850.07,
+      "mean_frac": 0.5242
+    },
+    "KLAX": {
+      "n_trades": 2510,
+      "accuracy": 0.555,
+      "total_pnl": -60599.21,
+      "mean_frac": 0.8122
+    },
+    "KMDW": {
+      "n_trades": 2830,
+      "accuracy": 0.5378,
+      "total_pnl": -30192.51,
+      "mean_frac": 0.4885
+    },
+    "KMIA": {
+      "n_trades": 2525,
+      "accuracy": 0.5362,
+      "total_pnl": -68657.5,
+      "mean_frac": 0.6359
+    },
+    "KMSP": {
+      "n_trades": 2828,
+      "accuracy": 0.5757,
+      "total_pnl": 16737.92,
+      "mean_frac": 0.4963
+    },
+    "KMSY": {
+      "n_trades": 2490,
+      "accuracy": 0.5562,
+      "total_pnl": -57496.48,
+      "mean_frac": 0.7594
+    },
     "KNYC": {
-      "n_trades": 200,
-      "accuracy": 0.595,
-      "total_pnl": 1676.53,
-      "mean_frac": 0.3965
+      "n_trades": 2681,
+      "accuracy": 0.5837,
+      "total_pnl": -27247.98,
+      "mean_frac": 0.6269
+    },
+    "KOKC": {
+      "n_trades": 2812,
+      "accuracy": 0.5413,
+      "total_pnl": -40024.09,
+      "mean_frac": 0.7634
+    },
+    "KPHL": {
+      "n_trades": 2789,
+      "accuracy": 0.5558,
+      "total_pnl": -37233.36,
+      "mean_frac": 0.5811
+    },
+    "KPHX": {
+      "n_trades": 2847,
+      "accuracy": 0.5293,
+      "total_pnl": -79272.97,
+      "mean_frac": 0.5467
+    },
+    "KSAT": {
+      "n_trades": 2618,
+      "accuracy": 0.5561,
+      "total_pnl": -54748.21,
+      "mean_frac": 0.7036
+    },
+    "KSEA": {
+      "n_trades": 2555,
+      "accuracy": 0.5941,
+      "total_pnl": -33765.76,
+      "mean_frac": 0.7469
+    },
+    "KSFO": {
+      "n_trades": 2747,
+      "accuracy": 0.5497,
+      "total_pnl": -68821.47,
+      "mean_frac": 0.5224
     }
   },
   "skipped": {
-    "no_gefs_data": 4,
-    "flat_days": 15,
-    "too_close_to_call": 21
+    "no_gefs_data": 598,
+    "flat_days": 7006,
+    "too_close_to_call": 6091
   }
 }

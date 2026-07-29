@@ -1,0 +1,335 @@
+2026-07-29 14:54:41,127 [EF-V2] INFO ============================================================
+2026-07-29 14:54:41,127 [EF-V2] INFO GEFS ENSEMBLE FRACTION BACKTEST V2
+2026-07-29 14:54:41,127 [EF-V2] INFO Correct methodology: ensemble fraction vs market price
+2026-07-29 14:54:41,127 [EF-V2] INFO ============================================================
+2026-07-29 14:54:41,127 [EF-V2] INFO Stations: 1, Min members: 30, Bankroll: $10000.00
+2026-07-29 14:54:41,127 [EF-V2] INFO Entry price cap: $0.70, Min |net_edge|: 8.0%
+2026-07-29 14:54:41,127 [EF-V2] INFO Loading settlement data...
+2026-07-29 14:54:41,133 [EF-V2] INFO Loaded 3398 settlement events across 1 stations
+2026-07-29 14:54:41,133 [EF-V2] INFO Loading GEFS archive data per station...
+2026-07-29 14:54:41,139 [EF-V2] INFO GEFS data loaded for 1 stations
+2026-07-29 14:54:41,139 [EF-V2] INFO ============================================================
+2026-07-29 14:54:41,139 [EF-V2] INFO ENSEMBLE FRACTION BACKTEST V2 — RESULTS
+2026-07-29 14:54:41,139 [EF-V2] INFO Correct: ensemble fraction vs market price
+2026-07-29 14:54:41,139 [EF-V2] INFO ============================================================
+2026-07-29 14:54:41,140 [EF-V2] INFO 
+2026-07-29 14:54:41,140 [EF-V2] INFO Trades:          5
+2026-07-29 14:54:41,140 [EF-V2] INFO Correct:         0
+2026-07-29 14:54:41,140 [EF-V2] INFO Accuracy:        0.00%
+2026-07-29 14:54:41,140 [EF-V2] INFO Total P&L:       $-584.68
+2026-07-29 14:54:41,140 [EF-V2] INFO Final bankroll:  $9415.32
+2026-07-29 14:54:41,140 [EF-V2] INFO Sharpe (ann.):   -30.7303
+2026-07-29 14:54:41,140 [EF-V2] INFO Max drawdown:    5.85%
+2026-07-29 14:54:41,140 [EF-V2] INFO Profit factor:   0.0000
+2026-07-29 14:54:41,140 [EF-V2] INFO Trading days:    4
+2026-07-29 14:54:41,140 [EF-V2] INFO Avg net edge:    0.4146
+2026-07-29 14:54:41,140 [EF-V2] INFO Avg confidence:  0.9935
+2026-07-29 14:54:41,140 [EF-V2] INFO Gross profit:    $0.00
+2026-07-29 14:54:41,140 [EF-V2] INFO Gross loss:      $584.68
+2026-07-29 14:54:41,140 [EF-V2] INFO 
+2026-07-29 14:54:41,140 [EF-V2] INFO Skipped: no_gefs=0 flat=1 price>0.70=2 |edge|<0.08=0
+2026-07-29 14:54:41,140 [EF-V2] INFO 
+2026-07-29 14:54:41,140 [EF-V2] INFO Per station:
+2026-07-29 14:54:41,140 [EF-V2] INFO   KNYC:   5 tr,   0.0% acc, $-584.68, conf=0.994, edge=0.4146
+2026-07-29 14:54:41,140 [EF-V2] INFO 
+2026-07-29 14:54:41,140 [EF-V2] INFO Edge: [-0.4000, 0.6589] mean=0.4146 med=0.6131
+2026-07-29 14:54:41,140 [EF-V2] INFO Correct edge mean=0.0000, Wrong edge mean=0.4146
+2026-07-29 14:54:41,140 [EF-V2] INFO 
+2026-07-29 14:54:41,140 [EF-V2] INFO ============================================================
+2026-07-29 14:54:41,140 [EF-V2] INFO ARCHITECTURE DECISION GATE
+2026-07-29 14:54:41,140 [EF-V2] INFO   Accuracy: 0.00% (v1 was 55.49% on WRONG methodology)
+2026-07-29 14:54:41,140 [EF-V2] INFO   ❌ FAIL (<58%%): Needs more work
+2026-07-29 14:54:41,140 [EF-V2] INFO ============================================================
+2026-07-29 14:54:41,140 [EF-V2] INFO Results -> /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_v2_backtest_results.json
+2026-07-29 14:54:45,696 [EF-V2] INFO ============================================================
+2026-07-29 14:54:45,697 [EF-V2] INFO GEFS ENSEMBLE FRACTION BACKTEST V2
+2026-07-29 14:54:45,697 [EF-V2] INFO Correct methodology: ensemble fraction vs market price
+2026-07-29 14:54:45,697 [EF-V2] INFO ============================================================
+2026-07-29 14:54:45,697 [EF-V2] INFO Stations: 1, Min members: 30, Bankroll: $10000.00
+2026-07-29 14:54:45,697 [EF-V2] INFO Entry price cap: $0.70, Min |net_edge|: 8.0%
+2026-07-29 14:54:45,697 [EF-V2] INFO Loading settlement data...
+2026-07-29 14:54:45,703 [EF-V2] INFO Loaded 3398 settlement events across 1 stations
+2026-07-29 14:54:45,703 [EF-V2] INFO Loading GEFS archive data per station...
+2026-07-29 14:54:45,713 [EF-V2] INFO GEFS data loaded for 1 stations
+2026-07-29 14:54:45,713 [EF-V2] INFO ============================================================
+2026-07-29 14:54:45,713 [EF-V2] INFO ENSEMBLE FRACTION BACKTEST V2 — RESULTS
+2026-07-29 14:54:45,713 [EF-V2] INFO Correct: ensemble fraction vs market price
+2026-07-29 14:54:45,713 [EF-V2] INFO ============================================================
+2026-07-29 14:54:45,713 [EF-V2] INFO 
+2026-07-29 14:54:45,713 [EF-V2] INFO Trades:          5
+2026-07-29 14:54:45,713 [EF-V2] INFO Correct:         0
+2026-07-29 14:54:45,714 [EF-V2] INFO Accuracy:        0.00%
+2026-07-29 14:54:45,714 [EF-V2] INFO Total P&L:       $-584.68
+2026-07-29 14:54:45,714 [EF-V2] INFO Final bankroll:  $9415.32
+2026-07-29 14:54:45,714 [EF-V2] INFO Sharpe (ann.):   -30.7303
+2026-07-29 14:54:45,714 [EF-V2] INFO Max drawdown:    5.85%
+2026-07-29 14:54:45,714 [EF-V2] INFO Profit factor:   0.0000
+2026-07-29 14:54:45,714 [EF-V2] INFO Trading days:    4
+2026-07-29 14:54:45,714 [EF-V2] INFO Avg net edge:    0.4146
+2026-07-29 14:54:45,714 [EF-V2] INFO Avg confidence:  0.9935
+2026-07-29 14:54:45,714 [EF-V2] INFO Gross profit:    $0.00
+2026-07-29 14:54:45,714 [EF-V2] INFO Gross loss:      $584.68
+2026-07-29 14:54:45,714 [EF-V2] INFO 
+2026-07-29 14:54:45,714 [EF-V2] INFO Skipped: no_gefs=0 flat=1 price>0.70=2 |edge|<0.08=0
+2026-07-29 14:54:45,714 [EF-V2] INFO 
+2026-07-29 14:54:45,714 [EF-V2] INFO Per station:
+2026-07-29 14:54:45,714 [EF-V2] INFO   KNYC:   5 tr,   0.0% acc, $-584.68, conf=0.994, edge=0.4146
+2026-07-29 14:54:45,714 [EF-V2] INFO 
+2026-07-29 14:54:45,714 [EF-V2] INFO Edge: [-0.4000, 0.6589] mean=0.4146 med=0.6131
+2026-07-29 14:54:45,714 [EF-V2] INFO Correct edge mean=0.0000, Wrong edge mean=0.4146
+2026-07-29 14:54:45,714 [EF-V2] INFO 
+2026-07-29 14:54:45,714 [EF-V2] INFO ============================================================
+2026-07-29 14:54:45,714 [EF-V2] INFO ARCHITECTURE DECISION GATE
+2026-07-29 14:54:45,714 [EF-V2] INFO   Accuracy: 0.00% (v1 was 55.49% on WRONG methodology)
+2026-07-29 14:54:45,714 [EF-V2] INFO   ❌ FAIL (<58%%): Needs more work
+2026-07-29 14:54:45,714 [EF-V2] INFO ============================================================
+2026-07-29 14:54:45,714 [EF-V2] INFO Results -> /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_v2_backtest_results.json
+2026-07-29 14:55:06,181 [EF-V2] INFO ============================================================
+2026-07-29 14:55:06,182 [EF-V2] INFO GEFS ENSEMBLE FRACTION BACKTEST V2
+2026-07-29 14:55:06,182 [EF-V2] INFO Correct methodology: ensemble fraction vs market price
+2026-07-29 14:55:06,182 [EF-V2] INFO ============================================================
+2026-07-29 14:55:06,182 [EF-V2] INFO Stations: 20, Min members: 30, Bankroll: $10000.00
+2026-07-29 14:55:06,182 [EF-V2] INFO Entry price cap: $0.70, Min |net_edge|: 8.0%
+2026-07-29 14:55:06,182 [EF-V2] INFO Loading settlement data...
+2026-07-29 14:55:06,239 [EF-V2] INFO Loaded 33974 settlement events across 20 stations
+2026-07-29 14:55:06,239 [EF-V2] INFO Loading GEFS archive data per station...
+2026-07-29 14:55:06,349 [EF-V2] INFO GEFS data loaded for 20 stations
+2026-07-29 14:55:06,568 [EF-V2] INFO ============================================================
+2026-07-29 14:55:06,568 [EF-V2] INFO ENSEMBLE FRACTION BACKTEST V2 — RESULTS
+2026-07-29 14:55:06,568 [EF-V2] INFO Correct: ensemble fraction vs market price
+2026-07-29 14:55:06,568 [EF-V2] INFO ============================================================
+2026-07-29 14:55:06,568 [EF-V2] INFO 
+2026-07-29 14:55:06,568 [EF-V2] INFO Trades:          20052
+2026-07-29 14:55:06,568 [EF-V2] INFO Correct:         12925
+2026-07-29 14:55:06,568 [EF-V2] INFO Accuracy:        64.46%
+2026-07-29 14:55:06,568 [EF-V2] INFO Total P&L:       $9042050.20
+2026-07-29 14:55:06,568 [EF-V2] INFO Final bankroll:  $9052050.20
+2026-07-29 14:55:06,568 [EF-V2] INFO Sharpe (ann.):   22.0024
+2026-07-29 14:55:06,568 [EF-V2] INFO Max drawdown:    2.13%
+2026-07-29 14:55:06,568 [EF-V2] INFO Profit factor:   12.2821
+2026-07-29 14:55:06,568 [EF-V2] INFO Trading days:    1688
+2026-07-29 14:55:06,568 [EF-V2] INFO Avg net edge:    -0.2342
+2026-07-29 14:55:06,568 [EF-V2] INFO Avg confidence:  0.9436
+2026-07-29 14:55:06,568 [EF-V2] INFO Gross profit:    $9843497.86
+2026-07-29 14:55:06,568 [EF-V2] INFO Gross loss:      $801447.66
+2026-07-29 14:55:06,568 [EF-V2] INFO 
+2026-07-29 14:55:06,568 [EF-V2] INFO Skipped: no_gefs=190 flat=3545 price>0.70=9279 |edge|<0.08=908
+2026-07-29 14:55:06,568 [EF-V2] INFO 
+2026-07-29 14:55:06,568 [EF-V2] INFO Per station:
+2026-07-29 14:55:06,568 [EF-V2] INFO   KATL: 961 tr,  60.4% acc, $+406562.28, conf=0.915, edge=-0.1462
+2026-07-29 14:55:06,568 [EF-V2] INFO   KAUS: 980 tr,  60.9% acc, $+407401.14, conf=0.900, edge=-0.1468
+2026-07-29 14:55:06,568 [EF-V2] INFO   KBOS: 972 tr,  65.2% acc, $+612971.57, conf=0.948, edge=-0.2236
+2026-07-29 14:55:06,568 [EF-V2] INFO   KDCA: 977 tr,  65.5% acc, $+503438.46, conf=0.943, edge=-0.2761
+2026-07-29 14:55:06,568 [EF-V2] INFO   KDEN: 1007 tr,  64.5% acc, $+609883.11, conf=0.968, edge=-0.3244
+2026-07-29 14:55:06,568 [EF-V2] INFO   KDFW: 999 tr,  60.0% acc, $+436418.80, conf=0.910, edge=-0.1268
+2026-07-29 14:55:06,568 [EF-V2] INFO   KHOU: 971 tr,  59.2% acc, $+335233.66, conf=0.907, edge=-0.1024
+2026-07-29 14:55:06,568 [EF-V2] INFO   KLAS: 1030 tr,  66.0% acc, $+312304.73, conf=0.997, edge=-0.4091
+2026-07-29 14:55:06,568 [EF-V2] INFO   KLAX: 993 tr,  51.8% acc, $+181994.08, conf=0.965, edge=-0.0015
+2026-07-29 14:55:06,568 [EF-V2] INFO   KMDW: 1063 tr,  70.7% acc, $+757584.21, conf=0.966, edge=-0.3334
+2026-07-29 14:55:06,568 [EF-V2] INFO   KMIA: 1011 tr,  69.2% acc, $+209358.06, conf=0.955, edge=-0.3487
+2026-07-29 14:55:06,568 [EF-V2] INFO   KMSP: 1115 tr,  73.1% acc, $+914714.93, conf=0.956, edge=-0.2572
+2026-07-29 14:55:06,568 [EF-V2] INFO   KMSY: 988 tr,  62.5% acc, $+342019.22, conf=0.911, edge=-0.1621
+2026-07-29 14:55:06,568 [EF-V2] INFO   KNYC: 965 tr,  67.5% acc, $+596987.95, conf=0.954, edge=-0.2668
+2026-07-29 14:55:06,568 [EF-V2] INFO   KOKC: 975 tr,  56.2% acc, $+470503.72, conf=0.920, edge=-0.0955
+2026-07-29 14:55:06,568 [EF-V2] INFO   KPHL: 1003 tr,  66.8% acc, $+559136.03, conf=0.953, edge=-0.3063
+2026-07-29 14:55:06,568 [EF-V2] INFO   KPHX: 1056 tr,  68.1% acc, $+302197.93, conf=0.980, edge=-0.3941
+2026-07-29 14:55:06,568 [EF-V2] INFO   KSAT: 953 tr,  64.7% acc, $+397170.14, conf=0.902, edge=-0.2028
+2026-07-29 14:55:06,568 [EF-V2] INFO   KSEA: 1004 tr,  63.1% acc, $+350024.64, conf=0.920, edge=-0.1213
+2026-07-29 14:55:06,568 [EF-V2] INFO   KSFO: 1029 tr,  71.1% acc, $+336145.54, conf=0.990, edge=-0.3948
+2026-07-29 14:55:06,568 [EF-V2] INFO 
+2026-07-29 14:55:06,568 [EF-V2] INFO Edge: [-0.6403, 0.6589] mean=-0.2342 med=-0.3488
+2026-07-29 14:55:06,568 [EF-V2] INFO Correct edge mean=-0.2867, Wrong edge mean=-0.1391
+2026-07-29 14:55:06,568 [EF-V2] INFO 
+2026-07-29 14:55:06,569 [EF-V2] INFO ============================================================
+2026-07-29 14:55:06,569 [EF-V2] INFO ARCHITECTURE DECISION GATE
+2026-07-29 14:55:06,569 [EF-V2] INFO   Accuracy: 64.46% (v1 was 55.49% on WRONG methodology)
+2026-07-29 14:55:06,569 [EF-V2] INFO   ✅ PASS (>=64%%): Ensemble fraction validated
+2026-07-29 14:55:06,569 [EF-V2] INFO ============================================================
+2026-07-29 14:55:06,569 [EF-V2] INFO Results -> /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_v2_backtest_results.json
+2026-07-29 14:55:49,633 [EF-V2] INFO ============================================================
+2026-07-29 14:55:49,633 [EF-V2] INFO GEFS ENSEMBLE FRACTION BACKTEST V2
+2026-07-29 14:55:49,633 [EF-V2] INFO Correct methodology: ensemble fraction vs market price
+2026-07-29 14:55:49,633 [EF-V2] INFO ============================================================
+2026-07-29 14:55:49,633 [EF-V2] INFO Stations: 20, Min members: 30, Bankroll: $10000.00
+2026-07-29 14:55:49,633 [EF-V2] INFO Entry price cap: $0.70, Min |net_edge|: 8.0%
+2026-07-29 14:55:49,633 [EF-V2] INFO Loading settlement data...
+2026-07-29 14:55:49,675 [EF-V2] INFO Loaded 33974 settlement events across 20 stations
+2026-07-29 14:55:49,675 [EF-V2] INFO Loading GEFS archive data per station...
+2026-07-29 14:55:49,790 [EF-V2] INFO GEFS data loaded for 20 stations
+2026-07-29 14:55:50,041 [EF-V2] INFO ============================================================
+2026-07-29 14:55:50,041 [EF-V2] INFO ENSEMBLE FRACTION BACKTEST V2 — RESULTS
+2026-07-29 14:55:50,041 [EF-V2] INFO Correct: ensemble fraction vs market price
+2026-07-29 14:55:50,041 [EF-V2] INFO ============================================================
+2026-07-29 14:55:50,041 [EF-V2] INFO 
+2026-07-29 14:55:50,041 [EF-V2] INFO Trades:          28418
+2026-07-29 14:55:50,041 [EF-V2] INFO Correct:         17383
+2026-07-29 14:55:50,041 [EF-V2] INFO Accuracy:        61.17%
+2026-07-29 14:55:50,041 [EF-V2] INFO Total P&L:       $2130893.92
+2026-07-29 14:55:50,041 [EF-V2] INFO Final bankroll:  $2140893.92
+2026-07-29 14:55:50,041 [EF-V2] INFO Sharpe (ann.):   8.2934
+2026-07-29 14:55:50,041 [EF-V2] INFO Max drawdown:    12.30%
+2026-07-29 14:55:50,041 [EF-V2] INFO Profit factor:   2.8443
+2026-07-29 14:55:50,041 [EF-V2] INFO Trading days:    1688
+2026-07-29 14:55:50,041 [EF-V2] INFO Avg net edge:    -0.2040
+2026-07-29 14:55:50,041 [EF-V2] INFO Avg confidence:  0.9175
+2026-07-29 14:55:50,041 [EF-V2] INFO Gross profit:    $3286309.50
+2026-07-29 14:55:50,041 [EF-V2] INFO Gross loss:      $1155415.58
+2026-07-29 14:55:50,041 [EF-V2] INFO 
+2026-07-29 14:55:50,041 [EF-V2] INFO Skipped: no_gefs=190 flat=3545 price>0.70=0 |edge|<0.08=1821
+2026-07-29 14:55:50,041 [EF-V2] INFO 
+2026-07-29 14:55:50,041 [EF-V2] INFO Per station:
+2026-07-29 14:55:50,041 [EF-V2] INFO   KATL: 1412 tr,  58.3% acc, $+33345.45, conf=0.884, edge=-0.1194
+2026-07-29 14:55:50,041 [EF-V2] INFO   KAUS: 1391 tr,  58.0% acc, $+39395.87, conf=0.873, edge=-0.1261
+2026-07-29 14:55:50,041 [EF-V2] INFO   KBOS: 1483 tr,  65.7% acc, $+202305.95, conf=0.920, edge=-0.1371
+2026-07-29 14:55:50,041 [EF-V2] INFO   KDCA: 1463 tr,  59.9% acc, $+79945.93, conf=0.898, edge=-0.2453
+2026-07-29 14:55:50,041 [EF-V2] INFO   KDEN: 1510 tr,  60.9% acc, $+156544.66, conf=0.929, edge=-0.2875
+2026-07-29 14:55:50,041 [EF-V2] INFO   KDFW: 1412 tr,  57.0% acc, $+52579.33, conf=0.885, edge=-0.0953
+2026-07-29 14:55:50,041 [EF-V2] INFO   KHOU: 1376 tr,  60.0% acc, $+31677.27, conf=0.878, edge=-0.0336
+2026-07-29 14:55:50,041 [EF-V2] INFO   KLAS: 1400 tr,  53.4% acc, $+20781.51, conf=0.992, edge=-0.4721
+2026-07-29 14:55:50,041 [EF-V2] INFO   KLAX: 1382 tr,  59.1% acc, $+25085.05, conf=0.961, edge=0.0223
+2026-07-29 14:55:50,041 [EF-V2] INFO   KMDW: 1499 tr,  63.4% acc, $+300546.01, conf=0.935, edge=-0.3230
+2026-07-29 14:55:50,041 [EF-V2] INFO   KMIA: 1265 tr,  63.0% acc, $+44284.24, conf=0.930, edge=-0.3321
+2026-07-29 14:55:50,041 [EF-V2] INFO   KMSP: 1478 tr,  70.6% acc, $+582062.32, conf=0.933, edge=-0.2157
+2026-07-29 14:55:50,041 [EF-V2] INFO   KMSY: 1372 tr,  61.7% acc, $+38576.81, conf=0.883, edge=-0.1014
+2026-07-29 14:55:50,041 [EF-V2] INFO   KNYC: 1456 tr,  64.3% acc, $+138858.05, conf=0.914, edge=-0.1959
+2026-07-29 14:55:50,041 [EF-V2] INFO   KOKC: 1445 tr,  56.2% acc, $+71934.99, conf=0.888, edge=-0.0076
+2026-07-29 14:55:50,041 [EF-V2] INFO   KPHL: 1485 tr,  61.1% acc, $+115726.00, conf=0.909, edge=-0.2842
+2026-07-29 14:55:50,041 [EF-V2] INFO   KPHX: 1399 tr,  57.3% acc, $+30002.94, conf=0.966, edge=-0.4395
+2026-07-29 14:55:50,041 [EF-V2] INFO   KSAT: 1339 tr,  61.0% acc, $+44812.53, conf=0.868, edge=-0.1714
+2026-07-29 14:55:50,041 [EF-V2] INFO   KSEA: 1392 tr,  69.5% acc, $+75904.56, conf=0.916, edge=-0.0693
+2026-07-29 14:55:50,041 [EF-V2] INFO   KSFO: 1459 tr,  62.2% acc, $+46524.45, conf=0.983, edge=-0.4284
+2026-07-29 14:55:50,041 [EF-V2] INFO 
+2026-07-29 14:55:50,041 [EF-V2] INFO Edge: [-0.6403, 0.6589] mean=-0.2040 med=-0.3488
+2026-07-29 14:55:50,041 [EF-V2] INFO Correct edge mean=-0.2112, Wrong edge mean=-0.1927
+2026-07-29 14:55:50,041 [EF-V2] INFO 
+2026-07-29 14:55:50,041 [EF-V2] INFO ============================================================
+2026-07-29 14:55:50,041 [EF-V2] INFO ARCHITECTURE DECISION GATE
+2026-07-29 14:55:50,041 [EF-V2] INFO   Accuracy: 61.17% (v1 was 55.49% on WRONG methodology)
+2026-07-29 14:55:50,041 [EF-V2] INFO   🔶 BELOW (58-62%%): Better than v1, needs refinement
+2026-07-29 14:55:50,041 [EF-V2] INFO ============================================================
+2026-07-29 14:55:50,042 [EF-V2] INFO Results -> /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_v2_backtest_results.json
+2026-07-29 15:23:00,553 [EF-V2] INFO ============================================================
+2026-07-29 15:23:00,553 [EF-V2] INFO GEFS ENSEMBLE FRACTION BACKTEST V2
+2026-07-29 15:23:00,553 [EF-V2] INFO Correct methodology: ensemble fraction vs market price
+2026-07-29 15:23:00,553 [EF-V2] INFO ============================================================
+2026-07-29 15:23:00,554 [EF-V2] INFO Stations: 20, Min members: 30, Bankroll: $10000.00
+2026-07-29 15:23:00,554 [EF-V2] INFO Entry price cap: $0.70, Min |net_edge|: 8.0%
+2026-07-29 15:23:00,554 [EF-V2] INFO Loading settlement data...
+2026-07-29 15:23:00,598 [EF-V2] INFO Loaded 33974 settlement events across 20 stations
+2026-07-29 15:23:00,598 [EF-V2] INFO Loading GEFS archive data per station...
+2026-07-29 15:23:00,720 [EF-V2] INFO GEFS data loaded for 20 stations
+2026-07-29 15:23:01,016 [EF-V2] INFO ============================================================
+2026-07-29 15:23:01,016 [EF-V2] INFO ENSEMBLE FRACTION BACKTEST V2 — RESULTS
+2026-07-29 15:23:01,016 [EF-V2] INFO Correct: ensemble fraction vs market price
+2026-07-29 15:23:01,016 [EF-V2] INFO ============================================================
+2026-07-29 15:23:01,016 [EF-V2] INFO 
+2026-07-29 15:23:01,016 [EF-V2] INFO Trades:          28644
+2026-07-29 15:23:01,016 [EF-V2] INFO Correct:         17243
+2026-07-29 15:23:01,016 [EF-V2] INFO Accuracy:        60.20%
+2026-07-29 15:23:01,016 [EF-V2] INFO Total P&L:       $2088291.39
+2026-07-29 15:23:01,016 [EF-V2] INFO Final bankroll:  $2098291.39
+2026-07-29 15:23:01,016 [EF-V2] INFO Sharpe (ann.):   8.0679
+2026-07-29 15:23:01,016 [EF-V2] INFO Max drawdown:    14.52%
+2026-07-29 15:23:01,016 [EF-V2] INFO Profit factor:   2.7498
+2026-07-29 15:23:01,016 [EF-V2] INFO Trading days:    1688
+2026-07-29 15:23:01,016 [EF-V2] INFO Avg net edge:    -0.2283
+2026-07-29 15:23:01,016 [EF-V2] INFO Avg confidence:  0.9258
+2026-07-29 15:23:01,016 [EF-V2] INFO Gross profit:    $3281737.17
+2026-07-29 15:23:01,016 [EF-V2] INFO Gross loss:      $1193445.78
+2026-07-29 15:23:01,016 [EF-V2] INFO 
+2026-07-29 15:23:01,016 [EF-V2] INFO Skipped: no_gefs=190 flat=3545 price>0.70=0 |edge|<0.08=1595
+2026-07-29 15:23:01,016 [EF-V2] INFO 
+2026-07-29 15:23:01,016 [EF-V2] INFO Per station:
+2026-07-29 15:23:01,016 [EF-V2] INFO   KATL: 1440 tr,  56.5% acc, $+29312.51, conf=0.899, edge=-0.1488
+2026-07-29 15:23:01,016 [EF-V2] INFO   KAUS: 1390 tr,  56.5% acc, $+35468.59, conf=0.893, edge=-0.1754
+2026-07-29 15:23:01,016 [EF-V2] INFO   KBOS: 1491 tr,  64.6% acc, $+199891.41, conf=0.920, edge=-0.1139
+2026-07-29 15:23:01,016 [EF-V2] INFO   KDCA: 1470 tr,  59.2% acc, $+78037.61, conf=0.905, edge=-0.2408
+2026-07-29 15:23:01,016 [EF-V2] INFO   KDEN: 1552 tr,  57.8% acc, $+148946.26, conf=0.965, edge=-0.4149
+2026-07-29 15:23:01,016 [EF-V2] INFO   KDFW: 1435 tr,  56.7% acc, $+52163.79, conf=0.894, edge=-0.1225
+2026-07-29 15:23:01,016 [EF-V2] INFO   KHOU: 1383 tr,  58.6% acc, $+28425.81, conf=0.883, edge=-0.0671
+2026-07-29 15:23:01,016 [EF-V2] INFO   KLAS: 1399 tr,  52.9% acc, $+19633.42, conf=0.994, edge=-0.4798
+2026-07-29 15:23:01,016 [EF-V2] INFO   KLAX: 1386 tr,  56.9% acc, $+18076.49, conf=0.964, edge=0.0509
+2026-07-29 15:23:01,016 [EF-V2] INFO   KMDW: 1508 tr,  61.9% acc, $+296363.45, conf=0.957, edge=-0.3864
+2026-07-29 15:23:01,016 [EF-V2] INFO   KMIA: 1270 tr,  64.3% acc, $+47068.20, conf=0.928, edge=-0.2954
+2026-07-29 15:23:01,016 [EF-V2] INFO   KMSP: 1497 tr,  70.6% acc, $+585065.13, conf=0.942, edge=-0.2799
+2026-07-29 15:23:01,016 [EF-V2] INFO   KMSY: 1386 tr,  59.0% acc, $+31576.43, conf=0.900, edge=-0.2007
+2026-07-29 15:23:01,016 [EF-V2] INFO   KNYC: 1453 tr,  63.9% acc, $+137054.08, conf=0.920, edge=-0.1791
+2026-07-29 15:23:01,016 [EF-V2] INFO   KOKC: 1468 tr,  55.0% acc, $+69772.13, conf=0.893, edge=-0.0794
+2026-07-29 15:23:01,016 [EF-V2] INFO   KPHL: 1495 tr,  60.3% acc, $+114168.79, conf=0.914, edge=-0.2900
+2026-07-29 15:23:01,016 [EF-V2] INFO   KPHX: 1392 tr,  57.5% acc, $+30682.38, conf=0.962, edge=-0.4306
+2026-07-29 15:23:01,016 [EF-V2] INFO   KSAT: 1378 tr,  59.4% acc, $+44083.61, conf=0.877, edge=-0.2089
+2026-07-29 15:23:01,016 [EF-V2] INFO   KSEA: 1394 tr,  69.4% acc, $+75175.45, conf=0.921, edge=-0.0585
+2026-07-29 15:23:01,016 [EF-V2] INFO   KSFO: 1457 tr,  62.5% acc, $+47325.85, conf=0.981, edge=-0.4196
+2026-07-29 15:23:01,016 [EF-V2] INFO 
+2026-07-29 15:23:01,016 [EF-V2] INFO Edge: [-0.6403, 0.6589] mean=-0.2283 med=-0.3488
+2026-07-29 15:23:01,016 [EF-V2] INFO Correct edge mean=-0.2336, Wrong edge mean=-0.2204
+2026-07-29 15:23:01,016 [EF-V2] INFO 
+2026-07-29 15:23:01,016 [EF-V2] INFO ============================================================
+2026-07-29 15:23:01,016 [EF-V2] INFO ARCHITECTURE DECISION GATE
+2026-07-29 15:23:01,016 [EF-V2] INFO   Accuracy: 60.20% (v1 was 55.49% on WRONG methodology)
+2026-07-29 15:23:01,016 [EF-V2] INFO   🔶 BELOW (58-62%%): Better than v1, needs refinement
+2026-07-29 15:23:01,016 [EF-V2] INFO ============================================================
+2026-07-29 15:23:01,017 [EF-V2] INFO Results -> /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_v2_backtest_results.json
+2026-07-29 15:32:03,729 [EF-V2] INFO Loaded calibration curves for 20 stations
+2026-07-29 15:32:03,729 [EF-V2] INFO ============================================================
+2026-07-29 15:32:03,729 [EF-V2] INFO GEFS ENSEMBLE FRACTION BACKTEST V2
+2026-07-29 15:32:03,729 [EF-V2] INFO Correct methodology: ensemble fraction vs market price
+2026-07-29 15:32:03,729 [EF-V2] INFO ============================================================
+2026-07-29 15:32:03,729 [EF-V2] INFO Stations: 20, Min members: 30, Bankroll: $10000.00
+2026-07-29 15:32:03,729 [EF-V2] INFO Entry price cap: $0.70, Min |net_edge|: 8.0%
+2026-07-29 15:32:03,729 [EF-V2] INFO Loading settlement data...
+2026-07-29 15:32:03,768 [EF-V2] INFO Loaded 33974 settlement events across 20 stations
+2026-07-29 15:32:03,769 [EF-V2] INFO Loading GEFS archive data per station...
+2026-07-29 15:32:03,878 [EF-V2] INFO GEFS data loaded for 20 stations
+2026-07-29 15:32:04,134 [EF-V2] INFO ============================================================
+2026-07-29 15:32:04,134 [EF-V2] INFO ENSEMBLE FRACTION BACKTEST V2 — RESULTS
+2026-07-29 15:32:04,134 [EF-V2] INFO Correct: ensemble fraction vs market price
+2026-07-29 15:32:04,134 [EF-V2] INFO ============================================================
+2026-07-29 15:32:04,134 [EF-V2] INFO 
+2026-07-29 15:32:04,134 [EF-V2] INFO Trades:          19995
+2026-07-29 15:32:04,134 [EF-V2] INFO Correct:         11930
+2026-07-29 15:32:04,134 [EF-V2] INFO Accuracy:        59.66%
+2026-07-29 15:32:04,134 [EF-V2] INFO Total P&L:       $1749276.66
+2026-07-29 15:32:04,134 [EF-V2] INFO Final bankroll:  $1759276.66
+2026-07-29 15:32:04,134 [EF-V2] INFO Sharpe (ann.):   7.2472
+2026-07-29 15:32:04,134 [EF-V2] INFO Max drawdown:    24.36%
+2026-07-29 15:32:04,134 [EF-V2] INFO Profit factor:   3.0672
+2026-07-29 15:32:04,134 [EF-V2] INFO Trading days:    1688
+2026-07-29 15:32:04,134 [EF-V2] INFO Avg net edge:    -0.0103
+2026-07-29 15:32:04,134 [EF-V2] INFO Avg confidence:  0.8855
+2026-07-29 15:32:04,134 [EF-V2] INFO Gross profit:    $2595467.73
+2026-07-29 15:32:04,134 [EF-V2] INFO Gross loss:      $846191.07
+2026-07-29 15:32:04,134 [EF-V2] INFO 
+2026-07-29 15:32:04,134 [EF-V2] INFO Skipped: no_gefs=190 flat=3545 price>0.70=0 |edge|<0.08=10244
+2026-07-29 15:32:04,134 [EF-V2] INFO 
+2026-07-29 15:32:04,134 [EF-V2] INFO Per station:
+2026-07-29 15:32:04,134 [EF-V2] INFO   KATL: 874 tr,  49.4% acc, $+5634.60, conf=0.838, edge=-0.0348
+2026-07-29 15:32:04,135 [EF-V2] INFO   KAUS: 730 tr,  52.7% acc, $+14922.87, conf=0.815, edge=-0.0461
+2026-07-29 15:32:04,135 [EF-V2] INFO   KBOS: 1078 tr,  67.2% acc, $+176863.93, conf=0.899, edge=-0.1190
+2026-07-29 15:32:04,135 [EF-V2] INFO   KDCA: 951 tr,  57.9% acc, $+56708.82, conf=0.871, edge=0.0493
+2026-07-29 15:32:04,135 [EF-V2] INFO   KDEN: 1101 tr,  60.1% acc, $+131816.62, conf=0.893, edge=0.0359
+2026-07-29 15:32:04,135 [EF-V2] INFO   KDFW: 773 tr,  53.4% acc, $+30336.31, conf=0.833, edge=-0.0082
+2026-07-29 15:32:04,135 [EF-V2] INFO   KHOU: 896 tr,  57.9% acc, $+24101.64, conf=0.863, edge=-0.0983
+2026-07-29 15:32:04,135 [EF-V2] INFO   KLAS: 831 tr,  41.4% acc, $-25040.87, conf=0.931, edge=-0.1648
+2026-07-29 15:32:04,135 [EF-V2] INFO   KLAX: 1086 tr,  57.4% acc, $+27263.14, conf=0.957, edge=-0.1313
+2026-07-29 15:32:04,135 [EF-V2] INFO   KMDW: 1245 tr,  64.2% acc, $+270352.76, conf=0.907, edge=0.0695
+2026-07-29 15:32:04,135 [EF-V2] INFO   KMIA: 1019 tr,  62.6% acc, $+20650.58, conf=0.883, edge=0.1351
+2026-07-29 15:32:04,135 [EF-V2] INFO   KMSP: 1172 tr,  70.3% acc, $+563647.60, conf=0.921, edge=-0.1460
+2026-07-29 15:32:04,135 [EF-V2] INFO   KMSY: 862 tr,  63.2% acc, $+34590.38, conf=0.878, edge=-0.0828
+2026-07-29 15:32:04,135 [EF-V2] INFO   KNYC: 943 tr,  67.0% acc, $+134192.24, conf=0.901, edge=-0.0522
+2026-07-29 15:32:04,135 [EF-V2] INFO   KOKC: 1109 tr,  50.6% acc, $+68976.09, conf=0.862, edge=-0.0491
+2026-07-29 15:32:04,135 [EF-V2] INFO   KPHL: 1014 tr,  59.6% acc, $+91638.96, conf=0.859, edge=0.0409
+2026-07-29 15:32:04,135 [EF-V2] INFO   KPHX: 1167 tr,  60.8% acc, $+13893.47, conf=0.851, edge=0.2632
+2026-07-29 15:32:04,135 [EF-V2] INFO   KSAT: 865 tr,  59.8% acc, $+30539.34, conf=0.839, edge=-0.0566
+2026-07-29 15:32:04,135 [EF-V2] INFO   KSEA: 1028 tr,  67.8% acc, $+60830.49, conf=0.915, edge=-0.0737
+2026-07-29 15:32:04,135 [EF-V2] INFO   KSFO: 1251 tr,  60.0% acc, $+17357.69, conf=0.932, edge=0.1377
+2026-07-29 15:32:04,135 [EF-V2] INFO 
+2026-07-29 15:32:04,135 [EF-V2] INFO Edge: [-0.4954, 0.5142] mean=-0.0103 med=-0.0870
+2026-07-29 15:32:04,135 [EF-V2] INFO Correct edge mean=-0.0333, Wrong edge mean=0.0238
+2026-07-29 15:32:04,135 [EF-V2] INFO 
+2026-07-29 15:32:04,135 [EF-V2] INFO ============================================================
+2026-07-29 15:32:04,135 [EF-V2] INFO ARCHITECTURE DECISION GATE
+2026-07-29 15:32:04,135 [EF-V2] INFO   Accuracy: 59.66% (v1 was 55.49% on WRONG methodology)
+2026-07-29 15:32:04,135 [EF-V2] INFO   🔶 BELOW (58-62%%): Better than v1, needs refinement
+2026-07-29 15:32:04,135 [EF-V2] INFO ============================================================
+2026-07-29 15:32:04,135 [EF-V2] INFO Results -> /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_v2_backtest_results.json

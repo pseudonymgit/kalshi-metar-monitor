@@ -131,3 +131,64 @@ Per-station breakdown:
 2026-07-29 07:05:56,817 [EF-BACKTEST] INFO   ❌ GATE NOT PASSED (<62%): Investigate before architecture change
 2026-07-29 07:05:56,817 [EF-BACKTEST] INFO ============================================================
 2026-07-29 07:05:56,817 [EF-BACKTEST] INFO Results written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_backtest_results.json
+2026-07-29 14:46:55,876 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:46:55,882 [EF-BACKTEST] INFO Ensemble Fraction Backtest — Starting
+2026-07-29 14:46:55,882 [EF-BACKTEST] INFO Stations: 1, Min members: 31, Bankroll: $10000.00
+2026-07-29 14:46:55,882 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:46:55,882 [EF-BACKTEST] INFO Loading settlement data...
+2026-07-29 14:46:55,883 [EF-BACKTEST] INFO Loaded 0 settlement events across 0 stations
+2026-07-29 14:46:55,883 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:46:55,883 [EF-BACKTEST] INFO ENSEMBLE FRACTION BACKTEST — RESULTS
+2026-07-29 14:46:55,883 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:46:55,883 [EF-BACKTEST] ERROR No trades executed
+2026-07-29 14:47:50,871 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:47:50,871 [EF-BACKTEST] INFO Ensemble Fraction Backtest — Starting
+2026-07-29 14:47:50,871 [EF-BACKTEST] INFO Stations: 20, Min members: 31, Bankroll: $10000.00
+2026-07-29 14:47:50,871 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:47:50,871 [EF-BACKTEST] INFO Loading settlement data...
+2026-07-29 14:47:50,948 [EF-BACKTEST] INFO Loaded 67948 settlement events across 20 stations
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO ENSEMBLE FRACTION BACKTEST — RESULTS
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Trades:          54253
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Correct:         30103
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Directional acc: 55.49%
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Total P&L:       $-902727.84
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Final bankroll:  $-892727.84
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Sharpe (ann.):   -13.2740
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Max drawdown:    8943.18%
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Profit factor:   0.6372
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Mean ensemble fraction: 0.6448
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Trading days:    1682
+2026-07-29 14:48:04,031 [EF-BACKTEST] INFO Skipped (no GEFS): 598
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO Skipped (flat):    7006
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO Skipped (close):   6091
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO 
+Per-station breakdown:
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KATL: 2706 trades, 55.9% acc, P&L=$-51934.83, mean_frac=0.720
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KAUS: 2723 trades, 54.9% acc, P&L=$-54204.18, mean_frac=0.722
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KBOS: 2759 trades, 58.7% acc, P&L=$-12863.80, mean_frac=0.625
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KDCA: 2781 trades, 55.5% acc, P&L=$-46352.43, mean_frac=0.617
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KDEN: 2890 trades, 55.7% acc, P&L=$-3374.58, mean_frac=0.552
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KDFW: 2728 trades, 54.7% acc, P&L=$-56377.66, mean_frac=0.732
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KHOU: 2577 trades, 55.5% acc, P&L=$-57448.67, mean_frac=0.785
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KLAS: 2857 trades, 52.2% acc, P&L=$-78850.07, mean_frac=0.524
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KLAX: 2510 trades, 55.5% acc, P&L=$-60599.21, mean_frac=0.812
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KMDW: 2830 trades, 53.8% acc, P&L=$-30192.51, mean_frac=0.488
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KMIA: 2525 trades, 53.6% acc, P&L=$-68657.50, mean_frac=0.636
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KMSP: 2828 trades, 57.6% acc, P&L=$16737.92, mean_frac=0.496
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KMSY: 2490 trades, 55.6% acc, P&L=$-57496.48, mean_frac=0.759
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KNYC: 2681 trades, 58.4% acc, P&L=$-27247.98, mean_frac=0.627
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KOKC: 2812 trades, 54.1% acc, P&L=$-40024.09, mean_frac=0.763
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KPHL: 2789 trades, 55.6% acc, P&L=$-37233.36, mean_frac=0.581
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KPHX: 2847 trades, 52.9% acc, P&L=$-79272.97, mean_frac=0.547
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KSAT: 2618 trades, 55.6% acc, P&L=$-54748.21, mean_frac=0.704
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KSEA: 2555 trades, 59.4% acc, P&L=$-33765.76, mean_frac=0.747
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   KSFO: 2747 trades, 55.0% acc, P&L=$-68821.47, mean_frac=0.522
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO 
+============================================================
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO ARCHITECTURE DECISION GATE
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   Accuracy: 55.49%
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO   ❌ GATE NOT PASSED (<62%): Investigate before architecture change
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO ============================================================
+2026-07-29 14:48:04,032 [EF-BACKTEST] INFO Results written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_backtest_results.json
