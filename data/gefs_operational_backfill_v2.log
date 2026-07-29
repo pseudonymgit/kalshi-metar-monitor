@@ -1,0 +1,2551 @@
+Source: auto → operational (2021+)
+Note: checking operational bucket availability for 2021-02-11 to 2026-07-28
+========================================================================
+  GEFS Historical Ensemble Forecast Backfill
+========================================================================
+  Database:  /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db
+  Date range: 2021-02-11 to 2026-07-28
+  Stations:   20
+  Workers:    4
+========================================================================
+
+
+########################################################################
+  Source: OPERATIONAL — 2021-02-11 to 2026-07-28
+########################################################################
+
+  Operational members: gec00, gep01, gep02, gep03, gep04, gep05
+  Forecast step: f024 (24h, predicting next day's max temp)
+  Parallel workers: 4
+  Expected records per date: 120 (6 members × 20 stations)
+
+  2021-02-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-02-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 10 dates processed (1200 total records) ---
+
+  2021-03-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 20 dates processed (2400 total records) ---
+
+  2021-03-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-03-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 30 dates processed (3600 total records) ---
+
+  2021-04-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-04-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 40 dates processed (4800 total records) ---
+
+  2021-05-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 50 dates processed (6000 total records) ---
+
+  2021-05-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-05-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 60 dates processed (7200 total records) ---
+
+  2021-06-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 70 dates processed (8400 total records) ---
+
+  2021-06-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 80 dates processed (9600 total records) ---
+
+  2021-06-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-06-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 90 dates processed (10800 total records) ---
+
+  2021-07-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 100 dates processed (12000 total records) ---
+
+  2021-07-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 110 dates processed (13200 total records) ---
+
+  2021-07-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-07-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 120 dates processed (14400 total records) ---
+
+  2021-08-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 130 dates processed (15600 total records) ---
+
+  2021-08-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 140 dates processed (16800 total records) ---
+
+  2021-08-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-08-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 150 dates processed (18000 total records) ---
+
+  2021-09-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 160 dates processed (19200 total records) ---
+
+  2021-09-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 170 dates processed (20400 total records) ---
+
+  2021-09-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-09-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 180 dates processed (21600 total records) ---
+
+  2021-10-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 190 dates processed (22800 total records) ---
+
+  2021-10-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 200 dates processed (24000 total records) ---
+
+  2021-10-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-10-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 210 dates processed (25200 total records) ---
+
+  2021-11-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 220 dates processed (26400 total records) ---
+
+  2021-11-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 230 dates processed (27600 total records) ---
+
+  2021-11-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-11-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 240 dates processed (28800 total records) ---
+
+  2021-12-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 250 dates processed (30000 total records) ---
+
+  2021-12-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 260 dates processed (31200 total records) ---
+
+  2021-12-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2021-12-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 270 dates processed (32400 total records) ---
+
+  2022-01-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 280 dates processed (33600 total records) ---
+
+  2022-01-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 290 dates processed (34800 total records) ---
+
+  2022-01-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-01-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 300 dates processed (36000 total records) ---
+
+  2022-02-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 310 dates processed (37200 total records) ---
+
+  2022-02-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 320 dates processed (38400 total records) ---
+
+  2022-02-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-02-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 330 dates processed (39600 total records) ---
+
+  2022-03-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 340 dates processed (40800 total records) ---
+
+  2022-03-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 350 dates processed (42000 total records) ---
+
+  2022-03-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-03-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 360 dates processed (43200 total records) ---
+
+  2022-04-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 370 dates processed (44400 total records) ---
+
+  2022-04-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 380 dates processed (45600 total records) ---
+
+  2022-04-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-04-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 390 dates processed (46800 total records) ---
+
+  2022-05-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 400 dates processed (48000 total records) ---
+
+  2022-05-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 410 dates processed (49200 total records) ---
+
+  2022-05-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-05-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 420 dates processed (50400 total records) ---
+
+  2022-06-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 430 dates processed (51600 total records) ---
+
+  2022-06-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 440 dates processed (52800 total records) ---
+
+  2022-06-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-06-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 450 dates processed (54000 total records) ---
+
+  2022-07-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 460 dates processed (55200 total records) ---
+
+  2022-07-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 470 dates processed (56400 total records) ---
+
+  2022-07-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-07-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 480 dates processed (57600 total records) ---
+
+  2022-08-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 490 dates processed (58800 total records) ---
+
+  2022-08-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 500 dates processed (60000 total records) ---
+
+  2022-08-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-08-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 510 dates processed (61200 total records) ---
+
+  2022-09-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 520 dates processed (62400 total records) ---
+
+  2022-09-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 530 dates processed (63600 total records) ---
+
+  2022-09-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-09-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 540 dates processed (64800 total records) ---
+
+  2022-10-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 550 dates processed (66000 total records) ---
+
+  2022-10-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 560 dates processed (67200 total records) ---
+
+  2022-10-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-25: downloading 6 members (f024) ... 5/6 OK, processing ... 100 records stored
+  2022-10-26: downloading 6 members (f024) ... 5/6 OK, processing ... 100 records stored
+  2022-10-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-10-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 570 dates processed (68360 total records) ---
+
+  2022-11-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 580 dates processed (69560 total records) ---
+
+  2022-11-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 590 dates processed (70760 total records) ---
+
+  2022-11-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-11-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 600 dates processed (71960 total records) ---
+
+  2022-12-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 610 dates processed (73160 total records) ---
+
+  2022-12-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 620 dates processed (74360 total records) ---
+
+  2022-12-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2022-12-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 630 dates processed (75560 total records) ---
+
+  2022-12-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 640 dates processed (76760 total records) ---
+
+  2023-01-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 650 dates processed (77960 total records) ---
+
+  2023-01-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 660 dates processed (79160 total records) ---
+
+  2023-01-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-01-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 670 dates processed (80360 total records) ---
+
+  2023-02-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 680 dates processed (81560 total records) ---
+
+  2023-02-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-02-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 690 dates processed (82760 total records) ---
+
+  2023-03-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 700 dates processed (83960 total records) ---
+
+  2023-03-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 710 dates processed (85160 total records) ---
+
+  2023-03-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-03-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 720 dates processed (86360 total records) ---
+
+  2023-03-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 730 dates processed (87560 total records) ---
+
+  2023-04-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 740 dates processed (88760 total records) ---
+
+  2023-04-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-04-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 750 dates processed (89960 total records) ---
+
+  2023-04-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 760 dates processed (91160 total records) ---
+
+  2023-05-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-11: downloading 6 members (f024) ... 5/6 OK, processing ... 100 records stored
+  2023-05-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 770 dates processed (92340 total records) ---
+
+  2023-05-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 780 dates processed (93540 total records) ---
+
+  2023-05-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-05-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 790 dates processed (94740 total records) ---
+
+  2023-06-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 800 dates processed (95940 total records) ---
+
+  2023-06-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 810 dates processed (97140 total records) ---
+
+  2023-06-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-06-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 820 dates processed (98340 total records) ---
+
+  2023-07-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 830 dates processed (99540 total records) ---
+
+  2023-07-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 840 dates processed (100740 total records) ---
+
+  2023-07-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-07-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 850 dates processed (101940 total records) ---
+
+  2023-08-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 860 dates processed (103140 total records) ---
+
+  2023-08-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 870 dates processed (104340 total records) ---
+
+  2023-08-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-08-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 880 dates processed (105540 total records) ---
+
+  2023-09-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 890 dates processed (106740 total records) ---
+
+  2023-09-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 900 dates processed (107940 total records) ---
+
+  2023-09-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-09-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 910 dates processed (109140 total records) ---
+
+  2023-10-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 920 dates processed (110340 total records) ---
+
+  2023-10-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 930 dates processed (111540 total records) ---
+
+  2023-10-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-10-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 940 dates processed (112740 total records) ---
+
+  2023-11-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-07: downloading 6 members (f024) ... 5/6 OK, processing ... 100 records stored
+  2023-11-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 950 dates processed (113920 total records) ---
+
+  2023-11-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 960 dates processed (115120 total records) ---
+
+  2023-11-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-11-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 970 dates processed (116320 total records) ---
+
+  2023-12-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 980 dates processed (117520 total records) ---
+
+  2023-12-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 990 dates processed (118720 total records) ---
+
+  2023-12-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2023-12-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1000 dates processed (119920 total records) ---
+
+  2024-01-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1010 dates processed (121120 total records) ---
+
+  2024-01-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-19: downloading 6 members (f024) ... 5/6 OK, processing ... 100 records stored
+  2024-01-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1020 dates processed (122300 total records) ---
+
+  2024-01-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-01-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1030 dates processed (123500 total records) ---
+
+  2024-02-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1040 dates processed (124700 total records) ---
+
+  2024-02-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1050 dates processed (125900 total records) ---
+
+  2024-02-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-02-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1060 dates processed (127100 total records) ---
+
+  2024-03-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1070 dates processed (128300 total records) ---
+
+  2024-03-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1080 dates processed (129500 total records) ---
+
+  2024-03-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-26: downloading 6 members (f024) ... 5/6 OK, processing ... 100 records stored
+  2024-03-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-03-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1090 dates processed (130680 total records) ---
+
+  2024-04-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1100 dates processed (131880 total records) ---
+
+  2024-04-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1110 dates processed (133080 total records) ---
+
+  2024-04-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-04-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1120 dates processed (134280 total records) ---
+
+  2024-05-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1130 dates processed (135480 total records) ---
+
+  2024-05-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1140 dates processed (136680 total records) ---
+
+  2024-05-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-05-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1150 dates processed (137880 total records) ---
+
+  2024-06-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1160 dates processed (139080 total records) ---
+
+  2024-06-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1170 dates processed (140280 total records) ---
+
+  2024-06-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-06-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1180 dates processed (141480 total records) ---
+
+  2024-07-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1190 dates processed (142680 total records) ---
+
+  2024-07-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1200 dates processed (143880 total records) ---
+
+  2024-07-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-07-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1210 dates processed (145080 total records) ---
+
+  2024-08-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1220 dates processed (146280 total records) ---
+
+  2024-08-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1230 dates processed (147480 total records) ---
+
+  2024-08-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-08-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1240 dates processed (148680 total records) ---
+
+  2024-09-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1250 dates processed (149880 total records) ---
+
+  2024-09-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1260 dates processed (151080 total records) ---
+
+  2024-09-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-09-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1270 dates processed (152280 total records) ---
+
+  2024-10-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1280 dates processed (153480 total records) ---
+
+  2024-10-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1290 dates processed (154680 total records) ---
+
+  2024-10-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-10-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1300 dates processed (155880 total records) ---
+
+  2024-10-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1310 dates processed (157080 total records) ---
+
+  2024-11-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1320 dates processed (158280 total records) ---
+
+  2024-11-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-11-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1330 dates processed (159480 total records) ---
+
+  2024-11-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1340 dates processed (160680 total records) ---
+
+  2024-12-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1350 dates processed (161880 total records) ---
+
+  2024-12-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1360 dates processed (163080 total records) ---
+
+  2024-12-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2024-12-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1370 dates processed (164280 total records) ---
+
+  2025-01-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1380 dates processed (165480 total records) ---
+
+  2025-01-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1390 dates processed (166680 total records) ---
+
+  2025-01-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-01-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1400 dates processed (167880 total records) ---
+
+  2025-02-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1410 dates processed (169080 total records) ---
+
+  2025-02-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-02-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1420 dates processed (170280 total records) ---
+
+  2025-02-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1430 dates processed (171480 total records) ---
+
+  2025-03-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1440 dates processed (172680 total records) ---
+
+  2025-03-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1450 dates processed (173880 total records) ---
+
+  2025-03-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-03-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1460 dates processed (175080 total records) ---
+
+  2025-04-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1470 dates processed (176280 total records) ---
+
+  2025-04-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1480 dates processed (177480 total records) ---
+
+  2025-04-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-04-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1490 dates processed (178680 total records) ---
+
+  2025-05-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1500 dates processed (179880 total records) ---
+
+  2025-05-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1510 dates processed (181080 total records) ---
+
+  2025-05-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-05-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1520 dates processed (182280 total records) ---
+
+  2025-06-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1530 dates processed (183480 total records) ---
+
+  2025-06-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1540 dates processed (184680 total records) ---
+
+  2025-06-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-06-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1550 dates processed (185880 total records) ---
+
+  2025-07-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1560 dates processed (187080 total records) ---
+
+  2025-07-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1570 dates processed (188280 total records) ---
+
+  2025-07-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-07-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1580 dates processed (189480 total records) ---
+
+  2025-08-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1590 dates processed (190680 total records) ---
+
+  2025-08-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1600 dates processed (191880 total records) ---
+
+  2025-08-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-08-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1610 dates processed (193080 total records) ---
+
+  2025-09-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1620 dates processed (194280 total records) ---
+
+  2025-09-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1630 dates processed (195480 total records) ---
+
+  2025-09-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-09-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1640 dates processed (196680 total records) ---
+
+  2025-10-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1650 dates processed (197880 total records) ---
+
+  2025-10-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1660 dates processed (199080 total records) ---
+
+  2025-10-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-10-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1670 dates processed (200280 total records) ---
+
+  2025-11-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1680 dates processed (201480 total records) ---
+
+  2025-11-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1690 dates processed (202680 total records) ---
+
+  2025-11-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-11-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1700 dates processed (203880 total records) ---
+
+  2025-12-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1710 dates processed (205080 total records) ---
+
+  2025-12-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1720 dates processed (206280 total records) ---
+
+  2025-12-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2025-12-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1730 dates processed (207480 total records) ---
+
+  2026-01-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1740 dates processed (208680 total records) ---
+
+  2026-01-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1750 dates processed (209880 total records) ---
+
+  2026-01-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-01-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1760 dates processed (211080 total records) ---
+
+  2026-02-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1770 dates processed (212280 total records) ---
+
+  2026-02-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1780 dates processed (213480 total records) ---
+
+  2026-02-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-02-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1790 dates processed (214680 total records) ---
+
+  2026-03-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-07: downloading 6 members (f024) ... 3/6 OK, processing ... 60 records stored
+  2026-03-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1800 dates processed (215820 total records) ---
+
+  2026-03-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1810 dates processed (217020 total records) ---
+
+  2026-03-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-03-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1820 dates processed (218220 total records) ---
+
+  2026-04-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1830 dates processed (219420 total records) ---
+
+  2026-04-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1840 dates processed (220620 total records) ---
+
+  2026-04-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-04-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1850 dates processed (221820 total records) ---
+
+  2026-05-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1860 dates processed (223020 total records) ---
+
+  2026-05-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1870 dates processed (224220 total records) ---
+
+  2026-05-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-05-31: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1880 dates processed (225420 total records) ---
+
+  2026-06-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1890 dates processed (226620 total records) ---
+
+  2026-06-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1900 dates processed (227820 total records) ---
+
+  2026-06-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-29: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-06-30: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-01: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-02: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1910 dates processed (229020 total records) ---
+
+  2026-07-03: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-04: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-05: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-06: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-07: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-08: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-09: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-10: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-11: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-12: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1920 dates processed (230220 total records) ---
+
+  2026-07-13: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-14: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-15: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-16: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-17: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-18: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-19: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-20: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-21: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-22: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+  --- 1930 dates processed (231420 total records) ---
+
+  2026-07-23: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-24: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-25: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-26: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-27: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+  2026-07-28: downloading 6 members (f024) ... 6/6 OK, processing ... 120 records stored
+
+========================================================================
+  BACKFILL COMPLETE
+========================================================================
+  Values stored:   232140
+  Downloads:       11607
+  Skipped:         0
+  Failed:          0
+  Errors:          0
+
+  GEFS ensemble data: 243860 rows, 20 stations, 2034 days
+  Control member (gec00): 40680 rows
+
+  Finished at 2026-07-29T02:05:00.784792+00:00
+
