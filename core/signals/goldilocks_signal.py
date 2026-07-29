@@ -154,62 +154,17 @@ class GoldilocksSignal(BaseSignal):
 
         return None, 0.0
     
-    def evaluate_for_station(self, station: str, date: str, conn: sqlite3.Connection = None) -> Tuple[Optional[str], float]:
-        """
-        Evaluate Goldilocks signal for a specific station and date using DB data.
-        
-        Loads daily data from metar_observations and delegates to evaluate().
-        
-        Args:
-            station: Station code (e.g. 'KATL')
-            date: ISO date string 'YYYY-MM-DD'
-            conn: Optional SQLite connection to metar DB
-        
-        Returns:
-            (direction, confidence) or (None, 0.0)
-        """
-        own_conn = conn is None
-        if own_conn:
-            conn = sqlite3.connect(self.db_path) if self.db_path else None
-            if conn is None:
-                return None, 0.0
-        
-        try:
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low,
-                       AVG(dewpoint_f) as dewpoint, AVG(temp_f) as temp,
-                       AVG(wind_direction_deg) as wind_dir, AVG(wind_speed_kt) as wind_speed,
-                       AVG(pressure_mb) as pressure
-                FROM metar_observations
-                WHERE station=? AND temp_f IS NOT NULL AND pressure_mb IS NOT NULL
-                GROUP BY date_utc ORDER BY date_utc ASC
-            """, (station,))
-            days = []
-            for r in cur.fetchall():
-                if any(v is None for v in r[1:]):
-                    continue
-                days.append({
-                    'date': r[0], 'high': r[1], 'low': r[2], 'dewpoint': r[3],
-                    'temp': r[4], 'wind_dir': r[5], 'wind_speed': r[6], 'pressure': r[7]
-                })
-            
-            # Find the index for the target date
-            target_idx = None
-            for i, d in enumerate(days):
-                if d['date'] == date:
-                    target_idx = i
-                    break
-            
-            if target_idx is None:
-                return None, 0.0
-            
-            return self.evaluate(target_idx, days)
-        finally:
-            if own_conn and conn:
-                conn.close()
-
+    def evaluate_for_station(self, station: str, idx: int, days: List[Dict]) -> Tuple[Optional[str], float]:
+        """Evaluate signal for a specific station at day index idx."""
+        # Implemented by B-Mode Phase 1 Step 4
+        if idx < 1 or idx >= len(days):
+            return None, 0.0
+        today = days[idx]
+        yesterday = days[idx - 1]
+        # Default stub: use generic evaluate()
+        return self.evaluate(idx, days)
 
 def create_goldilocks_signal(db_path: str) -> GoldilocksSignal:
     """Factory function to create a Goldilocks signal instance."""
     return GoldilocksSignal(db_path)
+
