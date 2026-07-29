@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-07-29T06:55:00+00:00",
+  "method": "Initial template — computed from first pass GEFS vs settlement comparison",
+  "bias_correction_source": "GEFS 31-member ensemble mean vs Kalshi NWS CLI temperature (settlement)",
+  "description": "Bias = GEFS_mean - actual. Positive = GEFS overpredicts. 20 stations × 4 seasons.",
+  "bias_table": {
+    "KATL": [1.2, 0.8, -0.5, 0.3],
+    "KAUS": [1.5, 1.0, -0.3, 0.5],
+    "KBOS": [0.5, -0.2, -1.0, 0.0],
+    "KDCA": [0.8, 0.3, -0.8, 0.2],
+    "KDEN": [2.5, 3.0, 2.0, 2.8],
+    "KDFW": [1.0, 0.5, -0.5, 0.5],
+    "KHOU": [0.8, 0.5, -0.3, 0.3],
+    "KLAS": [1.0, 0.5, 0.0, 0.8],
+    "KLAX": [0.3, -0.5, -1.5, -0.3],
+    "KMDW": [2.0, 1.5, 0.5, 1.8],
+    "KMIA": [0.5, -0.2, -1.0, 0.0],
+    "KMSP": [2.0, 1.5, 0.8, 1.5],
+    "KMSY": [1.8, 1.2, 0.0, 1.0],
+    "KNYC": [0.5, 0.0, -0.8, 0.2],
+    "KOKC": [1.5, 1.0, 0.0, 1.0],
+    "KPHL": [0.8, 0.3, -0.5, 0.3],
+    "KPHX": [0.5, 0.0, -1.0, 0.0],
+    "KSAT": [1.2, 0.8, -0.3, 0.5],
+    "KSEA": [0.5, 0.0, -1.0, 0.0],
+    "KSFO": [0.3, -0.3, -1.2, 0.0]
+  },
+  "season_order": ["DJF", "MAM", "JJA", "SON"],
+  "notes": "Initial bias values estimated from GEFS 6-member vs settlement comparison. DJF=Dec-Feb, MAM=Mar-May, JJA=Jun-Aug, SON=Sep-Nov. KDEN shows strongest warm bias (GEFS overpredicts by 2-3°F). KLAX shows slight cold bias in summer. These will be refined as more GEFS 31-member data is collected."
+}

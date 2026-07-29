@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-29T07:05:56.816498+00:00",
+    "version": "2.0",
+    "method": "GEFS ensemble mean directional prediction",
+    "stations": [
+      "KNYC",
+      "KLAX",
+      "KDEN",
+      "KATL"
+    ],
+    "n_members_required": 31,
+    "initial_bankroll": 10000.0,
+    "position_size": 100.0,
+    "min_temp_diff": 1.0
+  },
+  "stats": {
+    "n_trades": 200,
+    "n_correct": 119,
+    "directional_accuracy": 0.595,
+    "total_pnl": 1676.53,
+    "final_bankroll": 11676.53,
+    "sharpe": 1.7927,
+    "max_drawdown": 0.1041,
+    "profit_factor": 1.2004,
+    "mean_ensemble_fraction": 0.3965,
+    "n_trading_days": 116
+  },
+  "per_station": {
+    "KNYC": {
+      "n_trades": 200,
+      "accuracy": 0.595,
+      "total_pnl": 1676.53,
+      "mean_frac": 0.3965
+    }
+  },
+  "skipped": {
+    "no_gefs_data": 4,
+    "flat_days": 15,
+    "too_close_to_call": 21
+  }
+}

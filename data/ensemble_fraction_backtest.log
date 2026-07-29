@@ -1,0 +1,133 @@
+2026-07-29 07:02:07,596 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:02:07,596 [EF-BACKTEST] INFO Ensemble Fraction Backtest — Starting
+2026-07-29 07:02:07,596 [EF-BACKTEST] INFO Stations: 1, Min members: 31, Bankroll: $10000.00
+2026-07-29 07:02:07,596 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:02:07,596 [EF-BACKTEST] INFO Loading settlement data...
+2026-07-29 07:02:07,600 [EF-BACKTEST] INFO Loaded 3398 settlement events across 1 stations
+2026-07-29 07:02:07,600 [EF-BACKTEST] INFO Processing KNYC: 3398 settlement events
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO ENSEMBLE FRACTION BACKTEST — RESULTS
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Trades:          50
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Correct:         50
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Directional acc: 100.00%
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Total P&L:       $5298.46
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Final bankroll:  $15298.46
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Sharpe (ann.):   34.9442
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Mean edge:       0.3156
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Median edge:     0.3556
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Pos edge frac:   100.00%
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Mean confidence: 0.1500
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Trading days:    40
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Skipped (no GEFS): 2
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Skipped (flat):    10
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO Skipped (nontrade): 119
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO 
+Per-station breakdown:
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO   KNYC: 50 trades, 100.0% acc, mean_edge=0.3156
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO 
+============================================================
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO ARCHITECTURE DECISION GATE
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO   Accuracy: 100.00%
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO   ✅ GATE PASSED (≥64%): Immediate pivot to GEFS ensemble fraction
+2026-07-29 07:02:07,633 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:02:07,634 [EF-BACKTEST] INFO Results written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_backtest_results.json
+2026-07-29 07:03:39,934 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:03:39,934 [EF-BACKTEST] INFO Ensemble Fraction Backtest — Starting
+2026-07-29 07:03:39,934 [EF-BACKTEST] INFO Stations: 1, Min members: 31, Bankroll: $10000.00
+2026-07-29 07:03:39,934 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:03:39,934 [EF-BACKTEST] INFO Loading settlement data...
+2026-07-29 07:03:39,939 [EF-BACKTEST] INFO Loaded 3398 settlement events across 1 stations
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO ENSEMBLE FRACTION BACKTEST — RESULTS
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Trades:          50
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Correct:         25
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Directional acc: 50.00%
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Total P&L:       $-941.71
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Final bankroll:  $9058.29
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Sharpe (ann.):   -4.3601
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Max drawdown:    9.90%
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Profit factor:   0.6367
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Mean edge:       -0.1591
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Median edge:     -0.1522
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Pos edge frac:   46.00%
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Mean confidence: 0.4810
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Trading days:    27
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Skipped (no GEFS): 0
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Skipped (flat):    3
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO Skipped (nontrade): 0
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO 
+Per-station breakdown:
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO   KNYC: 50 trades, 50.0% acc, mean_edge=-0.1591, P&L=$-941.71
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO 
+============================================================
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO ARCHITECTURE DECISION GATE
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO   Accuracy: 50.00%
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO   ❌ GATE NOT PASSED (<62%): Investigate before architecture change
+2026-07-29 07:03:39,953 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:03:39,954 [EF-BACKTEST] INFO Results written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_backtest_results.json
+2026-07-29 07:05:48,448 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:48,448 [EF-BACKTEST] INFO Ensemble Fraction Backtest — Starting
+2026-07-29 07:05:48,448 [EF-BACKTEST] INFO Stations: 1, Min members: 31, Bankroll: $10000.00
+2026-07-29 07:05:48,448 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:48,448 [EF-BACKTEST] INFO Loading settlement data...
+2026-07-29 07:05:48,454 [EF-BACKTEST] INFO Loaded 3398 settlement events across 1 stations
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO ENSEMBLE FRACTION BACKTEST — RESULTS
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Trades:          100
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Correct:         59
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Directional acc: 59.00%
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Total P&L:       $2314.25
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Final bankroll:  $12314.25
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Sharpe (ann.):   4.4057
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Max drawdown:    7.51%
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Profit factor:   1.5445
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Mean ensemble fraction: 0.2548
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Trading days:    60
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Skipped (no GEFS): 2
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Skipped (flat):    6
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO Skipped (close):   15
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO 
+Per-station breakdown:
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO   KNYC: 100 trades, 59.0% acc, P&L=$2314.25, mean_frac=0.255
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO 
+============================================================
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO ARCHITECTURE DECISION GATE
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO   Accuracy: 59.00%
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO   ❌ GATE NOT PASSED (<62%): Investigate before architecture change
+2026-07-29 07:05:48,482 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:48,483 [EF-BACKTEST] INFO Results written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_backtest_results.json
+2026-07-29 07:05:56,725 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:56,728 [EF-BACKTEST] INFO Ensemble Fraction Backtest — Starting
+2026-07-29 07:05:56,728 [EF-BACKTEST] INFO Stations: 4, Min members: 31, Bankroll: $10000.00
+2026-07-29 07:05:56,729 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:56,729 [EF-BACKTEST] INFO Loading settlement data...
+2026-07-29 07:05:56,767 [EF-BACKTEST] INFO Loaded 13592 settlement events across 4 stations
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO ENSEMBLE FRACTION BACKTEST — RESULTS
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Trades:          200
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Correct:         119
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Directional acc: 59.50%
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Total P&L:       $1676.53
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Final bankroll:  $11676.53
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Sharpe (ann.):   1.7927
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Max drawdown:    10.41%
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Profit factor:   1.2004
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Mean ensemble fraction: 0.3965
+2026-07-29 07:05:56,816 [EF-BACKTEST] INFO Trading days:    116
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO Skipped (no GEFS): 4
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO Skipped (flat):    15
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO Skipped (close):   21
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO 
+Per-station breakdown:
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO   KNYC: 200 trades, 59.5% acc, P&L=$1676.53, mean_frac=0.397
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO 
+============================================================
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO ARCHITECTURE DECISION GATE
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO   Accuracy: 59.50%
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO   ❌ GATE NOT PASSED (<62%): Investigate before architecture change
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO ============================================================
+2026-07-29 07:05:56,817 [EF-BACKTEST] INFO Results written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/ensemble_fraction_backtest_results.json

@@ -1,0 +1,487 @@
+2026-07-29 06:11:53,571 [INFO] ============================================================
+2026-07-29 06:11:53,571 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:11:53,571 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:11:53,624 [INFO] Signal registry initialised: 8 signals
+2026-07-29 06:11:53,624 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:11:53,625 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:11:53,626 [INFO] Simulating 7 days: 2026-07-20 to 2026-07-26
+2026-07-29 06:11:53,626 [INFO] Loading settlement data for all stations...
+2026-07-29 06:11:54,243 [INFO] Loaded data for 20 stations
+2026-07-29 06:11:54,244 [INFO] Day 2026-07-20: 0 trades
+2026-07-29 06:11:54,246 [INFO] Day 2026-07-21: 0 trades
+2026-07-29 06:11:54,247 [INFO] Day 2026-07-22: 0 trades
+2026-07-29 06:11:54,248 [INFO] Day 2026-07-23: 0 trades
+2026-07-29 06:11:54,249 [INFO] Day 2026-07-24: 0 trades
+2026-07-29 06:11:54,250 [INFO] Day 2026-07-25: 0 trades
+2026-07-29 06:11:54,251 [INFO] Day 2026-07-26: 0 trades
+2026-07-29 06:11:54,251 [INFO] ============================================================
+2026-07-29 06:11:54,251 [INFO] SUMMARY: No trades executed
+2026-07-29 06:11:54,251 [INFO] ============================================================
+2026-07-29 06:11:54,251 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:11:54,259 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 06:13:00,620 [INFO] ============================================================
+2026-07-29 06:13:00,620 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:13:00,620 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:13:00,625 [INFO] Signal registry initialised: 8 signals
+2026-07-29 06:13:00,625 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:13:00,625 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:13:00,626 [INFO] Simulating 7 days: 2026-07-20 to 2026-07-26
+2026-07-29 06:13:00,626 [INFO] Discovering stations with settlement data...
+2026-07-29 06:13:00,626 [INFO] Available stations: 9
+2026-07-29 06:13:00,626 [INFO] Loading settlement data for all stations...
+2026-07-29 06:13:00,967 [INFO] Loaded data for 9 stations
+2026-07-29 06:13:00,967 [INFO] Day 2026-07-20: 0 trades
+2026-07-29 06:13:00,968 [INFO] Day 2026-07-21: 0 trades
+2026-07-29 06:13:00,968 [INFO] Day 2026-07-22: 0 trades
+2026-07-29 06:13:00,968 [INFO] Day 2026-07-23: 0 trades
+2026-07-29 06:13:00,968 [INFO] Day 2026-07-24: 0 trades
+2026-07-29 06:13:00,968 [INFO] Day 2026-07-25: 0 trades
+2026-07-29 06:13:00,968 [INFO] Day 2026-07-26: 0 trades
+2026-07-29 06:13:00,968 [INFO] ============================================================
+2026-07-29 06:13:00,968 [INFO] SUMMARY: No trades executed
+2026-07-29 06:13:00,968 [INFO] ============================================================
+2026-07-29 06:13:00,968 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:13:00,968 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 06:14:08,638 [INFO] ============================================================
+2026-07-29 06:14:08,639 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:14:08,639 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:14:08,643 [INFO] Signal registry initialised: 8 signals
+2026-07-29 06:14:08,643 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:14:08,643 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:14:08,644 [INFO] Simulating 7 days: 2026-07-20 to 2026-07-26
+2026-07-29 06:14:08,644 [INFO] Discovering stations with settlement data...
+2026-07-29 06:14:08,644 [INFO] Available stations: 9
+2026-07-29 06:14:08,644 [INFO] Loading settlement data for all stations...
+2026-07-29 06:14:08,766 [INFO] Loaded data for 9 stations
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-20: 0 trades
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-21: 0 trades
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-22: 0 trades
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-23: 0 trades
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-24: 0 trades
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-25: 0 trades
+2026-07-29 06:14:08,767 [INFO] Day 2026-07-26: 0 trades
+2026-07-29 06:14:08,767 [INFO] ============================================================
+2026-07-29 06:14:08,767 [INFO] SUMMARY: No trades executed
+2026-07-29 06:14:08,767 [INFO] ============================================================
+2026-07-29 06:14:08,767 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:14:08,767 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 06:14:59,412 [INFO] ============================================================
+2026-07-29 06:14:59,412 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:14:59,412 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:14:59,417 [INFO] Signal registry initialised: 8 signals
+2026-07-29 06:14:59,417 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:14:59,417 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:14:59,418 [INFO] Simulating 7 days: 2026-07-20 to 2026-07-26
+2026-07-29 06:14:59,418 [INFO] Discovering stations with settlement data...
+2026-07-29 06:14:59,418 [INFO] Available stations: 9
+2026-07-29 06:14:59,418 [INFO] Loading settlement data for all stations...
+2026-07-29 06:14:59,541 [INFO] Loaded data for 9 stations
+2026-07-29 06:14:59,541 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,563 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,568 [INFO] Day 2026-07-20: 1 trades, 0 correct (0.0%), P&L=$-816.40, bankroll=$9183.60
+2026-07-29 06:14:59,569 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,569 [INFO] Day 2026-07-21: 0 trades
+2026-07-29 06:14:59,569 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,570 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,570 [INFO] Day 2026-07-22: 0 trades
+2026-07-29 06:14:59,570 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,571 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,571 [INFO] Day 2026-07-23: 0 trades
+2026-07-29 06:14:59,571 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,571 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,571 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,572 [INFO] Day 2026-07-24: 0 trades
+2026-07-29 06:14:59,572 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,572 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,572 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,572 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,572 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,572 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [INFO] Day 2026-07-25: 0 trades
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,573 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,574 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:14:59,574 [INFO] Day 2026-07-26: 0 trades
+2026-07-29 06:14:59,574 [INFO] ============================================================
+2026-07-29 06:14:59,574 [INFO] PHASE 1 PAPER TRADING — SUMMARY
+2026-07-29 06:14:59,574 [INFO] ============================================================
+2026-07-29 06:14:59,574 [INFO] Total trades:     1
+2026-07-29 06:14:59,574 [INFO] Correct trades:   0
+2026-07-29 06:14:59,574 [INFO] Directional acc:  0.00%
+2026-07-29 06:14:59,574 [INFO] Total P&L:        $-816.40 (-8.16%)
+2026-07-29 06:14:59,574 [INFO] Final bankroll:   $9183.60
+2026-07-29 06:14:59,574 [INFO] Sharpe (ann.):    0.0000
+2026-07-29 06:14:59,574 [INFO] Max drawdown:     8.16%
+2026-07-29 06:14:59,574 [INFO] Profit factor:    0.0000
+2026-07-29 06:14:59,574 [INFO] Config: decay=0.802, min_agree=3, min_conf=0.7962, strike_offset=16.0
+2026-07-29 06:14:59,574 [INFO] Fee rate: 0.0205 (should be 0.0205)
+2026-07-29 06:14:59,574 [INFO] ============================================================
+2026-07-29 06:14:59,574 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:14:59,578 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 06:15:07,748 [INFO] ============================================================
+2026-07-29 06:15:07,749 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:15:07,749 [INFO] Config: min_agreement=2, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:15:07,754 [INFO] Signal registry initialised: 8 signals
+2026-07-29 06:15:07,754 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:15:07,754 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:15:07,756 [INFO] Simulating 7 days: 2025-08-21 to 2025-08-27
+2026-07-29 06:15:07,756 [INFO] Discovering stations with settlement data...
+2026-07-29 06:15:07,756 [INFO] Available stations: 29
+2026-07-29 06:15:07,756 [INFO] Loading settlement data for all stations...
+2026-07-29 06:15:08,205 [INFO] Loaded data for 29 stations
+2026-07-29 06:15:08,205 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,206 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,206 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,206 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,227 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,227 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,233 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,233 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,239 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,239 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,245 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,245 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,245 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,251 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,251 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,257 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,263 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,263 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,263 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,269 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,269 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,269 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,270 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,275 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,281 [INFO] Day 2025-08-21: 9 trades, 7 correct (77.8%), P&L=$4063.43, bankroll=$14063.43
+2026-07-29 06:15:08,281 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,282 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,282 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,288 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,294 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,294 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,300 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,300 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,300 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,306 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,306 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,306 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,306 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,306 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,312 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,312 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,313 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,313 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,319 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,319 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,325 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,325 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,331 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,331 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,332 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,338 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,338 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,338 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,344 [INFO] Day 2025-08-22: 9 trades, 9 correct (100.0%), P&L=$13290.29, bankroll=$27353.72
+2026-07-29 06:15:08,344 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,350 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,350 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,350 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,356 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,356 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,356 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,356 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,362 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,362 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,362 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,362 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,362 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,362 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,363 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,368 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,368 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,369 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,369 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,375 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,375 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,375 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,376 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,376 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,381 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,392 [INFO] Day 2025-08-23: 7 trades, 3 correct (42.9%), P&L=$-4602.80, bankroll=$22750.92
+2026-07-29 06:15:08,392 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,398 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,398 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,398 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,404 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,404 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,410 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,410 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,416 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,416 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,422 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,422 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,422 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,423 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,428 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,434 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,435 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,435 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,435 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,441 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,441 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,441 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,441 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,447 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,447 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,458 [INFO] Day 2025-08-24: 10 trades, 7 correct (70.0%), P&L=$3765.30, bankroll=$26516.22
+2026-07-29 06:15:08,458 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,459 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,459 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,459 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,459 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,459 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,465 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,472 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,472 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,472 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,472 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,478 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,478 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,479 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,484 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,485 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,485 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,485 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,491 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,497 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,497 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,498 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,498 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,498 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,498 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,509 [INFO] Day 2025-08-25: 7 trades, 2 correct (28.6%), P&L=$-4368.27, bankroll=$22147.95
+2026-07-29 06:15:08,510 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,510 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,510 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,515 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,516 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,516 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,521 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,522 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,527 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,527 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,528 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,533 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,533 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,539 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,539 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,545 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,551 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,552 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,552 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,552 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,558 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,563 [INFO] Day 2025-08-26: 8 trades, 5 correct (62.5%), P&L=$1444.52, bankroll=$23592.47
+2026-07-29 06:15:08,563 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,564 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,564 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,569 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,569 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,570 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,576 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,581 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,582 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,588 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,588 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,589 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,595 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,595 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,602 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,612 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:08,612 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:09,680 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:09,691 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:09,691 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:09,697 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:15:09,708 [INFO] Day 2025-08-27: 10 trades, 3 correct (30.0%), P&L=$-3997.58, bankroll=$19594.89
+2026-07-29 06:15:09,708 [INFO] ============================================================
+2026-07-29 06:15:09,709 [INFO] PHASE 1 PAPER TRADING — SUMMARY
+2026-07-29 06:15:09,709 [INFO] ============================================================
+2026-07-29 06:15:09,709 [INFO] Total trades:     60
+2026-07-29 06:15:09,709 [INFO] Correct trades:   36
+2026-07-29 06:15:09,709 [INFO] Directional acc:  60.00%
+2026-07-29 06:15:09,709 [INFO] Total P&L:        $9594.89 (95.95%)
+2026-07-29 06:15:09,709 [INFO] Final bankroll:   $19594.89
+2026-07-29 06:15:09,709 [INFO] Sharpe (ann.):    2.0333
+2026-07-29 06:15:09,709 [INFO] Max drawdown:     33.56%
+2026-07-29 06:15:09,709 [INFO] Profit factor:    1.3208
+2026-07-29 06:15:09,709 [INFO] Config: decay=0.802, min_agree=2, min_conf=0.7962, strike_offset=16.0
+2026-07-29 06:15:09,709 [INFO] Fee rate: 0.0205 (should be 0.0205)
+2026-07-29 06:15:09,709 [INFO] ============================================================
+2026-07-29 06:15:09,709 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:15:09,723 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 06:42:43,277 [INFO] ============================================================
+2026-07-29 06:42:43,277 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:42:43,277 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:42:43,281 [INFO] Signal registry initialised: 6 signals
+2026-07-29 06:42:43,281 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:42:43,281 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:42:43,282 [INFO] Simulating 7 days: 2026-07-20 to 2026-07-26
+2026-07-29 06:42:43,282 [INFO] Discovering stations with settlement data...
+2026-07-29 06:42:43,282 [INFO] Available stations: 9
+2026-07-29 06:42:43,283 [INFO] Loading settlement data for all stations...
+2026-07-29 06:42:43,407 [INFO] Loaded data for 9 stations
+2026-07-29 06:42:43,408 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,408 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,408 [INFO] Day 2026-07-20: 0 trades
+2026-07-29 06:42:43,408 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,431 [INFO] Day 2026-07-21: 1 trades, 1 correct (100.0%), P&L=$122.35, bankroll=$10122.35
+2026-07-29 06:42:43,432 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,433 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,443 [INFO] Day 2026-07-22: 1 trades, 1 correct (100.0%), P&L=$123.85, bankroll=$10246.20
+2026-07-29 06:42:43,444 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,444 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,444 [INFO] Day 2026-07-23: 0 trades
+2026-07-29 06:42:43,444 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,450 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,450 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,456 [INFO] Day 2026-07-24: 1 trades, 1 correct (100.0%), P&L=$125.37, bankroll=$10371.57
+2026-07-29 06:42:43,456 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,456 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,462 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,468 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,473 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,479 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,479 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,485 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,491 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,496 [INFO] Day 2026-07-25: 6 trades, 6 correct (100.0%), P&L=$785.05, bankroll=$11156.62
+2026-07-29 06:42:43,496 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,502 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,508 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,508 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,509 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,509 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:42:43,519 [INFO] Day 2026-07-26: 2 trades, 1 correct (50.0%), P&L=$-788.21, bankroll=$10368.41
+2026-07-29 06:42:43,519 [INFO] ============================================================
+2026-07-29 06:42:43,519 [INFO] PHASE 1 PAPER TRADING — SUMMARY
+2026-07-29 06:42:43,519 [INFO] ============================================================
+2026-07-29 06:42:43,519 [INFO] Total trades:     11
+2026-07-29 06:42:43,519 [INFO] Correct trades:   10
+2026-07-29 06:42:43,519 [INFO] Directional acc:  90.91%
+2026-07-29 06:42:43,519 [INFO] Total P&L:        $368.41 (3.68%)
+2026-07-29 06:42:43,519 [INFO] Final bankroll:   $10368.41
+2026-07-29 06:42:43,519 [INFO] Sharpe (ann.):    2.0637
+2026-07-29 06:42:43,520 [INFO] Max drawdown:     8.19%
+2026-07-29 06:42:43,520 [INFO] Profit factor:    1.3984
+2026-07-29 06:42:43,520 [INFO] Config: decay=0.802, min_agree=3, min_conf=0.7962, strike_offset=16.0
+2026-07-29 06:42:43,520 [INFO] Fee: $0.01/contract/side flat (entry_price=0.85 constant)
+2026-07-29 06:42:43,520 [INFO] Entry price: 0.85 (hardcoded — should come from Kalshi API)
+2026-07-29 06:42:43,520 [INFO] Fee rate: 0.0205 (legacy, for reference)
+2026-07-29 06:42:43,520 [INFO] ============================================================
+2026-07-29 06:42:43,520 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:42:43,532 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 06:43:07,536 [INFO] ============================================================
+2026-07-29 06:43:07,536 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 06:43:07,536 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 06:43:07,540 [INFO] Signal registry initialised: 6 signals
+2026-07-29 06:43:07,540 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 06:43:07,540 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 06:43:07,541 [INFO] Simulating 7 days: 2026-07-20 to 2026-07-26
+2026-07-29 06:43:07,541 [INFO] Discovering stations with settlement data...
+2026-07-29 06:43:07,542 [INFO] Available stations: 9
+2026-07-29 06:43:07,542 [INFO] Loading settlement data for all stations...
+2026-07-29 06:43:07,667 [INFO] Loaded data for 9 stations
+2026-07-29 06:43:07,667 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,668 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,668 [INFO] Day 2026-07-20: 0 trades
+2026-07-29 06:43:07,668 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,696 [INFO] Day 2026-07-21: 1 trades, 1 correct (100.0%), P&L=$122.35, bankroll=$10122.35
+2026-07-29 06:43:07,696 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,697 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,708 [INFO] Day 2026-07-22: 1 trades, 1 correct (100.0%), P&L=$123.85, bankroll=$10246.20
+2026-07-29 06:43:07,708 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,709 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,709 [INFO] Day 2026-07-23: 0 trades
+2026-07-29 06:43:07,709 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,715 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,715 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,721 [INFO] Day 2026-07-24: 1 trades, 1 correct (100.0%), P&L=$125.37, bankroll=$10371.57
+2026-07-29 06:43:07,721 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,721 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,728 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,733 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,739 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,745 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,745 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,751 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,757 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,762 [INFO] Day 2026-07-25: 6 trades, 6 correct (100.0%), P&L=$785.05, bankroll=$11156.62
+2026-07-29 06:43:07,762 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,768 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,774 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,774 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,774 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,775 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 06:43:07,780 [INFO] Day 2026-07-26: 2 trades, 1 correct (50.0%), P&L=$-788.21, bankroll=$10368.41
+2026-07-29 06:43:07,780 [INFO] ============================================================
+2026-07-29 06:43:07,780 [INFO] PHASE 1 PAPER TRADING — SUMMARY
+2026-07-29 06:43:07,780 [INFO] ============================================================
+2026-07-29 06:43:07,780 [INFO] Total trades:     11
+2026-07-29 06:43:07,781 [INFO] Correct trades:   10
+2026-07-29 06:43:07,781 [INFO] Directional acc:  90.91%
+2026-07-29 06:43:07,781 [INFO] Total P&L:        $368.41 (3.68%)
+2026-07-29 06:43:07,781 [INFO] Final bankroll:   $10368.41
+2026-07-29 06:43:07,781 [INFO] Sharpe (ann.):    2.0637
+2026-07-29 06:43:07,781 [INFO] Max drawdown:     8.19%
+2026-07-29 06:43:07,781 [INFO] Profit factor:    1.3984
+2026-07-29 06:43:07,781 [INFO] Config: decay=0.802, min_agree=3, min_conf=0.7962, strike_offset=16.0
+2026-07-29 06:43:07,781 [INFO] Fee: $0.01/contract/side flat (entry_price=0.85 constant)
+2026-07-29 06:43:07,781 [INFO] Entry price: 0.85 (hardcoded — should come from Kalshi API)
+2026-07-29 06:43:07,781 [INFO] Fee rate: 0.0205 (legacy, for reference)
+2026-07-29 06:43:07,781 [INFO] ============================================================
+2026-07-29 06:43:07,781 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 06:43:07,785 [INFO] Phase 1 Paper Trading Cron — Complete
+2026-07-29 07:07:01,448 [INFO] ============================================================
+2026-07-29 07:07:01,448 [INFO] Phase 1 Paper Trading Cron — Starting
+2026-07-29 07:07:01,448 [INFO] Config: min_agreement=4, min_conf=0.7962, decay=0.802, strike_offset=16.0, fee=0.0205
+2026-07-29 07:07:01,453 [INFO] Signal registry initialised: 6 signals
+2026-07-29 07:07:01,453 [INFO] PositionSizer initialised — bankroll=$10000.00, cap=8%, max_drawdown=10%, fee=0.0205, f_kelly=0.50
+2026-07-29 07:07:01,453 [INFO] Position sizer initialised: bankroll=$10000.00, fee=0.0205, f_kelly=0.50
+2026-07-29 07:07:01,454 [INFO] Simulating 1 days: 2026-07-26 to 2026-07-26
+2026-07-29 07:07:01,454 [INFO] Discovering stations with settlement data...
+2026-07-29 07:07:01,454 [INFO] Available stations: 9
+2026-07-29 07:07:01,455 [INFO] Loading settlement data for all stations...
+2026-07-29 07:07:01,580 [INFO] Loaded data for 9 stations
+2026-07-29 07:07:01,580 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 07:07:01,597 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 07:07:01,602 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 07:07:01,603 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 07:07:01,603 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 07:07:01,603 [WARNING] FrontalDetectorSignal (daily) is DEPRECATED. Use FrontalPassageIntradaySignal for intraday frontal passage detection. This signal will not generate trades.
+2026-07-29 07:07:01,609 [INFO] Day 2026-07-26: 2 trades, 1 correct (50.0%), P&L=$-706.49, bankroll=$9293.51
+2026-07-29 07:07:01,609 [INFO] ============================================================
+2026-07-29 07:07:01,609 [INFO] PHASE 1 PAPER TRADING — SUMMARY
+2026-07-29 07:07:01,609 [INFO] ============================================================
+2026-07-29 07:07:01,609 [INFO] Total trades:     2
+2026-07-29 07:07:01,609 [INFO] Correct trades:   1
+2026-07-29 07:07:01,609 [INFO] Directional acc:  50.00%
+2026-07-29 07:07:01,609 [INFO] Total P&L:        $-706.49 (-7.06%)
+2026-07-29 07:07:01,609 [INFO] Final bankroll:   $9293.51
+2026-07-29 07:07:01,609 [INFO] Sharpe (ann.):    0.0000
+2026-07-29 07:07:01,609 [INFO] Max drawdown:     8.19%
+2026-07-29 07:07:01,609 [INFO] Profit factor:    0.1476
+2026-07-29 07:07:01,609 [INFO] Config: decay=0.802, min_agree=3, min_conf=0.7962, strike_offset=16.0
+2026-07-29 07:07:01,609 [INFO] Fee: $0.01/contract/side flat (entry_price=0.85 constant)
+2026-07-29 07:07:01,609 [INFO] Entry price: 0.85 (hardcoded — should come from Kalshi API)
+2026-07-29 07:07:01,609 [INFO] Fee rate: 0.0205 (legacy, for reference)
+2026-07-29 07:07:01,609 [INFO] ============================================================
+2026-07-29 07:07:01,609 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/phase1_paper_trading_summary.json
+2026-07-29 07:07:01,613 [INFO] Phase 1 Paper Trading Cron — Complete
