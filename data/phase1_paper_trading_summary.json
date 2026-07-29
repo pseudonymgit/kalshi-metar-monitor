@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-07-29T07:07:01.609535+00:00",
+  "config": {
+    "min_agreement": 3,
+    "min_conf": 0.7962,
+    "decay_factor": 0.802,
+    "strike_offset": 16.0,
+    "fee_rate": 0.0205,
+    "fractional_kelly": 0.5
+  },
+  "total_trades": 2,
+  "correct_trades": 1,
+  "accuracy": 0.5,
+  "total_pnl": -706.49,
+  "final_bankroll": 9293.51,
+  "sharpe": 0.0,
+  "max_drawdown": 0.0819
+}
