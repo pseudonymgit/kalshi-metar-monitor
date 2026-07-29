@@ -38,7 +38,6 @@ DISABLED (in codebase, removed from registry — need data infrastructure):
 
 
 from .wind_direction_shift import WindDirectionShiftSignal
-from .spike_reversion_signal import SpikeReversionSignal, GoldilocksSignal  # A3: renamed, alias preserved
 from .gaussian_signal import GaussianSignal
 from .gaussian_v2_signal import GaussianV2Signal
 from .pressure_delta_signal import PressureDeltaSignal
@@ -58,22 +57,23 @@ class SignalRegistry:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.signals = {
-            # Core meteorology signals (all fire, produce non-zero output)
-            'wind_direction_shift': WindDirectionShiftSignal(db_path),
-            'gaussian': GaussianSignal(db_path),
-            'gaussian_v2': GaussianV2Signal(db_path),
-            'pressure_delta': PressureDeltaSignal(db_path),
-            'forecast_disagreement': ForecastDisagreementSignal(db_path),
-            'calendar_climatology': CalendarClimatologySignal(db_path),
-            'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
+            # ── Forecasting Ensemble (Lane 1) ──
+            'gaussian': GaussianSignal(db_path),               # 66.53% settlement-validated
+            'gaussian_v2': GaussianV2Signal(db_path),          # 63.95%
+            'pressure_delta': PressureDeltaSignal(db_path),    # 60.86%
+            'forecast_disagreement': ForecastDisagreementSignal(db_path),  # 64.36%
+            'calendar_climatology': CalendarClimatologySignal(db_path),    # 69.00% (best)
 
-            # Spike reversion lane (Lane 2 — separate from forecasting)
-            'spike_reversion': SpikeReversionSignal(db_path),
-            'goldilocks': SpikeReversionSignal(db_path),  # A3: backward-compatible alias
-
-            # Intraday frontal passage (Lane 2 — Sure Thing)
+            # ── Sure Thing Lane (Lane 2) ──
             'frontal_passage_intraday': FrontalPassageIntradaySignal(db_path),
+
+            # SpikeReversionSignal removed — Fix 5: 49.85% accuracy (negative EV)
+            # GoldilocksSignal removed — same signal, same negative EV
         }
+
+        # REMOVED from registry (verified by settlement validation 2026-07-25):
+        # wind_direction_shift         — 49.72% settlement accuracy (below coin flip)
+        # corrected_pressure_delta     — MCC=-0.2167 (actively harmful)
 
     def get_signal(self, signal_name: str):
         """Get a signal by name."""
