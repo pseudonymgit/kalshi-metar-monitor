@@ -1,0 +1,220 @@
+2026-07-30 00:52:58,143 [UPSTREAM] INFO ============================================================
+2026-07-30 00:52:58,143 [UPSTREAM] INFO UPSTREAM STATION METAR BACKFILL
+2026-07-30 00:52:58,143 [UPSTREAM] INFO Target: 49 upstream stations for nowcasting signal
+2026-07-30 00:52:58,143 [UPSTREAM] INFO ============================================================
+2026-07-30 00:52:58,143 [UPSTREAM] INFO [1/49] Fetching KACT...
+2026-07-30 00:53:07,216 [UPSTREAM] INFO Fetched 2187 observations for KACT
+2026-07-30 00:53:07,231 [UPSTREAM] INFO   Inserted 0 observations for KACT
+2026-07-30 00:53:08,231 [UPSTREAM] INFO [2/49] Fetching KACY...
+2026-07-30 00:53:16,440 [UPSTREAM] INFO Fetched 2143 observations for KACY
+2026-07-30 00:53:16,453 [UPSTREAM] INFO   Inserted 0 observations for KACY
+2026-07-30 00:53:17,453 [UPSTREAM] INFO [3/49] Fetching KAHN...
+2026-07-30 00:53:26,269 [UPSTREAM] INFO Fetched 2252 observations for KAHN
+2026-07-30 00:53:26,284 [UPSTREAM] INFO   Inserted 0 observations for KAHN
+2026-07-30 00:53:27,285 [UPSTREAM] INFO [4/49] Fetching KATT...
+2026-07-30 00:53:28,995 [UPSTREAM] INFO Fetched 207 observations for KATT
+2026-07-30 00:53:28,998 [UPSTREAM] INFO   Inserted 0 observations for KATT
+2026-07-30 00:53:29,998 [UPSTREAM] INFO [5/49] Fetching KAXH...
+2026-07-30 00:53:32,340 [UPSTREAM] INFO Fetched 491 observations for KAXH
+2026-07-30 00:53:32,345 [UPSTREAM] INFO   Inserted 0 observations for KAXH
+2026-07-30 00:53:33,345 [UPSTREAM] INFO [6/49] Fetching KAXN...
+2026-07-30 00:53:42,374 [UPSTREAM] INFO Fetched 2142 observations for KAXN
+2026-07-30 00:53:42,387 [UPSTREAM] INFO   Inserted 0 observations for KAXN
+2026-07-30 00:53:43,388 [UPSTREAM] INFO [7/49] Fetching KBED...
+2026-07-30 00:53:51,135 [UPSTREAM] INFO Fetched 2018 observations for KBED
+2026-07-30 00:53:51,148 [UPSTREAM] INFO   Inserted 0 observations for KBED
+2026-07-30 00:53:52,148 [UPSTREAM] INFO [8/49] Fetching KBLH...
+2026-07-30 00:54:00,854 [UPSTREAM] INFO Fetched 2172 observations for KBLH
+2026-07-30 00:54:00,872 [UPSTREAM] INFO   Inserted 0 observations for KBLH
+2026-07-30 00:54:01,872 [UPSTREAM] INFO [9/49] Fetching KBLI...
+2026-07-30 00:54:10,590 [UPSTREAM] INFO Fetched 2167 observations for KBLI
+2026-07-30 00:54:10,604 [UPSTREAM] INFO   Inserted 0 observations for KBLI
+2026-07-30 00:54:11,604 [UPSTREAM] INFO [10/49] Fetching KBTR...
+2026-07-30 00:54:19,921 [UPSTREAM] INFO Fetched 2190 observations for KBTR
+2026-07-30 00:54:19,938 [UPSTREAM] INFO   Inserted 0 observations for KBTR
+2026-07-30 00:54:20,938 [UPSTREAM] INFO [11/49] Fetching KBWI...
+2026-07-30 00:54:22,257 [UPSTREAM] WARNING NWS API exception for KBWI: <urlopen error [Errno 101] Network is unreachable>
+2026-07-30 00:54:22,260 [UPSTREAM] WARNING No observations for KBWI
+2026-07-30 00:54:22,260 [UPSTREAM] INFO [12/49] Fetching KCHO...
+2026-07-30 00:54:30,724 [UPSTREAM] WARNING NWS API exception for KCHO: <urlopen error [Errno 101] Network is unreachable>
+2026-07-30 00:54:30,726 [UPSTREAM] WARNING No observations for KCHO
+2026-07-30 00:54:30,727 [UPSTREAM] INFO [13/49] Fetching KCLM...
+2026-07-30 00:54:40,805 [UPSTREAM] INFO Fetched 2188 observations for KCLM
+2026-07-30 00:54:40,820 [UPSTREAM] INFO   Inserted 0 observations for KCLM
+2026-07-30 00:54:41,820 [UPSTREAM] INFO [14/49] Fetching KCMA...
+2026-07-30 00:54:50,611 [UPSTREAM] INFO Fetched 2026 observations for KCMA
+2026-07-30 00:54:50,626 [UPSTREAM] INFO   Inserted 0 observations for KCMA
+2026-07-30 00:54:51,626 [UPSTREAM] INFO [15/49] Fetching KCOS...
+2026-07-30 00:56:18,510 [UPSTREAM] INFO ============================================================
+2026-07-30 00:56:18,510 [UPSTREAM] INFO UPSTREAM STATION METAR BACKFILL
+2026-07-30 00:56:18,510 [UPSTREAM] INFO Target: 49 upstream stations for nowcasting signal
+2026-07-30 00:56:18,510 [UPSTREAM] INFO ============================================================
+2026-07-30 00:56:18,510 [UPSTREAM] INFO [1/49] Fetching KACT...
+2026-07-30 00:56:25,832 [UPSTREAM] INFO Fetched 2187 observations for KACT
+2026-07-30 00:56:25,875 [UPSTREAM] INFO   Inserted 2187 observations for KACT
+2026-07-30 00:56:26,875 [UPSTREAM] INFO [2/49] Fetching KACY...
+2026-07-30 00:56:34,037 [UPSTREAM] INFO Fetched 2143 observations for KACY
+2026-07-30 00:56:34,056 [UPSTREAM] INFO   Inserted 2143 observations for KACY
+2026-07-30 00:56:35,057 [UPSTREAM] INFO [3/49] Fetching KAHN...
+2026-07-30 00:56:41,574 [UPSTREAM] INFO Fetched 2252 observations for KAHN
+2026-07-30 00:56:41,596 [UPSTREAM] INFO   Inserted 2252 observations for KAHN
+2026-07-30 00:56:42,597 [UPSTREAM] INFO [4/49] Fetching KATT...
+2026-07-30 00:56:42,624 [UPSTREAM] WARNING NWS API exception for KATT: <urlopen error [Errno 101] Network is unreachable>
+2026-07-30 00:56:42,625 [UPSTREAM] WARNING No observations for KATT
+2026-07-30 00:56:42,625 [UPSTREAM] INFO [5/49] Fetching KAXH...
+2026-07-30 00:56:43,868 [UPSTREAM] INFO Fetched 491 observations for KAXH
+2026-07-30 00:56:43,882 [UPSTREAM] INFO   Inserted 491 observations for KAXH
+2026-07-30 00:56:44,883 [UPSTREAM] INFO [6/49] Fetching KAXN...
+2026-07-30 00:57:20,945 [UPSTREAM] INFO ============================================================
+2026-07-30 00:57:20,945 [UPSTREAM] INFO UPSTREAM STATION METAR BACKFILL
+2026-07-30 00:57:20,945 [UPSTREAM] INFO Target: 49 upstream stations for nowcasting signal
+2026-07-30 00:57:20,946 [UPSTREAM] INFO ============================================================
+2026-07-30 00:57:20,946 [UPSTREAM] INFO [1/49] KACT — already has data, skipping
+2026-07-30 00:57:20,946 [UPSTREAM] INFO [2/49] KACY — already has data, skipping
+2026-07-30 00:57:20,946 [UPSTREAM] INFO [3/49] KAHN — already has data, skipping
+2026-07-30 00:57:20,946 [UPSTREAM] INFO [4/49] Fetching KATT...
+2026-07-30 00:57:24,972 [UPSTREAM] WARNING NWS API exception for KATT: <urlopen error [Errno 101] Network is unreachable>
+2026-07-30 00:57:24,973 [UPSTREAM] WARNING No observations for KATT
+2026-07-30 00:57:24,973 [UPSTREAM] INFO [5/49] KAXH — already has data, skipping
+2026-07-30 00:57:24,973 [UPSTREAM] INFO [6/49] Fetching KAXN...
+2026-07-30 00:57:28,624 [UPSTREAM] INFO Fetched 2142 observations for KAXN
+2026-07-30 00:57:28,651 [UPSTREAM] INFO   Inserted 2142 observations for KAXN
+2026-07-30 00:57:29,651 [UPSTREAM] INFO [7/49] Fetching KBED...
+2026-07-30 00:57:33,333 [UPSTREAM] INFO Fetched 2018 observations for KBED
+2026-07-30 00:57:33,352 [UPSTREAM] INFO   Inserted 2018 observations for KBED
+2026-07-30 00:57:34,352 [UPSTREAM] INFO [8/49] Fetching KBLH...
+2026-07-30 00:57:38,534 [UPSTREAM] INFO Fetched 2172 observations for KBLH
+2026-07-30 00:57:38,555 [UPSTREAM] INFO   Inserted 2172 observations for KBLH
+2026-07-30 00:57:39,555 [UPSTREAM] INFO [9/49] Fetching KBLI...
+2026-07-30 00:57:43,182 [UPSTREAM] INFO Fetched 2167 observations for KBLI
+2026-07-30 00:57:43,202 [UPSTREAM] INFO   Inserted 2167 observations for KBLI
+2026-07-30 00:57:44,202 [UPSTREAM] INFO [10/49] Fetching KBTR...
+2026-07-30 00:57:47,887 [UPSTREAM] INFO Fetched 2190 observations for KBTR
+2026-07-30 00:57:47,909 [UPSTREAM] INFO   Inserted 2190 observations for KBTR
+2026-07-30 00:57:48,909 [UPSTREAM] INFO [11/49] Fetching KBWI...
+2026-07-30 00:57:56,835 [UPSTREAM] INFO Fetched 2191 observations for KBWI
+2026-07-30 00:57:56,860 [UPSTREAM] INFO   Inserted 2191 observations for KBWI
+2026-07-30 00:57:57,860 [UPSTREAM] INFO [12/49] Fetching KCHO...
+2026-07-30 00:58:02,322 [UPSTREAM] INFO Fetched 2192 observations for KCHO
+2026-07-30 00:58:02,359 [UPSTREAM] INFO   Inserted 2192 observations for KCHO
+2026-07-30 00:58:03,359 [UPSTREAM] INFO [13/49] Fetching KCLM...
+2026-07-30 00:58:07,286 [UPSTREAM] INFO Fetched 2188 observations for KCLM
+2026-07-30 00:58:07,304 [UPSTREAM] INFO   Inserted 2188 observations for KCLM
+2026-07-30 00:58:08,305 [UPSTREAM] INFO [14/49] Fetching KCMA...
+2026-07-30 00:58:11,869 [UPSTREAM] INFO Fetched 2026 observations for KCMA
+2026-07-30 00:58:11,884 [UPSTREAM] INFO   Inserted 2026 observations for KCMA
+2026-07-30 00:58:12,884 [UPSTREAM] INFO [15/49] Fetching KCOS...
+2026-07-30 00:58:18,668 [UPSTREAM] INFO Fetched 2229 observations for KCOS
+2026-07-30 00:58:18,684 [UPSTREAM] INFO   Inserted 2229 observations for KCOS
+2026-07-30 00:58:19,684 [UPSTREAM] INFO [16/49] Fetching KCSG...
+2026-07-30 00:58:27,727 [UPSTREAM] INFO Fetched 2178 observations for KCSG
+2026-07-30 00:58:27,742 [UPSTREAM] INFO   Inserted 2178 observations for KCSG
+2026-07-30 00:58:28,742 [UPSTREAM] INFO [17/49] Fetching KCXO...
+2026-07-30 00:58:36,753 [UPSTREAM] INFO Fetched 2226 observations for KCXO
+2026-07-30 00:58:36,768 [UPSTREAM] INFO   Inserted 2226 observations for KCXO
+2026-07-30 00:58:37,769 [UPSTREAM] INFO [18/49] Fetching KDBQ...
+2026-07-30 00:58:39,031 [UPSTREAM] WARNING NWS API exception for KDBQ: <urlopen error [Errno 101] Network is unreachable>
+2026-07-30 00:58:39,033 [UPSTREAM] WARNING No observations for KDBQ
+2026-07-30 00:58:39,034 [UPSTREAM] INFO [19/49] Fetching KEED...
+2026-07-30 00:58:48,029 [UPSTREAM] INFO Fetched 2173 observations for KEED
+2026-07-30 00:58:48,045 [UPSTREAM] INFO   Inserted 2173 observations for KEED
+2026-07-30 00:58:49,045 [UPSTREAM] INFO [20/49] Fetching KEWR...
+2026-07-30 00:58:54,825 [UPSTREAM] INFO Fetched 2212 observations for KEWR
+2026-07-30 00:58:54,849 [UPSTREAM] INFO   Inserted 2212 observations for KEWR
+2026-07-30 00:58:55,849 [UPSTREAM] INFO [21/49] Fetching KFLL...
+2026-07-30 00:59:06,137 [UPSTREAM] INFO Fetched 2203 observations for KFLL
+2026-07-30 00:59:06,152 [UPSTREAM] INFO   Inserted 2203 observations for KFLL
+2026-07-30 00:59:07,153 [UPSTREAM] INFO [22/49] Fetching KFSM...
+2026-07-30 00:59:16,343 [UPSTREAM] INFO Fetched 2188 observations for KFSM
+2026-07-30 00:59:16,354 [UPSTREAM] INFO   Inserted 2188 observations for KFSM
+2026-07-30 00:59:17,354 [UPSTREAM] INFO [23/49] Fetching KGPT...
+2026-07-30 00:59:26,312 [UPSTREAM] INFO Fetched 2184 observations for KGPT
+2026-07-30 00:59:26,328 [UPSTREAM] INFO   Inserted 2184 observations for KGPT
+2026-07-30 00:59:27,328 [UPSTREAM] INFO [24/49] Fetching KGTU...
+2026-07-30 00:59:29,140 [UPSTREAM] WARNING NWS API exception for KGTU: <urlopen error [Errno 101] Network is unreachable>
+2026-07-30 00:59:29,143 [UPSTREAM] WARNING No observations for KGTU
+2026-07-30 00:59:29,143 [UPSTREAM] INFO [25/49] Fetching KHDC...
+2026-07-30 00:59:31,522 [UPSTREAM] INFO Fetched 449 observations for KHDC
+2026-07-30 00:59:31,529 [UPSTREAM] INFO   Inserted 449 observations for KHDC
+2026-07-30 00:59:32,529 [UPSTREAM] INFO [26/49] Fetching KIFP...
+2026-07-30 00:59:34,131 [UPSTREAM] INFO Fetched 240 observations for KIFP
+2026-07-30 00:59:34,134 [UPSTREAM] INFO   Inserted 240 observations for KIFP
+2026-07-30 00:59:35,134 [UPSTREAM] INFO [27/49] Fetching KIGM...
+2026-07-30 00:59:44,416 [UPSTREAM] INFO Fetched 2161 observations for KIGM
+2026-07-30 00:59:44,433 [UPSTREAM] INFO   Inserted 2161 observations for KIGM
+2026-07-30 00:59:45,433 [UPSTREAM] INFO [28/49] Fetching KLAR...
+2026-07-30 00:59:52,210 [UPSTREAM] INFO Fetched 2193 observations for KLAR
+2026-07-30 00:59:52,224 [UPSTREAM] INFO   Inserted 2193 observations for KLAR
+2026-07-30 00:59:53,224 [UPSTREAM] INFO [29/49] Fetching KLAW...
+2026-07-30 01:00:03,504 [UPSTREAM] INFO Fetched 2179 observations for KLAW
+2026-07-30 01:00:03,531 [UPSTREAM] INFO   Inserted 2179 observations for KLAW
+2026-07-30 01:00:04,532 [UPSTREAM] INFO [30/49] Fetching KLVJ...
+2026-07-30 01:00:19,662 [UPSTREAM] WARNING NWS API exception for KLVJ: The read operation timed out
+2026-07-30 01:00:19,663 [UPSTREAM] WARNING No observations for KLVJ
+2026-07-30 01:00:19,663 [UPSTREAM] INFO [31/49] Fetching KMCN...
+2026-07-30 01:00:54,106 [UPSTREAM] INFO Fetched 2203 observations for KMCN
+2026-07-30 01:00:54,127 [UPSTREAM] INFO   Inserted 2203 observations for KMCN
+2026-07-30 01:00:55,127 [UPSTREAM] INFO [32/49] Fetching KMKE...
+2026-07-30 01:01:10,243 [UPSTREAM] INFO Fetched 2200 observations for KMKE
+2026-07-30 01:01:10,260 [UPSTREAM] INFO   Inserted 2200 observations for KMKE
+2026-07-30 01:01:11,260 [UPSTREAM] INFO [33/49] Fetching KMKT...
+2026-07-30 01:01:25,132 [UPSTREAM] INFO Fetched 2195 observations for KMKT
+2026-07-30 01:01:25,149 [UPSTREAM] INFO   Inserted 2195 observations for KMKT
+2026-07-30 01:01:26,149 [UPSTREAM] INFO [34/49] Fetching KMRY...
+2026-07-30 01:01:40,308 [UPSTREAM] INFO Fetched 2228 observations for KMRY
+2026-07-30 01:01:40,325 [UPSTREAM] INFO   Inserted 2228 observations for KMRY
+2026-07-30 01:01:41,325 [UPSTREAM] INFO [35/49] Fetching KNTD...
+2026-07-30 01:01:43,303 [UPSTREAM] INFO Fetched 189 observations for KNTD
+2026-07-30 01:01:43,312 [UPSTREAM] INFO   Inserted 189 observations for KNTD
+2026-07-30 01:01:44,312 [UPSTREAM] INFO [36/49] Fetching KORH...
+2026-07-30 01:02:02,055 [UPSTREAM] INFO Fetched 1882 observations for KORH
+2026-07-30 01:02:02,070 [UPSTREAM] INFO   Inserted 1882 observations for KORH
+2026-07-30 01:02:03,070 [UPSTREAM] INFO [37/49] Fetching KPBI...
+2026-07-30 01:02:03,348 [UPSTREAM] INFO Fetched 0 observations for KPBI
+2026-07-30 01:02:03,349 [UPSTREAM] WARNING No observations for KPBI
+2026-07-30 01:02:03,349 [UPSTREAM] INFO [38/49] Fetching KPIA...
+2026-07-30 01:02:16,955 [UPSTREAM] INFO Fetched 2213 observations for KPIA
+2026-07-30 01:02:16,968 [UPSTREAM] INFO   Inserted 2213 observations for KPIA
+2026-07-30 01:02:17,968 [UPSTREAM] INFO [39/49] Fetching KPUB...
+2026-07-30 01:02:29,078 [UPSTREAM] INFO Fetched 2195 observations for KPUB
+2026-07-30 01:02:29,096 [UPSTREAM] INFO   Inserted 2195 observations for KPUB
+2026-07-30 01:02:30,096 [UPSTREAM] INFO [40/49] Fetching KPVD...
+2026-07-30 01:02:38,921 [UPSTREAM] INFO Fetched 2109 observations for KPVD
+2026-07-30 01:02:38,931 [UPSTREAM] INFO   Inserted 2109 observations for KPVD
+2026-07-30 01:02:39,931 [UPSTREAM] INFO [41/49] Fetching KRIC...
+2026-07-30 01:02:47,953 [UPSTREAM] INFO Fetched 2223 observations for KRIC
+2026-07-30 01:02:47,972 [UPSTREAM] INFO   Inserted 2223 observations for KRIC
+2026-07-30 01:02:48,973 [UPSTREAM] INFO [42/49] Fetching KRSW...
+2026-07-30 01:02:58,127 [UPSTREAM] INFO Fetched 2221 observations for KRSW
+2026-07-30 01:02:58,138 [UPSTREAM] INFO   Inserted 2221 observations for KRSW
+2026-07-30 01:02:59,138 [UPSTREAM] INFO [43/49] Fetching KSBA...
+2026-07-30 01:03:06,115 [UPSTREAM] INFO Fetched 2174 observations for KSBA
+2026-07-30 01:03:06,159 [UPSTREAM] INFO   Inserted 2174 observations for KSBA
+2026-07-30 01:03:07,159 [UPSTREAM] INFO [44/49] Fetching KSPS...
+2026-07-30 01:03:15,585 [UPSTREAM] INFO Fetched 2183 observations for KSPS
+2026-07-30 01:03:15,602 [UPSTREAM] INFO   Inserted 2183 observations for KSPS
+2026-07-30 01:03:16,602 [UPSTREAM] INFO [45/49] Fetching KSQL...
+2026-07-30 01:03:18,705 [UPSTREAM] INFO Fetched 294 observations for KSQL
+2026-07-30 01:03:18,708 [UPSTREAM] INFO   Inserted 294 observations for KSQL
+2026-07-30 01:03:19,709 [UPSTREAM] INFO [46/49] Fetching KSTP...
+2026-07-30 01:03:29,002 [UPSTREAM] INFO Fetched 2122 observations for KSTP
+2026-07-30 01:03:29,016 [UPSTREAM] INFO   Inserted 2122 observations for KSTP
+2026-07-30 01:03:30,017 [UPSTREAM] INFO [47/49] Fetching KSTS...
+2026-07-30 01:03:38,095 [UPSTREAM] INFO Fetched 2163 observations for KSTS
+2026-07-30 01:03:38,110 [UPSTREAM] INFO   Inserted 2163 observations for KSTS
+2026-07-30 01:03:39,111 [UPSTREAM] INFO [48/49] Fetching KTIK...
+2026-07-30 01:03:40,790 [UPSTREAM] INFO Fetched 169 observations for KTIK
+2026-07-30 01:03:40,798 [UPSTREAM] INFO   Inserted 169 observations for KTIK
+2026-07-30 01:03:41,798 [UPSTREAM] INFO [49/49] Fetching KYUM...
+2026-07-30 01:03:42,092 [UPSTREAM] INFO Fetched 0 observations for KYUM
+2026-07-30 01:03:42,092 [UPSTREAM] WARNING No observations for KYUM
+2026-07-30 01:03:42,107 [UPSTREAM] INFO 
+2026-07-30 01:03:42,107 [UPSTREAM] INFO ============================================================
+2026-07-30 01:03:42,107 [UPSTREAM] INFO BACKFILL COMPLETE
+2026-07-30 01:03:42,107 [UPSTREAM] INFO   Fetched:  39 stations
+2026-07-30 01:03:42,107 [UPSTREAM] INFO   Skipped:  4 stations (already in DB)
+2026-07-30 01:03:42,108 [UPSTREAM] INFO   Failed:   6 stations
+2026-07-30 01:03:42,108 [UPSTREAM] INFO   Inserted: 75064 total observations
+2026-07-30 01:03:42,108 [UPSTREAM] INFO   Failed stations: KATT, KDBQ, KGTU, KLVJ, KPBI, KYUM
+2026-07-30 01:03:42,108 [UPSTREAM] INFO   Skipped stations: KACT, KACY, KAHN, KAXH
+2026-07-30 01:03:42,108 [UPSTREAM] INFO ============================================================

@@ -1,0 +1,489 @@
+2026-07-29 22:41:52,326 [ERA5] INFO ============================================================
+2026-07-29 22:41:52,326 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-29 22:41:52,326 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-29 22:41:52,326 [ERA5] INFO Years: ['2021']
+2026-07-29 22:41:52,326 [ERA5] INFO ============================================================
+2026-07-29 22:41:52,326 [ERA5] INFO Loaded 20 station coordinates
+2026-07-29 22:41:52,326 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-29 22:41:52,928 [ERA5] INFO 
+2026-07-29 22:41:52,928 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-29 22:41:52,929 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-29 22:41:52,929 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2021']
+2026-07-29 22:41:54,431 [ERA5] INFO Request ID is feb15cea-7103-46b9-944f-617bf98cc07a
+2026-07-29 22:41:54,650 [ERA5] INFO status has been updated to accepted
+2026-07-29 22:42:16,884 [ERA5] INFO status has been updated to running
+2026-07-30 00:11:46,217 [ERA5] INFO ============================================================
+2026-07-30 00:11:46,217 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:11:46,217 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:11:46,217 [ERA5] INFO Years: ['2021-2025']
+2026-07-30 00:11:46,217 [ERA5] INFO ============================================================
+2026-07-30 00:11:46,217 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:11:46,217 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:11:46,803 [ERA5] INFO 
+2026-07-30 00:11:46,803 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:11:46,803 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:11:46,803 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2021-2025']
+2026-07-30 00:11:47,214 [ERA5] ERROR CDS request failed station=KNYC error=400 Client Error: Bad Request for url: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/reanalysis-era5-single-levels/execution
+invalid request
+Invalid integer for year: '2021-2025'
+2026-07-30 00:11:47,233 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:11:52,240 [ERA5] INFO 
+2026-07-30 00:11:52,240 [ERA5] INFO ============================================================
+2026-07-30 00:11:52,240 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:11:52,240 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:11:52,240 [ERA5] INFO   Failed:  1 stations
+2026-07-30 00:11:52,240 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:11:52,240 [ERA5] INFO   Failed stations: KNYC
+2026-07-30 00:11:52,240 [ERA5] INFO ============================================================
+2026-07-30 00:12:29,370 [ERA5] INFO ============================================================
+2026-07-30 00:12:29,372 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:12:29,372 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:12:29,372 [ERA5] INFO Years: ['2021', '2022', '2023', '2024', '2025']
+2026-07-30 00:12:29,372 [ERA5] INFO ============================================================
+2026-07-30 00:12:29,373 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:12:29,373 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:12:30,118 [ERA5] INFO 
+2026-07-30 00:12:30,119 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:12:30,119 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:12:30,119 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2021', '2022', '2023', '2024', '2025']
+2026-07-30 00:12:30,668 [ERA5] ERROR CDS request failed station=KNYC error=403 Client Error: Forbidden for url: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/reanalysis-era5-single-levels/execution
+cost limits exceeded
+Your request is too large, please reduce your selection.
+2026-07-30 00:12:30,679 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:12:35,686 [ERA5] INFO 
+2026-07-30 00:12:35,686 [ERA5] INFO ============================================================
+2026-07-30 00:12:35,686 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:12:35,687 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:12:35,687 [ERA5] INFO   Failed:  1 stations
+2026-07-30 00:12:35,687 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:12:35,687 [ERA5] INFO   Failed stations: KNYC
+2026-07-30 00:12:35,687 [ERA5] INFO ============================================================
+2026-07-30 00:13:10,326 [ERA5] INFO ============================================================
+2026-07-30 00:13:10,326 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:13:10,326 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:13:10,326 [ERA5] INFO Years: ['2021']
+2026-07-30 00:13:10,326 [ERA5] INFO ============================================================
+2026-07-30 00:13:10,326 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:13:10,326 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:13:11,078 [ERA5] INFO 
+2026-07-30 00:13:11,078 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:13:11,078 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:13:11,078 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2021']
+2026-07-30 00:13:11,658 [ERA5] INFO Request ID is b56c052b-3280-42f7-b10b-7993d9935ae0
+2026-07-30 00:13:11,886 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:13:47,496 [ERA5] INFO status has been updated to successful
+2026-07-30 00:13:50,288 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-29/3fec6f5c48e93884375531eae91a13a9.nc
+2026-07-30 00:13:51,845 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:13:51,853 [ERA5] ERROR Failed to process NetCDF for KNYC: 'time'
+2026-07-30 00:13:51,854 [ERA5] WARNING === Station KNYC: no records inserted ===
+2026-07-30 00:13:51,897 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:13:56,899 [ERA5] INFO 
+2026-07-30 00:13:56,900 [ERA5] INFO ============================================================
+2026-07-30 00:13:56,900 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:13:56,900 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:13:56,900 [ERA5] INFO   Failed:  1 stations
+2026-07-30 00:13:56,900 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:13:56,900 [ERA5] INFO   Failed stations: KNYC
+2026-07-30 00:13:56,900 [ERA5] INFO ============================================================
+2026-07-30 00:13:57,099 [ERA5] INFO ============================================================
+2026-07-30 00:13:57,099 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:13:57,099 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:13:57,099 [ERA5] INFO Years: ['2022']
+2026-07-30 00:13:57,099 [ERA5] INFO ============================================================
+2026-07-30 00:13:57,100 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:13:57,100 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:13:57,707 [ERA5] INFO 
+2026-07-30 00:13:57,707 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:13:57,707 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:13:57,708 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2022']
+2026-07-30 00:13:58,454 [ERA5] INFO Request ID is 7634640c-11fb-4984-9e1b-6dbd4215d645
+2026-07-30 00:13:58,580 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:14:34,804 [ERA5] INFO status has been updated to running
+2026-07-30 00:17:13,302 [ERA5] INFO ============================================================
+2026-07-30 00:17:13,305 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:17:13,305 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:17:13,306 [ERA5] INFO Years: ['2021']
+2026-07-30 00:17:13,306 [ERA5] INFO ============================================================
+2026-07-30 00:17:13,306 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:17:13,306 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:17:13,993 [ERA5] INFO 
+2026-07-30 00:17:13,993 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:17:13,993 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:17:13,994 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2021']
+2026-07-30 00:17:14,547 [ERA5] INFO Request ID is a730f9fd-c9c1-441c-b46e-03cad2c9b8b7
+2026-07-30 00:17:14,704 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:22:23,834 [ERA5] INFO status has been updated to successful
+2026-07-30 00:22:24,146 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/d523353a7a2f4f635a89d4c7797e543b.nc
+2026-07-30 00:22:25,765 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:22:25,767 [ERA5] ERROR Failed to process NetCDF for KNYC: 'time'
+2026-07-30 00:22:25,767 [ERA5] WARNING === Station KNYC: no records inserted ===
+2026-07-30 00:22:25,872 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:22:30,873 [ERA5] INFO 
+2026-07-30 00:22:30,873 [ERA5] INFO ============================================================
+2026-07-30 00:22:30,873 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:22:30,873 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:22:30,873 [ERA5] INFO   Failed:  1 stations
+2026-07-30 00:22:30,873 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:22:30,873 [ERA5] INFO   Failed stations: KNYC
+2026-07-30 00:22:30,873 [ERA5] INFO ============================================================
+2026-07-30 00:23:44,645 [ERA5] INFO status has been updated to successful
+2026-07-30 00:23:44,935 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-29/3fec6f5c48e93884375531eae91a13a9.nc
+2026-07-30 00:23:46,647 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:23:46,850 [ERA5] INFO Processed KNYC: 365 daily records, 9.7°C mean daily max (49.4°F)
+2026-07-30 00:23:46,851 [ERA5] INFO === Station KNYC complete: 365 daily records ===
+2026-07-30 00:23:46,851 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:23:51,863 [ERA5] INFO 
+2026-07-30 00:23:51,863 [ERA5] INFO ============================================================
+2026-07-30 00:23:51,863 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:23:51,863 [ERA5] INFO   Success: 1 stations
+2026-07-30 00:23:51,863 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:23:51,863 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:23:51,863 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,057 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,057 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:23:52,057 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:23:52,057 [ERA5] INFO Years: ['2022']
+2026-07-30 00:23:52,057 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,058 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:23:52,058 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:23:52,751 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:23:52,751 [ERA5] INFO 
+2026-07-30 00:23:52,751 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,751 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:23:52,751 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:23:52,751 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:23:52,752 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:23:52,752 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,899 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,900 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:23:52,904 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:23:52,904 [ERA5] INFO Years: ['2023']
+2026-07-30 00:23:52,905 [ERA5] INFO ============================================================
+2026-07-30 00:23:52,905 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:23:52,905 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:23:53,436 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:23:53,436 [ERA5] INFO 
+2026-07-30 00:23:53,436 [ERA5] INFO ============================================================
+2026-07-30 00:23:53,436 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:23:53,436 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:23:53,436 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:23:53,436 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:23:53,437 [ERA5] INFO ============================================================
+2026-07-30 00:23:53,615 [ERA5] INFO ============================================================
+2026-07-30 00:23:53,615 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:23:53,615 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:23:53,615 [ERA5] INFO Years: ['2024']
+2026-07-30 00:23:53,615 [ERA5] INFO ============================================================
+2026-07-30 00:23:53,616 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:23:53,616 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:23:54,396 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:23:54,397 [ERA5] INFO 
+2026-07-30 00:23:54,397 [ERA5] INFO ============================================================
+2026-07-30 00:23:54,397 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:23:54,397 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:23:54,397 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:23:54,397 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:23:54,397 [ERA5] INFO ============================================================
+2026-07-30 00:23:54,568 [ERA5] INFO ============================================================
+2026-07-30 00:23:54,568 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:23:54,568 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:23:54,568 [ERA5] INFO Years: ['2025']
+2026-07-30 00:23:54,568 [ERA5] INFO ============================================================
+2026-07-30 00:23:54,569 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:23:54,569 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:23:55,124 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:23:55,125 [ERA5] INFO 
+2026-07-30 00:23:55,125 [ERA5] INFO ============================================================
+2026-07-30 00:23:55,125 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:23:55,125 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:23:55,125 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:23:55,125 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:23:55,125 [ERA5] INFO ============================================================
+2026-07-30 00:33:05,762 [ERA5] INFO ============================================================
+2026-07-30 00:33:05,763 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:33:05,763 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:33:05,763 [ERA5] INFO Years: ['2022']
+2026-07-30 00:33:05,763 [ERA5] INFO ============================================================
+2026-07-30 00:33:05,763 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:33:05,763 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:33:06,412 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:33:06,412 [ERA5] INFO 
+2026-07-30 00:33:06,412 [ERA5] INFO ============================================================
+2026-07-30 00:33:06,412 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:33:06,412 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:33:06,412 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:33:06,412 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:33:06,412 [ERA5] INFO ============================================================
+2026-07-30 00:33:06,568 [ERA5] INFO ============================================================
+2026-07-30 00:33:06,568 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:33:06,568 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:33:06,568 [ERA5] INFO Years: ['2023']
+2026-07-30 00:33:06,568 [ERA5] INFO ============================================================
+2026-07-30 00:33:06,568 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:33:06,568 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:33:07,113 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:33:07,113 [ERA5] INFO 
+2026-07-30 00:33:07,113 [ERA5] INFO ============================================================
+2026-07-30 00:33:07,113 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:33:07,113 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:33:07,113 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:33:07,113 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:33:07,113 [ERA5] INFO ============================================================
+2026-07-30 00:33:07,312 [ERA5] INFO ============================================================
+2026-07-30 00:33:07,312 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:33:07,312 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:33:07,312 [ERA5] INFO Years: ['2024']
+2026-07-30 00:33:07,312 [ERA5] INFO ============================================================
+2026-07-30 00:33:07,312 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:33:07,313 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:33:07,883 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:33:07,883 [ERA5] INFO 
+2026-07-30 00:33:07,883 [ERA5] INFO ============================================================
+2026-07-30 00:33:07,883 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:33:07,883 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:33:07,884 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:33:07,884 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:33:07,884 [ERA5] INFO ============================================================
+2026-07-30 00:33:08,081 [ERA5] INFO ============================================================
+2026-07-30 00:33:08,082 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:33:08,082 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:33:08,082 [ERA5] INFO Years: ['2025']
+2026-07-30 00:33:08,082 [ERA5] INFO ============================================================
+2026-07-30 00:33:08,082 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:33:08,082 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:33:08,643 [ERA5] INFO Station KNYC already checkpointed [done] — SKIPPING
+2026-07-30 00:33:08,643 [ERA5] INFO 
+2026-07-30 00:33:08,643 [ERA5] INFO ============================================================
+2026-07-30 00:33:08,643 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:33:08,643 [ERA5] INFO   Success: 0 stations
+2026-07-30 00:33:08,643 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:33:08,643 [ERA5] INFO   Skipped: 1 stations
+2026-07-30 00:33:08,643 [ERA5] INFO ============================================================
+2026-07-30 00:34:32,304 [ERA5] INFO ============================================================
+2026-07-30 00:34:32,304 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:34:32,304 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:34:32,304 [ERA5] INFO Years: ['2022']
+2026-07-30 00:34:32,304 [ERA5] INFO ============================================================
+2026-07-30 00:34:32,304 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:34:32,304 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:34:32,948 [ERA5] INFO 
+2026-07-30 00:34:32,948 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:34:32,948 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:34:32,949 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2022']
+2026-07-30 00:34:35,134 [ERA5] INFO Request ID is 64c4cf77-4399-4068-8686-2681f2d34c05
+2026-07-30 00:34:36,223 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:34:58,850 [ERA5] INFO status has been updated to running
+2026-07-30 00:35:10,386 [ERA5] INFO status has been updated to successful
+2026-07-30 00:35:14,943 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/d523353a7a2f4f635a89d4c7797e543b.nc
+2026-07-30 00:35:16,854 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:35:17,053 [ERA5] INFO Processed KNYC: 365 daily records, 10.4°C mean daily max (50.7°F)
+2026-07-30 00:35:17,053 [ERA5] INFO === Station KNYC complete: 365 daily records ===
+2026-07-30 00:35:17,053 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:35:22,060 [ERA5] INFO 
+2026-07-30 00:35:22,060 [ERA5] INFO ============================================================
+2026-07-30 00:35:22,061 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:35:22,061 [ERA5] INFO   Success: 1 stations
+2026-07-30 00:35:22,061 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:35:22,061 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:35:22,061 [ERA5] INFO ============================================================
+2026-07-30 00:35:22,258 [ERA5] INFO ============================================================
+2026-07-30 00:35:22,258 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:35:22,258 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:35:22,258 [ERA5] INFO Years: ['2023']
+2026-07-30 00:35:22,258 [ERA5] INFO ============================================================
+2026-07-30 00:35:22,258 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:35:22,258 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:35:22,776 [ERA5] INFO 
+2026-07-30 00:35:22,777 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:35:22,777 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:35:22,777 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2023']
+2026-07-30 00:35:23,439 [ERA5] INFO Request ID is d1a4e87b-af57-4b8b-8245-da280ee960cc
+2026-07-30 00:35:23,577 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:36:14,036 [ERA5] INFO status has been updated to running
+2026-07-30 00:41:44,460 [ERA5] INFO status has been updated to successful
+2026-07-30 00:41:44,768 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/2244b60ca5a8853e831b2c703350c825.nc
+2026-07-30 00:41:46,424 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:41:46,655 [ERA5] INFO Processed KNYC: 365 daily records, 7.2°C mean daily max (44.9°F)
+2026-07-30 00:41:46,656 [ERA5] INFO === Station KNYC complete: 365 daily records ===
+2026-07-30 00:41:46,656 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:41:51,667 [ERA5] INFO 
+2026-07-30 00:41:51,667 [ERA5] INFO ============================================================
+2026-07-30 00:41:51,667 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:41:51,667 [ERA5] INFO   Success: 1 stations
+2026-07-30 00:41:51,668 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:41:51,668 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:41:51,668 [ERA5] INFO ============================================================
+2026-07-30 00:41:51,865 [ERA5] INFO ============================================================
+2026-07-30 00:41:51,865 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:41:51,865 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:41:51,865 [ERA5] INFO Years: ['2024']
+2026-07-30 00:41:51,865 [ERA5] INFO ============================================================
+2026-07-30 00:41:51,865 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:41:51,865 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:41:52,464 [ERA5] INFO 
+2026-07-30 00:41:52,465 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:41:52,465 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:41:52,465 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2024']
+2026-07-30 00:41:53,091 [ERA5] INFO Request ID is a0625fd9-8476-4828-915b-11610bc20fb0
+2026-07-30 00:41:53,215 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:42:30,197 [ERA5] INFO status has been updated to running
+2026-07-30 00:50:18,895 [ERA5] INFO status has been updated to successful
+2026-07-30 00:50:22,191 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/923cde22fdf501c6facb789d03070c1d.nc
+2026-07-30 00:50:23,867 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:50:24,086 [ERA5] INFO Processed KNYC: 366 daily records, 9.8°C mean daily max (49.7°F)
+2026-07-30 00:50:24,087 [ERA5] INFO === Station KNYC complete: 366 daily records ===
+2026-07-30 00:50:24,087 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:50:29,099 [ERA5] INFO 
+2026-07-30 00:50:29,099 [ERA5] INFO ============================================================
+2026-07-30 00:50:29,099 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:50:29,099 [ERA5] INFO   Success: 1 stations
+2026-07-30 00:50:29,099 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:50:29,099 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:50:29,099 [ERA5] INFO ============================================================
+2026-07-30 00:50:29,273 [ERA5] INFO ============================================================
+2026-07-30 00:50:29,273 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 00:50:29,273 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 00:50:29,273 [ERA5] INFO Years: ['2025']
+2026-07-30 00:50:29,273 [ERA5] INFO ============================================================
+2026-07-30 00:50:29,274 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 00:50:29,274 [ERA5] INFO Stations to backfill: 1 (KNYC)
+2026-07-30 00:50:29,891 [ERA5] INFO 
+2026-07-30 00:50:29,891 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 00:50:29,892 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 00:50:29,892 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2025']
+2026-07-30 00:50:30,469 [ERA5] INFO Request ID is 98e845fa-8d5a-4297-b222-5ef151d9eaad
+2026-07-30 00:50:30,619 [ERA5] INFO status has been updated to accepted
+2026-07-30 00:50:46,106 [ERA5] INFO status has been updated to running
+2026-07-30 00:58:54,183 [ERA5] INFO status has been updated to successful
+2026-07-30 00:58:54,495 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/f72038b8839d537cd05b127ae745d94a.nc
+2026-07-30 00:58:56,124 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 00:58:56,306 [ERA5] INFO Processed KNYC: 365 daily records, 0.3°C mean daily max (32.6°F)
+2026-07-30 00:58:56,307 [ERA5] INFO === Station KNYC complete: 365 daily records ===
+2026-07-30 00:58:56,307 [ERA5] INFO Cooling down for 5s...
+2026-07-30 00:59:01,318 [ERA5] INFO 
+2026-07-30 00:59:01,318 [ERA5] INFO ============================================================
+2026-07-30 00:59:01,318 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 00:59:01,318 [ERA5] INFO   Success: 1 stations
+2026-07-30 00:59:01,318 [ERA5] INFO   Failed:  0 stations
+2026-07-30 00:59:01,318 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 00:59:01,318 [ERA5] INFO ============================================================
+2026-07-30 03:01:31,470 [ERA5] INFO ============================================================
+2026-07-30 03:01:31,470 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 03:01:31,470 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 03:01:31,470 [ERA5] INFO Years: ['2021']
+2026-07-30 03:01:31,470 [ERA5] INFO ============================================================
+2026-07-30 03:01:31,471 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 03:01:31,471 [ERA5] INFO Stations to backfill: 20 (KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO)
+2026-07-30 03:01:32,294 [ERA5] INFO 
+2026-07-30 03:01:32,295 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:01:32,295 [ERA5] INFO === Downloading ERA5 for KATL (lat=33.6407 lon=-84.4277) ===
+2026-07-30 03:01:32,295 [ERA5] INFO CDS request station=KATL lat=33.6407 lon=-84.4277 box=[33.7407,-84.5277,33.5407,-84.3277] years=['2021']
+2026-07-30 03:01:33,355 [ERA5] INFO Request ID is 7abc10c0-453f-4b34-b765-b5ec8a661bee
+2026-07-30 03:01:33,496 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:02:08,663 [ERA5] INFO status has been updated to running
+2026-07-30 03:09:57,558 [ERA5] INFO status has been updated to successful
+2026-07-30 03:09:59,812 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/7db20d34e1293b2e66d75b36e0abc95a.nc
+2026-07-30 03:10:01,481 [ERA5] INFO CDS download complete station=KATL file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KATL.nc
+2026-07-30 03:10:01,689 [ERA5] INFO Processed KATL: 365 daily records, 22.3°C mean daily max (72.2°F)
+2026-07-30 03:10:01,690 [ERA5] INFO === Station KATL complete: 365 daily records ===
+2026-07-30 03:10:01,690 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:10:06,690 [ERA5] INFO 
+2026-07-30 03:10:06,690 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:10:06,690 [ERA5] INFO === Downloading ERA5 for KAUS (lat=30.1945 lon=-97.6699) ===
+2026-07-30 03:10:06,691 [ERA5] INFO CDS request station=KAUS lat=30.1945 lon=-97.6699 box=[30.2945,-97.7699,30.0945,-97.5699] years=['2021']
+2026-07-30 03:10:07,366 [ERA5] INFO Request ID is a9023e7b-e39f-4f47-9512-de029ab9dcfa
+2026-07-30 03:10:07,499 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:10:30,777 [ERA5] INFO status has been updated to running
+2026-07-30 03:20:32,751 [ERA5] INFO status has been updated to successful
+2026-07-30 03:20:33,044 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/27b5c5e81fd22d32d6d6f33647aae126.nc
+2026-07-30 03:20:34,810 [ERA5] INFO CDS download complete station=KAUS file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KAUS.nc
+2026-07-30 03:20:34,985 [ERA5] INFO Processed KAUS: 365 daily records, 27.1°C mean daily max (80.8°F)
+2026-07-30 03:20:34,986 [ERA5] INFO === Station KAUS complete: 365 daily records ===
+2026-07-30 03:20:34,986 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:20:39,986 [ERA5] INFO 
+2026-07-30 03:20:39,986 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:20:39,987 [ERA5] INFO === Downloading ERA5 for KBOS (lat=42.3656 lon=-71.0096) ===
+2026-07-30 03:20:39,987 [ERA5] INFO CDS request station=KBOS lat=42.3656 lon=-71.0096 box=[42.4656,-71.1096,42.2656,-70.9096] years=['2021']
+2026-07-30 03:20:40,575 [ERA5] INFO Request ID is 4741137b-eff0-4230-be23-7afb02c631af
+2026-07-30 03:20:40,714 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:21:02,646 [ERA5] INFO status has been updated to running
+2026-07-30 03:21:31,407 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:21:57,175 [ERA5] INFO status has been updated to running
+2026-07-30 03:27:01,729 [ERA5] INFO status has been updated to successful
+2026-07-30 03:27:02,060 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/741386b28f58aec17db8e421db6e4ab2.nc
+2026-07-30 03:27:03,733 [ERA5] INFO CDS download complete station=KBOS file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KBOS.nc
+2026-07-30 03:27:03,941 [ERA5] INFO Processed KBOS: 365 daily records, 7.2°C mean daily max (45.0°F)
+2026-07-30 03:27:03,942 [ERA5] INFO === Station KBOS complete: 365 daily records ===
+2026-07-30 03:27:03,942 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:27:08,942 [ERA5] INFO 
+2026-07-30 03:27:08,942 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:27:08,943 [ERA5] INFO === Downloading ERA5 for KDCA (lat=38.8512 lon=-77.0402) ===
+2026-07-30 03:27:08,943 [ERA5] INFO CDS request station=KDCA lat=38.8512 lon=-77.0402 box=[38.9512,-77.1402,38.7512,-76.9402] years=['2021']
+2026-07-30 03:27:09,485 [ERA5] INFO Request ID is efd17b27-c1c9-4903-920d-b9d6757a7529
+2026-07-30 03:27:09,625 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:27:45,481 [ERA5] INFO status has been updated to running
+2026-07-30 03:33:34,848 [ERA5] INFO status has been updated to successful
+2026-07-30 03:33:35,361 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-30/fed7f92f552e33fe7d6cb888326e436.nc
+2026-07-30 03:33:37,032 [ERA5] INFO CDS download complete station=KDCA file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KDCA.nc
+2026-07-30 03:33:37,215 [ERA5] INFO Processed KDCA: 365 daily records, 14.3°C mean daily max (57.7°F)
+2026-07-30 03:33:37,215 [ERA5] INFO === Station KDCA complete: 365 daily records ===
+2026-07-30 03:33:37,216 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:33:42,216 [ERA5] INFO 
+2026-07-30 03:33:42,216 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:33:42,216 [ERA5] INFO === Downloading ERA5 for KDEN (lat=39.8561 lon=-104.6737) ===
+2026-07-30 03:33:42,216 [ERA5] INFO CDS request station=KDEN lat=39.8561 lon=-104.6737 box=[39.9561,-104.7737,39.7561,-104.5737] years=['2021']
+2026-07-30 03:33:42,819 [ERA5] INFO Request ID is b960c27e-47dc-444e-9c7d-6f03cef0f667
+2026-07-30 03:33:42,945 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:34:04,881 [ERA5] INFO status has been updated to running
+2026-07-30 03:40:04,658 [ERA5] INFO status has been updated to successful
+2026-07-30 03:40:04,956 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/1a1557c75cd4f42e9ace4a1f58ff4687.nc
+2026-07-30 03:40:06,462 [ERA5] INFO CDS download complete station=KDEN file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KDEN.nc
+2026-07-30 03:40:06,631 [ERA5] INFO Processed KDEN: 365 daily records, 6.2°C mean daily max (43.2°F)
+2026-07-30 03:40:06,632 [ERA5] INFO === Station KDEN complete: 365 daily records ===
+2026-07-30 03:40:06,632 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:40:11,632 [ERA5] INFO 
+2026-07-30 03:40:11,633 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:40:11,633 [ERA5] INFO === Downloading ERA5 for KDFW (lat=32.8998 lon=-97.0403) ===
+2026-07-30 03:40:11,633 [ERA5] INFO CDS request station=KDFW lat=32.8998 lon=-97.0403 box=[32.9998,-97.1403,32.7998,-96.9403] years=['2021']
+2026-07-30 03:40:12,250 [ERA5] INFO Request ID is 03a3428d-73ae-4754-8632-afedfba1e9c5
+2026-07-30 03:40:12,379 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:40:34,127 [ERA5] INFO status has been updated to running
+2026-07-30 03:46:35,829 [ERA5] INFO status has been updated to successful
+2026-07-30 03:46:36,404 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/489052509e6164990f11784b9decaa5f.nc
+2026-07-30 03:46:38,260 [ERA5] INFO CDS download complete station=KDFW file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KDFW.nc
+2026-07-30 03:46:38,434 [ERA5] INFO Processed KDFW: 365 daily records, 21.8°C mean daily max (71.2°F)
+2026-07-30 03:46:38,434 [ERA5] INFO === Station KDFW complete: 365 daily records ===
+2026-07-30 03:46:38,434 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:46:43,435 [ERA5] INFO 
+2026-07-30 03:46:43,435 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:46:43,435 [ERA5] INFO === Downloading ERA5 for KHOU (lat=29.6454 lon=-95.2789) ===
+2026-07-30 03:46:43,435 [ERA5] INFO CDS request station=KHOU lat=29.6454 lon=-95.2789 box=[29.7454,-95.3789,29.5454,-95.1789] years=['2021']
+2026-07-30 03:46:44,019 [ERA5] INFO Request ID is 712c260f-9017-4b27-9fb4-5ec8e74b8b86
+2026-07-30 03:46:44,159 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:47:07,766 [ERA5] INFO status has been updated to running
+2026-07-30 03:53:07,189 [ERA5] INFO status has been updated to successful
+2026-07-30 03:53:07,472 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/7e051c61b40a236913d74744e58105be.nc
+2026-07-30 03:53:09,568 [ERA5] INFO CDS download complete station=KHOU file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KHOU.nc
+2026-07-30 03:53:09,761 [ERA5] INFO Processed KHOU: 365 daily records, 27.3°C mean daily max (81.1°F)
+2026-07-30 03:53:09,762 [ERA5] INFO === Station KHOU complete: 365 daily records ===
+2026-07-30 03:53:09,762 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:53:14,762 [ERA5] INFO 
+2026-07-30 03:53:14,762 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:53:14,763 [ERA5] INFO === Downloading ERA5 for KLAS (lat=36.0840 lon=-115.1537) ===
+2026-07-30 03:53:14,763 [ERA5] INFO CDS request station=KLAS lat=36.0840 lon=-115.1537 box=[36.1840,-115.2537,35.9840,-115.0537] years=['2021']
+2026-07-30 03:53:15,306 [ERA5] INFO Request ID is deb67bc8-5873-4021-b59f-4f8c8ea7be17
+2026-07-30 03:53:15,469 [ERA5] INFO status has been updated to accepted
+2026-07-30 03:53:37,145 [ERA5] INFO status has been updated to running
+2026-07-30 03:59:37,173 [ERA5] INFO status has been updated to successful
+2026-07-30 03:59:37,477 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/92b7869709f36ea1173e21c68639e5b0.nc
+2026-07-30 03:59:39,087 [ERA5] INFO CDS download complete station=KLAS file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KLAS.nc
+2026-07-30 03:59:39,275 [ERA5] INFO Processed KLAS: 365 daily records, 11.4°C mean daily max (52.5°F)
+2026-07-30 03:59:39,276 [ERA5] INFO === Station KLAS complete: 365 daily records ===
+2026-07-30 03:59:39,276 [ERA5] INFO Cooling down for 5s...
+2026-07-30 03:59:44,276 [ERA5] INFO 
+2026-07-30 03:59:44,276 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 03:59:44,277 [ERA5] INFO === Downloading ERA5 for KLAX (lat=33.9425 lon=-118.4081) ===
+2026-07-30 03:59:44,277 [ERA5] INFO CDS request station=KLAX lat=33.9425 lon=-118.4081 box=[34.0425,-118.5081,33.8425,-118.3081] years=['2021']
+2026-07-30 03:59:45,475 [ERA5] INFO Request ID is 2f33ba3b-e1cd-4b5d-82b5-31f7e7f5851d
+2026-07-30 03:59:45,626 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:00:09,326 [ERA5] INFO status has been updated to running
