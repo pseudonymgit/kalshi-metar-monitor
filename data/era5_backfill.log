@@ -487,3 +487,858 @@ Your request is too large, please reduce your selection.
 2026-07-30 03:59:45,475 [ERA5] INFO Request ID is 2f33ba3b-e1cd-4b5d-82b5-31f7e7f5851d
 2026-07-30 03:59:45,626 [ERA5] INFO status has been updated to accepted
 2026-07-30 04:00:09,326 [ERA5] INFO status has been updated to running
+2026-07-30 04:04:09,495 [ERA5] INFO status has been updated to successful
+2026-07-30 04:04:09,801 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/d12fc2c4e4782643ee95ebcfae679269.nc
+2026-07-30 04:04:11,663 [ERA5] INFO CDS download complete station=KLAX file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KLAX.nc
+2026-07-30 04:04:11,868 [ERA5] INFO Processed KLAX: 365 daily records, 14.3°C mean daily max (57.7°F)
+2026-07-30 04:04:11,869 [ERA5] INFO === Station KLAX complete: 365 daily records ===
+2026-07-30 04:04:11,869 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:04:16,870 [ERA5] INFO 
+2026-07-30 04:04:16,870 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:04:16,870 [ERA5] INFO === Downloading ERA5 for KMDW (lat=41.7868 lon=-87.7522) ===
+2026-07-30 04:04:16,870 [ERA5] INFO CDS request station=KMDW lat=41.7868 lon=-87.7522 box=[41.8868,-87.8522,41.6868,-87.6522] years=['2021']
+2026-07-30 04:04:17,457 [ERA5] INFO Request ID is 9b469280-dcb4-40aa-9385-ec04bd87d183
+2026-07-30 04:04:17,602 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:04:43,250 [ERA5] INFO status has been updated to running
+2026-07-30 04:08:41,965 [ERA5] INFO status has been updated to successful
+2026-07-30 04:08:42,402 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/97b825cf4ac2b67a260e017787a8dc2c.nc
+2026-07-30 04:08:44,068 [ERA5] INFO CDS download complete station=KMDW file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KMDW.nc
+2026-07-30 04:08:44,269 [ERA5] INFO Processed KMDW: 365 daily records, 6.5°C mean daily max (43.7°F)
+2026-07-30 04:08:44,269 [ERA5] INFO === Station KMDW complete: 365 daily records ===
+2026-07-30 04:08:44,269 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:08:49,270 [ERA5] INFO 
+2026-07-30 04:08:49,270 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:08:49,271 [ERA5] INFO === Downloading ERA5 for KMIA (lat=25.7959 lon=-80.2870) ===
+2026-07-30 04:08:49,271 [ERA5] INFO CDS request station=KMIA lat=25.7959 lon=-80.2870 box=[25.8959,-80.3870,25.6959,-80.1870] years=['2021']
+2026-07-30 04:08:49,837 [ERA5] INFO Request ID is 1871324c-c521-4f36-b2d3-82693d9256ef
+2026-07-30 04:08:49,976 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:09:12,308 [ERA5] INFO status has been updated to running
+2026-07-30 04:13:11,975 [ERA5] INFO status has been updated to successful
+2026-07-30 04:13:12,254 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/4fbc18e997b3a91fd5145ab728ecc37f.nc
+2026-07-30 04:13:14,347 [ERA5] INFO CDS download complete station=KMIA file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KMIA.nc
+2026-07-30 04:13:14,532 [ERA5] INFO Processed KMIA: 365 daily records, 27.2°C mean daily max (80.9°F)
+2026-07-30 04:13:14,533 [ERA5] INFO === Station KMIA complete: 365 daily records ===
+2026-07-30 04:13:14,533 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:13:19,533 [ERA5] INFO 
+2026-07-30 04:13:19,533 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:13:19,533 [ERA5] INFO === Downloading ERA5 for KMSP (lat=44.8848 lon=-93.2223) ===
+2026-07-30 04:13:19,533 [ERA5] INFO CDS request station=KMSP lat=44.8848 lon=-93.2223 box=[44.9848,-93.3223,44.7848,-93.1223] years=['2021']
+2026-07-30 04:13:20,105 [ERA5] INFO Request ID is 1afd4165-c195-49b9-8ff9-c4aa31cfa031
+2026-07-30 04:13:20,229 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:13:53,596 [ERA5] INFO status has been updated to running
+2026-07-30 04:17:41,336 [ERA5] INFO status has been updated to successful
+2026-07-30 04:17:41,607 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/52720a952d491d2a0b1a8471baa565c1.nc
+2026-07-30 04:17:43,389 [ERA5] INFO CDS download complete station=KMSP file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KMSP.nc
+2026-07-30 04:17:43,572 [ERA5] INFO Processed KMSP: 365 daily records, -3.9°C mean daily max (25.0°F)
+2026-07-30 04:17:43,572 [ERA5] INFO === Station KMSP complete: 365 daily records ===
+2026-07-30 04:17:43,572 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:17:48,573 [ERA5] INFO 
+2026-07-30 04:17:48,576 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:17:48,576 [ERA5] INFO === Downloading ERA5 for KMSY (lat=29.9934 lon=-90.2580) ===
+2026-07-30 04:17:48,576 [ERA5] INFO CDS request station=KMSY lat=29.9934 lon=-90.2580 box=[30.0934,-90.3580,29.8934,-90.1580] years=['2021']
+2026-07-30 04:17:49,111 [ERA5] INFO Request ID is 22e65788-7158-404b-b4ca-14f0f7e16358
+2026-07-30 04:17:49,248 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:18:10,889 [ERA5] INFO status has been updated to running
+2026-07-30 04:22:09,351 [ERA5] INFO status has been updated to successful
+2026-07-30 04:22:09,638 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/e2c3233d3d195dfec642886de27390cb.nc
+2026-07-30 04:22:11,399 [ERA5] INFO CDS download complete station=KMSY file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KMSY.nc
+2026-07-30 04:22:11,580 [ERA5] INFO Processed KMSY: 365 daily records, 27.3°C mean daily max (81.1°F)
+2026-07-30 04:22:11,581 [ERA5] INFO === Station KMSY complete: 365 daily records ===
+2026-07-30 04:22:11,582 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:22:16,582 [ERA5] INFO 
+2026-07-30 04:22:16,582 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:22:16,582 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 04:22:16,582 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2021']
+2026-07-30 04:22:17,169 [ERA5] INFO Request ID is dc859586-ffc7-48d3-b301-32934cabef19
+2026-07-30 04:22:17,341 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:22:50,734 [ERA5] INFO status has been updated to successful
+2026-07-30 04:22:53,730 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-29/3fec6f5c48e93884375531eae91a13a9.nc
+2026-07-30 04:22:55,642 [ERA5] INFO CDS download complete station=KNYC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KNYC.nc
+2026-07-30 04:22:55,830 [ERA5] INFO Processed KNYC: 365 daily records, 9.7°C mean daily max (49.4°F)
+2026-07-30 04:22:55,831 [ERA5] INFO === Station KNYC complete: 365 daily records ===
+2026-07-30 04:22:55,831 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:23:00,831 [ERA5] INFO 
+2026-07-30 04:23:00,835 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:23:00,836 [ERA5] INFO === Downloading ERA5 for KOKC (lat=35.3931 lon=-97.6007) ===
+2026-07-30 04:23:00,836 [ERA5] INFO CDS request station=KOKC lat=35.3931 lon=-97.6007 box=[35.4931,-97.7007,35.2931,-97.5007] years=['2021']
+2026-07-30 04:23:01,329 [ERA5] INFO Request ID is dbae7dd0-117c-4a55-96c6-695e5611a288
+2026-07-30 04:23:01,491 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:23:35,639 [ERA5] INFO status has been updated to running
+2026-07-30 04:27:22,808 [ERA5] INFO status has been updated to successful
+2026-07-30 04:27:23,100 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-1/2026-07-30/ddd34f905d01d9ecb436164b337929ec.nc
+2026-07-30 04:27:24,944 [ERA5] INFO CDS download complete station=KOKC file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KOKC.nc
+2026-07-30 04:27:25,125 [ERA5] INFO Processed KOKC: 365 daily records, 16.9°C mean daily max (62.5°F)
+2026-07-30 04:27:25,126 [ERA5] INFO === Station KOKC complete: 365 daily records ===
+2026-07-30 04:27:25,126 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:27:30,126 [ERA5] INFO 
+2026-07-30 04:27:30,126 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:27:30,127 [ERA5] INFO === Downloading ERA5 for KPHL (lat=39.8744 lon=-75.2424) ===
+2026-07-30 04:27:30,127 [ERA5] INFO CDS request station=KPHL lat=39.8744 lon=-75.2424 box=[39.9744,-75.3424,39.7744,-75.1424] years=['2021']
+2026-07-30 04:27:30,673 [ERA5] INFO Request ID is c64b1066-379b-45af-a2fc-e0be9cbd69b2
+2026-07-30 04:27:30,795 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:27:52,963 [ERA5] INFO status has been updated to running
+2026-07-30 04:33:52,435 [ERA5] INFO status has been updated to successful
+2026-07-30 04:33:52,732 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-30/f125335bce840caf48f0621ad477947f.nc
+2026-07-30 04:33:54,358 [ERA5] INFO CDS download complete station=KPHL file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KPHL.nc
+2026-07-30 04:33:54,541 [ERA5] INFO Processed KPHL: 365 daily records, 11.9°C mean daily max (53.4°F)
+2026-07-30 04:33:54,541 [ERA5] INFO === Station KPHL complete: 365 daily records ===
+2026-07-30 04:33:54,541 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:33:59,541 [ERA5] INFO 
+2026-07-30 04:33:59,542 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:33:59,542 [ERA5] INFO === Downloading ERA5 for KPHX (lat=33.4342 lon=-112.0116) ===
+2026-07-30 04:33:59,542 [ERA5] INFO CDS request station=KPHX lat=33.4342 lon=-112.0116 box=[33.5342,-112.1116,33.3342,-111.9116] years=['2021']
+2026-07-30 04:34:01,292 [ERA5] INFO Request ID is 8cbefb64-b442-44c0-a3e0-8cede2353085
+2026-07-30 04:34:01,506 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:34:23,630 [ERA5] INFO status has been updated to running
+2026-07-30 04:42:27,291 [ERA5] INFO status has been updated to successful
+2026-07-30 04:42:30,152 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/adb4e2dc2d89a6f690f19df54b936091.nc
+2026-07-30 04:42:31,696 [ERA5] INFO CDS download complete station=KPHX file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KPHX.nc
+2026-07-30 04:42:31,879 [ERA5] INFO Processed KPHX: 365 daily records, 15.2°C mean daily max (59.3°F)
+2026-07-30 04:42:31,879 [ERA5] INFO === Station KPHX complete: 365 daily records ===
+2026-07-30 04:42:31,879 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:42:36,879 [ERA5] INFO 
+2026-07-30 04:42:36,880 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:42:36,880 [ERA5] INFO === Downloading ERA5 for KSAT (lat=29.5337 lon=-98.4698) ===
+2026-07-30 04:42:36,880 [ERA5] INFO CDS request station=KSAT lat=29.5337 lon=-98.4698 box=[29.6337,-98.5698,29.4337,-98.3698] years=['2021']
+2026-07-30 04:42:37,779 [ERA5] INFO Request ID is 5e3a322d-514d-4275-866c-73e5d0bc3f00
+2026-07-30 04:42:37,903 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:42:59,581 [ERA5] INFO status has been updated to running
+2026-07-30 04:47:01,173 [ERA5] INFO status has been updated to successful
+2026-07-30 04:47:01,454 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/617f5bd3e7a96fa857d92992f10c8bde.nc
+2026-07-30 04:47:02,992 [ERA5] INFO CDS download complete station=KSAT file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KSAT.nc
+2026-07-30 04:47:03,182 [ERA5] INFO Processed KSAT: 365 daily records, 27.4°C mean daily max (81.3°F)
+2026-07-30 04:47:03,183 [ERA5] INFO === Station KSAT complete: 365 daily records ===
+2026-07-30 04:47:03,183 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:47:08,183 [ERA5] INFO 
+2026-07-30 04:47:08,183 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:47:08,184 [ERA5] INFO === Downloading ERA5 for KSEA (lat=47.4502 lon=-122.3088) ===
+2026-07-30 04:47:08,185 [ERA5] INFO CDS request station=KSEA lat=47.4502 lon=-122.3088 box=[47.5502,-122.4088,47.3502,-122.2088] years=['2021']
+2026-07-30 04:47:11,828 [ERA5] INFO Request ID is 008937da-96bc-4537-b139-f3a7730bf5bc
+2026-07-30 04:47:11,956 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:47:27,281 [ERA5] INFO status has been updated to running
+2026-07-30 04:53:34,120 [ERA5] INFO status has been updated to successful
+2026-07-30 04:53:34,412 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-30/a9141e2dea85daa962a93fba1466167e.nc
+2026-07-30 04:53:36,223 [ERA5] INFO CDS download complete station=KSEA file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KSEA.nc
+2026-07-30 04:53:36,412 [ERA5] INFO Processed KSEA: 365 daily records, 1.6°C mean daily max (34.8°F)
+2026-07-30 04:53:36,413 [ERA5] INFO === Station KSEA complete: 365 daily records ===
+2026-07-30 04:53:36,413 [ERA5] INFO Cooling down for 5s...
+2026-07-30 04:53:41,413 [ERA5] INFO 
+2026-07-30 04:53:41,413 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 04:53:41,413 [ERA5] INFO === Downloading ERA5 for KSFO (lat=37.6213 lon=-122.3790) ===
+2026-07-30 04:53:41,414 [ERA5] INFO CDS request station=KSFO lat=37.6213 lon=-122.3790 box=[37.7213,-122.4790,37.5213,-122.2790] years=['2021']
+2026-07-30 04:53:42,038 [ERA5] INFO Request ID is 60358cf8-be77-4915-85ea-dd2d306d4bf9
+2026-07-30 04:53:42,219 [ERA5] INFO status has been updated to accepted
+2026-07-30 04:54:04,535 [ERA5] INFO status has been updated to running
+2026-07-30 05:00:05,556 [ERA5] INFO status has been updated to successful
+2026-07-30 05:00:07,077 [ERA5] INFO Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-3/2026-07-30/649fa0bf2a5cc016daec06cdce692151.nc
+2026-07-30 05:00:08,775 [ERA5] INFO CDS download complete station=KSFO file=/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/_era5_KSFO.nc
+2026-07-30 05:00:08,955 [ERA5] INFO Processed KSFO: 365 daily records, 11.2°C mean daily max (52.2°F)
+2026-07-30 05:00:08,956 [ERA5] INFO === Station KSFO complete: 365 daily records ===
+2026-07-30 05:00:08,956 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:13,969 [ERA5] INFO 
+2026-07-30 05:00:13,969 [ERA5] INFO ============================================================
+2026-07-30 05:00:13,969 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 05:00:13,969 [ERA5] INFO   Success: 20 stations
+2026-07-30 05:00:13,969 [ERA5] INFO   Failed:  0 stations
+2026-07-30 05:00:13,969 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 05:00:13,969 [ERA5] INFO ============================================================
+2026-07-30 05:00:14,130 [ERA5] INFO ============================================================
+2026-07-30 05:00:14,130 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 05:00:14,130 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 05:00:14,130 [ERA5] INFO Years: ['2022']
+2026-07-30 05:00:14,130 [ERA5] INFO ============================================================
+2026-07-30 05:00:14,130 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 05:00:14,130 [ERA5] INFO Stations to backfill: 20 (KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO)
+2026-07-30 05:00:14,667 [ERA5] INFO 
+2026-07-30 05:00:14,667 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:14,668 [ERA5] INFO === Downloading ERA5 for KATL (lat=33.6407 lon=-84.4277) ===
+2026-07-30 05:00:14,668 [ERA5] INFO CDS request station=KATL lat=33.6407 lon=-84.4277 box=[33.7407,-84.5277,33.5407,-84.3277] years=['2022']
+2026-07-30 05:00:14,789 [ERA5] ERROR CDS request failed station=KATL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:14,809 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:19,809 [ERA5] INFO 
+2026-07-30 05:00:19,809 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:19,810 [ERA5] INFO === Downloading ERA5 for KAUS (lat=30.1945 lon=-97.6699) ===
+2026-07-30 05:00:19,810 [ERA5] INFO CDS request station=KAUS lat=30.1945 lon=-97.6699 box=[30.2945,-97.7699,30.0945,-97.5699] years=['2022']
+2026-07-30 05:00:19,931 [ERA5] ERROR CDS request failed station=KAUS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:19,942 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:24,942 [ERA5] INFO 
+2026-07-30 05:00:24,942 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:24,942 [ERA5] INFO === Downloading ERA5 for KBOS (lat=42.3656 lon=-71.0096) ===
+2026-07-30 05:00:24,942 [ERA5] INFO CDS request station=KBOS lat=42.3656 lon=-71.0096 box=[42.4656,-71.1096,42.2656,-70.9096] years=['2022']
+2026-07-30 05:00:25,064 [ERA5] ERROR CDS request failed station=KBOS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:25,070 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:30,070 [ERA5] INFO 
+2026-07-30 05:00:30,070 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:30,071 [ERA5] INFO === Downloading ERA5 for KDCA (lat=38.8512 lon=-77.0402) ===
+2026-07-30 05:00:30,071 [ERA5] INFO CDS request station=KDCA lat=38.8512 lon=-77.0402 box=[38.9512,-77.1402,38.7512,-76.9402] years=['2022']
+2026-07-30 05:00:30,500 [ERA5] ERROR CDS request failed station=KDCA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:30,505 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:35,505 [ERA5] INFO 
+2026-07-30 05:00:35,505 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:35,506 [ERA5] INFO === Downloading ERA5 for KDEN (lat=39.8561 lon=-104.6737) ===
+2026-07-30 05:00:35,506 [ERA5] INFO CDS request station=KDEN lat=39.8561 lon=-104.6737 box=[39.9561,-104.7737,39.7561,-104.5737] years=['2022']
+2026-07-30 05:00:35,627 [ERA5] ERROR CDS request failed station=KDEN error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:35,633 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:40,633 [ERA5] INFO 
+2026-07-30 05:00:40,633 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:40,633 [ERA5] INFO === Downloading ERA5 for KDFW (lat=32.8998 lon=-97.0403) ===
+2026-07-30 05:00:40,633 [ERA5] INFO CDS request station=KDFW lat=32.8998 lon=-97.0403 box=[32.9998,-97.1403,32.7998,-96.9403] years=['2022']
+2026-07-30 05:00:40,760 [ERA5] ERROR CDS request failed station=KDFW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:40,771 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:45,771 [ERA5] INFO 
+2026-07-30 05:00:45,771 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:45,772 [ERA5] INFO === Downloading ERA5 for KHOU (lat=29.6454 lon=-95.2789) ===
+2026-07-30 05:00:45,772 [ERA5] INFO CDS request station=KHOU lat=29.6454 lon=-95.2789 box=[29.7454,-95.3789,29.5454,-95.1789] years=['2022']
+2026-07-30 05:00:46,076 [ERA5] ERROR CDS request failed station=KHOU error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:46,086 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:51,087 [ERA5] INFO 
+2026-07-30 05:00:51,087 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:51,087 [ERA5] INFO === Downloading ERA5 for KLAS (lat=36.0840 lon=-115.1537) ===
+2026-07-30 05:00:51,087 [ERA5] INFO CDS request station=KLAS lat=36.0840 lon=-115.1537 box=[36.1840,-115.2537,35.9840,-115.0537] years=['2022']
+2026-07-30 05:00:51,209 [ERA5] ERROR CDS request failed station=KLAS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:51,220 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:00:56,220 [ERA5] INFO 
+2026-07-30 05:00:56,220 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:00:56,221 [ERA5] INFO === Downloading ERA5 for KLAX (lat=33.9425 lon=-118.4081) ===
+2026-07-30 05:00:56,221 [ERA5] INFO CDS request station=KLAX lat=33.9425 lon=-118.4081 box=[34.0425,-118.5081,33.8425,-118.3081] years=['2022']
+2026-07-30 05:00:56,354 [ERA5] ERROR CDS request failed station=KLAX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:00:56,363 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:01,364 [ERA5] INFO 
+2026-07-30 05:01:01,364 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:01,364 [ERA5] INFO === Downloading ERA5 for KMDW (lat=41.7868 lon=-87.7522) ===
+2026-07-30 05:01:01,364 [ERA5] INFO CDS request station=KMDW lat=41.7868 lon=-87.7522 box=[41.8868,-87.8522,41.6868,-87.6522] years=['2022']
+2026-07-30 05:01:01,485 [ERA5] ERROR CDS request failed station=KMDW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:01,491 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:06,491 [ERA5] INFO 
+2026-07-30 05:01:06,491 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:06,492 [ERA5] INFO === Downloading ERA5 for KMIA (lat=25.7959 lon=-80.2870) ===
+2026-07-30 05:01:06,492 [ERA5] INFO CDS request station=KMIA lat=25.7959 lon=-80.2870 box=[25.8959,-80.3870,25.6959,-80.1870] years=['2022']
+2026-07-30 05:01:06,626 [ERA5] ERROR CDS request failed station=KMIA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:06,636 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:11,636 [ERA5] INFO 
+2026-07-30 05:01:11,636 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:11,637 [ERA5] INFO === Downloading ERA5 for KMSP (lat=44.8848 lon=-93.2223) ===
+2026-07-30 05:01:11,637 [ERA5] INFO CDS request station=KMSP lat=44.8848 lon=-93.2223 box=[44.9848,-93.3223,44.7848,-93.1223] years=['2022']
+2026-07-30 05:01:11,775 [ERA5] ERROR CDS request failed station=KMSP error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:11,783 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:16,783 [ERA5] INFO 
+2026-07-30 05:01:16,783 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:16,784 [ERA5] INFO === Downloading ERA5 for KMSY (lat=29.9934 lon=-90.2580) ===
+2026-07-30 05:01:16,784 [ERA5] INFO CDS request station=KMSY lat=29.9934 lon=-90.2580 box=[30.0934,-90.3580,29.8934,-90.1580] years=['2022']
+2026-07-30 05:01:16,930 [ERA5] ERROR CDS request failed station=KMSY error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:16,941 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:21,941 [ERA5] INFO 
+2026-07-30 05:01:21,941 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:21,942 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 05:01:21,942 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2022']
+2026-07-30 05:01:23,768 [ERA5] ERROR CDS request failed station=KNYC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:23,779 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:28,779 [ERA5] INFO 
+2026-07-30 05:01:28,779 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:28,780 [ERA5] INFO === Downloading ERA5 for KOKC (lat=35.3931 lon=-97.6007) ===
+2026-07-30 05:01:28,780 [ERA5] INFO CDS request station=KOKC lat=35.3931 lon=-97.6007 box=[35.4931,-97.7007,35.2931,-97.5007] years=['2022']
+2026-07-30 05:01:28,909 [ERA5] ERROR CDS request failed station=KOKC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:28,919 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:33,920 [ERA5] INFO 
+2026-07-30 05:01:33,920 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:33,921 [ERA5] INFO === Downloading ERA5 for KPHL (lat=39.8744 lon=-75.2424) ===
+2026-07-30 05:01:33,921 [ERA5] INFO CDS request station=KPHL lat=39.8744 lon=-75.2424 box=[39.9744,-75.3424,39.7744,-75.1424] years=['2022']
+2026-07-30 05:01:34,344 [ERA5] ERROR CDS request failed station=KPHL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:34,354 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:39,354 [ERA5] INFO 
+2026-07-30 05:01:39,355 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:39,355 [ERA5] INFO === Downloading ERA5 for KPHX (lat=33.4342 lon=-112.0116) ===
+2026-07-30 05:01:39,355 [ERA5] INFO CDS request station=KPHX lat=33.4342 lon=-112.0116 box=[33.5342,-112.1116,33.3342,-111.9116] years=['2022']
+2026-07-30 05:01:39,530 [ERA5] ERROR CDS request failed station=KPHX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:39,540 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:44,540 [ERA5] INFO 
+2026-07-30 05:01:44,541 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:44,541 [ERA5] INFO === Downloading ERA5 for KSAT (lat=29.5337 lon=-98.4698) ===
+2026-07-30 05:01:44,541 [ERA5] INFO CDS request station=KSAT lat=29.5337 lon=-98.4698 box=[29.6337,-98.5698,29.4337,-98.3698] years=['2022']
+2026-07-30 05:01:44,670 [ERA5] ERROR CDS request failed station=KSAT error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:44,676 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:49,676 [ERA5] INFO 
+2026-07-30 05:01:49,676 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:49,677 [ERA5] INFO === Downloading ERA5 for KSEA (lat=47.4502 lon=-122.3088) ===
+2026-07-30 05:01:49,678 [ERA5] INFO CDS request station=KSEA lat=47.4502 lon=-122.3088 box=[47.5502,-122.4088,47.3502,-122.2088] years=['2022']
+2026-07-30 05:01:49,802 [ERA5] ERROR CDS request failed station=KSEA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:49,813 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:01:54,813 [ERA5] INFO 
+2026-07-30 05:01:54,813 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:01:54,814 [ERA5] INFO === Downloading ERA5 for KSFO (lat=37.6213 lon=-122.3790) ===
+2026-07-30 05:01:54,814 [ERA5] INFO CDS request station=KSFO lat=37.6213 lon=-122.3790 box=[37.7213,-122.4790,37.5213,-122.2790] years=['2022']
+2026-07-30 05:01:55,033 [ERA5] ERROR CDS request failed station=KSFO error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:01:55,039 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:00,047 [ERA5] INFO 
+2026-07-30 05:02:00,047 [ERA5] INFO ============================================================
+2026-07-30 05:02:00,047 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 05:02:00,047 [ERA5] INFO   Success: 0 stations
+2026-07-30 05:02:00,047 [ERA5] INFO   Failed:  20 stations
+2026-07-30 05:02:00,047 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 05:02:00,047 [ERA5] INFO   Failed stations: KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO
+2026-07-30 05:02:00,048 [ERA5] INFO ============================================================
+2026-07-30 05:02:00,187 [ERA5] INFO ============================================================
+2026-07-30 05:02:00,187 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 05:02:00,187 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 05:02:00,187 [ERA5] INFO Years: ['2023']
+2026-07-30 05:02:00,188 [ERA5] INFO ============================================================
+2026-07-30 05:02:00,188 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 05:02:00,188 [ERA5] INFO Stations to backfill: 20 (KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO)
+2026-07-30 05:02:00,849 [ERA5] INFO 
+2026-07-30 05:02:00,849 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:00,850 [ERA5] INFO === Downloading ERA5 for KATL (lat=33.6407 lon=-84.4277) ===
+2026-07-30 05:02:00,850 [ERA5] INFO CDS request station=KATL lat=33.6407 lon=-84.4277 box=[33.7407,-84.5277,33.5407,-84.3277] years=['2023']
+2026-07-30 05:02:00,982 [ERA5] ERROR CDS request failed station=KATL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:00,998 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:05,998 [ERA5] INFO 
+2026-07-30 05:02:05,998 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:05,999 [ERA5] INFO === Downloading ERA5 for KAUS (lat=30.1945 lon=-97.6699) ===
+2026-07-30 05:02:05,999 [ERA5] INFO CDS request station=KAUS lat=30.1945 lon=-97.6699 box=[30.2945,-97.7699,30.0945,-97.5699] years=['2023']
+2026-07-30 05:02:06,132 [ERA5] ERROR CDS request failed station=KAUS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:06,142 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:11,142 [ERA5] INFO 
+2026-07-30 05:02:11,142 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:11,143 [ERA5] INFO === Downloading ERA5 for KBOS (lat=42.3656 lon=-71.0096) ===
+2026-07-30 05:02:11,143 [ERA5] INFO CDS request station=KBOS lat=42.3656 lon=-71.0096 box=[42.4656,-71.1096,42.2656,-70.9096] years=['2023']
+2026-07-30 05:02:11,275 [ERA5] ERROR CDS request failed station=KBOS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:11,286 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:16,286 [ERA5] INFO 
+2026-07-30 05:02:16,287 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:16,288 [ERA5] INFO === Downloading ERA5 for KDCA (lat=38.8512 lon=-77.0402) ===
+2026-07-30 05:02:16,288 [ERA5] INFO CDS request station=KDCA lat=38.8512 lon=-77.0402 box=[38.9512,-77.1402,38.7512,-76.9402] years=['2023']
+2026-07-30 05:02:16,418 [ERA5] ERROR CDS request failed station=KDCA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:16,428 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:21,428 [ERA5] INFO 
+2026-07-30 05:02:21,429 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:21,429 [ERA5] INFO === Downloading ERA5 for KDEN (lat=39.8561 lon=-104.6737) ===
+2026-07-30 05:02:21,429 [ERA5] INFO CDS request station=KDEN lat=39.8561 lon=-104.6737 box=[39.9561,-104.7737,39.7561,-104.5737] years=['2023']
+2026-07-30 05:02:21,601 [ERA5] ERROR CDS request failed station=KDEN error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:21,611 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:26,611 [ERA5] INFO 
+2026-07-30 05:02:26,611 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:26,612 [ERA5] INFO === Downloading ERA5 for KDFW (lat=32.8998 lon=-97.0403) ===
+2026-07-30 05:02:26,612 [ERA5] INFO CDS request station=KDFW lat=32.8998 lon=-97.0403 box=[32.9998,-97.1403,32.7998,-96.9403] years=['2023']
+2026-07-30 05:02:26,745 [ERA5] ERROR CDS request failed station=KDFW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:26,755 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:31,755 [ERA5] INFO 
+2026-07-30 05:02:31,755 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:31,756 [ERA5] INFO === Downloading ERA5 for KHOU (lat=29.6454 lon=-95.2789) ===
+2026-07-30 05:02:31,756 [ERA5] INFO CDS request station=KHOU lat=29.6454 lon=-95.2789 box=[29.7454,-95.3789,29.5454,-95.1789] years=['2023']
+2026-07-30 05:02:31,880 [ERA5] ERROR CDS request failed station=KHOU error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:31,890 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:36,890 [ERA5] INFO 
+2026-07-30 05:02:36,890 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:36,891 [ERA5] INFO === Downloading ERA5 for KLAS (lat=36.0840 lon=-115.1537) ===
+2026-07-30 05:02:36,891 [ERA5] INFO CDS request station=KLAS lat=36.0840 lon=-115.1537 box=[36.1840,-115.2537,35.9840,-115.0537] years=['2023']
+2026-07-30 05:02:37,017 [ERA5] ERROR CDS request failed station=KLAS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:37,028 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:42,028 [ERA5] INFO 
+2026-07-30 05:02:42,028 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:42,029 [ERA5] INFO === Downloading ERA5 for KLAX (lat=33.9425 lon=-118.4081) ===
+2026-07-30 05:02:42,029 [ERA5] INFO CDS request station=KLAX lat=33.9425 lon=-118.4081 box=[34.0425,-118.5081,33.8425,-118.3081] years=['2023']
+2026-07-30 05:02:42,299 [ERA5] ERROR CDS request failed station=KLAX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:42,310 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:47,310 [ERA5] INFO 
+2026-07-30 05:02:47,310 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:47,311 [ERA5] INFO === Downloading ERA5 for KMDW (lat=41.7868 lon=-87.7522) ===
+2026-07-30 05:02:47,311 [ERA5] INFO CDS request station=KMDW lat=41.7868 lon=-87.7522 box=[41.8868,-87.8522,41.6868,-87.6522] years=['2023']
+2026-07-30 05:02:47,434 [ERA5] ERROR CDS request failed station=KMDW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:47,439 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:52,439 [ERA5] INFO 
+2026-07-30 05:02:52,440 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:52,440 [ERA5] INFO === Downloading ERA5 for KMIA (lat=25.7959 lon=-80.2870) ===
+2026-07-30 05:02:52,440 [ERA5] INFO CDS request station=KMIA lat=25.7959 lon=-80.2870 box=[25.8959,-80.3870,25.6959,-80.1870] years=['2023']
+2026-07-30 05:02:52,564 [ERA5] ERROR CDS request failed station=KMIA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:52,570 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:02:57,570 [ERA5] INFO 
+2026-07-30 05:02:57,570 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:02:57,571 [ERA5] INFO === Downloading ERA5 for KMSP (lat=44.8848 lon=-93.2223) ===
+2026-07-30 05:02:57,571 [ERA5] INFO CDS request station=KMSP lat=44.8848 lon=-93.2223 box=[44.9848,-93.3223,44.7848,-93.1223] years=['2023']
+2026-07-30 05:02:57,748 [ERA5] ERROR CDS request failed station=KMSP error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:02:57,754 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:02,754 [ERA5] INFO 
+2026-07-30 05:03:02,754 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:02,755 [ERA5] INFO === Downloading ERA5 for KMSY (lat=29.9934 lon=-90.2580) ===
+2026-07-30 05:03:02,755 [ERA5] INFO CDS request station=KMSY lat=29.9934 lon=-90.2580 box=[30.0934,-90.3580,29.8934,-90.1580] years=['2023']
+2026-07-30 05:03:02,953 [ERA5] ERROR CDS request failed station=KMSY error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:02,963 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:07,963 [ERA5] INFO 
+2026-07-30 05:03:07,963 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:07,963 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 05:03:07,963 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2023']
+2026-07-30 05:03:08,097 [ERA5] ERROR CDS request failed station=KNYC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:08,107 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:13,108 [ERA5] INFO 
+2026-07-30 05:03:13,108 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:13,108 [ERA5] INFO === Downloading ERA5 for KOKC (lat=35.3931 lon=-97.6007) ===
+2026-07-30 05:03:13,109 [ERA5] INFO CDS request station=KOKC lat=35.3931 lon=-97.6007 box=[35.4931,-97.7007,35.2931,-97.5007] years=['2023']
+2026-07-30 05:03:13,250 [ERA5] ERROR CDS request failed station=KOKC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:13,261 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:18,261 [ERA5] INFO 
+2026-07-30 05:03:18,261 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:18,262 [ERA5] INFO === Downloading ERA5 for KPHL (lat=39.8744 lon=-75.2424) ===
+2026-07-30 05:03:18,262 [ERA5] INFO CDS request station=KPHL lat=39.8744 lon=-75.2424 box=[39.9744,-75.3424,39.7744,-75.1424] years=['2023']
+2026-07-30 05:03:18,385 [ERA5] ERROR CDS request failed station=KPHL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:18,396 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:23,396 [ERA5] INFO 
+2026-07-30 05:03:23,396 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:23,397 [ERA5] INFO === Downloading ERA5 for KPHX (lat=33.4342 lon=-112.0116) ===
+2026-07-30 05:03:23,397 [ERA5] INFO CDS request station=KPHX lat=33.4342 lon=-112.0116 box=[33.5342,-112.1116,33.3342,-111.9116] years=['2023']
+2026-07-30 05:03:23,518 [ERA5] ERROR CDS request failed station=KPHX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:23,529 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:28,529 [ERA5] INFO 
+2026-07-30 05:03:28,529 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:28,530 [ERA5] INFO === Downloading ERA5 for KSAT (lat=29.5337 lon=-98.4698) ===
+2026-07-30 05:03:28,530 [ERA5] INFO CDS request station=KSAT lat=29.5337 lon=-98.4698 box=[29.6337,-98.5698,29.4337,-98.3698] years=['2023']
+2026-07-30 05:03:28,657 [ERA5] ERROR CDS request failed station=KSAT error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:28,668 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:33,668 [ERA5] INFO 
+2026-07-30 05:03:33,668 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:33,669 [ERA5] INFO === Downloading ERA5 for KSEA (lat=47.4502 lon=-122.3088) ===
+2026-07-30 05:03:33,669 [ERA5] INFO CDS request station=KSEA lat=47.4502 lon=-122.3088 box=[47.5502,-122.4088,47.3502,-122.2088] years=['2023']
+2026-07-30 05:03:33,808 [ERA5] ERROR CDS request failed station=KSEA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:33,818 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:38,819 [ERA5] INFO 
+2026-07-30 05:03:38,819 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:38,820 [ERA5] INFO === Downloading ERA5 for KSFO (lat=37.6213 lon=-122.3790) ===
+2026-07-30 05:03:38,820 [ERA5] INFO CDS request station=KSFO lat=37.6213 lon=-122.3790 box=[37.7213,-122.4790,37.5213,-122.2790] years=['2023']
+2026-07-30 05:03:38,941 [ERA5] ERROR CDS request failed station=KSFO error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:38,952 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:43,959 [ERA5] INFO 
+2026-07-30 05:03:43,960 [ERA5] INFO ============================================================
+2026-07-30 05:03:43,960 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 05:03:43,960 [ERA5] INFO   Success: 0 stations
+2026-07-30 05:03:43,960 [ERA5] INFO   Failed:  20 stations
+2026-07-30 05:03:43,960 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 05:03:43,960 [ERA5] INFO   Failed stations: KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO
+2026-07-30 05:03:43,960 [ERA5] INFO ============================================================
+2026-07-30 05:03:44,154 [ERA5] INFO ============================================================
+2026-07-30 05:03:44,154 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 05:03:44,155 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 05:03:44,155 [ERA5] INFO Years: ['2024']
+2026-07-30 05:03:44,155 [ERA5] INFO ============================================================
+2026-07-30 05:03:44,155 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 05:03:44,155 [ERA5] INFO Stations to backfill: 20 (KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO)
+2026-07-30 05:03:44,790 [ERA5] INFO 
+2026-07-30 05:03:44,790 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:44,790 [ERA5] INFO === Downloading ERA5 for KATL (lat=33.6407 lon=-84.4277) ===
+2026-07-30 05:03:44,790 [ERA5] INFO CDS request station=KATL lat=33.6407 lon=-84.4277 box=[33.7407,-84.5277,33.5407,-84.3277] years=['2024']
+2026-07-30 05:03:44,910 [ERA5] ERROR CDS request failed station=KATL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:44,930 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:49,930 [ERA5] INFO 
+2026-07-30 05:03:49,930 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:49,931 [ERA5] INFO === Downloading ERA5 for KAUS (lat=30.1945 lon=-97.6699) ===
+2026-07-30 05:03:49,931 [ERA5] INFO CDS request station=KAUS lat=30.1945 lon=-97.6699 box=[30.2945,-97.7699,30.0945,-97.5699] years=['2024']
+2026-07-30 05:03:50,857 [ERA5] ERROR CDS request failed station=KAUS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:50,867 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:03:55,868 [ERA5] INFO 
+2026-07-30 05:03:55,868 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:03:55,869 [ERA5] INFO === Downloading ERA5 for KBOS (lat=42.3656 lon=-71.0096) ===
+2026-07-30 05:03:55,869 [ERA5] INFO CDS request station=KBOS lat=42.3656 lon=-71.0096 box=[42.4656,-71.1096,42.2656,-70.9096] years=['2024']
+2026-07-30 05:03:55,998 [ERA5] ERROR CDS request failed station=KBOS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:03:56,009 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:01,010 [ERA5] INFO 
+2026-07-30 05:04:01,010 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:01,011 [ERA5] INFO === Downloading ERA5 for KDCA (lat=38.8512 lon=-77.0402) ===
+2026-07-30 05:04:01,011 [ERA5] INFO CDS request station=KDCA lat=38.8512 lon=-77.0402 box=[38.9512,-77.1402,38.7512,-76.9402] years=['2024']
+2026-07-30 05:04:01,130 [ERA5] ERROR CDS request failed station=KDCA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:01,140 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:06,140 [ERA5] INFO 
+2026-07-30 05:04:06,140 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:06,141 [ERA5] INFO === Downloading ERA5 for KDEN (lat=39.8561 lon=-104.6737) ===
+2026-07-30 05:04:06,141 [ERA5] INFO CDS request station=KDEN lat=39.8561 lon=-104.6737 box=[39.9561,-104.7737,39.7561,-104.5737] years=['2024']
+2026-07-30 05:04:07,608 [ERA5] ERROR CDS request failed station=KDEN error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:07,618 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:12,618 [ERA5] INFO 
+2026-07-30 05:04:12,618 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:12,619 [ERA5] INFO === Downloading ERA5 for KDFW (lat=32.8998 lon=-97.0403) ===
+2026-07-30 05:04:12,619 [ERA5] INFO CDS request station=KDFW lat=32.8998 lon=-97.0403 box=[32.9998,-97.1403,32.7998,-96.9403] years=['2024']
+2026-07-30 05:04:12,820 [ERA5] ERROR CDS request failed station=KDFW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:12,828 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:17,828 [ERA5] INFO 
+2026-07-30 05:04:17,828 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:17,830 [ERA5] INFO === Downloading ERA5 for KHOU (lat=29.6454 lon=-95.2789) ===
+2026-07-30 05:04:17,830 [ERA5] INFO CDS request station=KHOU lat=29.6454 lon=-95.2789 box=[29.7454,-95.3789,29.5454,-95.1789] years=['2024']
+2026-07-30 05:04:17,958 [ERA5] ERROR CDS request failed station=KHOU error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:17,968 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:22,968 [ERA5] INFO 
+2026-07-30 05:04:22,968 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:22,973 [ERA5] INFO === Downloading ERA5 for KLAS (lat=36.0840 lon=-115.1537) ===
+2026-07-30 05:04:22,973 [ERA5] INFO CDS request station=KLAS lat=36.0840 lon=-115.1537 box=[36.1840,-115.2537,35.9840,-115.0537] years=['2024']
+2026-07-30 05:04:23,112 [ERA5] ERROR CDS request failed station=KLAS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:23,122 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:28,122 [ERA5] INFO 
+2026-07-30 05:04:28,122 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:28,123 [ERA5] INFO === Downloading ERA5 for KLAX (lat=33.9425 lon=-118.4081) ===
+2026-07-30 05:04:28,123 [ERA5] INFO CDS request station=KLAX lat=33.9425 lon=-118.4081 box=[34.0425,-118.5081,33.8425,-118.3081] years=['2024']
+2026-07-30 05:04:28,262 [ERA5] ERROR CDS request failed station=KLAX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:28,267 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:33,267 [ERA5] INFO 
+2026-07-30 05:04:33,268 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:33,268 [ERA5] INFO === Downloading ERA5 for KMDW (lat=41.7868 lon=-87.7522) ===
+2026-07-30 05:04:33,268 [ERA5] INFO CDS request station=KMDW lat=41.7868 lon=-87.7522 box=[41.8868,-87.8522,41.6868,-87.6522] years=['2024']
+2026-07-30 05:04:33,494 [ERA5] ERROR CDS request failed station=KMDW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:33,504 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:38,505 [ERA5] INFO 
+2026-07-30 05:04:38,505 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:38,506 [ERA5] INFO === Downloading ERA5 for KMIA (lat=25.7959 lon=-80.2870) ===
+2026-07-30 05:04:38,506 [ERA5] INFO CDS request station=KMIA lat=25.7959 lon=-80.2870 box=[25.8959,-80.3870,25.6959,-80.1870] years=['2024']
+2026-07-30 05:04:38,673 [ERA5] ERROR CDS request failed station=KMIA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:38,683 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:43,683 [ERA5] INFO 
+2026-07-30 05:04:43,683 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:43,684 [ERA5] INFO === Downloading ERA5 for KMSP (lat=44.8848 lon=-93.2223) ===
+2026-07-30 05:04:43,684 [ERA5] INFO CDS request station=KMSP lat=44.8848 lon=-93.2223 box=[44.9848,-93.3223,44.7848,-93.1223] years=['2024']
+2026-07-30 05:04:44,028 [ERA5] ERROR CDS request failed station=KMSP error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:44,038 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:49,038 [ERA5] INFO 
+2026-07-30 05:04:49,038 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:49,039 [ERA5] INFO === Downloading ERA5 for KMSY (lat=29.9934 lon=-90.2580) ===
+2026-07-30 05:04:49,039 [ERA5] INFO CDS request station=KMSY lat=29.9934 lon=-90.2580 box=[30.0934,-90.3580,29.8934,-90.1580] years=['2024']
+2026-07-30 05:04:49,160 [ERA5] ERROR CDS request failed station=KMSY error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:49,171 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:54,171 [ERA5] INFO 
+2026-07-30 05:04:54,172 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:54,172 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 05:04:54,172 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2024']
+2026-07-30 05:04:54,304 [ERA5] ERROR CDS request failed station=KNYC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:54,316 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:04:59,316 [ERA5] INFO 
+2026-07-30 05:04:59,316 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:04:59,317 [ERA5] INFO === Downloading ERA5 for KOKC (lat=35.3931 lon=-97.6007) ===
+2026-07-30 05:04:59,317 [ERA5] INFO CDS request station=KOKC lat=35.3931 lon=-97.6007 box=[35.4931,-97.7007,35.2931,-97.5007] years=['2024']
+2026-07-30 05:04:59,436 [ERA5] ERROR CDS request failed station=KOKC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:04:59,447 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:04,447 [ERA5] INFO 
+2026-07-30 05:05:04,448 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:04,448 [ERA5] INFO === Downloading ERA5 for KPHL (lat=39.8744 lon=-75.2424) ===
+2026-07-30 05:05:04,448 [ERA5] INFO CDS request station=KPHL lat=39.8744 lon=-75.2424 box=[39.9744,-75.3424,39.7744,-75.1424] years=['2024']
+2026-07-30 05:05:04,573 [ERA5] ERROR CDS request failed station=KPHL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:04,584 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:09,584 [ERA5] INFO 
+2026-07-30 05:05:09,584 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:09,585 [ERA5] INFO === Downloading ERA5 for KPHX (lat=33.4342 lon=-112.0116) ===
+2026-07-30 05:05:09,585 [ERA5] INFO CDS request station=KPHX lat=33.4342 lon=-112.0116 box=[33.5342,-112.1116,33.3342,-111.9116] years=['2024']
+2026-07-30 05:05:09,703 [ERA5] ERROR CDS request failed station=KPHX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:09,713 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:14,713 [ERA5] INFO 
+2026-07-30 05:05:14,713 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:14,714 [ERA5] INFO === Downloading ERA5 for KSAT (lat=29.5337 lon=-98.4698) ===
+2026-07-30 05:05:14,714 [ERA5] INFO CDS request station=KSAT lat=29.5337 lon=-98.4698 box=[29.6337,-98.5698,29.4337,-98.3698] years=['2024']
+2026-07-30 05:05:14,834 [ERA5] ERROR CDS request failed station=KSAT error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:14,845 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:19,845 [ERA5] INFO 
+2026-07-30 05:05:19,845 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:19,846 [ERA5] INFO === Downloading ERA5 for KSEA (lat=47.4502 lon=-122.3088) ===
+2026-07-30 05:05:19,846 [ERA5] INFO CDS request station=KSEA lat=47.4502 lon=-122.3088 box=[47.5502,-122.4088,47.3502,-122.2088] years=['2024']
+2026-07-30 05:05:19,970 [ERA5] ERROR CDS request failed station=KSEA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:19,981 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:24,981 [ERA5] INFO 
+2026-07-30 05:05:24,981 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:24,982 [ERA5] INFO === Downloading ERA5 for KSFO (lat=37.6213 lon=-122.3790) ===
+2026-07-30 05:05:24,982 [ERA5] INFO CDS request station=KSFO lat=37.6213 lon=-122.3790 box=[37.7213,-122.4790,37.5213,-122.2790] years=['2024']
+2026-07-30 05:05:25,102 [ERA5] ERROR CDS request failed station=KSFO error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:25,108 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:30,115 [ERA5] INFO 
+2026-07-30 05:05:30,116 [ERA5] INFO ============================================================
+2026-07-30 05:05:30,116 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 05:05:30,116 [ERA5] INFO   Success: 0 stations
+2026-07-30 05:05:30,116 [ERA5] INFO   Failed:  20 stations
+2026-07-30 05:05:30,116 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 05:05:30,116 [ERA5] INFO   Failed stations: KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO
+2026-07-30 05:05:30,116 [ERA5] INFO ============================================================
+2026-07-30 05:05:30,310 [ERA5] INFO ============================================================
+2026-07-30 05:05:30,310 [ERA5] INFO ERA5 GROUND TRUTH BACKFILL
+2026-07-30 05:05:30,310 [ERA5] INFO Dataset: reanalysis-era5-single-levels (2m temperature)
+2026-07-30 05:05:30,310 [ERA5] INFO Years: ['2025']
+2026-07-30 05:05:30,310 [ERA5] INFO ============================================================
+2026-07-30 05:05:30,311 [ERA5] INFO Loaded 20 station coordinates
+2026-07-30 05:05:30,311 [ERA5] INFO Stations to backfill: 20 (KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO)
+2026-07-30 05:05:30,925 [ERA5] INFO 
+2026-07-30 05:05:30,925 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:30,926 [ERA5] INFO === Downloading ERA5 for KATL (lat=33.6407 lon=-84.4277) ===
+2026-07-30 05:05:30,926 [ERA5] INFO CDS request station=KATL lat=33.6407 lon=-84.4277 box=[33.7407,-84.5277,33.5407,-84.3277] years=['2025']
+2026-07-30 05:05:31,071 [ERA5] ERROR CDS request failed station=KATL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:31,087 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:36,087 [ERA5] INFO 
+2026-07-30 05:05:36,087 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:36,088 [ERA5] INFO === Downloading ERA5 for KAUS (lat=30.1945 lon=-97.6699) ===
+2026-07-30 05:05:36,088 [ERA5] INFO CDS request station=KAUS lat=30.1945 lon=-97.6699 box=[30.2945,-97.7699,30.0945,-97.5699] years=['2025']
+2026-07-30 05:05:37,153 [ERA5] ERROR CDS request failed station=KAUS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:37,158 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:42,158 [ERA5] INFO 
+2026-07-30 05:05:42,159 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:42,159 [ERA5] INFO === Downloading ERA5 for KBOS (lat=42.3656 lon=-71.0096) ===
+2026-07-30 05:05:42,160 [ERA5] INFO CDS request station=KBOS lat=42.3656 lon=-71.0096 box=[42.4656,-71.1096,42.2656,-70.9096] years=['2025']
+2026-07-30 05:05:42,285 [ERA5] ERROR CDS request failed station=KBOS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:42,291 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:47,291 [ERA5] INFO 
+2026-07-30 05:05:47,295 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:47,296 [ERA5] INFO === Downloading ERA5 for KDCA (lat=38.8512 lon=-77.0402) ===
+2026-07-30 05:05:47,296 [ERA5] INFO CDS request station=KDCA lat=38.8512 lon=-77.0402 box=[38.9512,-77.1402,38.7512,-76.9402] years=['2025']
+2026-07-30 05:05:47,441 [ERA5] ERROR CDS request failed station=KDCA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:47,447 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:52,447 [ERA5] INFO 
+2026-07-30 05:05:52,447 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:52,448 [ERA5] INFO === Downloading ERA5 for KDEN (lat=39.8561 lon=-104.6737) ===
+2026-07-30 05:05:52,448 [ERA5] INFO CDS request station=KDEN lat=39.8561 lon=-104.6737 box=[39.9561,-104.7737,39.7561,-104.5737] years=['2025']
+2026-07-30 05:05:52,571 [ERA5] ERROR CDS request failed station=KDEN error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:52,577 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:05:57,577 [ERA5] INFO 
+2026-07-30 05:05:57,577 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:05:57,578 [ERA5] INFO === Downloading ERA5 for KDFW (lat=32.8998 lon=-97.0403) ===
+2026-07-30 05:05:57,578 [ERA5] INFO CDS request station=KDFW lat=32.8998 lon=-97.0403 box=[32.9998,-97.1403,32.7998,-96.9403] years=['2025']
+2026-07-30 05:05:57,703 [ERA5] ERROR CDS request failed station=KDFW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:05:57,714 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:02,714 [ERA5] INFO 
+2026-07-30 05:06:02,714 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:02,714 [ERA5] INFO === Downloading ERA5 for KHOU (lat=29.6454 lon=-95.2789) ===
+2026-07-30 05:06:02,714 [ERA5] INFO CDS request station=KHOU lat=29.6454 lon=-95.2789 box=[29.7454,-95.3789,29.5454,-95.1789] years=['2025']
+2026-07-30 05:06:03,358 [ERA5] ERROR CDS request failed station=KHOU error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:03,369 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:08,369 [ERA5] INFO 
+2026-07-30 05:06:08,370 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:08,370 [ERA5] INFO === Downloading ERA5 for KLAS (lat=36.0840 lon=-115.1537) ===
+2026-07-30 05:06:08,370 [ERA5] INFO CDS request station=KLAS lat=36.0840 lon=-115.1537 box=[36.1840,-115.2537,35.9840,-115.0537] years=['2025']
+2026-07-30 05:06:08,492 [ERA5] ERROR CDS request failed station=KLAS error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:08,501 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:13,501 [ERA5] INFO 
+2026-07-30 05:06:13,502 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:13,502 [ERA5] INFO === Downloading ERA5 for KLAX (lat=33.9425 lon=-118.4081) ===
+2026-07-30 05:06:13,502 [ERA5] INFO CDS request station=KLAX lat=33.9425 lon=-118.4081 box=[34.0425,-118.5081,33.8425,-118.3081] years=['2025']
+2026-07-30 05:06:13,643 [ERA5] ERROR CDS request failed station=KLAX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:13,649 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:18,649 [ERA5] INFO 
+2026-07-30 05:06:18,649 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:18,649 [ERA5] INFO === Downloading ERA5 for KMDW (lat=41.7868 lon=-87.7522) ===
+2026-07-30 05:06:18,649 [ERA5] INFO CDS request station=KMDW lat=41.7868 lon=-87.7522 box=[41.8868,-87.8522,41.6868,-87.6522] years=['2025']
+2026-07-30 05:06:18,780 [ERA5] ERROR CDS request failed station=KMDW error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:18,790 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:23,790 [ERA5] INFO 
+2026-07-30 05:06:23,791 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:23,791 [ERA5] INFO === Downloading ERA5 for KMIA (lat=25.7959 lon=-80.2870) ===
+2026-07-30 05:06:23,791 [ERA5] INFO CDS request station=KMIA lat=25.7959 lon=-80.2870 box=[25.8959,-80.3870,25.6959,-80.1870] years=['2025']
+2026-07-30 05:06:23,986 [ERA5] ERROR CDS request failed station=KMIA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:23,996 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:28,996 [ERA5] INFO 
+2026-07-30 05:06:28,997 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:28,997 [ERA5] INFO === Downloading ERA5 for KMSP (lat=44.8848 lon=-93.2223) ===
+2026-07-30 05:06:28,997 [ERA5] INFO CDS request station=KMSP lat=44.8848 lon=-93.2223 box=[44.9848,-93.3223,44.7848,-93.1223] years=['2025']
+2026-07-30 05:06:29,475 [ERA5] ERROR CDS request failed station=KMSP error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:29,486 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:34,486 [ERA5] INFO 
+2026-07-30 05:06:34,486 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:34,487 [ERA5] INFO === Downloading ERA5 for KMSY (lat=29.9934 lon=-90.2580) ===
+2026-07-30 05:06:34,487 [ERA5] INFO CDS request station=KMSY lat=29.9934 lon=-90.2580 box=[30.0934,-90.3580,29.8934,-90.1580] years=['2025']
+2026-07-30 05:06:34,610 [ERA5] ERROR CDS request failed station=KMSY error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:34,620 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:39,620 [ERA5] INFO 
+2026-07-30 05:06:39,620 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:39,620 [ERA5] INFO === Downloading ERA5 for KNYC (lat=40.6413 lon=-73.7781) ===
+2026-07-30 05:06:39,620 [ERA5] INFO CDS request station=KNYC lat=40.6413 lon=-73.7781 box=[40.7413,-73.8781,40.5413,-73.6781] years=['2025']
+2026-07-30 05:06:39,755 [ERA5] ERROR CDS request failed station=KNYC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:39,761 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:44,761 [ERA5] INFO 
+2026-07-30 05:06:44,761 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:44,762 [ERA5] INFO === Downloading ERA5 for KOKC (lat=35.3931 lon=-97.6007) ===
+2026-07-30 05:06:44,762 [ERA5] INFO CDS request station=KOKC lat=35.3931 lon=-97.6007 box=[35.4931,-97.7007,35.2931,-97.5007] years=['2025']
+2026-07-30 05:06:44,880 [ERA5] ERROR CDS request failed station=KOKC error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:44,886 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:49,886 [ERA5] INFO 
+2026-07-30 05:06:49,887 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:49,887 [ERA5] INFO === Downloading ERA5 for KPHL (lat=39.8744 lon=-75.2424) ===
+2026-07-30 05:06:49,887 [ERA5] INFO CDS request station=KPHL lat=39.8744 lon=-75.2424 box=[39.9744,-75.3424,39.7744,-75.1424] years=['2025']
+2026-07-30 05:06:50,010 [ERA5] ERROR CDS request failed station=KPHL error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:50,021 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:06:55,021 [ERA5] INFO 
+2026-07-30 05:06:55,021 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:06:55,021 [ERA5] INFO === Downloading ERA5 for KPHX (lat=33.4342 lon=-112.0116) ===
+2026-07-30 05:06:55,021 [ERA5] INFO CDS request station=KPHX lat=33.4342 lon=-112.0116 box=[33.5342,-112.1116,33.3342,-111.9116] years=['2025']
+2026-07-30 05:06:55,156 [ERA5] ERROR CDS request failed station=KPHX error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:06:55,162 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:07:00,162 [ERA5] INFO 
+2026-07-30 05:07:00,162 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:07:00,163 [ERA5] INFO === Downloading ERA5 for KSAT (lat=29.5337 lon=-98.4698) ===
+2026-07-30 05:07:00,163 [ERA5] INFO CDS request station=KSAT lat=29.5337 lon=-98.4698 box=[29.6337,-98.5698,29.4337,-98.3698] years=['2025']
+2026-07-30 05:07:00,285 [ERA5] ERROR CDS request failed station=KSAT error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:07:00,292 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:07:05,292 [ERA5] INFO 
+2026-07-30 05:07:05,292 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:07:05,293 [ERA5] INFO === Downloading ERA5 for KSEA (lat=47.4502 lon=-122.3088) ===
+2026-07-30 05:07:05,293 [ERA5] INFO CDS request station=KSEA lat=47.4502 lon=-122.3088 box=[47.5502,-122.4088,47.3502,-122.2088] years=['2025']
+2026-07-30 05:07:05,413 [ERA5] ERROR CDS request failed station=KSEA error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:07:05,423 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:07:10,423 [ERA5] INFO 
+2026-07-30 05:07:10,423 [ERA5] INFO ──────────────────────────────────────────────────
+2026-07-30 05:07:10,424 [ERA5] INFO === Downloading ERA5 for KSFO (lat=37.6213 lon=-122.3790) ===
+2026-07-30 05:07:10,424 [ERA5] INFO CDS request station=KSFO lat=37.6213 lon=-122.3790 box=[37.7213,-122.4790,37.5213,-122.2790] years=['2025']
+2026-07-30 05:07:10,628 [ERA5] ERROR CDS request failed station=KSFO error=404 Client Error: Not Found for url: https://ecds.ecmwf.int/api/retrieve/v1/processes/reanalysis-era5-single-levels
+process not found
+dataset reanalysis-era5-single-levels not found
+2026-07-30 05:07:10,634 [ERA5] INFO Cooling down for 5s...
+2026-07-30 05:07:15,641 [ERA5] INFO 
+2026-07-30 05:07:15,641 [ERA5] INFO ============================================================
+2026-07-30 05:07:15,641 [ERA5] INFO BACKFILL COMPLETE
+2026-07-30 05:07:15,641 [ERA5] INFO   Success: 0 stations
+2026-07-30 05:07:15,641 [ERA5] INFO   Failed:  20 stations
+2026-07-30 05:07:15,641 [ERA5] INFO   Skipped: 0 stations
+2026-07-30 05:07:15,641 [ERA5] INFO   Failed stations: KATL, KAUS, KBOS, KDCA, KDEN, KDFW, KHOU, KLAS, KLAX, KMDW, KMIA, KMSP, KMSY, KNYC, KOKC, KPHL, KPHX, KSAT, KSEA, KSFO
+2026-07-30 05:07:15,641 [ERA5] INFO ============================================================
