@@ -162,6 +162,25 @@ except ImportError:
     StopLossMonitor = None
     HAS_STOP_LOSS = False
 
+# Execution Simulator for Monte Carlo fill simulation + P&L ranges
+try:
+    from .execution_simulator import ExecutionSimulator, TradeSimulationResult
+    HAS_EXECUTION_SIMULATOR = True
+except ImportError:
+    print("Warning: Execution Simulator module not available. Monte Carlo execution sim disabled.")
+    ExecutionSimulator = None
+    TradeSimulationResult = None
+    HAS_EXECUTION_SIMULATOR = False
+
+# P&L Tracking module — extracted reconciliation, calibration, and reporting
+try:
+    from . import pnl_tracking as _pnl_tracking
+    HAS_PNL_TRACKING = True
+except ImportError:
+    print("Warning: PnL Tracking module not available. Extracted reconciliation disabled.")
+    _pnl_tracking = None
+    HAS_PNL_TRACKING = False
+
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 # Attempt to import Multi-Model Ensemble Signal
 try:
@@ -406,6 +425,16 @@ class PaperTrader:
             except Exception as e:
                 print(f"Warning: Failed to initialize LowLiquidityTrapFilter: {e}")
                 self._low_liquidity_trap_filter = None
+
+        # Initialize Execution Simulator for Monte Carlo P&L
+        self._execution_simulator = None
+        if HAS_EXECUTION_SIMULATOR:
+            try:
+                self._execution_simulator = ExecutionSimulator()
+                _LOGGER.info("Execution Simulator initialized")
+            except Exception as e:
+                _LOGGER.warning(f"Failed to initialize Execution Simulator: {e}")
+                self._execution_simulator = None
 
         self._stop_loss_monitor = None
         if HAS_STOP_LOSS:
@@ -1777,6 +1806,38 @@ class PaperTrader:
         trade_id = c.lastrowid
         conn.close()
 
+        # ─── EXECUTION SIMULATOR: Monte Carlo fill simulation ──────────────
+        exec_sim_result = None
+        if HAS_EXECUTION_SIMULATOR and self._execution_simulator is not None:
+            try:
+                from station_registry import get_station_mapping
+                mapping = get_station_mapping()
+                station_meta = mapping.get(station, {})
+                city_code = station_meta.get('kalshi_code', station.replace('K', ''))
+                date_token_dt = datetime.strptime(date, '%Y-%m-%d') if '-' in date else datetime.now(timezone.utc)
+                day_label = date_token_dt.strftime('%y%b%d').upper()
+                market_ticker = f"KXHIGH{city_code}-{day_label}" if market_type == "HIGH" else f"KXLOW{city_code}-{day_label}"
+                direction_str = "LONG" if trade_type in (TradeType.BUY_YES, TradeType.BUY_NO) else "SHORT"
+                exec_sim_result = self._execution_simulator.simulate_trade(
+                    ticker=market_ticker,
+                    direction=direction_str,
+                    requested_size_contracts=quantity,
+                    signal_price=market_price,
+                    model_fair_value=analytical_prob,
+                    market_price=effective_price,
+                )
+                _LOGGER.info(
+                    "exec_sim station=%s ticker=%s dir=%s size=%d edge=%.4f "
+                    "mc_median_pnl=%.2f mc_5th=%.2f mc_95th=%.2f",
+                    station, market_ticker, direction_str, quantity,
+                    fair_price_advantage,
+                    exec_sim_result.monte_carlo.median_pnl,
+                    exec_sim_result.monte_carlo.pnl_5th,
+                    exec_sim_result.monte_carlo.pnl_95th,
+                )
+            except Exception as e:
+                _LOGGER.warning(f"Execution simulation failed for {station}: {e}")
+
         # Open/update position for this trade
         self._update_position_after_trade(trade_uuid, trade_type, fill_price, quantity,
                                         trade_version, functionality, date)
@@ -1885,7 +1946,16 @@ class PaperTrader:
             'market_ticker': market_ticker,  # Kalshi market ticker (includes strike, e.g. KXHIGHDEN-70)
             'risk_state': self._risk_metrics.risk_state,
             'risk_reasons': [],  # risk_report provides checks, not kill_switch_reasons
-            'detailed_risk_state': risk_state_after_execution  # Detailed risk state from the risk manager
+            'detailed_risk_state': risk_state_after_execution,  # Detailed risk state from the risk manager
+            'exec_simulation': {  # Monte Carlo execution simulation results
+                'median_pnl': exec_sim_result.monte_carlo.median_pnl if exec_sim_result else None,
+                'pnl_5th': exec_sim_result.monte_carlo.pnl_5th if exec_sim_result else None,
+                'pnl_95th': exec_sim_result.monte_carlo.pnl_95th if exec_sim_result else None,
+                'expected_fill': exec_sim_result.monte_carlo.expected_fill_price if exec_sim_result else None,
+                'fill_std': exec_sim_result.monte_carlo.fill_std if exec_sim_result else None,
+                'full_fill_prob': exec_sim_result.monte_carlo.full_fill_probability if exec_sim_result else None,
+                'execution_summary': exec_sim_result.execution_summary if exec_sim_result else None,
+            } if exec_sim_result else None
         }
 
     def _update_position_after_trade(self, trade_uuid, trade_type, fill_price, quantity,
@@ -2195,7 +2265,23 @@ class PaperTrader:
         """
         Process settlements for a specific date. Updates trades with settlement results
         and calculates realized P/L.
+
+        Delegates to pnl_tracking module for primary logic when available.
         """
+        # PnL Tracking: delegate to extracted module for settlement processing
+        if HAS_PNL_TRACKING and _pnl_tracking is not None:
+            try:
+                _pnl_tracking.process_settlements_for_date(self, settlement_date)
+                _LOGGER.info(
+                    "pnl_tracking.process_settlements_for_date completed for %s",
+                    settlement_date
+                )
+            except Exception as e:
+                _LOGGER.warning(
+                    "pnl_tracking.process_settlements_for_date failed for %s: %s",
+                    settlement_date, e
+                )
+
         conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
         c.execute("ATTACH DATABASE ? AS metar", (self.metar_db,))
@@ -2333,9 +2419,24 @@ class PaperTrader:
         - Settlement processing for the date
         - Mark-to-market of all open positions (using current Kalshi prices)
         - Both realized and unrealized P&L in daily P&L calculation
+        - PnL Tracking module integration (extracted reconciliation pipeline)
         """
         if reconcile_date is None:
             reconcile_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+
+        # PnL Tracking: delegate to extracted module for enhanced reconciliation
+        if HAS_PNL_TRACKING and _pnl_tracking is not None:
+            try:
+                _pnl_tracking.daily_reconciliation(self, reconcile_date)
+                _LOGGER.info(
+                    "pnl_tracking.daily_reconciliation completed for %s",
+                    reconcile_date
+                )
+            except Exception as e:
+                _LOGGER.warning(
+                    "pnl_tracking.daily_reconciliation failed for %s: %s",
+                    reconcile_date, e
+                )
 
         # Process any settlements for the reconcile date
         self.process_settlements_for_date(reconcile_date)
@@ -2565,7 +2666,21 @@ class PaperTrader:
         }
 
     def generate_calibration_report(self, save_path=CALIBRATION_REPORT_PATH):
-        """Generate a JSON report of calibration metrics for the dashboard."""
+        """Generate a JSON report of calibration metrics for the dashboard.
+
+        Delegates to pnl_tracking module for primary logic when available.
+        """
+        # PnL Tracking: delegate to extracted module for calibration report
+        if HAS_PNL_TRACKING and _pnl_tracking is not None:
+            try:
+                result = _pnl_tracking.generate_calibration_report(self, save_path)
+                if result is not None:
+                    return result
+            except Exception as e:
+                _LOGGER.warning(
+                    "pnl_tracking.generate_calibration_report failed, falling back: %s", e
+                )
+
         conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
