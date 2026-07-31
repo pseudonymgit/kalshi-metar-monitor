@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-31T15:16:08.981308+00:00",
+    "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/kalshi_settlements.db"
+  },
+  "counts": {
+    "finalized": 599,
+    "historical_api": 5471
+  },
+  "temperature_range": {
+    "min": 2.0,
+    "max": 117.0,
+    "mean": 74.04316309719934
+  },
+  "outliers": 0,
+  "stations": 20,
+  "missing_stations": [],
+  "date_range": {
+    "min": "2021-08-19",
+    "max": "2026-07-27"
+  },
+  "n_unique_dates": 1745,
+  "duplicates": 1,
+  "decision": {
+    "status": "issues_found",
+    "max_error_f": null,
+    "note": "No cross-validation possible (disjoint spaces)"
+  }
+}
