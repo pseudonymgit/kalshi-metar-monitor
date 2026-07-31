@@ -1,21 +1,21 @@
 {
   "metadata": {
-    "generated_at": "2026-07-29T01:44:08.307545+00:00",
+    "generated_at": "2026-07-31T06:04:04.244958+00:00",
     "version": "1.0",
     "method": "GEFS 6-member ensemble fraction exceedance probability (local DB)",
     "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db",
     "kalshi_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/kalshi_backfill_complete.json",
     "total_kalshi_records": 6070,
-    "records_with_gefs": 2984,
-    "coverage_fraction": 0.4916,
-    "unique_dates_with_gefs": 1765,
+    "records_with_gefs": 6070,
+    "coverage_fraction": 1.0,
+    "unique_dates_with_gefs": 2034,
     "stations_with_gefs": 20,
-    "full_6_member_records": 2975,
-    "partial_records": 9,
+    "full_6_member_records": 6047,
+    "partial_records": 23,
     "sparse_records": 0,
-    "no_gefs_records": 3086,
+    "no_gefs_records": 0,
     "gefs_date_min": "2021-01-02",
-    "gefs_date_max": "2025-11-02",
+    "gefs_date_max": "2026-07-29",
     "fee_model": "2.050% round-trip",
     "thresholds": [
       70,
@@ -50,125 +50,1085 @@
     ]
   },
   "overall": {
-    "n_stations": 4,
-    "n_events": 2984,
-    "n_threshold_evaluations": 62664,
+    "n_stations": 20,
+    "n_events": 6070,
+    "n_threshold_evaluations": 127470,
     "temperature_prediction": {
-      "mae_f": 5.9721,
-      "bias_f": -1.9463,
-      "rmse_f": 7.7863,
-      "correlation": 0.9039
+      "mae_f": 5.6805,
+      "bias_f": -1.8324,
+      "rmse_f": 7.3569,
+      "correlation": 0.8729
     },
     "best_threshold_metrics": {
-      "avg_brier": 0.3438,
-      "avg_log_loss": 10.2365,
-      "directional_accuracy": 0.6193,
-      "avg_edge_after_fees": -0.2387
+      "avg_brier": 0.3835,
+      "avg_log_loss": 11.4363,
+      "directional_accuracy": 0.5748,
+      "avg_edge_after_fees": -0.2243
     },
     "all_threshold_metrics": {
-      "avg_brier": 0.0624,
-      "avg_log_loss": 1.688,
-      "directional_accuracy": 0.9295,
-      "avg_edge_after_fees": -0.3116,
-      "positive_edge_fraction": 0.2059,
-      "edge_sharpe": -0.961,
-      "ece": 0.0558
+      "avg_brier": 0.0682,
+      "avg_log_loss": 1.8508,
+      "directional_accuracy": 0.9224,
+      "avg_edge_after_fees": -0.2863,
+      "positive_edge_fraction": 0.2311,
+      "edge_sharpe": -1.0179,
+      "ece": 0.0625
     },
     "top_stations": [
       {
+        "station": "KBOS",
+        "directional_accuracy": 0.7558,
+        "n_events": 172,
+        "mae": 7.08
+      },
+      {
+        "station": "KNYC",
+        "directional_accuracy": 0.7538,
+        "n_events": 195,
+        "mae": 4.35
+      },
+      {
         "station": "KLAX",
-        "directional_accuracy": 0.7349,
-        "n_events": 298,
-        "mae": 3.34
+        "directional_accuracy": 0.6812,
+        "n_events": 505,
+        "mae": 3.27
       },
       {
-        "station": "KMDW",
-        "directional_accuracy": 0.6531,
-        "n_events": 1499,
-        "mae": 6.75
+        "station": "KSAT",
+        "directional_accuracy": 0.6667,
+        "n_events": 72,
+        "mae": 2.74
       },
       {
-        "station": "KDEN",
-        "directional_accuracy": 0.571,
-        "n_events": 331,
-        "mae": 8.16
-      },
-      {
-        "station": "KAUS",
-        "directional_accuracy": 0.5386,
-        "n_events": 856,
-        "mae": 4.68
+        "station": "KMSY",
+        "directional_accuracy": 0.6623,
+        "n_events": 77,
+        "mae": 3.23
       }
     ],
     "bottom_stations": [
       {
-        "station": "KLAX",
-        "directional_accuracy": 0.7349,
-        "n_events": 298,
-        "mae": 3.34
+        "station": "KATL",
+        "directional_accuracy": 0.4798,
+        "n_events": 173,
+        "mae": 5.14
       },
       {
-        "station": "KMDW",
-        "directional_accuracy": 0.6531,
-        "n_events": 1499,
-        "mae": 6.75
+        "station": "KPHL",
+        "directional_accuracy": 0.2987,
+        "n_events": 77,
+        "mae": 6.21
       },
       {
-        "station": "KDEN",
-        "directional_accuracy": 0.571,
-        "n_events": 331,
-        "mae": 8.16
+        "station": "KLAS",
+        "directional_accuracy": 0.2113,
+        "n_events": 194,
+        "mae": 7.4
       },
       {
-        "station": "KAUS",
-        "directional_accuracy": 0.5386,
-        "n_events": 856,
-        "mae": 4.68
+        "station": "KPHX",
+        "directional_accuracy": 0.0983,
+        "n_events": 173,
+        "mae": 4.88
+      },
+      {
+        "station": "KMIA",
+        "directional_accuracy": 0.039,
+        "n_events": 77,
+        "mae": 3.6
       }
     ]
   },
   "per_station": {
-    "KAUS": {
-      "station": "KAUS",
-      "n_events": 856,
-      "n_threshold_evaluations": 17976,
+    "KLAX": {
+      "station": "KLAX",
+      "n_events": 505,
+      "n_threshold_evaluations": 10605,
       "temperature_prediction": {
-        "mae_f": 4.68,
-        "bias_f": -0.59,
-        "rmse_f": 6.55,
-        "correlation": 0.9103
+        "mae_f": 3.27,
+        "bias_f": 0.3,
+        "rmse_f": 4.13,
+        "correlation": 0.8253
       },
       "best_threshold_metrics": {
-        "n": 856,
-        "avg_brier": 0.3818,
-        "avg_log_loss": 10.1527,
-        "directional_accuracy": 0.5386,
-        "avg_edge_after_fees": -0.0756
+        "n": 505,
+        "avg_brier": 0.2965,
+        "avg_log_loss": 9.0632,
+        "directional_accuracy": 0.6812,
+        "avg_edge_after_fees": -0.0961
       },
       "all_threshold_metrics": {
-        "n": 17976,
-        "avg_brier": 0.0709,
-        "avg_log_loss": 1.677,
-        "directional_accuracy": 0.9158,
-        "avg_edge_after_fees": -0.0967,
-        "positive_edge_fraction": 0.4186,
-        "edge_sharpe": -0.2034,
-        "ece": 0.0571
+        "n": 10605,
+        "avg_brier": 0.0478,
+        "avg_log_loss": 1.4027,
+        "directional_accuracy": 0.9491,
+        "avg_edge_after_fees": -0.4148,
+        "positive_edge_fraction": 0.1032,
+        "edge_sharpe": -1.3883,
+        "ece": 0.0455
       },
       "calibration": [
         {
           "bin": "0.0-0.1",
-          "n": 9543,
+          "n": 9326,
           "avg_predicted": 0.0,
-          "freq_actual": 0.0563,
-          "calibration_error": 0.0563
+          "freq_actual": 0.0199,
+          "calibration_error": 0.0199
         },
         {
           "bin": "0.1-0.2",
-          "n": 338,
+          "n": 88,
           "avg_predicted": 0.1667,
-          "freq_actual": 0.3817,
-          "calibration_error": 0.215
+          "freq_actual": 0.25,
+          "calibration_error": 0.0833
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 53,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.3396,
+          "calibration_error": 0.0063
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 44,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.2273,
+          "calibration_error": 0.2727
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 46,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.4565,
+          "calibration_error": 0.2102
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 74,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.4459,
+          "calibration_error": 0.3874
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 974,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.7556,
+          "calibration_error": 0.2444
+        }
+      ]
+    },
+    "KNYC": {
+      "station": "KNYC",
+      "n_events": 195,
+      "n_threshold_evaluations": 4095,
+      "temperature_prediction": {
+        "mae_f": 4.35,
+        "bias_f": -1.71,
+        "rmse_f": 5.74,
+        "correlation": 0.9692
+      },
+      "best_threshold_metrics": {
+        "n": 195,
+        "avg_brier": 0.2192,
+        "avg_log_loss": 6.4724,
+        "directional_accuracy": 0.7538,
+        "avg_edge_after_fees": -0.3026
+      },
+      "all_threshold_metrics": {
+        "n": 4095,
+        "avg_brier": 0.048,
+        "avg_log_loss": 1.3434,
+        "directional_accuracy": 0.9455,
+        "avg_edge_after_fees": -0.3875,
+        "positive_edge_fraction": 0.1306,
+        "edge_sharpe": -1.1773,
+        "ece": 0.0442
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 3474,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0248,
+          "calibration_error": 0.0248
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 38,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.3421,
+          "calibration_error": 0.1754
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 27,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.3704,
+          "calibration_error": 0.0371
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 21,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.7143,
+          "calibration_error": 0.2143
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 30,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.5333,
+          "calibration_error": 0.1334
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 38,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.6053,
+          "calibration_error": 0.228
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 467,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.8501,
+          "calibration_error": 0.1499
+        }
+      ]
+    },
+    "KDFW": {
+      "station": "KDFW",
+      "n_events": 166,
+      "n_threshold_evaluations": 3486,
+      "temperature_prediction": {
+        "mae_f": 2.86,
+        "bias_f": 0.09,
+        "rmse_f": 3.96,
+        "correlation": 0.9487
+      },
+      "best_threshold_metrics": {
+        "n": 166,
+        "avg_brier": 0.3029,
+        "avg_log_loss": 6.2045,
+        "directional_accuracy": 0.5723,
+        "avg_edge_after_fees": 0.0056
+      },
+      "all_threshold_metrics": {
+        "n": 3486,
+        "avg_brier": 0.0495,
+        "avg_log_loss": 0.9326,
+        "directional_accuracy": 0.936,
+        "avg_edge_after_fees": -0.121,
+        "positive_edge_fraction": 0.3944,
+        "edge_sharpe": -0.258,
+        "ece": 0.034
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1919,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0234,
+          "calibration_error": 0.0234
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 80,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.2875,
+          "calibration_error": 0.1208
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 50,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.42,
+          "calibration_error": 0.0867
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 62,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.5806,
+          "calibration_error": 0.0806
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 75,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.6533,
+          "calibration_error": 0.0134
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 110,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.7273,
+          "calibration_error": 0.106
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1190,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9647,
+          "calibration_error": 0.0353
+        }
+      ]
+    },
+    "KDCA": {
+      "station": "KDCA",
+      "n_events": 188,
+      "n_threshold_evaluations": 3948,
+      "temperature_prediction": {
+        "mae_f": 4.98,
+        "bias_f": -2.0,
+        "rmse_f": 6.75,
+        "correlation": 0.9492
+      },
+      "best_threshold_metrics": {
+        "n": 188,
+        "avg_brier": 0.3753,
+        "avg_log_loss": 10.8368,
+        "directional_accuracy": 0.5745,
+        "avg_edge_after_fees": -0.329
+      },
+      "all_threshold_metrics": {
+        "n": 3948,
+        "avg_brier": 0.0554,
+        "avg_log_loss": 1.4741,
+        "directional_accuracy": 0.9347,
+        "avg_edge_after_fees": -0.3303,
+        "positive_edge_fraction": 0.1882,
+        "edge_sharpe": -0.8719,
+        "ece": 0.0502
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 3094,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0401,
+          "calibration_error": 0.0401
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 42,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.5,
+          "calibration_error": 0.3333
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 41,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.6341,
+          "calibration_error": 0.3008
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 28,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.75,
+          "calibration_error": 0.25
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 43,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.6744,
+          "calibration_error": 0.0077
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 74,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.8378,
+          "calibration_error": 0.0045
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 626,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9361,
+          "calibration_error": 0.0639
+        }
+      ]
+    },
+    "KPHX": {
+      "station": "KPHX",
+      "n_events": 173,
+      "n_threshold_evaluations": 3633,
+      "temperature_prediction": {
+        "mae_f": 4.88,
+        "bias_f": -4.62,
+        "rmse_f": 5.35,
+        "correlation": 0.9724
+      },
+      "best_threshold_metrics": {
+        "n": 173,
+        "avg_brier": 0.8349,
+        "avg_log_loss": 26.5461,
+        "directional_accuracy": 0.0983,
+        "avg_edge_after_fees": -0.4107
+      },
+      "all_threshold_metrics": {
+        "n": 3633,
+        "avg_brier": 0.1047,
+        "avg_log_loss": 2.8879,
+        "directional_accuracy": 0.8761,
+        "avg_edge_after_fees": 0.0077,
+        "positive_edge_fraction": 0.523,
+        "edge_sharpe": 0.016,
+        "ece": 0.1164
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1569,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.188,
+          "calibration_error": 0.188
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 61,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.918,
+          "calibration_error": 0.7513
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 47,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.8723,
+          "calibration_error": 0.539
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 56,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.9286,
+          "calibration_error": 0.4286
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 60,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.9833,
+          "calibration_error": 0.3166
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 89,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.9663,
+          "calibration_error": 0.133
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1751,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9989,
+          "calibration_error": 0.0011
+        }
+      ]
+    },
+    "KSEA": {
+      "station": "KSEA",
+      "n_events": 101,
+      "n_threshold_evaluations": 2121,
+      "temperature_prediction": {
+        "mae_f": 4.57,
+        "bias_f": 1.83,
+        "rmse_f": 6.87,
+        "correlation": 0.7515
+      },
+      "best_threshold_metrics": {
+        "n": 101,
+        "avg_brier": 0.2998,
+        "avg_log_loss": 7.4364,
+        "directional_accuracy": 0.6436,
+        "avg_edge_after_fees": -0.1212
+      },
+      "all_threshold_metrics": {
+        "n": 2121,
+        "avg_brier": 0.07,
+        "avg_log_loss": 1.7368,
+        "directional_accuracy": 0.9194,
+        "avg_edge_after_fees": -0.3772,
+        "positive_edge_fraction": 0.1381,
+        "edge_sharpe": -1.1404,
+        "ece": 0.0636
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1738,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.023,
+          "calibration_error": 0.023
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 45,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.2667,
+          "calibration_error": 0.1
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 23,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.3043,
+          "calibration_error": 0.029
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 22,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.4091,
+          "calibration_error": 0.0909
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 24,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.4167,
+          "calibration_error": 0.25
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 44,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.4091,
+          "calibration_error": 0.4242
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 225,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.72,
+          "calibration_error": 0.28
+        }
+      ]
+    },
+    "KSFO": {
+      "station": "KSFO",
+      "n_events": 194,
+      "n_threshold_evaluations": 4074,
+      "temperature_prediction": {
+        "mae_f": 5.96,
+        "bias_f": -5.28,
+        "rmse_f": 7.61,
+        "correlation": 0.6266
+      },
+      "best_threshold_metrics": {
+        "n": 194,
+        "avg_brier": 0.3741,
+        "avg_log_loss": 12.6639,
+        "directional_accuracy": 0.6186,
+        "avg_edge_after_fees": -0.5042
+      },
+      "all_threshold_metrics": {
+        "n": 4074,
+        "avg_brier": 0.0509,
+        "avg_log_loss": 1.7004,
+        "directional_accuracy": 0.9477,
+        "avg_edge_after_fees": -0.5137,
+        "positive_edge_fraction": 0.0061,
+        "edge_sharpe": -6.8354,
+        "ece": 0.0512
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 4034,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0496,
+          "calibration_error": 0.0496
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 7,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.8571,
+          "calibration_error": 0.6904
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 4,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.5,
+          "calibration_error": 0.1667
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 4,
+          "avg_predicted": 0.5,
+          "freq_actual": 1.0,
+          "calibration_error": 0.5
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 4,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.75,
+          "calibration_error": 0.0833
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 4,
+          "avg_predicted": 0.8333,
+          "freq_actual": 1.0,
+          "calibration_error": 0.1667
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 17,
+          "avg_predicted": 1.0,
+          "freq_actual": 1.0,
+          "calibration_error": 0.0
+        }
+      ]
+    },
+    "KOKC": {
+      "station": "KOKC",
+      "n_events": 166,
+      "n_threshold_evaluations": 3486,
+      "temperature_prediction": {
+        "mae_f": 6.76,
+        "bias_f": -0.07,
+        "rmse_f": 8.79,
+        "correlation": 0.7739
+      },
+      "best_threshold_metrics": {
+        "n": 166,
+        "avg_brier": 0.455,
+        "avg_log_loss": 13.318,
+        "directional_accuracy": 0.5,
+        "avg_edge_after_fees": -0.0416
+      },
+      "all_threshold_metrics": {
+        "n": 3486,
+        "avg_brier": 0.1099,
+        "avg_log_loss": 2.9657,
+        "directional_accuracy": 0.8766,
+        "avg_edge_after_fees": -0.1825,
+        "positive_edge_fraction": 0.3339,
+        "edge_sharpe": -0.4013,
+        "ece": 0.0996
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2158,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0728,
+          "calibration_error": 0.0728
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 71,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.3662,
+          "calibration_error": 0.1995
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 44,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.4091,
+          "calibration_error": 0.0758
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 49,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.449,
+          "calibration_error": 0.051
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 65,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.5846,
+          "calibration_error": 0.0821
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 91,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.5055,
+          "calibration_error": 0.3278
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1008,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.8661,
+          "calibration_error": 0.1339
+        }
+      ]
+    },
+    "KHOU": {
+      "station": "KHOU",
+      "n_events": 166,
+      "n_threshold_evaluations": 3486,
+      "temperature_prediction": {
+        "mae_f": 3.98,
+        "bias_f": 1.24,
+        "rmse_f": 5.77,
+        "correlation": 0.7789
+      },
+      "best_threshold_metrics": {
+        "n": 166,
+        "avg_brier": 0.3318,
+        "avg_log_loss": 8.3912,
+        "directional_accuracy": 0.6205,
+        "avg_edge_after_fees": 0.105
+      },
+      "all_threshold_metrics": {
+        "n": 3486,
+        "avg_brier": 0.0766,
+        "avg_log_loss": 1.8723,
+        "directional_accuracy": 0.9108,
+        "avg_edge_after_fees": -0.108,
+        "positive_edge_fraction": 0.4108,
+        "edge_sharpe": -0.228,
+        "ece": 0.0645
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1889,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0302,
+          "calibration_error": 0.0302
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 78,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.4103,
+          "calibration_error": 0.2436
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 51,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.2941,
+          "calibration_error": 0.0392
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 36,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.5556,
+          "calibration_error": 0.0556
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 78,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.5769,
+          "calibration_error": 0.0898
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 97,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.701,
+          "calibration_error": 0.1323
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1257,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9006,
+          "calibration_error": 0.0994
+        }
+      ]
+    },
+    "KMDW": {
+      "station": "KMDW",
+      "n_events": 1704,
+      "n_threshold_evaluations": 35784,
+      "temperature_prediction": {
+        "mae_f": 6.87,
+        "bias_f": -3.14,
+        "rmse_f": 8.8,
+        "correlation": 0.9209
+      },
+      "best_threshold_metrics": {
+        "n": 1704,
+        "avg_brier": 0.3296,
+        "avg_log_loss": 10.4403,
+        "directional_accuracy": 0.6538,
+        "avg_edge_after_fees": -0.3518
+      },
+      "all_threshold_metrics": {
+        "n": 35784,
+        "avg_brier": 0.0592,
+        "avg_log_loss": 1.708,
+        "directional_accuracy": 0.9346,
+        "avg_edge_after_fees": -0.4057,
+        "positive_edge_fraction": 0.113,
+        "edge_sharpe": -1.317,
+        "ece": 0.0555
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 31023,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0439,
+          "calibration_error": 0.0439
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 342,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.5526,
+          "calibration_error": 0.3859
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 206,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.5825,
+          "calibration_error": 0.2492
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 171,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.5789,
+          "calibration_error": 0.0789
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 239,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.6485,
+          "calibration_error": 0.0182
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 384,
+          "avg_predicted": 0.8332,
+          "freq_actual": 0.7109,
+          "calibration_error": 0.1223
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 3419,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.89,
+          "calibration_error": 0.11
+        }
+      ]
+    },
+    "KATL": {
+      "station": "KATL",
+      "n_events": 173,
+      "n_threshold_evaluations": 3633,
+      "temperature_prediction": {
+        "mae_f": 5.14,
+        "bias_f": -1.65,
+        "rmse_f": 6.47,
+        "correlation": 0.8642
+      },
+      "best_threshold_metrics": {
+        "n": 173,
+        "avg_brier": 0.4385,
+        "avg_log_loss": 12.4115,
+        "directional_accuracy": 0.4798,
+        "avg_edge_after_fees": -0.14
+      },
+      "all_threshold_metrics": {
+        "n": 3633,
+        "avg_brier": 0.0793,
+        "avg_log_loss": 1.9954,
+        "directional_accuracy": 0.9039,
+        "avg_edge_after_fees": -0.2528,
+        "positive_edge_fraction": 0.2618,
+        "edge_sharpe": -0.5962,
+        "ece": 0.0717
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 2509,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.053,
+          "calibration_error": 0.053
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 63,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.4603,
+          "calibration_error": 0.2936
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 63,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.5873,
+          "calibration_error": 0.254
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 47,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.7234,
+          "calibration_error": 0.2234
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 51,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.6471,
+          "calibration_error": 0.0196
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 98,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.7143,
+          "calibration_error": 0.119
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 802,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9127,
+          "calibration_error": 0.0873
+        }
+      ]
+    },
+    "KBOS": {
+      "station": "KBOS",
+      "n_events": 172,
+      "n_threshold_evaluations": 3612,
+      "temperature_prediction": {
+        "mae_f": 7.08,
+        "bias_f": -1.47,
+        "rmse_f": 8.95,
+        "correlation": 0.8973
+      },
+      "best_threshold_metrics": {
+        "n": 172,
+        "avg_brier": 0.2206,
+        "avg_log_loss": 6.522,
+        "directional_accuracy": 0.7558,
+        "avg_edge_after_fees": -0.2879
+      },
+      "all_threshold_metrics": {
+        "n": 3612,
+        "avg_brier": 0.0572,
+        "avg_log_loss": 1.5833,
+        "directional_accuracy": 0.9363,
+        "avg_edge_after_fees": -0.396,
+        "positive_edge_fraction": 0.1218,
+        "edge_sharpe": -1.2483,
+        "ece": 0.0538
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 3085,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0331,
+          "calibration_error": 0.0331
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 33,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.3939,
+          "calibration_error": 0.2272
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 28,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.5,
+          "calibration_error": 0.1667
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 26,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.3077,
+          "calibration_error": 0.1923
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 33,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.4545,
+          "calibration_error": 0.2122
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 42,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.6429,
+          "calibration_error": 0.1904
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 365,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.8356,
+          "calibration_error": 0.1644
+        }
+      ]
+    },
+    "KAUS": {
+      "station": "KAUS",
+      "n_events": 1057,
+      "n_threshold_evaluations": 22197,
+      "temperature_prediction": {
+        "mae_f": 4.89,
+        "bias_f": -0.67,
+        "rmse_f": 6.84,
+        "correlation": 0.8981
+      },
+      "best_threshold_metrics": {
+        "n": 1057,
+        "avg_brier": 0.3947,
+        "avg_log_loss": 10.5635,
+        "directional_accuracy": 0.527,
+        "avg_edge_after_fees": -0.0792
+      },
+      "all_threshold_metrics": {
+        "n": 22197,
+        "avg_brier": 0.0741,
+        "avg_log_loss": 1.7783,
+        "directional_accuracy": 0.9122,
+        "avg_edge_after_fees": -0.1115,
+        "positive_edge_fraction": 0.4037,
+        "edge_sharpe": -0.236,
+        "ece": 0.0603
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 12083,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.058,
+          "calibration_error": 0.058
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 449,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.3898,
+          "calibration_error": 0.2231
         },
         {
           "bin": "0.2-0.3",
@@ -179,10 +1139,10 @@
         },
         {
           "bin": "0.3-0.4",
-          "n": 297,
+          "n": 368,
           "avg_predicted": 0.3333,
-          "freq_actual": 0.4512,
-          "calibration_error": 0.1179
+          "freq_actual": 0.4592,
+          "calibration_error": 0.1259
         },
         {
           "bin": "0.4-0.5",
@@ -193,268 +1153,584 @@
         },
         {
           "bin": "0.5-0.6",
-          "n": 271,
+          "n": 334,
           "avg_predicted": 0.5,
-          "freq_actual": 0.4982,
-          "calibration_error": 0.0018
+          "freq_actual": 0.506,
+          "calibration_error": 0.006
         },
         {
           "bin": "0.6-0.7",
-          "n": 322,
+          "n": 410,
           "avg_predicted": 0.6665,
-          "freq_actual": 0.6242,
-          "calibration_error": 0.0423
+          "freq_actual": 0.622,
+          "calibration_error": 0.0446
         },
         {
           "bin": "0.8-0.9",
-          "n": 539,
+          "n": 657,
           "avg_predicted": 0.8332,
-          "freq_actual": 0.7087,
-          "calibration_error": 0.1245
+          "freq_actual": 0.723,
+          "calibration_error": 0.1102
         },
         {
           "bin": "0.9-1.0",
-          "n": 6663,
+          "n": 7893,
           "avg_predicted": 1.0,
-          "freq_actual": 0.955,
-          "calibration_error": 0.045
+          "freq_actual": 0.9497,
+          "calibration_error": 0.0503
         }
       ]
     },
     "KDEN": {
       "station": "KDEN",
-      "n_events": 331,
-      "n_threshold_evaluations": 6951,
+      "n_events": 536,
+      "n_threshold_evaluations": 11256,
       "temperature_prediction": {
-        "mae_f": 8.16,
-        "bias_f": -2.06,
-        "rmse_f": 10.41,
-        "correlation": 0.8557
+        "mae_f": 8.08,
+        "bias_f": -1.63,
+        "rmse_f": 10.34,
+        "correlation": 0.8503
       },
       "best_threshold_metrics": {
-        "n": 331,
-        "avg_brier": 0.4009,
-        "avg_log_loss": 12.4334,
-        "directional_accuracy": 0.571,
-        "avg_edge_after_fees": -0.2884
+        "n": 536,
+        "avg_brier": 0.3865,
+        "avg_log_loss": 12.0943,
+        "directional_accuracy": 0.5877,
+        "avg_edge_after_fees": -0.2724
       },
       "all_threshold_metrics": {
-        "n": 6951,
-        "avg_brier": 0.0685,
-        "avg_log_loss": 1.9447,
-        "directional_accuracy": 0.9236,
-        "avg_edge_after_fees": -0.3576,
-        "positive_edge_fraction": 0.1601,
-        "edge_sharpe": -0.9996,
-        "ece": 0.0641
+        "n": 11256,
+        "avg_brier": 0.0659,
+        "avg_log_loss": 1.8675,
+        "directional_accuracy": 0.9262,
+        "avg_edge_after_fees": -0.3519,
+        "positive_edge_fraction": 0.1661,
+        "edge_sharpe": -0.969,
+        "ece": 0.0616
       },
       "calibration": [
         {
           "bin": "0.0-0.1",
-          "n": 5665,
+          "n": 9115,
           "avg_predicted": 0.0,
-          "freq_actual": 0.0434,
-          "calibration_error": 0.0434
+          "freq_actual": 0.0428,
+          "calibration_error": 0.0428
         },
         {
           "bin": "0.1-0.2",
-          "n": 80,
+          "n": 120,
           "avg_predicted": 0.1667,
-          "freq_actual": 0.45,
-          "calibration_error": 0.2833
+          "freq_actual": 0.4083,
+          "calibration_error": 0.2416
         },
         {
           "bin": "0.3-0.4",
-          "n": 45,
+          "n": 76,
           "avg_predicted": 0.3333,
-          "freq_actual": 0.5556,
-          "calibration_error": 0.2223
+          "freq_actual": 0.5395,
+          "calibration_error": 0.2062
         },
         {
           "bin": "0.5-0.6",
-          "n": 48,
+          "n": 75,
           "avg_predicted": 0.5,
-          "freq_actual": 0.5417,
-          "calibration_error": 0.0417
+          "freq_actual": 0.5333,
+          "calibration_error": 0.0333
         },
         {
           "bin": "0.6-0.7",
-          "n": 53,
+          "n": 89,
           "avg_predicted": 0.6667,
-          "freq_actual": 0.5472,
-          "calibration_error": 0.1195
+          "freq_actual": 0.4831,
+          "calibration_error": 0.1836
         },
         {
           "bin": "0.8-0.9",
-          "n": 94,
+          "n": 153,
           "avg_predicted": 0.8333,
-          "freq_actual": 0.617,
-          "calibration_error": 0.2163
+          "freq_actual": 0.6209,
+          "calibration_error": 0.2124
         },
         {
           "bin": "0.9-1.0",
-          "n": 966,
+          "n": 1628,
           "avg_predicted": 1.0,
-          "freq_actual": 0.8571,
-          "calibration_error": 0.1429
+          "freq_actual": 0.8729,
+          "calibration_error": 0.1271
         }
       ]
     },
-    "KLAX": {
-      "station": "KLAX",
-      "n_events": 298,
-      "n_threshold_evaluations": 6258,
+    "KLAS": {
+      "station": "KLAS",
+      "n_events": 194,
+      "n_threshold_evaluations": 4074,
       "temperature_prediction": {
-        "mae_f": 3.34,
-        "bias_f": 0.59,
-        "rmse_f": 4.28,
-        "correlation": 0.8393
+        "mae_f": 7.4,
+        "bias_f": -6.91,
+        "rmse_f": 8.21,
+        "correlation": 0.9596
       },
       "best_threshold_metrics": {
-        "n": 298,
-        "avg_brier": 0.2386,
-        "avg_log_loss": 6.8437,
-        "directional_accuracy": 0.7349,
-        "avg_edge_after_fees": -0.0764
+        "n": 194,
+        "avg_brier": 0.7772,
+        "avg_log_loss": 26.0582,
+        "directional_accuracy": 0.2113,
+        "avg_edge_after_fees": -0.4535
       },
       "all_threshold_metrics": {
-        "n": 6258,
-        "avg_brier": 0.0443,
-        "avg_log_loss": 1.26,
-        "directional_accuracy": 0.9521,
-        "avg_edge_after_fees": -0.4141,
-        "positive_edge_fraction": 0.1034,
-        "edge_sharpe": -1.3838,
-        "ece": 0.0423
+        "n": 4074,
+        "avg_brier": 0.139,
+        "avg_log_loss": 4.4085,
+        "directional_accuracy": 0.8527,
+        "avg_edge_after_fees": -0.2102,
+        "positive_edge_fraction": 0.3093,
+        "edge_sharpe": -0.4622,
+        "ece": 0.1433
       },
       "calibration": [
         {
           "bin": "0.0-0.1",
-          "n": 5492,
+          "n": 2729,
           "avg_predicted": 0.0,
-          "freq_actual": 0.014,
-          "calibration_error": 0.014
+          "freq_actual": 0.1847,
+          "calibration_error": 0.1847
         },
         {
           "bin": "0.1-0.2",
-          "n": 55,
+          "n": 44,
           "avg_predicted": 0.1667,
-          "freq_actual": 0.2364,
-          "calibration_error": 0.0697
+          "freq_actual": 0.9091,
+          "calibration_error": 0.7424
         },
         {
           "bin": "0.3-0.4",
-          "n": 36,
+          "n": 26,
           "avg_predicted": 0.3333,
-          "freq_actual": 0.3611,
-          "calibration_error": 0.0278
+          "freq_actual": 0.9231,
+          "calibration_error": 0.5898
         },
         {
           "bin": "0.5-0.6",
-          "n": 28,
+          "n": 15,
           "avg_predicted": 0.5,
-          "freq_actual": 0.2143,
-          "calibration_error": 0.2857
+          "freq_actual": 0.9333,
+          "calibration_error": 0.4333
         },
         {
           "bin": "0.6-0.7",
-          "n": 28,
+          "n": 34,
           "avg_predicted": 0.6667,
+          "freq_actual": 0.8824,
+          "calibration_error": 0.2157
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 47,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.9574,
+          "calibration_error": 0.1241
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1179,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9898,
+          "calibration_error": 0.0102
+        }
+      ]
+    },
+    "KMIA": {
+      "station": "KMIA",
+      "n_events": 77,
+      "n_threshold_evaluations": 1617,
+      "temperature_prediction": {
+        "mae_f": 3.6,
+        "bias_f": -3.45,
+        "rmse_f": 3.99,
+        "correlation": 0.7055
+      },
+      "best_threshold_metrics": {
+        "n": 77,
+        "avg_brier": 0.917,
+        "avg_log_loss": 30.592,
+        "directional_accuracy": 0.039,
+        "avg_edge_after_fees": -0.4556
+      },
+      "all_threshold_metrics": {
+        "n": 1617,
+        "avg_brier": 0.0869,
+        "avg_log_loss": 2.4793,
+        "directional_accuracy": 0.9011,
+        "avg_edge_after_fees": -0.068,
+        "positive_edge_fraction": 0.449,
+        "edge_sharpe": -0.1392,
+        "ece": 0.0942
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 845,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.1337,
+          "calibration_error": 0.1337
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 20,
+          "avg_predicted": 0.1667,
+          "freq_actual": 1.0,
+          "calibration_error": 0.8333
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 18,
+          "avg_predicted": 0.3333,
+          "freq_actual": 1.0,
+          "calibration_error": 0.6667
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 8,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.875,
+          "calibration_error": 0.375
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 12,
+          "avg_predicted": 0.6667,
+          "freq_actual": 1.0,
+          "calibration_error": 0.3333
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 22,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.9545,
+          "calibration_error": 0.1212
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 692,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9986,
+          "calibration_error": 0.0014
+        }
+      ]
+    },
+    "KMSP": {
+      "station": "KMSP",
+      "n_events": 77,
+      "n_threshold_evaluations": 1617,
+      "temperature_prediction": {
+        "mae_f": 4.87,
+        "bias_f": -0.45,
+        "rmse_f": 6.62,
+        "correlation": 0.7899
+      },
+      "best_threshold_metrics": {
+        "n": 77,
+        "avg_brier": 0.3939,
+        "avg_log_loss": 10.1702,
+        "directional_accuracy": 0.5455,
+        "avg_edge_after_fees": -0.0356
+      },
+      "all_threshold_metrics": {
+        "n": 1617,
+        "avg_brier": 0.082,
+        "avg_log_loss": 2.0156,
+        "directional_accuracy": 0.9035,
+        "avg_edge_after_fees": -0.2095,
+        "positive_edge_fraction": 0.3061,
+        "edge_sharpe": -0.4724,
+        "ece": 0.0723
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 1040,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0519,
+          "calibration_error": 0.0519
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 37,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.4595,
+          "calibration_error": 0.2928
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 22,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.5455,
+          "calibration_error": 0.2122
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 23,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.4348,
+          "calibration_error": 0.0652
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 27,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.4815,
+          "calibration_error": 0.1852
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 49,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.7551,
+          "calibration_error": 0.0782
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 419,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9117,
+          "calibration_error": 0.0883
+        }
+      ]
+    },
+    "KMSY": {
+      "station": "KMSY",
+      "n_events": 77,
+      "n_threshold_evaluations": 1617,
+      "temperature_prediction": {
+        "mae_f": 3.23,
+        "bias_f": 1.01,
+        "rmse_f": 4.3,
+        "correlation": 0.6299
+      },
+      "best_threshold_metrics": {
+        "n": 77,
+        "avg_brier": 0.2666,
+        "avg_log_loss": 6.9444,
+        "directional_accuracy": 0.6623,
+        "avg_edge_after_fees": 0.144
+      },
+      "all_threshold_metrics": {
+        "n": 1617,
+        "avg_brier": 0.0622,
+        "avg_log_loss": 1.3915,
+        "directional_accuracy": 0.9246,
+        "avg_edge_after_fees": -0.0145,
+        "positive_edge_fraction": 0.5015,
+        "edge_sharpe": -0.0301,
+        "ece": 0.0525
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 731,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0369,
+          "calibration_error": 0.0369
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 28,
+          "avg_predicted": 0.1667,
           "freq_actual": 0.3929,
-          "calibration_error": 0.2738
+          "calibration_error": 0.2262
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 18,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.1667,
+          "calibration_error": 0.1666
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 29,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.5172,
+          "calibration_error": 0.0172
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 33,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.5152,
+          "calibration_error": 0.1515
         },
         {
           "bin": "0.8-0.9",
           "n": 42,
           "avg_predicted": 0.8333,
-          "freq_actual": 0.3571,
-          "calibration_error": 0.4762
+          "freq_actual": 0.6429,
+          "calibration_error": 0.1904
         },
         {
           "bin": "0.9-1.0",
-          "n": 577,
+          "n": 736,
           "avg_predicted": 1.0,
-          "freq_actual": 0.7452,
-          "calibration_error": 0.2548
+          "freq_actual": 0.9524,
+          "calibration_error": 0.0476
         }
       ]
     },
-    "KMDW": {
-      "station": "KMDW",
-      "n_events": 1499,
-      "n_threshold_evaluations": 31479,
+    "KPHL": {
+      "station": "KPHL",
+      "n_events": 77,
+      "n_threshold_evaluations": 1617,
       "temperature_prediction": {
-        "mae_f": 6.75,
-        "bias_f": -3.2,
-        "rmse_f": 8.61,
-        "correlation": 0.9238
+        "mae_f": 6.21,
+        "bias_f": -2.47,
+        "rmse_f": 7.51,
+        "correlation": 0.7191
       },
       "best_threshold_metrics": {
-        "n": 1499,
-        "avg_brier": 0.3304,
-        "avg_log_loss": 10.4737,
-        "directional_accuracy": 0.6531,
-        "avg_edge_after_fees": -0.3532
+        "n": 77,
+        "avg_brier": 0.6313,
+        "avg_log_loss": 18.2367,
+        "directional_accuracy": 0.2987,
+        "avg_edge_after_fees": -0.2088
       },
       "all_threshold_metrics": {
-        "n": 31479,
-        "avg_brier": 0.0597,
-        "avg_log_loss": 1.7226,
-        "directional_accuracy": 0.9341,
-        "avg_edge_after_fees": -0.4038,
-        "positive_edge_fraction": 0.1149,
-        "edge_sharpe": -1.3011,
-        "ece": 0.0559
+        "n": 1617,
+        "avg_brier": 0.122,
+        "avg_log_loss": 3.1461,
+        "directional_accuracy": 0.8578,
+        "avg_edge_after_fees": -0.1847,
+        "positive_edge_fraction": 0.3309,
+        "edge_sharpe": -0.4083,
+        "ece": 0.1154
       },
       "calibration": [
         {
           "bin": "0.0-0.1",
-          "n": 27227,
+          "n": 990,
           "avg_predicted": 0.0,
-          "freq_actual": 0.0445,
-          "calibration_error": 0.0445
+          "freq_actual": 0.1121,
+          "calibration_error": 0.1121
         },
         {
           "bin": "0.1-0.2",
-          "n": 305,
+          "n": 48,
           "avg_predicted": 0.1667,
-          "freq_actual": 0.5475,
-          "calibration_error": 0.3808
+          "freq_actual": 0.6875,
+          "calibration_error": 0.5208
         },
         {
           "bin": "0.3-0.4",
-          "n": 181,
+          "n": 26,
           "avg_predicted": 0.3333,
-          "freq_actual": 0.6022,
-          "calibration_error": 0.2689
+          "freq_actual": 0.6154,
+          "calibration_error": 0.2821
         },
         {
           "bin": "0.5-0.6",
-          "n": 149,
+          "n": 18,
           "avg_predicted": 0.5,
-          "freq_actual": 0.5772,
-          "calibration_error": 0.0772
+          "freq_actual": 0.6667,
+          "calibration_error": 0.1667
         },
         {
           "bin": "0.6-0.7",
-          "n": 212,
+          "n": 29,
           "avg_predicted": 0.6667,
-          "freq_actual": 0.6651,
-          "calibration_error": 0.0016
+          "freq_actual": 0.6207,
+          "calibration_error": 0.046
         },
         {
           "bin": "0.8-0.9",
-          "n": 343,
-          "avg_predicted": 0.8332,
-          "freq_actual": 0.7143,
-          "calibration_error": 0.1189
+          "n": 48,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.6875,
+          "calibration_error": 0.1458
         },
         {
           "bin": "0.9-1.0",
-          "n": 3062,
+          "n": 458,
           "avg_predicted": 1.0,
-          "freq_actual": 0.8919,
-          "calibration_error": 0.1081
+          "freq_actual": 0.9301,
+          "calibration_error": 0.0699
+        }
+      ]
+    },
+    "KSAT": {
+      "station": "KSAT",
+      "n_events": 72,
+      "n_threshold_evaluations": 1512,
+      "temperature_prediction": {
+        "mae_f": 2.74,
+        "bias_f": 1.23,
+        "rmse_f": 3.71,
+        "correlation": 0.6921
+      },
+      "best_threshold_metrics": {
+        "n": 72,
+        "avg_brier": 0.2211,
+        "avg_log_loss": 3.7153,
+        "directional_accuracy": 0.6667,
+        "avg_edge_after_fees": 0.1531
+      },
+      "all_threshold_metrics": {
+        "n": 1512,
+        "avg_brier": 0.051,
+        "avg_log_loss": 0.9012,
+        "directional_accuracy": 0.9339,
+        "avg_edge_after_fees": 0.0191,
+        "positive_edge_fraction": 0.5331,
+        "edge_sharpe": 0.0401,
+        "ece": 0.0332
+      },
+      "calibration": [
+        {
+          "bin": "0.0-0.1",
+          "n": 606,
+          "avg_predicted": 0.0,
+          "freq_actual": 0.0132,
+          "calibration_error": 0.0132
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 44,
+          "avg_predicted": 0.1667,
+          "freq_actual": 0.2045,
+          "calibration_error": 0.0378
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 31,
+          "avg_predicted": 0.3333,
+          "freq_actual": 0.3226,
+          "calibration_error": 0.0107
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 25,
+          "avg_predicted": 0.5,
+          "freq_actual": 0.6,
+          "calibration_error": 0.1
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 32,
+          "avg_predicted": 0.6667,
+          "freq_actual": 0.5938,
+          "calibration_error": 0.0729
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 58,
+          "avg_predicted": 0.8333,
+          "freq_actual": 0.7069,
+          "calibration_error": 0.1264
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 716,
+          "avg_predicted": 1.0,
+          "freq_actual": 0.9609,
+          "calibration_error": 0.0391
         }
       ]
     }
