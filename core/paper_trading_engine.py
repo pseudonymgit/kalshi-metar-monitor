@@ -31,6 +31,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import time
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import sys
+import math
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 import threading
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
@@ -1741,8 +1742,11 @@ class PaperTrader:
         effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
         quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
 
-        fee_cost = abs(quantity * self.fee_rate)  # quantity (contracts), not dollar notional
-        net_cost = position_size + fee_cost * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
+        # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side
+        # Round trip = 2 × per-side fee
+        per_side_fee = math.ceil(0.07 * quantity * effective_price * (1.0 - effective_price))
+        round_trip_fee = per_side_fee * 2
+        net_cost = position_size + round_trip_fee * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 
         # Record the trade in our log with enhanced analytics
         conn = get_sqlite_connection(self.paper_db)
