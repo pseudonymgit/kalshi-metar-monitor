@@ -267,6 +267,76 @@ def test_position_sizer_with_zero_confidence():
     print(f"  ✓ Zero confidence → position=${size:.2f}")
 
 
+def test_edge_below_minimum_no_trade():
+    """Edge < 0.03 -> NO TRADE."""
+    sizer = PositionSizer(bankroll=10000.0)
+    size, details = sizer.compute_position_size(
+        confidence=0.90, win_rate=0.50, edge=0.02
+    )
+    assert size == 0.0, f"Expected 0 position for edge=0.02, got ${size:.2f}"
+    assert details.get("edge_tier_label", "") == "NO TRADE — edge < 0.03", \
+        f"Wrong edge tier label: {details.get('edge_tier_label')}"
+    print(f"  ✓ Edge=0.02 (<0.03): position=${size:.2f}")
+
+
+def test_edge_weak_edge_25pct_kelly():
+    """Edge 0.03-0.06 -> 25% Kelly."""
+    sizer = PositionSizer(bankroll=10000.0)
+    size, details = sizer.compute_position_size(
+        confidence=0.90, win_rate=0.55, edge=0.05
+    )
+    assert size > 0.0, f"Expected position > 0 for edge=0.05, got ${size:.2f}"
+    assert details.get("edge_multiplier", 0.0) == 0.25, \
+        f"Expected 0.25 edge_multiplier, got {details.get('edge_multiplier')}"
+    assert "25% Kelly" in details.get("edge_tier_label", ""), \
+        f"Wrong edge tier label: {details.get('edge_tier_label')}"
+    print(f"  ✓ Edge=0.05 (weak): edge_multiplier={details['edge_multiplier']}, position=${size:.2f}")
+
+
+def test_edge_moderate_edge_50pct_kelly():
+    """Edge 0.06-0.10 -> 50% Kelly."""
+    sizer = PositionSizer(bankroll=10000.0)
+    size, details = sizer.compute_position_size(
+        confidence=0.90, win_rate=0.55, edge=0.08
+    )
+    assert size > 0.0, f"Expected position > 0 for edge=0.08, got ${size:.2f}"
+    assert details.get("edge_multiplier", 0.0) == 0.50, \
+        f"Expected 0.50 edge_multiplier, got {details.get('edge_multiplier')}"
+    assert "50% Kelly" in details.get("edge_tier_label", ""), \
+        f"Wrong edge tier label: {details.get('edge_tier_label')}"
+    print(f"  ✓ Edge=0.08 (moderate): edge_multiplier={details['edge_multiplier']}, position=${size:.2f}")
+
+
+def test_edge_strong_edge_75pct_kelly():
+    """Edge > 0.10 -> 75% Kelly."""
+    sizer = PositionSizer(bankroll=10000.0)
+    size, details = sizer.compute_position_size(
+        confidence=0.90, win_rate=0.80, edge=0.20
+    )
+    assert size > 0.0, f"Expected position > 0 for edge=0.20, got ${size:.2f}"
+    assert details.get("edge_multiplier", 0.0) == 0.75, \
+        f"Expected 0.75 edge_multiplier, got {details.get('edge_multiplier')}"
+    assert "75% Kelly" in details.get("edge_tier_label", ""), \
+        f"Wrong edge tier label: {details.get('edge_tier_label')}"
+    print(f"  ✓ Edge=0.20 (strong): edge_multiplier={details['edge_multiplier']}, position=${size:.2f}")
+
+
+def test_entry_price_validation():
+    """Validate entry price clamping."""
+    assert PositionSizer.validate_entry_price(0.10) == 0.15, "Price 0.10 should clamp to 0.15"
+    assert PositionSizer.validate_entry_price(0.50) == 0.50, "Price 0.50 should stay"
+    assert PositionSizer.validate_entry_price(0.90) == 0.85, "Price 0.90 should clamp to 0.85"
+    print(f"  ✓ Entry price validation: 0.10→0.15, 0.50→0.50, 0.90→0.85")
+
+
+def test_max_contracts_cap():
+    """Cap contracts at 500."""
+    assert PositionSizer.cap_contracts(100) == 100, "100 contracts should stay"
+    assert PositionSizer.cap_contracts(500) == 500, "500 contracts should stay"
+    assert PositionSizer.cap_contracts(1000) == 500, "1000 contracts should cap to 500"
+    print(f"  ✓ Max contracts cap: 100→100, 500→500, 1000→500")
+
+
 # ─── Run all tests ──────────────────────────────────────────────────────────
 
 def main():
@@ -290,6 +360,12 @@ def main():
         ("Config post-init fixes fee_rate=0", test_position_sizing_config_post_init),
         ("Small bankroll", test_small_bankroll),
         ("Zero confidence", test_position_sizer_with_zero_confidence),
+        ("Edge < 0.03 NO TRADE", test_edge_below_minimum_no_trade),
+        ("Edge 0.03-0.06 25% Kelly", test_edge_weak_edge_25pct_kelly),
+        ("Edge 0.06-0.10 50% Kelly", test_edge_moderate_edge_50pct_kelly),
+        ("Edge > 0.10 75% Kelly", test_edge_strong_edge_75pct_kelly),
+        ("Entry price validation", test_entry_price_validation),
+        ("Max contracts cap", test_max_contracts_cap),
     ]
 
     passed = 0
