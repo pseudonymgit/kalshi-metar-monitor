@@ -275,3 +275,95 @@ def get_research_stations():
     These are the 20 ICAO codes from the STATIC_MAPPING as required by the B-MODE specs.
     """
     return list(STATIC_MAPPING.keys())
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# A5: Liquidity Tier Classification for Microstructure Edge Penalty
+# ════════════════════════════════════════════════════════════════════════════
+#
+# Liquidity tiers for microstructure edge penalty (from Gray Room E6):
+#   Tier 1 (liquid):     0% edge discount
+#   Tier 2 (moderate):  25% edge discount
+#   Tier 3 (thin):      50% edge discount
+#
+# The authoritative tier mapping is in scripts/sweep/tiers.py.
+# This provides a registry-level reference for station classification.
+#
+# Config-driven override: set CONFIG_MICROSTRUCTURE_OVERRIDE to override
+# tier discounts for specific stations.
+
+STATION_LIQUIDITY_TIERS = {
+    # Tier 1 — Liquid (8 cities, 0% discount)
+    "KNYC": 1,  # New York City
+    "KLAX": 1,  # Los Angeles
+    "KMDW": 1,  # Chicago
+    "KDCA": 1,  # Washington DC
+    "KATL": 1,  # Atlanta
+    "KDFW": 1,  # Dallas-Fort Worth
+    "KPHL": 1,  # Philadelphia
+    "KBOS": 1,  # Boston
+    # Tier 2 — Moderate (6 cities, 25% discount)
+    "KDEN": 2,  # Denver
+    "KLAS": 2,  # Las Vegas
+    "KSFO": 2,  # San Francisco
+    "KSEA": 2,  # Seattle
+    "KMIA": 2,  # Miami
+    "KHOU": 2,  # Houston
+    # Tier 3 — Thin (6 cities, 50% discount)
+    "KPHX": 3,  # Phoenix
+    "KMSP": 3,  # Minneapolis
+    "KMSY": 3,  # New Orleans
+    "KAUS": 3,  # Austin
+    "KSAT": 3,  # San Antonio
+    "KOKC": 3,  # Oklahoma City
+}
+
+# Tier microstructure discounts (config-driven overridable)
+TIER_MICROSTRUCTURE_DISCOUNTS = {
+    1: 0.00,  # 0% discount
+    2: 0.25,  # 25% discount
+    3: 0.50,  # 50% discount
+}
+
+# Config-driven override: set this dict to override tier discounts
+# e.g., CONFIG_MICROSTRUCTURE_OVERRIDE = {"KOKC": 0.30}
+CONFIG_MICROSTRUCTURE_OVERRIDE: dict = {}
+
+
+def get_liquidity_tier(station: str) -> int:
+    """Get the liquidity tier (1, 2, or 3) for a station.
+
+    Tier 1 = liquid (0% edge discount)
+    Tier 2 = moderate (25% edge discount)
+    Tier 3 = thin (50% edge discount)
+
+    Defaults to Tier 3 for unknown stations.
+    """
+    return STATION_LIQUIDITY_TIERS.get(station.upper(), 3)
+
+
+def get_microstructure_discount(station: str) -> float:
+    """Get the microstructure edge discount for a station's tier.
+
+    Supports config-driven override via CONFIG_MICROSTRUCTURE_OVERRIDE.
+    """
+    if station in CONFIG_MICROSTRUCTURE_OVERRIDE:
+        return CONFIG_MICROSTRUCTURE_OVERRIDE[station]
+    tier = get_liquidity_tier(station)
+    return TIER_MICROSTRUCTURE_DISCOUNTS.get(tier, 0.50)
+
+
+def apply_microstructure_penalty(raw_edge: float, station: str) -> float:
+    """Apply microstructure edge penalty by liquidity tier.
+
+    edge_after = raw_edge * (1.0 - microstructure_discount)
+
+    Args:
+        raw_edge: Raw (gross or net) edge before penalty
+        station: ICAO station code
+
+    Returns:
+        Edge after applying tier-based microstructure discount
+    """
+    discount = get_microstructure_discount(station)
+    return raw_edge * (1.0 - discount)

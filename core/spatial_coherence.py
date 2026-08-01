@@ -1,540 +1,420 @@
-#!/usr/bin/env python3
 """
-D4 + D2 — Spatial Coherence Gate & Cross-Station Trade Coordination
+Spatial Coherence Gate — First-Principles (FP 6.3)
 
-Detects and manages cross-station spatial correlations in trading signals.
+Continuous confidence modulation based on regional spatial coherence.
 
-D4 — Spatial Correlation Gate:
-  Checks if two nearby stations both signal the same direction within a short
-  time window. Verifies they're not double-counting the same weather event.
-  Downgrades confidence or skips the second trade.
+6 climate regions with inverse-distance-weighted consensus:
+    NE: Northeast Corridor (KNYC, KBOS, KPHL, KDCA)
+    SE: Southeast (KATL, KMIA, KMSY)
+    SC: South Central/Gulf (KHOU, KDFW, KAUS, KSAT, KOKC)
+    MW: Midwest/Great Lakes (KMDW, KMSP)
+    RW: Mountain West (KDEN, KPHX, KLAS, KOKC - overlapping)
+    PAC: Pacific Coast (KSEA, KSFO, KLAX)
 
-D2 — Cross-Station Trade Coordination:
-  Actively coordinates trades between nearby stations:
-  - Coherent signal (both same direction within window) → trade both, mark coordinated
-  - Conflicting signal (opposite directions within window) → flag for review
-  - Records coordination events for later analysis
+Formula:
+    Phi = 0.6 * (1 - tanh(|mean_anomaly - station_anomaly| / sigma_phi))
+          + 0.4 * directional_agreement
+
+    M(Phi) = 0.5 + 0.8 * Phi  (continuous modulation, 0.5-1.3x)
 
 Usage:
-    from core.spatial_coherence import SpatialCoherenceGate, CoordinatedSignal
+    from core.spatial_coherence import SpatialCoherenceGate
 
     gate = SpatialCoherenceGate()
-    result = gate.evaluate("KATL", "up", "2026-07-24", "HIGH")
-    if result.is_coherent:
-        # Signal is verifiable — proceed
-    elif result.is_conflicting:
-        # Conflicting signals nearby — reduce confidence or skip
+    mod_factors = gate.compute_modulation(forecasts)
+    # Apply: conviction_adj = conviction_base * mod_factors[station]
+
+B-Mode R8 Cycle 4.5: Replaced binary D4/D2 gate with FP 6.3 continuous modulation.
 """
 
-import json
-import logging
 import math
-import sqlite3
-import time
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+import logging
+from typing import Dict, List, Optional, Tuple, Any
 
 logger = logging.getLogger(__name__)
 
-# ─── Constants ──────────────────────────────────────────────────
 
-# Proximity threshold in miles for "nearby" stations
-PROXIMITY_MILES = 200
+# ─────────────────────────────────────────────────────────────────────
+# Region Definitions (FP 6.3 Section 2.2)
+# ─────────────────────────────────────────────────────────────────────
 
-# Time window in minutes for "same event" detection
-EVENT_WINDOW_MINUTES = 30
+REGIONS = {
+    'NE': {  # Northeast Corridor
+        'stations': ['KNYC', 'KBOS', 'KPHL', 'KDCA'],
+        'L': 300,  # decorrelation length (km)
+        'M_min': 0.5,
+        'M_max': 1.25,
+    },
+    'SE': {  # Southeast
+        'stations': ['KATL', 'KMIA', 'KMSY'],
+        'L': 500,
+        'M_min': 0.6,
+        'M_max': 1.15,
+    },
+    'SC': {  # South Central / Gulf
+        'stations': ['KHOU', 'KDFW', 'KAUS', 'KSAT', 'KOKC'],
+        'L': 350,
+        'M_min': 0.5,
+        'M_max': 1.30,
+    },
+    'MW': {  # Midwest / Great Lakes
+        'stations': ['KMDW', 'KMSP'],
+        'L': 350,
+        'M_min': 0.5,
+        'M_max': 1.30,
+    },
+    'RW': {  # Mountain West (Rocky West)
+        'stations': ['KDEN', 'KPHX', 'KLAS', 'KOKC'],
+        'L': 600,
+        'M_min': 0.7,
+        'M_max': 1.10,
+    },
+    'PAC': {  # Pacific Coast
+        'stations': ['KSEA', 'KSFO', 'KLAX'],
+        'L': 400,
+        'M_min': 0.6,
+        'M_max': 1.20,
+    },
+}
 
-# Confidence adjustments
-COHERENT_BOOST = 1.10        # +10% for coherent cross-station signals
-CONFLICT_PENALTY = 0.60      # -40% for conflicting signals nearby
-NO_NEIGHBOR_DISCOUNT = 0.95  # -5% if no nearby stations for verification
+# Station coordinates (lat, lon) for distance computation
+STATION_COORDS: Dict[str, Tuple[float, float]] = {
+    'KNYC': (40.78, -73.97), 'KBOS': (42.36, -71.01),
+    'KPHL': (39.87, -75.24), 'KDCA': (38.85, -77.04),
+    'KATL': (33.64, -84.43), 'KMIA': (25.79, -80.29),
+    'KMSY': (30.00, -90.26),
+    'KHOU': (29.65, -95.28), 'KDFW': (32.90, -97.04),
+    'KAUS': (30.19, -97.67), 'KSAT': (29.53, -98.47),
+    'KOKC': (35.39, -97.60),
+    'KMDW': (41.79, -87.75), 'KMSP': (44.88, -93.22),
+    'KDEN': (39.85, -104.67), 'KPHX': (33.43, -112.02),
+    'KLAS': (36.08, -115.15),
+    'KSEA': (47.45, -122.31), 'KSFO': (37.62, -122.38),
+    'KLAX': (33.94, -118.41),
+}
 
-# Earth radius in miles
-EARTH_RADIUS_MILES = 3958.8
+# Overlap stations with secondary region membership (FP 6.3 Section 2.3)
+OVERLAP_STATIONS: Dict[str, Dict[str, float]] = {
+    'KOKC': {'primary': 'SC', 'primary_weight': 0.65,
+             'secondary': 'RW', 'secondary_weight': 0.35},
+}
 
 
-def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Compute great-circle distance in miles between two lat/lon points."""
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = (math.sin(dlat / 2) ** 2 +
-         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
-         math.sin(dlon / 2) ** 2)
-    return EARTH_RADIUS_MILES * 2 * math.asin(math.sqrt(a))
+def great_circle_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Compute great-circle distance between two points in km (Haversine)."""
+    R = 6371.0  # Earth radius in km
+    d_lat = math.radians(lat2 - lat1)
+    d_lon = math.radians(lon2 - lon1)
+    a = (math.sin(d_lat / 2) ** 2
+         + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2))
+         * math.sin(d_lon / 2) ** 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
 
 
-# ─── Result ────────────────────────────────────────────────────
-
-class CoordinationResult:
+def distance_weight(d_km: float, L: float) -> float:
     """
-    Result of a spatial coherence evaluation.
+    Compute inverse-distance weight (FP 6.3 Section 2.3).
 
-    Attributes:
-        station: The evaluated station
-        is_coherent: True if nearby stations confirm the same direction
-        is_conflicting: True if nearby stations have conflicting signals
-        has_neighbors: True if nearby stations were found for verification
-        coordinated_signals: List of coordinated signal details
-        adjusted_confidence: Confidence multiplier based on coherence
-        nearby_station_count: Number of nearby stations found
-        conflicting_count: Number of nearby stations with conflicting signals
-        coherent_count: Number of nearby stations with coherent signals
-        recommendation: 'trade', 'skip', 'investigate'
+    w(j|s) = exp(-d(s,j)^2 / (2 * L^2))
+
+    Args:
+        d_km: Great-circle distance in km
+        L: Characteristic decorrelation length in km
+
+    Returns:
+        Weight in [0, 1]
     """
-
-    def __init__(
-        self,
-        station: str,
-        is_coherent: bool = False,
-        is_conflicting: bool = False,
-        has_neighbors: bool = False,
-        coordinated_signals: Optional[List[Dict]] = None,
-        adjusted_confidence: float = 1.0,
-        nearby_station_count: int = 0,
-        conflicting_count: int = 0,
-        coherent_count: int = 0,
-        recommendation: str = "trade",
-    ):
-        self.station = station
-        self.is_coherent = is_coherent
-        self.is_conflicting = is_conflicting
-        self.has_neighbors = has_neighbors
-        self.coordinated_signals = coordinated_signals or []
-        self.adjusted_confidence = adjusted_confidence
-        self.nearby_station_count = nearby_station_count
-        self.conflicting_count = conflicting_count
-        self.coherent_count = coherent_count
-        self.recommendation = recommendation
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "station": self.station,
-            "is_coherent": self.is_coherent,
-            "is_conflicting": self.is_conflicting,
-            "has_neighbors": self.has_neighbors,
-            "adjusted_confidence": round(self.adjusted_confidence, 4),
-            "nearby_station_count": self.nearby_station_count,
-            "conflicting_count": self.conflicting_count,
-            "coherent_count": self.coherent_count,
-            "recommendation": self.recommendation,
-            "coordinated_signals": self.coordinated_signals[:5],  # Limit output
-        }
-
-    def __repr__(self) -> str:
-        return (f"<CoordinationResult {self.station} "
-                f"coherent={self.is_coherent} conflict={self.is_conflicting} "
-                f"rec={self.recommendation}>")
+    if L <= 0:
+        return 0.0
+    return math.exp(-(d_km ** 2) / (2.0 * L * L))
 
 
-# ─── SpatialCoherenceGate ──────────────────────────────────────
+def compute_coherence_phi(
+    station_anomaly: float,
+    regional_anomalies: Dict[str, float],
+    station: str,
+    region_name: str,
+) -> float:
+    """
+    Compute spatial coherence Phi for a station (FP 6.3 Section 4).
+
+    Phi = 0.6 * magnitude_agreement + 0.4 * directional_agreement
+
+    magnitude_agreement = 1 - tanh(|station_anomaly - mean_anomaly| / sigma_phi)
+    directional_agreement = fraction of neighboring stations with same direction
+
+    Args:
+        station_anomaly: Station's anomaly vs climatology
+        regional_anomalies: Dict of station -> anomaly for all stations in region
+        station: ICAO code of target station
+        region_name: Region key
+
+    Returns:
+        Phi in [0, 1]
+    """
+    region = REGIONS.get(region_name, REGIONS['SC'])
+    sigma_phi = region.get('L', 400) * 0.3  # Scale: ~120 km for 400 km L
+
+    # Compute weighted consensus anomaly and direction agreement
+    other_stations = {s: a for s, a in regional_anomalies.items() if s != station}
+    if not other_stations:
+        return 0.65  # No neighbors = neutral
+
+    coords = STATION_COORDS
+    weights = {}
+    for s in other_stations:
+        dist = great_circle_distance(
+            coords[station][0], coords[station][1],
+            coords[s][0], coords[s][1]
+        )
+        weights[s] = distance_weight(dist, region['L'])
+
+    total_weight = sum(weights.values())
+    if total_weight == 0:
+        return 0.65
+
+    # Weighted consensus anomaly
+    weighted_anomaly = sum(
+        weights[s] * other_stations[s] for s in other_stations
+    ) / total_weight
+
+    # Magnitude agreement (FP 6.3 Section 4.2)
+    delta = abs(station_anomaly - weighted_anomaly)
+    magnitude_agree = 1.0 - min(1.0, math.tanh(delta / sigma_phi))
+
+    # Directional agreement
+    station_dir = 1 if station_anomaly >= 0 else -1
+    dir_matches = sum(
+        1 for s in other_stations
+        if (1 if other_stations[s] >= 0 else -1) == station_dir
+    )
+    dir_agreement = dir_matches / max(len(other_stations), 1)
+
+    # Combined Phi
+    phi = 0.6 * magnitude_agree + 0.4 * dir_agreement
+    return min(1.0, max(0.0, phi))
+
+
+def compute_modulation_factor(phi: float, region_name: str) -> float:
+    """
+    Compute modulation factor M(Phi) from spatial coherence (FP 6.3 Section 4.2).
+
+    M(Phi) = 0.5 + 0.8 * Phi, clamped to regional [M_min, M_max].
+
+    Args:
+        phi: Spatial coherence Phi in [0, 1]
+        region_name: Region key for bounds
+
+    Returns:
+        Modulation factor in [0.5, 1.3] typically
+    """
+    region = REGIONS.get(region_name, REGIONS['SC'])
+    raw = 0.5 + 0.8 * phi
+    return max(region['M_min'], min(region['M_max'], raw))
+
 
 class SpatialCoherenceGate:
     """
-    Spatial coherence gate for cross-station signal verification.
+    Computes spatial coherence modulation for 20-station ensemble.
 
-    Uses station proximity (within 200 miles) and event timing (within
-    30 minutes) to determine if signals are spatially coherent or
-    conflicting.
+    Integrates at pipeline layer 6: between base conviction and trade generation.
+    Applies continuous modulation (not binary pass/fail) per FP 6.3 spec.
     """
 
-    def __init__(
-        self,
-        station_mapping_path: Optional[str] = None,
-        alert_db_path: Optional[str] = None,
-        proximity_miles: float = PROXIMITY_MILES,
-        event_window_minutes: int = EVENT_WINDOW_MINUTES,
-    ):
-        self.proximity_miles = proximity_miles
-        self.event_window_minutes = event_window_minutes
+    def __init__(self):
+        self._coords = STATION_COORDS
+        self._regions = REGIONS
+        self._overlaps = OVERLAP_STATIONS
 
-        # Station coordinates loaded from mapping
-        self._station_coords: Dict[str, Tuple[float, float]] = {}
-        self._load_station_coords(station_mapping_path)
-
-        # Coordination event tracking
-        self._coordination_events: List[Dict] = []
-
-    # ── Station Loading ───────────────────────────────────────
-
-    def _load_station_coords(self, mapping_path: Optional[str] = None) -> None:
-        """Load station coordinates from the station mapping file."""
-        paths_to_try = [
-            mapping_path,
-            "data/station_mapping.json",
-            "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/station_mapping.json",
-        ]
-
-        for path in paths_to_try:
-            if path and Path(path).exists():
-                try:
-                    with open(path, "r") as f:
-                        data = json.load(f)
-                    stations = data.get("stations", data)
-                    if isinstance(stations, dict):
-                        for code, info in stations.items():
-                            lat = info.get("lat")
-                            lon = info.get("lon")
-                            if lat is not None and lon is not None:
-                                self._station_coords[code] = (float(lat), float(lon))
-                    logger.info(f"Loaded {len(self._station_coords)} station coordinates")
-                    return
-                except Exception as e:
-                    logger.warning(f"Failed to load station mapping: {e}")
-
-        # Fallback: hardcoded station coordinates for our 20 stations
-        self._station_coords = {
-            "KATL": (33.6407, -84.4277),
-            "KAUS": (30.1945, -97.6699),
-            "KBOS": (42.3656, -71.0096),
-            "KDCA": (38.8512, -77.0402),
-            "KDEN": (39.8561, -104.6737),
-            "KDFW": (32.8998, -97.0403),
-            "KHOU": (29.6455, -95.2784),
-            "KJAX": (30.4941, -81.6879),
-            "KJFK": (40.6397, -73.7789),
-            "KLAS": (36.0801, -115.1362),
-            "KLAX": (33.9425, -118.4081),
-            "KMCI": (39.2975, -94.7139),
-            "KMCO": (28.4280, -81.3090),
-            "KMDW": (41.7856, -87.7524),
-            "KMIA": (25.7959, -80.2870),
-            "KMSP": (44.8819, -93.2217),
-            "KMSY": (29.9933, -90.2580),
-            "KNYC": (40.7168, -73.9982),
-            "KOKC": (35.3931, -97.6007),
-            "KORD": (41.9786, -87.9047),
-            "KPHL": (39.8728, -75.2411),
-            "KPHX": (33.4350, -112.0065),
-            "KPIT": (40.4914, -80.2328),
-            "KRDU": (35.8776, -78.7875),
-            "KSEA": (47.4489, -122.3093),
-            "KSFO": (37.6213, -122.3789),
-            "KSLC": (40.7884, -111.9778),
-            "KSTL": (38.7472, -90.3600),
-            "KTPA": (27.9799, -82.5349),
-            "KTTD": (45.5494, -122.4033),
-        }
-        logger.info(f"Loaded {len(self._station_coords)} station coordinates (fallback)")
-
-    # ── Proximity Query ───────────────────────────────────────
-
-    def get_station_distance(self, station_a: str, station_b: str) -> Optional[float]:
-        """Get distance in miles between two stations."""
-        coords_a = self._station_coords.get(station_a)
-        coords_b = self._station_coords.get(station_b)
-        if coords_a and coords_b:
-            return haversine_miles(
-                coords_a[0], coords_a[1], coords_b[0], coords_b[1]
-            )
-        return None
-
-    def get_nearby_stations(
-        self,
-        station: str,
-        max_distance: Optional[float] = None,
-    ) -> List[Tuple[str, float]]:
+    def get_region_for_station(self, station: str) -> Tuple[str, str, float]:
         """
-        Get all stations within proximity range of the given station.
-
-        Args:
-            station: Station code
-            max_distance: Maximum distance in miles (defaults to proximity_miles)
+        Get the primary region for a station, handling overlaps.
 
         Returns:
-            List of (station_code, distance_miles) sorted by distance
+            Tuple of (primary_region, secondary_region_or_empty, primary_weight)
         """
-        max_dist = max_distance or self.proximity_miles
-        results = []
+        # Check overlap first
+        if station in self._overlaps:
+            o = self._overlaps[station]
+            return o['primary'], o.get('secondary', ''), o['primary_weight']
 
-        coords = self._station_coords.get(station)
-        if not coords:
-            return []
+        # Find region by station membership
+        for r_name, r_data in self._regions.items():
+            if station in r_data['stations']:
+                return r_name, '', 1.0
 
-        for other_code, other_coords in self._station_coords.items():
-            if other_code == station:
-                continue
-            distance = haversine_miles(
-                coords[0], coords[1], other_coords[0], other_coords[1]
-            )
-            if distance <= max_dist:
-                results.append((other_code, round(distance, 1)))
+        return 'SC', '', 1.0  # Default to South Central
 
-        return sorted(results, key=lambda x: x[1])
-
-    # ─── Signal Evaluation ────────────────────────────────────
-
-    def evaluate(
+    def compute_modulation(
         self,
-        station: str,
-        direction: str,
-        date: str,
-        market_type: str = "HIGH",
-        current_signals: Optional[Dict[str, str]] = None,
-        verbose: bool = False,
-    ) -> CoordinationResult:
+        station_forecasts: Dict[str, Dict[str, Any]],
+    ) -> Dict[str, float]:
         """
-        Evaluate spatial coherence for a signal at a station.
-
-        Checks nearby stations for:
-        - Coherent signals (same direction) → confidence boost
-        - Conflicting signals (opposite direction) → confidence penalty
-        - No nearby stations → slight discount (unverifiable)
+        Compute spatial coherence modulation for all stations.
 
         Args:
-            station: Station code
-            direction: 'up' or 'down'
-            date: ISO date string
-            market_type: 'HIGH' or 'LOW'
-            current_signals: Dict of {station_code: direction} for currently
-                            active signals across stations. If None, uses
-                            proximity-only analysis.
-            verbose: If True, include additional debug info
-
-        Returns:
-            CoordinationResult with coherence assessment
-        """
-        nearby = self.get_nearby_stations(station)
-
-        if not nearby:
-            return CoordinationResult(
-                station=station,
-                is_coherent=False,
-                is_conflicting=False,
-                has_neighbors=False,
-                adjusted_confidence=NO_NEIGHBOR_DISCOUNT,
-                nearby_station_count=0,
-                recommendation="trade",
-            )
-
-        # Check signals from nearby stations
-        coherent_count = 0
-        conflicting_count = 0
-        silent_count = 0
-        coordinated_signals = []
-
-        for nearby_code, distance in nearby:
-            nearby_dir = None
-            if current_signals:
-                nearby_dir = current_signals.get(nearby_code)
-
-            if nearby_dir is None:
-                silent_count += 1
-                continue
-
-            signal_info = {
-                "station": nearby_code,
-                "distance_miles": distance,
-                "direction": nearby_dir,
+            station_forecasts: Dict of station -> {
+                'anomaly': float,  # forecast temp - climato mean (°F)
+                'conviction': float,  # base conviction (for logging)
+                'confidence': float,  # optional
             }
 
-            if nearby_dir == direction:
-                coherent_count += 1
-                signal_info["relation"] = "coherent"
-                coordinated_signals.append(signal_info)
-            else:
-                conflicting_count += 1
-                signal_info["relation"] = "conflicting"
-                coordinated_signals.append(signal_info)
-
-        # Determine coherence state
-        has_any_signal = coherent_count + conflicting_count > 0
-        has_neighbors = len(nearby) > 0
-
-        if not has_any_signal:
-            # Nearby stations exist but no signals — slight discount
-            return CoordinationResult(
-                station=station,
-                is_coherent=False,
-                is_conflicting=False,
-                has_neighbors=True,
-                adjusted_confidence=0.98,
-                nearby_station_count=len(nearby),
-                recommendation="trade",
-            )
-
-        if conflicting_count > coherent_count:
-            # More conflicting than coherent — significant conflict
-            confidence_mult = CONFLICT_PENALTY
-            recommendation = "investigate"
-            is_conflicting = True
-            is_coherent = False
-        elif coherent_count >= 1 and conflicting_count == 0:
-            # All nearby signals agree
-            confidence_mult = COHERENT_BOOST
-            recommendation = "trade"
-            is_coherent = True
-            is_conflicting = False
-        else:
-            # Mixed signals
-            ratio = coherent_count / (coherent_count + conflicting_count) if (coherent_count + conflicting_count) > 0 else 0
-            if ratio >= 0.5:
-                confidence_mult = 1.0 + (ratio - 0.5) * 0.1
-                recommendation = "trade"
-                is_coherent = True
-                is_conflicting = False
-            else:
-                confidence_mult = CONFLICT_PENALTY + ratio * 0.4
-                recommendation = "investigate"
-                is_coherent = False
-                is_conflicting = True
-
-        # Log coordination event
-        event = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "station": station,
-            "direction": direction,
-            "date": date,
-            "market_type": market_type,
-            "coherent_count": coherent_count,
-            "conflicting_count": conflicting_count,
-            "nearby_count": len(nearby),
-            "recommendation": recommendation,
-        }
-        self._coordination_events.append(event)
-
-        return CoordinationResult(
-            station=station,
-            is_coherent=is_coherent,
-            is_conflicting=is_conflicting,
-            has_neighbors=has_neighbors,
-            coordinated_signals=coordinated_signals,
-            adjusted_confidence=confidence_mult,
-            nearby_station_count=len(nearby),
-            coherent_count=coherent_count,
-            conflicting_count=conflicting_count,
-            recommendation=recommendation,
-        )
-
-    def apply_to_confidence(
-        self,
-        station: str,
-        direction: str,
-        confidence: float,
-        date: str,
-        market_type: str = "HIGH",
-        current_signals: Optional[Dict[str, str]] = None,
-    ) -> Tuple[float, CoordinationResult]:
-        """
-        Convenience: evaluate spatial coherence and apply adjustment to confidence.
-
-        Args:
-            station: Station code
-            direction: 'up' or 'down'
-            confidence: Original confidence [0.0, 1.0]
-            date: ISO date string
-            market_type: 'HIGH' or 'LOW'
-            current_signals: Dict of nearby station signals
-
         Returns:
-            (adjusted_confidence, CoordinationResult)
+            Dict of station -> modulation factor M(Phi)
         """
-        result = self.evaluate(
-            station=station,
-            direction=direction,
-            date=date,
-            market_type=market_type,
-            current_signals=current_signals,
-        )
-        adjusted = confidence * result.adjusted_confidence
-        return min(1.0, adjusted), result
+        # Build anomalies dict per region
+        region_anomalies: Dict[str, Dict[str, float]] = {}
+        for r_name in self._regions:
+            region_anomalies[r_name] = {}
 
-    def get_coordination_events(
+        for station, forecast in station_forecasts.items():
+            anomaly = forecast.get('anomaly', 0.0)
+            prim_region, sec_region, prim_weight = self.get_region_for_station(station)
+
+            if prim_region in region_anomalies:
+                region_anomalies[prim_region][station] = anomaly
+            if sec_region and sec_region in region_anomalies:
+                region_anomalies[sec_region][station] = anomaly
+
+        # Compute modulation per station
+        mod_factors: Dict[str, float] = {}
+        for station, forecast in station_forecasts.items():
+            station_anomaly = forecast.get('anomaly', 0.0)
+            prim_region, sec_region, prim_weight = self.get_region_for_station(station)
+
+            # Primary region coherence
+            phi_prim = compute_coherence_phi(
+                station_anomaly, region_anomalies.get(prim_region, {}),
+                station, prim_region
+            )
+            m_prim = compute_modulation_factor(phi_prim, prim_region)
+
+            # Blend with secondary region if applicable
+            if sec_region and sec_region in self._regions:
+                phi_sec = compute_coherence_phi(
+                    station_anomaly, region_anomalies.get(sec_region, {}),
+                    station, sec_region
+                )
+                m_sec = compute_modulation_factor(phi_sec, sec_region)
+                modulation = prim_weight * m_prim + (1.0 - prim_weight) * m_sec
+                logger.debug(
+                    "Spatial gate %s: prim=%s phi=%.3f m=%.3f sec=%s phi=%.3f m=%.3f blended=%.3f",
+                    station, prim_region, phi_prim, m_prim,
+                    sec_region, phi_sec, m_sec, modulation
+                )
+            else:
+                modulation = m_prim
+                logger.debug(
+                    "Spatial gate %s: region=%s phi=%.3f m=%.3f",
+                    station, prim_region, phi_prim, modulation
+                )
+
+            mod_factors[station] = modulation
+
+        return mod_factors
+
+    def apply_modulation(
         self,
-        station: Optional[str] = None,
-        limit: int = 50,
-    ) -> List[Dict]:
-        """Get recent coordination events."""
-        if station:
-            events = [e for e in self._coordination_events if e["station"] == station]
-        else:
-            events = self._coordination_events
-        return events[-limit:]
+        station_forecasts: Dict[str, Dict[str, Any]],
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Apply spatial coherence modulation to forecasts.
 
-    def get_nearby_summary(self, station: str) -> Dict[str, Any]:
-        """Get a summary of nearby stations for a given station."""
-        nearby = self.get_nearby_stations(station)
+        Modifies: forecast['conviction'] *= M(Phi)
+        Returns: modified station_forecasts dict
+        """
+        mod_factors = self.compute_modulation(station_forecasts)
+        result = {}
+
+        for station, forecast in station_forecasts.items():
+            result[station] = dict(forecast)
+            modulation = mod_factors.get(station, 1.0)
+            base_conviction = forecast.get('conviction', 0.5)
+            result[station]['conviction_adjusted'] = base_conviction * modulation
+            result[station]['spatial_modulation'] = modulation
+            result[station]['spatial_phi'] = forecast.get('spatial_phi', 0.65)
+
+        return result
+
+    def get_region_stats(self) -> Dict[str, dict]:
+        """Return region definitions with station counts for monitoring."""
         return {
-            "station": station,
-            "nearby_stations": [{"code": c, "distance_miles": d} for c, d in nearby],
-            "count": len(nearby),
-            "farthest_miles": max((d for _, d in nearby), default=0),
-            "closest_miles": min((d for _, d in nearby), default=0),
+            name: {
+                'stations': data['stations'],
+                'L_km': data['L'],
+                'M_range': [data['M_min'], data['M_max']],
+            }
+            for name, data in self._regions.items()
         }
 
 
-# ─── Self-Test ──────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────
+# Standalone usage / test
+# ─────────────────────────────────────────────────────────────────────
 
-def _self_test():
-    """Run basic validation."""
+def self_test():
+    """Run a self-test with synthetic forecasts."""
     gate = SpatialCoherenceGate()
 
-    # Test 1: Station distance (KNYC to KJFK ~12mi, KNYC to KLAX ~2470mi)
-    d_prox = gate.get_station_distance("KNYC", "KJFK")
-    d_far = gate.get_station_distance("KNYC", "KLAX")
-    assert d_prox is not None and d_prox < 50, f"Expected nearby (~12mi), got {d_prox}"
-    assert d_far is not None and d_far > 2000, f"Expected far (~2470mi), got {d_far}"
-    print(f"Test 1 PASS: KNYC-KJFK={d_prox:.0f}mi, KNYC-KLAX={d_far:.0f}mi")
+    # Synthetic forecasts: cold front sweeping through Midwest/NE
+    forecasts = {
+        # Midwest — cold anomaly, consistent
+        'KMDW': {'anomaly': -8.0, 'conviction': 0.22, 'confidence': 0.7},
+        'KMSP': {'anomaly': -6.0, 'conviction': 0.24, 'confidence': 0.72},
+        # Northeast — moderate cold, consistent with front
+        'KNYC': {'anomaly': -5.0, 'conviction': 0.20, 'confidence': 0.68},
+        'KBOS': {'anomaly': -4.0, 'conviction': 0.19, 'confidence': 0.65},
+        'KPHL': {'anomaly': -3.0, 'conviction': 0.18, 'confidence': 0.66},
+        'KDCA': {'anomaly': -2.0, 'conviction': 0.16, 'confidence': 0.64},
+        # Contrarian: ATL says warm while neighbors cold
+        'KATL': {'anomaly': +3.0, 'conviction': 0.21, 'confidence': 0.70},
+        'KMIA': {'anomaly': -1.0, 'conviction': 0.15, 'confidence': 0.60},
+        'KMSY': {'anomaly': -2.0, 'conviction': 0.17, 'confidence': 0.63},
+        # Contrarian: LAX says cold while neighbors warm
+        'KLAX': {'anomaly': -5.0, 'conviction': 0.20, 'confidence': 0.70},
+        'KSFO': {'anomaly': +1.0, 'conviction': 0.15, 'confidence': 0.60},
+        'KSEA': {'anomaly': +2.0, 'conviction': 0.16, 'confidence': 0.62},
+        # South Central — slight warm
+        'KHOU': {'anomaly': +2.0, 'conviction': 0.16, 'confidence': 0.65},
+        'KDFW': {'anomaly': +1.0, 'conviction': 0.15, 'confidence': 0.63},
+        'KAUS': {'anomaly': +2.0, 'conviction': 0.17, 'confidence': 0.64},
+        'KSAT': {'anomaly': +1.0, 'conviction': 0.16, 'confidence': 0.62},
+        'KOKC': {'anomaly': 0.0, 'conviction': 0.14, 'confidence': 0.60},
+        # Mountain West
+        'KDEN': {'anomaly': -3.0, 'conviction': 0.18, 'confidence': 0.66},
+        'KPHX': {'anomaly': +2.0, 'conviction': 0.15, 'confidence': 0.62},
+        'KLAS': {'anomaly': +1.0, 'conviction': 0.14, 'confidence': 0.60},
+    }
 
-    # Test 2: Nearby stations for KATL (should find KCLT, KHOU, KJAX, etc.)
-    nearby = gate.get_nearby_stations("KATL")
-    assert len(nearby) > 0, f"Expected nearby stations for KATL, got none"
-    print(f"Test 2 PASS: KATL nearby = {len(nearby)} stations: {[s[0] for s in nearby[:5]]}")
+    result = gate.apply_modulation(forecasts)
 
-    # Test 3: Coherent signal → confidence boost
-    signals = {"KATL": "up", "KBOS": "up", "KNYC": "up", "KPHL": "up"}
-    r3 = gate.evaluate("KDCA", "up", "2026-07-24", current_signals=signals)
-    assert r3.is_coherent, f"Expected coherent for KDCA up with NE corridor"
-    assert r3.adjusted_confidence >= 1.0, f"Expected boost, got {r3.adjusted_confidence}"
-    print(f"Test 3 PASS: coherent={r3.is_coherent} mult={r3.adjusted_confidence} rec={r3.recommendation}")
+    print("=== Spatial Coherence Self-Test ===")
+    print(f"{'Station':<8} {'Region':<10} {'Anomaly':>8} {'Base':>8} {'Mod':>8} {'Adj':>8}")
+    print("-" * 55)
+    for station in sorted(forecasts.keys()):
+        f = forecasts[station]
+        r = result[station]
+        prim, sec, _ = gate.get_region_for_station(station)
+        reg = sec if sec else prim
+        print(f"{station:<8} {reg:<10} {f['anomaly']:>+7.1f}°F "
+              f"{f['conviction']:>8.3f} "
+              f"{r.get('spatial_modulation', 1.0):>7.3f} "
+              f"{r.get('conviction_adjusted', 0):>8.3f}")
 
-    # Test 4: Conflicting signal → penalty
-    signals_conflict = {"KNYC": "up", "KPHL": "down"}
-    r4 = gate.evaluate("KDCA", "up", "2026-07-24", current_signals=signals_conflict)
-    assert r4.is_conflicting, f"Expected conflicting"
-    assert r4.adjusted_confidence < 1.0, f"Expected penalty, got {r4.adjusted_confidence}"
-    print(f"Test 4 PASS: conflicting={r4.is_conflicting} mult={r4.adjusted_confidence}")
-
-    # Test 5: Isolated station → slight discount
-    r5 = gate.evaluate("KSEA", "up", "2026-07-24")
-    # KSEA is on the west coast - few nearby within 200mi
-    assert r5.adjusted_confidence <= 1.0
-    print(f"Test 5 PASS: isolated station mult={r5.adjusted_confidence} neighbors={r5.nearby_station_count}")
-
-    # Test 6: apply_to_confidence
-    adj_confidence, result = gate.apply_to_confidence(
-        "KDCA", "up", 0.70, "2026-07-24",
-        current_signals={"KNYC": "up", "KPHL": "up"},
-    )
-    assert adj_confidence > 0.70, f"Expected boosted confidence, got {adj_confidence}"
-    print(f"Test 6 PASS: confidence {0.70} → {adj_confidence:.3f}")
-
-    # Test 7: get_nearby_summary
-    summary = gate.get_nearby_summary("KATL")
-    assert "nearby_stations" in summary
-    assert summary["count"] > 0
-    print(f"Test 7 PASS: KATL summary = {summary['count']} nearby")
-
-    # Test 8: Coordination events
-    events = gate.get_coordination_events(station="KDCA")
-    assert len(events) >= 2
-    print(f"Test 8 PASS: {len(events)} coordination events for KDCA")
-
-    # Test 9: No signal nearby
-    r9 = gate.evaluate("KDCA", "up", "2026-07-24", current_signals={})
-    assert r9.adjusted_confidence == 0.98  # Nearby exist but no signals
-    print(f"Test 9 PASS: no signals nearby mult={r9.adjusted_confidence}")
-
-    # Test 10: to_dict
-    d = r9.to_dict()
-    assert "is_coherent" in d
-    assert "adjusted_confidence" in d
-    assert "recommendation" in d
-    print(f"Test 10 PASS: to_dict={d['recommendation']}")
-
-    print("\nAll self-tests PASS")
-    return True
+    # Verify Midwest consistency (should be near neutral)
+    kw_mod = result['KMDW'].get('spatial_modulation', 1.0)
+    se_mod = result['KATL'].get('spatial_modulation', 1.0)
+    la_mod = result['KLAX'].get('spatial_modulation', 1.0)
+    print(f"\nKMDW (consistent MW): mod={kw_mod:.3f}")
+    print(f"KATL (contrarian SE): mod={se_mod:.3f}")
+    print(f"KLAX (contrarian PAC): mod={la_mod:.3f}")
+    assert kw_mod >= 0.9, f"KMDW should be boosted or neutral: {kw_mod}"
+    assert se_mod < 1.0, f"KATL should be penalized: {se_mod}"
+    assert la_mod < 1.0, f"KLAX should be penalized: {la_mod}"
+    print("\nSelf-test: PASSED")
 
 
 if __name__ == "__main__":
-    _self_test()
+    logging.basicConfig(level=logging.INFO)
+    self_test()

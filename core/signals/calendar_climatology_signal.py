@@ -60,50 +60,56 @@ class CalendarClimatologySignal(BaseSignal):
         return None, 0.0
 
     def evaluate_for_station(self, station: str, date: str, conn=None) -> Tuple[Optional[str], float]:
-        """DB-based evaluation for calendar climatology signal."""
+        """DB-based evaluation using ERA5 reanalysis climatology (salvaged from METAR pipeline)."""
         import sqlite3
         import math
-        
+        import os
+
+        # Use ERA5 reanalysis archive for consistent climatology
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        era5_db = os.path.join(repo_root, 'data', 'era5_archive.db')
+
         own_conn = conn is None
         if own_conn:
-            conn = sqlite3.connect(self.db_path) if self.db_path else None
-            if conn is None:
+            if not os.path.exists(era5_db):
                 return None, 0.0
+            conn = sqlite3.connect(era5_db)
 
         try:
-            # Query max daily temperature for the climatological analysis
+            # Query ERA5 daily max temperature (in Celsius) for climatological analysis
             cur = conn.cursor()
             # Get previous days for the climatological window
             cur.execute("""
-                SELECT date_utc, MAX(temp_f) as high
-                FROM metar_observations
-                WHERE station=? AND temp_f IS NOT NULL AND date_utc < ?
-                GROUP BY date_utc
-                ORDER BY date_utc DESC
+                SELECT target_date, daily_max_t2m
+                FROM era5_archive
+                WHERE station=? AND target_date < ?
+                ORDER BY target_date DESC
                 LIMIT ?
             """, (station, date, self.window))
 
             days_data = []
             for r in reversed(cur.fetchall()):  # Reverse to get ascending order
-                if r[1] is not None:  # high temp
+                if r[1] is not None:
+                    # Convert Celsius to Fahrenheit for API consistency
+                    high_f = r[1] * 9.0 / 5.0 + 32.0
                     days_data.append({
                         'date': r[0],
-                        'high': r[1]
+                        'high': high_f
                     })
 
-            # Find the current date's high temperature
+            # Find the current date's high temperature from ERA5
             cur.execute("""
-                SELECT MAX(temp_f) as high
-                FROM metar_observations
-                WHERE station=? AND date_utc=?
-                AND temp_f IS NOT NULL
+                SELECT daily_max_t2m
+                FROM era5_archive
+                WHERE station=? AND target_date=?
             """, (station, date))
-            
+
             current_res = cur.fetchone()
             if current_res is None or current_res[0] is None:
                 return None, 0.0
-                
-            current_high = current_res[0]
+
+            # Convert Celsius to Fahrenheit
+            current_high = current_res[0] * 9.0 / 5.0 + 32.0
 
             if len(days_data) < 2:
                 return None, 0.0

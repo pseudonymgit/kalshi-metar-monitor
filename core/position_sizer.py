@@ -53,6 +53,13 @@ CONFIDENCE_TIERS = [
     (0.00, 0.5),   # < 60% → 0.5×
 ]
 
+# Max contracts per trade (cap from R11 E2)
+MAX_CONTRACTS = 500
+
+# Entry price range limits (cap from R11 E2)
+MIN_ENTRY_PRICE = 0.15
+MAX_ENTRY_PRICE = 0.85
+
 # Confidence classification thresholds
 HIGH_CONF_THRESHOLD = 0.70
 MEDIUM_CONF_THRESHOLD = 0.50
@@ -305,6 +312,42 @@ class PositionSizer:
             details["fraction_kelly"] = self._fraction_kelly
             return 0.0, details
 
+        # Edge-dependent tiered sizing (Oalkhadra R11 E2)
+        # Replaces uniform fractional Kelly with edge-based tiers
+        EDGE_TIERS = [
+            (0.10, 0.75, "75% Kelly — strong edge"),    # edge > 0.10
+            (0.06, 0.50, "50% Kelly — moderate edge"),   # edge 0.06-0.10
+            (0.03, 0.25, "25% Kelly — weak edge"),       # edge 0.03-0.06
+        ]
+        effective_kelly_multiplier = 0.0
+        edge_tier_label = "NO TRADE — edge < 0.03"
+        for threshold, kelly_pct, label in EDGE_TIERS:
+            if edge >= threshold:
+                effective_kelly_multiplier = kelly_pct
+                edge_tier_label = label
+                break
+
+        details["edge_multiplier"] = effective_kelly_multiplier
+        details["edge_tier_label"] = edge_tier_label
+
+        # NO TRADE if edge < 0.03
+        if effective_kelly_multiplier <= 0.0:
+            details["kelly_fraction"] = 0.0
+            details["kelly_type"] = "edge_too_low"
+            details["adaptive_multiplier"] = 0.0
+            details["adjusted_kelly"] = 0.0
+            details["max_position"] = 0.0
+            details["raw_position"] = 0.0
+            details["drawdown_protection"] = "inactive"
+            details["final_position"] = 0.0
+            details["bankroll"] = round(self.bankroll, 2)
+            details["confidence"] = round(confidence, 4)
+            details["win_rate"] = round(win_rate, 4)
+            details["edge"] = round(edge, 4)
+            details["posterior_mean"] = round(self._belief.posterior_mean, 4)
+            details["fraction_kelly"] = self._fraction_kelly
+            return 0.0, details
+
         if use_kelly:
             # 1. Raw Kelly (primary formula)
             kelly = self.calculate_kelly_fraction(win_rate)
@@ -318,14 +361,18 @@ class PositionSizer:
             details["kelly_fraction"] = round(confidence, 6)
             details["kelly_type"] = "confidence_weighted"
 
-        # 2. Adaptive multiplier
+        # 2. Adaptive multiplier (from confidence tiers)
         multiplier = self.set_adaptive_multiplier(confidence)
         details["adaptive_multiplier"] = multiplier
 
-        adjusted_kelly = kelly * multiplier
+        # 3. Combine edge multiplier and adaptive multiplier
+        combined_multiplier = effective_kelly_multiplier * multiplier
+        details["combined_multiplier"] = round(combined_multiplier, 6)
+
+        adjusted_kelly = kelly * combined_multiplier
         details["adjusted_kelly"] = round(adjusted_kelly, 6)
 
-        # 3. Bankroll cap (8%)
+        # 4. Bankroll cap (8%)
         max_position = self.bankroll * MAX_BANKROLL_PCT
         raw_position = adjusted_kelly * self.bankroll
         position = min(raw_position, max_position)
@@ -372,6 +419,16 @@ class PositionSizer:
 
     def get_drawdown(self) -> float:
         return self._current_drawdown
+
+    @staticmethod
+    def validate_entry_price(price: float) -> float:
+        """Clamp entry price to [MIN_ENTRY_PRICE, MAX_ENTRY_PRICE]. Returns clamped price."""
+        return max(MIN_ENTRY_PRICE, min(MAX_ENTRY_PRICE, price))
+
+    @staticmethod
+    def cap_contracts(contracts: int) -> int:
+        """Cap contract count at MAX_CONTRACTS."""
+        return min(contracts, MAX_CONTRACTS)
 
 
 # ─── Standalone functions (from position_sizing.py) ────────────────────────
@@ -521,48 +578,45 @@ if __name__ == "__main__":
     # Kelly ≈ (0.60 - 0.0205) / (1 - 0.0205) ≈ 0.5913, mult=1.0, cap=$800
     assert size == 800.0, f"Expected cap $800, got ${size}"
 
-    # 5. Fee-aware Kelly formula
-    k_fa = sizer.calculate_kelly_fraction_fee_aware(win_rate=0.60, edge=0.20)
-    print(f"[5] Fee-aware Kelly (win_rate=0.60, edge=0.20): k={k_fa:.4f}")
-    assert k_fa > 0, f"Expected positive Kelly, got {k_fa}"
+    # 5. (Fee-aware Kelly formula removed — Fix 3: use standard binary Kelly)
 
-    # 6. Bayesian belief update
+    # 5. Bayesian belief update
     posterior = sizer.update_belief(wins=30, losses=20)
-    print(f"[6] After 30W/20L → posterior mean={posterior:.4f}")
+    print(f"[5] After 30W/20L → posterior mean={posterior:.4f}")
     assert abs(posterior - 31.0/52.0) < 1e-6, f"Expected {31/52}, got {posterior}"
 
-    # 7. Drawdown protection
+    # 6. Drawdown protection
     sizer.update_bankroll(8500.0)
     size3, details3 = sizer.compute_position_size(
         confidence=0.90, win_rate=0.60, edge=0.10
     )
-    print(f"[7] Position in drawdown (15%): ${size3:.2f} — "
+    print(f"[6] Position in drawdown (15%): ${size3:.2f} — "
           f"{details3['drawdown_protection']}")
     assert "ACTIVE" in details3["drawdown_protection"]
 
-    # 8. Disagreement computation
+    # 7. Disagreement computation
     disc = compute_disagreement(
         ['up', 'up', 'down'],
         [1.0, 0.8, 0.6],
     )
-    print(f"[8] Disagreement (2 up, 1 down): {disc:.4f}")
+    print(f"[7] Disagreement (2 up, 1 down): {disc:.4f}")
     assert 0 < disc < 1.0, f"Expected moderate disagreement, got {disc}"
 
-    # 9. Instance config
+    # 8. Instance config
     prod_cfg = get_config_for_instance("PROD")
-    print(f"[9] PROD config: fee_rate={prod_cfg.fee_rate}, "
+    print(f"[8] PROD config: fee_rate={prod_cfg.fee_rate}, "
           f"fraction_kelly={prod_cfg.fraction_kelly}")
     assert prod_cfg.fee_rate == DEFAULT_COST_FRACTION
     assert prod_cfg.fraction_kelly == 0.5
 
-    # 10. Rolling win rate
+    # 9. Rolling win rate
     for i in range(20):
         sizer.add_win_result(
             (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d'),
             i % 3 != 2,
         )
     wr = sizer.get_rolling_win_rate()
-    print(f"[10] Rolling win rate (20 recent trades): {wr:.4f}")
+    print(f"[9] Rolling win rate (20 recent trades): {wr:.4f}")
     assert 0.5 < wr < 1.0, f"Expected ~0.66, got {wr}"
 
     print("\n✅ All Position Sizer tests passed.\n")

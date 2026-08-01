@@ -213,6 +213,70 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 </html>"""
 
 
+# ─── Market Probability Resolution ────────────────────────────────────────
+
+
+def _resolve_market_prob(station: str, stats: dict) -> float:
+    """
+    Resolve market probability for a station using multiple sources.
+
+    Resolution order:
+      1. Live Kalshi API (via kalshi_price_fetcher)
+      2. Alerts DB market_cache table
+      3. Fallback: 0.5 (neutral)
+
+    B-Mode R8 Cycle 4.3/4.1: Multi-source with circuit breaker awareness.
+    """
+    # Source 1: Live Kalshi API
+    if _dashboard_get_market_price is not None:
+        try:
+            live_date = stats.get("latest_date")
+            if live_date:
+                live_price, _ = _dashboard_get_market_price(station, 'HIGH', live_date)
+                if live_price is not None and 0.01 <= live_price <= 0.99:
+                    return live_price
+        except Exception:
+            pass
+
+    # Source 2: Alerts DB market_cache table
+    try:
+        alert_db = os.getenv("ALERT_DB_PATH", "/var/data/alerts.db")
+        if os.path.exists(alert_db):
+            import sqlite3
+            conn = sqlite3.connect(alert_db, timeout=1)
+            try:
+                row = conn.execute(
+                    """SELECT cache_json FROM market_cache
+                       WHERE station = ? ORDER BY updated_at DESC LIMIT 1""",
+                    (station,)
+                ).fetchone()
+                if row:
+                    cache = json.loads(row[0])
+                    if isinstance(cache, dict):
+                        yes_bid = cache.get("yes_bid_dollars") or cache.get("yes_bid")
+                        yes_ask = cache.get("yes_ask_dollars") or cache.get("yes_ask")
+                        last_price = cache.get("last_price_dollars") or cache.get("last_price")
+                        # Prefer last_price, then midpoint
+                        if last_price is not None:
+                            price = float(last_price)
+                            if 0 < price <= 1:
+                                return price
+                            if 1 < price <= 100:
+                                return price / 100.0
+                        if yes_bid is not None and yes_ask is not None:
+                            bid = float(yes_bid) if float(yes_bid) <= 1 else float(yes_bid) / 100.0
+                            ask = float(yes_ask) if float(yes_ask) <= 1 else float(yes_ask) / 100.0
+                            if 0 < bid <= ask <= 1:
+                                return (bid + ask) / 2.0
+            finally:
+                conn.close()
+    except Exception:
+        pass
+
+    # Source 3: Fallback — neutral 0.5
+    return 0.5
+
+
 # ─── Dashboard Application ────────────────────────────────────────────────
 
 
@@ -484,19 +548,10 @@ class DashboardApp:
         # If latest > mean, model thinks upward bias is more likely
         model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
 
-        # Market probability: try live Kalshi price, fallback to 0.5
-        # Market probability: try live Kalshi price, fallback to 0.5
+        # Market probability: try live Kalshi price, fallback to cache, then 0.5
         # B-Mode R8 Cycle 4.3: Use stats latest_date instead of undefined 'date' variable
-        market_prob = 0.5
-        if _dashboard_get_market_price is not None:
-            try:
-                live_date = stats.get("latest_date")
-                if live_date:
-                    live_price, _ = _dashboard_get_market_price(station, 'HIGH', live_date)
-                    if live_price is not None and 0.01 <= live_price <= 0.99:
-                        market_prob = live_price
-            except Exception:
-                pass
+        # B-Mode R8 Cycle 4.x (FP 5.8): Multi-source market_prob with circuit breaker awareness
+        market_prob = _resolve_market_prob(station, stats)
 
         # Discrepancy
         discrepancy = model_prob - market_prob
@@ -558,16 +613,7 @@ class DashboardApp:
             z = (latest - mean) / std if std > 0 else 0.0
             model_prob = float(sp_stats.norm.cdf(z)) if std > 0 else 0.5
             # B-Mode R8 Cycle 4.3: Use stats latest_date instead of undefined 'date' variable
-            market_prob = 0.5
-            if _dashboard_get_market_price is not None:
-                try:
-                    live_date = stats.get("latest_date")
-                    if live_date:
-                        live_price, _ = _dashboard_get_market_price(station, 'HIGH', live_date)
-                        if live_price is not None and 0.01 <= live_price <= 0.99:
-                            market_prob = live_price
-                except Exception:
-                    pass
+            market_prob = _resolve_market_prob(station, stats)
             discrepancy = model_prob - market_prob
             raw_discrepancies.append(discrepancy)
 

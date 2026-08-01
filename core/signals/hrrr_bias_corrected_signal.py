@@ -1,314 +1,302 @@
 #!/usr/bin/env python3
 """
-HRRR Bias-Corrected Temperature Signal
+ADVANCE Signal 3: HRRR Bias-Corrected (2-3d)
 
-Bias-corrects HRRR hourly forecasts using the latest METAR observation
-to produce more accurate short-term temperature predictions.
+Uses the High-Resolution Rapid Refresh (HRRR) model via the Open-Meteo API
+to fetch short-range weather forecasts at 3km resolution, hourly step.
 
-Formula: T_forecast(h) = T_hrrr(t+h) + [T_metar(t) - T_hrrr(t)]
+Applies rolling bias correction per station to improve forecast accuracy.
 
-Where:
-- T_metar(t) = latest METAR observed temperature at time t
-- T_hrrr(t) = HRRR forecast temperature for time t (analysis)
-- T_hrrr(t+h) = HRRR forecast temperature for time t+h
-- T_forecast(h) = bias-corrected forecast for h hours ahead
+API endpoint: https://api.open-meteo.com/v1/forecast
+Parameters: latitude, longitude, hourly=temperature_2m, forecast_days=3
 
-Expected accuracy: 80-85% at 1-3h horizon.
+B-Mode compliant. No AI/ML.
 
-This is an intraday signal that requires both METAR and HRRR data.
+Usage:
+    from core.signals.hrrr_bias_corrected_signal import HRRRBiasCorrectedSignal
+
+    signal = HRRRBiasCorrectedSignal()
+    result = signal.get_forecast(station="KNYC", lat=40.71, lon=-74.01)
+    bias_corrected = signal.apply_bias_correction(result, station="KNYC")
 """
 
-from typing import Optional, Tuple, Dict, List
-import sqlite3
+import json
 import logging
 import os
-from pathlib import Path
-from datetime import datetime, timedelta, timezone
-
-from .base_signal import BaseSignal, validate_signal
+import sqlite3
+import sys
+import time
+from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Optional, Tuple
+from urllib.request import urlopen, Request
 
 logger = logging.getLogger(__name__)
 
-# Default HRRR DB path
-NWP_DB_DEFAULT = "data/nwp_forecasts.db"
-METAR_DB_DEFAULT = "data/metar_backfill.db"
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(REPO_ROOT, "data")
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+# Open-Meteo free tier: 10,000 requests/day, no API key needed
+OPEN_METEO_BASE = "https://api.open-meteo.com/v1/forecast"
+RATE_LIMIT_DELAY = 0.5  # 500ms between requests (well within 10k/day limit)
+
+# Bias correction
+BIAS_DB_PATH = os.path.join(DATA_DIR, "hrrr_bias.db")
+BIAS_WINDOW_DAYS = 14      # rolling 14-day bias window
+MIN_BIAS_OBSERVATIONS = 7  # minimum observations for reliable bias estimate
+MAX_BIAS_MAGNITUDE_F = 5.0  # cap bias correction at ±5°F
+
+# Station coordinates
+STATIONS = {
+    "KNYC": (40.71, -74.01), "KLAX": (33.94, -118.41),
+    "KATL": (33.64, -84.43), "KBOS": (42.37, -71.01),
+    "KDEN": (39.86, -104.67), "KDFW": (32.90, -97.04),
+    "KHOU": (29.65, -95.28), "KLAS": (36.08, -115.15),
+    "KMDW": (41.79, -87.75), "KMIA": (25.80, -80.29),
+    "KMSP": (44.88, -93.22), "KMSY": (29.99, -90.26),
+    "KOKC": (35.39, -97.60), "KPHL": (39.87, -75.24),
+    "KPHX": (33.45, -112.08), "KSAT": (29.42, -98.49),
+    "KSEA": (47.45, -122.31), "KSFO": (37.62, -122.37),
+    "KDCA": (38.85, -77.04), "KAUS": (30.19, -97.67),
+}
 
 
-class HrrrBiasCorrectedSignal(BaseSignal):
-    """
-    HRRR Bias-Corrected Temperature Signal.
+class HRRRBiasCorrectedSignal:
+    """HRRR model fetcher with rolling bias correction."""
 
-    Uses the latest METAR observation to bias-correct HRRR hourly forecasts,
-    producing more accurate short-term temperature predictions.
-    """
+    def __init__(self, config: Optional[dict] = None):
+        self.config = config or {}
+        self._init_bias_db()
 
-    def __init__(self, db_path: str = None, hrrr_db_path: str = None):
-        super().__init__(db_path)
-        self.hrrr_db_path = hrrr_db_path or self._resolve_hrrr_db()
+    def _init_bias_db(self):
+        """Initialize bias correction database."""
+        os.makedirs(DATA_DIR, exist_ok=True)
+        conn = sqlite3.connect(BIAS_DB_PATH)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS hrrr_bias (
+                station TEXT,
+                forecast_date TEXT,
+                forecast_hour INTEGER,
+                hrrr_temp_f REAL,
+                actual_temp_f REAL,
+                bias_f REAL,
+                recorded_at TEXT DEFAULT (datetime('now')),
+                PRIMARY KEY (station, forecast_date, forecast_hour)
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS hrrr_forecasts (
+                station TEXT,
+                forecast_date TEXT,
+                forecast_hour INTEGER,
+                temp_f REAL,
+                fetched_at TEXT DEFAULT (datetime('now')),
+                PRIMARY KEY (station, forecast_date, forecast_hour)
+            )
+        """)
+        conn.commit()
+        conn.close()
 
-    def _resolve_hrrr_db(self):
-        """Resolve HRRR DB path."""
-        if os.environ.get('NWP_DB_PATH'):
-            return Path(os.environ['NWP_DB_PATH']).absolute()
-        alt = Path(__file__).resolve().parent.parent.parent / NWP_DB_DEFAULT
-        if alt.exists():
-            return alt
-        return Path(NWP_DB_DEFAULT).resolve()
-
-    @property
-    def name(self) -> str:
-        return "hrrr_bias_corrected"
-
-    @property
-    def min_lookback(self) -> int:
-        return 0  # Only needs current observations
-
-    @validate_signal
-    def evaluate(self, idx: int, days: list) -> Tuple[Optional[str], float]:
+    def _fetch_from_open_meteo(self, lat: float, lon: float) -> Optional[Dict]:
         """
-        Standard evaluate interface — not applicable to intraday signals.
-        Returns (None, 0.0). Use evaluate_for_station() instead.
+        Fetch HRRR forecast from Open-Meteo API.
+
+        Open-Meteo's "best_match" model selection picks HRRR for US locations
+        automatically when no model override is specified. For explicit HRRR,
+        we can use `models=best_match` or omit (it auto-selects).
         """
-        return None, 0.0
-
-    def _get_latest_metar_obs(self, conn: sqlite3.Connection, station: str, date: str) -> Optional[dict]:
-        """Get the most recent METAR observation for the station."""
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT temp_f, timestamp_utc
-            FROM metar_observations
-            WHERE station = ? AND date_utc = ? AND temp_f IS NOT NULL
-            ORDER BY timestamp_utc DESC
-            LIMIT 1
-        """, (station, date))
-        row = cur.fetchone()
-        if row:
-            return {'temp_f': row[0], 'timestamp_utc': row[1]}
-        return None
-
-    def _get_hrrr_forecast(self, hrrr_conn: sqlite3.Connection, station: str,
-                           target_datetime: str) -> Optional[float]:
-        """Get HRRR temperature forecast for a specific datetime."""
-        cur = hrrr_conn.cursor()
-        cur.execute("""
-            SELECT value
-            FROM hrrr_forecasts
-            WHERE station = ? AND target_datetime = ? AND variable = 'temperature_2m'
-            ORDER BY fetch_timestamp DESC
-            LIMIT 1
-        """, (station, target_datetime))
-        row = cur.fetchone()
-        if row:
-            return row[0]
-        return None
-
-    def _get_hrrr_forecast_for_time(self, hrrr_conn: sqlite3.Connection, station: str,
-                                     target_datetime_str: str, date: str) -> Optional[float]:
-        """Get the most recent HRRR forecast for a specific datetime.
-
-        Tries to find a forecast for the target datetime, falling back to
-        exact match on target_datetime field.
-        """
-        cur = hrrr_conn.cursor()
-
-        # Try exact match first
-        cur.execute("""
-            SELECT value, fetch_timestamp
-            FROM hrrr_forecasts
-            WHERE station = ? AND target_datetime = ? AND variable = 'temperature_2m'
-            ORDER BY fetch_timestamp DESC
-            LIMIT 1
-        """, (station, target_datetime_str))
-        row = cur.fetchone()
-        if row:
-            return row[0]
-
-        # Try fuzzy match — look for the closest target_datetime
-        cur.execute("""
-            SELECT target_datetime, value
-            FROM hrrr_forecasts
-            WHERE station = ? AND substr(target_datetime, 1, 10) = ?
-              AND variable = 'temperature_2m'
-            ORDER BY ABS(
-                cast(substr(target_datetime, 12, 2) AS INTEGER) - cast(substr(?, 12, 2) AS INTEGER)
-            ) ASC
-            LIMIT 1
-        """, (station, date, target_datetime_str))
-        row = cur.fetchone()
-        if row:
-            return row[1]
-        return None
-
-    def evaluate_for_station(
-        self,
-        station: str,
-        date: str,
-        conn: sqlite3.Connection = None,
-        market_type: str = 'HIGH',
-        lookahead_hours: int = 3
-    ) -> Tuple[Optional[str], float]:
-        """
-        Evaluate HRRR bias-corrected temperature signal.
-
-        Fetches the latest METAR observation and the corresponding HRRR forecast,
-        computes bias correction, and predicts direction for the next N hours.
-
-        Args:
-            station: Station code
-            date: ISO date string 'YYYY-MM-DD'
-            conn: Optional SQLite connection to metar_backfill.db
-            market_type: 'HIGH' or 'LOW'
-            lookahead_hours: How many hours ahead to predict (default 3)
-
-        Returns:
-            (direction, confidence) or (None, 0.0)
-        """
-        own_conn = conn is None
-        if own_conn:
-            conn = sqlite3.connect(self.db_path) if self.db_path else None
-            if conn is None:
-                return None, 0.0
-
-        # Connect to HRRR DB
-        hrrr_own_conn = False
-        try:
-            if os.path.exists(self.hrrr_db_path):
-                hrrr_conn = sqlite3.connect(self.hrrr_db_path)
-                hrrr_own_conn = True
-            else:
-                logger.warning(f"HRRR DB not found at {self.hrrr_db_path}")
-                hrrr_conn = None
-        except Exception:
-            hrrr_conn = None
+        params = (
+            f"latitude={lat}&longitude={lon}"
+            f"&hourly=temperature_2m"
+            f"&forecast_days=3"
+            f"&temperature_unit=fahrenheit"
+            f"&timezone=auto"
+        )
+        url = f"{OPEN_METEO_BASE}?{params}"
 
         try:
-            # Get latest METAR
-            metar_obs = self._get_latest_metar_obs(conn, station, date)
-            if not metar_obs:
-                return None, 0.0
+            req = Request(url, headers={"User-Agent": "WeatherEngine/1.0"})
+            resp = urlopen(req, timeout=15)
+            data = json.loads(resp.read().decode())
+            return data
+        except Exception as e:
+            logger.error(f"Open-Meteo fetch failed: {e}")
+            return None
 
-            t_metar_now = metar_obs['temp_f']
-            metar_ts = metar_obs['timestamp_utc']
+    def get_forecast(self, station: str, lat: float, lon: float) -> Optional[Dict]:
+        """
+        Fetch 3-day HRRR forecast for a station.
 
-            # Parse the timestamp (strip timezone offset like +00:00 or Z)
-            clean_ts = metar_ts.split('+')[0].split('Z')[0]
+        Returns dict with hourly temperature forecasts.
+        """
+        time.sleep(RATE_LIMIT_DELAY)  # Rate limit safety
+
+        raw = self._fetch_from_open_meteo(lat, lon)
+        if raw is None:
+            return None
+
+        hourly = raw.get("hourly", {})
+        times = hourly.get("time", [])
+        temps = hourly.get("temperature_2m", [])
+
+        if not times or not temps:
+            logger.warning(f"Empty HRRR response for {station}")
+            return None
+
+        forecasts = []
+        now = datetime.now(timezone.utc)
+
+        conn = sqlite3.connect(BIAS_DB_PATH)
+        for t_str, temp_f in zip(times, temps):
             try:
-                metar_dt = datetime.strptime(clean_ts, '%Y-%m-%dT%H:%M:%S')
-            except ValueError:
-                try:
-                    metar_dt = datetime.strptime(clean_ts, '%Y-%m-%d %H:%M:%S')
-                except ValueError:
-                    return None, 0.0
+                dt = datetime.fromisoformat(t_str)
+                date_str = dt.strftime("%Y-%m-%d")
+                hour = dt.hour
+                forecasts.append({
+                    "datetime": t_str,
+                    "date": date_str,
+                    "hour": hour,
+                    "temp_f": temp_f,
+                })
+                # Store in DB
+                conn.execute("""
+                    INSERT OR REPLACE INTO hrrr_forecasts
+                    (station, forecast_date, forecast_hour, temp_f)
+                    VALUES (?, ?, ?, ?)
+                """, (station, date_str, hour, temp_f))
+            except (ValueError, TypeError):
+                continue
 
-            # If no HRRR DB, fall back to using the METAR trend itself
-            if hrrr_conn is None:
-                # Simple persistence: use METAR-only trend
-                return self._metar_only_fallback(conn, station, date, t_metar_now, metar_dt, lookahead_hours)
+        conn.commit()
+        conn.close()
 
-            # Get HRRR analysis for current time (or nearest hour)
-            current_hour = metar_dt.strftime('%Y-%m-%dT%H:00:00')
-            t_hrrr_now = self._get_hrrr_forecast_for_time(hrrr_conn, station, current_hour, date)
+        return {
+            "station": station,
+            "forecasts": forecasts,
+            "fetched_at": now.isoformat(),
+        }
 
-            if t_hrrr_now is None:
-                # Try fuzzy hour match
-                for h_offset in range(-1, 2):
-                    adj_dt = metar_dt + timedelta(hours=h_offset)
-                    adj_hour = adj_dt.strftime('%Y-%m-%dT%H:00:00')
-                    t_hrrr_now = self._get_hrrr_forecast_for_time(hrrr_conn, station, adj_hour, date)
-                    if t_hrrr_now is not None:
-                        break
+    def _record_actual(self, station: str, forecast_date: str,
+                       forecast_hour: int, actual_temp_f: float):
+        """Record an actual temperature for bias computation."""
+        conn = sqlite3.connect(BIAS_DB_PATH)
+        
+        # Check if we have a forecast for this time
+        cursor = conn.execute(
+            "SELECT temp_f FROM hrrr_forecasts WHERE station=? AND forecast_date=? AND forecast_hour=?",
+            (station, forecast_date, forecast_hour)
+        )
+        row = cursor.fetchone()
+        if row is None:
+            conn.close()
+            return
 
-            if t_hrrr_now is None or t_hrrr_now is None:
-                return self._metar_only_fallback(conn, station, date, t_metar_now, metar_dt, lookahead_hours)
+        hrrr_temp = row[0]
+        bias = round(actual_temp_f - hrrr_temp, 2)
 
-            # Compute bias: how much METAR differs from HRRR analysis
-            bias = t_metar_now - t_hrrr_now
+        conn.execute("""
+            INSERT OR REPLACE INTO hrrr_bias
+            (station, forecast_date, forecast_hour, hrrr_temp_f, actual_temp_f, bias_f)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (station, forecast_date, forecast_hour, hrrr_temp, actual_temp_f, bias))
+        conn.commit()
+        conn.close()
 
-            # Get HRRR forecast for lookahead_hours from now
-            forecast_dt = metar_dt + timedelta(hours=lookahead_hours)
-            forecast_hour = forecast_dt.strftime('%Y-%m-%dT%H:00:00')
-            t_hrrr_future = self._get_hrrr_forecast_for_time(hrrr_conn, station, forecast_hour, date)
-
-            if t_hrrr_future is None:
-                return self._metar_only_fallback(conn, station, date, t_metar_now, metar_dt, lookahead_hours)
-
-            # Bias-corrected forecast
-            t_forecast = t_hrrr_future + bias
-
-            # Predict direction
-            delta = t_forecast - t_metar_now
-
-            if abs(delta) < 1.0:
-                # Not enough predicted change to signal
-                return None, 0.0
-
-            direction = 'up' if delta > 0 else 'down'
-
-            # Confidence: higher for larger bias-corrected delta, but capped
-            # Also reduce confidence if bias is very large (model initialization error)
-            bias_penalty = min(abs(bias) / 10.0, 0.3)
-            base_confidence = min(abs(delta) / 3.0, 0.85)
-            confidence = max(0.1, base_confidence - bias_penalty)
-
-            return direction, confidence
-
-        finally:
-            if own_conn and conn:
-                conn.close()
-            if hrrr_own_conn and hrrr_conn:
-                hrrr_conn.close()
-
-    def _metar_only_fallback(
-        self, conn: sqlite3.Connection, station: str, date: str,
-        t_metar_now: float, metar_dt: datetime, lookahead_hours: int
-    ) -> Tuple[Optional[str], float]:
+    def get_station_bias(self, station: str) -> Optional[float]:
         """
-        Fallback when HRRR data is unavailable: use METAR trend only.
+        Compute rolling bias for a station from recent observations.
+
+        Returns mean bias in °F (positive = HRRR under-predicts).
+        None if insufficient data.
         """
-        cur = conn.cursor()
-        # Get observations from the last few hours
-        lookback_hours = max(3, lookahead_hours)
-        # Build time range
-        start_dt = metar_dt - timedelta(hours=lookback_hours)
-        start_str = start_dt.strftime('%Y-%m-%dT%H:%M:%S')
+        conn = sqlite3.connect(BIAS_DB_PATH)
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=BIAS_WINDOW_DAYS)).isoformat()
 
-        cur.execute("""
-            SELECT temp_f, timestamp_utc
-            FROM metar_observations
-            WHERE station = ? AND temp_f IS NOT NULL AND timestamp_utc >= ?
-            ORDER BY timestamp_utc ASC
-        """, (station, start_str))
+        cursor = conn.execute(
+            """SELECT AVG(bias_f), COUNT(*), MIN(bias_f), MAX(bias_f)
+               FROM hrrr_bias
+               WHERE station=? AND recorded_at >= ?""",
+            (station, cutoff)
+        )
+        row = cursor.fetchone()
+        conn.close()
 
-        rows = cur.fetchall()
-        if len(rows) < 2:
-            return None, 0.0
+        if row is None or row[1] < MIN_BIAS_OBSERVATIONS:
+            return None
 
-        # Compute recent trend
-        first_temp = rows[0][0]
-        if first_temp is None:
-            return None, 0.0
+        avg_bias = row[0]
+        count = row[1]
 
-        delta = t_metar_now - first_temp
-        abs_delta = abs(delta)
+        # Cap at max magnitude
+        avg_bias = max(-MAX_BIAS_MAGNITUDE_F, min(MAX_BIAS_MAGNITUDE_F, avg_bias))
 
-        if abs_delta < 1.0:
-            return None, 0.0
+        return round(avg_bias, 2)
 
-        direction = 'up' if delta > 0 else 'down'
+    def apply_bias_correction(self, forecast_result: Dict, station: str) -> Dict:
+        """Apply rolling bias correction to HRRR forecast."""
+        bias = self.get_station_bias(station)
 
-        # Extrapolate trend forward
-        confidence = min(abs_delta / 5.0, 0.5)  # Lower confidence without HRRR bias correction
-        return direction, confidence
+        corrected = []
+        for fc in forecast_result.get("forecasts", []):
+            entry = dict(fc)
+            if bias is not None:
+                entry["temp_f_corrected"] = round(fc["temp_f"] + bias, 1)
+                entry["bias_applied"] = bias
+            else:
+                entry["temp_f_corrected"] = fc["temp_f"]
+                entry["bias_applied"] = 0.0
+            corrected.append(entry)
 
+        return {
+            "station": station,
+            "bias_f": bias,
+            "forecasts": corrected,
+            "fetched_at": forecast_result.get("fetched_at"),
+        }
 
-def test_signal():
-    """Quick test."""
-    signal = HrrrBiasCorrectedSignal()
-    print(f"Name: {signal.name}")
-    print(f"HRRR DB path: {signal.hrrr_db_path}")
-    print(f"HRRR DB exists: {os.path.exists(signal.hrrr_db_path)}")
-    print("Test complete.")
+    def get_daily_extremes(self, station: str, lat: float, lon: float,
+                           target_date: str = None) -> Dict:
+        """
+        Shortcut: get bias-corrected max/min for a date.
+        Used by the trading pipeline to evaluate temperature buckets.
 
+        Returns dict with max_f, min_f, confidence.
+        """
+        forecast = self.get_forecast(station, lat, lon)
+        if forecast is None:
+            return {"max_f": None, "min_f": None, "confidence": 0.0}
 
-if __name__ == "__main__":
-    test_signal()
+        corrected = self.apply_bias_correction(forecast, station)
+
+        # Find max/min for target date (default: tomorrow)
+        if target_date is None:
+            target_date = (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
+
+        day_forecasts = [f for f in corrected["forecasts"] if f["date"] == target_date]
+        if not day_forecasts:
+            return {"max_f": None, "min_f": None, "confidence": 0.0}
+
+        temps = [f["temp_f_corrected"] for f in day_forecasts]
+        max_f = max(temps)
+        min_f = min(temps)
+
+        # Confidence based on bias data quality
+        if corrected["bias_f"] is not None:
+            bias_confidence = 1.0 - min(abs(corrected["bias_f"]) / MAX_BIAS_MAGNITUDE_F, 0.5)
+        else:
+            bias_confidence = 0.5  # No bias data → lower confidence
+
+        return {
+            "max_f": round(max_f, 1),
+            "min_f": round(min_f, 1),
+            "max_hour": day_forecasts[temps.index(max_f)]["hour"],
+            "min_hour": day_forecasts[temps.index(min_f)]["hour"],
+            "confidence": round(bias_confidence, 3),
+            "bias_f": corrected["bias_f"],
+        }
+
+    def record_settlement(self, station: str, settlement_date: str,
+                          settlement_hour: int, actual_temp_f: float):
+        """Call this after settlement to record actual temp for bias learning."""
+        self._record_actual(station, settlement_date, settlement_hour, actual_temp_f)

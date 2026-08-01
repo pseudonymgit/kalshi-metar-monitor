@@ -24,6 +24,9 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
+# ─── Bias Correction Path ──────────────────────────────────────────────────
+BIAS_CORRECTIONS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ensemble_fraction_bias_corrections.json")
+
 # ─── Paths ─────────────────────────────────────────────────────────────────────
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +44,69 @@ logging.basicConfig(
     stream=sys.stderr,
 )
 logger = logging.getLogger("ensemble_fraction_db")
+
+
+# ─── Bias Correction Helpers ──────────────────────────────────────────────────
+
+_BIAS_CACHE = None
+
+
+def get_season(date_str: str) -> str:
+    """Return season key (DJF, MAM, JJA, SON) for a YYYY-MM-DD date."""
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+    m = dt.month
+    if m == 12 or m <= 2:
+        return "DJF"
+    elif m <= 5:
+        return "MAM"
+    elif m <= 8:
+        return "JJA"
+    else:
+        return "SON"
+
+
+def load_bias_corrections() -> Optional[dict]:
+    """Load bias table from JSON. Returns {station: {season: bias_f}} or None."""
+    global _BIAS_CACHE
+    if _BIAS_CACHE is not None:
+        return _BIAS_CACHE
+    try:
+        with open(BIAS_CORRECTIONS_PATH) as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.warning("Bias corrections not found at %s: %s", BIAS_CORRECTIONS_PATH, e)
+        return None
+    bias_table = data.get("bias_table", {})
+    seasons = data.get("season_order", ["DJF", "MAM", "JJA", "SON"])
+    result = {}
+    for station, biases in bias_table.items():
+        result[station] = {s: biases[i] for i, s in enumerate(seasons) if i < len(biases)}
+    _BIAS_CACHE = result
+    logger.info("Loaded bias corrections: %d stations x 4 seasons", len(result))
+    return result
+
+
+def apply_bias_correction(
+    members_f: List[float],
+    station: str,
+    date_str: str,
+    bias_table: Optional[dict],
+) -> List[float]:
+    """
+    Apply bias correction to ensemble member values before fraction computation.
+    
+    corrected_value = member_value - bias_table[station][season]
+    Bias defined as (GEFS_mean - actual). Positive bias = GEFS overpredicts.
+    Subtracting bias from members removes systematic error.
+    For KDEN DJF bias = -3.75, member - (-3.75) = member + 3.75""F.
+    """
+    if bias_table is None:
+        return members_f
+    bs = bias_table.get(station, {}).get(get_season(date_str))
+    if bs is None:
+        return members_f
+    return [m - bs for m in members_f]
+
 
 # ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -206,10 +272,14 @@ def analyze_single_record(
     if not members_f:
         return None
 
+    # Apply bias correction (Item A2 from Gray Room Round 12)
+    bias_table = load_bias_corrections()
+    corrected_f = apply_bias_correction(members_f, station, target_date, bias_table)
+
     n_members = len(members_f)
 
-    # Compute exceedance probabilities for all thresholds
-    exceedance_probs = compute_exceedance_probabilities(members_f)
+    # Compute exceedance probabilities from CORRECTED values
+    exceedance_probs = compute_exceedance_probabilities(corrected_f)
 
     # Score each threshold
     threshold_results = []
@@ -238,9 +308,9 @@ def analyze_single_record(
             best_dist = dist
             best_threshold = tr
 
-    # Ensemble mean
-    ensemble_mean = sum(members_f) / len(members_f)
-    variance = sum((m - ensemble_mean) ** 2 for m in members_f) / len(members_f)
+    # Ensemble mean (from corrected values)
+    ensemble_mean = sum(corrected_f) / len(corrected_f)
+    variance = sum((m - ensemble_mean) ** 2 for m in corrected_f) / len(corrected_f)
     ensemble_std = math.sqrt(variance)
 
     return {
