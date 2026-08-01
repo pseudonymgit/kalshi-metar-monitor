@@ -26,7 +26,11 @@ CORE_DIR = os.path.dirname(os.path.abspath(__file__))
 if CORE_DIR not in sys.path:
     sys.path.insert(0, CORE_DIR)
 
+import logging
+
 from core.signals import SignalRegistry
+
+logger = logging.getLogger(__name__)
 from core.signal_fusion import SignalFusionEngine, TimeDecaySignalManager
 from core.market_cost_model import MARKET_COST_MODEL
 
@@ -241,14 +245,14 @@ def run_backtest(
         days, market = load_station_data(station, conn)
         if len(days) < train_days + test_days:
             if verbose:
-                print(f"  {station}: insufficient data ({len(days)} days)")
+                logger.warning("Station %s: insufficient data (%d days)", station, len(days))
             continue
 
         # Direction is determined by comparing today's settlement to yesterday's.
         # All signals predict directional change (today vs yesterday), not
         # strike level (above/below median). See docs/plans/BACKTEST-AUDIT-FINDINGS.md
         if verbose:
-            print(f"  {station}: using day-over-day directional validation")
+            logger.debug("Station %s: using day-over-day directional validation", station)
 
         # Walk-forward backtest
         start = train_days
@@ -360,9 +364,7 @@ def run_backtest(
     # Paper accuracy systematically differs from settlement-validated accuracy.
     # See docs/weather-engine/BACKTEST-SETTLEMENT-VALIDATION.md for the delta.
     if not hasattr(run_backtest, '_cycle4_warning_printed'):
-        print("\n⚠️  WARNING: All accuracy numbers below are PAPER accuracy.")
-        print("   These have NOT been validated against Kalshi settlement data.")
-        print("   Settlement-validated accuracy will differ (see Cycle 4.4).\n")
+        logger.warning("PAPER ACCURACY -- unconfirmed against settlement data. See Cycle 4.4 for settlement-validated accuracy.")
         run_backtest._cycle4_warning_printed = True
 
     return {

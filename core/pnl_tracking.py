@@ -13,6 +13,14 @@ from typing import Dict, List, Optional, Tuple, Any
 from pathlib import Path
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .market_cost_model import MARKET_COST_MODEL
+from .trade_execution import TradeType
+
+# Import calibration pipeline flag (from paper_trading_engine module-level constant)
+HAVE_CALIBRATION_PIPELINE = False
+try:
+    from .paper_trading_engine import HAS_CALIBRATION_PIPELINE as HAVE_CALIBRATION_PIPELINE
+except ImportError:
+    pass
 
 # Default calibration report path
 CALIBRATION_REPORT_PATH = str(Path(__file__).resolve().parent.parent / "reports" / "paper_trading_calibration.json")
@@ -159,7 +167,7 @@ def process_settlements_for_date(self, settlement_date):
         c.execute("SELECT signal_direction, functionality, confidence_indicator, forecast_prob FROM trades WHERE trade_uuid = ?", (trade_uuid,))
         trade_row = c.fetchone()
 
-        if trade_row and HAS_CALIBRATION_PIPELINE and self._calibrator:
+        if trade_row and HAVE_CALIBRATION_PIPELINE and self._calibrator:
             orig_signal_direction, functionality, raw_confidence, raw_forecast_prob = trade_row
 
             # Determine if the prediction was correct (strike-based)
@@ -188,7 +196,7 @@ def process_settlements_for_date(self, settlement_date):
                 conf_to_use = raw_forecast_prob if raw_forecast_prob is not None else (raw_confidence if raw_confidence is not None else 0.5)
                 self._calibrator.update(signal_name, station, conf_to_use, was_correct)
             except Exception as e:
-                print(f"Error feeding trade to calibrator: {e}")
+                _LOGGER.error("calibrator_update_failed error=%s", e)
 
         # Update RiskManager with realized P&L after settlement
         settlement_trade_result = TradeResult(
@@ -203,7 +211,7 @@ def process_settlements_for_date(self, settlement_date):
 
     conn.commit()
     conn.close()
-    print(f"Processed {settled_count} trade settlements for date {settlement_date}")
+    _LOGGER.info("settlements_processed count=%d date=%s", settled_count, settlement_date)
 def daily_reconciliation(self, reconcile_date=None):
     """
     Perform daily reconciliation of all positions and calculate metrics.
@@ -636,7 +644,7 @@ def generate_calibration_report(self, save_path=CALIBRATION_REPORT_PATH):
         }
 
         # Add calibration pipeline metrics if available
-        if HAS_CALIBRATION_PIPELINE and self._calibrator:
+        if HAVE_CALIBRATION_PIPELINE and self._calibrator:
             try:
                 # Refit calibrators to get current stats
                 self._calibrator.refit()
@@ -663,7 +671,7 @@ def generate_calibration_report(self, save_path=CALIBRATION_REPORT_PATH):
                 report['calibration_pipeline_metrics'] = calibration_info
 
             except Exception as e:
-                print(f"Error generating calibration pipeline report: {e}")
+                _LOGGER.error("calibration_report_generation_failed error=%s", e)
                 report['calibration_pipeline_metrics'] = {
                     'calibration_pipeline_enabled': True,
                     'error_generating_report': str(e)
@@ -681,10 +689,10 @@ def generate_calibration_report(self, save_path=CALIBRATION_REPORT_PATH):
         with open(save_path, 'w') as f:
             json.dump(report, f, indent=2)
 
-        print(f"Calibration report generated: {save_path}")
+        _LOGGER.info("calibration_report_generated path=%s", save_path)
         return report
     else:
-        print("No calibration data available yet")
+        _LOGGER.warning("no_calibration_data_available")
         return {}
 def compute_sharpe(self, trades: List[Dict[str, Any]] = None) -> float:
     """
