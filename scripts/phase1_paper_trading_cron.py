@@ -333,7 +333,8 @@ def execute_trade(
     # Per-contract binary math
     entry_price = 0.85  # Default; should come from market data
     contracts = position_size / entry_price
-    round_trip_fee = contracts * 0.01 * 2  # $0.01/contract/side × 2 sides
+    # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side × 2
+    round_trip_fee = math.ceil(0.07 * contracts * entry_price * (1.0 - entry_price)) * 2
 
     # P&L calculation
     if is_correct:

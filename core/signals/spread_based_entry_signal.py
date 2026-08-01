@@ -1,203 +1,176 @@
 #!/usr/bin/env python3
 """
-Spread-Based Entry Signal — Market Micro Structure Signal.
+ADVANCE Signal 1: Spread-Based Entry (<1d)
 
-Detects informed trading opportunities from spread dynamics:
-- Widening spreads often indicate informed traders pulling liquidity
-- Narrowing spreads indicate consensus / low uncertainty
-- Spread-to-volume ratio helps filter noise
+Detects when the Kalshi market bid/ask spread narrows enough for profitable
+entry before settlement. Trades the convergence between market price and
+expected settlement value as the spread compresses.
 
-Core insight: When bid-ask spreads widen without a clear news catalyst,
-it's often because informed participants are reducing their footprint
-(making markets less liquid). This is a contrarian entry signal.
+B-Mode compliant. No AI/ML.
 
-Version: 1.0 — 2026-07-22 (Phase 19.3)
+Usage:
+    from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
+
+    detector = SpreadBasedEntryDetector()
+    result = detector.check(bid=55, ask=57, volume_24h=1500.0,
+                            hours_to_settlement=3.5, station="KNYC", bucket_temp_f=84)
+    if result["entry"]:
+        # execute trade
+        pass
 """
 
 import logging
-import math
-from datetime import datetime, timezone
+import os
+import sys
 from typing import Dict, Optional, Tuple
 
-from core.market_cost_model import MARKET_COST_MODEL
-from core.signals.base_signal import BaseSignal
+logger = logging.getLogger(__name__)
 
-_LOGGER = logging.getLogger(__name__)
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
-# Default thresholds
-SPREAD_WIDENING_THRESHOLD = 0.04   # 4¢ — threshold for "wide" spread
-SPREAD_NARROW_THRESHOLD = 0.02     # 2¢ — threshold for "narrow" spread
-BASELINE_SPREAD = 0.031            # Mean measured spread
-LOOKBACK_MINUTES = 30              # How far back to compare spreads
+# Default config — overridable per station/bucket
+MIN_SPREAD_PROFIT_MARGIN = 0.5  # cents: spread must be < profit after costs
+TRANSACTION_COST_CENTS = 1.0     # 1¢ per side round trip
+MAX_POSITION_DOLLARS = 200.0
+MIN_POSITION_DOLLARS = 5.0
+BASE_VOLUME_PCT = 0.02
+STOP_LOSS_PCT = 0.30
+EXIT_SPREAD_REWIDEN_MULTIPLIER = 1.5  # times entry spread to trigger exit
+MIN_HOURS_TO_SETTLEMENT = 1.0
+MAX_SPREAD_PERCENTILE = 50  # percentile of historical spread distribution
 
 
-class SpreadBasedEntrySignal(BaseSignal):
-    """
-    Market Micro Signal: Spread-Based Entry.
+class SpreadBasedEntryDetector:
+    """Detects profitable spread-based entry opportunities."""
 
-    Evaluates whether current spread conditions favor entry:
-    - Widening spreads → signal strength HIGH (liquidity providers pulling back,
-      potential for mean reversion in spread)
-    - Narrowing spreads → signal strength LOW (consensus, less edge)
-    - Spread-to-volume ratio filters noise
+    def __init__(self, config: Optional[dict] = None):
+        self.config = config or {}
+        # Station-specific spread percentiles: {station: {bucket_temp_f: percentile_map}}
+        self.spread_history: Dict[str, Dict[int, list]] = {}
 
-    This is a gating / confidence modulation signal, not a directional signal.
-    It tells you WHEN to trade, not WHICH direction.
-    """
+    def record_spread(self, station: str, bucket_temp_f: int, spread_cents: int):
+        """Record a spread observation for historical percentile computation."""
+        if station not in self.spread_history:
+            self.spread_history[station] = {}
+        if bucket_temp_f not in self.spread_history[station]:
+            self.spread_history[station][bucket_temp_f] = []
+        self.spread_history[station][bucket_temp_f].append(spread_cents)
+        # Keep last 100 observations
+        if len(self.spread_history[station][bucket_temp_f]) > 100:
+            self.spread_history[station][bucket_temp_f].pop(0)
 
-    def __init__(
-        self,
-        db_path: str,
-        widening_threshold: float = SPREAD_WIDENING_THRESHOLD,
-        narrow_threshold: float = SPREAD_NARROW_THRESHOLD,
-    ):
-        super().__init__(db_path)
-        self._signal_name = "spread_based_entry"
-        self._signal_min_lookback = 1  # Real-time signal, no lookback needed
-        self.widening_threshold = widening_threshold
-        self.narrow_threshold = narrow_threshold
-        self.cost_model = MARKET_COST_MODEL
+    def get_spread_percentile(self, station: str, bucket_temp_f: int, spread_cents: int) -> float:
+        """Return the percentile rank of current spread against history."""
+        hist = self.spread_history.get(station, {}).get(bucket_temp_f, [])
+        if not hist:
+            return 0.5  # Default to median if no history
+        count_below = sum(1 for s in hist if s <= spread_cents)
+        return count_below / len(hist)
 
-    @property
-    def name(self) -> str:
-        return self._signal_name
-
-    @property
-    def min_lookback(self) -> int:
-        return self._signal_min_lookback
-
-    def evaluate(self, idx: int, days: list) -> tuple:
+    def check(self, bid: int, ask: int, volume_24h: float,
+              hours_to_settlement: float, station: str,
+              bucket_temp_f: int) -> Dict:
         """
-        Evaluate spread conditions for the given index.
+        Evaluate spread-based entry opportunity.
 
-        Returns standard (direction, confidence) tuple for BaseSignal interface.
-        direction = None (modulation signal), confidence = spread-based confidence.
+        Args:
+            bid: YES bid price in cents
+            ask: YES ask price in cents
+            volume_24h: 24-hour dollar volume
+            hours_to_settlement: hours until market settlement
+            station: Kalshi station code (e.g., "KNYC")
+            bucket_temp_f: temperature bucket being evaluated
+
+        Returns:
+            Dict with flags: entry, exit, score, reason, units
         """
-        result = self.evaluate_raw(idx, days)
-        signal = result.get('signal', 0.0)
-        confidence = result.get('confidence', 0.0)
-        # Modulation signal: direction is None, confidence represents spread quality
-        return None, min(float(confidence), 1.0)
-
-    def evaluate_raw(self, idx: int, days: list) -> Dict[str, any]:
-        """
-        Evaluate spread conditions for the given index.
-
-        Returns a dict with:
-            - signal: float (-1 to 1), positive = favorable entry conditions
-            - confidence: float (0-1)
-            - metadata: dict with spread details
-        """
-        # Get the timestamp for this bar
-        timestamp = self._get_timestamp_for_idx(idx)
-        if timestamp is None:
-            timestamp = datetime.now(timezone.utc)
-
-        # Try to get live spread from Kalshi API for the ticker
-        ticker = self._get_ticker_for_idx(idx)
-        spread = BASELINE_SPREAD  # fallback
-        depth = None
-
-        if ticker:
-            depth = self.cost_model.get_market_depth_snapshot(ticker)
-            if depth:
-                spread = depth.spread
-
-        # Score the spread environment
-        signal, confidence, details = self._score_spread_environment(
-            current_spread=spread,
-            depth=depth,
-            ticker=ticker,
-        )
-
-        return {
-            'signal': signal,
-            'confidence': confidence,
-            'metadata': {
-                'signal_name': self.name,
-                'spread': spread,
-                'baseline_spread': BASELINE_SPREAD,
-                'spread_ratio': spread / max(BASELINE_SPREAD, 1e-8),
-                'depth_score': depth.implied_depth_score if depth else None,
-                'bid_volume': depth.bid_volume if depth else None,
-                'ask_volume': depth.ask_volume if depth else None,
-                'widening_threshold': self.widening_threshold,
-                'narrow_threshold': self.narrow_threshold,
-                'timestamp': timestamp.isoformat(),
-                **details,
-            }
+        result = {
+            "entry": False,
+            "exit": False,
+            "exit_reason": None,
+            "score": 0.0,
+            "reason": None,
+            "units": 0,
+            "dollar_value": 0.0,
         }
 
-    def _score_spread_environment(
-        self,
-        current_spread: float,
-        depth: Optional[any],
-        ticker: Optional[str],
-    ) -> Tuple[float, float, Dict]:
+        # Gate: minimum time to settlement
+        if hours_to_settlement < MIN_HOURS_TO_SETTLEMENT:
+            result["reason"] = "Too close to settlement"
+            return result
+
+        # Gate: minimum volume
+        if volume_24h < 500.0:
+            result["reason"] = "Insufficient volume"
+            return result
+
+        spread = ask - bid
+        fair_value = (bid + ask) / 2.0
+
+        # Gate: check if spread is profitable after costs
+        profit_margin = (100 - fair_value) / 100.0 * fair_value  # simplified EV
+        net_profit = profit_margin - spread - TRANSACTION_COST_CENTS
+
+        if net_profit <= MIN_SPREAD_PROFIT_MARGIN:
+            result["reason"] = f"Spread too wide: {spread}¢, net profit {net_profit:.1f}¢"
+            return result
+
+        # Spread percentile against historical baseline
+        spread_pct = self.get_spread_percentile(station, bucket_temp_f, spread)
+        if spread_pct > MAX_SPREAD_PERCENTILE / 100.0:
+            result["reason"] = f"Spread {spread}¢ not compressed (pctile={spread_pct:.2f})"
+            return result
+
+        # Entry signal
+        spread_compression_strength = (1.0 - spread_pct)  # 1.0 = very compressed
+        result["entry"] = True
+        result["score"] = round(spread_compression_strength, 3)
+        result["reason"] = (f"Spread compressed: {spread}¢ (pctile={spread_pct:.2f}), "
+                           f"net profit={net_profit:.1f}¢")
+
+        # Position sizing
+        base_units = int(BASE_VOLUME_PCT * volume_24h / fair_value * 100)  # contracts
+        scalar = min(spread_compression_strength, 1.0)
+        units = max(1, int(base_units * scalar))
+        dollar_value = min(units * fair_value / 100.0, MAX_POSITION_DOLLARS)
+        if dollar_value < MIN_POSITION_DOLLARS:
+            dollar_value = 0.0
+            units = 0
+            result["entry"] = False
+            result["reason"] = "Position below minimum"
+
+        result["units"] = units
+        result["dollar_value"] = round(dollar_value, 2)
+        return result
+
+    def check_exit(self, entry_spread: int, current_ask: int, current_bid: int,
+                   bid: int, ask: int, profit_loss_pct: float) -> Dict:
         """
-        Score the spread environment on a [-1, 1] scale.
+        Evaluate exit condition for a position opened by this signal.
 
-        Positive = favorable entry conditions.
-        Negative = unfavorable (tight spread, no edge from micro structure).
+        Args:
+            entry_spread: spread at entry (cents)
+            current_ask, current_bid: current market prices (cents)
+            profit_loss_pct: current P&L as % of entry
 
-        Logic:
-        - Spread > 4¢ (widening): signal = +0.4 to +0.7 (informed traders active)
-        - Spread < 2¢ (tight): signal = -0.3 to -0.5 (consensus, no micro edge)
-        - Spread 2-4¢ (normal): signal = 0.0 to +0.3 (neutral to slightly favorable)
-        - Depth score adjusts confidence: deeper markets = more reliable signal
+        Returns:
+            Dict with exit flag and reason
         """
-        details = {}
+        result = {"exit": False, "reason": None}
+        current_spread = ask - bid
 
-        # Spread ratio vs baseline
-        spread_ratio = current_spread / max(BASELINE_SPREAD, 1e-8)
+        # E1: Spread re-widened
+        if current_spread > entry_spread * EXIT_SPREAD_REWIDEN_MULTIPLIER:
+            result["exit"] = True
+            result["reason"] = "Spread re-widened beyond threshold"
+            return result
 
-        # Base signal from spread width
-        if current_spread >= self.widening_threshold:
-            # Widening spread — informed traders pulling liquidity
-            # Stronger signal as spread widens, but diminishing returns
-            excess = current_spread - self.widening_threshold
-            signal = min(0.7, 0.4 + excess * 5.0)
-            details['spread_regime'] = 'widening'
-            details['widening_excess'] = round(excess, 4)
-        elif current_spread <= self.narrow_threshold:
-            # Tight spread — consensus, low edge opportunity
-            deficit = self.narrow_threshold - current_spread
-            signal = max(-0.5, -0.3 - deficit * 10.0)
-            details['spread_regime'] = 'tight'
-            details['tightness_deficit'] = round(deficit, 4)
-        else:
-            # Normal spread — slightly favorable
-            normalized = (current_spread - self.narrow_threshold) / (
-                self.widening_threshold - self.narrow_threshold
-            )
-            signal = 0.0 + normalized * 0.3
-            details['spread_regime'] = 'normal'
-            details['spread_percentile'] = round(normalized, 3)
+        # E4: Stop loss
+        if profit_loss_pct <= -STOP_LOSS_PCT:
+            result["exit"] = True
+            result["reason"] = f"Stop loss hit ({profit_loss_pct:.1f}%)"
+            return result
 
-        # Confidence adjustment
-        if depth:
-            # Higher depth score → more reliable signal
-            base_confidence = 0.5 + 0.3 * depth.implied_depth_score
-            # Volume asymmetry: big difference between bid/ask volume = more signal
-            if depth.bid_volume > 0 and depth.ask_volume > 0:
-                vol_ratio = min(depth.bid_volume, depth.ask_volume) / max(
-                    depth.bid_volume, depth.ask_volume, 1
-                )
-                asymmetry_boost = (1.0 - vol_ratio) * 0.2
-                base_confidence += asymmetry_boost
-                details['volume_asymmetry'] = round(1.0 - vol_ratio, 3)
-        else:
-            base_confidence = 0.5  # Neutral when no depth data
-
-        confidence = min(0.95, max(0.1, base_confidence))
-        details['base_confidence'] = round(base_confidence, 3)
-
-        return round(signal, 4), round(confidence, 3), details
-
-    def _get_timestamp_for_idx(self, idx: int):
-        """Get the timestamp for a given index. Override in subclass."""
-        return None
-
-    def _get_ticker_for_idx(self, idx: int):
-        """Get the ticker for a given index. Override in subclass."""
-        return None
+        return result

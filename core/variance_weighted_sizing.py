@@ -1,405 +1,349 @@
-#!/usr/bin/env python3
 """
-C8 — Variance-Weighted Ensemble Position Sizing
+Variance-Weighted Position Sizing — First-Principles (FP 6.1)
 
-Implements variance-weighted position sizing for the signal ensemble.
-Lower-variance signals get higher weight in position sizing.
+Hyperbolic 1/(1 + k * σ²_total) formulation from Bayesian decision theory.
 
-Key design:
-- Rolling 30-day variance estimate per signal per station
-- Variance weight = 1 / (variance + epsilon) normalized across signals
-- Base size scaled by variance weight, not by raw confidence alone
-- Interface: variance_weighted_size(signal_name, station, base_size, confidences)
+Two variance sources:
+    σ²_member = p̂ * (1-p̂) / 0.25  (ensemble member spread, normalized to [0,1])
+    σ²_signal = inter-signal disagreement (normalized to [0,1])
+    σ²_total = 0.6 * σ²_member + 0.4 * σ²_signal (weighted combination)
+
+Formula:
+    kelly_multiplier = 1.0 / (1.0 + k * σ²_total)
+    f_final = edge * kelly_multiplier * 0.5  (half-Kelly)
+
+Where k ∈ [0.5, 5.0], default 2.0.
 
 Usage:
     from core.variance_weighted_sizing import VarianceWeightedSizer
 
     sizer = VarianceWeightedSizer()
-    size = sizer.variance_weighted_size("gaussian", "KATL", 100.0, {"gaussian": 0.70, "calendar_climatology": 0.65})
-    # Returns position size adjusted for signal variance
+    multiplier = sizer.compute_kelly_multiplier(ensemble_fraction=0.72,
+                                                 signal_probabilities=[0.68, 0.75, 0.70])
+    size = sizer.variance_weighted_size("gaussian", "KATL", 100.0, ...)
+
+B-Mode R8 Cycle 4.5: Hyperbolic formulation replacing linear 1.0-disagreement.
 """
 
-import json
-import logging
 import math
-import os
-import time
-from collections import defaultdict
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+import logging
+from typing import Dict, List, Optional, Tuple, Any
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
-# ─── Constants ──────────────────────────────────────────────────
+# Default parameters
+DEFAULT_K = 2.0          # Aggressiveness parameter
+FLOOR_MULTIPLIER = 0.1   # Floor on kelly_multiplier (min position)
+WEIGHT_MEMBER = 0.6      # Weight for ensemble member spread
+WEIGHT_SIGNAL = 0.4      # Weight for inter-signal disagreement
+FRACTIONAL_KELLY = 0.5   # Half-Kelly for safety
+ROUND_TRIP_FEE = 0.02    # Kalshi fee per contract ($0.02)
 
-DEFAULT_CACHE_FILE = "data/variance_weights_cache.json"
-DEFAULT_ROLLING_WINDOW = 30  # days
-EPSILON = 1e-6  # Small constant to avoid division by zero
-MIN_VARIANCE = 0.01  # Floor for variance estimate
-MAX_WEIGHT_RATIO = 5.0  # Max ratio between highest and lowest weight (prevents over-concentration)
-DEFAULT_WEIGHT = 1.0  # Default weight for signals with insufficient history
+
+def compute_ensemble_variance(ensemble_fraction: float) -> float:
+    """
+    Compute σ²_member from ensemble member spread (FP 6.1 Section 2.1).
+
+    Args:
+        ensemble_fraction: p̂ = mean of member predictions (0.0-1.0)
+
+    Returns:
+        Normalized variance [0, 1]. 0 at extremes, 1 at p̂=0.5.
+    """
+    p = max(0.0, min(1.0, ensemble_fraction))
+    # Bernoulli variance p*(1-p), normalized by max (0.25)
+    variance = p * (1.0 - p)
+    return variance / 0.25  # Normalize to [0, 1]
+
+
+def compute_inter_signal_variance(signal_probabilities: List[float]) -> float:
+    """
+    Compute σ²_signal from inter-signal disagreement (FP 6.1 Section 2.2).
+
+    Args:
+        signal_probabilities: List of calibrated probabilities from active signals
+
+    Returns:
+        Normalized variance [0, 1]. 0 with perfect consensus, 1 with maximal disagreement.
+    """
+    # Filter None/missing
+    active = [p for p in signal_probabilities if p is not None]
+    if len(active) < 2:
+        return 0.0  # No disagreement possible with < 2 signals
+
+    # Compute variance of signal probabilities
+    mean_p = sum(active) / len(active)
+    variance = sum((p - mean_p) ** 2 for p in active) / len(active)
+
+    # Normalize by max theoretical variance (0.25)
+    return min(1.0, variance / 0.25)
+
+
+def compute_kelly_multiplier(
+    sigma2_total: float,
+    k: float = DEFAULT_K,
+    floor: float = FLOOR_MULTIPLIER,
+) -> float:
+    """
+    Compute kelly_multiplier from total estimation variance (FP 6.1 Section 3).
+
+    Formula: 1 / (1 + k * σ²_total), clamped to [floor, 1.0].
+
+    Args:
+        sigma2_total: Combined estimation variance [0, 1]
+        k: Aggressiveness parameter (default 2.0)
+        floor: Minimum multiplier (default 0.1)
+
+    Returns:
+        Kelly multiplier [floor, 1.0]
+    """
+    s2 = max(0.0, min(1.0, sigma2_total))
+    raw = 1.0 / (1.0 + k * s2)
+    return max(floor, raw)
+
+
+def compute_total_variance(
+    ensemble_fraction: float,
+    signal_probabilities: Optional[List[float]] = None,
+    w_member: float = WEIGHT_MEMBER,
+    w_signal: float = WEIGHT_SIGNAL,
+) -> float:
+    """
+    Compute combined estimation variance from both sources (FP 6.1 Section 2.3).
+
+    Args:
+        ensemble_fraction: GEFS ensemble fraction p̂
+        signal_probabilities: List of secondary signal probabilities
+        w_member: Weight for ensemble spread (default 0.6)
+        w_signal: Weight for inter-signal disagreement (default 0.4)
+
+    Returns:
+        σ²_total ∈ [0, 1]
+    """
+    var_member = compute_ensemble_variance(ensemble_fraction)
+
+    var_signal = 0.0
+    if signal_probabilities and len(signal_probabilities) >= 2:
+        var_signal = compute_inter_signal_variance(signal_probabilities)
+
+    return w_member * var_member + w_signal * var_signal
+
+
+def compute_variance_weighted_edge(
+    probability: float,
+    cost: float,
+    sigma2_total: float,
+    k: float = DEFAULT_K,
+) -> Tuple[float, float]:
+    """
+    Compute edge adjusted by estimation variance (FP 6.1 Section 5).
+
+    Args:
+        probability: Estimated exceedance probability p̂
+        cost: Cost per contract as fraction of $1 (e.g., 0.52 for 52¢)
+        sigma2_total: Combined estimation variance
+        k: Aggressiveness parameter
+
+    Returns:
+        Tuple of (edge, kelly_multiplier)
+    """
+    multiplier = compute_kelly_multiplier(sigma2_total, k=k)
+    edge_per_contract = probability - cost - ROUND_TRIP_FEE
+    edge = edge_per_contract * multiplier * FRACTIONAL_KELLY
+    return edge, multiplier
 
 
 class VarianceWeightedSizer:
     """
-    Rolls a 30-day variance estimate per signal per station and uses
-    it to compute position sizing weights.
+    Variance-weighted position sizing using the hyperbolic 1/(1+kσ²) formulation.
 
-    Signals with lower variance (more consistent outcomes) get higher
-    weights. Signals with higher variance (less reliable) get lower weights.
+    Manages rolling variance estimates per (signal, station) pair.
     """
 
-    def __init__(
+    def __init__(self, k: float = DEFAULT_K):
+        self.k = k
+        # Cache: {(signal, station): list of recent outcomes}
+        self._outcomes: Dict[Tuple[str, str], List[float]] = {}
+        # Cache: {(signal, station): variance estimate}
+        self._variance_cache: Dict[Tuple[str, str], float] = {}
+        # Max history per signal/station
+        self._max_history = 500
+
+    def compute_multiplier_from_fraction(
         self,
-        rolling_window: int = DEFAULT_ROLLING_WINDOW,
-        cache_file: str = DEFAULT_CACHE_FILE,
-    ):
-        self.rolling_window = rolling_window
-        self.cache_file = Path(cache_file)
-
-        # Per-signal per-station outcome history
-        # {signal_name: {station: [(timestamp, outcome_value), ...]}}
-        self._outcome_history: Dict[str, Dict[str, List[Tuple[float, float]]]] = defaultdict(
-            lambda: defaultdict(list)
-        )
-
-        # Cached variance estimates
-        self._variance_cache: Dict[str, Dict[str, float]] = defaultdict(dict)
-        self._cache_timestamp = 0.0
-        self._cache_ttl = 3600  # 1 hour
-
-        self._load_cache()
-
-    # ── Public API ────────────────────────────────────────────
-
-    def record_outcome(
-        self,
-        signal_name: str,
-        station: str,
-        outcome_value: float,
-        timestamp: Optional[float] = None,
-    ) -> None:
-        """
-        Record a trade outcome for variance estimation.
-
-        Args:
-            signal_name: Signal name (e.g. 'gaussian', 'spike_reversion')
-            station: Station code (e.g. 'KATL')
-            outcome_value: Numeric outcome (1.0 = correct, 0.0 = incorrect,
-                           or actual P&L as a fraction)
-            timestamp: Unix timestamp (defaults to now)
-        """
-        if timestamp is None:
-            timestamp = time.time()
-
-        self._outcome_history[signal_name][station].append((timestamp, outcome_value))
-        self._prune(signal_name, station)
-        self._invalidate_cache()
-
-    def get_variance(
-        self,
-        signal_name: str,
-        station: str,
+        ensemble_fraction: float,
+        signal_probabilities: Optional[List[float]] = None,
     ) -> float:
         """
-        Get the rolling variance estimate for a signal and station.
+        Quick calculation: kelly multiplier from ensemble fraction + optional signals.
 
         Args:
-            signal_name: Signal name
-            station: Station code
+            ensemble_fraction: GEFS ensemble fraction p̂
+            signal_probabilities: Optional list of signal probabilities
 
         Returns:
-            Variance estimate (lower = more consistent)
+            Kelly multiplier [0.1, 1.0]
         """
-        self._refresh_cache()
-        return self._variance_cache.get(signal_name, {}).get(station, 0.25)
-
-    def get_weight(
-        self,
-        signal_name: str,
-        station: str,
-    ) -> float:
-        """
-        Get the variance-based weight for a signal and station.
-
-        Weight = 1 / (variance + epsilon), normalized so that the average
-        weight across all available signals is 1.0.
-
-        Args:
-            signal_name: Signal name
-            station: Station code
-
-        Returns:
-            Weight multiplier (higher = more weight)
-        """
-        variance = self.get_variance(signal_name, station)
-        return 1.0 / (variance + EPSILON)
+        s2 = compute_total_variance(ensemble_fraction, signal_probabilities)
+        return compute_kelly_multiplier(s2, k=self.k)
 
     def variance_weighted_size(
         self,
         signal_name: str,
         station: str,
         base_size: float,
-        all_signal_confidences: Optional[Dict[str, float]] = None,
+        confidences: Dict[str, float],
+        signal_probabilities: Optional[List[float]] = None,
     ) -> float:
         """
-        Compute the variance-weighted position size for a signal.
-
-        The base_size is scaled by the signal's variance weight relative
-        to the ensemble average weight.
+        Compute position size adjusted for signal variance.
 
         Args:
-            signal_name: Signal name to size
-            station: Station code
-            base_size: Base position size in dollars (from Kelly or config)
-            all_signal_confidences: Dict of {signal_name: confidence} for
-                                   normalization. If None, uses global average.
+            signal_name: Canonical signal name
+            station: ICAO station code
+            base_size: Base position size in dollars
+            confidences: Dict of signal_name -> confidence values
+            signal_probabilities: Optional list of all active signal probabilities for inter-signal variance
 
         Returns:
             Adjusted position size in dollars
         """
-        self._refresh_cache()
+        # Get rolling variance for this signal/station
+        rolling_variance = self.get_variance(signal_name, station)
 
-        # Get variance weight for this signal
-        weight = self.get_weight(signal_name, station)
+        # Get member spread variance from confidences
+        ensemble_fraction = confidences.get('ensemble_fraction', 0.5)
+        var_member = compute_ensemble_variance(ensemble_fraction)
 
-        # Compute ensemble average weight for normalization
-        if all_signal_confidences:
-            # Normalize against active signals in this trade
-            weights = []
-            for sig in all_signal_confidences:
-                w = self.get_weight(sig, station)
-                weights.append(w)
-            avg_weight = sum(weights) / len(weights) if weights else 1.0
-        else:
-            # Use global average of all known signal-station pairs
-            all_weights = []
-            for sig_name, stations in self._variance_cache.items():
-                for stn, _ in stations.items():
-                    all_weights.append(self.get_weight(sig_name, stn))
-            avg_weight = sum(all_weights) / len(all_weights) if all_weights else 1.0
+        # Inter-signal variance
+        var_signal = 0.0
+        if signal_probabilities and len(signal_probabilities) >= 2:
+            var_signal = compute_inter_signal_variance(signal_probabilities)
 
-        # Compute relative weight and apply to base size
-        relative_weight = weight / avg_weight if avg_weight > 0 else 1.0
-
-        # Clamp to prevent extreme values
-        relative_weight = max(
-            1.0 / MAX_WEIGHT_RATIO,
-            min(MAX_WEIGHT_RATIO, relative_weight),
+        # Combined variance (weighted + rolling)
+        sigma2_total = (
+            0.5 * (WEIGHT_MEMBER * var_member + WEIGHT_SIGNAL * var_signal)
+            + 0.5 * rolling_variance
         )
+        sigma2_total = min(1.0, sigma2_total)
 
-        return base_size * relative_weight
+        # Compute multiplier
+        multiplier = compute_kelly_multiplier(sigma2_total, k=self.k)
 
-    def get_all_weights(
-        self,
-        station: str,
-    ) -> Dict[str, float]:
+        adjusted_size = base_size * multiplier
+        logger.debug(
+            "Variance-weighted size: signal=%s station=%s base=%.2f "
+            "var_member=%.3f var_signal=%.3f rolling=%.3f s2=%.3f "
+            "mult=%.3f adjusted=%.2f",
+            signal_name, station, base_size,
+            var_member, var_signal, rolling_variance,
+            sigma2_total, multiplier, adjusted_size
+        )
+        return adjusted_size
+
+    def record_outcome(self, signal_name: str, station: str, value: float) -> None:
         """
-        Get all variance weights for a station across all signals.
+        Record an outcome for rolling variance calculation.
 
         Args:
-            station: Station code
-
-        Returns:
-            Dict of {signal_name: weight}
+            signal_name: Canonical signal name
+            station: ICAO station code
+            value: Outcome (e.g., P&L, confidence, or correctness bit)
         """
-        self._refresh_cache()
-        weights = {}
-        for signal_name in self._variance_cache:
-            w = self.get_weight(signal_name, station)
-            weights[signal_name] = w
-        return weights
+        key = (signal_name, station)
+        if key not in self._outcomes:
+            self._outcomes[key] = []
+        self._outcomes[key].append(value)
 
-    def get_all_variances(
-        self,
-        station: str,
-    ) -> Dict[str, float]:
+        # Prune old history
+        if len(self._outcomes[key]) > self._max_history:
+            self._outcomes[key] = self._outcomes[key][-self._max_history:]
+
+        # Invalidate variance cache
+        self._variance_cache.pop(key, None)
+
+    def get_variance(self, signal_name: str, station: str) -> float:
         """
-        Get all variance estimates for a station across all signals.
+        Get rolling variance estimate for a (signal, station) pair.
 
-        Args:
-            station: Station code
-
-        Returns:
-            Dict of {signal_name: variance}
+        Computed from recent outcomes using population variance.
+        Returns 0.0 if insufficient data.
         """
-        self._refresh_cache()
-        result = {}
-        for signal_name, stations in self._variance_cache.items():
-            if station in stations:
-                result[signal_name] = stations[station]
-        return result
+        key = (signal_name, station)
+        if key in self._variance_cache:
+            return self._variance_cache[key]
 
-    # ── Internal ──────────────────────────────────────────────
+        outcomes = self._outcomes.get(key, [])
+        if len(outcomes) < 5:
+            return 0.0
+
+        variance = self._compute_variance(outcomes)
+        self._variance_cache[key] = variance
+        return variance
+
+    def get_weight(self, signal_name: str, station: str) -> float:
+        """
+        Get variance weight (inverse of variance, normalized).
+
+        Returns weight in [0, 1] where lower variance = higher weight.
+        """
+        variance = self.get_variance(signal_name, station)
+        return 1.0 / (1.0 + variance * 10.0)  # Inverse relationship
+
+    def get_all_weights(self) -> Dict[Tuple[str, str], float]:
+        """Get all current variance weights."""
+        return {
+            key: self.get_weight(*key)
+            for key in self._outcomes
+        }
+
+    def get_all_variances(self) -> Dict[Tuple[str, str], float]:
+        """Get all current variance estimates."""
+        return {
+            key: self.get_variance(*key)
+            for key in self._outcomes
+        }
 
     def _compute_variance(self, outcomes: List[float]) -> float:
-        """
-        Compute the variance of a list of outcome values.
-
-        Args:
-            outcomes: List of numeric outcome values
-
-        Returns:
-            Variance (biased, N-based)
-        """
-        if len(outcomes) < 3:
-            return 0.25  # Default: maximum uncertainty
-
-        n = len(outcomes)
-        mean = sum(outcomes) / n
-        variance = sum((x - mean) ** 2 for x in outcomes) / n
-
-        return max(MIN_VARIANCE, variance)
-
-    def _prune(self, signal_name: str, station: str) -> None:
-        """Remove outcomes older than the rolling window."""
-        cutoff = time.time() - (self.rolling_window * 86400)
-        history = self._outcome_history[signal_name][station]
-        self._outcome_history[signal_name][station] = [
-            (ts, val) for ts, val in history if ts >= cutoff
-        ]
-
-    def _invalidate_cache(self) -> None:
-        """Mark the variance cache as stale."""
-        self._cache_timestamp = 0.0
-
-    def _refresh_cache(self) -> None:
-        """Rebuild the variance cache if stale."""
-        if time.time() - self._cache_timestamp < self._cache_ttl:
-            return
-
-        for signal_name, stations in self._outcome_history.items():
-            for station, history in stations.items():
-                if len(history) < 3:
-                    continue
-                outcomes = [val for _, val in history]
-                variance = self._compute_variance(outcomes)
-                self._variance_cache[signal_name][station] = variance
-
-        self._cache_timestamp = time.time()
-        self._save_cache()
-
-    def _load_cache(self) -> None:
-        """Load cached variance estimates."""
-        try:
-            if self.cache_file.exists():
-                with open(self.cache_file, "r") as f:
-                    data = json.load(f)
-                raw = data.get("variance_cache", {})
-                for sig, stations in raw.items():
-                    for stn, var in stations.items():
-                        self._variance_cache[sig][stn] = var
-                self._cache_timestamp = data.get("timestamp", 0.0)
-
-                # Also load outcome history
-                raw_history = data.get("outcome_history", {})
-                for sig, stations in raw_history.items():
-                    for stn, outcomes in stations.items():
-                        self._outcome_history[sig][stn] = [
-                            (t, v) for t, v in outcomes
-                        ]
-        except Exception as e:
-            logger.debug(f"Failed to load variance cache: {e}")
-
-    def _save_cache(self) -> None:
-        """Save variance estimates to cache."""
-        try:
-            self.cache_file.parent.mkdir(parents=True, exist_ok=True)
-
-            serializable = {}
-            for sig, stations in self._variance_cache.items():
-                serializable[sig] = dict(stations)
-
-            history_serializable = {}
-            for sig, stations in self._outcome_history.items():
-                history_serializable[sig] = {}
-                for stn, outcomes in stations.items():
-                    history_serializable[sig][stn] = [[t, v] for t, v in outcomes]
-
-            with open(self.cache_file, "w") as f:
-                json.dump({
-                    "timestamp": time.time(),
-                    "variance_cache": serializable,
-                    "outcome_history": history_serializable,
-                }, f, indent=2)
-        except Exception as e:
-            logger.warning(f"Failed to save variance cache: {e}")
+        """Compute population variance of a list of values."""
+        if len(outcomes) < 2:
+            return 0.0
+        mean = sum(outcomes) / len(outcomes)
+        return sum((v - mean) ** 2 for v in outcomes) / len(outcomes)
 
 
-# ─── Self-Test ──────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────
+# Legacy compatibility interface
+# ─────────────────────────────────────────────────────────────────────
 
-def _self_test():
-    """Run basic validation."""
-    sizer = VarianceWeightedSizer(cache_file="/tmp/test_variance_sizing.json")
-
-    # Test 1: Default weight for unknown signal
-    w = sizer.get_weight("unknown", "KATL")
-    assert abs(w - 4.0) < 0.01, f"Expected 4.0 (1/0.25), got {w}"
-    print(f"Test 1 PASS: default weight = {w:.2f}")
-
-    # Test 2: Record low-variance signal (all correct)
-    now = time.time()
-    for i in range(30):
-        sizer.record_outcome("gaussian", "KATL", 1.0, timestamp=now - i * 86400)
-    v_low = sizer.get_variance("gaussian", "KATL")
-    assert v_low < 0.02, f"Expected low variance (<0.02), got {v_low}"
-    w_low = sizer.get_weight("gaussian", "KATL")
-    print(f"Test 2 PASS: low-variance signal var={v_low:.4f} weight={w_low:.2f}")
-
-    # Test 3: Record high-variance signal (mixed 50/50)
-    for i in range(30):
-        outcome = 1.0 if i % 2 == 0 else 0.0
-        sizer.record_outcome("noise", "KATL", outcome, timestamp=now - i * 86400)
-    v_high = sizer.get_variance("noise", "KATL")
-    assert v_high > 0.1, f"Expected high variance (>0.1), got {v_high}"
-    w_high = sizer.get_weight("noise", "KATL")
-    print(f"Test 3 PASS: high-variance signal var={v_high:.4f} weight={w_high:.2f}")
-
-    # Test 4: Variance-weighted size
-    size = sizer.variance_weighted_size(
-        "gaussian", "KATL", 100.0,
-        all_signal_confidences={"gaussian": 0.70, "noise": 0.55},
-    )
-    assert size > 100.0, f"Expected >100 (low var gets boost), got {size}"
-    print(f"Test 4 PASS: variance-weighted size = ${size:.2f}")
-
-    # Test 5: High-variance signal gets smaller size
-    size_noise = sizer.variance_weighted_size(
-        "noise", "KATL", 100.0,
-        all_signal_confidences={"gaussian": 0.70, "noise": 0.55},
-    )
-    assert size_noise < 100.0, f"Expected <100 (high var gets penalty), got {size_noise}"
-    print(f"Test 5 PASS: high-variance size = ${size_noise:.2f}")
-
-    # Test 6: get_all_weights
-    weights = sizer.get_all_weights("KATL")
-    assert "gaussian" in weights
-    assert "noise" in weights
-    print(f"Test 6 PASS: all weights = {len(weights)} signals")
-
-    # Test 7: get_all_variances
-    variances = sizer.get_all_variances("KATL")
-    assert "gaussian" in variances
-    assert "noise" in variances
-    print(f"Test 7 PASS: all variances = {len(variances)} signals")
-
-    # Test 8: Cache persistence
-    sizer2 = VarianceWeightedSizer(cache_file="/tmp/test_variance_sizing.json")
-    v_cached = sizer2.get_variance("gaussian", "KATL")
-    assert abs(v_cached - v_low) < 0.01, f"Cache mismatch: {v_cached} vs {v_low}"
-    print(f"Test 8 PASS: cache persistence, var={v_cached:.4f}")
-
-    # Cleanup
-    import glob
-    for f in glob.glob("/tmp/test_variance_sizing*"):
-        try:
-            os.remove(f)
-        except OSError:
-            pass
-
-    print("\nAll self-tests PASS")
-    return True
+_sizer: Optional[VarianceWeightedSizer] = None
 
 
-if __name__ == "__main__":
-    _self_test()
+def get_sizer() -> VarianceWeightedSizer:
+    """Get the module-level singleton sizer."""
+    global _sizer
+    if _sizer is None:
+        _sizer = VarianceWeightedSizer()
+    return _sizer
+
+
+def compute_disagreement(ensemble_fraction: float,
+                          signal_probabilities: Optional[List[float]] = None) -> float:
+    """
+    Legacy: compute disagreement (1 - sigma2_total) from ensemble fraction.
+
+    Returns 0.0 (high confidence) to 1.0 (max disagreement).
+    """
+    sigma2 = compute_total_variance(ensemble_fraction, signal_probabilities)
+    return min(1.0, sigma2)  # Disagreement = variance
+
+
+def compute_kelly_multiplier_from_disagreement(disagreement: float) -> float:
+    """
+    Legacy: compute Kelly multiplier from disagreement value.
+
+    Replaced the old linear (1.0 - disagreement) with hyperbolic 1/(1 + kσ²).
+    """
+    # Treat disagreement directly as variance
+    return compute_kelly_multiplier(disagreement, k=DEFAULT_K)

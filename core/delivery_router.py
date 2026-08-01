@@ -291,18 +291,23 @@ async def create_default_delivery_router() -> DeliveryRouter:
     router = DeliveryRouter()
     
     # Add Discord if configured
-    discord_webhook = os.getenv('ALERT_WEBHOOK_URL')
+    # Check multiple env var names for compatibility
+    discord_webhook = (
+        os.getenv('ALERT_WEBHOOK_URL')
+        or os.getenv('DISCORD_WEBHOOK')
+        or os.getenv('DISCORD_WEBHOOK_PROD')
+    )
     if discord_webhook:
         router.add_target(DiscordDelivery(discord_webhook))
-        _LOGGER.info("Discord delivery target added from ALERT_WEBHOOK_URL env var")
+        _LOGGER.info("Discord delivery target added from ALERT_WEBHOOK_URL/DISCORD_WEBHOOK env var")
     else:
-        _LOGGER.warning("No ALERT_WEBHOOK_URL found - Discord delivery not configured")
+        _LOGGER.warning("No ALERT_WEBHOOK_URL or DISCORD_WEBHOOK found - Discord delivery not configured")
     
     # Add HTTP dashboard if configured
     dashboard_endpoint = os.getenv('DASHBOARD_ENDPOINT_URL')
     if dashboard_endpoint:
         router.add_target(HTTPDashboardDelivery(dashboard_endpoint))
-        _LOGGER.info(f"HTTP dashboard delivery target added from DASHBOARD_ENDPOINT_URL: {dashboard_endpoint}")
+        _LOGGER.info("HTTP dashboard delivery target added from DASHBOARD_ENDPOINT_URL: %s", dashboard_endpoint)
     
     # Always add SMS placeholder (can be enabled with configuration)
     sms_enabled = os.getenv('SMS_NOTIFICATIONS_ENABLED', '').lower() in ['true', 'yes', '1']
