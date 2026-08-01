@@ -41,7 +41,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KAUS": {
@@ -85,7 +86,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KBOS": {
@@ -129,7 +131,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KDCA": {
@@ -173,7 +176,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KDEN": {
@@ -217,7 +221,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KDFW": {
@@ -261,7 +266,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KHOU": {
@@ -305,7 +311,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KLAS": {
@@ -349,7 +356,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KLAX": {
@@ -393,7 +401,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KMDW": {
@@ -437,7 +446,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KMIA": {
@@ -481,7 +491,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KMSP": {
@@ -525,7 +536,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KMSY": {
@@ -569,7 +581,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KNYC": {
@@ -613,7 +626,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KOKC": {
@@ -657,7 +671,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KPHL": {
@@ -701,7 +716,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KPHX": {
@@ -745,7 +761,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KSAT": {
@@ -789,7 +806,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KSEA": {
@@ -833,7 +851,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     },
     "KSFO": {
@@ -877,7 +896,8 @@
         "2021-02-07",
         "2021-02-08",
         "2021-02-09",
-        "2021-02-10"
+        "2021-02-10",
+        "2021-02-11"
       ]
     }
   },
@@ -892,729 +912,741 @@
     },
     "20210101/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210101/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210101/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210101/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210102/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210102/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210102/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210102/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210102/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210102/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210103/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210103/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210103/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210103/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210103/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210103/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210104/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210104/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210104/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210104/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210104/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210104/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210105/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210105/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210105/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210105/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210105/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210105/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210106/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210106/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210106/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210106/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210106/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210106/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210107/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210107/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210107/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210107/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210107/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210107/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210108/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210108/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210108/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210108/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210108/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210108/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210109/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210109/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210109/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210109/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210109/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210109/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210110/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210110/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210110/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210110/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210110/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210110/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210111/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210111/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210111/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210111/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210111/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210111/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210112/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210112/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210112/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210112/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210112/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210112/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210113/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210113/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210113/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210113/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210113/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210113/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210114/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210114/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210114/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210114/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210114/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210114/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210115/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210115/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210115/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210115/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210115/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210115/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210116/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210116/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210116/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210116/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210116/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210116/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210117/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210117/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210117/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210117/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210117/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210117/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210118/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210118/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210118/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210118/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210118/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210118/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210119/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210119/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210119/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210119/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210119/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210119/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210120/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210120/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210120/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210120/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210120/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210120/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210121/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210121/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210121/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210121/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210121/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210121/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210122/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210122/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210122/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210122/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210122/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210122/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210123/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210123/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210123/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210123/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210123/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210123/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210124/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210124/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210124/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210124/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210124/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210124/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210125/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210125/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210125/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210125/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210125/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210125/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210126/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210126/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210126/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210126/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210126/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210126/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210127/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210127/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210127/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210127/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210127/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210127/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210128/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210128/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210128/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210128/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210128/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210128/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210129/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210129/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210129/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210129/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210129/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210129/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210130/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210130/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210130/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210130/00/gep03": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210130/00/gep04": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210130/00/gep05": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210131/00/gec00": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210131/00/gep01": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210131/00/gep02": {
       "status": "complete",
-      "values": 10
+      "values": 0
     },
     "20210131/00/gep03": {
+      "status": "complete",
+      "values": 0
+    },
+    "20210131/00/gep04": {
+      "status": "complete",
+      "values": 10
+    },
+    "20210131/00/gep05": {
+      "status": "complete",
+      "values": 10
+    },
+    "20210201/00/gec00": {
       "status": "complete",
       "values": 10
     }

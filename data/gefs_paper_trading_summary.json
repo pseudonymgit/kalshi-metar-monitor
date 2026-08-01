@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-08-01T08:00:56.990009+00:00",
+  "config": {
+    "edge_threshold": 0.02,
+    "kelly_fraction": 0.5,
+    "entry_price_min": 0.15,
+    "entry_price_max": 0.7,
+    "max_contracts": 500,
+    "initial_bankroll": 10000.0,
+    "signal_source": "GEFS ensemble (step=24)",
+    "fee_model": "kalshi_real (ceil(0.07 \u00d7 C \u00d7 P \u00d7 (1-P)) per side)"
+  },
+  "results": {
+    "start_date": "2026-07-31",
+    "end_date": "2026-07-31",
+    "trading_days": 1,
+    "total_trades": 0,
+    "correct_trades": 0,
+    "accuracy": 0,
+    "total_pnl": 0,
+    "total_fees": 0,
+    "final_bankroll": 10000.0,
+    "total_return_pct": 0.0,
+    "daily_sharpe": 0.0,
+    "profit_factor": 0.0
+  }
+}
