@@ -230,6 +230,15 @@ except ImportError as e:
     TemperatureAdvectionSignal = None
     TEMPERATURE_ADVECTION_ENABLED = False
 
+# Import Frontal Passage Nowcast Signal (Phase 4.1 — spatial nowcasting)
+try:
+    from core.signals.frontal_passage_nowcast_signal import FrontalPassageNowcastSignal
+    HAS_FRONTAL_PASSAGE_NOWCAST = True
+except ImportError as e:
+    print(f"Warning: FrontalPassageNowcastSignal import failed: {e}")
+    FrontalPassageNowcastSignal = None
+    HAS_FRONTAL_PASSAGE_NOWCAST = False
+
 # Import Spike Reversion Signal (A3: renamed from Goldilocks)
 try:
     from core.signals.spike_reversion_signal import SpikeReversionSignal
@@ -355,6 +364,9 @@ class PaperTrader:
         # A3: backward-compatible alias
         self._goldilocks_signal = self._spike_reversion_signal
 
+        # Frontal Passage Nowcast Signal (Phase 4.1 — spatial nowcasting, lazy-loaded)
+        self._frontal_passage_nowcast = None
+
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
         self.signal_names = ["calendar_climatology", "late_day_momentum", "late_day_analysis"]
@@ -363,6 +375,9 @@ class PaperTrader:
         # Add multi-model ensemble signal if available
         if HAS_MULTI_MODEL_ENSEMBLE:
             self.signal_names.append("multi_model_ensemble")
+        # Frontal passage nowcast signal (Phase 4.1)
+        if HAS_FRONTAL_PASSAGE_NOWCAST:
+            self.signal_names.append("frontal_passage_nowcast")
         # Define common weather stations for initial available locations
         self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']  # Common trade locations
 
@@ -1026,6 +1041,24 @@ class PaperTrader:
                         _LOGGER.info(f"Spike Reversion signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
                 except Exception as e:
                     _LOGGER.warning(f"Failed to compute Spike Reversion signal for {station} on {date}: {e}")
+
+            # Signal 8: Frontal Passage Nowcast (Phase 4.1 — spatial nowcasting)
+            if HAS_FRONTAL_PASSAGE_NOWCAST:
+                if self._frontal_passage_nowcast is None:
+                    try:
+                        self._frontal_passage_nowcast = FrontalPassageNowcastSignal()
+                        _LOGGER.info("Frontal Passage Nowcast signal initialized (lazy load)")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to initialize Frontal Passage Nowcast signal: {e}")
+                if self._frontal_passage_nowcast is not None:
+                    try:
+                        direction, confidence = self._frontal_passage_nowcast.evaluate_for_station(station, date, metar_conn)
+                        if direction is not None and confidence >= 0.25:
+                            market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
+                            signals.append((station, "HIGH", market_side, "frontal_passage_nowcast"))
+                            _LOGGER.info(f"Frontal Passage Nowcast signal fired for {station} on {date}: direction={direction}, confidence={confidence:.3f}")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to compute Frontal Passage Nowcast signal for {station} on {date}: {e}")
 
         metar_conn.close()
 
