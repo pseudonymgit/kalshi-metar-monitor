@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-08-01T06:56:55.654642+00:00",
+    "timestamp": "2026-08-01T15:30:48.394656+00:00",
     "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/kalshi_settlements.db",
     "script": "validate_kalshi_settlement_sources.py"
   },

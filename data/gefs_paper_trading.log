@@ -50,3 +50,24 @@
 2026-08-01 08:00:56,989 [INFO] Trading window: 2026-07-31 → 2026-07-31 (1 days)
 2026-08-01 08:00:56,990 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
 2026-08-01 08:00:56,990 [INFO] GEFS Paper Trading Cron — Complete
+2026-08-01 12:00:56,954 [INFO] ============================================================
+2026-08-01 12:00:56,957 [INFO] GEFS Paper Trading Cron — Starting
+2026-08-01 12:00:56,957 [INFO] Start: 2026-07-31, Days: 1, Bankroll: $10000.00
+2026-08-01 12:00:56,958 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-08-01 12:00:56,958 [INFO] Loading Kalshi settlement data...
+2026-08-01 12:00:56,974 [INFO]   Loaded 6069 records
+2026-08-01 12:00:56,976 [INFO] Trading window: 2026-07-31 → 2026-07-31 (1 days)
+2026-08-01 12:00:56,980 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
+2026-08-01 12:00:56,980 [INFO] GEFS Paper Trading Cron — Complete
+2026-08-01 16:00:58,015 [INFO] ============================================================
+2026-08-01 16:00:58,016 [INFO] GEFS Paper Trading Cron — Starting
+2026-08-01 16:00:58,016 [INFO] Start: 2026-07-25, Days: 7, Bankroll: $10000.00
+2026-08-01 16:00:58,016 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-08-01 16:00:58,016 [INFO] Loading Kalshi settlement data...
+2026-08-01 16:00:58,024 [INFO]   Loaded 6069 records
+2026-08-01 16:00:58,025 [INFO] Trading window: 2026-07-25 → 2026-07-31 (7 days)
+2026-08-01 16:00:58,043 [INFO]   2026-07-25: 2 trades, 1 correct, PnL=$+156.73, Bankroll=$10156.73
+2026-08-01 16:00:58,103 [INFO]   2026-07-26: 9 trades, 3 correct, PnL=$+509.49, Bankroll=$10666.22
+2026-08-01 16:00:58,150 [INFO]   2026-07-27: 6 trades, 3 correct, PnL=$+497.67, Bankroll=$11163.89
+2026-08-01 16:00:58,169 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
+2026-08-01 16:00:58,172 [INFO] GEFS Paper Trading Cron — Complete

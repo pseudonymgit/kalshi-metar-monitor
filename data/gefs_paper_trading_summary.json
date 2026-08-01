@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-01T08:00:56.990009+00:00",
+  "timestamp": "2026-08-01T16:00:58.169036+00:00",
   "config": {
     "edge_threshold": 0.02,
     "kelly_fraction": 0.5,
@@ -11,17 +11,17 @@
     "fee_model": "kalshi_real (ceil(0.07 \u00d7 C \u00d7 P \u00d7 (1-P)) per side)"
   },
   "results": {
-    "start_date": "2026-07-31",
+    "start_date": "2026-07-25",
     "end_date": "2026-07-31",
-    "trading_days": 1,
-    "total_trades": 0,
-    "correct_trades": 0,
-    "accuracy": 0,
-    "total_pnl": 0,
-    "total_fees": 0,
-    "final_bankroll": 10000.0,
-    "total_return_pct": 0.0,
-    "daily_sharpe": 0.0,
-    "profit_factor": 0.0
+    "trading_days": 7,
+    "total_trades": 17,
+    "correct_trades": 7,
+    "accuracy": 0.4118,
+    "total_pnl": 1163.89,
+    "total_fees": 63.0,
+    "final_bankroll": 11163.89,
+    "total_return_pct": 11.64,
+    "daily_sharpe": 31.3592,
+    "profit_factor": 2.8923
   }
 }
