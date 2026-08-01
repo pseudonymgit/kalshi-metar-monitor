@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "timestamp": "2026-08-01T06:56:55.654642+00:00",
+    "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/kalshi_settlements.db",
+    "script": "validate_kalshi_settlement_sources.py"
+  },
+  "counts": {
+    "finalized": 599,
+    "historical_api": 5471
+  },
+  "overlap_analysis": {
+    "n_overlapping": 0,
+    "error_distribution": null,
+    "overlapping_records": []
+  },
+  "internal_consistency": {
+    "temperature_range": {
+      "min": 2.0,
+      "max": 117.0,
+      "mean": 74.04316309719934
+    },
+    "temp_outside_plausible": false,
+    "station_coverage": {
+      "present": [
+        "KATL",
+        "KAUS",
+        "KBOS",
+        "KDCA",
+        "KDEN",
+        "KDFW",
+        "KHOU",
+        "KLAS",
+        "KLAX",
+        "KMDW",
+        "KMIA",
+        "KMSP",
+        "KMSY",
+        "KNYC",
+        "KOKC",
+        "KPHL",
+        "KPHX",
+        "KSAT",
+        "KSEA",
+        "KSFO"
+      ],
+      "missing": [],
+      "total": 20
+    },
+    "date_range": {
+      "min": "2021-08-19",
+      "max": "2026-07-27"
+    },
+    "duplicates_in_historical_api": 1,
+    "duplicate_examples": [
+      {
+        "station": "KMDW",
+        "date": "2024-02-28",
+        "count": 2,
+        "sources": "events_backfill,events_backfill"
+      }
+    ],
+    "historical_api_breakdown": {
+      "events_backfill": 3411,
+      "historical_api": 1465,
+      "live_api": 595
+    }
+  },
+  "checks": {
+    "check_1_max_error_below_0_5": {
+      "pass": null,
+      "note": "No overlap data available"
+    },
+    "check_2_any_error_above_1": {
+      "pass": null,
+      "note": "No overlap data available"
+    },
+    "check_3_median_error_below_0_5": {
+      "pass": null,
+      "note": "No overlap data available"
+    }
+  },
+  "decision": {
+    "status": "issues_found",
+    "reason": "No overlap; internal consistency issues: 1 duplicate (station,date) pairs",
+    "issues": [
+      "1 duplicate (station,date) pairs"
+    ]
+  }
+}

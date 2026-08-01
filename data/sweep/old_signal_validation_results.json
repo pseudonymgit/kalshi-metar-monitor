@@ -1,0 +1,84 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-31T18:01:37.065377+00:00",
+    "signals_tested": [
+      "calendar_climatology",
+      "gaussian",
+      "gaussian_v2",
+      "pressure_delta",
+      "forecast_disagreement"
+    ],
+    "fee_model": "kalshi_real",
+    "ground_truth": "kalshi_settlements.db",
+    "data_source": "weather_data.db (metar_observations)"
+  },
+  "signal_results": {
+    "calendar_climatology": {
+      "n_trades": 0,
+      "accuracy": 0.0,
+      "total_pnl": 0.0,
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "total_fees": 0.0,
+      "signal_name": "calendar_climatology"
+    },
+    "gaussian": {
+      "n_trades": 0,
+      "accuracy": 0.0,
+      "total_pnl": 0.0,
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "total_fees": 0.0,
+      "signal_name": "gaussian"
+    },
+    "gaussian_v2": {
+      "n_trades": 0,
+      "accuracy": 0.0,
+      "total_pnl": 0.0,
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "total_fees": 0.0,
+      "signal_name": "gaussian_v2"
+    },
+    "pressure_delta": {
+      "n_trades": 0,
+      "accuracy": 0.0,
+      "total_pnl": 0.0,
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "total_fees": 0.0,
+      "signal_name": "pressure_delta"
+    },
+    "forecast_disagreement": {
+      "n_trades": 0,
+      "accuracy": 0.0,
+      "total_pnl": 0.0,
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "total_fees": 0.0,
+      "signal_name": "forecast_disagreement"
+    }
+  },
+  "gefs_comparison": {
+    "n_trades": 5460,
+    "accuracy": 0.5648351648351648,
+    "total_pnl": 73580.0,
+    "sharpe": 5.932590485188906,
+    "profit_factor": 1.7911657813810455,
+    "total_fees": 10920.0
+  },
+  "best_signal": "calendar_climatology",
+  "best_signal_details": {
+    "name": "calendar_climatology",
+    "metrics": {
+      "n_trades": 0,
+      "accuracy": 0.0,
+      "total_pnl": 0.0,
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "total_fees": 0.0,
+      "signal_name": "calendar_climatology"
+    },
+    "per_station": {}
+  }
+}

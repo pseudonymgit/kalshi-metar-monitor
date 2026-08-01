@@ -1,0 +1,52 @@
+2026-07-31 18:23:28,835 [INFO] ============================================================
+2026-07-31 18:23:28,838 [INFO] GEFS Paper Trading Cron — Starting
+2026-07-31 18:23:28,838 [INFO] Start: 2026-07-25, Days: 5, Bankroll: $10000.00
+2026-07-31 18:23:28,839 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-07-31 18:23:28,839 [INFO] Loading Kalshi settlement data...
+2026-07-31 18:23:28,852 [INFO]   Loaded 6069 records
+2026-07-31 18:23:28,877 [INFO] Trading window: 2026-07-25 → 2026-07-29 (5 days)
+2026-07-31 18:23:34,693 [INFO] ============================================================
+2026-07-31 18:23:34,693 [INFO] GEFS Paper Trading Cron — Starting
+2026-07-31 18:23:34,693 [INFO] Start: 2026-07-25, Days: 5, Bankroll: $10000.00
+2026-07-31 18:23:34,693 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-07-31 18:23:34,693 [INFO] Loading Kalshi settlement data...
+2026-07-31 18:23:34,699 [INFO]   Loaded 6069 records
+2026-07-31 18:23:34,728 [INFO] Trading window: 2026-07-25 → 2026-07-29 (5 days)
+2026-07-31 18:23:34,740 [INFO]   2026-07-25: 2 trades, 1 correct, PnL=$+156.73, Bankroll=$10156.73
+2026-07-31 18:23:34,789 [INFO]   2026-07-26: 9 trades, 3 correct, PnL=$+509.49, Bankroll=$10666.22
+2026-07-31 18:23:34,822 [INFO]   2026-07-27: 6 trades, 3 correct, PnL=$+497.67, Bankroll=$11163.89
+2026-07-31 18:23:34,841 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
+2026-07-31 18:23:34,848 [INFO] GEFS Paper Trading Cron — Complete
+2026-08-01 03:47:57,627 [INFO] ============================================================
+2026-08-01 03:47:57,627 [INFO] GEFS Paper Trading Cron — Starting
+2026-08-01 03:47:57,627 [INFO] Start: 2026-07-25, Days: 7, Bankroll: $10000.00
+2026-08-01 03:47:57,627 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-08-01 03:47:57,627 [INFO] Loading Kalshi settlement data...
+2026-08-01 03:47:57,632 [INFO]   Loaded 6069 records
+2026-08-01 03:47:57,633 [INFO] Trading window: 2026-07-25 → 2026-07-31 (7 days)
+2026-08-01 03:47:57,650 [INFO]   2026-07-25: 2 trades, 1 correct, PnL=$+156.73, Bankroll=$10156.73
+2026-08-01 03:47:57,699 [INFO]   2026-07-26: 9 trades, 3 correct, PnL=$+509.49, Bankroll=$10666.22
+2026-08-01 03:47:57,733 [INFO]   2026-07-27: 6 trades, 3 correct, PnL=$+497.67, Bankroll=$11163.89
+2026-08-01 03:47:57,754 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
+2026-08-01 03:47:57,761 [INFO] GEFS Paper Trading Cron — Complete
+2026-08-01 04:00:56,276 [INFO] ============================================================
+2026-08-01 04:00:56,277 [INFO] GEFS Paper Trading Cron — Starting
+2026-08-01 04:00:56,277 [INFO] Start: 2026-07-25, Days: 7, Bankroll: $10000.00
+2026-08-01 04:00:56,278 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-08-01 04:00:56,278 [INFO] Loading Kalshi settlement data...
+2026-08-01 04:00:56,283 [INFO]   Loaded 6069 records
+2026-08-01 04:00:56,284 [INFO] Trading window: 2026-07-25 → 2026-07-31 (7 days)
+2026-08-01 04:00:56,301 [INFO]   2026-07-25: 2 trades, 1 correct, PnL=$+156.73, Bankroll=$10156.73
+2026-08-01 04:00:56,352 [INFO]   2026-07-26: 9 trades, 3 correct, PnL=$+509.49, Bankroll=$10666.22
+2026-08-01 04:00:56,387 [INFO]   2026-07-27: 6 trades, 3 correct, PnL=$+497.67, Bankroll=$11163.89
+2026-08-01 04:00:56,406 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
+2026-08-01 04:00:56,412 [INFO] GEFS Paper Trading Cron — Complete
+2026-08-01 08:00:56,964 [INFO] ============================================================
+2026-08-01 08:00:56,967 [INFO] GEFS Paper Trading Cron — Starting
+2026-08-01 08:00:56,967 [INFO] Start: 2026-07-31, Days: 1, Bankroll: $10000.00
+2026-08-01 08:00:56,968 [INFO] Config: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, max_contracts=500
+2026-08-01 08:00:56,968 [INFO] Loading Kalshi settlement data...
+2026-08-01 08:00:56,984 [INFO]   Loaded 6069 records
+2026-08-01 08:00:56,989 [INFO] Trading window: 2026-07-31 → 2026-07-31 (1 days)
+2026-08-01 08:00:56,990 [INFO] Summary written to /home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_paper_trading_summary.json
+2026-08-01 08:00:56,990 [INFO] GEFS Paper Trading Cron — Complete

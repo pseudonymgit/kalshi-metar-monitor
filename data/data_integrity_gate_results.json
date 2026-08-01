@@ -1,0 +1,184 @@
+{
+  "timestamp": "2026-08-01T04:46:25.569202+00:00",
+  "all_pass": false,
+  "gates": [
+    {
+      "name": "GEFS completeness (\u226530/31 members per date/station/step)",
+      "pass": true,
+      "issues": [],
+      "failed_count": 0,
+      "total_checked": 40720,
+      "details": {
+        "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/gefs_archive.db",
+        "target_step": 24,
+        "total_records": 40720,
+        "member_distribution": {
+          "30": 160,
+          "31": 40560
+        },
+        "expected_members": 31,
+        "min_required": 30,
+        "records_below_threshold": 0,
+        "records_with_full_members": 40560,
+        "completeness_pct": 99.6
+      }
+    },
+    {
+      "name": "ECMWF completeness (\u226549/51 members per date/station/step)",
+      "pass": true,
+      "issues": [],
+      "failed_count": 0,
+      "total_checked": 4820,
+      "details": {
+        "db_path": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/tigge_archive.db",
+        "table_name": "tigge_archive",
+        "target_step": 24,
+        "total_records": 4820,
+        "member_distribution": {
+          "50": 4820
+        },
+        "expected_members": 51,
+        "min_required": 49,
+        "records_below_threshold": 0
+      }
+    },
+    {
+      "name": "Station alignment: GEFS and ECMWF sample same stations",
+      "pass": true,
+      "issues": [],
+      "failed_count": 0,
+      "total_checked": 20,
+      "details": {
+        "expected_stations": [
+          "KATL",
+          "KAUS",
+          "KBOS",
+          "KDCA",
+          "KDEN",
+          "KDFW",
+          "KHOU",
+          "KLAS",
+          "KLAX",
+          "KMDW",
+          "KMIA",
+          "KMSP",
+          "KMSY",
+          "KNYC",
+          "KOKC",
+          "KPHL",
+          "KPHX",
+          "KSAT",
+          "KSEA",
+          "KSFO"
+        ],
+        "gefs_stations": [
+          "KATL",
+          "KAUS",
+          "KBOS",
+          "KDCA",
+          "KDEN",
+          "KDFW",
+          "KHOU",
+          "KLAS",
+          "KLAX",
+          "KMDW",
+          "KMIA",
+          "KMSP",
+          "KMSY",
+          "KNYC",
+          "KOKC",
+          "KPHL",
+          "KPHX",
+          "KSAT",
+          "KSEA",
+          "KSFO"
+        ],
+        "ecmwf_stations": [
+          "KATL",
+          "KAUS",
+          "KBOS",
+          "KDCA",
+          "KDEN",
+          "KDFW",
+          "KHOU",
+          "KLAS",
+          "KLAX",
+          "KMDW",
+          "KMIA",
+          "KMSP",
+          "KMSY",
+          "KNYC",
+          "KOKC",
+          "KPHL",
+          "KPHX",
+          "KSAT",
+          "KSEA",
+          "KSFO"
+        ],
+        "gefs_missing": [],
+        "ecmwf_missing": [],
+        "both_missing": [],
+        "gefs_only_missing": [],
+        "ecmwf_only_missing": [],
+        "gefs_coverage": "20/20",
+        "ecmwf_coverage": "20/20",
+        "note": "All 20 stations present in both models"
+      }
+    },
+    {
+      "name": "Date alignment: both models have f024 for same target dates",
+      "pass": false,
+      "issues": [
+        "Only 240/2037 dates in common"
+      ],
+      "failed_count": 1,
+      "total_checked": 2037,
+      "details": {
+        "n_gefs_dates": 2036,
+        "n_ecmwf_dates": 241,
+        "n_common_dates": 240,
+        "n_gefs_only": 1796,
+        "n_ecmwf_only": 1,
+        "gefs_min_date": "2021-01-02",
+        "gefs_max_date": "2026-07-30",
+        "ecmwf_min_date": "2021-01-01",
+        "ecmwf_max_date": "2021-08-29",
+        "gefs_only_examples": [
+          "2021-08-30",
+          "2021-08-31",
+          "2021-09-01",
+          "2021-09-02",
+          "2021-09-03"
+        ],
+        "ecmwf_only_examples": [
+          "2021-01-01"
+        ]
+      }
+    },
+    {
+      "name": "Price sanity: entry_price between $0.01 and $0.99",
+      "pass": true,
+      "issues": [],
+      "failed_count": 0,
+      "total_checked": 1,
+      "details": {
+        "note": "No trade results provided; checked settlement temperature range as proxy",
+        "temp_min": 2.0,
+        "temp_max": 117.0,
+        "temp_mean": 74.04316309719934,
+        "implied_price_range_f": "Kalshi 2\u00b0F bins: 2\u00b0F to 118\u00b0F",
+        "price_check_note": "Run with trade results to validate actual entry prices"
+      }
+    },
+    {
+      "name": "Fee sanity: fee_per_trade / notional \u2264 0.15",
+      "pass": true,
+      "issues": [],
+      "failed_count": 0,
+      "total_checked": 0,
+      "details": {
+        "note": "No trade results provided. Pass trade data to validate fee sanity."
+      }
+    }
+  ]
+}
