@@ -603,7 +603,13 @@ if __name__ == "__main__":
     parser.add_argument("--quick", action="store_true", help="Reduced grid")
     parser.add_argument("--calibration", default="none", choices=["none", "isotonic", "beta"],
                         help="Calibration method")
+    parser.add_argument("--skip-integrity", action="store_true",
+                        help="Skip pre-run integrity check")
     args = parser.parse_args()
+    
+    # Pre-run integrity gate
+    if not sweep_config.run_integrity_gate(skip=args.skip_integrity):
+        sys.exit(1)
     
     print("Loading data...")
     print("  Kalshi settlements (finalized)...")

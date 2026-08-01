@@ -31,6 +31,8 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sweep import config as sweep_config
 from sweep.data import load_kalshi_settlements, load_gefs_archive
+from sweep.config import FEE_TYPE_OPTIONS, SLIPPAGE_BUDGET
+from sweep.tiers import apply_edge_penalty, get_tier_info
 
 # ── Constants ──
 KALSHI_SETTLEMENTS_DB = sweep_config.DB_PATH
@@ -109,6 +111,8 @@ def simulate_trade(
     kelly_fraction = config.get("kelly_fraction", 0.5)
     max_contracts = config.get("max_contracts", 100)
     position_sizing = config.get("position_sizing_model", "fixed")
+    fee_type = config.get("fee_type", "taker_and_slippage")
+    slippage_budget = config.get("slippage_budget", SLIPPAGE_BUDGET)
     
     if prev_temp_f is None:
         return None
@@ -142,12 +146,42 @@ def simulate_trade(
     if entry_price < entry_price_min or entry_price > entry_price_max:
         return None
     
-    # Edge: confidence in the prediction vs entry cost
+    # ═══ Edge Calculation ═══
+    # Gross edge: confidence - entry_price (model_prob - market_price for "yes")
     # For UP: edge = confidence - entry_price (buy "yes" at P, think prob > P)
     # For DOWN: edge = confidence - entry_price (buy "no" at 1-P, think prob > 1-P)
-    edge = confidence - entry_price
-    if edge < edge_threshold:
+    gross_edge = confidence - entry_price
+    
+    # Fee per side: ceil(0.07 × C × P × (1-P)) — Kalshi taker formula
+    # We use a conservative estimate before position sizing
+    # Round-trip fee fraction = 2 * 0.07 * P * (1-P) ≈ 0.035 for P=0.5
+    fee_frac_entry = 0.07 * market_price * (1.0 - market_price) if 0 < market_price < 1 else 0.0
+    fee_frac_exit = 0.07 * 0.5 * 0.5  # conservative exit fee estimate
+    
+    if fee_type == "none":
+        round_trip_fee_frac = 0.0
+    elif fee_type == "taker_only":
+        round_trip_fee_frac = fee_frac_entry
+    elif fee_type == "taker_and_slippage":
+        round_trip_fee_frac = fee_frac_entry + fee_frac_exit + slippage_budget
+    elif fee_type == "maker":
+        round_trip_fee_frac = 0.0  # Maker fee = $0.00 per E6 retail-sized limit orders
+    else:
+        round_trip_fee_frac = 0.0
+    
+    net_edge = gross_edge - round_trip_fee_frac
+    
+    # ═══ Microstructure Edge Penalty by Liquidity Tier (A5) ═══
+    # Apply tier discount before threshold comparison
+    tier_info = get_tier_info(station)
+    tier_discount = tier_info["discount"]
+    tier_adjusted_edge = net_edge * (1.0 - tier_discount)
+    
+    # Use tier-adjusted edge for threshold check (primary metric)
+    if tier_adjusted_edge < edge_threshold:
         return None
+    
+    edge = net_edge  # Position sizing uses net edge
     
     # Position sizing (only kelly and fixed — removed tiered and stop_loss from sweep)
     if position_sizing == "kelly":
@@ -187,7 +221,10 @@ def simulate_trade(
         "confidence": confidence,
         "market_price": market_price,
         "entry_price": entry_price,
-        "edge": edge,
+        "gross_edge": gross_edge,
+        "net_edge": net_edge,
+        "fee_type": fee_type,
+        "round_trip_fee_frac": round_trip_fee_frac,
         "contracts": n_contracts,
         "correct": correct,
         "gross_pnl": gross_pnl,
@@ -325,6 +362,10 @@ def evaluate_config(
                 bin_conf[i] /= bin_counts[i]
         ece = np.sum(bin_counts * np.abs(bin_acc - bin_conf)) / np.sum(bin_counts)
     
+    # Average gross and net edge
+    avg_gross_edge = sum(t["gross_edge"] for t in trades) / n if n else 0.0
+    avg_net_edge = sum(t["net_edge"] for t in trades) / n if n else 0.0
+    
     return {
         "n_trades": n,
         "accuracy": accuracy,
@@ -338,6 +379,8 @@ def evaluate_config(
         "total_fees": total_fees,
         "total_cost": total_cost,
         "ece": ece,
+        "avg_gross_edge": avg_gross_edge,
+        "avg_net_edge": avg_net_edge,
     }
 
 
@@ -365,7 +408,11 @@ def generate_lhs_samples(n_samples: int) -> List[dict]:
         samples = np.random.uniform(0, 1, size=(n_samples, 6))
     
     configs = []
-    for sample in samples:
+    fee_type_indices = [0, 1, 2, 3]  # none, taker_only, taker_and_slippage, maker
+    for i, sample in enumerate(samples):
+        # Cycle through fee types deterministically
+        ft_idx = fee_type_indices[i % 4]
+        fee_type = FEE_TYPE_OPTIONS[ft_idx]
         config = {
             # Fixed params
             "fee_model": "kalshi_real",
@@ -373,6 +420,7 @@ def generate_lhs_samples(n_samples: int) -> List[dict]:
             "stop_loss_kind": "none",
             "stop_loss_pct": 0.0,
             "trajectory_gate_enabled": False,
+            "fee_type": fee_type,
             # Sampled params
             "kelly_fraction": round(0.1 + sample[0] * 3.9, 4),
             "edge_threshold": round(0.001 + sample[1] * 0.2, 4),
@@ -444,6 +492,31 @@ def analyze_results(results: List[dict]):
     print(f"  Fee model: ceil(0.07 × C × P × (1-P)) per side")
     print(f"  {len(valid)} valid configs (≥30 trades)")
     print(f"{'=' * 72}")
+    
+    # ── Net edge vs gross edge analysis ──
+    gross_edges = []
+    net_edges = []
+    for r in valid:
+        if r.get("n_trades", 0) > 0:
+            gross_edges.append(r.get("avg_gross_edge", 0))
+            net_edges.append(r.get("avg_net_edge", 0))
+    
+    print(f"\n  EDGE ANALYSIS (primary=net_edge, secondary=gross_edge):")
+    print(f"    Gross edge:  mean={np.mean(gross_edges):.4f}  median={np.median(gross_edges):.4f}" if gross_edges else "    N/A")
+    print(f"    Net edge:    mean={np.mean(net_edges):.4f}  median={np.median(net_edges):.4f}" if net_edges else "    N/A")
+    
+    # Fee type breakdown
+    ft_counts = defaultdict(int)
+    for r in valid:
+        ft = r.get("config", {}).get("fee_type", "unknown")
+        ft_counts[ft] += 1
+    print(f"\n  FEE TYPE DISTRIBUTION:")
+    for ft, cnt in sorted(ft_counts.items()):
+        ft_pnls = [r["total_pnl"] for r in valid if r.get("config", {}).get("fee_type") == ft]
+        ft_sharpes = [r["sharpe"] for r in valid if r.get("config", {}).get("fee_type") == ft]
+        mean_pnl = np.mean(ft_pnls) if ft_pnls else 0
+        mean_s = np.mean(ft_sharpes) if ft_sharpes else 0
+        print(f"    {ft:<20}: {cnt:4d} configs  mean PnL=${mean_pnl:+7.0f}  mean Sharpe={mean_s:.4f}")
     
     # ── 1. Net P&L ──
     pnls = [r["total_pnl"] for r in valid]
@@ -523,6 +596,8 @@ def analyze_results(results: List[dict]):
     best_pnl_config = sorted_by_pnl[0]
     print(f"\n  BEST CONFIG (NET P&L):")
     print(f"    PnL: ${best_pnl_config['total_pnl']:+.0f}  Sharpe: {best_pnl_config['sharpe']:.4f}")
+    print(f"    Gross Edge: {best_pnl_config.get('avg_gross_edge', 0):.4f}  Net Edge: {best_pnl_config.get('avg_net_edge', 0):.4f}")
+    print(f"    Fee Type: {best_pnl_config.get('config', {}).get('fee_type', '?')}")
     print(f"    Accuracy: {best_pnl_config['accuracy']*100:.2f}%  Trades: {best_pnl_config['n_trades']}")
     print(f"    Profit Factor: {best_pnl_config['profit_factor']:.3f}  ECE: {best_pnl_config['ece']:.4f}")
     print(f"    Fees: ${best_pnl_config['total_fees']:.0f}  Cost: ${best_pnl_config['total_cost']:.0f}")
@@ -568,7 +643,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Kalshi sweep evaluation")
     parser.add_argument("--n-configs", type=int, default=5000, help="Number of configs")
     parser.add_argument("--quick", action="store_true", help="Quick mode: top 100 only")
+    parser.add_argument("--skip-integrity", action="store_true", help="Skip pre-run integrity check")
     args = parser.parse_args()
+    
+    # Pre-run integrity gate
+    if not sweep_config.run_integrity_gate(skip=args.skip_integrity):
+        sys.exit(1)
     
     results = run_sweep(n_configs=args.n_configs, quick=args.quick)
     analyze_results(results)
