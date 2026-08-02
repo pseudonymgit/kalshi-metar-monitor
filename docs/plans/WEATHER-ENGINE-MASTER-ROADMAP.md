@@ -139,6 +139,61 @@ Gray Room Round 7 redefined this as explicit infrastructure hardening. The origi
 
 ---
 
+## Phase 15: Polymarket WhaleWatch Crossfeed Integration (PLANNED)
+**Spec:** `/home/node/.openclaw/workspace/prototypes/polymarket-whalewatch/docs/WHALEWATCH-POLYMARKET-SPEC.md` (Section 9)
+
+### Objective
+Read whale detection signals from the Polymarket WhaleWatch crossfeed signal journal DB and apply confidence modulation to the weather engine's ensemble probabilities for matching stations.
+
+### Communication Model
+**Pull via signal journal DB** (`data/whalewatch_crossfeed.db`, located in the Polymarket WhaleWatch repo):
+- WhaleWatch writes DETECTED/HIGH_CONVICTION signals to the DB
+- Weather engine reads unconsumed signals for matching stations during each evaluation cycle
+- Applies +0.5-2pp modulation to ensemble probability
+- Marks signals as consumed
+
+### Tasks
+| # | Task | Effort | Dependencies |
+|:--:|------|:------:|:-------------|
+| **1** | Build `core/whalewatch_crossfeed_consumer.py` — reads crossfeed DB, resolves path relative to workspace, get_unconsumed_signals(station_icao, max_age_hours), mark_consumed(signal_id, note) | 0.5 day | Polymarket WhaleWatch deployed and writing to crossfeed DB |
+| **2** | Wire into evaluation cycle — in each station's evaluation, check for unconsumed whale signals and apply modulation to `ensemble_fraction.py` probability output | 0.5 day | #1 |
+| **3** | Compute_whale_modulation(signal) — maps anomaly_score (1.0-5.0) + direction to +0.5-2pp boost, with ensemble base-probability discounting (extreme probs get 0.3× modulation) | 0.5 day | #2 |
+| **4** | Crossfeed conflict detection — if whale direction disagrees with ensemble direction, reduce position by 50% instead of boosting | 0.5 day | #3 |
+| **5** | P&L attribution — track which trades were influenced by crossfeed signals, log contribution to overall P&L | 1 day | #2-4 |
+| **6** | Tests — mock crossfeed DB, verify modulation applied correctly, verify consumed marking, verify conflict detection | 0.5 day | #1-4 |
+
+**Total effort:** 3.5 days
+**Gate:** WhaleWatch producing consistent signals with <40% false positive rate
+**Branch:** Main weather engine branch (will merge when ready)
+
+### Signal Modulation Formula
+```
+base_prob = ensemble_calibrated_probability[bucket]
+whale_strength = anomaly_score / 5.0  # 0.0-1.0
+
+# Base: +0.5pp for detection, up to +2pp at max strength
+modulation_pp = 0.5 + 1.5 * whale_strength
+
+# Discount extreme probabilities
+if base_prob > 0.90 or base_prob < 0.10:
+    modulation_pp *= 0.3
+
+# Bonus for agreement
+if (base_prob > 0.5 and direction == "YES") or (base_prob < 0.5 and direction == "NO"):
+    modulation_pp += 0.5
+
+modulation_pp = min(modulation_pp, 2.0)
+adjusted_prob = base_prob + (modulation_pp / 100.0)
+```
+
+### Key Files
+- **NEW** `core/whalewatch_crossfeed_consumer.py` — crossfeed DB reader
+- **MODIFY** `core/ensemble_fraction.py` — apply modulation in probability output
+- **MODIFY** `core/paper_trading_engine.py` — crossfeed check in evaluation cycle
+- **REFERENCE** `prototypes/polymarket-whalewatch/docs/WHALEWATCH-POLYMARKET-SPEC.md` (Section 9)
+
+---
+
 ## Reference: Gray Room Round 7 Sources
 - Full synthesis: `docs/plans/GRAY-ROOM-ROUND7-SYNTHESIS.md`
 - Expert 1 (Market Microstructure/METAR): GRAY-ROOM-ROUND7-EXPERT1-MARKET-MICROSTRUCTURE.md

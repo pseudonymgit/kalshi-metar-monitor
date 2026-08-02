@@ -52,7 +52,13 @@ if str(PROJECT_ROOT) not in sys.path:
 from core.station_registry import get_all_stations
 from core.market_cost_model import MARKET_COST_MODEL
 from core.risk_controls import check_kill_switches, RiskState, DEFAULT_RISK_CONFIG
-from core.fee_aware_kelly_position_sizing import KellyPositionSizer, KellySizingConfig
+from core.position_sizer import PositionSizer as KellyPositionSizer
+from core.market_cost_model import ROUND_TRIP_FEE as DEFAULT_COST_FRACTION
+class KellySizingConfig:
+    """Minimal config shim for position_sizer compatibility."""
+    fraction_kelly = 0.5
+    max_bankroll_pct = 0.08
+    min_trades_for_kelly = 10
 
 logger = logging.getLogger(__name__)
 

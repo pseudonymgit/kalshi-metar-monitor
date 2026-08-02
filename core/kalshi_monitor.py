@@ -43,6 +43,17 @@ from core.station_time import parse_iso_utc, station_local_day_key, to_station_l
 from core.metar_monitor import _now_utc_iso
 from core.alert_schema import ALERT_SCHEMA_VERSION
 from cryptography.hazmat.primitives import hashes, serialization
+from core.api_circuit_breaker import CircuitBreaker, CircuitConfig, ErrorTier
+
+# Singleton circuit breakers for external APIs
+_KALSHI_CIRCUIT = CircuitBreaker(CircuitConfig(
+    name='kalshi-api',
+    failure_threshold=5,
+    recovery_timeout=30.0,
+    max_retries=2,
+    retry_backoff=2.0,
+    error_tiers=(ErrorTier.TRANSIENT, ErrorTier.NON_TRANSIENT),
+))
 from cryptography.hazmat.primitives.asymmetric import padding
 
 _last_market_state = {}
@@ -850,13 +861,15 @@ def _kalshi_get(path):
         "Content-Type": "application/json",
     }
 
-    response = requests.get(
-        f"{base_url}{normalized_path}",
-        headers=headers,
-        timeout=10,
-    )
-    response.raise_for_status()
-    return response.json()
+    def _do_get():
+        resp = requests.get(f"{base_url}{normalized_path}", headers=headers, timeout=10)
+        resp.raise_for_status()
+        return resp.json()
+
+    success, result = _KALSHI_CIRCUIT.call(_do_get)
+    if not success:
+        raise RuntimeError(f"Kalshi API circuit breaker open after retries: {result}")
+    return result
 
 
 def get_state():

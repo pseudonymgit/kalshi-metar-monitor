@@ -18,6 +18,16 @@ import sqlite3
 import threading
 import requests
 import time
+from core.api_circuit_breaker import CircuitBreaker, CircuitConfig, ErrorTier
+
+_NWS_CIRCUIT = CircuitBreaker(CircuitConfig(
+    name='nws-noaa-api', failure_threshold=5, recovery_timeout=30.0,
+    max_retries=2, retry_backoff=2.0,
+))
+_OPENMETEO_CIRCUIT = CircuitBreaker(CircuitConfig(
+    name='openmeteo-api', failure_threshold=5, recovery_timeout=30.0,
+    max_retries=2, retry_backoff=2.0,
+))
 import re
 from collections import deque
 from io import StringIO

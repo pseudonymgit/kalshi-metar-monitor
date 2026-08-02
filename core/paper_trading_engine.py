@@ -126,23 +126,19 @@ try:
     from core.low_liquidity_traps import LowLiquidityTrapFilter
     HAS_LOW_LIQUIDITY_TRAP = True
 except ImportError:
-    print("Warning: Low Liquidity Trap Filter module not available. Illiquid market protection disabled.")
+    _LOGGER.warning("Low Liquidity Trap Filter module not available. Illiquid market protection disabled.")
     LowLiquidityTrapFilter = None
     HAS_LOW_LIQUIDITY_TRAP = False
 
-try:
-    from core.kelly_position_sizer import KellyPositionSizer
-    HAS_KELLY_SIZER = True
-except ImportError:
-    print("Warning: Kelly Position Sizer module not available. Advanced position sizing disabled.")
-    KellyPositionSizer = None
-    HAS_KELLY_SIZER = False
+from core.position_sizer import PositionSizer
+HAS_KELLY_SIZER = True
+KellyPositionSizer = PositionSizer
 
 try:
     from core.risk_budget import RiskBudgetAllocator
     HAS_RISK_BUDGET = True
 except ImportError:
-    print("Warning: Risk Budget module not available. Risk budget controls disabled.")
+    _LOGGER.warning("Risk Budget module not available. Risk budget controls disabled.")
     RiskBudgetAllocator = None
     HAS_RISK_BUDGET = False
 
@@ -150,7 +146,7 @@ try:
     from core.scaling_ladder import ScalingLadder
     HAS_SCALING_LADDER = True
 except ImportError:
-    print("Warning: Scaling Ladder module not available. Tiered scaling controls disabled.")
+    _LOGGER.warning("Scaling Ladder module not available. Tiered scaling controls disabled.")
     ScalingLadder = None
     HAS_SCALING_LADDER = False
 
@@ -158,7 +154,7 @@ try:
     from core.stop_loss import StopLossMonitor
     HAS_STOP_LOSS = True
 except ImportError:
-    print("Warning: Stop Loss Monitor module not available. Stop loss controls disabled.")
+    _LOGGER.warning("Stop Loss Monitor module not available. Stop loss controls disabled.")
     StopLossMonitor = None
     HAS_STOP_LOSS = False
 
@@ -167,7 +163,7 @@ try:
     from .execution_simulator import ExecutionSimulator, TradeSimulationResult
     HAS_EXECUTION_SIMULATOR = True
 except ImportError:
-    print("Warning: Execution Simulator module not available. Monte Carlo execution sim disabled.")
+    _LOGGER.warning("Execution Simulator module not available. Monte Carlo execution sim disabled.")
     ExecutionSimulator = None
     TradeSimulationResult = None
     HAS_EXECUTION_SIMULATOR = False
@@ -177,7 +173,7 @@ try:
     from . import pnl_tracking as _pnl_tracking
     HAS_PNL_TRACKING = True
 except ImportError:
-    print("Warning: PnL Tracking module not available. Extracted reconciliation disabled.")
+    _LOGGER.warning("PnL Tracking module not available. Extracted reconciliation disabled.")
     _pnl_tracking = None
     HAS_PNL_TRACKING = False
 
@@ -187,7 +183,7 @@ try:
     from core.multi_model_ensemble import multi_model_real_signal as multi_model_ensemble_signal
     HAS_MULTI_MODEL_ENSEMBLE = True
 except ImportError:
-    print("Warning: Multi-Model Ensemble Signal not available.")
+    _LOGGER.warning("Multi-Model Ensemble Signal not available.")
     multi_model_ensemble_signal = None
     HAS_MULTI_MODEL_ENSEMBLE = False
 
@@ -197,13 +193,13 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 try:
     from core.signals.nwp_analog_signal import NwpAnalogSignal, NWP_ANALOG_ENABLED
 except ImportError:
-    print("Warning: NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
+    _LOGGER.warning("NWP Analog Signal modules not available. Install sklearn and xgboost for NWP features.")
     NwpAnalogSignal = None
     NWP_ANALOG_ENABLED = False
 
 # Determine if we should attempt to use the NWP analog signal
 if not NWP_ANALOG_ENABLED:
-    print("WARNING: NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
+    _LOGGER.warning("NWP analog signal is experimental. Set NWP_ANALOG_ENABLED=1 to enable.")
 HAS_NWP_ANOG = NWP_ANALOG_ENABLED
 
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
@@ -218,15 +214,15 @@ dewpoint_depression_imported = False
 try:
     from core.signals.dewpoint_depression_modulator import modulate_confidence
     dewpoint_depression_imported = True
-    print("INFO: Dewpoint depression modulator imported successfully")
+    _LOGGER.info("Dewpoint depression modulator imported successfully")
 except ImportError as e:
-    print(f"Warning: Dewpoint depression modulator import failed: {e}")
+    _LOGGER.warning(f"Warning: Dewpoint depression modulator import failed: {e}")
     modulate_confidence = None
 try:
     from core.signals.temperature_advection_signal import TemperatureAdvectionSignal
     # Skip logger info due to initialization order; _LOGGER defined after imports
 except ImportError as e:
-    print(f"Warning: TemperatureAdvectionSignal import failed: {e}")
+    _LOGGER.warning(f"Warning: TemperatureAdvectionSignal import failed: {e}")
     TemperatureAdvectionSignal = None
     TEMPERATURE_ADVECTION_ENABLED = False
 
@@ -235,7 +231,7 @@ try:
     from core.signals.frontal_passage_nowcast_signal import FrontalPassageNowcastSignal
     HAS_FRONTAL_PASSAGE_NOWCAST = True
 except ImportError as e:
-    print(f"Warning: FrontalPassageNowcastSignal import failed: {e}")
+    _LOGGER.warning(f"Warning: FrontalPassageNowcastSignal import failed: {e}")
     FrontalPassageNowcastSignal = None
     HAS_FRONTAL_PASSAGE_NOWCAST = False
 
@@ -244,7 +240,7 @@ try:
     from core.signals.spike_reversion_signal import SpikeReversionSignal
     HAS_SPIKE_REVERSION_SIGNAL = True
 except ImportError as e:
-    print(f"Warning: SpikeReversionSignal import failed: {e}")
+    _LOGGER.warning(f"Warning: SpikeReversionSignal import failed: {e}")
     SpikeReversionSignal = None
     HAS_SPIKE_REVERSION_SIGNAL = False
 
@@ -252,12 +248,22 @@ except ImportError as e:
 HAS_GOLDILOCKS_SIGNAL = HAS_SPIKE_REVERSION_SIGNAL
 GoldilocksSignal = SpikeReversionSignal
 
+# WhaleWatch Crossfeed Consumer — reads Polymarket whale signals for station modulation
+try:
+    from .whalewatch_crossfeed_consumer import CrossfeedConsumer, modulate_with_crossfeed
+    HAS_WHALEWATCH_CROSSFEED = True
+except ImportError as e:
+    _LOGGER.warning(f"Warning: WhaleWatch Crossfeed Consumer import failed: {e}")
+    CrossfeedConsumer = None
+    modulate_with_crossfeed = None
+    HAS_WHALEWATCH_CROSSFEED = False
+
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
     from core.calibration_pipeline import CalibrationPipeline
     HAS_CALIBRATION_PIPELINE = True
 except ImportError:
-    print("Warning: CalibrationPipeline modules not available. Install sklearn and scipy for calibration features.")
+    _LOGGER.warning("Warning: CalibrationPipeline modules not available. Install sklearn and scipy for calibration features.")
     CalibrationPipeline = None
     HAS_CALIBRATION_PIPELINE = False
 
@@ -315,13 +321,14 @@ class PaperTrader:
                  paper_db=PAPER_DB_PATH,
                  metar_db=METAR_DB_PATH,
                  initial_balance=10000.0,
-                 fee_rate=0.0205):  # Realistic fee matching MARKET_COST_MODEL.round_trip_fraction()
+                 fee_rate=None):  # Will load from market_cost_model in __init__
         self.paper_db = paper_db
         self.metar_db = metar_db
         self.initial_balance = initial_balance
         self.position_size = 100  # Min position size in dollars
         self.max_position_value = 1000  # Max exposure per trade
-        self.fee_rate = fee_rate  # Trading fee as proportion of fill
+        from core.market_cost_model import ROUND_TRIP_FEE as _DEFAULT_FEE
+        self.fee_rate = fee_rate if fee_rate is not None else _DEFAULT_FEE  # Trading fee as proportion of fill
 
         # Marty's Phase 1 B1.5: Risk controls
         self._risk_config = RISK_CONFIG
@@ -386,7 +393,7 @@ class PaperTrader:
             try:
                 self._calibrator = CalibrationPipeline(self.signal_names, self.available_stations)
             except Exception as e:
-                print(f"Warning: Failed to initialize CalibrationPipeline: {e}")
+                _LOGGER.warning(f"Warning: Failed to initialize CalibrationPipeline: {e}")
                 self._calibrator = None
         else:
             self._calibrator = None
@@ -396,7 +403,7 @@ class PaperTrader:
             from core.station_skill_gate import StationSkillGate
             self._skill_gate = StationSkillGate(self.metar_db)
         except Exception as e:
-            print(f"Warning: Failed to initialize StationSkillGate: {e}, feature will be disabled")
+            _LOGGER.warning(f"Warning: Failed to initialize StationSkillGate: {e}, feature will be disabled")
             self._skill_gate = None
         
         # Initialize trade journal for adaptive thresholds (Phase 4.4)
@@ -405,7 +412,7 @@ class PaperTrader:
             self._trade_journal = get_journal()  # Use default journal path
             _LOGGER.info("Trade journal initialized for adaptive thresholds")
         except Exception as e:
-            print(f"Warning: Failed to initialize TradeJournal for adaptive thresholds: {e}")
+            _LOGGER.warning(f"Warning: Failed to initialize TradeJournal for adaptive thresholds: {e}")
             self._trade_journal = None
 
         # Initialize Phase 3 risk modules
@@ -414,7 +421,7 @@ class PaperTrader:
             try:
                 self._kelly_sizer = KellyPositionSizer(bankroll=self.initial_balance)
             except Exception as e:
-                print(f"Warning: Failed to initialize KellyPositionSizer: {e}")
+                _LOGGER.warning(f"Warning: Failed to initialize KellyPositionSizer: {e}")
                 self._kelly_sizer = None
 
         self._risk_budget = None
@@ -422,7 +429,7 @@ class PaperTrader:
             try:
                 self._risk_budget = RiskBudgetAllocator(total_budget=250.0)  # Default $250 total budget
             except Exception as e:
-                print(f"Warning: Failed to initialize RiskBudgetAllocator: {e}")
+                _LOGGER.warning(f"Warning: Failed to initialize RiskBudgetAllocator: {e}")
                 self._risk_budget = None
 
         self._scaling_ladder = None
@@ -430,7 +437,7 @@ class PaperTrader:
             try:
                 self._scaling_ladder = ScalingLadder()
             except Exception as e:
-                print(f"Warning: Failed to initialize ScalingLadder: {e}")
+                _LOGGER.warning(f"Warning: Failed to initialize ScalingLadder: {e}")
                 self._scaling_ladder = None
 
         self._low_liquidity_trap_filter = None
@@ -438,7 +445,7 @@ class PaperTrader:
             try:
                 self._low_liquidity_trap_filter = LowLiquidityTrapFilter()
             except Exception as e:
-                print(f"Warning: Failed to initialize LowLiquidityTrapFilter: {e}")
+                _LOGGER.warning(f"Warning: Failed to initialize LowLiquidityTrapFilter: {e}")
                 self._low_liquidity_trap_filter = None
 
         # Initialize Execution Simulator for Monte Carlo P&L
@@ -456,8 +463,18 @@ class PaperTrader:
             try:
                 self._stop_loss_monitor = StopLossMonitor(budget=250.0)  # Same budget as risk budget
             except Exception as e:
-                print(f"Warning: Failed to initialize StopLossMonitor: {e}")
+                _LOGGER.warning(f"Warning: Failed to initialize StopLossMonitor: {e}")
                 self._stop_loss_monitor = None
+
+        # WhaleWatch Crossfeed Consumer — reads whale signals for station modulation
+        self._crossfeed_consumer = None
+        if HAS_WHALEWATCH_CROSSFEED and CrossfeedConsumer is not None:
+            try:
+                self._crossfeed_consumer = CrossfeedConsumer()
+                _LOGGER.info("WhaleWatch Crossfeed Consumer initialized")
+            except Exception as e:
+                _LOGGER.warning(f"Warning: Failed to initialize CrossfeedConsumer: {e}")
+                self._crossfeed_consumer = None
 
     def _init_paper_db(self):
         """Create paper trading database schema."""
@@ -685,7 +702,7 @@ class PaperTrader:
             c.execute("SELECT COUNT(*) FROM settlement_epochs LIMIT 1")
             conn.close()
         except Exception as e:
-            print(f"WARNING: METAR database incomplete: {e}")
+            _LOGGER.warning(f"WARNING: METAR database incomplete: {e}")
 
     def _current_datetime(self):
         """Get current datetime in UTC."""
@@ -948,7 +965,7 @@ class PaperTrader:
         available_stations = self._get_daily_metars(date)
 
         if not available_stations:
-            print(f"INFO: No settlement data available for {date}, checking for live trading signals instead...")
+            _LOGGER.info(f"No settlement data available for {date}, checking for live trading signals instead...")
             available_stations = [s[0] for s in
                 [('KATL', 'Atlanta'), ('KBOS', 'Boston'), ('KLAX', 'Los Angeles'),
                  ('KJFK', 'New York'), ('KORD', 'Chicago'), ('KMIA', 'Miami'),
@@ -1382,7 +1399,7 @@ class PaperTrader:
             return result[0] if result and result[0] is not None else None
         except Exception as e:
             conn.close()
-            print(f"Error fetching previous day high temperature: {e}")
+            _LOGGER.warning(f"Error fetching previous day high temperature: {e}")
             return None
 
     def place_paper_trade(self, station, market_type, signal_direction,
@@ -1506,12 +1523,44 @@ class PaperTrader:
                 # This may happen multiple times as the same function gets called
                 # We should be careful not to refit too frequently
             except Exception as e:
-                print(f"Calibration failed for {station}, signal: {functionality}: {e}")
+                _LOGGER.info(f"Calibration failed for {station}, signal: {functionality}: {e}")
                 # Fall back to original confidence
                 calibrated_confidence = confidence
         else:
             # Use uncalibrated confidence if calibration is not available
             calibrated_confidence = confidence
+
+        # ─── WHALEWATCH CROSSFEED MODULATION ──────────────────────────
+        # Apply WhaleWatch signal modulation to analytical probability
+        # Modulates ensemble probability based on detected whale activity
+        crossfeed_applied = False
+        crossfeed_metadata = {}
+        if self._crossfeed_consumer is not None:
+            try:
+                modulated_prob, crossfeed_meta = modulate_with_crossfeed(
+                    consumer=self._crossfeed_consumer,
+                    station_icao=station,
+                    base_prob=analytical_prob,
+                )
+                if crossfeed_meta.get("crossfeed_applied", False):
+                    crossfeed_applied = True
+                    crossfeed_metadata = crossfeed_meta
+                    analytical_prob = modulated_prob
+                    _LOGGER.info(
+                        "WhaleWatch crossfeed modulation applied for %s: "
+                        "pp=%.1f signals=%d prob=%.4f",
+                        station,
+                        crossfeed_meta.get("total_modulation_pp", 0),
+                        crossfeed_meta.get("num_signals", 0),
+                        analytical_prob,
+                    )
+                    # Append modulation note to existing notes
+                    if notes:
+                        notes += f" | crossfeed: {crossfeed_meta.get('total_modulation_pp', 0):.1f}pp"
+                    else:
+                        notes = f"whalewatch_crossfeed_{crossfeed_meta.get('total_modulation_pp', 0):.1f}pp"
+            except Exception as e:
+                _LOGGER.warning("WhaleWatch crossfeed modulation failed: %s", e)
 
         # Record decision output - this is P1.4 requirement
 
@@ -1930,7 +1979,7 @@ class PaperTrader:
 
         # Check if any risk control has been violated after this trade
         if not risk_state_after_execution.get('passed', True):
-            print(f"Risk kill switch triggered for {station} by risk: {risk_state_after_execution.get('checks')} - skipping remaining trades")
+            _LOGGER.warning(f"Risk kill switch triggered for {station} by risk: {risk_state_after_execution.get('checks')} - skipping remaining trades")
 
             # Prepare failure reasons from failed checks
             kill_reasons = []
@@ -2427,7 +2476,7 @@ class PaperTrader:
                     conf_to_use = raw_forecast_prob if raw_forecast_prob is not None else (raw_confidence if raw_confidence is not None else 0.5)
                     self._calibrator.update(signal_name, station, conf_to_use, was_correct)
                 except Exception as e:
-                    print(f"Error feeding trade to calibrator: {e}")
+                    _LOGGER.warning(f"Error feeding trade to calibrator: {e}")
 
             # Update RiskManager with realized P&L after settlement
             settlement_trade_result = TradeResult(
@@ -2442,7 +2491,7 @@ class PaperTrader:
 
         conn.commit()
         conn.close()
-        print(f"Processed {settled_count} trade settlements for date {settlement_date}")
+        _LOGGER.info(f"Processed {settled_count} trade settlements for date {settlement_date}")
 
     def daily_reconciliation(self, reconcile_date=None):
         """
@@ -2770,7 +2819,7 @@ class PaperTrader:
                     report['calibration_pipeline_metrics'] = calibration_info
 
                 except Exception as e:
-                    print(f"Error generating calibration pipeline report: {e}")
+                    _LOGGER.warning(f"Error generating calibration pipeline report: {e}")
                     report['calibration_pipeline_metrics'] = {
                         'calibration_pipeline_enabled': True,
                         'error_generating_report': str(e)
@@ -2788,10 +2837,10 @@ class PaperTrader:
             with open(save_path, 'w') as f:
                 json.dump(report, f, indent=2)
 
-            print(f"Calibration report generated: {save_path}")
+            _LOGGER.info(f"Calibration report generated: {save_path}")
             return report
         else:
-            print("No calibration data available yet")
+            _LOGGER.info("No calibration data available yet")
             return {}
 
     # ─── Marty's Phase 1 B1.5: Risk Report ──────────────────────────────
@@ -3008,20 +3057,21 @@ def daily_paper_run(run_date=None):
     if run_date is None:
         run_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
 
-    print(f"PAPER TRADING RUN - {run_date}")
-    print("=" * 70)
+    _LOGGER.info(f"PAPER TRADING RUN - {run_date}")
+    _LOGGER.info("=" * 70)
 
     # Increased initial balance for more realistic trading
     # Support PAPER_TRADING_DB_PATH env var for instance-specific DB (used by production deployment)
     _pt_db_path = os.environ.get("PAPER_TRADING_DB_PATH") or PAPER_DB_PATH
-    trader = PaperTrader(paper_db=_pt_db_path, initial_balance=10000.0, fee_rate=0.0205)  # Kalshi round-trip cost
+    from core.market_cost_model import ROUND_TRIP_FEE as _PT_FEE
+    trader = PaperTrader(paper_db=_pt_db_path, initial_balance=10000.0, fee_rate=_PT_FEE)  # Kalshi round-trip cost
 
     # Marty's Phase 1 B1.5: Check kill switches before trading
     should_halt, kill_reasons = trader.check_kill_switches()
     if should_halt:
-        print("\n=== RISK GUARDRAILS KILL SWITCH TRIGGERED ===")
-        print(trader.format_risk_alert())
-        print("\nTrading halted. Resolve issues before resuming.")
+        _LOGGER.info("\n=== RISK GUARDRAILS KILL SWITCH TRIGGERED ===")
+        _LOGGER.warning(trader.format_risk_alert())
+        _LOGGER.info("\nTrading halted. Resolve issues before resuming.")
         return {
             'status': 'halted',
             'reasons': kill_reasons,
@@ -3029,14 +3079,14 @@ def daily_paper_run(run_date=None):
         }
 
     # Generate signals for all stations with available data
-    print(f"Generating signals for {run_date}...")
+    _LOGGER.info(f"Generating signals for {run_date}...")
     signals = trader.generate_signals(run_date)
 
     # Apply spatial coherence gate - enhance confidence based on regional agreement
     SPATIAL_COHERENCE_ENABLED = bool(int(os.getenv('SPATIAL_COHERENCE_ENABLED', '1')))  # Enabled by default, 0/1
     
     if SPATIAL_COHERENCE_ENABLED:
-        print("Applying spatial coherence gate...")
+        _LOGGER.info("Applying spatial coherence gate...")
         try:
             # Old batch API was replaced by SpatialCoherenceGate class
             from .spatial_coherence import SpatialCoherenceGate
@@ -3049,7 +3099,7 @@ def daily_paper_run(run_date=None):
                 adj_conf, _ = _sc_gate.apply_to_confidence(station, direction, confidence, run_date)
                 signals_with_conf.append((sig[0], sig[1], sig[2], sig[3], adj_conf))
         except Exception as e:
-            print(f"  Spatial coherence gate failed: {e}")
+            _LOGGER.info(f"  Spatial coherence gate failed: {e}")
             signals_with_conf = list(signals)
         
         # Count signal adjustments for logging
@@ -3058,13 +3108,13 @@ def daily_paper_run(run_date=None):
             if orig_sig[-1] != new_sig[-1]:  # Compare confidence values
                 conf_modified += 1
         
-        print(f"Applied spatial coherence to {len(signals_with_conf)} signals, modified confidence of {conf_modified} signals")
+        _LOGGER.info(f"Applied spatial coherence to {len(signals_with_conf)} signals, modified confidence of {conf_modified} signals")
         signals = signals_with_conf
         
         # Apply dewpoint depression modulation after spatial coherence gate
         DEWPOINT_MODULATION_ENABLED = dewpoint_depression_modulation_enabled
         if DEWPOINT_MODULATION_ENABLED and dewpoint_depression_imported:
-            print("Applying dewpoint depression modulation...")
+            _LOGGER.info("Applying dewpoint depression modulation...")
             
             # Parse date string to datetime object
             try:
@@ -3100,15 +3150,15 @@ def daily_paper_run(run_date=None):
                     modulated_signals.append((*signal, 0.5))
             
             signals = modulated_signals
-            print(f"Applied dewpoint depression modulation to {len(signals_with_conf)} signals, modified confidence of {dpd_modifications} signals")
+            _LOGGER.info(f"Applied dewpoint depression modulation to {len(signals_with_conf)} signals, modified confidence of {dpd_modifications} signals")
     else:
-        print("Spatial coherence gate disabled")
+        _LOGGER.info("Spatial coherence gate disabled")
         # Ensure signals have confidence values (default 0.5) for downstream compatibility
         signals = [(s[0], s[1], s[2], s[3], 0.5) if len(s) < 5 else s for s in signals]
 
     # Apply intraday METAR confirmation signal to adjust confidence based on same-day temperature trends
     # Only applies to signals where same-day METAR data is available (dates within last 24 hours)
-    print("Applying intraday METAR confirmation...")
+    _LOGGER.info("Applying intraday METAR confirmation...")
     intraday_confirmation_enabled = os.getenv('INTRADAY_CONFIRMATION_ENABLED', 'True').lower() == 'true'
     
     if intraday_confirmation_enabled:
@@ -3152,16 +3202,16 @@ def daily_paper_run(run_date=None):
                 confirmed_signals.append(signal)
         
         signals = confirmed_signals
-        print(f"Applied intraday confirmation to {intraday_confirmed} signals, made meaningful confidence adjustments to {intraday_adjustments} signals")
+        _LOGGER.info(f"Applied intraday confirmation to {intraday_confirmed} signals, made meaningful confidence adjustments to {intraday_adjustments} signals")
     
-    print(f"Generated {len(signals)} signals:")
+    _LOGGER.info(f"Generated {len(signals)} signals:")
     for i, sig in enumerate(signals):
         if len(sig) >= 5:  
             station, mtype, direction, reason, confidence = sig[0], sig[1], sig[2], sig[3], sig[4]
         else:
             station, mtype, direction, reason = sig
             confidence = 0.5  # Default
-        print(f"  {i+1:2d}. {station} {mtype} {direction.value:>4s}: {reason} (conf: {confidence:.2f})")
+        _LOGGER.info(f"  {i+1:2d}. {station} {mtype} {direction.value:>4s}: {reason} (conf: {confidence:.2f})")
 
     # Execute trades based on signals
     executed = 0
@@ -3207,47 +3257,47 @@ def daily_paper_run(run_date=None):
             # Dispatch to Discord (skip if alert was filtered by hard filters)
             dispatch_result = dispatch_current_alert(alert_data, discord_payload)
             if dispatch_result.get('error'):
-                print(f"  [DISPATCH ERROR] {dispatch_result['error']}")
+                _LOGGER.info(f"  [DISPATCH ERROR] {dispatch_result['error']}")
 
             # Print alert to console
             if alert_data.get('skip_reason'):
-                print(f"  [FILTERED] {station}:{market_type} {result['trade_type'].value.upper()} - {alert_data['skip_reason']}")
+                _LOGGER.info(f"  [FILTERED] {station}:{market_type} {result['trade_type'].value.upper()} - {alert_data['skip_reason']}")
                 skipped += 1
             else:
-                print(f"  [ALERT] {station}:{market_type} {result['trade_type'].value.upper()} ")
-                print(f"         Grade: {alert_data['grade']} | Lane: {alert_data['lane_label']}")
-                print(f"         Edge: {alert_data['edge_pct']} | Sharpe: {alert_data['Sharpe']:.1f}")
-                print(f"         Conf: {alert_data['trade_confidence']:.0%} | Market prob: {alert_data['market_prob']:.2%}")
-                print(f"         Market URL: {alert_data['market_url']}")
-                print(f"         Amount: ${result['cost']:.2f}")
+                _LOGGER.info(f"  [ALERT] {station}:{market_type} {result['trade_type'].value.upper()} ")
+                _LOGGER.info(f"         Grade: {alert_data['grade']} | Lane: {alert_data['lane_label']}")
+                _LOGGER.info(f"         Edge: {alert_data['edge_pct']} | Sharpe: {alert_data['Sharpe']:.1f}")
+                _LOGGER.info(f"         Conf: {alert_data['trade_confidence']:.0%} | Market prob: {alert_data['market_prob']:.2%}")
+                _LOGGER.info(f"         Market URL: {alert_data['market_url']}")
+                _LOGGER.info(f"         Amount: ${result['cost']:.2f}")
 
             # Store alert data in result for tracking
             result['alert_data'] = alert_data
             executed += 1
             trade_results.append(result)
         else:
-            print(f"  [SKIP] {station}:{signal_direction.value} {result['reason']}")
+            _LOGGER.info(f"  [SKIP] {station}:{signal_direction.value} {result['reason']}")
             skipped += 1
 
-    print(f"\nTrade execution: {executed} executed, {skipped} skipped")
+    _LOGGER.info(f"\nTrade execution: {executed} executed, {skipped} skipped")
 
     # Perform daily reconciliation (includes settlement processing if available)
-    print(f"\nDaily Reconciliation for {run_date}...")
+    _LOGGER.info(f"\nDaily Reconciliation for {run_date}...")
     reconciled = trader.daily_reconciliation(run_date)
 
-    print("Reconciliation Summary:")
-    print(f"  Trades executed:    {reconciled['new_trades_today']}")
-    print(f"  Open positions:     {reconciled['open_positions']}")
-    print(f"  Settled today:      {reconciled['settled_trades']}")
-    print(f"  Win/Loss:           {reconciled['winning_trades']}/{reconciled['losing_trades']}")
-    print(f"  Fees paid:          ${reconciled['total_fees']:.2f}")
-    print(f"  Daily P&L:          ${reconciled['daily_pnl']:.2f}")
-    print(f"  Max drawdown:       ${reconciled['max_drawdown']:.2f}")
+    _LOGGER.info("Reconciliation Summary:")
+    _LOGGER.info(f"  Trades executed:    {reconciled['new_trades_today']}")
+    _LOGGER.info(f"  Open positions:     {reconciled['open_positions']}")
+    _LOGGER.info(f"  Settled today:      {reconciled['settled_trades']}")
+    _LOGGER.info(f"  Win/Loss:           {reconciled['winning_trades']}/{reconciled['losing_trades']}")
+    _LOGGER.info(f"  Fees paid:          ${reconciled['total_fees']:.2f}")
+    _LOGGER.info(f"  Daily P&L:          ${reconciled['daily_pnl']:.2f}")
+    _LOGGER.info(f"  Max drawdown:       ${reconciled['max_drawdown']:.2f}")
 
-    print(f"\nAccount Balance:")
-    print(f"  Opening:            ${reconciled['opening_balance']:.2f}")
-    print(f"  Closing:            ${reconciled['closing_balance']:.2f}")
-    print(f"  Daily Change:       ${reconciled['daily_pnl']:.2f}")
+    _LOGGER.info(f"\nAccount Balance:")
+    _LOGGER.info(f"  Opening:            ${reconciled['opening_balance']:.2f}")
+    _LOGGER.info(f"  Closing:            ${reconciled['closing_balance']:.2f}")
+    _LOGGER.info(f"  Daily Change:       ${reconciled['daily_pnl']:.2f}")
 
     # Update risk metrics with reconciliation results
     trader._risk_metrics.current_balance = reconciled['closing_balance']
@@ -3257,25 +3307,25 @@ def daily_paper_run(run_date=None):
     # Re-evaluate risk state after reconciliation
     trader._risk_metrics.risk_state = evaluate_risk_state(trader._risk_manager)
 
-    print(f"\n=== RISK GUARDRAILS STATUS ===")
+    _LOGGER.info(f"\n=== RISK GUARDRAILS STATUS ===")
     risk_report = trader.risk_report()
-    print(f"  Risk State: {risk_report['risk_state'].upper()}")
-    print(f"  Current Balance: ${risk_report['current_balance_usd']:,.2f}")
-    print(f"  Daily P&L: ${risk_report['daily_pnl_usd']:,.2f}")
-    print(f"  Max Drawdown: {risk_report['max_drawdown_pct']:.1%}")
-    print(f"  Consecutive Losses: {risk_report['consecutive_losses']}")
+    _LOGGER.info(f"  Risk State: {risk_report['risk_state'].upper()}")
+    _LOGGER.info(f"  Current Balance: ${risk_report['current_balance_usd']:,.2f}")
+    _LOGGER.info(f"  Daily P&L: ${risk_report['daily_pnl_usd']:,.2f}")
+    _LOGGER.info(f"  Max Drawdown: {risk_report['max_drawdown_pct']:.1%}")
+    _LOGGER.info(f"  Consecutive Losses: {risk_report['consecutive_losses']}")
     if risk_report['kill_switch_reasons']:
-        print("  Kill Switch Triggers:")
+        _LOGGER.info("  Kill Switch Triggers:")
         for reason in risk_report['kill_switch_reasons']:
-            print(f"    - {reason}")
+            _LOGGER.info(f"    - {reason}")
     else:
-        print("  Kill Switch Status: OK (no triggers)")
+        _LOGGER.info("  Kill Switch Status: OK (no triggers)")
 
     # Generate enhanced calibration report for P1.5
-    print(f"\nGenerating calibration report...")
+    _LOGGER.info(f"\nGenerating calibration report...")
     calibration_metrics = trader.generate_calibration_report()
 
-    print("\nRun complete.")
+    _LOGGER.info("\nRun complete.")
 
 
 if __name__ == "__main__":
