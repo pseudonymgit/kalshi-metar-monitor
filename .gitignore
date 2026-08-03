@@ -11,3 +11,6 @@ __pycache__/
 data/paper_trading_dev.db
 data/backtests/
 data/bmode_p1_execution_log.md
+data/tigge_grib/*.grib
+data/tigge_grib/
+*.grib
