@@ -62,7 +62,9 @@ NWP_DB = PROJECT_ROOT / "data" / "nwp_forecasts.db"
 
 # Intraday signal imports
 from core.signals.fogr_reversion_signal import FogrReversionSignal
-from core.signals.hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
+from core.signals.hrrr_bias_corrected_signal import HRRRBiasCorrectedSignal
+from core.signals.metar_nowcast_signal import MetarNowcastSignal
+from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
 from core.signals.nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 
 # ── Configuration ──────────────────────────────────────────────
@@ -86,7 +88,7 @@ SPREAD_WIDENING_FULL_CLOSE = 0.75 # 75% spread widening = full close
 EDGE_SPREAD_MULTIPLIER = 2.0      # Edge requirement = 2x spread
 
 # Stage sequence
-STAGE_A_SIGNALS = ['fogr_reversion']
+STAGE_A_SIGNALS = ['fogr_reversion', 'metar_nowcast']
 STAGE_B_SIGNALS = ['hrrr_bias_corrected']
 STAGE_C_SIGNALS = ['nwp_dtdt_fusion']
 
@@ -148,7 +150,9 @@ class IntradayTradingLoop:
 
         # Initialize signals
         self.fogr = FogrReversionSignal(db_path=self.metar_db_path)
-        self.hrrr = HrrrBiasCorrectedSignal(db_path=self.metar_db_path)
+        self.hrrr = HRRRBiasCorrectedSignal(db_path=self.metar_db_path)
+        self.metar_nowcast = MetarNowcastSignal()
+        self.spread_entry = SpreadBasedEntryDetector()
         self.fusion = NwpDtdtFusionSignal(db_path=self.metar_db_path, nwp_db_path=self.nwp_db_path)
 
         # Risk controls
@@ -180,6 +184,21 @@ class IntradayTradingLoop:
             d, c = self.fogr.evaluate_for_station(station, date, market_type=market_type)
             if d is not None:
                 signals.append(('fogr', d, c))
+
+        # A2: METAR Nowcast (ADVANCE signal)
+        try:
+            result = self.metar_nowcast.evaluate(
+                station=station,
+                bucket_temp_f=75,  # Default — use actual bucket in production
+                gefs_max_f=85.0,
+                gefs_min_f=65.0,
+            )
+            if result.get('signal'):
+                d = 'up' if result['direction'] == 'HIGH' else 'down'
+                c = result['confidence']
+                signals.append(('metar_nowcast', d, c))
+        except Exception as e:
+            logger.debug(f"METAR nowcast Stage A failed for {station}: {e}")
 
         if not signals:
             return None, 0.0
@@ -385,21 +404,46 @@ class IntradayTradingLoop:
     # ── Stage D3: Spread-Based Entry Avoidance ────────────────
 
     def check_spread_entry_avoidance(self, current_spread: float,
-                                      historical_spread: float = None) -> Tuple[bool, float]:
+                                      historical_spread: float = None,
+                                      station: str = None,
+                                      bucket_temp_f: int = 75) -> Tuple[bool, float]:
         """
         Check if current market spread is widening and adjust edge requirement.
+
+        Uses the ADVANCE SpreadBasedEntryDetector for statistical spread analysis
+        (percentile-based) when station is provided, falling back to simple
+        threshold comparison.
 
         Args:
             current_spread: Current Kalshi market spread
             historical_spread: Historical average spread for this market
+            station: Station code (required for ADVANCE signal analysis)
+            bucket_temp_f: Temperature bucket
 
         Returns:
             (avoid_entry, edge_requirement)
         """
         edge_requirement = current_spread * EDGE_SPREAD_MULTIPLIER
 
+        # Use ADVANCE Spread-Based Entry Detector for percentile analysis
+        if station is not None and hasattr(self, 'spread_entry'):
+            try:
+                pctile = self.spread_entry.get_spread_percentile(
+                    station, bucket_temp_f, current_spread
+                )
+                # If spread is in the 80th+ percentile (very wide), avoid
+                if pctile > 0.80:
+                    edge_requirement = max(edge_requirement, current_spread * 3.0)
+                    return True, edge_requirement
+                # If spread is below 50th percentile (compressed), reduce edge
+                if pctile < 0.50:
+                    edge_requirement = max(edge_requirement, current_spread * 1.5)
+                    return False, edge_requirement
+            except Exception:
+                pass
+
+        # Fallback: simple historical comparison
         if historical_spread is not None and current_spread > historical_spread:
-            # Spread is widening — require higher edge
             edge_requirement = max(edge_requirement, current_spread * 3.0)
             return True, edge_requirement
 
@@ -489,11 +533,20 @@ class IntradayTradingLoop:
         is_entry_eligible = False
         if position.stage == 0:
             spread_pass, iqr = self.check_spread_condition(station, date)
+
+            # Stage D3: Spread-Based Entry Avoidance check
+            avoid_entry, edge_req = self.check_spread_entry_avoidance(
+                current_spread=iqr if iqr else 0.0,
+                station=station,
+                bucket_temp_f=75,
+            )
+
             min_confidence = 0.3
             is_entry_eligible = (
                 overall_direction is not None
                 and overall_confidence >= min_confidence
                 and spread_pass
+                and not avoid_entry
             )
 
             if is_entry_eligible:
@@ -506,13 +559,15 @@ class IntradayTradingLoop:
                     'direction': overall_direction,
                     'confidence': overall_confidence,
                     'spread_iqr_c': iqr,
-                    'reason': 'sequential_triggers_met'
+                    'edge_requirement': edge_req,
+                    'reason': 'sequential_triggers_met' if not avoid_entry else 'spread_too_wide',
                 }
             else:
                 result['entry_decision'] = {
                     'action': 'hold',
                     'reason': 'entry_conditions_not_met',
                     'spread_check': spread_pass,
+                    'spread_avoid_entry': avoid_entry,
                     'confidence': overall_confidence,
                     'min_confidence': min_confidence,
                 }

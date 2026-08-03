@@ -32,8 +32,8 @@ _LOGGER = logging.getLogger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 
-MAX_BANKROLL_PCT = 0.08         # 8% cap per position (kelly_position_sizer.py)
-MAX_DRAWDOWN_PCT = 0.10          # 10% trailing drawdown
+MAX_BANKROLL_PCT = 0.05         # 5% cap per position (GLM 5.2 Gray Room R14 — corrected from 8%)
+MAX_DRAWDOWN_PCT = 0.15          # 15% trailing drawdown (GLM 5.2 — relaxed from 10% for smaller positions)
 MAX_POSITION_PCT = 0.25          # 25% max of balance (legacy SH3 cap)
 
 # Round-trip fee = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
@@ -217,22 +217,39 @@ class PositionSizer:
         """Update the cost fraction (spread-based)."""
         self._cost_fraction = max(0.0, min(1.0, cost_fraction))
 
-    def calculate_kelly_fraction(self, win_rate: float) -> float:
+    def calculate_kelly_fraction(self, win_rate: float, market_price: float = 0.50) -> float:
         """
-        Calculate Kelly fraction.
+        Calculate Kelly fraction for binary options.
 
-        f* = (p - c) / (1 - c)
+        f* = edge / (1 - c)   where edge = abs(win_rate - market_price)
 
-        where p is win probability and c is cost fraction.
-        This is the standard Kelly for binary outcomes with asymmetric payoff:
-        win → get (1-c) per contract, lose → forfeit full contract value.
+        For a YES contract at price M with true probability p:
+        - Edge = p - M (expected value vs market price)
+        - If edge <= 0: no trade (market already prices it fairly or overpriced)
+        - c = round-trip fee fraction
 
         Returns raw Kelly fraction (before adaptive scaling and caps).
+        When market_price is not available (0.50 default), falls back to
+        conservative estimate using win_rate.
         """
         c = self._cost_fraction
         if c >= 1.0:
             return 0.0
-        kelly = (win_rate - c) / (1.0 - c)
+        
+        # Calculate edge against market price
+        # For binary options: edge = true_probability - market_price
+        # We use abs to handle both UP (buy YES) and DOWN (buy NO) predictions
+        if market_price != 0.50 or abs(win_rate - 0.50) > 0.10:
+            # Market price is available or win_rate is significantly off-fair
+            edge = abs(win_rate - market_price)
+        else:
+            # Fallback: use deviation from 50%
+            edge = abs(win_rate - 0.50) - c
+        
+        if edge <= 0.0:
+            return 0.0
+        
+        kelly = edge / (1.0 - c)
         return max(0.0, min(1.0, kelly))
 
     # Fee-aware Kelly formula removed — Fix 3: use standard binary Kelly
@@ -273,6 +290,7 @@ class PositionSizer:
         win_rate: float,
         edge: float,
         use_kelly: bool = True,
+        market_price: Optional[float] = None,
     ) -> Tuple[float, Dict]:
         """
         Compute the final position size in dollars.
@@ -349,8 +367,9 @@ class PositionSizer:
             return 0.0, details
 
         if use_kelly:
-            # 1. Raw Kelly (primary formula)
-            kelly = self.calculate_kelly_fraction(win_rate)
+            # 1. Raw Kelly (primary formula) — now references market price
+            mp = market_price if market_price is not None else 0.50
+            kelly = self.calculate_kelly_fraction(win_rate, market_price=mp)
             details["kelly_fraction"] = round(kelly, 6)
             details["kelly_type"] = "p-c/1-c"
 

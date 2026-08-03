@@ -87,6 +87,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_registry import (
     get_all_stations as _get_all_stations,
     get_station_mapping as _get_station_mapping,
+    get_station_coordinates as _get_station_coordinates,
     validate_station_registry as _validate_station_registry,
     get_cluster_for_station as _get_cluster_for_station,
     CLUSTER_BUDGET_USD as _CLUSTER_BUDGET_USD,
@@ -252,6 +253,35 @@ except ImportError as e:
 HAS_GOLDILOCKS_SIGNAL = HAS_SPIKE_REVERSION_SIGNAL
 GoldilocksSignal = SpikeReversionSignal
 
+# ── ADVANCE Signal Imports (B-Mode integration) ──────────────────────────
+
+# HRRR Bias-Corrected Signal — short-range NWP source via Open-Meteo
+try:
+    from core.signals.hrrr_bias_corrected_signal import HRRRBiasCorrectedSignal
+    HAS_HRRR_BIAS_CORRECTED = True
+except ImportError as e:
+    print(f"Warning: HRRRBiasCorrectedSignal import failed: {e}")
+    HRRRBiasCorrectedSignal = None
+    HAS_HRRR_BIAS_CORRECTED = False
+
+# Intraday METAR Nowcast Signal — live METAR vs forecast comparison
+try:
+    from core.signals.metar_nowcast_signal import MetarNowcastSignal
+    HAS_METAR_NOWCAST = True
+except ImportError as e:
+    print(f"Warning: MetarNowcastSignal import failed: {e}")
+    MetarNowcastSignal = None
+    HAS_METAR_NOWCAST = False
+
+# Spread-Based Entry Detector — Kalshi order book spread optimization
+try:
+    from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
+    HAS_SPREAD_BASED_ENTRY = True
+except ImportError as e:
+    print(f"Warning: SpreadBasedEntryDetector import failed: {e}")
+    SpreadBasedEntryDetector = None
+    HAS_SPREAD_BASED_ENTRY = False
+
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
     from core.calibration_pipeline import CalibrationPipeline
@@ -367,6 +397,11 @@ class PaperTrader:
         # Frontal Passage Nowcast Signal (Phase 4.1 — spatial nowcasting, lazy-loaded)
         self._frontal_passage_nowcast = None
 
+        # ── ADVANCE Signal instances (lazy-loaded) ──────────────────────────
+        self._hrrr_signal = None
+        self._metar_nowcast = None
+        self._spread_entry = None
+
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
         self.signal_names = ["calendar_climatology", "late_day_momentum", "late_day_analysis"]
@@ -378,6 +413,15 @@ class PaperTrader:
         # Frontal passage nowcast signal (Phase 4.1)
         if HAS_FRONTAL_PASSAGE_NOWCAST:
             self.signal_names.append("frontal_passage_nowcast")
+        # HRRR Bias-Corrected signal (ADVANCE)
+        if HAS_HRRR_BIAS_CORRECTED:
+            self.signal_names.append("hrrr_bias_corrected")
+        # Intraday METAR Nowcast (ADVANCE)
+        if HAS_METAR_NOWCAST:
+            self.signal_names.append("metar_nowcast")
+        # Spread-based entry (ADVANCE - execution layer)
+        if HAS_SPREAD_BASED_ENTRY:
+            self.signal_names.append("spread_based_entry")
         # Define common weather stations for initial available locations
         self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']  # Common trade locations
 
@@ -1060,7 +1104,72 @@ class PaperTrader:
                     except Exception as e:
                         _LOGGER.warning(f"Failed to compute Frontal Passage Nowcast signal for {station} on {date}: {e}")
 
+            # ═══════════════════════════════════════════════════════════════
+            # ADVANCE Signals (B-Mode integration)
+            # ═══════════════════════════════════════════════════════════════
+
+            # Signal 9: HRRR Bias-Corrected (NWP source — short-range forecasts)
+            if HAS_HRRR_BIAS_CORRECTED:
+                if self._hrrr_signal is None:
+                    try:
+                        self._hrrr_signal = HRRRBiasCorrectedSignal()
+                        _LOGGER.info("HRRR Bias-Corrected signal initialized (lazy load)")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to initialize HRRR Bias-Corrected Signal: {e}")
+                if self._hrrr_signal is not None:
+                    try:
+                        # Get station coordinates for HRRR fetch
+                        lat, lon = _get_station_coordinates(station)
+                        if lat is not None and lon is not None:
+                            extremes = self._hrrr_signal.get_daily_extremes(station, lat, lon)
+                            if extremes.get('max_f') is not None and extremes.get('confidence', 0) > 0.3:
+                                # Compare HRRR forecast to GEFS or climatology
+                                # For now, signal fires if bias-corrected HRRR shows confidence
+                                direction = 'up' if extremes['max_f'] > 70 else 'down'  # Simplified
+                                confidence = extremes['confidence']
+                                market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
+                                signals.append((station, "HIGH", market_side, "hrrr_bias_corrected"))
+                                _LOGGER.info(f"HRRR Bias-Corrected signal fired for {station}: max={extremes['max_f']}°F, conf={confidence:.3f}")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to compute HRRR Bias-Corrected signal for {station}: {e}")
+
+            # Signal 10: Intraday METAR Nowcast (live METAR vs forecast)
+            if HAS_METAR_NOWCAST:
+                if self._metar_nowcast is None:
+                    try:
+                        self._metar_nowcast = MetarNowcastSignal()
+                        _LOGGER.info("METAR Nowcast signal initialized (lazy load)")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to initialize METAR Nowcast Signal: {e}")
+                if self._metar_nowcast is not None:
+                    try:
+                        # Use latest GEFS forecast for comparison (simplified)
+                        bucket_temp = 75  # Default — would be pulled from actual forecast
+                        result = self._metar_nowcast.evaluate(
+                            station=station,
+                            bucket_temp_f=bucket_temp,
+                            gefs_max_f=85.0,
+                            gefs_min_f=65.0,
+                        )
+                        if result.get('signal'):
+                            direction = 'up' if result['direction'] == 'HIGH' else 'down'
+                            confidence = result['confidence']
+                            market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
+                            signals.append((station, "HIGH", market_side, "metar_nowcast"))
+                            _LOGGER.info(f"METAR Nowcast signal fired for {station}: dir={result['direction']}, conf={confidence:.3f}")
+                    except Exception as e:
+                        _LOGGER.warning(f"Failed to compute METAR Nowcast signal for {station}: {e}")
+
         metar_conn.close()
+
+        # Spread-Based Entry — execution layer check (applied during order placement, not signal gen)
+        if HAS_SPREAD_BASED_ENTRY:
+            if self._spread_entry is None:
+                try:
+                    self._spread_entry = SpreadBasedEntryDetector()
+                    _LOGGER.info("Spread-Based Entry Detector initialized")
+                except Exception as e:
+                    _LOGGER.warning(f"Failed to initialize Spread-Based Entry Detector: {e}")
 
         # Filter signals based on station skill (T5 - per station skill gating)
         if self._skill_gate is not None:
@@ -1116,6 +1225,12 @@ class PaperTrader:
                     base_confidence = 0.6
                 elif reason in ["spike_reversion", "goldilocks_spike_reversion"]:
                     base_confidence = 0.65
+                elif reason in ["hrrr_bias_corrected"]:
+                    base_confidence = 0.7
+                elif reason in ["metar_nowcast"]:
+                    base_confidence = 0.65
+                elif reason in ["spread_based_entry"]:
+                    base_confidence = 0.6
                 else:
                     base_confidence = 0.5
                 

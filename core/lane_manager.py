@@ -60,7 +60,8 @@ class LaneType(Enum):
             "frontal_detector", "intraday_metar_confirmation", "fogr_reversion",
             "hrrr_bias_corrected", "nwp_dtdt_fusion", "spread_based_entry",
             "volume_momentum", "settlement_arbitrage", "corrected_pressure_delta",
-            "ai_composite",
+            "ai_composite", "hrrr_bias_corrected_signal", "metar_nowcast",
+            "spread_based_entry_detector",
         }
         spike_signals = {
             "microstructure_spike_reversion", "microstructure_spike_momentum_down",

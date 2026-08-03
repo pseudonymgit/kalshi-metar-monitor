@@ -46,6 +46,14 @@ REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(SCRIPT_DIR))
 
+
+# ─── Risk Controls ─────────────────────────────────────────────────────────
+
+from core.risk_controls import RiskManager, RiskConfig, TradeResult as RCTradeResult
+from core.stop_loss import StopLossMonitor
+
+
+# ─── Paths
 GEFS_DB = str(REPO_ROOT / "data" / "gefs_archive.db")
 SETTLEMENTS_DB = str(REPO_ROOT / "data" / "kalshi_settlements.db")
 TRADE_DB = str(REPO_ROOT / "data" / "paper_trading_dev.db")
@@ -67,13 +75,20 @@ STATIONS = [
     "KPHX", "KSAT", "KSEA", "KSFO",
 ]
 
-# Default config (from best sweep: edge=0.02, kelly=0.5, ep_min=0.15, ep_max=0.7, mc=500)
+# Config (Gray Room R14 — GLM 5.2 corrected values)
+# Edge threshold raised: circular formula fixed, edge is now real market edge
+# Gray Room R14: edge threshold and price bounds kept at pre-sweep values
+# until we see the real edge distribution with corrected market prices.
+# GLM 5.2 recommended 0.03 / 0.25 / 0.75 — revisit after 7 days of data.
 DEFAULT_EDGE_THRESHOLD = 0.02
+# Half-Kelly on corrected f* = 0.1746 at baseline p=0.67, M=0.50
 DEFAULT_KELLY_FRACTION = 0.50
+# Price bounds: old values (0.15/0.70) — revisit after edge distribution analysis
 DEFAULT_ENTRY_PRICE_MIN = 0.15
 DEFAULT_ENTRY_PRICE_MAX = 0.70
-DEFAULT_MAX_CONTRACTS = 500
-DEFAULT_TEMP_DIFF_MIN = 0.5  # °F
+# Max contracts: reduced from 500 to 175 per corrected Kelly (GLM 5.2)
+DEFAULT_MAX_CONTRACTS = 175
+DEFAULT_TEMP_DIFF_MIN = 0.5  # °F — edge_threshold is the real quality gate
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -81,10 +96,22 @@ DEFAULT_TEMP_DIFF_MIN = 0.5  # °F
 # ═══════════════════════════════════════════════════════════════════════════
 
 def kalshi_fee(contracts: int, price: float) -> float:
-    """Kalshi REAL fee: ceil(0.07 × C × P × (1-P)) per side."""
+    """Kalshi published taker fee: ceil(0.07 × P × (1-P) × 100) / 100 per contract.
+    
+    From Kalshi's published fee schedule (July 2026):
+    fee per contract = ceil(multiplier × price × (1-price) × 100) / 100
+    
+    For weather/climate markets, the taker multiplier is approximately 0.056
+    (peak ~1.4% at 50¢). We use 0.07 (standard taker rate) as a conservative
+    estimate since weather-specific multiplier data is not publicly published.
+    
+    The per-contract rounding (rather than total ceil) avoids the stair-step
+    discontinuity issue where adding 1 contract could triple the fee.
+    """
     if price <= 0.0 or price >= 1.0:
         return 0.0
-    return math.ceil(0.07 * contracts * price * (1.0 - price))
+    fee_per_contract = math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
+    return fee_per_contract * contracts
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -101,20 +128,31 @@ def get_gefs_forecast(target_date: str) -> Dict[str, dict]:
     conn = sqlite3.connect(GEFS_DB)
     cur = conn.cursor()
     cur.execute("""
-        SELECT station, ensemble_mean, ensemble_min, ensemble_max, n_members
+        SELECT station, ensemble_mean, ensemble_min, ensemble_max, n_members, member_values
         FROM gefs_archive
         WHERE target_date = ? AND step = 24
     """, (target_date,))
     rows = cur.fetchall()
     conn.close()
     
+    import struct
     result = {}
     for r in rows:
+        n_members = r[4] or 31
+        member_values = r[5]
+        # Decode member offsets: int8 offsets from mean in 0.1°C
+        if member_values and len(member_values) >= n_members:
+            offsets = list(struct.unpack('b' * n_members, member_values[:n_members]))
+            member_temps_c = [r[1] + o * 0.1 for o in offsets]
+        else:
+            member_temps_c = None
+        
         result[r[0]] = {
             "mean": r[1],
             "min": r[2],
             "max": r[3],
-            "n_members": r[4] or 31,
+            "n_members": n_members,
+            "member_temps_c": member_temps_c,
         }
     return result
 
@@ -143,13 +181,32 @@ def get_kalshi_market_price(event_ticker: str) -> Optional[float]:
     """
     Get current market price for a Kalshi event ticker.
     
-    In backtest mode, derives price from GEFS ensemble fraction.
-    In live mode (--live flag), fetches from Kalshi API.
+    In live mode: fetches from Kalshi API via kalshi_monitor.
+    In backtest mode: returns None (backfill uses settlement data).
     
-    Stub: for now, derive from GEFS confidence (0.5 + confidence * 0.4)
+    This replaces the old circular formula market_price = 0.5 + confidence * 0.4
+    which was deriving artificial prices from the signal itself.
     """
-    # For backtest mode: market price derived from model confidence
-    return None  # Will be set dynamically
+    try:
+        from core.kalshi_monitor import _kalshi_get
+        path = f"/markets?series_ticker={event_ticker}&limit=1&status=open"
+        resp = _kalshi_get(path)
+        if resp and "markets" in resp and len(resp["markets"]) > 0:
+            m = resp["markets"][0]
+            # Use the mid-price: (yes_bid + yes_ask) / 2 or last_price
+            yes_bid = m.get("yes_bid", 0)
+            yes_ask = m.get("yes_ask", 1)
+            if yes_bid > 0 and yes_ask < 1:
+                return (yes_bid + yes_ask) / 2.0
+            return m.get("last_price", None)
+    except ValueError as e:
+        if "not configured" in str(e):
+            pass  # Kalshi API not configured — expected in backtest mode
+        else:
+            _LOGGER.warning(f"Kalshi API error for {event_ticker}: {e}")
+    except Exception as e:
+        _LOGGER.warning(f"Kalshi API price fetch failed for {event_ticker}: {e}")
+    return None  # Fallback: caller uses 0.50
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -201,26 +258,48 @@ def compute_ensemble_signal(
     if temp_diff < DEFAULT_TEMP_DIFF_MIN:
         return None
     
-    # Raw confidence from temperature difference (0.5 to 0.99)
-    raw_conf = min(0.99, 0.5 + temp_diff / 20.0)
-    confidence = raw_conf
+    # FIRST PRINCIPLES: Ensemble fraction as confidence
+    # The GEFS has 31 members. Each member is a slightly different model run.
+    # fraction_up = count(members predicting up) / 31
+    # Confidence = max(fraction_up, 1 - fraction_up) — ensemble agreement
+    # This is more principled than the old heuristic (0.5 + temp_diff / 20.0)
+    # because it uses all 31 members, not just the mean.
+    member_temps_c = gefs_data.get("member_temps_c")
+    if member_temps_c and len(member_temps_c) >= 3:
+        member_temps_f = [t * 9/5 + 32 for t in member_temps_c]
+        n_up = sum(1 for t in member_temps_f if t > prev_temp_f)
+        fraction_up = n_up / len(member_temps_f)
+        confidence = max(fraction_up, 1.0 - fraction_up)
+        # Keep direction from mean (more stable), confidence from fraction
+    else:
+        # Fallback: old heuristic if no member data
+        confidence = min(0.99, 0.5 + temp_diff / 20.0)
     
-    # Market price derived from confidence
-    market_price = min(0.95, 0.5 + confidence * 0.4)
+    # Market price from Kalshi API (backtest mode: 0.50 fair value)
+    # Replaced old circular formula: market_price = 0.5 + confidence * 0.4
+    event_ticker = f"KXHIGH{station}"  # Simplified; actual ticker includes date
+    market_price = get_kalshi_market_price(event_ticker)
+    if market_price is None:
+        market_price = 0.50  # Fair value fallback (no information)
     
     if pred_dir == 1:
+        # Buying YES contract — edge = confidence - price
         entry_price = market_price
+        edge = confidence - market_price
     else:
+        # Buying NO contract — edge = (1-confidence) - (1-price) = price - confidence
         entry_price = 1.0 - market_price
+        edge = market_price - confidence
     
     if entry_price < DEFAULT_ENTRY_PRICE_MIN or entry_price > DEFAULT_ENTRY_PRICE_MAX:
         return None
     
-    edge = confidence - entry_price
     if edge < DEFAULT_EDGE_THRESHOLD:
         return None
     
-    # Kelly sizing
+    # Kelly sizing (correct formula for binary options)
+    # f* = edge / (1 - entry_price) for YES buys
+    # For NO buys, same formula since we normalize to YES-equivalent
     if edge > 0 and entry_price < 1.0:
         kelly_pct = edge / (1.0 - entry_price)
     else:
@@ -407,6 +486,16 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
     # ── Init trade DB ──
     trade_conn = init_trade_db(TRADE_DB)
     
+    # ── Init risk controls ──
+    risk_config = RiskConfig(
+        max_daily_loss_percentage=0.05,    # 5% max daily loss
+        max_drawdown_percent=0.15,          # 15% max drawdown
+        max_consecutive_losses=10,          # 10 consecutive losses max (20 stations × ~40% loss rate)
+        initial_capital=initial_bankroll,
+    )
+    risk_manager = RiskManager(config=risk_config)
+    stop_loss = StopLossMonitor(budget=initial_bankroll)
+    
     # ── Generate trading window ──
     start_dt = datetime.strptime(start_date, "%Y-%m-%d")
     date_list = [(start_dt + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)]
@@ -431,6 +520,18 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
         for station in STATIONS:
             if station not in gefs_forecast:
                 continue
+            
+            # Check risk controls before trading
+            risk_state = risk_manager.evaluate()
+            if risk_state.halted:
+                _LOGGER.warning(f"Risk controls halted trading on {target_date}: {risk_state.halt_reason}")
+                break
+            
+            # Check stop-loss
+            stopped, stop_reason, stop_details = stop_loss.check_stop_conditions()
+            if stopped:
+                _LOGGER.warning(f"Stop-loss triggered on {target_date}: {stop_reason}")
+                break
             
             trade = compute_ensemble_signal(station, target_date,
                                             gefs_forecast[station], settlements)
@@ -466,6 +567,15 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
             # Log to DB
             log_trade(trade_conn, trade, bankroll)
             
+            # Update risk controls
+            risk_result = risk_manager.update_after_trade(RCTradeResult(
+                trade_id=f"{station}_{target_date}_{trade['contracts']}",
+                pnl=net_pnl,
+                is_profitable=net_pnl > 0,
+                trade_date=target_date,
+            ))
+            stop_loss.record_trade(pnl=net_pnl, is_profitable=net_pnl > 0, date_str=target_date)
+            
             day_pnl += net_pnl
             day_fees += trade.get("total_fees", 0)
         
@@ -475,6 +585,13 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
             bankroll += day_pnl
         
         all_trades.extend(trades_today)
+        
+        # Log daily risk summary
+        risk_state = risk_manager.evaluate()
+        if not risk_state.passed:
+            failed = risk_state.get_failed_checks()
+            for check_name, reason in failed:
+                _LOGGER.warning(f"Risk check failed: {check_name} — {reason}")
         
         n_correct = sum(1 for t in trades_today if t.get("correct"))
         _LOGGER.info(f"  {target_date}: {len(trades_today)} trades, "

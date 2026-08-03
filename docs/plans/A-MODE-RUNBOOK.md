@@ -1,10 +1,22 @@
 # A-Mode Autonomous Phase Execution Runbook
 
 ## Overview
-This runbook is executed by the A-Mode dispatcher cron job. It reads the current state from `.meta/continuity/weather-engine/a-mode-state.json`, determines the next action, executes it, and updates the state.
+This runbook is executed by the A-Mode dispatcher cron job. The weather engine is an **intraday trading system** for Kalshi daily HIGH temperature markets. Primary signal: GEFS ensemble fraction (67.1% accuracy on 85 GEFS-cron paper trades), refined every 4 hours with fresh METAR data and intraday signals.
+
+The dispatcher reads current state from `.meta/continuity/weather-engine/a-mode-state.json`, determines next action, executes, and updates state.
 
 ## Operating Principle
 A-mode executes the phased roadmap (Phases 8.5-14) autonomously. Each phase has clear tasks, success criteria, and gates. The dispatcher does NOT need Dan or Donna to route each phase — it reads the state file and executes the next uncompleted task.
+
+### Intraday Trading Cycle
+1. GEFS issues forecast at 00/06/12/18 UTC (4-hour refresh)
+2. Ensemble fraction → probability for each station's daily HIGH direction
+3. Intraday signals (frontal passage nowcast, dewpoint modulation) adjust confidence
+4. Spatial coherence gate modulates by regional consensus
+5. Risk controls check kill switches, position limits, drawdown
+6. Position sized via fee-aware Kelly (canonical position_sizer.py)
+7. Trade recorded in paper DB; validated against Kalshi settlement DB at close
+8. Every 4-hour cycle updates position with fresher data
 
 B-mode (production reliability) runs in parallel. P0 items are B-mode, not deferred.
 

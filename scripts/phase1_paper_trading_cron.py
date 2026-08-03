@@ -10,6 +10,11 @@ Six critical fixes applied 2026-07-29:
   Fix 5: Goldilocks/SpikeReversion removed (49.85% accuracy, negative EV)
   Fix 6: Fee changed to flat $0.01/contract/side, not % of position
 
+Fix 7 (2026-08-03): Entry price now comes from Kalshi API market data.
+  Replaced hardcoded 0.85 with live mid-price via _kalshi_get().
+  Falls back to 0.50 when API is unavailable.
+  Fee docstring corrected to match real code: ceil(0.07 × C × P × (1-P)) per side.
+
 Uses historical settlement data from metar_backfill.db (always available)
 Phase 2 best config: decay=0.802, min_agreement=4, min_conf=0.7962
 Trades recorded to local data/phase1_paper_trades.db
@@ -52,6 +57,43 @@ from core.position_sizer import (
 from core.market_cost_model import ROUND_TRIP_FEE
 from core.sqlite_utils import get_sqlite_connection
 from core.signals import create_signal_registry, SignalRegistry
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Kalshi Market Price Feed
+# ═══════════════════════════════════════════════════════════════════════════
+
+def get_kalshi_market_price(event_ticker: str) -> float | None:
+    """
+    Fetch the current Kalshi market mid-price for a given event ticker.
+
+    Uses the Kalshi REST API via _kalshi_get() from core.kalshi_monitor.
+    Returns mid-price (yes_bid + yes_ask) / 2, or None if unavailable.
+
+    FIRST PRINCIPLES: The market price is the cost of a YES contract.
+    Edge = model_confidence - market_price (for YES buys).
+    If we can't get a real price, we return None and the caller uses 0.50
+    (fair value / no-information fallback).
+    """
+    try:
+        from core.kalshi_monitor import _kalshi_get
+        path = f"/markets?series_ticker={event_ticker}&limit=1&status=open"
+        resp = _kalshi_get(path)
+        if resp and "markets" in resp and len(resp["markets"]) > 0:
+            m = resp["markets"][0]
+            yes_bid = m.get("yes_bid", 0)
+            yes_ask = m.get("yes_ask", 1)
+            if yes_bid > 0 and yes_ask < 1:
+                return (yes_bid + yes_ask) / 2.0
+            return m.get("last_price", None)
+    except ValueError as e:
+        if "not configured" in str(e):
+            pass  # Expected in backtest mode
+        else:
+            _LOGGER.warning(f"Kalshi API error for {event_ticker}: {e}")
+    except Exception as e:
+        _LOGGER.warning(f"Kalshi API price fetch failed for {event_ticker}: {e}")
+    return None
 
 # ─── Logging ────────────────────────────────────────────────────────────────
 
@@ -265,6 +307,7 @@ def compute_kelly_position(
     confidence: float,
     win_rate: float,
     agreeing_signals: List[Tuple[str, str, float]],
+    market_price: float = 0.50,
 ) -> Tuple[float, Dict]:
     """
     Compute Kelly position size with disagreement-based multiplier.
@@ -274,6 +317,7 @@ def compute_kelly_position(
         confidence: Average signal confidence
         win_rate: Estimated win rate
         agreeing_signals: List of (direction, name, conf) tuples
+        market_price: Current market price for the traded contract
 
     Returns (position_size, details_dict).
     """
@@ -286,11 +330,12 @@ def compute_kelly_position(
 
     edge = sizer.calculate_edge_from_win_rate(win_rate)
 
-    # Compute base position
+    # Compute base position with correct market-price-aware Kelly
     size, details = sizer.compute_position_size(
         confidence=confidence,
         win_rate=win_rate,
         edge=edge,
+        market_price=market_price,
     )
 
     # Apply disagreement multiplier
@@ -312,29 +357,33 @@ def execute_trade(
     position_size: float,
     actual_direction: str,
     bankroll: float,
+    market_price: float = 0.50,
 ) -> Dict:
     """
     Execute a single trade and record it.
 
     Uses per-contract binary option math:
-    - Entry price is 0.85 (default; should come from market data)
-    - Kalshi fee is $0.01/contract/side flat
+    - Entry price comes from Kalshi API market data (default 0.50 fallback)
+    - Kalshi fee: ceil(0.07 × C × P × (1-P)) per side (Kalshi REAL fee model)
     - Contracts = position_size / entry_price
-    - Win: contracts * (1.0 - entry_price) - round_trip_fee
-    - Loss: -contracts * entry_price - round_trip_fee
+    - Win: contracts * (1.0 - entry_price) - total_fees
+    - Loss: -contracts * entry_price - total_fees
 
-    TODO: entry_price should come from Kalshi API market data.
-    Currently using a hardcoded default of 0.85.
+    FIRST PRINCIPLES:
+    In a binary market, a YES contract costs `entry_price` and pays $1 if correct.
+    P&L on win = contracts × (1 - entry_price) - fees
+    P&L on loss = -contracts × entry_price - fees
 
     Returns trade result dict with P&L.
     """
     is_correct = direction == actual_direction if actual_direction != "flat" else False
 
-    # Per-contract binary math
-    entry_price = 0.85  # Default; should come from market data
-    contracts = position_size / entry_price
+    # Per-contract binary math — price from Kalshi API
+    entry_price = market_price  # Live price from Kalshi, or 0.50 fallback
+    contracts = position_size / entry_price if entry_price > 0 else 0
     # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side × 2
-    round_trip_fee = math.ceil(0.07 * contracts * entry_price * (1.0 - entry_price)) * 2
+    fee_per_contract = math.ceil(0.07 * entry_price * (1.0 - entry_price) * 100.0) / 100.0
+    round_trip_fee = fee_per_contract * contracts * 2
 
     # P&L calculation
     if is_correct:
@@ -473,8 +522,8 @@ def print_summary(
     _LOGGER.info("Config: decay=%.3f, min_agree=%d, min_conf=%.4f, "
                  "strike_offset=%.1f", DECAY, MIN_AGREEMENT, MIN_CONFIDENCE,
                  STRIKE_OFFSET)
-    _LOGGER.info("Fee: $0.01/contract/side flat (entry_price=0.85 constant)")
-    _LOGGER.info("Entry price: 0.85 (hardcoded — should come from Kalshi API)")
+    _LOGGER.info("Fee: ceil(0.07 × C × P × (1-P)) per side (Kalshi REAL fee model)")
+    _LOGGER.info("Entry price: from Kalshi API (0.50 fallback when unavailable)")
     _LOGGER.info("Fee rate: %.4f (legacy, for reference)", FEE)
     _LOGGER.info("=" * 60)
 
@@ -528,20 +577,27 @@ def simulate_day(
         if avg_conf < MIN_CONFIDENCE:
             continue
 
-        # Compute position size
+        # Compute position size with market price
         win_rate = sizer.get_rolling_win_rate()
+        event_ticker = f"KXHIGH{station}"  # Simplified; actual ticker includes date
+        market_price = get_kalshi_market_price(event_ticker)
+        if market_price is None:
+            market_price = 0.50  # Fair value fallback
+
         position_size, details = compute_kelly_position(
-            sizer, avg_conf, win_rate, agreeing
+            sizer, avg_conf, win_rate, agreeing,
+            market_price=market_price,
         )
 
         if position_size <= 0:
             continue
 
-        # Record trade (no spread builder — Fix 4: removed)
+        # Record trade — pass market_price for honest P&L
         result = execute_trade(
             trade_conn, station, date, majority_dir, avg_conf,
             len(agreeing), position_size,
             today["market_dir"], current_bankroll,
+            market_price=market_price,
         )
 
         # Update bankroll

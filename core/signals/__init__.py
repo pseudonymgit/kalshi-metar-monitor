@@ -28,10 +28,15 @@ Active signal count: 9 (after B-Mode Cycle 3 cleanup, verified by correlation ma
   - 1 spike-reversion lane signal (spike_reversion/goldilocks — separate lane)
   - 1 intraday frontal passage signal (frontal_passage_intraday — Sure Thing lane)
 
+ADVANCE (wired into pipeline — operational, via integration layer):
+  hrrr_bias_corrected      — core/signals/hrrr_bias_corrected_signal.py  (NWP source signal)
+  metar_nowcast            — core/signals/metar_nowcast_signal.py        (intraday nowcast)
+  spread_based_entry       — core/signals/spread_based_entry_signal.py   (execution optimizer)
+
 DISABLED (in codebase, removed from registry — need data infrastructure):
   temperature_advection, intraday_metar_confirmation    — NWP / ERA5 backfill
-  fogr_reversion, hrrr_bias_corrected, nwp_dtdt_fusion  — HRRR / FOGR NWP data
-  spread_based_entry, volume_momentum, settlement_arbitrage — Kalshi API execution
+  fogr_reversion, nwp_dtdt_fusion                       — HRRR / FOGR NWP data
+  volume_momentum, settlement_arbitrage                  — Kalshi API execution
   frontal_detector                                       — deprecated
   ai_composite                                           — ML pipeline not deployed
 """

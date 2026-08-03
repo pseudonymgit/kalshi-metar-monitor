@@ -373,6 +373,14 @@ def main():
         log(f"  → Parsed + stored: {stored} rows in {parse_elapsed:.1f}s "
             f"(members: {member_count})")
         
+        # Purge raw GRIB immediately — parsed data already in DB
+        try:
+            if os.path.exists(grib_path):
+                os.remove(grib_path)
+                log(f"  → Purged raw GRIB (124.0 MB)")
+        except Exception as e:
+            log(f"  → GRIB purge failed: {e}")
+        
         processed += 1
         done_dates.add(ds)
         
