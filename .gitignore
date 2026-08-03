@@ -8,3 +8,6 @@ __pycache__/
 *.db
 *.json
 *.log
+data/paper_trading_dev.db
+data/backtests/
+data/bmode_p1_execution_log.md

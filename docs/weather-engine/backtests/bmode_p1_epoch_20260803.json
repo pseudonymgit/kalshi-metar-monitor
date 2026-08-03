@@ -1,0 +1,343 @@
+{
+  "run_tag": "epoch",
+  "timestamp": "2026-08-03T04:50:30.066921+00:00",
+  "config": {
+    "start_date": "2025-08-03",
+    "days": 365,
+    "edge_threshold": 0.02,
+    "kelly_fraction": 0.5,
+    "entry_price_min": 0.15,
+    "entry_price_max": 0.7,
+    "temp_diff_min": 0.5,
+    "max_contracts": 175,
+    "market_price": 0.5,
+    "use_uhi": false,
+    "uhi_window_days": 120,
+    "use_epoch": true,
+    "epoch_cycle": "12Z",
+    "use_calibration": false,
+    "calib_window_days": 180,
+    "use_risk_halts": false,
+    "signal_source": "GEFS ensemble step=24, ensemble-fraction confidence",
+    "fee_model": "kalshi_real per-contract ceil"
+  },
+  "results": {
+    "trades": 2806,
+    "correct": 1689,
+    "accuracy": 0.6019,
+    "accuracy_ci": [
+      0.5837,
+      0.6199
+    ],
+    "total_pnl": 41226.32,
+    "total_fees": 9684.18,
+    "final_bankroll": 51226.32,
+    "return_pct": 412.26,
+    "daily_sharpe": 7.4124,
+    "max_drawdown_pct": 7.48,
+    "profit_factor": 1.4147
+  },
+  "per_station": {
+    "KATL": {
+      "trades": 139,
+      "correct": 79,
+      "accuracy": 0.5683,
+      "accuracy_ci": [
+        0.4853,
+        0.6478
+      ],
+      "pnl": 1283.0,
+      "fees": 468.5,
+      "sharpe": 1.5439,
+      "profit_factor": 1.2477,
+      "avg_edge": 0.3686,
+      "avg_confidence": 0.8686
+    },
+    "KAUS": {
+      "trades": 221,
+      "correct": 122,
+      "accuracy": 0.552,
+      "accuracy_ci": [
+        0.4861,
+        0.6162
+      ],
+      "pnl": 1432.04,
+      "fees": 747.46,
+      "sharpe": 1.0204,
+      "profit_factor": 1.1668,
+      "avg_edge": 0.3591,
+      "avg_confidence": 0.8591
+    },
+    "KBOS": {
+      "trades": 150,
+      "correct": 92,
+      "accuracy": 0.6133,
+      "accuracy_ci": [
+        0.5335,
+        0.6875
+      ],
+      "pnl": 2465.24,
+      "fees": 515.26,
+      "sharpe": 3.0323,
+      "profit_factor": 1.4788,
+      "avg_edge": 0.4034,
+      "avg_confidence": 0.9034
+    },
+    "KDCA": {
+      "trades": 170,
+      "correct": 124,
+      "accuracy": 0.7294,
+      "accuracy_ci": [
+        0.6581,
+        0.7906
+      ],
+      "pnl": 6301.32,
+      "fees": 586.68,
+      "sharpe": 7.4607,
+      "profit_factor": 2.5578,
+      "avg_edge": 0.4402,
+      "avg_confidence": 0.9402
+    },
+    "KDEN": {
+      "trades": 250,
+      "correct": 150,
+      "accuracy": 0.6,
+      "accuracy_ci": [
+        0.5382,
+        0.6588
+      ],
+      "pnl": 3817.84,
+      "fees": 858.16,
+      "sharpe": 2.5871,
+      "profit_factor": 1.4376,
+      "avg_edge": 0.3995,
+      "avg_confidence": 0.8995
+    },
+    "KDFW": {
+      "trades": 129,
+      "correct": 104,
+      "accuracy": 0.8062,
+      "accuracy_ci": [
+        0.7295,
+        0.8651
+      ],
+      "pnl": 6388.64,
+      "fees": 445.86,
+      "sharpe": 11.4495,
+      "profit_factor": 3.8492,
+      "avg_edge": 0.4132,
+      "avg_confidence": 0.9132
+    },
+    "KHOU": {
+      "trades": 105,
+      "correct": 62,
+      "accuracy": 0.5905,
+      "accuracy_ci": [
+        0.4948,
+        0.6797
+      ],
+      "pnl": 1356.0,
+      "fees": 364.0,
+      "sharpe": 2.2642,
+      "profit_factor": 1.3533,
+      "avg_edge": 0.3881,
+      "avg_confidence": 0.8881
+    },
+    "KLAS": {
+      "trades": 175,
+      "correct": 76,
+      "accuracy": 0.4343,
+      "accuracy_ci": [
+        0.363,
+        0.5084
+      ],
+      "pnl": -2625.0,
+      "fees": 612.5,
+      "sharpe": -2.7373,
+      "profit_factor": 0.7086,
+      "avg_edge": 0.4983,
+      "avg_confidence": 0.9983
+    },
+    "KLAX": {
+      "trades": 226,
+      "correct": 158,
+      "accuracy": 0.6991,
+      "accuracy_ci": [
+        0.6364,
+        0.7552
+      ],
+      "pnl": 7084.0,
+      "fees": 791.0,
+      "sharpe": 6.1858,
+      "profit_factor": 2.1448,
+      "avg_edge": 0.481,
+      "avg_confidence": 0.981
+    },
+    "KMDW": {
+      "trades": 236,
+      "correct": 120,
+      "accuracy": 0.5085,
+      "accuracy_ci": [
+        0.4451,
+        0.5716
+      ],
+      "pnl": -405.96,
+      "fees": 810.46,
+      "sharpe": -0.3652,
+      "profit_factor": 0.9607,
+      "avg_edge": 0.4066,
+      "avg_confidence": 0.9066
+    },
+    "KMIA": {
+      "trades": 58,
+      "correct": 28,
+      "accuracy": 0.4828,
+      "accuracy_ci": [
+        0.3593,
+        0.6084
+      ],
+      "pnl": -378.0,
+      "fees": 203.0,
+      "sharpe": -1.1728,
+      "profit_factor": 0.8615,
+      "avg_edge": 0.4983,
+      "avg_confidence": 0.9983
+    },
+    "KMSP": {
+      "trades": 59,
+      "correct": 34,
+      "accuracy": 0.5763,
+      "accuracy_ci": [
+        0.4493,
+        0.6939
+      ],
+      "pnl": 581.0,
+      "fees": 206.5,
+      "sharpe": 1.7923,
+      "profit_factor": 1.2554,
+      "avg_edge": 0.4355,
+      "avg_confidence": 0.9355
+    },
+    "KMSY": {
+      "trades": 56,
+      "correct": 35,
+      "accuracy": 0.625,
+      "accuracy_ci": [
+        0.4941,
+        0.7399
+      ],
+      "pnl": 1047.0,
+      "fees": 193.0,
+      "sharpe": 3.4121,
+      "profit_factor": 1.5616,
+      "avg_edge": 0.3842,
+      "avg_confidence": 0.8842
+    },
+    "KNYC": {
+      "trades": 169,
+      "correct": 129,
+      "accuracy": 0.7633,
+      "accuracy_ci": [
+        0.6938,
+        0.8211
+      ],
+      "pnl": 7245.56,
+      "fees": 588.44,
+      "sharpe": 9.0602,
+      "profit_factor": 3.0261,
+      "avg_edge": 0.45,
+      "avg_confidence": 0.95
+    },
+    "KOKC": {
+      "trades": 137,
+      "correct": 78,
+      "accuracy": 0.5693,
+      "accuracy_ci": [
+        0.4857,
+        0.6493
+      ],
+      "pnl": 1302.68,
+      "fees": 469.32,
+      "sharpe": 1.5761,
+      "profit_factor": 1.2515,
+      "avg_edge": 0.382,
+      "avg_confidence": 0.882
+    },
+    "KPHL": {
+      "trades": 70,
+      "correct": 32,
+      "accuracy": 0.4571,
+      "accuracy_ci": [
+        0.3457,
+        0.573
+      ],
+      "pnl": -749.12,
+      "fees": 240.62,
+      "sharpe": -1.9887,
+      "profit_factor": 0.7792,
+      "avg_edge": 0.406,
+      "avg_confidence": 0.906
+    },
+    "KPHX": {
+      "trades": 142,
+      "correct": 80,
+      "accuracy": 0.5634,
+      "accuracy_ci": [
+        0.4812,
+        0.6422
+      ],
+      "pnl": 1170.56,
+      "fees": 493.44,
+      "sharpe": 1.3836,
+      "profit_factor": 1.2109,
+      "avg_edge": 0.4643,
+      "avg_confidence": 0.9643
+    },
+    "KSAT": {
+      "trades": 49,
+      "correct": 31,
+      "accuracy": 0.6327,
+      "accuracy_ci": [
+        0.4927,
+        0.7534
+      ],
+      "pnl": 882.72,
+      "fees": 164.28,
+      "sharpe": 3.6715,
+      "profit_factor": 1.5548,
+      "avg_edge": 0.3302,
+      "avg_confidence": 0.8302
+    },
+    "KSEA": {
+      "trades": 95,
+      "correct": 64,
+      "accuracy": 0.6737,
+      "accuracy_ci": [
+        0.5743,
+        0.7596
+      ],
+      "pnl": 2571.8,
+      "fees": 330.7,
+      "sharpe": 5.1759,
+      "profit_factor": 1.9219,
+      "avg_edge": 0.4093,
+      "avg_confidence": 0.9093
+    },
+    "KSFO": {
+      "trades": 170,
+      "correct": 91,
+      "accuracy": 0.5353,
+      "accuracy_ci": [
+        0.4604,
+        0.6087
+      ],
+      "pnl": 455.0,
+      "fees": 595.0,
+      "sharpe": 0.4854,
+      "profit_factor": 1.0633,
+      "avg_edge": 0.4941,
+      "avg_confidence": 0.9941
+    }
+  },
+  "uhi_factors": {}
+}

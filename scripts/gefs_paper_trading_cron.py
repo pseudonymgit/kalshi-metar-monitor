@@ -50,7 +50,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 # ─── Risk Controls ─────────────────────────────────────────────────────────
 
 from core.risk_controls import RiskManager, RiskConfig, TradeResult as RCTradeResult
-from core.stop_loss import StopLossMonitor
+from core.stop_loss import StopLossMonitor, PRIMARY_DAY_LIMIT
 
 
 # ─── Paths
@@ -58,6 +58,100 @@ GEFS_DB = str(REPO_ROOT / "data" / "gefs_archive.db")
 SETTLEMENTS_DB = str(REPO_ROOT / "data" / "kalshi_settlements.db")
 TRADE_DB = str(REPO_ROOT / "data" / "paper_trading_dev.db")
 LOG_FILE = str(REPO_ROOT / "data" / "gefs_paper_trading.log")
+UHI_BIAS_TABLE = str(REPO_ROOT / "data" / "uhi_bias_table.json")
+CALIBRATION_TABLE = str(REPO_ROOT / "data" / "calibration_curves.json")
+
+# ─── UHI bias correction (P1.2) ────────────────────────────────────────────
+# Per-station × per-month bias (GEFS_°F - Kalshi_°F), loaded from
+# data/uhi_bias_table.json. Positive bias means GEFS overpredicts.
+# Corrected GEFS temp = GEFS_°F - bias. Applied before direction computation.
+_uhi_bias = None
+
+def _load_uhi_bias():
+    global _uhi_bias
+    if _uhi_bias is not None:
+        return _uhi_bias
+    try:
+        with open(UHI_BIAS_TABLE) as f:
+            table = json.load(f)
+        _uhi_bias = {s: {int(k): float(v) for k, v in months.items()}
+                     for s, months in table.items()}
+        _LOGGER.info("Loaded UHI bias table: %d stations", len(_uhi_bias))
+    except Exception as e:
+        _LOGGER.warning(f"UHI bias table not loaded ({e}); correction disabled")
+        _uhi_bias = {}
+    return _uhi_bias
+
+def apply_uhi_correction(station: str, gefs_mean_f: float, target_date: str) -> float:
+    """Subtract per-station monthly UHI bias from GEFS temp (°F)."""
+    table = _load_uhi_bias()
+    if station not in table:
+        return gefs_mean_f
+    month = int(target_date.split("-")[1])
+    bias = table[station].get(month)
+    if bias is None:
+        return gefs_mean_f
+    return gefs_mean_f - bias
+
+
+# ─── Calibration curves (P1.5) ─────────────────────────────────────────────
+# Per-station empirical calibration: maps raw ensemble fraction confidence
+# to actual win rate. Replaces overconfident raw confidence with calibrated
+# values for position sizing and edge calculation.
+_calibration = None
+
+def _load_calibration():
+    global _calibration
+    if _calibration is not None:
+        return _calibration
+    try:
+        with open(CALIBRATION_TABLE) as f:
+            _calibration = json.load(f)
+        _LOGGER.info("Loaded calibration curves: %d stations",
+                     len([k for k in _calibration if not k.startswith('_')]))
+    except Exception as e:
+        _LOGGER.warning(f"Calibration table not loaded ({e}); using raw confidence")
+        _calibration = {}
+    return _calibration
+
+def calibrate_confidence(station: str, raw_confidence: float, target_date: str) -> float:
+    """
+    Map raw ensemble fraction confidence to empirically calibrated win rate.
+    
+    Uses per-station bin lookup. Falls back to global calibration for
+    stations with insufficient data, and to raw confidence if no calibration
+    is available.
+    """
+    table = _load_calibration()
+    if not table:
+        return raw_confidence
+    
+    # Per-station calibration
+    cal = table.get(station, {})
+    bins = cal.get("bins", {})
+    
+    # Find the bin
+    confidence_bins = [0.50 + i * 0.05 for i in range(11)]
+    for i in range(len(confidence_bins) - 1):
+        if confidence_bins[i] <= raw_confidence < confidence_bins[i + 1]:
+            label = f"{confidence_bins[i]:.2f}-{confidence_bins[i+1]:.2f}"
+            bin_data = bins.get(label, {})
+            if bin_data.get("win_rate") is not None:
+                return bin_data["win_rate"]
+            break
+    
+    # Fallback: global calibration
+    global_cal = table.get("_global", {})
+    global_bins = global_cal.get("bins", {})
+    for i in range(len(confidence_bins) - 1):
+        if confidence_bins[i] <= raw_confidence < confidence_bins[i + 1]:
+            label = f"{confidence_bins[i]:.2f}-{confidence_bins[i+1]:.2f}"
+            bin_data = global_bins.get(label, {})
+            if bin_data.get("win_rate") is not None:
+                return bin_data["win_rate"]
+            break
+    
+    return raw_confidence
 
 # ─── Logging ──
 logging.basicConfig(
@@ -83,12 +177,28 @@ STATIONS = [
 DEFAULT_EDGE_THRESHOLD = 0.02
 # Half-Kelly on corrected f* = 0.1746 at baseline p=0.67, M=0.50
 DEFAULT_KELLY_FRACTION = 0.50
-# Price bounds: old values (0.15/0.70) — revisit after edge distribution analysis
-DEFAULT_ENTRY_PRICE_MIN = 0.15
-DEFAULT_ENTRY_PRICE_MAX = 0.70
+# Price bounds: GLM 5.2 recommended [0.25, 0.75] — tighter, avoids extremes
+DEFAULT_ENTRY_PRICE_MIN = 0.25
+DEFAULT_ENTRY_PRICE_MAX = 0.75
 # Max contracts: reduced from 500 to 175 per corrected Kelly (GLM 5.2)
 DEFAULT_MAX_CONTRACTS = 175
 DEFAULT_TEMP_DIFF_MIN = 0.5  # °F — edge_threshold is the real quality gate
+
+# GLM 5.2 epoch-based Kelly schedule (P1.4)
+# Cycle tracking: init_cycle column in gefs_archive (default '12Z' for existing rows)
+EPOCH_MULTIPLIERS = {"00Z": 0.70, "06Z": 0.85, "12Z": 1.00, "18Z": 0.55}
+EPOCH_CONFIDENCE_THRESHOLDS = {"00Z": 0.55, "06Z": 0.58, "12Z": 0.55, "18Z": 0.62}
+EPOCH_ENTRY_PRICE_MIN = 0.25
+EPOCH_ENTRY_PRICE_MAX = 0.75
+EDGE_TIERS = [
+    (0.10, 1.00, "strong_edge"),
+    (0.06, 0.75, "moderate_edge"),
+    (0.03, 0.50, "weak_edge"),
+    (0.00, 0.00, "no_trade"),
+]
+# Cycle tracking: which GEFS init cycle applies to this forecast
+# Defaults to '12Z' when archive lacks init_cycle (historical rows)
+DEFAULT_EPOCH_CYCLE = "12Z"
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -128,10 +238,10 @@ def get_gefs_forecast(target_date: str) -> Dict[str, dict]:
     conn = sqlite3.connect(GEFS_DB)
     cur = conn.cursor()
     cur.execute("""
-        SELECT station, ensemble_mean, ensemble_min, ensemble_max, n_members, member_values
+        SELECT station, ensemble_mean, ensemble_min, ensemble_max, n_members, member_values, COALESCE(init_cycle, ?) AS init_cycle
         FROM gefs_archive
         WHERE target_date = ? AND step = 24
-    """, (target_date,))
+    """, (DEFAULT_EPOCH_CYCLE, target_date,))
     rows = cur.fetchall()
     conn.close()
     
@@ -153,6 +263,7 @@ def get_gefs_forecast(target_date: str) -> Dict[str, dict]:
             "max": r[3],
             "n_members": n_members,
             "member_temps_c": member_temps_c,
+            "init_cycle": r[6],
         }
     return result
 
@@ -248,6 +359,9 @@ def compute_ensemble_signal(
     
     gefs_mean_f = mean_c * 9/5 + 32
     
+    # P1.2: UHI bias correction (subtract per-station monthly bias)
+    gefs_mean_f = apply_uhi_correction(station, gefs_mean_f, target_date)
+    
     actual_dir = 1 if actual_temp_f > prev_temp_f else (-1 if actual_temp_f < prev_temp_f else 0)
     pred_dir = 1 if gefs_mean_f > prev_temp_f else (-1 if gefs_mean_f < prev_temp_f else 0)
     
@@ -269,11 +383,15 @@ def compute_ensemble_signal(
         member_temps_f = [t * 9/5 + 32 for t in member_temps_c]
         n_up = sum(1 for t in member_temps_f if t > prev_temp_f)
         fraction_up = n_up / len(member_temps_f)
-        confidence = max(fraction_up, 1.0 - fraction_up)
+        raw_confidence = max(fraction_up, 1.0 - fraction_up)
         # Keep direction from mean (more stable), confidence from fraction
     else:
         # Fallback: old heuristic if no member data
-        confidence = min(0.99, 0.5 + temp_diff / 20.0)
+        raw_confidence = min(0.99, 0.5 + temp_diff / 20.0)
+    
+    # P1.5: Calibrate confidence — replace raw ensemble fraction with
+    # empirically calibrated win rate (maps confidence → actual outcome rate)
+    confidence = calibrate_confidence(station, raw_confidence, target_date)
     
     # Market price from Kalshi API (backtest mode: 0.50 fair value)
     # Replaced old circular formula: market_price = 0.5 + confidence * 0.4
@@ -283,18 +401,41 @@ def compute_ensemble_signal(
         market_price = 0.50  # Fair value fallback (no information)
     
     if pred_dir == 1:
-        # Buying YES contract — edge = confidence - price
+        # Buying YES contract — edge = P(UP) - YES_price = confidence - market_price
         entry_price = market_price
         edge = confidence - market_price
     else:
-        # Buying NO contract — edge = (1-confidence) - (1-price) = price - confidence
+        # Buying NO contract — edge = P(DOWN) - NO_price
+        # P(DOWN) = confidence (since confidence = 1-f_up when pred=-1)
+        # NO_price = 1 - market_price
+        # edge = confidence - (1 - market_price)
         entry_price = 1.0 - market_price
-        edge = market_price - confidence
+        edge = confidence - (1.0 - market_price)
     
-    if entry_price < DEFAULT_ENTRY_PRICE_MIN or entry_price > DEFAULT_ENTRY_PRICE_MAX:
+    # GLM 5.2 epoch-based gates (P1.4)
+    # init_cycle from gefs archive (defaults to '12Z' when null)
+    init_cycle = gefs_data.get("init_cycle", DEFAULT_EPOCH_CYCLE) or DEFAULT_EPOCH_CYCLE
+    epoch_mult = EPOCH_MULTIPLIERS.get(init_cycle, 1.0)
+    epoch_conf_thresh = EPOCH_CONFIDENCE_THRESHOLDS.get(init_cycle, 0.55)
+    
+    # Epoch entry bounds (tighter [0.25,0.75] vs default [0.15,0.70])
+    ep_min = EPOCH_ENTRY_PRICE_MIN
+    ep_max = EPOCH_ENTRY_PRICE_MAX
+    
+    if entry_price < ep_min or entry_price > ep_max:
+        return None
+    if edge < DEFAULT_EDGE_THRESHOLD:
+        return None
+    if confidence < epoch_conf_thresh:
         return None
     
-    if edge < DEFAULT_EDGE_THRESHOLD:
+    # Edge tiers (GLM 5.2): stronger edge → higher Kelly multiplier
+    tier_mult = 1.0
+    for thresh, mult, _ in EDGE_TIERS:
+        if edge >= thresh:
+            tier_mult = mult
+            break
+    if tier_mult <= 0.0:
         return None
     
     # Kelly sizing (correct formula for binary options)
@@ -305,7 +446,7 @@ def compute_ensemble_signal(
     else:
         kelly_pct = 0
     
-    n_contracts = int(min(DEFAULT_MAX_CONTRACTS, max(1, kelly_pct * DEFAULT_KELLY_FRACTION * 1000)))
+    n_contracts = int(min(DEFAULT_MAX_CONTRACTS, max(1, kelly_pct * DEFAULT_KELLY_FRACTION * epoch_mult * tier_mult * 1000)))
     n_contracts = max(1, n_contracts)
     
     correct = pred_dir == actual_dir
@@ -328,6 +469,7 @@ def compute_ensemble_signal(
         "pred_direction": pred_direction_str,
         "actual_direction": actual_direction_str,
         "confidence": confidence,
+        "raw_confidence": round(raw_confidence, 4),
         "gefs_mean_f": gefs_mean_f,
         "prev_temp_f": prev_temp_f,
         "entry_price": round(entry_price, 4),
@@ -462,7 +604,7 @@ def log_daily_summary(conn: sqlite3.Connection, date: str, trades: list,
 # Main Runner
 # ═══════════════════════════════════════════════════════════════════════════
 
-def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
+def run_paper_trading(start_date: str, days: int, initial_bankroll: float, no_risk_controls: bool = False):
     """Run GEFS-based paper trading simulation."""
     _LOGGER.info("=" * 60)
     _LOGGER.info("GEFS Paper Trading Cron — Starting")
@@ -494,12 +636,18 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
         initial_capital=initial_bankroll,
     )
     risk_manager = RiskManager(config=risk_config)
-    stop_loss = StopLossMonitor(budget=initial_bankroll)
+    # Disable the day-limit stop for backtest windows > 30 days.
+    # The day-limit is a live-trading control (30 calendar days) that uses
+    # simulation-relative time; for long backtests it would halt the full window.
+    enable_day_limit = days <= PRIMARY_DAY_LIMIT
+    stop_loss = StopLossMonitor(budget=initial_bankroll, enable_day_limit=enable_day_limit)
+    _LOGGER.info("  StopLossMonitor: day_limit=%s (PRIMARY_DAY_LIMIT=%d)", enable_day_limit, PRIMARY_DAY_LIMIT)
     
     # ── Generate trading window ──
     start_dt = datetime.strptime(start_date, "%Y-%m-%d")
     date_list = [(start_dt + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)]
     _LOGGER.info(f"Trading window: {date_list[0]} → {date_list[-1]} ({len(date_list)} days)")
+    _LOGGER.info(f"  Risk controls: {'DISABLED' if no_risk_controls else 'ENABLED'}")
     
     # ── Run simulation ──
     all_trades = []
@@ -521,17 +669,18 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
             if station not in gefs_forecast:
                 continue
             
-            # Check risk controls before trading
-            risk_state = risk_manager.evaluate()
-            if risk_state.halted:
-                _LOGGER.warning(f"Risk controls halted trading on {target_date}: {risk_state.halt_reason}")
-                break
-            
-            # Check stop-loss
-            stopped, stop_reason, stop_details = stop_loss.check_stop_conditions()
-            if stopped:
-                _LOGGER.warning(f"Stop-loss triggered on {target_date}: {stop_reason}")
-                break
+            # Check risk controls before trading (skipped in baseline mode)
+            if not no_risk_controls:
+                risk_state = risk_manager.evaluate()
+                if risk_state.halted:
+                    _LOGGER.warning(f"Risk controls halted trading on {target_date}: {risk_state.halt_reason}")
+                    break
+                
+                # Check stop-loss
+                stopped, stop_reason, stop_details = stop_loss.check_stop_conditions()
+                if stopped:
+                    _LOGGER.warning(f"Stop-loss triggered on {target_date}: {stop_reason}")
+                    break
             
             trade = compute_ensemble_signal(station, target_date,
                                             gefs_forecast[station], settlements)
@@ -567,14 +716,15 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
             # Log to DB
             log_trade(trade_conn, trade, bankroll)
             
-            # Update risk controls
-            risk_result = risk_manager.update_after_trade(RCTradeResult(
-                trade_id=f"{station}_{target_date}_{trade['contracts']}",
-                pnl=net_pnl,
-                is_profitable=net_pnl > 0,
-                trade_date=target_date,
-            ))
-            stop_loss.record_trade(pnl=net_pnl, is_profitable=net_pnl > 0, date_str=target_date)
+            # Update risk controls (skip in baseline mode)
+            if not no_risk_controls:
+                risk_result = risk_manager.update_after_trade(RCTradeResult(
+                    trade_id=f"{station}_{target_date}_{trade['contracts']}",
+                    pnl=net_pnl,
+                    is_profitable=net_pnl > 0,
+                    trade_date=target_date,
+                ))
+                stop_loss.record_trade(pnl=net_pnl, is_profitable=net_pnl > 0, date_str=target_date)
             
             day_pnl += net_pnl
             day_fees += trade.get("total_fees", 0)
@@ -586,12 +736,13 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float):
         
         all_trades.extend(trades_today)
         
-        # Log daily risk summary
-        risk_state = risk_manager.evaluate()
-        if not risk_state.passed:
-            failed = risk_state.get_failed_checks()
-            for check_name, reason in failed:
-                _LOGGER.warning(f"Risk check failed: {check_name} — {reason}")
+        # Log daily risk summary (skip in baseline mode)
+        if not no_risk_controls:
+            risk_state = risk_manager.evaluate()
+            if not risk_state.passed:
+                failed = risk_state.get_failed_checks()
+                for check_name, reason in failed:
+                    _LOGGER.warning(f"Risk check failed: {check_name} — {reason}")
         
         n_correct = sum(1 for t in trades_today if t.get("correct"))
         _LOGGER.info(f"  {target_date}: {len(trades_today)} trades, "
@@ -694,12 +845,15 @@ def main():
                         help="Start date (YYYY-MM-DD). Default: today-N days")
     parser.add_argument("--bankroll", type=float, default=INITIAL_BANKROLL,
                         help=f"Initial bankroll (default: ${INITIAL_BANKROLL:.0f})")
+    parser.add_argument("--no-risk-controls", action="store_true",
+                        help="Disable stop-loss and risk manager for baseline backtesting. "
+                             "Evaluates pure signal accuracy without live-trading guardrails.")
     args = parser.parse_args()
     
     if not args.start:
         args.start = (datetime.now(timezone.utc) - timedelta(days=args.days)).strftime("%Y-%m-%d")
     
-    return run_paper_trading(args.start, args.days, args.bankroll)
+    return run_paper_trading(args.start, args.days, args.bankroll, args.no_risk_controls)
 
 
 if __name__ == "__main__":
