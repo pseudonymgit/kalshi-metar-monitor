@@ -96,11 +96,80 @@ class BacktestConfig:
     uhi_min_samples: int = 30
     use_epoch: bool = False             # P1.4 GLM 5.2 epoch schedule
     epoch_cycle: str = "12Z"            # assumed cycle when archive lacks init_cycle
-    use_calibration: bool = False       # P1.5 empirical per-station calibration
-    calib_window_days: int = 180
-    calib_min_samples: int = 40
+    use_calibration: bool = False       # P1.5 empirical per-station, per-direction calibration
+    calib_window_days: int = 180       # (unused; uses full-archive pre-computed curves)
+    calib_min_samples: int = 40        # (unused; uses full-archive pre-computed curves)
     use_risk_halts: bool = False        # production RiskManager halts on/off
     bankroll: float = INITIAL_BANKROLL
+    station_sizing: Optional[Dict[str, float]] = None  # per-station contract multiplier, e.g. {"KLAS": 0.5}
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Pre-computed Direction-Specific Calibration (full archive, no walk-forward)
+# ═══════════════════════════════════════════════════════════════════════════
+
+CALIBRATION_FILE = str(REPO_ROOT / "data" / "calibration_curves.json")
+
+# Cached calibration table: {station: {up: {bins:..., global:...}, down: {...}}}
+_calibration_table = None
+
+def _load_calibration_table():
+    global _calibration_table
+    if _calibration_table is not None:
+        return _calibration_table
+    try:
+        with open(CALIBRATION_FILE) as f:
+            _calibration_table = json.load(f)
+    except Exception as e:
+        print(f"  ⚠ Could not load calibration curves: {e}")
+        _calibration_table = {}
+    return _calibration_table
+
+
+def calibrate_confidence(station: str, raw_confidence: float, pred_direction: str) -> float:
+    """
+    Map raw ensemble fraction confidence to empirically calibrated win rate
+    using pre-computed full-archive, direction-specific calibration curves.
+    
+    Lookup order:
+      1. Per-station, per-direction bin
+      2. Global per-direction bin
+      3. Raw confidence (fallback)
+    """
+    table = _load_calibration_table()
+    if not table:
+        return raw_confidence
+    
+    # Find bin label
+    confidence_bins = [0.50 + i * 0.05 for i in range(11)]
+    bin_label = None
+    for i in range(len(confidence_bins) - 1):
+        if confidence_bins[i] <= raw_confidence < confidence_bins[i + 1]:
+            bin_label = f"{confidence_bins[i]:.2f}-{confidence_bins[i+1]:.2f}"
+            break
+    if bin_label is None:
+        return raw_confidence
+    
+    direction = pred_direction if pred_direction in ("up", "down") else "up"
+    
+    # 1. Per-station, per-direction
+    cal = table.get(station, {})
+    dir_cal = cal.get(direction, {})
+    dir_bins = dir_cal.get("bins", {})
+    bin_data = dir_bins.get(bin_label, {})
+    if bin_data.get("win_rate") is not None:
+        return bin_data["win_rate"]
+    
+    # 2. Global per-direction
+    global_cal = table.get("_global", {})
+    global_dir = global_cal.get(direction, {})
+    global_bins = global_dir.get("bins", {})
+    bin_data = global_bins.get(bin_label, {})
+    if bin_data.get("win_rate") is not None:
+        return bin_data["win_rate"]
+    
+    # 3. Raw fallback
+    return raw_confidence
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -286,9 +355,10 @@ def compute_signal(
     else:
         confidence = min(0.99, 0.5 + temp_diff / 20.0)
 
-    # P1.5: empirical calibration (walk-forward)
+    # P1.5: empirical calibration (direction-specific, full-archive curves)
     if cfg.use_calibration:
-        confidence = wf.calibrate(station, confidence)
+        pred_dir_str = "up" if pred_dir == 1 else "down"
+        confidence = calibrate_confidence(station, confidence, pred_dir_str)
 
     market_price = cfg.market_price
 
@@ -343,6 +413,10 @@ def compute_signal(
     n_contracts = int(min(cfg.max_contracts,
                           max(1, kelly_pct * cfg.kelly_fraction * epoch_mult * tier_mult * 1000)))
     n_contracts = max(1, n_contracts)
+    
+    # Per-station sizing multiplier (sweep config 5)
+    if cfg.station_sizing and station in cfg.station_sizing:
+        n_contracts = max(1, int(n_contracts * cfg.station_sizing[station]))
 
     correct = pred_dir == actual_dir
     gross_pnl = n_contracts * (1.0 if correct else 0.0)
@@ -666,10 +740,13 @@ def run_backtest(cfg: BacktestConfig, start_date: str, days: int) -> Dict:
             "use_epoch": cfg.use_epoch,
             "epoch_cycle": cfg.epoch_cycle,
             "use_calibration": cfg.use_calibration,
+            "calib_type": "full-archive direction-specific" if cfg.use_calibration else None,
             "calib_window_days": cfg.calib_window_days,
             "use_risk_halts": cfg.use_risk_halts,
             "signal_source": "GEFS ensemble step=24, ensemble-fraction confidence",
             "fee_model": "kalshi_real per-contract ceil",
+            "calibration_notes": "Direction-specific calibration: UP predictions use UP curve, DOWN use DOWN curve. Full archive (no walk-forward) because GEFS is a physical model." if cfg.use_calibration else None,
+            "station_sizing": cfg.station_sizing,
         },
         "results": stats,
         "per_station": station_stats,
@@ -686,14 +763,20 @@ def main():
     parser.add_argument("--uhi", action="store_true", help="Enable walk-forward UHI correction (P1.2)")
     parser.add_argument("--epoch", action="store_true", help="Enable GLM 5.2 epoch Kelly schedule (P1.4)")
     parser.add_argument("--epoch-cycle", type=str, default="12Z", choices=["00Z", "06Z", "12Z", "18Z"])
-    parser.add_argument("--calib", action="store_true", help="Enable walk-forward calibration (P1.5)")
+    parser.add_argument("--calib", action="store_true", help="Enable direction-specific calibration from full-archive curves (P1.5)")
     parser.add_argument("--risk", action="store_true", help="Enable RiskManager halts (production-like)")
     parser.add_argument("--edge", type=float, default=0.02)
     parser.add_argument("--max-contracts", type=int, default=175)
     parser.add_argument("--kelly", type=float, default=0.50)
     parser.add_argument("--market-price", type=float, default=0.50)
     parser.add_argument("--json", type=str, default=None, help="Explicit JSON output path")
+    parser.add_argument("--station-sizing", type=str, default=None,
+                        help='Per-station contract multiplier JSON, e.g. \'{"KLAS": 0.5, "KNYC": 1.2}\'')
     args = parser.parse_args()
+
+    station_sizing = None
+    if args.station_sizing:
+        station_sizing = json.loads(args.station_sizing)
 
     cfg = BacktestConfig(
         tag=args.tag,
@@ -706,6 +789,7 @@ def main():
         epoch_cycle=args.epoch_cycle,
         use_calibration=args.calib,
         use_risk_halts=args.risk,
+        station_sizing=station_sizing,
     )
 
     result = run_backtest(cfg, args.start, args.days)
@@ -785,6 +869,7 @@ def _load_trades_from_result(result: Dict, start_date: str, days: int) -> List[d
         use_calibration=result["config"]["use_calibration"],
         calib_window_days=result["config"]["calib_window_days"],
         use_risk_halts=result["config"]["use_risk_halts"],
+        station_sizing=result["config"].get("station_sizing", None),
     )
     gefs = load_gefs_all()
     settlements = load_settlements()

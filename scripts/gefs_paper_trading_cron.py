@@ -114,43 +114,57 @@ def _load_calibration():
         _calibration = {}
     return _calibration
 
-def calibrate_confidence(station: str, raw_confidence: float, target_date: str) -> float:
+def calibrate_confidence(station: str, raw_confidence: float, target_date: str,
+                           pred_direction: str = "up") -> float:
     """
     Map raw ensemble fraction confidence to empirically calibrated win rate.
     
-    Uses per-station bin lookup. Falls back to global calibration for
-    stations with insufficient data, and to raw confidence if no calibration
-    is available.
+    Uses DIRECTION-SPECIFIC per-station calibration (up/down bins).
+    Falls back to direction-specific global calibration, then to raw confidence.
+    
+    Args:
+        station: ICAO station code
+        raw_confidence: Raw ensemble fraction confidence (0.50-1.00)
+        target_date: Not used for direction-specific lookup (kept for API compat)
+        pred_direction: "up" or "down" — which calibration curve to use
     """
     table = _load_calibration()
     if not table:
         return raw_confidence
     
-    # Per-station calibration
-    cal = table.get(station, {})
-    bins = cal.get("bins", {})
-    
-    # Find the bin
     confidence_bins = [0.50 + i * 0.05 for i in range(11)]
-    for i in range(len(confidence_bins) - 1):
-        if confidence_bins[i] <= raw_confidence < confidence_bins[i + 1]:
-            label = f"{confidence_bins[i]:.2f}-{confidence_bins[i+1]:.2f}"
-            bin_data = bins.get(label, {})
-            if bin_data.get("win_rate") is not None:
-                return bin_data["win_rate"]
-            break
     
-    # Fallback: global calibration
+    # Find the bin label for this confidence value
+    def _find_bin_label(c):
+        for i in range(len(confidence_bins) - 1):
+            if confidence_bins[i] <= c < confidence_bins[i + 1]:
+                return f"{confidence_bins[i]:.2f}-{confidence_bins[i+1]:.2f}"
+        return None
+    
+    bin_label = _find_bin_label(raw_confidence)
+    if bin_label is None:
+        return raw_confidence
+    
+    # Direction must be valid
+    direction = pred_direction if pred_direction in ("up", "down") else "up"
+    
+    # 1. Per-station, per-direction calibration
+    cal = table.get(station, {})
+    dir_cal = cal.get(direction, {})
+    dir_bins = dir_cal.get("bins", {})
+    bin_data = dir_bins.get(bin_label, {})
+    if bin_data.get("win_rate") is not None:
+        return bin_data["win_rate"]
+    
+    # 2. Fallback: global per-direction calibration
     global_cal = table.get("_global", {})
-    global_bins = global_cal.get("bins", {})
-    for i in range(len(confidence_bins) - 1):
-        if confidence_bins[i] <= raw_confidence < confidence_bins[i + 1]:
-            label = f"{confidence_bins[i]:.2f}-{confidence_bins[i+1]:.2f}"
-            bin_data = global_bins.get(label, {})
-            if bin_data.get("win_rate") is not None:
-                return bin_data["win_rate"]
-            break
+    global_dir = global_cal.get(direction, {})
+    global_bins = global_dir.get("bins", {})
+    bin_data = global_bins.get(bin_label, {})
+    if bin_data.get("win_rate") is not None:
+        return bin_data["win_rate"]
     
+    # 3. Fallback: raw confidence
     return raw_confidence
 
 # ─── Logging ──
@@ -389,9 +403,11 @@ def compute_ensemble_signal(
         # Fallback: old heuristic if no member data
         raw_confidence = min(0.99, 0.5 + temp_diff / 20.0)
     
-    # P1.5: Calibrate confidence — replace raw ensemble fraction with
-    # empirically calibrated win rate (maps confidence → actual outcome rate)
-    confidence = calibrate_confidence(station, raw_confidence, target_date)
+    # P1.5: Calibrate confidence — direction-specific lookup
+    # UP predictions use the UP calibration curve, DOWN use DOWN curve
+    # This is critical because UP accuracy (59.8%) differs from DOWN (56.1%)
+    pred_direction_str = "up" if pred_dir == 1 else "down"
+    confidence = calibrate_confidence(station, raw_confidence, target_date, pred_direction_str)
     
     # Market price from Kalshi API (backtest mode: 0.50 fair value)
     # Replaced old circular formula: market_price = 0.5 + confidence * 0.4
