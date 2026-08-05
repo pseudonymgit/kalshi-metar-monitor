@@ -8,7 +8,7 @@ more recent METAR data, and manages entry/exit using sequential triggers.
 
 Architecture (D1):
 - Stage A: METAR-based signals (FOGR, dT/dt, Pressure Tendency)
-- Stage B: HRRR bias-corrected (if HRRR data available)
+- Stage B: ECMWF bias-corrected (if ECMWF data available)
 - Stage C: NWP+METAR fusion (confirmation/contradiction)
 - Stage D: Entry/Exit rules
 
@@ -62,7 +62,7 @@ NWP_DB = PROJECT_ROOT / "data" / "nwp_forecasts.db"
 
 # Intraday signal imports
 from core.signals.fogr_reversion_signal import FogrReversionSignal
-from core.signals.hrrr_bias_corrected_signal import HRRRBiasCorrectedSignal
+from core.signals.ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
 from core.signals.metar_nowcast_signal import MetarNowcastSignal
 from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
 from core.signals.nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
@@ -89,7 +89,7 @@ EDGE_SPREAD_MULTIPLIER = 2.0      # Edge requirement = 2x spread
 
 # Stage sequence
 STAGE_A_SIGNALS = ['fogr_reversion', 'metar_nowcast']
-STAGE_B_SIGNALS = ['hrrr_bias_corrected']
+STAGE_B_SIGNALS = ['ecmwf_bias_corrected']
 STAGE_C_SIGNALS = ['nwp_dtdt_fusion']
 
 
@@ -139,7 +139,7 @@ class IntradayTradingLoop:
 
     Sequential trigger architecture (A→B→C→D):
     - Stage A: METAR-based signals (FOGR, dT/dt, Pressure Tendency)
-    - Stage B: HRRR bias-corrected signal
+    - Stage B: ECMWF bias-corrected signal
     - Stage C: NWP+METAR fusion signal
     - Stage D: Entry/Exit rules
     """
@@ -150,7 +150,7 @@ class IntradayTradingLoop:
 
         # Initialize signals
         self.fogr = FogrReversionSignal(db_path=self.metar_db_path)
-        self.hrrr = HRRRBiasCorrectedSignal(db_path=self.metar_db_path)
+        self.ecmwf = ECMWFBiasCorrectedSignal(db_path=self.metar_db_path)
         self.metar_nowcast = MetarNowcastSignal()
         self.spread_entry = SpreadBasedEntryDetector()
         self.fusion = NwpDtdtFusionSignal(db_path=self.metar_db_path, nwp_db_path=self.nwp_db_path)
@@ -222,16 +222,16 @@ class IntradayTradingLoop:
         # Mixed signals — no clear Stage A trigger
         return None, 0.0
 
-    # ── Stage B: HRRR Bias-Corrected ──────────────────────────
+    # ── Stage B: ECMWF IFS Bias-Corrected ──────────────────────────
 
     def evaluate_stage_b(self, station: str, date: str, market_type: str) -> Tuple[Optional[str], float]:
         """
-        Evaluate Stage B signal (HRRR bias-corrected).
+        Evaluate Stage B signal (ECMWF bias-corrected).
 
         Returns:
             (direction, confidence) or (None, 0.0)
         """
-        return self.hrrr.evaluate_for_station(station, date, market_type=market_type)
+        return self.ecmwf.evaluate_for_station(station, date, market_type=market_type)
 
     # ── Stage C: NWP + METAR Fusion ──────────────────────────
 
@@ -495,7 +495,7 @@ class IntradayTradingLoop:
 
         position.stage_a_fired = True
 
-        # Stage B: HRRR (if available)
+        # Stage B: ECMWF IFS (if available)
         stage_b_dir, stage_b_conf = self.evaluate_stage_b(station, date, market_type)
         result['stage_b'] = {'direction': stage_b_dir, 'confidence': stage_b_conf}
 

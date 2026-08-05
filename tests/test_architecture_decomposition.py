@@ -260,7 +260,7 @@ class TestSignalRegistryImportPaths:
             'core.signals.fogr_reversion_signal',
             'core.signals.metar_dtdt_signal',
             'core.signals.pressure_tendency_signal',
-            'core.signals.hrrr_bias_corrected_signal',
+            'core.signals.ecmwf_bias_corrected_signal',
             'core.signals.esdr_signal',
             'core.signals.nwp_dtdt_fusion_signal',
             'core.signals.spread_based_entry_signal',

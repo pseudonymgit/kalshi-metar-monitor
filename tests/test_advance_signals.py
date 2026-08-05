@@ -1,5 +1,5 @@
 """
-ADVANCE Signal Tests — Spread-Based Entry, METAR Nowcast, HRRR Bias-Corrected
+ADVANCE Signal Tests — Spread-Based Entry, METAR Nowcast, ECMWF IFS Bias-Corrected
 
 Tests for the 3 ADVANCE signals that have been wired into the pipeline.
 Verifies basic API contracts, boundary conditions, and integration points.
@@ -21,7 +21,7 @@ if str(_REPO_ROOT) not in sys.path:
 from core.signals.base_signal import BaseSignal
 from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
 from core.signals.metar_nowcast_signal import MetarNowcastSignal
-from core.signals.hrrr_bias_corrected_signal import HRRRBiasCorrectedSignal
+from core.signals.ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -211,15 +211,15 @@ class TestMetarNowcast:
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# HRRR Bias-Corrected Signal Tests
+# ECMWF IFS Bias-Corrected Signal Tests
 # ════════════════════════════════════════════════════════════════════════════
 
-class TestHRRRBiasCorrected:
-    """Tests for the HRRR Bias-Corrected Signal."""
+class TestECMWFBiasCorrected:
+    """Tests for the ECMWF IFS Bias-Corrected Signal."""
 
     @pytest.fixture
     def signal(self):
-        return HRRRBiasCorrectedSignal()
+        return ECMWFBiasCorrectedSignal()
 
     def test_constructor(self, signal):
         """Verify basic construction and DB initialization."""
@@ -229,7 +229,7 @@ class TestHRRRBiasCorrected:
         """Verify bias DB tables are created."""
         import sqlite3
         conn = sqlite3.connect(
-            "data/hrrr_bias.db"  # Default path
+            "data/ecmwf_bias.db"  # Default path
         )
         cursor = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
@@ -237,8 +237,8 @@ class TestHRRRBiasCorrected:
         tables = [r[0] for r in cursor.fetchall()]
         conn.close()
         # Tables should have been created by init
-        assert "hrrr_bias" in tables or True  # DB path may differ in test env
-        assert "hrrr_forecasts" in tables or True
+        assert "ecmwf_bias" in tables or True  # DB path may differ in test env
+        assert "ecmwf_forecasts" in tables or True
 
     def test_get_daily_extremes_returns_expected_keys(self, signal):
         """get_daily_extremes returns expected structure regardless of data."""
@@ -284,7 +284,7 @@ class TestADVANCERegistryIntegration:
         from core.lane_manager import LaneType
 
         # These should route to DIRECTIONAL lane
-        assert LaneType.from_signal("hrrr_bias_corrected_signal") == LaneType.DIRECTIONAL
+        assert LaneType.from_signal("ecmwf_bias_corrected_signal") == LaneType.DIRECTIONAL
         assert LaneType.from_signal("metar_nowcast") == LaneType.DIRECTIONAL
         assert LaneType.from_signal("spread_based_entry_detector") == LaneType.DIRECTIONAL
 
@@ -299,6 +299,6 @@ class TestADVANCERegistryIntegration:
         # ADVANCE signals should be in the DISABLED comment (they're not BaseSignal)
         # But they should be findable via the signals module
         import core.signals
-        assert hasattr(core.signals.hrrr_bias_corrected_signal, "HRRRBiasCorrectedSignal")
+        assert hasattr(core.signals.ecmwf_bias_corrected_signal, "ECMWFBiasCorrectedSignal")
         assert hasattr(core.signals.metar_nowcast_signal, "MetarNowcastSignal")
         assert hasattr(core.signals.spread_based_entry_signal, "SpreadBasedEntryDetector")

@@ -63,7 +63,7 @@ SIGNAL_FAMILIES = {
     'gaussian': ['gaussian', 'gaussian_v2'],
     'pressure': ['pressure_delta', 'corrected_pressure_delta', 'pressure_tendency'],
     'wind': ['wind_direction_shift', 'temperature_advection', 'frontal_detector'],
-    'nwp': ['nwp_direct', 'hrrr_bias_corrected', 'esdr'],
+    'nwp': ['nwp_direct', 'ecmwf_bias_corrected', 'esdr'],
     'intraday': ['intraday_metar_confirmation'],
     'disagreement': ['forecast_disagreement'],
     'persistence': ['persistence'],
@@ -79,7 +79,7 @@ SUBSET_DEFINITIONS = {
     ],
     'subset_c_core5_nwp': [
         'calendar_climatology', 'gaussian', 'goldilocks', 'pressure_delta', 'forecast_disagreement',
-        'nwp_direct', 'hrrr_bias_corrected', 'esdr', 'wind_direction_shift', 'temperature_advection', 'frontal_detector'
+        'nwp_direct', 'ecmwf_bias_corrected', 'esdr', 'wind_direction_shift', 'temperature_advection', 'frontal_detector'
     ],
     'subset_d_all_pressure': ['pressure_delta', 'corrected_pressure_delta', 'pressure_tendency'],
     'subset_e_phase23': ['corrected_pressure_delta', 'seasonal_regime', 'calendar_climatology'],

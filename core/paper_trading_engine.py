@@ -255,14 +255,14 @@ GoldilocksSignal = SpikeReversionSignal
 
 # ── ADVANCE Signal Imports (B-Mode integration) ──────────────────────────
 
-# HRRR Bias-Corrected Signal — short-range NWP source via Open-Meteo
+# ECMWF IFS Bias-Corrected Signal — NWP source via Open-Meteo (v1/ecmwf)
 try:
-    from core.signals.hrrr_bias_corrected_signal import HRRRBiasCorrectedSignal
-    HAS_HRRR_BIAS_CORRECTED = True
+    from core.signals.ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
+    HAS_ECMWF_BIAS_CORRECTED = True
 except ImportError as e:
-    print(f"Warning: HRRRBiasCorrectedSignal import failed: {e}")
-    HRRRBiasCorrectedSignal = None
-    HAS_HRRR_BIAS_CORRECTED = False
+    print(f"Warning: ECMWFBiasCorrectedSignal import failed: {e}")
+    ECMWFBiasCorrectedSignal = None
+    HAS_ECMWF_BIAS_CORRECTED = False
 
 # Intraday METAR Nowcast Signal — live METAR vs forecast comparison
 try:
@@ -398,7 +398,7 @@ class PaperTrader:
         self._frontal_passage_nowcast = None
 
         # ── ADVANCE Signal instances (lazy-loaded) ──────────────────────────
-        self._hrrr_signal = None
+        self._ecmwf_signal = None
         self._metar_nowcast = None
         self._spread_entry = None
 
@@ -413,9 +413,9 @@ class PaperTrader:
         # Frontal passage nowcast signal (Phase 4.1)
         if HAS_FRONTAL_PASSAGE_NOWCAST:
             self.signal_names.append("frontal_passage_nowcast")
-        # HRRR Bias-Corrected signal (ADVANCE)
-        if HAS_HRRR_BIAS_CORRECTED:
-            self.signal_names.append("hrrr_bias_corrected")
+        # ECMWF IFS Bias-Corrected signal (ADVANCE)
+        if HAS_ECMWF_BIAS_CORRECTED:
+            self.signal_names.append("ecmwf_bias_corrected")
         # Intraday METAR Nowcast (ADVANCE)
         if HAS_METAR_NOWCAST:
             self.signal_names.append("metar_nowcast")
@@ -1108,30 +1108,30 @@ class PaperTrader:
             # ADVANCE Signals (B-Mode integration)
             # ═══════════════════════════════════════════════════════════════
 
-            # Signal 9: HRRR Bias-Corrected (NWP source — short-range forecasts)
-            if HAS_HRRR_BIAS_CORRECTED:
-                if self._hrrr_signal is None:
+            # Signal 9: ECMWF IFS Bias-Corrected (NWP source — medium-range forecasts)
+            if HAS_ECMWF_BIAS_CORRECTED:
+                if self._ecmwf_signal is None:
                     try:
-                        self._hrrr_signal = HRRRBiasCorrectedSignal()
-                        _LOGGER.info("HRRR Bias-Corrected signal initialized (lazy load)")
+                        self._ecmwf_signal = ECMWFBiasCorrectedSignal()
+                        _LOGGER.info("ECMWF IFS Bias-Corrected signal initialized (lazy load)")
                     except Exception as e:
-                        _LOGGER.warning(f"Failed to initialize HRRR Bias-Corrected Signal: {e}")
-                if self._hrrr_signal is not None:
+                        _LOGGER.warning(f"Failed to initialize ECMWF IFS Bias-Corrected Signal: {e}")
+                if self._ecmwf_signal is not None:
                     try:
-                        # Get station coordinates for HRRR fetch
+                        # Get station coordinates for ECMWF fetch
                         lat, lon = _get_station_coordinates(station)
                         if lat is not None and lon is not None:
-                            extremes = self._hrrr_signal.get_daily_extremes(station, lat, lon)
+                            extremes = self._ecmwf_signal.get_daily_extremes(station, lat, lon)
                             if extremes.get('max_f') is not None and extremes.get('confidence', 0) > 0.3:
-                                # Compare HRRR forecast to GEFS or climatology
-                                # For now, signal fires if bias-corrected HRRR shows confidence
+                                # Compare ECMWF forecast to GEFS or climatology
+                                # For now, signal fires if bias-corrected ECMWF shows confidence
                                 direction = 'up' if extremes['max_f'] > 70 else 'down'  # Simplified
                                 confidence = extremes['confidence']
                                 market_side = MarketSide.UP if direction == 'up' else MarketSide.DOWN
-                                signals.append((station, "HIGH", market_side, "hrrr_bias_corrected"))
-                                _LOGGER.info(f"HRRR Bias-Corrected signal fired for {station}: max={extremes['max_f']}°F, conf={confidence:.3f}")
+                                signals.append((station, "HIGH", market_side, "ecmwf_bias_corrected"))
+                                _LOGGER.info(f"ECMWF IFS Bias-Corrected signal fired for {station}: max={extremes['max_f']}°F, conf={confidence:.3f}")
                     except Exception as e:
-                        _LOGGER.warning(f"Failed to compute HRRR Bias-Corrected signal for {station}: {e}")
+                        _LOGGER.warning(f"Failed to compute ECMWF IFS Bias-Corrected signal for {station}: {e}")
 
             # Signal 10: Intraday METAR Nowcast (live METAR vs forecast)
             if HAS_METAR_NOWCAST:
@@ -1225,7 +1225,7 @@ class PaperTrader:
                     base_confidence = 0.6
                 elif reason in ["spike_reversion", "goldilocks_spike_reversion"]:
                     base_confidence = 0.65
-                elif reason in ["hrrr_bias_corrected"]:
+                elif reason in ["ecmwf_bias_corrected"]:
                     base_confidence = 0.7
                 elif reason in ["metar_nowcast"]:
                     base_confidence = 0.65

@@ -58,9 +58,9 @@ class LaneType(Enum):
             "gaussian", "gaussian_v2", "pressure_delta", "calendar_climatology",
             "forecast_disagreement", "wind_direction_shift", "temperature_advection",
             "frontal_detector", "intraday_metar_confirmation", "fogr_reversion",
-            "hrrr_bias_corrected", "nwp_dtdt_fusion", "spread_based_entry",
+            "ecmwf_bias_corrected", "nwp_dtdt_fusion", "spread_based_entry",
             "volume_momentum", "settlement_arbitrage", "corrected_pressure_delta",
-            "ai_composite", "hrrr_bias_corrected_signal", "metar_nowcast",
+            "ai_composite", "ecmwf_bias_corrected_signal", "metar_nowcast",
             "spread_based_entry_detector",
         }
         spike_signals = {

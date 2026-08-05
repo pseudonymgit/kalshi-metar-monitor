@@ -143,7 +143,7 @@ class OperationState(Enum):
                 "forecast_disagreement",
                 "temperature_advection",
                 "nwp_analog",
-                "hrrr_bias_corrected",
+                "ecmwf_bias_corrected",
             }
             return signal_name not in core_signals
         elif self in (OperationState.HALTED, OperationState.EMERGENCY):

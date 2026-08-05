@@ -49,7 +49,7 @@ TEST_DAYS = 90
 MIN_CONF = 0.0
 
 # Signals to skip (missing NWP infrastructure, slow)
-SKIP_SIGNALS = {'temperature_advection', 'intraday_metar_confirmation', 'hrrr_bias_corrected', 'esdr', 'nwp_direct'}
+SKIP_SIGNALS = {'temperature_advection', 'intraday_metar_confirmation', 'ecmwf_bias_corrected', 'esdr', 'nwp_direct'}
 SIGNAL_LIST = [s for s in BACKTEST_SIGNALS if s not in SKIP_SIGNALS]
 
 

@@ -58,7 +58,7 @@ CALIBRATION_MIN_SAMPLES = {
 # Signals whose evaluate() always returns (None, 0.0) — must use evaluate_for_station
 SIGNALS_NEEDING_FOR_STATION = {
     'intraday_metar_confirmation', 'fogr_reversion', 'metar_dtdt', 'pressure_tendency',
-    'hrrr_bias_corrected', 'esdr', 'nwp_dtdt_fusion'
+    'ecmwf_bias_corrected', 'esdr', 'nwp_dtdt_fusion'
 }
 
 # Signals that need sig._station set for evaluate() to work
@@ -68,7 +68,7 @@ SIGNALS_NEEDING_STATION_CONTEXT = {'nwp_direct', 'ai_composite'}
 SLOW_SIGNALS_TO_SKIP = {
     'temperature_advection',      # Makes live GFS API calls
     'intraday_metar_confirmation', # 20s/station for 0 trades
-    'hrrr_bias_corrected',        # Missing hrrr_forecasts table
+    'ecmwf_bias_corrected',        # Missing ecmwf_forecasts table
     'esdr',                        # Missing member_index column
     'nwp_direct',                  # Needs NWP DB data not available
 }

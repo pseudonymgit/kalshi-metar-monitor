@@ -12,7 +12,7 @@ from core.signals import SignalRegistry
 STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU','KLAS','KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX','KSAT','KSEA','KSFO']
 SIGNALS = list(BACKTEST_SIGNALS)
 TRAIN = 365; TEST = 90
-SKIP = {'temperature_advection','intraday_metar_confirmation','hrrr_bias_corrected','esdr','nwp_direct'}
+SKIP = {'temperature_advection','intraday_metar_confirmation','ecmwf_bias_corrected','esdr','nwp_direct'}
 FOR_STATION = {'fogr_reversion','metar_dtdt','pressure_tendency','nwp_dtdt_fusion'}
 CONTEXT = {'nwp_direct','ai_composite'}
 # For these signals, evaluate() returning None means 'no signal', DON'T fallback to for_station

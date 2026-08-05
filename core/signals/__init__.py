@@ -29,7 +29,7 @@ Active signal count: 9 (after B-Mode Cycle 3 cleanup, verified by correlation ma
   - 1 intraday frontal passage signal (frontal_passage_intraday — Sure Thing lane)
 
 ADVANCE (wired into pipeline — operational, via integration layer):
-  hrrr_bias_corrected      — core/signals/hrrr_bias_corrected_signal.py  (NWP source signal)
+  ecmwf_bias_corrected     — core/signals/ecmwf_bias_corrected_signal.py  (NWP source signal)
   metar_nowcast            — core/signals/metar_nowcast_signal.py        (intraday nowcast)
   spread_based_entry       — core/signals/spread_based_entry_signal.py   (execution optimizer)
 
