@@ -14,3 +14,8 @@ data/bmode_p1_execution_log.md
 data/tigge_grib/*.grib
 data/tigge_grib/
 *.grib
+data/nwp_forecasts.db
+logs/weather_collector.log
+logs/*.log
+*.db-shm
+*.db-wal

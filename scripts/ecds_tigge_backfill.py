@@ -199,8 +199,18 @@ def save_checkpoint(start, end, last_date, status):
 
 
 def get_done_dates(conn):
-    """Get set of already-completed target dates."""
-    r = conn.execute("SELECT DISTINCT target_date FROM tigge_archive").fetchall()
+    """Get set of target dates where ALL 20 stations have data (fully complete).
+
+    A date is only 'done' if every station has at least one row for it, so
+    partial coverage (e.g. KNYC-only dates) still gets backfilled for the
+    remaining stations.
+    """
+    r = conn.execute("""
+        SELECT target_date FROM (
+            SELECT target_date, COUNT(DISTINCT station) AS n_station
+            FROM tigge_archive GROUP BY target_date
+        ) WHERE n_station >= ?
+    """, (len(STATIONS),)).fetchall()
     return set(row[0] for row in r)
 
 
@@ -325,9 +335,34 @@ def main():
                     except Exception as e2:
                         err2 = str(e2)[:200]
                         log(f"  → Retry FAILED: {err2}")
-                        save_checkpoint(start, end, ds, f"failed_twice:{err2}")
-                        conn.close()
-                        return
+                        # Fallback: if cdsapi downloaded to a temp file but failed to rename,
+                        # find the .grib file in CWD and move it manually
+                        import glob
+                        temp_gribs = sorted(glob.glob("*.grib"), key=os.path.getmtime, reverse=True)
+                        if temp_gribs:
+                            latest = temp_gribs[0]
+                            sz_tmp = os.path.getsize(latest)
+                            if sz_tmp > 10000:
+                                log(f"  → Found temp GRIB: {latest} ({sz_tmp/1024/1024:.1f} MB), moving to {grib_path}")
+                                import shutil
+                                shutil.copy2(latest, grib_path)
+                                os.remove(latest)
+                                if os.path.exists(grib_path) and os.path.getsize(grib_path) > 10000:
+                                    log(f"  → Fallback OK: {os.path.getsize(grib_path)/1024/1024:.1f} MB at {grib_path}")
+                                else:
+                                    log(f"  → Fallback FAILED: copy produced empty file")
+                                    save_checkpoint(start, end, ds, f"failed_twice:{err2}")
+                                    conn.close()
+                                    return
+                            else:
+                                log(f"  → Temp GRIB {latest} too small ({sz_tmp} bytes), skipping")
+                                save_checkpoint(start, end, ds, f"failed_twice:{err2}")
+                                conn.close()
+                                return
+                        else:
+                            save_checkpoint(start, end, ds, f"failed_twice:{err2}")
+                            conn.close()
+                            return
         
         # ── PARSE immediately after download ──
         if not os.path.exists(grib_path) or os.path.getsize(grib_path) < 1000:

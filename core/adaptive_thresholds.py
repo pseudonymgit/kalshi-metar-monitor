@@ -390,27 +390,26 @@ class AdaptiveThresholdRegistry:
             logger.debug("No existing state DB at %s, starting fresh", self.db_path)
             return
         try:
-            conn = sqlite3.connect(self.db_path, timeout=5)
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute(
-                "SELECT signal_name, station, prior_alpha, prior_beta, "
-                "fast_ema, slow_ema, current_threshold, total_observations, "
-                "correct_observations FROM thresholds"
-            ).fetchall()
-            for row in rows:
-                config = SIGNAL_CONFIGS.get(row['signal_name'], DEFAULT_CONFIG)
-                controller = AdaptiveThresholdController(
-                    row['signal_name'], row['station'], config,
-                    prior_alpha=row['prior_alpha'],
-                    prior_beta=row['prior_beta'],
-                )
-                controller.fast_ema = row['fast_ema']
-                controller.slow_ema = row['slow_ema']
-                controller.current_threshold = row['current_threshold']
-                controller.total_observations = row['total_observations']
-                controller.correct_observations = row['correct_observations']
-                self.controllers[(row['signal_name'], row['station'])] = controller
-            conn.close()
+            with sqlite3.connect(self.db_path, timeout=5) as conn:
+                conn.row_factory = sqlite3.Row
+                rows = conn.execute(
+                    "SELECT signal_name, station, prior_alpha, prior_beta, "
+                    "fast_ema, slow_ema, current_threshold, total_observations, "
+                    "correct_observations FROM thresholds"
+                ).fetchall()
+                for row in rows:
+                    config = SIGNAL_CONFIGS.get(row['signal_name'], DEFAULT_CONFIG)
+                    controller = AdaptiveThresholdController(
+                        row['signal_name'], row['station'], config,
+                        prior_alpha=row['prior_alpha'],
+                        prior_beta=row['prior_beta'],
+                    )
+                    controller.fast_ema = row['fast_ema']
+                    controller.slow_ema = row['slow_ema']
+                    controller.current_threshold = row['current_threshold']
+                    controller.total_observations = row['total_observations']
+                    controller.correct_observations = row['correct_observations']
+                    self.controllers[(row['signal_name'], row['station'])] = controller
             logger.info("Loaded %d threshold controllers from %s", len(rows), self.db_path)
         except (sqlite3.Error, OSError) as e:
             logger.warning("Failed to load threshold state: %s", e)

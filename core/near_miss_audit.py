@@ -143,10 +143,9 @@ def _ensure_near_miss_audit_schema() -> None:
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
     with _AUDIT_LOCK:
-        conn = sqlite3.connect(db_path, timeout=1)
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
-        try:
+        with sqlite3.connect(db_path, timeout=1) as conn:
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS near_miss_audit (
@@ -175,8 +174,6 @@ def _ensure_near_miss_audit_schema() -> None:
                 """
             )
             conn.commit()
-        finally:
-            conn.close()
 
 
 # ─── Core Functions ─────────────────────────────────────────────────────────
@@ -226,10 +223,9 @@ def log_near_miss(
     with _AUDIT_LOCK:
         _ensure_near_miss_audit_schema()
         
-        conn = sqlite3.connect(_get_alert_db_path(), timeout=1)
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
-        try:
+        with sqlite3.connect(_get_alert_db_path(), timeout=1) as conn:
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             cursor = conn.execute(
                 """
                 INSERT INTO near_miss_audit (
@@ -249,8 +245,6 @@ def log_near_miss(
             )
             conn.commit()
             return cursor.lastrowid or 0
-        finally:
-            conn.close()
 
 
 def query_near_miss_log(
@@ -310,13 +304,10 @@ def query_near_miss_log(
     with _AUDIT_LOCK:
         _ensure_near_miss_audit_schema()
         
-        conn = sqlite3.connect(_get_alert_db_path(), timeout=1)
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
-        try:
+        with sqlite3.connect(_get_alert_db_path(), timeout=1) as conn:
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
             rows = conn.execute(query, params).fetchall()
-        finally:
-            conn.close()
     
     results = []
     for row in rows:

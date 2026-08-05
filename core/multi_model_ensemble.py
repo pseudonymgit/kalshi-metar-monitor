@@ -24,8 +24,10 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 import sqlite3
 
-NWP_DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
-DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
+from .signal_config import DEFAULT_NWP_DB_PATH, DEFAULT_METAR_DB_PATH
+
+NWP_DB_PATH = DEFAULT_NWP_DB_PATH
+DB_PATH = DEFAULT_METAR_DB_PATH
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',
@@ -485,6 +487,101 @@ def live_multi_model_consensus(station, prev_day_high):
         forecasts, prev_day_high, weights)
     
     return direction, confidence, consensus_temp, n_sources
+
+
+# ─── MULTI-MODEL ENSEMBLE CLASS (for activation wiring) ─────────────────────
+
+class MultiModelEnsemble:
+    """
+    Edge 20 Multi-Model Ensemble wrapper.
+    
+    Aggregates forecasts from multiple NWP sources (GFS, ECMWF, ICON, GEM)
+    via the nwp_forecasts.db database. Provides a clean API for ensemble
+    signal consumption by other modules.
+    
+    Uses real NWP data from the backfilled database (2,045+ dates, 4 models,
+    20 stations). Falls back to simulated forecasts only when real data is
+    unavailable.
+    """
+    
+    def __init__(self, db_path=None):
+        self.db_path = db_path or NWP_DB_PATH
+        self.metar_db_path = DB_PATH
+    
+    def get_ensemble(self, station, target_date, prev_day_high=None):
+        """
+        Get multi-model ensemble signal for a station and target date.
+        
+        Args:
+            station: ICAO station code (e.g., 'KNYC')
+            target_date: target date string (YYYY-MM-DD)
+            prev_day_high: previous day's actual high temp (°F), or None
+                            to auto-fetch from METAR DB
+        
+        Returns: dict with keys:
+            - direction: 'up' or 'down' (or None if no consensus)
+            - confidence: float [0, 1]
+            - consensus_temp: weighted ensemble temperature (°F)
+            - disagreement: std dev across models (°F)
+            - n_sources: number of models with data
+            - model_forecasts: dict of {model: temp_f}
+            - ensemble_weights: dict of {model: weight}
+        """
+        import sqlite3
+        
+        # Auto-fetch prev_day_high if not provided
+        if prev_day_high is None:
+            try:
+                conn = sqlite3.connect(self.metar_db_path)
+                conn.execute("PRAGMA busy_timeout=5000;")
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT kalshi_temp FROM kalshi_settlements
+                    WHERE station=? AND target_date=?
+                """, (station, self._prev_date(target_date)))
+                row = cur.fetchone()
+                if row and row[0] is not None:
+                    prev_day_high = float(row[0])
+                conn.close()
+            except Exception:
+                pass
+        
+        # Use the real signal function
+        direction, confidence = multi_model_real_signal(station, target_date, prev_day_high)
+        
+        # Fetch raw forecasts for detailed output
+        raw_forecasts = fetch_real_nwp_forecasts(station, target_date)
+        
+        # Compute consensus temp from forecasts
+        if raw_forecasts:
+            weights = get_station_model_accuracy_weights(station)
+            _, _, consensus_temp, disagreement, n_sources = compute_consensus(
+                raw_forecasts, prev_day_high or 70.0, weights)
+        else:
+            consensus_temp = None
+            disagreement = None
+            n_sources = 0
+            weights = {}
+        
+        return {
+            'direction': direction,
+            'confidence': confidence,
+            'consensus_temp': consensus_temp,
+            'disagreement': disagreement,
+            'n_sources': n_sources,
+            'model_forecasts': raw_forecasts,
+            'ensemble_weights': weights,
+        }
+    
+    def _prev_date(self, date_str):
+        """Get previous date string."""
+        from datetime import datetime, timedelta
+        dt = datetime.strptime(date_str, '%Y-%m-%d')
+        return (dt - timedelta(days=1)).strftime('%Y-%m-%d')
+    
+    def get_all_stations(self):
+        """Return the list of all tracked stations."""
+        return list(ALL_STATIONS)
 
 
 # ─── BACKTEST ENGINE ────────────────────────────────────────────────────────

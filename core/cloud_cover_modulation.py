@@ -6,9 +6,9 @@ Adjusts the Gaussian model's σ (variance) based on METAR cloud cover observatio
 - Overcast → compress σ (temperature distribution is narrower)
 - Clear → expand σ (temperature distribution is wider)
 
-Data source: ISD-lite sky condition field (already in isd_lite_raw.db)
-  Sky condition codes: 0=CLR, 2=FEW, 4=SCT, 6=BKN, 8=OVC, 9=missing
-  Cloud cover fraction: CLR=0.0, FEW=0.125, SCT=0.375, BKN=0.625, OVC=1.0
+Data source: WeatherAPI hourly.cloud field (cloud cover % 0-100)
+  Replaces the previous ISD-lite sky condition code approach with direct,
+  more granular cloud cover percentage. Aggregated to daily fraction.
 
 Aggregates hourly observations into daily cloud-cover fraction, then uses it
 as a σ multiplier on Edge 8's Gaussian model.
@@ -25,28 +25,14 @@ import sys
 
 # Database paths
 METAR_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
-ISD_LITE_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/isd_lite_raw.db"
+WEATHERAPI_DB = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/weatherapi_archive.db"
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',
                 'KSAT','KSEA','KSFO']
 
-# ISD sky condition → cloud cover fraction mapping
-SKY_CODE_TO_FRACTION = {
-    0: 0.0,    # Clear
-    1: 0.125,  # Few (rare in ISD-lite, usually 2)
-    2: 0.125,  # Few
-    3: 0.375,  # Scattered (rare)
-    4: 0.375,  # Scattered
-    5: 0.625,  # Broken (rare)
-    6: 0.625,  # Broken
-    7: 0.625,  # Broken (rare)
-    8: 1.0,    # Overcast
-    9: None,   # Missing/obscured
-    10: None,  # Missing
-    -9999: None,
-    -1: None,  # Our sentinel for missing
-}
+# WeatherAPI cloud cover % → fraction (cloud is already 0-100)
+# No sky-code mapping needed — WeatherAPI provides direct cloud cover %
 
 # σ multiplier range — don't compress/expand too aggressively
 SIGMA_MIN = 0.75   # Overcast: reduce σ by up to 25%
@@ -54,33 +40,27 @@ SIGMA_MAX = 1.35   # Clear: expand σ by up to 35%
 # Neutral point: cloud_cover ≈ 0.5 → multiplier ≈ 1.0
 
 
-def load_cloud_cover(station, conn_isd):
+def load_cloud_cover(station, conn_weatherapi):
     """
-    Load daily cloud cover fraction from ISD-lite data.
+    Load daily cloud cover fraction from WeatherAPI hourly data.
+    
+    WeatherAPI provides direct cloud cover % (0-100) per hour.
+    Aggregated to a daily average, normalized to 0.0-1.0.
     
     Returns: dict of {date_str: cloud_cover_fraction}
     """
-    cur = conn_isd.cursor()
+    cur = conn_weatherapi.cursor()
     cur.execute("""
-        SELECT date_utc, raw_line FROM isd_lite_raw
-        WHERE station=? AND raw_line IS NOT NULL
-        ORDER BY date_utc ASC
+        SELECT date, cloud FROM hourly
+        WHERE station=? AND cloud IS NOT NULL
+        ORDER BY date ASC
     """, (station,))
     
     daily_cloud = defaultdict(list)
-    for date_str, raw_line in cur.fetchall():
-        parts = raw_line.split()
-        if len(parts) < 10:
-            continue
-        sky_code_str = parts[9]
-        try:
-            sky_code = int(sky_code_str)
-        except ValueError:
-            continue
-        
-        fraction = SKY_CODE_TO_FRACTION.get(sky_code)
-        if fraction is not None:
-            daily_cloud[date_str].append(fraction)
+    for date_str, cloud_pct in cur.fetchall():
+        # cloud_pct is 0-100; convert to fraction 0.0-1.0
+        fraction = cloud_pct / 100.0
+        daily_cloud[date_str].append(fraction)
     
     # Average hourly observations into daily cloud cover fraction
     result = {}
@@ -170,7 +150,7 @@ def cloud_cover_sigma_adjustment(idx, days, cloud_data):
 
 # ─── BACKTEST ENGINE ────────────────────────────────────────────────────────
 
-def load_station_data(station, conn_metar, conn_isd):
+def load_station_data(station, conn_metar, conn_weatherapi):
     """Load daily highs, cloud cover, and settlement epochs for a station."""
     cur = conn_metar.cursor()
     
@@ -189,8 +169,8 @@ def load_station_data(station, conn_metar, conn_isd):
         days.append({'date': r[0], 'high': r[1], 'low': r[2],
                       'temp': r[3], 'pressure': r[4]})
     
-    # Cloud cover from isd_lite_raw.db
-    cloud_data = load_cloud_cover(station, conn_isd)
+    # Cloud cover from weatherapi_archive.db (replaces ISD-lite)
+    cloud_data = load_cloud_cover(station, conn_weatherapi)
     
     # Settlement epochs
     cur.execute("""
@@ -280,7 +260,7 @@ def run_backtest():
     print("EDGE 23: CLOUD-COVER MODULATION — BACKTEST")
     print("=" * 90)
     print(f"METAR DB: {METAR_DB}")
-    print(f"ISD Lite DB: {ISD_LITE_DB}")
+    print(f"WeatherAPI DB: {WEATHERAPI_DB}")
     print(f"Stations: {len(ALL_STATIONS)}")
     print(f"σ multiplier range: [{SIGMA_MIN}, {SIGMA_MAX}]")
     print(f"Walk-forward: 6-month train / 1-month test")
@@ -293,9 +273,9 @@ def run_backtest():
     conn_metar = sqlite3.connect(METAR_DB, timeout=60)
     conn_metar.execute("PRAGMA journal_mode=WAL;")
     conn_metar.execute("PRAGMA busy_timeout=5000;")
-    conn_isd = sqlite3.connect(ISD_LITE_DB, timeout=60)
-    conn_isd.execute("PRAGMA journal_mode=WAL;")
-    conn_isd.execute("PRAGMA busy_timeout=5000;")
+    conn_weatherapi = sqlite3.connect(WEATHERAPI_DB, timeout=60)
+    conn_weatherapi.execute("PRAGMA journal_mode=WAL;")
+    conn_weatherapi.execute("PRAGMA busy_timeout=5000;")
     
     # Run both configurations
     configs = [
@@ -318,7 +298,7 @@ def run_backtest():
         total_days_all = 0
         
         for station in ALL_STATIONS:
-            days, cloud_data, market = load_station_data(station, conn_metar, conn_isd)
+            days, cloud_data, market = load_station_data(station, conn_metar, conn_weatherapi)
             if len(days) < 210:
                 continue
             
@@ -384,22 +364,22 @@ def run_backtest():
     # Analyze extreme cloud cover days
     print(f"\n--- Extreme Cloud Cover Day Analysis ---")
     conn_metar.close()
-    conn_isd.close()
+    conn_weatherapi.close()
     
     # Re-open for extreme analysis
     conn_metar = sqlite3.connect(METAR_DB, timeout=60)
     conn_metar.execute("PRAGMA journal_mode=WAL;")
     conn_metar.execute("PRAGMA busy_timeout=5000;")
-    conn_isd = sqlite3.connect(ISD_LITE_DB, timeout=60)
-    conn_isd.execute("PRAGMA journal_mode=WAL;")
-    conn_isd.execute("PRAGMA busy_timeout=5000;")
+    conn_weatherapi = sqlite3.connect(WEATHERAPI_DB, timeout=60)
+    conn_weatherapi.execute("PRAGMA journal_mode=WAL;")
+    conn_weatherapi.execute("PRAGMA busy_timeout=5000;")
     
     extreme_clear = {'correct': 0, 'total': 0}
     extreme_overcast = {'correct': 0, 'total': 0}
     moderate = {'correct': 0, 'total': 0}
     
     for station in ALL_STATIONS:
-        days, cloud_data, market = load_station_data(station, conn_metar, conn_isd)
+        days, cloud_data, market = load_station_data(station, conn_metar, conn_weatherapi)
         if len(days) < 210:
             continue
         
@@ -443,7 +423,7 @@ def run_backtest():
     print(f"  Extreme Overcast (frac ≥ 0.85): {extreme_overcast['correct']}/{extreme_overcast['total']} = {extreme_overcast['correct']/extreme_overcast['total']:.2%}" if extreme_overcast['total'] > 0 else f"  Extreme Overcast: 0 trades")
     
     conn_metar.close()
-    conn_isd.close()
+    conn_weatherapi.close()
     
     print(f"\n{'=' * 90}")
     print("EDGE 23 BACKTEST COMPLETE")

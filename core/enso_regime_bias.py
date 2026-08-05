@@ -2,7 +2,7 @@
 """
 EDGE 21: ENSO Regime Bias
 
-Calculates per-city, per-season, per-regime temperature anomalies from ISD data 2020-2024.
+Calculates per-city, per-season, per-regime temperature anomalies from METAR data 2020-2024.
 Applies regime-based adjustments to the Gaussian model's expected mean temperature.
 
 Climate indices used:
@@ -17,7 +17,7 @@ import math
 import datetime
 import os
 
-DB_PATH_ISD = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/isd_lite_raw.db"
+DB_PATH_METAR = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
 CLIMATE_DIR = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/climate_indices/"
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
@@ -263,22 +263,21 @@ def get_climate_indicators(date_str, all_indices):
     return regime, pdo_val, nao_val, ao_val
 
 
-def load_isd_daily_temps(station):
+def load_daily_temps(station):
     """
-    Load daily highs and lows from ISD data.
+    Load daily highs and lows from METAR daily_stats.
     Returns: list of {'date': 'YYYY-MM-DD', 'high':temp, 'low':temp}
     """
-    conn = sqlite3.connect(DB_PATH_ISD, timeout=10)
+    conn = sqlite3.connect(DB_PATH_METAR, timeout=10)
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA busy_timeout=5000;")
     cur = conn.cursor()
     
-    # Group by day to get daily highs/lows, not hourly
+    # Use pre-computed daily aggregates from daily_stats (max/min/avg)
     cur.execute('''
-        SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low
-        FROM isd_lite_raw 
-        WHERE station = ? AND temp_f IS NOT NULL
-        GROUP BY date_utc 
+        SELECT date_utc, max_temp_f, min_temp_f
+        FROM daily_stats 
+        WHERE station = ? AND max_temp_f IS NOT NULL AND min_temp_f IS NOT NULL
         ORDER BY date_utc
     ''', (station,))
     
@@ -297,7 +296,7 @@ def load_isd_daily_temps(station):
 
 def compute_station_anomalies(station, climate_indices, min_sample_size=30, cutoff_date=None):
     """
-    Compute per-city, per-season, per-regime temperature anomalies from ISD 2020-2024.
+    Compute per-city, per-season, per-regime temperature anomalies from METAR 2020-2024.
     
     Args:
         station: station code
@@ -308,7 +307,7 @@ def compute_station_anomalies(station, climate_indices, min_sample_size=30, cuto
     Returns: { (season, regime) : adjustment }
     """
     # Load daily temps for the station
-    daily_temps = load_isd_daily_temps(station)
+    daily_temps = load_daily_temps(station)
     
     # Filter by cutoff_date if provided
     if cutoff_date is not None:
@@ -385,7 +384,7 @@ def compute_regional_anomalies(regional_grouping, climate_indices, min_sample_si
     all_temps_by_season_regime = {}
     
     for station in regional_grouping:
-        daily_temps = load_isd_daily_temps(station)
+        daily_temps = load_daily_temps(station)
         if not daily_temps:
             continue
         
@@ -540,7 +539,7 @@ if __name__ == "__main__":
     print("=" * 90)
     print("EDGE 21: ENSO REGIME BIAS — STANDALONE BACKTEST")
     print("=" * 90)
-    print(f"ISD DB: {DB_PATH_ISD}")
+    print(f"METAR DB: {DB_PATH_METAR}")
     print(f"Climate indices: {CLIMATE_DIR}")
     print(f"Stations: {len(ALL_STATIONS)}")
     print()

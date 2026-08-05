@@ -104,82 +104,79 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
 
     Returns dict with raw/calibrated metrics per station and aggregate.
     """
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
-    calib = CalibrationPipeline(signal_names_list, stations)
-    
-    # Per-station raw data storage
-    per_station_raw = defaultdict(lambda: {
-        'correct': 0, 'total': 0,
-        'raw_confs': [], 'correct_bools': []
-    })
-    
-    # Track ALL samples with their station for Brier computation
-    all_samples = []  # list of (station, confidence, is_correct)
-    
-    signal_obj = registry.get_signal(signal_name)
-    if signal_obj is None:
-        logger.warning(f"  Signal '{signal_name}' not found in registry, skipping")
-        conn.close()
-        return None
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
+        calib = CalibrationPipeline(signal_names_list, stations)
+        
+        # Per-station raw data storage
+        per_station_raw = defaultdict(lambda: {
+            'correct': 0, 'total': 0,
+            'raw_confs': [], 'correct_bools': []
+        })
+        
+        # Track ALL samples with their station for Brier computation
+        all_samples = []  # list of (station, confidence, is_correct)
+        
+        signal_obj = registry.get_signal(signal_name)
+        if signal_obj is None:
+            logger.warning(f"  Signal '{signal_name}' not found in registry, skipping")
+            return None
 
-    for station in stations:
-        days, market = load_station_data(station, conn)
-        if len(days) < TRAIN_DAYS + TEST_DAYS:
-            continue
+        for station in stations:
+            days, market = load_station_data(station, conn)
+            if len(days) < TRAIN_DAYS + TEST_DAYS:
+                continue
 
-        # Compute strike price from training data
-        training_temps = [
-            market[d['date']]['settlement_bucket']
-            for d in days[:TRAIN_DAYS]
-            if d['date'] in market and market[d['date']]['settlement_bucket'] is not None
-        ]
-        if not training_temps:
-            continue
-        strike = statistics.median(training_temps)
+            # Compute strike price from training data
+            training_temps = [
+                market[d['date']]['settlement_bucket']
+                for d in days[:TRAIN_DAYS]
+                if d['date'] in market and market[d['date']]['settlement_bucket'] is not None
+            ]
+            if not training_temps:
+                continue
+            strike = statistics.median(training_temps)
 
-        # Walk-forward backtest
-        start = TRAIN_DAYS
-        while start + TEST_DAYS <= len(days):
-            for idx in range(start, min(start + TEST_DAYS, len(days))):
-                date = days[idx]['date']
-                actual = market.get(date)
-                if actual is None or actual['settlement_bucket'] is None:
-                    continue
+            # Walk-forward backtest
+            start = TRAIN_DAYS
+            while start + TEST_DAYS <= len(days):
+                for idx in range(start, min(start + TEST_DAYS, len(days))):
+                    date = days[idx]['date']
+                    actual = market.get(date)
+                    if actual is None or actual['settlement_bucket'] is None:
+                        continue
 
-                actual_direction = 'up' if actual['settlement_bucket'] > strike else 'down'
+                    actual_direction = 'up' if actual['settlement_bucket'] > strike else 'down'
 
-                try:
-                    direction, confidence = signal_obj.evaluate(idx, days)
-                except Exception as e:
-                    logger.warning(f"    {signal_name}@{station} eval error at idx {idx}: {e}")
-                    continue
+                    try:
+                        direction, confidence = signal_obj.evaluate(idx, days)
+                    except Exception as e:
+                        logger.warning(f"    {signal_name}@{station} eval error at idx {idx}: {e}")
+                        continue
 
-                if direction is None or confidence < 0.0:
-                    continue
+                    if direction is None or confidence < 0.0:
+                        continue
 
-                confidence = max(0.0, min(1.0, confidence))
-                if confidence == 0.0:
-                    continue
+                    confidence = max(0.0, min(1.0, confidence))
+                    if confidence == 0.0:
+                        continue
 
-                is_correct = (direction == actual_direction)
+                    is_correct = (direction == actual_direction)
 
-                # Store per-station data
-                per_station_raw[station]['correct'] += int(is_correct)
-                per_station_raw[station]['total'] += 1
-                per_station_raw[station]['raw_confs'].append(confidence)
-                per_station_raw[station]['correct_bools'].append(is_correct)
-                
-                # Store sample with station metadata
-                all_samples.append((station, confidence, is_correct))
+                    # Store per-station data
+                    per_station_raw[station]['correct'] += int(is_correct)
+                    per_station_raw[station]['total'] += 1
+                    per_station_raw[station]['raw_confs'].append(confidence)
+                    per_station_raw[station]['correct_bools'].append(is_correct)
+                    
+                    # Store sample with station metadata
+                    all_samples.append((station, confidence, is_correct))
 
-                # Feed into calibration pipeline
-                calib.update(signal_name, station, confidence, is_correct)
+                    # Feed into calibration pipeline
+                    calib.update(signal_name, station, confidence, is_correct)
 
-            start += TEST_DAYS
-
-    conn.close()
+                start += TEST_DAYS
 
     # If no trades, return empty
     if not all_samples:

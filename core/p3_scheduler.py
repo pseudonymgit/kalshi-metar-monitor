@@ -191,10 +191,9 @@ def get_latest_settlement_epoch(
     db_path = _resolve_db_path()
     
     import sqlite3
-    conn = sqlite3.connect(db_path, timeout=1)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
-    try:
+    with sqlite3.connect(db_path, timeout=1) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -212,8 +211,6 @@ def get_latest_settlement_epoch(
             # Get column names
             columns = [desc[0] for desc in cursor.description]
             return dict(zip(columns, row))
-    finally:
-        conn.close()
     
     return None
 
@@ -231,10 +228,9 @@ def get_closed_epochs_for_station(
     db_path = _resolve_db_path()
     
     import sqlite3
-    conn = sqlite3.connect(db_path, timeout=1)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
-    try:
+    with sqlite3.connect(db_path, timeout=1) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -250,8 +246,6 @@ def get_closed_epochs_for_station(
         rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
-    finally:
-        conn.close()
 
 
 def run_prediction_for_station(

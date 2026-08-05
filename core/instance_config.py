@@ -25,6 +25,28 @@ from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+# ─── Signal Configuration ──────────────────────────────────────────────
+# Centralized thresholds and parameters for weather engine signals.
+# Consolidated from previously hardcoded values in various modules.
+
+# Disagreement Threshold (forecast_disagreement.py)
+DISAGREEMENT_THRESHOLD = 5.0  # °F - minimum disagreement to trigger
+
+# Nine Signal Ensemble Threshold (nine_signal_ensemble.py)
+ACTIVATION_THRESHOLD = 0.08  # ~8% consensus required to trade
+
+# Round Number Anchoring Thresholds (round_number_anchoring.py)
+ROUND_NUMBER_THRESHOLDS = [80, 85, 90, 95, 100]  # Temperature thresholds to analyze
+ROUND_NUMBER_SINGLE_THRESHOLD = 0.05  # 5% difference triggers action
+ROUND_NUMBER_AGGREGATE_THRESHOLD = 0.025  # 2.5% aggregate difference triggers action
+
+# Default DB paths (for signals that need direct DB access)
+DEFAULT_METAR_DB_PATH = str(REPO_ROOT / "data" / "metar_backfill.db")
+DEFAULT_NWP_DB_PATH = str(REPO_ROOT / "data" / "nwp_forecasts.db")
+DEFAULT_PAPER_TRADING_DB_PATH = str(REPO_ROOT / "data" / "paper_trading_dev.db")
+# Note: Instance-specific DB paths are available via INSTANCE_CONFIGS[instance].db_path
+
+
 # ─── Default Webhook URLs (empty by default) ──────────────
 # Production/DEV/SBOX webhooks must be set via environment variables.
 _DEFAULT_WEBHOOKS = {

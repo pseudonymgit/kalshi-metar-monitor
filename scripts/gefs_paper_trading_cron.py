@@ -47,14 +47,25 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(SCRIPT_DIR))
 
 
+# ─── Load .env for Kalshi API
+ENV_FILE = REPO_ROOT / '.env'
+if ENV_FILE.exists():
+    for line in ENV_FILE.read_text().splitlines():
+        line = line.strip()
+        if '=' in line and not line.startswith('#'):
+            k, v = line.split('=', 1)
+            os.environ.setdefault(k, v)
+
 # ─── Risk Controls ─────────────────────────────────────────────────────────
 
 from core.risk_controls import RiskManager, RiskConfig, TradeResult as RCTradeResult
 from core.stop_loss import StopLossMonitor, PRIMARY_DAY_LIMIT
+from core.market_cost_model import MARKET_COST_MODEL
 
 
 # ─── Paths
 GEFS_DB = str(REPO_ROOT / "data" / "gefs_archive.db")
+NWP_DB = str(REPO_ROOT / "data" / "nwp_forecasts.db")
 SETTLEMENTS_DB = str(REPO_ROOT / "data" / "kalshi_settlements.db")
 TRADE_DB = str(REPO_ROOT / "data" / "paper_trading_dev.db")
 LOG_FILE = str(REPO_ROOT / "data" / "gefs_paper_trading.log")
@@ -232,10 +243,7 @@ def kalshi_fee(contracts: int, price: float) -> float:
     The per-contract rounding (rather than total ceil) avoids the stair-step
     discontinuity issue where adding 1 contract could triple the fee.
     """
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-    fee_per_contract = math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
-    return fee_per_contract * contracts
+    return MARKET_COST_MODEL.kalshi_fee(contracts, price)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -279,7 +287,56 @@ def get_gefs_forecast(target_date: str) -> Dict[str, dict]:
             "member_temps_c": member_temps_c,
             "init_cycle": r[6],
         }
+    
+    # Fallback: try nwp_forecasts.db if gefs_archive has no data for this date
+    if not result:
+        _LOGGER.info(f"  GEFS archive empty for {target_date}, trying NWP DB...")
+        result = _get_gefs_from_nwp(target_date)
+    
     return result
+
+
+def _get_gefs_from_nwp(target_date: str) -> Dict[str, dict]:
+    """Fallback: get GEFS ensemble data from nwp_forecasts.db gefs_ens."""
+    try:
+        conn = sqlite3.connect(NWP_DB)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT station, variable, value
+            FROM nwp_forecasts
+            WHERE model='gefs_ens' AND target_date = ?
+        """, (target_date,))
+        rows = cur.fetchall()
+        conn.close()
+        
+        stations = {}
+        for r in rows:
+            stn = r[0]
+            if stn not in stations:
+                stations[stn] = []
+            stations[stn].append(r[2])
+        
+        result = {}
+        for stn, temps in stations.items():
+            if len(temps) < 3:
+                continue
+            mean_c = sum(temps) / len(temps)
+            result[stn] = {
+                "mean": mean_c,
+                "min": min(temps),
+                "max": max(temps),
+                "n_members": len(temps),
+                "member_temps_c": temps,
+                "init_cycle": "12Z",
+                "source": "nwp",
+            }
+        
+        if result:
+            _LOGGER.info(f"  NWP fallback: {len(result)} stations for {target_date}")
+        return result
+    except Exception as e:
+        _LOGGER.warning(f"NWP fallback failed: {e}")
+        return {}
 
 
 def get_prev_temp(target_date: str, lookback: int = 5) -> Dict[str, Optional[float]]:
