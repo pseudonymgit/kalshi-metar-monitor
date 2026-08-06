@@ -1,4 +1,2 @@
-,gaussian,pressure_delta,forecast_disagreement
-gaussian,1.0000,0.9946,0.9814
-pressure_delta,0.9946,1.0000,0.9760
-forecast_disagreement,0.9814,0.9760,1.0000
+,gaussian
+gaussian,1.0000
