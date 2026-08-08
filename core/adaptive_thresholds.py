@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import sqlite3
+from core.db_utils import with_db
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
 
@@ -418,8 +419,8 @@ class AdaptiveThresholdRegistry:
         """Persist current state to SQLite DB."""
         try:
             os.makedirs(os.path.dirname(self.db_path) or '.', exist_ok=True)
-            conn = sqlite3.connect(self.db_path, timeout=5)
-            conn.execute("PRAGMA journal_mode=WAL;")
+            with with_db(self.db_path, timeout=5) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
 
             # Create table if not exists
             conn.execute("""
@@ -454,8 +455,6 @@ class AdaptiveThresholdRegistry:
                     ctrl.total_observations, ctrl.correct_observations,
                 ))
 
-            conn.commit()
-            conn.close()
             logger.debug("Persisted %d threshold controllers", len(self.controllers))
         except (sqlite3.Error, OSError) as e:
             logger.warning("Failed to persist threshold state: %s", e)

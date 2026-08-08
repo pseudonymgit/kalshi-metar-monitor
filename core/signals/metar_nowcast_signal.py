@@ -28,7 +28,7 @@ import os
 import sqlite3
 import sys
 from datetime import datetime, timezone
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -52,12 +52,50 @@ METAR_FRESHNESS_HOURS = 2     # METAR older than this is stale
 METAR_DB_PATH = os.path.join(DATA_DIR, "metar_archive.db")
 
 
-class MetarNowcastSignal:
+from .base_signal import BaseSignal
+
+
+class MetarNowcastSignal(BaseSignal):
     """Confidence-weighted nowcast based on live METAR vs forecast."""
 
-    def __init__(self, config: Optional[dict] = None):
+    def __init__(self, config: Optional[dict] = None, db_path: str = None):
+        super().__init__(db_path)
         self.config = config or {}
         self._metar_cache: Dict[str, dict] = {}
+
+    @property
+    def name(self) -> str:
+        return "metar_nowcast"
+
+    @property
+    def min_lookback(self) -> int:
+        return 1
+
+    # ---- BaseSignal sweep interface ----
+
+    def evaluate(self, idx: int, days: List[dict]) -> Tuple[Optional[str], float]:
+        """
+        Sweep-compatible evaluate placeholder.
+
+        Real METAR-based evaluate() requires per-station DB access unavailable
+        in the standard sweep (days-only) interface. Use evaluate_for_station()
+        for real signal evaluation.
+        """
+        return None, 0.0
+
+    def evaluate_for_station(self, station: str, date: str, conn: sqlite3.Connection = None) -> Tuple[Optional[str], float]:
+        """
+        Evaluate METAR nowcast for a specific station using live DB data.
+
+        Returns (None, 0.5) if METAR observation is fresh (< 2h old),
+        (None, 0.0) if stale or unavailable.
+        """
+        metar = self._get_latest_metar(station)
+        if metar is None or not metar.get("fresh", False):
+            return None, 0.0
+        return None, 0.5
+
+    # ---- Legacy station-level interface (preserved) ----
 
     def _get_latest_metar(self, station: str) -> Optional[dict]:
         """Fetch latest METAR observation for a station from DB."""
@@ -96,8 +134,8 @@ class MetarNowcastSignal:
             logger.error(f"Failed to fetch METAR for {station}: {e}")
             return None
 
-    def evaluate(self, station: str, bucket_temp_f: int,
-                 gefs_max_f: float, gefs_min_f: float) -> Dict:
+    def evaluate_forecast(self, station: str, bucket_temp_f: int,
+                          gefs_max_f: float, gefs_min_f: float) -> Dict:
         """
         Evaluate nowcast confidence based on current METAR vs forecast.
 
@@ -190,7 +228,7 @@ class MetarNowcastSignal:
         Evaluate whether current METAR temp supports a specific bucket.
         Returns confidence that this bucket will be settled.
         """
-        nowcast = self.evaluate(station, bucket_temp_f, gefs_max_f, gefs_min_f)
+        nowcast = self.evaluate_forecast(station, bucket_temp_f, gefs_max_f, gefs_min_f)
         if not nowcast["signal"]:
             return {"confidence": 0.0, "reason": nowcast["reason"]}
 

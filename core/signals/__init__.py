@@ -51,6 +51,16 @@ from .calendar_climatology_signal import CalendarClimatologySignal
 from .dual_polarity_signal import CorrectedPressureDeltaSignal
 from .frontal_passage_intraday_signal import FrontalPassageIntradaySignal
 
+# ── Radiational Cooling Signal (v2026-08-06) ──
+from .radiational_cooling_signal import RadiationalCoolingSignal
+
+# ── WeatherAPI P0 Signals (v2026-08-05) ──
+from .cloud_cover_index_signal import CloudCoverIndexSignal
+from .feels_like_delta_signal import FeelsLikeDeltaSignal
+from .ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
+from .metar_trend_signal import MetarTrendSignal
+from .cross_model_divergence_signal import CrossModelDivergenceSignal
+
 
 class SignalRegistry:
     """
@@ -69,8 +79,19 @@ class SignalRegistry:
             'forecast_disagreement': ForecastDisagreementSignal(db_path),  # 64.36%
             'calendar_climatology': CalendarClimatologySignal(db_path),    # 69.00% (best)
 
+            # ── WeatherAPI P0 Signals (independent from METAR) ──
+            'cloud_cover_index': CloudCoverIndexSignal(db_path),        # P0-1: Cloud Cover Index
+            'feels_like_delta': FeelsLikeDeltaSignal(db_path),           # P0-2: Feels-Like Delta
+
+            # ── NWP Signals ──
+            'metar_trend': MetarTrendSignal(db_path),  # METAR trend (was ecmwf_bias_corrected)
+            'cross_model_divergence': CrossModelDivergenceSignal(),      # Model disagreement → confidence
+
             # ── Sure Thing Lane (Lane 2) ──
             'frontal_passage_intraday': FrontalPassageIntradaySignal(db_path),
+
+            # ── Radiational Cooling (LOW only) ──
+            'radiational_cooling': RadiationalCoolingSignal(db_path),
 
             # SpikeReversionSignal removed — Fix 5: 49.85% accuracy (negative EV)
             # GoldilocksSignal removed — same signal, same negative EV

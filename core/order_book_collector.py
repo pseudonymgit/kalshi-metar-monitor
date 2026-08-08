@@ -47,10 +47,31 @@ STATIONS = [
     "KPHX", "KSAT", "KSEA", "KSFO",
 ]
 
-# Series ticker patterns
-# HIGH: KXHIGH{ICAO}  (e.g., KXHIGHNYC)
-# LOW:  KXLOW{ICAO}   (e.g., KXLOWNYC)
+# Series ticker patterns — uses kalshi_price_fetcher mapping
+# HIGH: KXHIGH{code}  (e.g., KXHIGHNY for KNYC)
+# LOW:  KXLOWT{code}  (e.g., KXLOWTNYC for KNYC — note: some use KXLOW{code})
 SERIES_TYPES = ["HIGH", "LOW"]
+
+# Import canonical station→Kalshi code mapping from price fetcher
+try:
+    from core.kalshi_price_fetcher import STATION_TO_KALSHI_CODE, _series_ticker_for_station
+except ImportError:
+    # Fallback mapping if price fetcher not available
+    STATION_TO_KALSHI_CODE = {
+        "KATL": "TATL", "KAUS": "AUS", "KBOS": "TBOS", "KDCA": "TDC",
+        "KDEN": "DEN", "KDFW": "TDAL", "KHOU": "THOU", "KLAS": "TLV",
+        "KLAX": "LAX", "KMDW": "CHI", "KMIA": "MIA", "KMSP": "TMIN",
+        "KMSY": "TNOLA", "KNYC": "NY", "KOKC": "TOKC", "KPHL": "PHIL",
+        "KPHX": "TPHX", "KSAT": "TSATX", "KSEA": "TSEA", "KSFO": "TSFO",
+    }
+    def _series_ticker_for_station(station, market_type="HIGH"):
+        code = STATION_TO_KALSHI_CODE.get(station)
+        if code is None:
+            return None
+        # Most HIGH: KXHIGH{code}
+        # Most LOW:  KXLOW{code}
+        prefix = "KXHIGH" if market_type.upper() == "HIGH" else "KXLOW"
+        return f"{prefix}{code}"
 
 # Tiered polling config
 TIER_1_BUCKETS = 6       # Strike-adjacent: current temp ±3°F
@@ -87,10 +108,10 @@ def _kalshi_public_get(endpoint: str) -> Optional[dict]:
         return None
 
 
-def _get_station_series_ticker(station: str, series_type: str) -> str:
-    """Get the Kalshi series ticker for a station and series type."""
-    prefix = "KXHIGH" if series_type == "HIGH" else "KXLOW"
-    return f"{prefix}{station}"
+def _get_station_series_ticker(station: str, series_type: str) -> Optional[str]:
+    """Get the Kalshi series ticker for a station and series type.
+    Uses the canonical mapping from kalshi_price_fetcher."""
+    return _series_ticker_for_station(station, series_type)
 
 
 def _fetch_open_markets(series_ticker: str) -> Optional[List[dict]]:
@@ -124,10 +145,23 @@ def _parse_market_to_snapshot(market: dict, station: str, series_type: str) -> d
     # Actual temperature mapping depends on the day's baseline
     bucket_temp_f = _ticker_to_temperature(ticker, station, series_type)
 
-    yes_bid = market.get('yes_bid')
-    yes_ask = market.get('yes_ask')
-    no_bid = market.get('no_bid')
-    no_ask = market.get('no_ask')
+    yes_bid = market.get('yes_bid_dollars') or market.get('yes_bid')
+    yes_ask = market.get('yes_ask_dollars') or market.get('yes_ask')
+    no_bid = market.get('no_bid_dollars') or market.get('no_bid')
+    no_ask = market.get('no_ask_dollars') or market.get('no_ask')
+
+    # Convert string dollars to float cents
+    if yes_bid is not None:
+        yes_bid = int(float(yes_bid) * 100) if isinstance(yes_bid, str) else yes_bid
+    if yes_ask is not None:
+        yes_ask = int(float(yes_ask) * 100) if isinstance(yes_ask, str) else yes_ask
+    if no_bid is not None:
+        no_bid = int(float(no_bid) * 100) if isinstance(no_bid, str) else no_bid
+    if no_ask is not None:
+        no_ask = int(float(no_ask) * 100) if isinstance(no_ask, str) else no_ask
+
+    bid_size = float(str(market.get('yes_bid_size_fp', '0') or '0'))
+    ask_size = float(str(market.get('yes_ask_size_fp', '0') or '0'))
 
     return {
         'station': station,
@@ -139,46 +173,38 @@ def _parse_market_to_snapshot(market: dict, station: str, series_type: str) -> d
         'yes_ask': yes_ask,
         'no_bid': no_bid,
         'no_ask': no_ask,
-        'yes_bid_size': market.get('yes_bid_size'),
-        'yes_ask_size': market.get('yes_ask_size'),
-        'no_bid_size': market.get('no_bid_size'),
-        'no_ask_size': market.get('no_ask_size'),
-        'last_price': market.get('last_price'),
-        'volume_24h': market.get('volume_24h_fp', 0),
-        'open_interest': market.get('open_interest'),
+        'yes_bid_size': bid_size,
+        'yes_ask_size': ask_size,
+        'no_bid_size': float(str(market.get('no_bid_size_fp', '0') or '0')),
+        'no_ask_size': float(str(market.get('no_ask_size_fp', '0') or '0')),
+        'last_price': market.get('last_price_dollars') or market.get('last_price'),
+        'volume_24h': float(str(market.get('volume_24h_fp', '0') or '0')),
+        'open_interest': float(str(market.get('open_interest_fp', '0') or '0')),
         'spread_cents': (yes_ask - yes_bid) if (yes_ask is not None and yes_bid is not None) else None,
-        'bid_ask_ratio': (yes_bid_size / max(ask_size, 1))
-            if ((yes_bid_size := market.get('yes_bid_size', 0)) is not None
-                and (ask_size := market.get('yes_ask_size', 1)) is not None)
-            else None,
+        'bid_ask_ratio': bid_size / max(ask_size, 1.0) if bid_size > 0 and ask_size > 0 else None,
     }
 
 
 def _ticker_to_temperature(ticker: str, station: str, series_type: str) -> int:
     """
-    Kalshi ticker format: KXHIGH{ICAO}-{increment}
-    Increment maps to temperature via daily baseline.
+    Kalshi ticker format: KXHIGH{code}-{YYYYMMDD}-{T/B}{temp}
+    e.g. KXHIGHNY-26AUG07-T96 or KXHIGHNY-26AUG07-B95.5
 
-    Since baseline varies daily, use a heuristic: for Kalshi, the increment
-    number represents the temperature in °F directly starting from a baseline.
-    Common convention: increment 0 = 0°F, each increment = 1°F.
-
-    For HIGH: increment = temperature - baseline_low
-    For LOW:  increment = baseline_high - temperature
-
-    Without the daily baseline from Kalshi, we extract the last segment.
+    T{temp} = exact temperature strike
+    B{temp} = bucket threshold (high temp = above bucket, low = below bucket)
     """
-    # Fallback: extract the last number from ticker
     parts = ticker.split('-')
-    if len(parts) >= 2:
+    if len(parts) >= 3:
+        last = parts[-1]
+        # Strip T/B prefix and parse the number
+        if last and last[0] in ('T', 'B'):
+            try:
+                return int(float(last[1:]))
+            except ValueError:
+                pass
+        # Fallback: try plain int
         try:
-            inc = int(parts[-1])
-            # High series: temperature = inc (approximately)
-            # Low series: temperature = 100-inc (approximately)
-            if series_type == "HIGH":
-                return inc
-            else:
-                return 100 - inc
+            return int(float(last))
         except ValueError:
             pass
     return 0
@@ -202,10 +228,12 @@ def _get_tier1_buckets(markets: List[dict], station: str, series_type: str,
         total = 0
         weighted = 0
         for m in markets:
-            if m.get('yes_bid'):
+            bid_val = m.get('yes_bid_dollars') or m.get('yes_bid')
+            if bid_val:
+                bid_float = float(bid_val) if isinstance(bid_val, str) else bid_val
                 temp = _ticker_to_temperature(m['ticker'], station, series_type)
-                total += m['yes_bid']
-                weighted += m['yes_bid'] * temp
+                total += bid_float
+                weighted += bid_float * temp
         target = (weighted / total) if total > 0 else 50
 
     tier1 = []

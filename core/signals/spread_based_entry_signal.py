@@ -22,7 +22,9 @@ Usage:
 import logging
 import os
 import sys
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
+
+from .base_signal import BaseSignal
 
 logger = logging.getLogger(__name__)
 
@@ -42,10 +44,11 @@ MIN_HOURS_TO_SETTLEMENT = 1.0
 MAX_SPREAD_PERCENTILE = 50  # percentile of historical spread distribution
 
 
-class SpreadBasedEntryDetector:
+class SpreadBasedEntryDetector(BaseSignal):
     """Detects profitable spread-based entry opportunities."""
 
-    def __init__(self, config: Optional[dict] = None):
+    def __init__(self, db_path: str = None, config: Optional[dict] = None):
+        super().__init__(db_path)
         self.config = config or {}
         # Station-specific spread percentiles: {station: {bucket_temp_f: percentile_map}}
         self.spread_history: Dict[str, Dict[int, list]] = {}
@@ -68,6 +71,40 @@ class SpreadBasedEntryDetector:
             return 0.5  # Default to median if no history
         count_below = sum(1 for s in hist if s <= spread_cents)
         return count_below / len(hist)
+
+    @property
+    def name(self) -> str:
+        """Canonical name for this signal."""
+        return "spread_based_entry"
+
+    @property
+    def min_lookback(self) -> int:
+        """Minimum number of prior days required — needs 5 spread observations for percentile."""
+        return 5
+
+    def evaluate(self, idx: int, days: List[dict]) -> Tuple[Optional[str], float]:
+        """
+        Evaluate signal at day index. This is an execution-layer component that
+        produces no directional signal from weather data alone. Returns a default
+        confidence placeholder until the sweep is revised to pass order book data.
+
+        Returns:
+            (None, 0.5) if days has data, (None, 0.0) otherwise.
+        """
+        if days and len(days) > 0:
+            return None, 0.5
+        return None, 0.0
+
+    def evaluate_for_station(self, station: str, date: str, conn=None) -> Tuple[Optional[str], float]:
+        """
+        Evaluate signal for a specific station and date.
+        Execution-layer component; returns placeholder until sweep is revised
+        to pass order book data.
+
+        Returns:
+            (None, 0.0)
+        """
+        return None, 0.0
 
     def check(self, bid: int, ask: int, volume_24h: float,
               hours_to_settlement: float, station: str,

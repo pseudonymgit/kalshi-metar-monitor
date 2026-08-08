@@ -53,6 +53,14 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+# ─── Bias Correction Module (GR12 Phase A) ─────────────────────────────
+from core.ensemble_fraction import (
+    load_bias_corrections as _load_bias_table,
+    apply_bias_correction as _apply_bias_correction,
+    compute_ensemble_fraction as _compute_ensemble_fraction,
+)
+from core.forecast_confidence_modulator import ForecastConfidenceModulator
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))
@@ -330,11 +338,19 @@ def compute_signal(
 
     gefs_mean_f = mean_c * 9 / 5 + 32
 
-    # P1.2: UHI correction (walk-forward trailing bias)
-    if cfg.use_uhi:
-        bias = wf.bias_for(station)
-        if abs(bias) >= 0.05:  # only correct when there's real signal
-            gefs_mean_f = gefs_mean_f - bias
+    # P1.2: Bias correction — prefer ensemble seasonal bias over walk-forward UHI
+    try:
+        mean_f_arr = np.array([gefs_mean_f], dtype=np.float64)
+        ensemble_corrected = _apply_bias_correction(mean_f_arr, station, target_date)
+        if ensemble_corrected is not None and len(ensemble_corrected) > 0:
+            corrected_mean_f = float(ensemble_corrected[0])
+            if abs(corrected_mean_f - gefs_mean_f) < 50.0:
+                gefs_mean_f = corrected_mean_f
+    except Exception:
+        if cfg.use_uhi:
+            bias = wf.bias_for(station)
+            if abs(bias) >= 0.05:
+                gefs_mean_f = gefs_mean_f - bias
 
     actual_dir = 1 if actual_temp_f > prev_temp_f else (-1 if actual_temp_f < prev_temp_f else 0)
     pred_dir = 1 if gefs_mean_f > prev_temp_f else (-1 if gefs_mean_f < prev_temp_f else 0)
@@ -348,9 +364,18 @@ def compute_signal(
     # Confidence from ensemble fraction
     member_temps_c = gefs.get("member_temps_c")
     if member_temps_c and len(member_temps_c) >= 3:
-        member_temps_f = [t * 9 / 5 + 32 for t in member_temps_c]
-        n_up = sum(1 for t in member_temps_f if t > prev_temp_f)
-        fraction_up = n_up / len(member_temps_f)
+        member_temps_f = np.array([t * 9 / 5 + 32 for t in member_temps_c], dtype=np.float64)
+        # Use module's bias-corrected ensemble fraction
+        try:
+            corrected_members = _apply_bias_correction(member_temps_f, station, target_date)
+            if corrected_members is not None and len(corrected_members) == len(member_temps_f):
+                fraction_up = _compute_ensemble_fraction(corrected_members, prev_temp_f)
+            else:
+                n_up = int(np.sum(member_temps_f > prev_temp_f))
+                fraction_up = n_up / len(member_temps_f)
+        except Exception:
+            n_up = int(np.sum(member_temps_f > prev_temp_f))
+            fraction_up = n_up / len(member_temps_f)
         confidence = max(fraction_up, 1.0 - fraction_up)
     else:
         confidence = min(0.99, 0.5 + temp_diff / 20.0)

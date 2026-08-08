@@ -1881,6 +1881,16 @@ def _clear_request_execution_domain(_exc):
         reset_kalshi_execution_domain(token)
 
 
+@app.route("/healthz", methods=["GET"])
+def healthz():
+    return jsonify({
+        "status": "ok",
+        "uptime_seconds": int(monotonic()),
+        "app": "kalshi-metar-monitor",
+        "version": "2026.08.05",
+    }), 200
+
+
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "ok"}), 200

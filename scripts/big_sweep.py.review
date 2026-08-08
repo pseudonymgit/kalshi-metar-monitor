@@ -1,0 +1,92 @@
+# A2 RE-REVIEW: Platt Calibrator Integration Into Big Sweep (Revised)
+**Reviewer:** luna-pro (routing depth 1, re-review)
+**Date:** 2026-08-05 23:58 UTC
+**File:** `scripts/big_sweep.py`
+
+---
+
+## Verdict: ✅ APPROVE — Ready for EXECUTE phase
+
+All blocking issues (A, B) from the prior review are fixed and empirically verified.
+Issue D fixed. Issue C remains as a non-blocking cleanup item.
+
+---
+
+## Issue-by-Issue Verification
+
+### ISSUE A (CRITICAL) — `_eval_wrapper()` must use calibrated confidence — ✅ FIXED
+
+`_eval_wrapper()` signature now accepts `signal_name` and calls `calibrate_confidence()` before `simulate_trade()`:
+
+```python
+cal_result = calibrate_confidence(station, pd, signal_name, cf, date_str)
+if cal_result is None:
+    continue  # skip — P(correct) < 50%
+cal_conf, raw_conf = cal_result
+# dual brier contributions computed
+trade = simulate_trade(pd, cal_conf, actual_dir, config, station, date_str)
+if trade:
+    trade["raw_confidence"] = raw_conf
+    trade["calibrated_confidence"] = cal_conf
+    trade["raw_brier_contrib"] = brier_raw
+    trade["calibrated_brier_contrib"] = brier_cal
+```
+
+Callers verified: `run_three_stage_validation()` passes `signal_name` to all three
+`_eval_wrapper()` calls (discovery, time_holdout, geo_holdout). Three-stage validation
+metrics now use calibrated confidence — consistent with the leaderboard/aggregate path.
+
+### ISSUE B (HIGH) — Missing/corrupt calibration file — ✅ FIXED (verified empirically)
+
+`get_platt_pipeline()` now:
+1. Checks `os.path.exists(path)` — warns + falls back to identity `PlattCalibrationPipeline()` (`refitted = True`)
+2. Wraps `PlattCalibrationPipeline.load(path)` in `try/except (FileNotFoundError, json.JSONDecodeError, KeyError)` — same identity fallback
+
+**Verified live:**
+- Renamed `platt_calibration.json` away → printed `⚠️ No calibration file... Using identity calibrator.` and `calibrate_confidence('KNYC','up','gaussian',0.7,...)` returned `(0.7, 0.7)` (identity). ✅
+- Corrupt JSON → `JSONDecodeError` raised by `load()`, which is in the caught tuple. ✅
+- File restored to `data/platt_calibration.json` after test. ✅
+
+### ISSUE C (LOW) — Code duplication `_eval_wrapper` vs `evaluate_signal_on_station` — ⚠️ NOT ADDRESSED (non-blocking)
+
+Both functions still contain structurally duplicated inner loops. However, they are now
+**behaviorally identical** (same calibration + dual-brier logic in both), so the
+maintenance hazard that caused Issue A in the first place is mitigated. Recommend a
+shared-helper refactor in a later cleanup pass — not a blocker.
+
+### ISSUE D (LOW) — `raw_brier_contrib` / `calibrated_brier_contrib` in `_eval_wrapper` — ✅ FIXED
+
+Both keys are now set on trade records in `_eval_wrapper`, enabling per-validation-set
+dual-brier scoring.
+
+---
+
+## Re-Run Checklist
+
+| Command | Result |
+|---|---|
+| `python3 -m py_compile scripts/big_sweep.py` | ✅ COMPILE OK |
+| `python3 scripts/big_sweep.py --help` | ✅ HELP OK |
+| `from scripts.big_sweep import calibrate_confidence, _eval_wrapper` | ✅ IMPORT OK |
+| `get_platt_pipeline()` with file present | ✅ Loaded, refitted=True, calibrate(0.7)=0.5949 |
+| Missing-file fallback (file renamed) | ✅ Identity path, (0.7, 0.7) returned, warning printed |
+| Corrupt-file path | ✅ JSONDecodeError caught by except tuple |
+| `data/platt_calibration.json` | ✅ Restored post-test |
+
+Full `--fast --signals gaussian --n-configs 50` sweep not executed in this review pass
+(deliberately, to avoid mutating `sweep_results_v1.json` outside EXECUTE phase); the
+critical code paths above were verified directly.
+
+---
+
+## Summary
+
+| Item | Status |
+|---|---|
+| ISSUE A — three-stage validation uses calibration | ✅ FIXED |
+| ISSUE B — missing-file graceful degradation | ✅ FIXED & verified |
+| ISSUE C — duplication reduced | ⚠️ Non-blocking cleanup (behavior now consistent) |
+| ISSUE D — dual-brier in `_eval_wrapper` | ✅ FIXED |
+| Compile / help / import | ✅ |
+
+**Verdict: APPROVE.** Ready for EXECUTE phase.

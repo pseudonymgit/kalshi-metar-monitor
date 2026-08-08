@@ -104,17 +104,24 @@ def main():
     except Exception as e:
         logger.error("WhaleWatch collector error: %s", e, exc_info=True)
     finally:
-        conn.close()
+        # Checkpoint WAL before closing to ensure data persistence
+        try:
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            conn.commit()
+        except Exception:
+            pass
         logger.info("WhaleWatch collector finished")
 
-    # Print summary
-    from core.whale_watch_db import get_stats
+    # Print summary (before closing conn)
+    from core.whale_watch_db import get_snapshot_stats
     try:
-        stats = get_stats()
+        stats = get_snapshot_stats(conn)
         if stats:
             logger.info("Collection stats: %s", stats)
     except Exception:
         pass
+
+    conn.close()
 
 
 if __name__ == '__main__':

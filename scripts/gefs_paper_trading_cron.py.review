@@ -1,0 +1,117 @@
+# REVIEW: A5 — Paper Trading Gap Fixes
+**Reviewer:** luna-pro (different model than builder deepseek-chat)
+**Date:** 2026-08-06
+**File:** `scripts/gefs_paper_trading_cron.py`
+**Verdict:** REVISE — 3 of 5 gaps missing, 1 partially implemented, 1 correctly implemented
+
+---
+
+## Gap 1: HIGH/LOW market asymmetry — ⚠️ PARTIALLY IMPLEMENTED
+
+**What was done:** ✅ The `event_ticker` now uses the correct market type:
+```python
+market_type = "high" if pred_dir == 1 else "low"
+event_ticker = f"KX{market_type.upper()}{station}"
+```
+Previously it always used `KXHIGH{station}`. The pricing logic correctly handles both directions:
+- UP: `entry_price = market_price`, `edge = confidence - market_price`
+- DOWN: `entry_price = 1.0 - market_price`, `edge = confidence - (1.0 - market_price)`
+
+**What's missing:** ❌ "Size from historical depth/spread" — no depth-based position sizing. The script uses pure Kelly formula + 25% bankroll cap. No call to `MARKET_COST_MODEL.estimate_slippage()` or `fill_probability` anywhere in the position sizing path. The `market_cost_model.py` has `SlippageEstimate.fill_probability` and `estimate_slippage()` which could be used for size adjustment, but neither is invoked.
+
+---
+
+## Gap 2: Position-size-to-depth gate — ❌ NOT IMPLEMENTED
+
+No `fill_probability ≥ 0.7` gate exists. Position sizing is purely Kelly-based:
+```python
+kelly_pct = edge / (1.0 - entry_price)
+n_contracts = int(min(DEFAULT_MAX_CONTRACTS, max(1, kelly_pct * DEFAULT_KELLY_FRACTION * epoch_mult * tier_mult * 1000)))
+```
+The only cap is `cost > bankroll * 0.25` — a fixed percentage, not a depth-based fill probability gate.
+
+**Positive:** ✅ No new `liquidity_monitor.py` was created — the builder reused existing `market_cost_model.py` imports. But the actual fill-probability gating logic that should reuse `MARKET_COST_MODEL.estimate_slippage()` was never wired in.
+
+---
+
+## Gap 3: Fee model separation — ✅ CORRECTLY IMPLEMENTED
+
+**In `market_cost_model.py`:** Both fee models exist and are clearly separated:
+- `kalshi_fee()` — taker fee: `ceil(0.07 × P × (1-P) × 100) / 100` per contract (conservative, 0.056 actual for weather)
+- `ROUND_TRIP_FEE` = 3.1¢/2 + 0¢ + 0.5¢ = 0.0205 — spread/2 + commission + slippage
+
+**In `gefs_paper_trading_cron.py`:** `kalshi_fee()` now delegates to `MARKET_COST_MODEL.kalshi_fee()`:
+```python
+def kalshi_fee(contracts: int, price: float) -> float:
+    return MARKET_COST_MODEL.kalshi_fee(contracts, price)
+```
+
+Entry and exit fees are both computed as `kalshi_fee()`, not conflated with `ROUND_TRIP_FEE`. The spreadsheet/slippage cost does not appear in the P&L calculation (which is a separate Gap concern, not a fee-separation concern).
+
+---
+
+## Gap 4: Settlement timing (D+1 capital lock) — ❌ NOT IMPLEMENTED
+
+No D+1 capital lock logic exists. Bankroll is updated immediately:
+```python
+bankroll += day_pnl
+```
+No settlement pipeline integration. No capital lock period. The `settlement_cascade.py` module exists in `core/` but is not referenced by the cron script. Trades are treated as instantly settled, which overstates capital availability for consecutive-day trading.
+
+---
+
+## Gap 5: Geo concentration — ❌ NOT IMPLEMENTED
+
+**In `station_registry.py`:** Pre-existing cluster infrastructure exists (from R4-1.6):
+- `STATION_CLUSTERS` — 6 geographic clusters
+- `CLUSTER_BUDGET_USD = 30.0` — max per cluster
+- `CITY_PAIR_CAP_USD = 12.0` — max per city pair
+
+**Enhancement missing:** ❌ No "bankroll caps 15-20%" (percentage-based) is present. The caps are fixed-dollar ($30, $12), not percentage-based.
+
+**In the cron script:** ❌ None of the cluster caps are enforced. The script imports `STATION_LIQUIDITY_TIERS` and `get_liquidity_tier` but these are **dead code** — never referenced anywhere in the cron script body. No cluster budget, no geographic concentration check, no enforcement of any cap.
+
+---
+
+## Other Checks
+
+### Backward compatibility — ✅ PRESERVED
+
+The database schema is identical to what `init_trade_db()` creates:
+```sql
+CREATE TABLE IF NOT EXISTS trades (id, station, target_date, ...)
+CREATE TABLE IF NOT EXISTS daily_summary (id, trading_date, ...)
+```
+No schema migration needed. The `CREATE TABLE IF NOT EXISTS` pattern means existing databases are left untouched. No "status" column exists, so there's nothing to default to 'settled' — but the existing data is fully compatible with the new schema.
+
+### `--help` works — ✅ PASSES
+
+```
+$ python3 scripts/gefs_paper_trading_cron.py --help
+usage: gefs_paper_trading_cron.py [-h] [--days DAYS] [--start START]
+                                  [--bankroll BANKROLL] [--no-risk-controls]
+```
+
+### Syntax — ✅ PASSES
+
+Python syntax is valid. No import errors for the code path.
+
+### Station list divergence — ⚠️ NOTE
+
+The cron script hardcodes 20 stations (KNYC, KPHL, KMDW, KLAS, KPHX, KMSY, KAUS, KSAT, KOKC, etc.) that differ from the station_registry's `_RESEARCH_STATION_CODES` (KJFK, KORD, KBNA, KPDX, KSLC, PHNL, KTPA, KDTW, KCLT). This is likely intentional (Gray Room station set), but worth noting for consistency.
+
+---
+
+## Summary
+
+| Gap | Status | Detail |
+|-----|--------|--------|
+| 1. HIGH/LOW asymmetry | ⚠️ PARTIAL | Ticker + pricing correct; depth-based sizing missing |
+| 2. Position-size-to-depth gate | ❌ MISSING | No fill_probability ≥ 0.7 gate |
+| 3. Fee model separation | ✅ OK | kalshi_fee() from ROUND_TRIP_FEE cleanly separated |
+| 4. Settlement timing (D+1) | ❌ MISSING | No capital lock, no settlement pipeline |
+| 5. Geo concentration | ❌ MISSING | Station_registry unchanged; no %-based caps; unused import dead code |
+| Backward compat | ✅ OK | Schema unchanged, no migration needed |
+| --help | ✅ OK | Works |
+
+**Recommendation:** REVISE. The builder implemented only 1 of 5 gaps correctly (Gap 3), partially addressed Gap 1, and left Gaps 2, 4, and 5 entirely unimplemented. The unused import of `STATION_LIQUIDITY_TIERS/get_liquidity_tier` suggests the builder started on Gap 5 / liquidity tier work but didn't finish. The `market_cost_model.py` already has the `estimate_slippage()` and `fill_probability` infrastructure needed for Gap 2 — it just needs to be wired into the position sizing path.

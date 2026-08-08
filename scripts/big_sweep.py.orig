@@ -1,0 +1,2060 @@
+#!/usr/bin/env python3
+"""
+big_sweep.py — Big Sweep: All 36 Signals × Full Parameter Sweep
+
+Sweeps all 36 signals through comprehensive LHS-optimized parameter space
+with 18 parameters and 3-stage validation.
+
+Outputs:
+  data/sweep_results_v1.json       — Raw per-signal config results
+  data/sweep_signal_summary.csv    — Per-signal aggregate metrics
+  data/sweep_correlation_matrix.csv— Cross-signal correlation matrix
+  data/sweep/differential_results.json — All-pairs differential analysis
+
+Usage:
+    python3 scripts/big_sweep.py --fast
+    python3 scripts/big_sweep.py --n-configs 5000 --stations KNYC KMDW
+
+B-Mode compliant. No AI/ML inside the sweep loop.
+"""
+
+import argparse
+import csv
+import json
+import math
+import os
+import sqlite3
+import sys
+import time
+import threading
+from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+sys.path.insert(0, str(REPO_ROOT))
+
+from scripts.sweep import config as sweep_config
+from scripts.sweep.config import STATIONS as _DEF_STATIONS
+from scripts.sweep.config import SLIPPAGE_BUDGET
+from scripts.sweep.tiers import get_tier, get_tier_info
+from core.platt_calibration import PlattCalibrationPipeline
+from core.bma_emos import bma_calibrate, emos_calibrate
+from core.trajectory_confirmation_gate import (
+    TrajectoryConfirmationGate,
+    evaluate_gate_for_station_date,
+)
+from core.trajectory_lane import (
+    TrajectoryLane,
+    evaluate_lane_for_station_date,
+    apply_trajectory_lane_to_probability,
+)
+from core.settlement_execution_gate import (
+    SettlementExecutionGate,
+    GateVerdict,
+)
+from core.db_utils import query_db, with_db
+from core.continuous_kelly import fee_aware_kelly, KellyState, kalshi_fee as ck_fee
+from core.liquidity_gate import LiquidityGate
+from core.ensemble_fraction import load_bias_corrections
+from core.production_gate import ProductionGate, LossLimiter
+from core.station_skill_gate import StationSkillGate
+from core.agreement_gate import AgreementGate
+from core.signal_fusion import (
+    UncertaintyWeightedCascade,
+    FusionModeConfig,
+    fuse_majority_vote,
+    fuse_weighted_vote,
+    DEFAULT_FUSION_CONFIG,
+)
+from core.signal_families import get_active_signals, POOL_NAMES
+from core.adaptive_thresholds import AdaptiveThresholdRegistry
+from core.variance_weighted_sizing import (
+    variance_weighted_blend,
+    variance_adjusted_kelly,
+    variance_weighted_pipeline,
+    compute_signal_variance,
+)
+from core.luck_elimination import (
+    wire_dependencies as luck_wire_dependencies,
+    run_luck_elimination,
+    print_luck_report,
+)
+
+METAR_DB = os.path.join(str(REPO_ROOT), "data", "metar_backfill.db")
+SETTLEMENTS_DB = sweep_config.DB_PATH
+SWEEP_DIR = sweep_config.SWEEP_DIR
+RESULTS_DIR = Path(str(REPO_ROOT)) / "data"
+os.makedirs(SWEEP_DIR, exist_ok=True)
+
+KALSHI_REAL_FEE_RATE = 0.07
+MIN_TRADES_REPORT = 10
+MIN_TRADES_CALIBRATE = 20
+
+# Trajectory Confirmation Gate (lazy init)
+_TRAJECTORY_GATE_ENABLED: bool = False
+_TRAJECTORY_GATE: Optional[TrajectoryConfirmationGate] = None
+
+# Settlement Execution Gate (lazy init)
+_SETTLEMENT_GATE_ENABLED: bool = False
+_SETTLEMENT_GATE: Optional[SettlementExecutionGate] = None
+
+def set_trajectory_gate(enabled: bool):
+    global _TRAJECTORY_GATE, _TRAJECTORY_GATE_ENABLED
+    _TRAJECTORY_GATE_ENABLED = enabled
+    if enabled:
+        _TRAJECTORY_GATE = TrajectoryConfirmationGate()
+
+def get_trajectory_gate() -> Optional[TrajectoryConfirmationGate]:
+    return _TRAJECTORY_GATE
+
+# Trajectory Lane (heavy informant — lazy init)
+_TRAJECTORY_LANE_ENABLED: bool = False
+_TRAJECTORY_LANE: Optional[TrajectoryLane] = None
+
+def set_trajectory_lane(enabled: bool):
+    global _TRAJECTORY_LANE, _TRAJECTORY_LANE_ENABLED
+    _TRAJECTORY_LANE_ENABLED = enabled
+    if enabled:
+        _TRAJECTORY_LANE = TrajectoryLane()
+
+def get_trajectory_lane() -> Optional[TrajectoryLane]:
+    return _TRAJECTORY_LANE
+
+def set_settlement_gate(enabled: bool):
+    global _SETTLEMENT_GATE, _SETTLEMENT_GATE_ENABLED
+    _SETTLEMENT_GATE_ENABLED = enabled
+    if enabled:
+        _SETTLEMENT_GATE = SettlementExecutionGate()
+
+def get_settlement_gate() -> Optional[SettlementExecutionGate]:
+    return _SETTLEMENT_GATE
+
+# LossLimiter registry (keyed by (signal_name, station))
+_LOSS_LIMITERS: Dict[Tuple[str, str], LossLimiter] = {}
+
+def _get_loss_limiter(signal_name: str, station: str) -> LossLimiter:
+    """Get or create a LossLimiter for a (signal, station) pair."""
+    key = (signal_name, station)
+    if key not in _LOSS_LIMITERS:
+        _LOSS_LIMITERS[key] = LossLimiter()
+    return _LOSS_LIMITERS[key]
+
+def _record_trade_outcome(signal_name: str, station: str, trade: dict) -> None:
+    """Record a trade outcome in the appropriate LossLimiter."""
+    limiter = _get_loss_limiter(signal_name, station)
+    was_loss = not trade.get("correct", False)
+    magnitude = trade.get("net_pnl", 0.0)
+    limiter.record_outcome(was_loss=was_loss, magnitude=magnitude)
+
+# Agreement Gate (N-of-M consensus filter)
+_AGREEMENT_GATE_ENABLED: bool = False
+_AGREEMENT_GATE: Optional[AgreementGate] = None
+_AGREEMENT_N: int = 3
+_AGREEMENT_M: int = 9
+
+def set_agreement_gate(enabled: bool, n_required: int = 3, m_total: int = 9):
+    global _AGREEMENT_GATE, _AGREEMENT_GATE_ENABLED, _AGREEMENT_N, _AGREEMENT_M
+    _AGREEMENT_GATE_ENABLED = enabled
+    _AGREEMENT_N = n_required
+    _AGREEMENT_M = m_total
+    if enabled:
+        _AGREEMENT_GATE = AgreementGate(n_required=n_required, m_total=m_total)
+
+def get_agreement_gate() -> Optional[AgreementGate]:
+    return _AGREEMENT_GATE
+
+# Spatual coherence toggle (set from --spatial-coherence flag)
+_SPATIAL_COHERENCE_ENABLED: bool = False
+_SPATIAL_COHERENCE_GATE = None  # lazy init
+_SPATIAL_COHERENCE_TRACKER: dict = {}
+
+# Adaptive Thresholds (Bayesian Beta-Bernoulli)
+_ADAPTIVE_THRESHOLDS_ENABLED: bool = False
+_ADAPTIVE_REGISTRY: Optional[AdaptiveThresholdRegistry] = None
+
+# Station Skill Gate (lazy init)
+_STATION_SKILL_GATE_ENABLED: bool = False
+_STATION_SKILL_GATE: Optional[StationSkillGate] = None
+_STATION_SKILL_GATE_BSS_THRESHOLD: float = 0.0
+
+
+def set_adaptive_thresholds(enabled: bool):
+    global _ADAPTIVE_REGISTRY, _ADAPTIVE_THRESHOLDS_ENABLED
+    _ADAPTIVE_THRESHOLDS_ENABLED = enabled
+    if enabled:
+        _ADAPTIVE_REGISTRY = AdaptiveThresholdRegistry()
+    else:
+        _ADAPTIVE_REGISTRY = None
+
+
+def get_adaptive_registry() -> Optional[AdaptiveThresholdRegistry]:
+    return _ADAPTIVE_REGISTRY
+
+
+def set_spatial_coherence(enabled: bool):
+    global _SPATIAL_COHERENCE_ENABLED, _SPATIAL_COHERENCE_GATE
+    _SPATIAL_COHERENCE_ENABLED = enabled
+    if enabled and _SPATIAL_COHERENCE_GATE is None:
+        from core.spatial_coherence import SpatialCoherenceGate
+        _SPATIAL_COHERENCE_GATE = SpatialCoherenceGate()
+
+
+def get_spatial_coherence() -> bool:
+    return _SPATIAL_COHERENCE_ENABLED
+
+def set_station_skill_gate(enabled: bool, bss_threshold: float = 0.0):
+    global _STATION_SKILL_GATE, _STATION_SKILL_GATE_ENABLED, _STATION_SKILL_GATE_BSS_THRESHOLD
+    _STATION_SKILL_GATE_ENABLED = enabled
+    _STATION_SKILL_GATE_BSS_THRESHOLD = bss_threshold
+    if enabled and _STATION_SKILL_GATE is None:
+        _STATION_SKILL_GATE = StationSkillGate(METAR_DB)
+
+def get_station_skill_gate_enabled() -> bool:
+    return _STATION_SKILL_GATE_ENABLED
+
+def set_calibration_mode(mode: str):
+    global _CALIBRATION_MODE
+    _CALIBRATION_MODE = mode
+
+def get_calibration_mode() -> str:
+    return _CALIBRATION_MODE
+
+FT_NONE, FT_TAKER, FT_TAKER_SLIPPAGE, FT_MAKER = range(4)
+STATIONS = list(_DEF_STATIONS)
+_get_thread_ident = threading.get_ident
+
+
+def kalshi_fee(contracts: int, price: float) -> float:
+    if price <= 0.0 or price >= 1.0:
+        return 0.0
+    return math.ceil(KALSHI_REAL_FEE_RATE * contracts * price * (1.0 - price))
+
+
+# ═══════════════════════════════════════════════════════════════
+# 1. ALL 36 SIGNALS
+# ═══════════════════════════════════════════════════════════════
+def _safe_import_signal(rel_module, class_name):
+    """Import a signal using the proper package path."""
+    try:
+        full = f"core.signals.{rel_module}"
+        import importlib
+        mod = importlib.import_module(full)
+        return getattr(mod, class_name, None)
+    except Exception:
+        return None
+
+
+def _try_instantiate(cls, db_path=METAR_DB, **extra_kw):
+    if cls is None:
+        return None
+    # Try with all kwargs first, then fall back
+    for kw in [{**extra_kw, "db_path": db_path}, {"db_path": db_path}, {}]:
+        try:
+            return cls(**kw)
+        except (TypeError, Exception):
+            continue
+    return None
+
+
+def build_signal_registry():
+    sig_dir = os.path.join(str(REPO_ROOT), "core", "signals")
+    nwp_db = os.path.join(str(REPO_ROOT), "data", "nwp_forecasts.db")
+    registry = {}
+
+    def _reg(name, rel_module, class_name, **extra):
+        cls = _safe_import_signal(rel_module, class_name)
+        if cls is None:
+            registry[name] = None
+            return
+        kw = dict(extra)
+        if "db_path" not in kw:
+            kw["db_path"] = METAR_DB
+        inst = _try_instantiate(cls, **kw)
+        registry[name] = inst
+
+    def _reg_func(name, rel_module, func_name):
+        try:
+            full = f"core.signals.{rel_module}"
+            import importlib
+            mod = importlib.import_module(full)
+            registry[name] = getattr(mod, func_name, None)
+        except Exception:
+            registry[name] = None
+
+    # Radiational Cooling (LOW only signal)
+    _reg("radiational_cooling", "radiational_cooling_signal", "RadiationalCoolingSignal")
+
+    # Active (9)
+    _reg("gaussian", "gaussian_signal", "GaussianSignal")
+    _reg("gaussian_v2", "gaussian_v2_signal", "GaussianV2Signal")
+    _reg("pressure_delta", "pressure_delta_signal", "PressureDeltaSignal")
+    _reg("forecast_disagreement", "forecast_disagreement_signal", "ForecastDisagreementSignal")
+    _reg("calendar_climatology", "calendar_climatology_signal", "CalendarClimatologySignal")
+    _reg("frontal_passage_intraday", "frontal_passage_intraday_signal", "FrontalPassageIntradaySignal")
+    _reg("dual_polarity", "dual_polarity_signal", "DualPolaritySignal", wrapped_signal=None)
+    _reg("cloud_cover_index", "cloud_cover_index_signal", "CloudCoverIndexSignal")
+    _reg("feels_like_delta", "feels_like_delta_signal", "FeelsLikeDeltaSignal")
+
+    # Built not in registry (3)
+    _reg("ecmwf_bias_corrected", "ecmwf_bias_corrected_signal", "ECMWFBiasCorrectedSignal",
+         nwp_db_path=nwp_db, metar_db_path=METAR_DB)
+    _reg("cross_model_divergence", "cross_model_divergence_signal", "CrossModelDivergenceSignal",
+         nwp_db_path=nwp_db, metar_db_path=METAR_DB)
+    _reg("nwp_analog", "nwp_analog_signal", "NwpAnalogSignal", db_path=METAR_DB, nwp_db_path=nwp_db)
+
+    # Dead/Retired (24)
+    _reg("persistence", "persistence_signal", "PersistenceSignal")
+    _reg("simple_trend", "simple_trend_signal", "SimpleTrendSignal")
+    _reg("wind_direction_shift", "wind_direction_shift", "WindDirectionShiftSignal")
+    _reg("corrected_pressure_delta", "dual_polarity_signal", "DualPolaritySignal", wrapped_signal=None)
+    _reg("spike_reversion", "spike_reversion_signal", "SpikeReversionSignal")
+    _reg("goldilocks", "goldilocks_signal", "GoldilocksSignal")
+    _reg("pressure_tendency", "pressure_tendency_signal", "PressureTendencySignal")
+    _reg("metar_dtdt", "metar_dtdt_signal", "MetarDtdtSignal")
+    _reg("volume_momentum", "volume_momentum_signal", "VolumeMomentumSignal")
+    _reg("settlement_arbitrage", "settlement_arbitrage_signal", "SettlementTimeArbitrageSignal")
+    _reg("intraday_metar_confirmation", "intraday_metar_confirmation_signal", "IntradayMetarConfirmationSignal")
+    _reg("fogr_reversion", "fogr_reversion_signal", "FogrReversionSignal")
+    _reg("esdr", "esdr_signal", "EsdrSignal", nwp_db_path=nwp_db)
+    _reg("frontal_detector", "frontal_detector_signal", "FrontalDetectorSignal")
+    _reg("ai_composite", "ai_composite_signal", "AiCompositeSignal")
+    _reg_func("frontal_passage_detector", "frontal_passage_detector", "evaluate")
+    _reg("nwp_direct", "nwp_direct_signal", "NwpDirectSignal")
+    _reg("nwp_dtdt_fusion", "nwp_dtdt_fusion_signal", "NwpDtdtFusionSignal", nwp_db_path=nwp_db)
+    _reg("metar_nowcast", "metar_nowcast_signal", "MetarNowcastSignal")
+    _reg("spread_based_entry", "spread_based_entry_signal", "SpreadBasedEntryDetector")
+    _reg_func("dewpoint_depression", "dewpoint_depression_modulator", "modulate_confidence")
+    _reg("regime", "regime_signal", "RegimeSignal")
+    _reg("frontal_passage_nowcast", "frontal_passage_nowcast_signal", "FrontalPassageNowcastSignal", metar_db_path=METAR_DB)
+    _reg("temperature_advection", "temperature_advection_signal", "TemperatureAdvectionSignal", db_path=METAR_DB)
+
+    # ── A1: Combined 82-member meta-signal ──
+    # Equal weighting (default)
+    _reg("eighty_two_member_ensemble", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
+         gefs_db=os.path.join(str(REPO_ROOT), "data", "gefs_archive.db"),
+         tigge_db=os.path.join(str(REPO_ROOT), "data", "tigge_archive.db"))
+    
+    # ECE‑inverse weighting
+    _reg("eighty_two_member_ensemble_ece", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
+         gefs_db=os.path.join(str(REPO_ROOT), "data", "gefs_archive.db"),
+         tigge_db=os.path.join(str(REPO_ROOT), "data", "tigge_archive.db"),
+         weighting_mode='ece_inverse')
+    
+    # Member‑pooling weighting
+    _reg("eighty_two_member_ensemble_pooled", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
+         gefs_db=os.path.join(str(REPO_ROOT), "data", "gefs_archive.db"),
+         tigge_db=os.path.join(str(REPO_ROOT), "data", "tigge_archive.db"),
+         weighting_mode='member_pooling')
+
+    return registry
+
+
+# ═══════════════════════════════════════════════════════════════
+# 2. DATA CACHE
+# ═══════════════════════════════════════════════════════════════
+class DataCache:
+    _settlements = None
+    _market_types = {}
+    _metar_data = {}
+    _date_range = ("", "")
+
+    @classmethod
+    def get_settlements(cls):
+        if cls._settlements is not None:
+            return cls._settlements
+
+        rows = query_db(SETTLEMENTS_DB,
+                        "SELECT station, target_date, kalshi_temp FROM kalshi_settlements ORDER BY target_date")
+        result = defaultdict(dict)
+        for r in rows:
+            if r['kalshi_temp'] is not None:
+                result[r['station']][r['target_date']] = float(r['kalshi_temp'])
+        cls._settlements = dict(result)
+
+        try:
+            rows2 = query_db(SETTLEMENTS_DB,
+                             "SELECT station, target_date, market_type FROM kalshi_settlements")
+            cls._market_types = {f"{r['station']}|{r['target_date']}": r['market_type'] for r in rows2}
+        except Exception:
+            cls._market_types = {}
+
+        all_dates = set()
+        for sd in cls._settlements.values():
+            all_dates.update(sd.keys())
+        if all_dates:
+            sd = sorted(all_dates)
+            cls._date_range = (sd[0], sd[-1])
+        return cls._settlements
+
+    @classmethod
+    def get_market_type(cls, station, date_str):
+        cls.get_settlements()
+        return cls._market_types.get(f"{station}|{date_str}", "HIGH")
+
+    @classmethod
+    def get_date_range(cls):
+        cls.get_settlements()
+        return cls._date_range
+
+    @classmethod
+    def get_metar_data(cls, station):
+        if station in cls._metar_data:
+            return cls._metar_data[station]
+        rows = query_db(METAR_DB, """
+            SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low,
+                   AVG(dewpoint_f) as dewpoint, AVG(temp_f) as temp,
+                   AVG(pressure_mb) as pressure,
+                   AVG(wind_speed_kt) as wind_speed,
+                   AVG(wind_direction_deg) as wind_dir
+            FROM metar_observations
+            WHERE station = ? AND temp_f IS NOT NULL AND temp_f < 200
+            GROUP BY date_utc ORDER BY date_utc ASC
+        """, (station,))
+        days = []
+        for r in rows:
+            days.append({'date': r['date_utc'], 'high': r['high'], 'low': r['low'], 'dewpoint': r['dewpoint'],
+                         'temp': r['temp'], 'pressure': r['pressure'], 'wind_speed': r['wind_speed'], 'wind_dir': r['wind_dir']})
+        cls._metar_data[station] = days
+        return days
+
+
+# ═══════════════════════════════════════════════════════════════
+# 3. LHS WITH 18 PARAMS
+# ═══════════════════════════════════════════════════════════════
+def _latin_hypercube(n_samples, n_dims, seed=42):
+    try:
+        from scipy.stats import qmc
+        sampler = qmc.LatinHypercube(d=n_dims, seed=seed)
+        return sampler.random(n=n_samples)
+    except ImportError:
+        rng = np.random.RandomState(seed)
+        s = np.zeros((n_samples, n_dims))
+        for j in range(n_dims):
+            perm = rng.permutation(n_samples)
+            s[perm, j] = (np.arange(n_samples) + rng.uniform(size=n_samples)) / n_samples
+        return s
+
+
+def generate_sweep_configs(n_configs):
+    cont_params = {
+        "kl_dro_lambda": (0.0, 1.0),
+        "edge_threshold": (0.001, 0.2),
+        "kelly_fraction": (0.1, 4.0),
+        "entry_price_min": (0.01, 0.5),
+        "slippage_budget": (0.0, 0.01),
+        "fee_deduction": (0.0, 1.0),
+        "confidence_floor": (0.5, 0.95),
+        "entry_price_max": (0.5, 0.99),
+    }
+    cont_names = list(cont_params.keys())
+    n_cont = len(cont_names)
+    cat_params = {
+        "fee_type": [0,1,2,3],
+        "member_weighting": [0,1,2,3],
+        "holdout_start_frac": [0.5,0.6,0.7,0.8],
+        "validation_type": [0,1,2,3],
+        "market_type_split": [0,1,2],
+        "station_pool_size": [10,15,20],
+        "position_sizing_model": [0,1,2],
+        "stop_loss_kind": [0,1,2],
+        "agreement_n": [2,3,4,5],
+        "agreement_m": [5,7,9,11],
+    }
+    cat_items = list(cat_params.items())
+    n_cat = sum(len(v) for v in cat_params.values())
+    n_dims = n_cont + 1 + n_cat
+    samples = _latin_hypercube(n_configs, n_dims)
+    configs = []
+    for i in range(n_configs):
+        s = samples[i]
+        cfg = {}
+        idx = 0
+        for pn in cont_names:
+            lo, hi = cont_params[pn]
+            cfg[pn] = round(lo + s[idx] * (hi - lo), 6)
+            idx += 1
+        log_lo, log_hi = math.log10(10), math.log10(5000)
+        cfg["max_contracts"] = int(10 ** (log_lo + s[idx] * (log_hi - log_lo)))
+        idx += 1
+        for cat_name, cat_vals in cat_items:
+            cat_idx = min(int(s[idx] * len(cat_vals)), len(cat_vals) - 1)
+            cfg[cat_name] = cat_vals[cat_idx]
+            idx += 1
+        ft_label = ["none", "taker_only", "taker_and_slippage", "maker"]
+        cfg["fee_type_label"] = ft_label[cfg["fee_type"]]
+        cfg["config_id"] = i
+        configs.append(cfg)
+    return configs
+
+
+# ═══════════════════════════════════════════════════════════════
+# 4. TRADE SIMULATION
+# ═══════════════════════════════════════════════════════════════
+
+# Platt calibration pipeline singleton
+_platt_pipeline: Optional[PlattCalibrationPipeline] = None
+
+def get_platt_pipeline() -> PlattCalibrationPipeline:
+    global _platt_pipeline
+    if _platt_pipeline is None:
+        path = os.path.join(str(REPO_ROOT), "data", "platt_calibration.json")
+        if not os.path.exists(path):
+            print(f"  ⚠️  No calibration file at {path}. Using identity calibrator.")
+            _platt_pipeline = PlattCalibrationPipeline()
+            _platt_pipeline.refitted = True
+            return _platt_pipeline
+        try:
+            _platt_pipeline = PlattCalibrationPipeline.load(path)
+        except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+            print(f"  ⚠️  Failed to load calibration ({e}). Using identity calibrator.")
+            _platt_pipeline = PlattCalibrationPipeline()
+            _platt_pipeline.refitted = True
+    return _platt_pipeline
+
+# Bias correction singleton
+_bias_data: Optional[dict] = None
+
+def get_bias_corrections() -> dict:
+    """Load bias corrections once and cache globally."""
+    global _bias_data
+    if _bias_data is None:
+        bias_path = os.path.join(str(REPO_ROOT), "data", "ensemble_fraction_bias_corrections.json")
+        _bias_data = load_bias_corrections(bias_path)
+        if _bias_data:
+            n_stations = len(_bias_data.get("bias_table", {}))
+            n_pairs = _bias_data.get("matched_pairs", 0)
+            print(f"  Bias corrections loaded: {n_stations} stations, {n_pairs} matched pairs")
+        else:
+            print("  ⚠️  Bias corrections file not found — all corrections will be identity")
+    return _bias_data
+
+def calibrate_confidence(
+    station: str,
+    direction: str,
+    signal_name: str,
+    raw_conf: float,
+    date_str: str,
+    calibration_mode: str = 'platt',
+) -> Optional[Tuple[float, float]]:
+    """
+    Return (calibrated_conf, raw_conf). Falls back to raw if no curve.
+    Returns None if calibrated P(correct) < 0.5 — skip the trade.
+
+    Supports calibration modes:
+      'platt' — Platt scaling (default)
+      'bma'   — Bayesian Model Averaging (ensemble-level)
+      'emos'  — Ensemble Model Output Statistics (ensemble-level)
+      'both'  — Average of Platt + BMA/EMOS
+    """
+    pipeline = get_platt_pipeline()
+    market_type = DataCache.get_market_type(station, date_str)
+    platt_conf = pipeline.calibrate(
+        station=station,
+        direction=direction,
+        market_type=market_type,
+        signal_name=signal_name,
+        raw_conf=raw_conf,
+    )
+
+    # BMA/EMOS integration: for ensemble signals, apply BMA/EMOS calibration
+    bma_conf = None
+    if calibration_mode in ('bma', 'emos', 'both') and signal_name.startswith('eighty_two'):
+        try:
+            from core.bma_emos import bma_calibrate, emos_calibrate
+            if calibration_mode == 'bma' or calibration_mode == 'both':
+                bma_conf = bma_calibrate(station, (raw_conf, None))
+            elif calibration_mode == 'emos':
+                # EMOS needs ensemble mean/variance — use raw_conf as proxy
+                bma_conf = raw_conf
+        except Exception:
+            pass
+
+    # Combine calibration results
+    if bma_conf is not None and calibration_mode == 'both':
+        cal_conf = (platt_conf + bma_conf) / 2.0
+    elif bma_conf is not None and calibration_mode in ('bma', 'emos'):
+        cal_conf = bma_conf
+    else:
+        cal_conf = platt_conf
+    
+    # Guard on calibrated output
+    if cal_conf < 0.5:
+        return None
+    
+    return (cal_conf, raw_conf)
+    
+    return (cal_conf, raw_conf)
+
+def simulate_trade(pred_direction, confidence, actual_direction, config, station="", date_str="", signal_name="", loss_limiter: Optional[LossLimiter] = None):
+    if pred_direction is None or actual_direction is None or actual_direction == 0:
+        return None
+    pred_up = 1 if pred_direction == 'up' else -1
+    if pred_up == 0:
+        return None
+    confidence = max(0.501, min(0.999, confidence))
+    # Use adaptive threshold when enabled, falling back to static config
+    conf_floor = config.get("confidence_floor", 0.5)
+    if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None and signal_name:
+        conf_floor = _ADAPTIVE_REGISTRY.get_threshold(signal_name, station)
+    if confidence < conf_floor:
+        return None
+
+    # Settlement Execution Gate check — skip trade if gate blocks it
+    if _SETTLEMENT_GATE_ENABLED and _SETTLEMENT_GATE is not None:
+        market_type = DataCache.get_market_type(station, date_str)
+        epoch_id = f"{date_str}_{market_type}"
+        gate_result = _SETTLEMENT_GATE.evaluate(
+            station=station,
+            trading_date=date_str,
+            epoch_id=epoch_id,
+        )
+        if not gate_result.verdict.is_pass():
+            return None
+
+    fee_type = config.get("fee_type", FT_TAKER_SLIPPAGE)
+    edge_threshold = config.get("edge_threshold", 0.05)
+    kelly_fraction = config.get("kelly_fraction", 0.5)
+    entry_price_min = config.get("entry_price_min", 0.01)
+    entry_price_max = config.get("entry_price_max", 0.95)
+    max_contracts = config.get("max_contracts", 100)
+    slippage_budget = config.get("slippage_budget", SLIPPAGE_BUDGET)
+    fee_deduction = config.get("fee_deduction", 1.0)
+    pos_sizing = config.get("position_sizing_model", 1)
+
+    market_price = min(0.95, max(0.05, 0.5 + (confidence - 0.5) * 0.8))
+    entry_price = market_price if pred_up == 1 else 1.0 - market_price
+    if entry_price < entry_price_min or entry_price > entry_price_max:
+        return None
+    gross_edge = confidence - entry_price
+    fee_frac_entry = (KALSHI_REAL_FEE_RATE * market_price * (1.0 - market_price)
+                      if 0 < market_price < 1 else 0.0)
+    if fee_type == FT_NONE:
+        rt_fee_frac = 0.0
+    elif fee_type == FT_TAKER:
+        rt_fee_frac = fee_frac_entry
+    elif fee_type == FT_TAKER_SLIPPAGE:
+        rt_fee_frac = fee_frac_entry + slippage_budget
+    else:
+        rt_fee_frac = 0.0
+    net_edge = gross_edge - rt_fee_frac * fee_deduction
+    tier_info = get_tier_info(station)
+    tier_adjusted = net_edge * (1.0 - tier_info["discount"])
+    if tier_adjusted < edge_threshold:
+        return None
+    if pos_sizing == 1:
+        # Discrete Kelly formula (existing)
+        if net_edge <= 0 or entry_price >= 1.0:
+            return None
+        kelly_pct = net_edge / (1.0 - entry_price)
+        n_contracts = max(1, int(min(max_contracts, kelly_pct * kelly_fraction * 1000)))
+    elif pos_sizing == 4:
+        # Continuous Kelly from core.continuous_kelly
+        n_contracts = fee_aware_kelly(
+            pred_price=confidence,
+            market_price=market_price,
+            confidence=confidence,
+            direction="up" if pred_up == 1 else "down",
+            kelly_frac=kelly_fraction,
+            max_contracts=max_contracts,
+            capital=50000.0,
+            station=station,
+            signal_name="",
+        )
+        if n_contracts == 0:
+            return None
+    elif pos_sizing == 5:
+        # Variance-Adjusted Kelly Sizing (from core.variance_weighted_sizing)
+        try:
+            variance_mult = config.get("variance_multiplier", 0.5)
+            variance = variance_mult * 0.25  # Map directional strength to variance [0, 0.25]
+            total_variance = 1.0 - variance * 4.0  # Invert: high directional strength → low variance
+            total_variance = max(0.05, min(1.0, total_variance))
+
+            # Use variance_adjusted_kelly from the imported module
+            n_contracts = variance_adjusted_kelly(
+                capital=50000.0,
+                edge=max(0, net_edge),
+                variance=total_variance,
+                base_kelly=kelly_fraction,
+                aggressiveness_k=2.0,
+                floor_multiplier=0.1,
+                max_position_fraction=0.25,
+            )
+            n_contracts = min(n_contracts, max_contracts)
+            if n_contracts == 0:
+                return None
+        except Exception:
+            # Fallback to model 1 on error
+            if net_edge <= 0 or entry_price >= 1.0:
+                return None
+            kelly_pct = net_edge / (1.0 - entry_price)
+            n_contracts = max(1, int(min(max_contracts, kelly_pct * kelly_fraction * 1000)))
+    elif pos_sizing == 2:
+        cap = {1: 200, 2: 100}.get(get_tier(station), 50)
+        n_contracts = max(1, min(max_contracts, cap))
+    else:
+        n_contracts = max(1, min(max_contracts, 100))
+    # Apply LossLimiter scale factor (scales down after consecutive losses)
+    if loss_limiter is not None:
+        scale = loss_limiter.get_scale_factor()
+        n_contracts = max(0, int(n_contracts * scale))
+        if n_contracts == 0:
+            return None
+    correct = pred_up == actual_direction
+    gross_pnl = n_contracts * (1.0 if correct else 0.0)
+    cost = n_contracts * entry_price
+    entry_fee = kalshi_fee(n_contracts, market_price)
+    exit_fee = kalshi_fee(n_contracts, 1.0 if correct else 0.0)
+    total_fees = entry_fee + exit_fee
+    net_pnl = gross_pnl - cost - total_fees
+    brier_c = (confidence - (1.0 if correct else 0.0)) ** 2
+    return {"station": station, "date": date_str, "predicted": pred_up, "actual": actual_direction,
+            "confidence": confidence, "market_price": market_price, "entry_price": entry_price,
+            "gross_edge": gross_edge, "net_edge": net_edge, "contracts": n_contracts,
+            "correct": correct, "net_pnl": net_pnl, "gross_pnl": gross_pnl, "cost": cost,
+            "entry_fee": entry_fee, "exit_fee": exit_fee, "total_fees": total_fees,
+            "brier_contrib": brier_c, "market_type": DataCache.get_market_type(station, date_str)}
+
+
+def safe_signal_evaluate(signal_obj, idx, days):
+    try:
+        if hasattr(signal_obj, 'evaluate'):
+            result = signal_obj.evaluate(idx, days)
+            if isinstance(result, tuple) and len(result) == 2:
+                return result
+        elif callable(signal_obj):
+            result = signal_obj(days, idx)
+            if isinstance(result, tuple) and len(result) == 2:
+                return result
+        return None, 0.0
+    except Exception:
+        return None, 0.0
+
+
+def evaluate_signal_on_station(signal_name, signal_obj, station, config, settlements):
+    if signal_obj is None:
+        return []
+    days = DataCache.get_metar_data(station)
+    if len(days) < 5:
+        return []
+    station_s = settlements.get(station, {})
+    if not station_s:
+        return []
+    min_lb = 2
+    if hasattr(signal_obj, 'min_lookback') and signal_obj.min_lookback is not None:
+        try:
+            min_lb = max(1, int(signal_obj.min_lookback))
+        except (ValueError, TypeError):
+            pass
+    trades = []
+    for idx in range(min_lb, len(days)):
+        date_str = days[idx]['date']
+        if date_str not in station_s:
+            continue
+        actual_temp = station_s[date_str]
+        prev_date = days[idx-1]['date']
+        if prev_date not in station_s:
+            continue
+        prev_temp = station_s[prev_date]
+        diff = actual_temp - prev_temp
+        if diff == 0:
+            continue
+        actual_dir = 1 if diff > 0 else -1
+        pd, cf = safe_signal_evaluate(signal_obj, idx, days)
+        if pd is None:
+            continue
+        
+        # Calibrate confidence using Platt calibrator
+        cal_result = calibrate_confidence(station, pd, signal_name, cf, date_str)
+        if cal_result is None:
+            continue  # skip this trade — calibrator says P(correct) < 50%
+        cal_conf, raw_conf = cal_result
+        
+        # Compute dual brier contributions
+        outcome = 1.0 if pd == actual_dir else 0.0
+        brier_raw = (raw_conf - outcome) ** 2
+        brier_cal = (cal_conf - outcome) ** 2
+        
+        # Apply Trajectory Confirmation Gate (if enabled)
+        mod_conf = cal_conf
+        traj_verdict = "NEUTRAL"
+        if _TRAJECTORY_GATE_ENABLED and _TRAJECTORY_GATE is not None:
+            try:
+                traj_verdict, mod_conf = evaluate_gate_for_station_date(
+                    station, date_str, pd, cal_conf, _TRAJECTORY_GATE)[:2]
+            except Exception:
+                mod_conf = cal_conf
+                traj_verdict = "NEUTRAL"
+
+        # Apply Trajectory Lane modulation (heavy informant — if enabled)
+        lane_dir = None
+        lane_prob = 0.5
+        lane_weight = 0.0
+        lane_quality = 0.0
+        lane_divergence = False
+        if _TRAJECTORY_LANE_ENABLED and _TRAJECTORY_LANE is not None:
+            try:
+                lane_result = evaluate_lane_for_station_date(
+                    station, date_str, cal_conf, pd, _TRAJECTORY_LANE
+                )
+                lane_dir, lane_prob, lane_weight, lane_quality, lane_divergence = lane_result
+                mod_conf = apply_trajectory_lane_to_probability(
+                    mod_conf, lane_dir, lane_prob, lane_weight
+                )
+                mod_conf = max(0.501, min(0.999, mod_conf))
+            except Exception:
+                pass
+
+        # Apply Station Skill Gate (if enabled)
+        if _STATION_SKILL_GATE_ENABLED and _STATION_SKILL_GATE is not None:
+            market_type = DataCache.get_market_type(station, date_str)
+            bss_matrix = _STATION_SKILL_GATE.get_bss_matrix()
+            bss_val = bss_matrix.get(station, {}).get(market_type, -999.0)
+            if bss_val <= _STATION_SKILL_GATE_BSS_THRESHOLD:
+                logger.debug(f"Station Skill Gate: BLOCKED {station} {market_type} (BSS={bss_val:.4f} <= {_STATION_SKILL_GATE_BSS_THRESHOLD})")
+                continue
+        trade = simulate_trade(pd, mod_conf, actual_dir, config, station, date_str, signal_name, loss_limiter=_get_loss_limiter(signal_name, station))
+        if trade:
+            trade["raw_confidence"] = raw_conf
+            trade["calibrated_confidence"] = cal_conf
+            trade["trajectory_verdict"] = traj_verdict
+            trade["trajectory_modulated_confidence"] = mod_conf
+            trade["raw_brier_contrib"] = brier_raw
+            trade["calibrated_brier_contrib"] = brier_cal
+            trade["trajectory_lane_dir"] = lane_dir
+            trade["trajectory_lane_prob"] = lane_prob
+            trade["trajectory_lane_weight"] = lane_weight
+            trade["trajectory_lane_quality"] = lane_quality
+            trade["trajectory_lane_divergence"] = lane_divergence
+            trades.append(trade)
+            _record_trade_outcome(signal_name, station, trade)
+
+        # Record outcome for adaptive threshold learning
+        if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None:
+            was_correct = pd == actual_dir
+            _ADAPTIVE_REGISTRY.record_outcome(signal_name, station, cal_conf, was_correct)
+
+    return trades
+
+
+def compute_metrics(trades, min_trades=MIN_TRADES_REPORT):
+    if len(trades) < min_trades:
+        return {"n_trades": 0, "accuracy": 0.0, "total_pnl": 0.0, "sharpe": 0.0,
+                "profit_factor": 0.0, "max_drawdown": 0.0, "avg_pnl_per_trade": 0.0,
+                "win_rate": 0.0, "brier_score": 0.0, "ece": 0.0, "total_fees": 0.0,
+                "total_cost": 0.0, "avg_confidence": 0.0, "n_dates": 0}
+    n = len(trades)
+    correct = sum(1 for t in trades if t["correct"])
+    accuracy = correct / n
+    daily_pnl = defaultdict(float)
+    confs = []
+    for t in trades:
+        daily_pnl[t["date"]] += t["net_pnl"]
+        confs.append(t["confidence"])
+    total_pnl = sum(t["net_pnl"] for t in trades)
+    total_fees = sum(t["total_fees"] for t in trades)
+    total_cost = sum(t["cost"] for t in trades)
+    win_rate = correct / n
+    avg_conf = float(np.mean(confs))
+    gross_wins = sum(t["net_pnl"] for t in trades if t["net_pnl"] > 0)
+    gross_losses = abs(sum(t["net_pnl"] for t in trades if t["net_pnl"] < 0))
+    pf = gross_wins / gross_losses if gross_losses > 0 else (999.0 if gross_wins > 0 else 0.0)
+    sorted_dates = sorted(daily_pnl.keys())
+    bankroll = 10000.0
+    daily_rets = []
+    for date in sorted_dates:
+        ret = daily_pnl[date] / bankroll if bankroll > 0 else 0.0
+        daily_rets.append(ret)
+        bankroll += daily_pnl[date]
+    nd = len(daily_rets)
+    if nd > 1:
+        dm = float(np.mean(daily_rets))
+        ds = float(np.std(daily_rets, ddof=1))
+        sharpe = (dm / ds * math.sqrt(252)) if ds > 0 else 0.0
+    else:
+        sharpe = 0.0
+    cum_ret = 0.0
+    peak = 0.0
+    max_dd = 0.0
+    for r in daily_rets:
+        cum_ret += r
+        peak = max(peak, cum_ret)
+        if peak > 0:
+            dd = (peak - cum_ret) / peak
+            max_dd = max(max_dd, dd)
+    brier = sum(t["brier_contrib"] for t in trades) / n
+    ece = 0.0
+    if n >= MIN_TRADES_CALIBRATE:
+        n_bins = 10
+        bin_acc = np.zeros(n_bins)
+        bin_conf = np.zeros(n_bins)
+        bin_counts = np.zeros(n_bins)
+        for t in trades:
+            c = min(0.999, t["confidence"])
+            if c < 0.5:
+                continue
+            bi = min(int((c - 0.5) / 0.5 * n_bins), n_bins - 1)
+            bin_acc[bi] += 1 if t["correct"] else 0
+            bin_conf[bi] += c
+            bin_counts[bi] += 1
+        for i in range(n_bins):
+            if bin_counts[i] > 0:
+                bin_acc[i] /= bin_counts[i]
+                bin_conf[i] /= bin_counts[i]
+        ece = float(np.sum(bin_counts * np.abs(bin_acc - bin_conf)) / np.sum(bin_counts) if np.sum(bin_counts) > 0 else 0.0)
+    return {"n_trades": n, "accuracy": float(accuracy), "total_pnl": float(total_pnl),
+            "sharpe": float(sharpe), "profit_factor": float(pf), "max_drawdown": float(max_dd),
+            "avg_pnl_per_trade": float(total_pnl/n) if n else 0.0, "win_rate": float(win_rate),
+            "brier_score": float(brier), "ece": float(ece), "total_fees": float(total_fees),
+            "total_cost": float(total_cost), "avg_confidence": float(avg_conf), "n_dates": nd}
+
+
+# ═══════════════════════════════════════════════════════════════
+# 5. 3-STAGE VALIDATION
+# ═══════════════════════════════════════════════════════════════
+def split_discovery_holdout(settlements, holdout_frac=0.7):
+    all_dates = sorted(set(d for sd in settlements.values() for d in sd))
+    if not all_dates:
+        return {}, {}
+    si = max(1, int(len(all_dates) * holdout_frac))
+    disc_dates = set(all_dates[:si])
+    hold_dates = set(all_dates[si:])
+    discovery = {}
+    holdout = {}
+    for station, date_temps in settlements.items():
+        d = {k: v for k, v in date_temps.items() if k in disc_dates}
+        h = {k: v for k, v in date_temps.items() if k in hold_dates}
+        if d:
+            discovery[station] = d
+        if h:
+            holdout[station] = h
+    return discovery, holdout
+
+
+def split_geo_holdout(settlements, holdout_stations=None):
+    if holdout_stations is None:
+        all_st = sorted(settlements.keys())
+        n_h = max(1, len(all_st) // 4)
+        holdout_stations = all_st[-n_h:]
+    discovery = {}
+    holdout = {}
+    for st, date_temps in settlements.items():
+        if st in holdout_stations:
+            holdout[st] = date_temps
+        else:
+            discovery[st] = date_temps
+    return discovery, holdout
+
+def _eval_wrapper(signal_obj, signal_name, settlements_subset, config):
+    all_trades = []
+    for station in STATIONS:
+        if station not in settlements_subset:
+            continue
+        days = DataCache.get_metar_data(station)
+        if len(days) < 5:
+            continue
+        station_s = settlements_subset[station]
+        min_lb = 2
+        if hasattr(signal_obj, 'min_lookback') and signal_obj.min_lookback is not None:
+            try:
+                min_lb = max(1, int(signal_obj.min_lookback))
+            except (ValueError, TypeError):
+                pass
+        for idx in range(min_lb, len(days)):
+            date_str = days[idx]['date']
+            if date_str not in station_s:
+                continue
+            actual_temp = station_s[date_str]
+            prev_date = days[idx-1]['date']
+            if prev_date not in station_s:
+                continue
+            diff = actual_temp - station_s[prev_date]
+            if diff == 0:
+                continue
+            actual_dir = 1 if diff > 0 else -1
+            pd, cf = safe_signal_evaluate(signal_obj, idx, days)
+            if pd is None:
+                continue
+            # Calibrate confidence using Platt calibrator
+            cal_result = calibrate_confidence(station, pd, signal_name, cf, date_str)
+            if cal_result is None:
+                continue  # skip this trade — calibrator says P(correct) < 50%
+            cal_conf, raw_conf = cal_result
+            
+            # Compute dual brier contributions
+            outcome = 1.0 if pd == actual_dir else 0.0
+            brier_raw = (raw_conf - outcome) ** 2
+            brier_cal = (cal_conf - outcome) ** 2
+            
+            # Apply Trajectory Confirmation Gate (if enabled)
+            mod_conf = cal_conf
+            traj_verdict = "NEUTRAL"
+            if _TRAJECTORY_GATE_ENABLED and _TRAJECTORY_GATE is not None:
+                try:
+                    traj_verdict, mod_conf = evaluate_gate_for_station_date(
+                        station, date_str, pd, cal_conf, _TRAJECTORY_GATE)[:2]
+                except Exception:
+                    mod_conf = cal_conf
+                    traj_verdict = "NEUTRAL"
+
+            # Apply Trajectory Lane modulation (heavy informant — if enabled)
+            lane_dir = None
+            lane_prob = 0.5
+            lane_weight = 0.0
+            lane_quality = 0.0
+            lane_divergence = False
+            if _TRAJECTORY_LANE_ENABLED and _TRAJECTORY_LANE is not None:
+                try:
+                    lane_result = evaluate_lane_for_station_date(
+                        station, date_str, cal_conf, pd, _TRAJECTORY_LANE
+                    )
+                    lane_dir, lane_prob, lane_weight, lane_quality, lane_divergence = lane_result
+                    mod_conf = apply_trajectory_lane_to_probability(
+                        mod_conf, lane_dir, lane_prob, lane_weight
+                    )
+                    mod_conf = max(0.501, min(0.999, mod_conf))
+                except Exception:
+                    pass
+
+            # Apply Station Skill Gate (if enabled)
+            if _STATION_SKILL_GATE_ENABLED and _STATION_SKILL_GATE is not None:
+                market_type = DataCache.get_market_type(station, date_str)
+                bss_matrix = _STATION_SKILL_GATE.get_bss_matrix()
+                bss_val = bss_matrix.get(station, {}).get(market_type, -999.0)
+                if bss_val <= _STATION_SKILL_GATE_BSS_THRESHOLD:
+                    logger.debug(f"Station Skill Gate: BLOCKED {station} {market_type} (BSS={bss_val:.4f} <= {_STATION_SKILL_GATE_BSS_THRESHOLD})")
+                    continue
+            trade = simulate_trade(pd, mod_conf, actual_dir, config, station, date_str, signal_name, loss_limiter=_get_loss_limiter(signal_name, station))
+            if trade:
+                trade["raw_confidence"] = raw_conf
+                trade["calibrated_confidence"] = cal_conf
+                trade["trajectory_verdict"] = traj_verdict
+                trade["trajectory_modulated_confidence"] = mod_conf
+                trade["raw_brier_contrib"] = brier_raw
+                trade["calibrated_brier_contrib"] = brier_cal
+                trade["trajectory_lane_dir"] = lane_dir
+                trade["trajectory_lane_prob"] = lane_prob
+                trade["trajectory_lane_weight"] = lane_weight
+                trade["trajectory_lane_quality"] = lane_quality
+                trade["trajectory_lane_divergence"] = lane_divergence
+                all_trades.append(trade)
+            _record_trade_outcome(signal_name, station, trade)
+
+            # Record outcome for adaptive threshold learning
+            if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None:
+                was_correct = pd == actual_dir
+                _ADAPTIVE_REGISTRY.record_outcome(signal_name, station, cal_conf, was_correct)
+
+    return all_trades
+
+
+def run_three_stage_validation(signal_obj, signal_name, config, settlements_all):
+    discovery, time_holdout = split_discovery_holdout(
+        settlements_all, holdout_frac=config.get("holdout_start_frac", 0.7))
+    disc_trades = _eval_wrapper(signal_obj, signal_name, discovery, config)
+    time_trades = _eval_wrapper(signal_obj, signal_name, time_holdout, config)
+    _, geo_holdout = split_geo_holdout(settlements_all)
+    geo_trades = _eval_wrapper(signal_obj, signal_name, geo_holdout, config)
+    return {
+        "discovery": compute_metrics(disc_trades, min_trades=3),
+        "time_holdout": compute_metrics(time_trades, min_trades=3),
+        "geo_holdout": compute_metrics(geo_trades, min_trades=3),
+        "consolidated": compute_metrics(disc_trades + time_trades + geo_trades,
+                                         min_trades=MIN_TRADES_REPORT)}
+
+
+def evaluate_signal_all_stations(signal_name, signal_obj, config, settlements):
+    all_trades = []
+    per_station = defaultdict(list)
+    per_market = defaultdict(list)
+    for station in STATIONS:
+        st = evaluate_signal_on_station(signal_name, signal_obj, station, config, settlements)
+        all_trades.extend(st)
+        if st:
+            per_station[station] = st
+            for t in st:
+                per_market[t.get("market_type", "HIGH")].append(t)
+    station_metrics = {s: compute_metrics(t, 3) for s, t in per_station.items()
+                       if compute_metrics(t, 3)["n_trades"] > 0}
+    market_metrics = {m: compute_metrics(t, 3) for m, t in per_market.items()
+                      if compute_metrics(t, 3)["n_trades"] > 0}
+
+    # Apply spatial coherence modulation (if enabled)
+    if _SPATIAL_COHERENCE_ENABLED:
+        all_trades = apply_spatial_coherence_to_trades(all_trades)
+        # Recompute per-station and per-market metrics with adjusted trades
+        per_station_adj = defaultdict(list)
+        per_market_adj = defaultdict(list)
+        for t in all_trades:
+            per_station_adj[t['station']].append(t)
+            per_market_adj[t.get('market_type', 'HIGH')].append(t)
+        station_metrics = {s: compute_metrics(t, 3) for s, t in per_station_adj.items()
+                           if compute_metrics(t, 3)["n_trades"] > 0}
+        market_metrics = {m: compute_metrics(t, 3) for m, t in per_market_adj.items()
+                          if compute_metrics(t, 3)["n_trades"] > 0}
+
+    # Apply Agreement Gate filtering (if enabled)
+    if _AGREEMENT_GATE_ENABLED:
+        all_trades = apply_agreement_gate_to_trades(all_trades, signal_name)
+        # Recompute per-station and per-market metrics with filtered trades
+        per_station_adj = defaultdict(list)
+        per_market_adj = defaultdict(list)
+        for t in all_trades:
+            per_station_adj[t['station']].append(t)
+            per_market_adj[t.get('market_type', 'HIGH')].append(t)
+        station_metrics = {s: compute_metrics(t, 3) for s, t in per_station_adj.items()
+                           if compute_metrics(t, 3)["n_trades"] > 0}
+        market_metrics = {m: compute_metrics(t, 3) for m, t in per_market_adj.items()
+                          if compute_metrics(t, 3)["n_trades"] > 0}
+
+    aggregate = compute_metrics(all_trades, MIN_TRADES_REPORT)
+    val = run_three_stage_validation(signal_obj, signal_name, config, settlements)
+    return {"signal_name": signal_name, "config_id": config.get("config_id", -1),
+            "aggregate": aggregate, "per_station": station_metrics,
+            "per_market": market_metrics, "validation": val,
+            "n_stations_active": len(station_metrics), "total_trades": len(all_trades)}
+
+
+def apply_agreement_gate_to_trades(all_trades, signal_name):
+    """
+    Apply N-of-M agreement filtering to collected trades for a single signal.
+
+    Builds direction-vote tuples from all trades produced by this signal,
+    groups them by (station, market_type), and filters out trades for
+    (station, market_type) combos where fewer than N of M signals agree.
+
+    Returns:
+        Filtered list of trades where direction consensus was met.
+    """
+    if not all_trades or not _AGREEMENT_GATE_ENABLED:
+        return all_trades
+
+    gate = _AGREEMENT_GATE
+    if gate is None:
+        return all_trades
+
+    # Build signal tuples: (station, market_type, direction, reason)
+    signals = []
+    for t in all_trades:
+        direction = 'UP' if t['predicted'] == 1 else 'DOWN'
+        market_type = t.get('market_type', 'HIGH')
+        signals.append((t['station'], market_type, direction, signal_name))
+
+    if len(signals) < _AGREEMENT_M:
+        # Not enough signals to form proper consensus — leave intact
+        return all_trades
+
+    filtered = gate.filter_signals(signals)
+
+    # Build set of (station, market_type, direction) combos that passed
+    approved = set()
+    for station, market_type, direction, _ in filtered:
+        approved.add((station, market_type, direction))
+
+    # Keep only trades matching approved combos
+    result = []
+    for t in all_trades:
+        direction = 'UP' if t['predicted'] == 1 else 'DOWN'
+        market_type = t.get('market_type', 'HIGH')
+        if (t['station'], market_type, direction) in approved:
+            result.append(t)
+
+    return result
+
+
+def apply_spatial_coherence_to_trades(all_trades):
+    """
+    Apply spatial coherence modulation to collected trades.
+
+    Builds a cross-station signal map per date, then modulates confidence
+    using SpatialCoherenceGate.modulate_confidence().
+
+    Returns:
+        Modified list of trade dicts with adjusted confidence.
+    """
+    if not all_trades:
+        return all_trades
+    if not _SPATIAL_COHERENCE_ENABLED:
+        return all_trades
+
+    gate = _SPATIAL_COHERENCE_GATE
+    if gate is None:
+        return all_trades
+
+    # Build date -> {station: signal_info} map
+    date_signals: Dict[str, Dict[str, dict]] = {}
+    for t in all_trades:
+        d = t['date']
+        s = t['station']
+        if d not in date_signals:
+            date_signals[d] = {}
+        date_signals[d][s] = {
+            'direction': 'up' if t['predicted'] == 1 else 'down',
+            'confidence': t['confidence'],
+            'anomaly': t.get('anomaly', 1.0 if t['predicted'] == 1 else -1.0),
+            'signal_name': t.get('signal_name', 'unknown'),
+        }
+
+    adjusted = []
+    global _SPATIAL_COHERENCE_TRACKER
+    _SPATIAL_COHERENCE_TRACKER = {}
+
+    for t in all_trades:
+        d = t['date']
+        s = t['station']
+        direction = 'up' if t['predicted'] == 1 else 'down'
+        nearby = {st: info for st, info in date_signals.get(d, {}).items()
+                  if st != s}
+
+        old_conf = t['confidence']
+        new_conf = gate.modulate_confidence(
+            station=s,
+            signal_name=t.get('signal_name', 'unknown'),
+            direction=direction,
+            confidence=old_conf,
+            nearby_signals=nearby,
+            date_str=d,
+        )
+
+        # Track spatial coherence effect
+        _SPATIAL_COHERENCE_TRACKER[s] = {
+            'before': old_conf,
+            'after': new_conf,
+            'delta': new_conf - old_conf,
+            'applied': True,
+        }
+
+        # Build minimal config from trade metadata
+        cfg = {
+            'fee_type': t.get('fee_type', 2),
+            'edge_threshold': t.get('edge_threshold', 0.02),
+            'kelly_fraction': t.get('kelly_fraction', 0.5),
+            'entry_price_min': t.get('entry_price_min', 0.01),
+            'entry_price_max': t.get('entry_price_max', 0.95),
+            'max_contracts': t.get('max_contracts', 100),
+            'slippage_budget': t.get('slippage_budget', 0.005),
+            'fee_deduction': t.get('fee_deduction', 1.0),
+            'position_sizing_model': t.get('position_sizing_model', 1),
+            'confidence_floor': t.get('confidence_floor', 0.5),
+        }
+
+        adj_trade = simulate_trade(
+            t['predicted'], new_conf,
+            t['actual'], cfg, s, d,
+            signal_name=t.get('signal_name', '')
+        )
+        if adj_trade is None:
+            continue  # filtered by spatial coherence
+
+        # Preserve metadata from original trade
+        adj_trade['raw_confidence'] = t.get('raw_confidence', old_conf)
+        adj_trade['calibrated_confidence'] = t.get('calibrated_confidence', old_conf)
+        adj_trade['raw_brier_contrib'] = t.get('raw_brier_contrib', 0.0)
+        adj_trade['calibrated_brier_contrib'] = t.get('calibrated_brier_contrib', 0.0)
+        adj_trade['spatial_modulation'] = new_conf - old_conf
+        adj_trade['spatial_old_conf'] = old_conf
+        adj_trade['spatial_new_conf'] = new_conf
+        adj_trade['signal_name'] = t.get('signal_name', 'unknown')
+        adj_trade['fee_type'] = t.get('fee_type', 2)
+        adj_trade['edge_threshold'] = t.get('edge_threshold', 0.02)
+        adj_trade['confidence_floor'] = t.get('confidence_floor', 0.5)
+
+        adjusted.append(adj_trade)
+
+    n_filtered = len(all_trades) - len(adjusted)
+    if n_filtered > 0:
+        logger.info(
+            "Spatial coherence filtered %d trades", n_filtered
+        )
+
+    return adjusted
+
+
+def compute_correlation_matrix(signal_results):
+    names = [s for s, r in signal_results.items() if r.get("total_trades", 0) > 0]
+    n = len(names)
+    if n < 2:
+        return np.eye(max(1, n)), names or [list(signal_results.keys())[0]]
+    corr = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                corr[i, j] = 1.0
+            else:
+                a1 = signal_results[names[i]].get("aggregate", {}).get("accuracy", 0)
+                a2 = signal_results[names[j]].get("aggregate", {}).get("accuracy", 0)
+                corr[i, j] = 1.0 - abs(a1 - a2)
+    return corr, names
+
+
+def compute_differential_results(signal_results):
+    sigs = [(s, r) for s, r in signal_results.items()
+            if r.get("total_trades", 0) >= MIN_TRADES_REPORT]
+    results = []
+    for i in range(len(sigs)):
+        for j in range(i + 1, len(sigs)):
+            s1, r1 = sigs[i]
+            s2, r2 = sigs[j]
+            a1 = r1.get("aggregate", {})
+            a2 = r2.get("aggregate", {})
+            d_acc = a2.get("accuracy", 0) - a1.get("accuracy", 0)
+            d_pnl = a2.get("total_pnl", 0) - a1.get("total_pnl", 0)
+            d_shp = a2.get("sharpe", 0) - a1.get("sharpe", 0)
+            agree = 1.0 - abs(d_acc)
+            results.append({"signal_a": s1, "signal_b": s2, "delta_accuracy": d_acc,
+                            "delta_pnl": d_pnl, "delta_sharpe": d_shp,
+                            "agreement_rate": agree, "abs_delta_accuracy": abs(d_acc)})
+    results.sort(key=lambda x: x["abs_delta_accuracy"], reverse=True)
+    return results
+
+
+def run_best_config_for_signal(signal_name, signal_obj, configs, settlements):
+    best_pnl = -1e9
+    best_metrics = None
+    for cfg in configs[:500]:
+        result = evaluate_signal_all_stations(signal_name, signal_obj, cfg, settlements)
+        agg = result.get("aggregate", {})
+        pnl = agg.get("total_pnl", -1e9)
+        if pnl > best_pnl and agg.get("n_trades", 0) >= MIN_TRADES_REPORT:
+            best_pnl = pnl
+            best_metrics = result
+    if best_metrics is None:
+        best_metrics = evaluate_signal_all_stations(signal_name, signal_obj, configs[0], settlements)
+    return best_metrics
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Big Sweep — All 36 Signals x Full Param Sweep")
+    parser.add_argument("--stations", nargs="*", default=None)
+    parser.add_argument("--n-configs", type=int, default=2000)
+    parser.add_argument("--signals", nargs="*", default=None)
+    parser.add_argument("--skip-integrity", action="store_true")
+    parser.add_argument("--fast", action="store_true")
+    parser.add_argument("--calibration", type=str, default="platt", choices=["platt", "bma", "emos", "both"], help="Calibration method: platt, bma, emos, both")
+    parser.add_argument("--fusion", type=str, default="none", choices=["none", "uwc", "majority", "weighted"],
+                        help="Fusion mode: none (baseline), uwc (Uncertainty-Weighted Cascade), majority, weighted")
+    parser.add_argument("--trajectory-gate", action="store_true", default=False,
+                        help="Enable Trajectory Confirmation Gate (epoch-based analog matching)")
+    parser.add_argument("--trajectory-lane", action="store_true", default=False,
+                        help="Enable Trajectory Lane (heavy informant — modulates fused probability via analog matching)")
+    parser.add_argument("--spatial-coherence", action="store_true", default=False,
+                        help="Enable Spatial Coherence Verification (cross-station confidence modulation)")
+    parser.add_argument("--settlement-gate", action="store_true", default=False,
+                        help="Enable Settlement Execution Gate (market open, cooldowns, approved stations)")
+    parser.add_argument("--production-gate", action="store_true", default=False,
+                        help="Enable Production Gate check: >=58%% acc, >=100 trades, <=30%% per-station concentration")
+    parser.add_argument("--liquidity-gate", action="store_true", default=False, help="Enable liquidity gate: reject low-liquidity markets")
+    parser.add_argument("--adaptive-thresholds", action="store_true", default=False,
+                        help="Enable Bayesian Beta-Bernoulli adaptive confidence thresholds per (signal, station)")
+    parser.add_argument("--agreement-gate", action="store_true", default=False,
+                        help="Enable Agreement Gate (N-of-M consensus filtering)")
+    parser.add_argument("--station-skill-gate", action="store_true", default=False,
+                        help="Enable Station Skill Gate (filters stations with poor Brier Skill Score)")
+    parser.add_argument("--bss-threshold", type=float, default=0.0,
+                        help="Minimum Brier Skill Score threshold (BSS must be > this) [default: 0.0]")
+    parser.add_argument("--variance-sizing", action="store_true", default=False,
+                        help="Enable Variance-Weighted Sizing: blend signals by inverse variance and adjust Kelly by variance factor")
+    parser.add_argument("--luck-test", action="store_true", default=False,
+                        help="Run Luck Elimination Protocol on final results (null distribution, p-value, bootstrap CI)")
+    parser.add_argument("--luck-shuffles", type=int, default=1000,
+                        help="Number of Monte Carlo shuffles for luck test [default: 1000]")
+    parser.add_argument("--goldilocks-lane", action="store_true", default=False,
+                        help="Enable Goldilocks Lane (microstructure transient spike detection — separate sweep lane, not a signal)")
+    args = parser.parse_args()
+
+    # Set fusion mode for the run
+    global _FUSION_MODE
+    _FUSION_MODE = args.fusion
+    if args.fusion != "none":
+        print(f"  Fusion mode: {args.fusion}")
+
+    # Variance-Weighted Sizing
+    global _VARIANCE_SIZING_ENABLED
+    _VARIANCE_SIZING_ENABLED = args.variance_sizing
+    if args.variance_sizing:
+        print(f"  Variance-Weighted Sizing: ENABLED")
+        print(f"  Blending: inverse-variance-squared weighting")
+        print(f"  Kelly: hyperbolic penalty 1/(1+k*σ²) with k=2.0")
+
+    global STATIONS
+    if args.stations:
+        STATIONS = args.stations
+
+    set_calibration_mode(getattr(args, "calibration", "platt"))
+
+    print("=" * 72)
+    print("  BIG SWEEP — Full Parameter x All-Signal Validation")
+    print(f"  Started: {datetime.now(timezone.utc).isoformat()}")
+    print(f"  N configs: {args.n_configs}")
+    print(f"  Stations: {len(STATIONS)}")
+    print("=" * 72)
+
+    if not args.skip_integrity:
+        print("\n[Phase 0] Data integrity gate...")
+        if not sweep_config.run_integrity_gate(skip=False):
+            print("  INTEGRITY GATE FAILED. Aborting.")
+            sys.exit(1)
+
+    print("\n[Phase 1] Loading data...")
+    t0 = time.time()
+    settlements = DataCache.get_settlements()
+    n_records = sum(len(v) for v in settlements.values())
+    dr = DataCache.get_date_range()
+    print(f"  Kalshi settlements: {n_records} records ({dr[0]} -> {dr[1]})")
+    avail = sum(1 for s in STATIONS if len(DataCache.get_metar_data(s)) > 10)
+    print(f"  METAR stations available: {avail}/{len(STATIONS)}")
+    print(f"  Loaded in {time.time() - t0:.1f}s")
+
+    # Pre-load bias corrections
+    bias_data = get_bias_corrections()
+
+    # Initialize Trajectory Confirmation Gate if enabled
+    if args.trajectory_gate:
+        print("\n[Gate] Initializing Trajectory Confirmation Gate...")
+        set_trajectory_gate(True)
+        print(f"  Trajectory Gate: ENABLED")
+        print(f"  Gate evaluates epoch-based analog matching before trade generation")
+    else:
+        set_trajectory_gate(False)
+
+    # Initialize Trajectory Lane (heavy informant) if enabled
+    if args.trajectory_lane:
+        print("\n[Lane] Initializing Trajectory Lane (heavy informant)...")
+        set_trajectory_lane(True)
+        print(f"  Trajectory Lane: ENABLED")
+        print(f"  Lane produces secondary probability estimate weighted into fusion layer")
+    else:
+        set_trajectory_lane(False)
+
+    # Initialize Spatial Coherence if enabled
+    if args.spatial_coherence:
+        print("\n[Gate] Initializing Spatial Coherence Verification...")
+        set_spatial_coherence(True)
+        print(f"  Spatial Coherence: ENABLED")
+        print(f"  Gate modulates confidence using cross-station agreement")
+        print(f"  Clusters: NE(4), SE(3), SC(5), MW(2), RW(3), PAC(3)")
+    else:
+        set_spatial_coherence(False)
+
+    # Initialize Settlement Execution Gate if enabled
+    if args.settlement_gate:
+        print("\n[Gate] Initializing Settlement Execution Gate...")
+        set_settlement_gate(True)
+        print(f"  Settlement Gate: ENABLED")
+        print(f"  Gate evaluates market open, station cooldown, boundary cooldown, approved stations")
+    else:
+        set_settlement_gate(False)
+
+    # Initialize Adaptive Threshold Registry if enabled
+    if args.adaptive_thresholds:
+        print("\n[Gate] Initializing Adaptive Threshold Registry...")
+        set_adaptive_thresholds(True)
+        print(f"  Adaptive Thresholds: ENABLED")
+        print(f"  Bayesian Beta-Bernoulli per (signal, station) confidence floors")
+    else:
+        set_adaptive_thresholds(False)
+
+    # Initialize Agreement Gate if enabled
+    if args.agreement_gate:
+        print("\n[Gate] Initializing Agreement Gate (N-of-M consensus)...")
+        set_agreement_gate(True, n_required=args.agreement_n, m_total=args.agreement_m)
+        print(f"  Agreement Gate: ENABLED")
+        print(f"  N={args.agreement_n}, M={args.agreement_m}")
+        print(f"  Filters trades where fewer than N of M top signals agree on direction")
+    else:
+        set_agreement_gate(False)
+
+    # Initialize Station Skill Gate if enabled
+    if args.station_skill_gate:
+        print("\n[Gate] Initializing Station Skill Gate...")
+        set_station_skill_gate(True, args.bss_threshold)
+        print(f"  Station Skill Gate: ENABLED")
+        print(f"  BSS Threshold: {args.bss_threshold}")
+        print(f"  Gate filters stations where Brier Skill Score <= {args.bss_threshold}")
+    else:
+        set_station_skill_gate(False)
+
+    # Initialize Goldilocks Lane if enabled
+    if args.goldilocks_lane:
+        print("\n[Lane] Initializing Goldilocks Lane (microstructure transient spike detection)...")
+        try:
+            from core.lane_goldilocks import GoldilocksLane, get_goldilocks_lane
+            goldilocks_lane = get_goldilocks_lane()
+            print(f"  Goldilocks Lane: ENABLED")
+            print(f"  Lane monitors METAR observations at Kalshi bucket boundaries")
+            print(f"  Detects transient microstructure spikes via DualHypothesisEngine")
+            print(f"  Station exclusion: KNYC, stations with <100000 obs")
+            print(f"  Max alerts/station/day: 3")
+            _GOLDILOCKS_LANE_ENABLED = True
+            _GOLDILOCKS_LANE = goldilocks_lane
+        except Exception as e:
+            print(f"  \u26a0\ufe0f Could not initialize Goldilocks Lane: {e}")
+            _GOLDILOCKS_LANE_ENABLED = False
+            _GOLDILOCKS_LANE = None
+    else:
+        _GOLDILOCKS_LANE_ENABLED = False
+        _GOLDILOCKS_LANE = None
+
+    print("\n[Phase 2] Building signal registry (36 signals)...")
+    registry = build_signal_registry()
+    active = {k: v for k, v in registry.items() if v is not None}
+    print(f"  Total: {len(registry)} | Loaded: {len(active)} | Failed: {len(registry)-len(active)}")
+    if len(active) < len(registry):
+        print(f"  Failed: {[k for k,v in registry.items() if v is None]}")
+
+    signal_names = list(args.signals) if args.signals else list(active.keys())
+    if args.signals:
+        signal_names = [s for s in args.signals if s in active]
+    print(f"  Sweeping: {len(signal_names)} signals")
+
+    # Count actual sweep params (continuous + discrete + categorical choices)
+    n_total_params = 8 + 1 + 8 + 2  # cont + log + cat + agreement_n/m
+    print(f"\n[Phase 3] Generating {args.n_configs} LHS configs with {n_total_params} parameters...")
+    configs = generate_sweep_configs(args.n_configs)
+    print(f"  Generated {len(configs)} configs")
+
+    print("\n[Phase 4] Per-signal evaluation...")
+    signal_results = {}
+
+    for si, sname in enumerate(signal_names):
+        sobj = active.get(sname)
+        if sobj is None:
+            print(f"  [{si+1}/{len(signal_names)}] {sname}: SKIP")
+            continue
+        print(f"\n[{si+1}/{len(signal_names)}] {sname}:")
+        result = run_best_config_for_signal(sname, sobj, configs, settlements)
+        signal_results[sname] = result
+        agg = result.get("aggregate", {})
+        print(f"  -> Trades: {agg.get('n_trades', 0)} | "
+              f"Acc: {agg.get('accuracy', 0)*100:.2f}% | "
+              f"PnL: ${agg.get('total_pnl', 0):+.0f} | "
+              f"Sharpe: {agg.get('sharpe', 0):.4f} | "
+              f"Brier: {agg.get('brier_score', 0):.4f} | "
+              f"ECE: {agg.get('ece', 0):.4f}")
+
+    # ── Goldilocks Lane Evaluation (if enabled) ──
+    goldilocks_results = {}
+    if args.goldilocks_lane and _GOLDILOCKS_LANE is not None:
+        print("\n[Goldilocks Lane] Evaluating microstructure transient spike detection...")
+        try:
+            g_lane = _GOLDILOCKS_LANE
+            available_stations = [s for s in STATIONS if not g_lane.is_station_excluded(s)]
+            print(f"  Active stations: {len(available_stations)}/{len(STATIONS)}")
+
+            # Get all unique dates from settlements
+            all_dates = set()
+            for station_s in settlements.values():
+                all_dates.update(station_s.keys())
+            all_dates = sorted(all_dates)
+            print(f"  Date range: {all_dates[0] if all_dates else 'N/A'} to {all_dates[-1] if all_dates else 'N/A'}")
+            print(f"  Total dates: {len(all_dates)}")
+
+            goldilocks_trades = []
+            goldilocks_by_station = defaultdict(list)
+
+            for station in available_stations:
+                station_trades = 0
+                for date_utc in all_dates:
+                    results = g_lane.evaluate_day(station, date_utc)
+                    for r in results:
+                        if r.should_trade:
+                            trade = {
+                                "station": r.station,
+                                "date": date_utc,
+                                "bucket_boundary": r.bucket_boundary,
+                                "direction": r.direction,
+                                "confidence": r.confidence,
+                                "hypothesis": r.hypothesis,
+                                "correct": None,  # Needs settlement data to evaluate
+                            }
+                            goldilocks_trades.append(trade)
+                            goldilocks_by_station[r.station].append(trade)
+                            station_trades += 1
+
+                print(f"    {station}: {station_trades} Goldilocks signals")
+
+            goldilocks_results = {
+                "total_signals": len(goldilocks_trades),
+                "by_station": {s: len(t) for s, t in goldilocks_by_station.items()},
+                "total_trades": len(goldilocks_trades),
+            }
+            print(f"  Goldilocks Lane: {len(goldilocks_trades)} total signals generated")
+
+        except Exception as e:
+            print(f"  \u26a0\ufe0f Goldilocks Lane evaluation failed: {e}")
+            import traceback
+            traceback.print_exc()
+            goldilocks_results = {"error": str(e)}
+
+    # Production Gate check (if enabled)
+    if args.production_gate:
+        pg = ProductionGate()
+        station_trades = result.get("per_station", {})
+        station_counts = {st: m.get("n_trades", 0) for st, m in station_trades.items()}
+        passes, failures = pg.meets_requirements(
+            accuracy=agg.get("accuracy", 0),
+            total_trades=agg.get("n_trades", 0),
+            station_trade_counts=station_counts,
+            sharpe=agg.get("sharpe", 0),
+        )
+        if passes:
+            print(f"    \U0001f4c8 Production Gate: PASS (all requirements met)")
+        else:
+            print(f"    \U0001f6ab Production Gate: FAIL")
+            for f in failures:
+                print(f"      - {f}")
+
+    print("\n[Phase 5] Correlation & differential analysis...")
+    corr_matrix, corr_names = compute_correlation_matrix(signal_results)
+    differentials = compute_differential_results(signal_results)
+    print(f"  Correlation: {corr_matrix.shape} | Differentials: {len(differentials)} pairs")
+
+    print("\n[Phase 6] Writing output files...")
+    raw_output = {
+        "metadata": {"timestamp": datetime.now(timezone.utc).isoformat(),
+                     "n_signals": len(signal_results), "n_configs": args.n_configs,
+                     "n_stations": len(STATIONS), "date_range": list(dr) if dr else [],
+                     "fee_model": "kalshi_real",
+                     "validation": "3-stage: discovery -> time-holdout -> geo-holdout",
+                     "bias_correction": {
+                         "enabled": True,
+                         "layer": "member-level (pre-fraction)",
+                         "source": "ensemble_fraction_bias_corrections.json",
+                         "mode": "always-on for ensemble-fraction signals",
+                         "stations_in_table": len(get_bias_corrections().get("bias_table", {})),
+                         "matched_pairs": get_bias_corrections().get("matched_pairs", 0),
+                     }},
+        "signals": signal_results,
+        "correlation_matrix": {"names": corr_names, "matrix": corr_matrix.tolist()},
+        "differential_results": differentials}
+
+    json_path = os.path.join(str(RESULTS_DIR), "sweep_results_v1.json")
+    with open(json_path, "w") as f:
+        json.dump(raw_output, f, indent=1, default=str)
+    print(f"  Wrote: {json_path}")
+
+    csv_path = os.path.join(str(RESULTS_DIR), "sweep_signal_summary.csv")
+    with open(csv_path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["signal", "n_trades", "accuracy", "total_pnl", "sharpe",
+                     "profit_factor", "max_drawdown", "brier_score", "ece",
+                     "total_fees", "avg_confidence", "n_stations_active",
+                     "val_disc_n", "val_disc_acc", "val_time_n", "val_time_acc",
+                     "val_geo_n", "val_geo_acc"])
+        for sname in sorted(signal_results):
+            r = signal_results[sname]
+            agg = r.get("aggregate", {})
+            val = r.get("validation", {})
+            disc = val.get("discovery", {})
+            th = val.get("time_holdout", {})
+            gh = val.get("geo_holdout", {})
+            w.writerow([sname, agg.get("n_trades",0),
+                        f"{agg.get('accuracy',0):.6f}", f"{agg.get('total_pnl',0):.2f}",
+                        f"{agg.get('sharpe',0):.6f}", f"{agg.get('profit_factor',0):.6f}",
+                        f"{agg.get('max_drawdown',0):.6f}", f"{agg.get('brier_score',0):.6f}",
+                        f"{agg.get('ece',0):.6f}", f"{agg.get('total_fees',0):.2f}",
+                        f"{agg.get('avg_confidence',0):.6f}", r.get("n_stations_active",0),
+                        disc.get("n_trades",0), f"{disc.get('accuracy',0):.6f}",
+                        th.get("n_trades",0), f"{th.get('accuracy',0):.6f}",
+                        gh.get("n_trades",0), f"{gh.get('accuracy',0):.6f}"])
+    print(f"  Wrote: {csv_path}")
+
+    corr_csv = os.path.join(str(RESULTS_DIR), "sweep_correlation_matrix.csv")
+    with open(corr_csv, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow([""] + corr_names)
+        for i, name in enumerate(corr_names):
+            w.writerow([name] + [f"{corr_matrix[i,j]:.4f}" for j in range(len(corr_names))])
+    print(f"  Wrote: {corr_csv}")
+
+    diff_json = os.path.join(SWEEP_DIR, "differential_results.json")
+    with open(diff_json, "w") as f:
+        json.dump(differentials, f, indent=2, default=str)
+    print(f"  Wrote: {diff_json}")
+
+    print(f"\n  SIGNAL LEADERBOARD (by P&L):")
+    leaders = sorted(
+        [(s, r) for s, r in signal_results.items()
+         if r.get("aggregate", {}).get("n_trades", 0) >= MIN_TRADES_REPORT],
+        key=lambda x: x[1].get("aggregate", {}).get("total_pnl", -99999), reverse=True)
+    hdr = f"  {'Rank':<5} {'Signal':<30} {'Trades':>7} {'Acc':>7} {'PnL':>10} {'Sharpe':>8} {'Brier':>7} {'ECE':>7}"
+    print(hdr)
+    print(f"  {'-'*5} {'-'*30} {'-'*7} {'-'*7} {'-'*10} {'-'*8} {'-'*7} {'-'*7}")
+    for rank, (sname, result) in enumerate(leaders[:15], 1):
+        agg = result.get("aggregate", {})
+        print(f"  {rank:<5} {sname:<30} {agg.get('n_trades',0):>7} "
+              f"{agg.get('accuracy',0)*100:>6.2f}% "
+              f"${agg.get('total_pnl',0):>+8.0f} "
+              f"{agg.get('sharpe',0):>8.4f} "
+              f"{agg.get('brier_score',0):>7.4f} "
+              f"{agg.get('ece',0):>7.4f}")
+
+    # Include Goldilocks results in output
+    if args.goldilocks_lane and goldilocks_results:
+        raw_output["goldilocks_lane"] = goldilocks_results
+
+    # ── Phase 7: Luck Elimination Protocol (if --luck-test) ──
+    luck_results = {}
+    if args.luck_test:
+        print(f"\n[Phase 7] Luck Elimination Protocol...")
+        print(f"  Shuffles per signal: {args.luck_shuffles}")
+
+        # Wire luck-elimination dependencies
+        luck_wire_dependencies(
+            stations=STATIONS,
+            metar_db=METAR_DB,
+            safe_signal_evaluate_fn=safe_signal_evaluate,
+            compute_metrics_fn=compute_metrics,
+        )
+
+        for si, sname in enumerate(signal_names):
+            sobj = active.get(sname)
+            if sobj is None:
+                continue
+            sig_result = signal_results.get(sname)
+            if sig_result is None:
+                continue
+            agg = sig_result.get("aggregate", {})
+            n_trades = agg.get("n_trades", 0)
+            if n_trades < MIN_TRADES_REPORT:
+                print(f"\n  [{si+1}/{len(signal_names)}] {sname}: SKIP (only {n_trades} trades)")
+                continue
+
+            print(f"\n  [{si+1}/{len(signal_names)}] {sname} ({n_trades} trades)...")
+
+            # Re-run the signal with best config to get full trade list for bootstrap
+            best_config = {
+                "holdout_start_frac": 0.7,
+                "fee_type": 2,
+                "edge_threshold": 0.02,
+                "kelly_fraction": 0.5,
+                "entry_price_min": 0.01,
+                "entry_price_max": 0.95,
+                "max_contracts": 100,
+                "slippage_budget": SLIPPAGE_BUDGET,
+                "fee_deduction": 1.0,
+                "confidence_floor": 0.5,
+                "position_sizing_model": 1,
+            }
+            # Merge any stored best config if available
+            best_config_override = sig_result.get("best_config", {})
+            best_config.update(best_config_override)
+
+            # Collect trades for this signal
+            luck_trades = []
+            for station in STATIONS:
+                st_trades = evaluate_signal_on_station(
+                    sname, sobj, station, best_config, settlements
+                )
+                luck_trades.extend(st_trades)
+
+            luck_result = run_luck_elimination(
+                signal_obj=sobj,
+                signal_name=sname,
+                settlements=settlements,
+                config=best_config,
+                data_cache_get_metar_data=DataCache.get_metar_data,
+                trades=luck_trades,
+                n_shuffles=args.luck_shuffles,
+            )
+            luck_results[sname] = luck_result
+            print_luck_report(luck_result)
+
+        # Augment raw_output and append luck CSV
+        raw_output["luck_elimination"] = luck_results
+
+        luck_csv_path = os.path.join(str(RESULTS_DIR), "sweep_luck_elimination.csv")
+        with open(luck_csv_path, "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow([
+                "signal", "n_trades", "raw_accuracy", "luck_adjusted_accuracy",
+                "p_value", "significant_05", "significant_01", "percentile_in_null",
+                "bootstrap_ci_lower", "bootstrap_ci_upper",
+                "null_mean", "null_median", "null_std", "null_n_shuffles",
+            ])
+            for sname in sorted(luck_results):
+                lr = luck_results[sname]
+                if lr is None:
+                    continue
+                w.writerow([
+                    sname,
+                    lr["n_trades"],
+                    f"{lr['raw_accuracy']:.6f}",
+                    f"{lr['luck_adjusted_accuracy']:.6f}",
+                    f"{lr['p_value']:.6f}",
+                    "YES" if lr["p_value_significant"] else "NO",
+                    "YES" if lr["p_value_highly_significant"] else "NO",
+                    f"{lr['percentile_in_null']:.6f}",
+                    f"{lr['bootstrap_ci_lower']:.6f}",
+                    f"{lr['bootstrap_ci_upper']:.6f}",
+                    f"{lr['null_mean']:.6f}",
+                    f"{lr['null_median']:.6f}",
+                    f"{lr['null_std']:.6f}",
+                    lr["null_n_shuffles"],
+                ])
+        print(f"\n  Wrote: {luck_csv_path}")
+
+        # Re-persist raw output with luck data
+        with open(json_path, "w") as f:
+            json.dump(raw_output, f, indent=1, default=str)
+        print(f"  Updated: {json_path}")
+
+    # ── Phase 8: Fusion Evaluation (if --fusion enabled) ──
+    if _FUSION_MODE != "none":
+        label = "Fusion + Variance-Weighted Sizing" if _VARIANCE_SIZING_ENABLED else "Fusion"
+        print(f"\n[Phase 7] {label} evaluation (mode={_FUSION_MODE})...")
+        fusion_results = evaluate_fusion(
+            signal_results, signal_names, active, settlements, configs
+        )
+        if fusion_results:
+            raw_output["fusion"] = fusion_results
+            agg = fusion_results.get("aggregate", {})
+            print(f"  FUSION -> Trades: {agg.get('n_trades', 0)} | "
+                  f"Acc: {agg.get('accuracy', 0)*100:.2f}% | "
+                  f"PnL: ${agg.get('total_pnl', 0):+.0f} | "
+                  f"Sharpe: {agg.get('sharpe', 0):.4f}")
+
+    print(f"\n{'=' * 72}")
+
+
+# Fusion mode (set from --fusion arg)
+_FUSION_MODE: str = 'none'
+
+# Variance-Weighted Sizing
+_VARIANCE_SIZING_ENABLED: bool = False
+
+
+def get_variance_sizing_enabled() -> bool:
+    return _VARIANCE_SIZING_ENABLED
+
+def get_fusion_mode() -> str:
+    return _FUSION_MODE
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 9. FUSION EVALUATION
+# ═══════════════════════════════════════════════════════════════════
+
+def evaluate_fusion(
+    signal_results: Dict[str, Any],
+    signal_names: List[str],
+    registry: Dict[str, Any],
+    settlements: Dict[str, Any],
+    configs: List[Dict],
+) -> Dict[str, Any]:
+    """
+    Evaluate the fusion layer across all stations and dates.
+
+    Collects predictions from all active signals at each (station, date),
+    applies the selected fusion mode, and produces a unified trade signal.
+    """
+    mode = get_fusion_mode()
+    if mode == "none":
+        return {}
+
+    fusion_cfg = FusionModeConfig(mode=mode)
+    cascade = UncertaintyWeightedCascade(fusion_cfg)
+
+    # Use the best config from the first active signal as a representative
+    rep_config = {}
+    for sname in signal_names:
+        sr = signal_results.get(sname, {})
+        best = sr.get("best_config")
+        if best:
+            rep_config = best
+            break
+
+    if not rep_config:
+        rep_config = configs[0] if configs else generate_sweep_configs(1)[0]
+
+    # Build fusion signal predictions for each (station, day)
+    all_trades = []
+    for station in STATIONS:
+        station_result = _evaluate_fusion_station(
+            station, registry, settlements, rep_config, cascade, mode
+        )
+        all_trades.extend(station_result)
+
+    all_metrics = compute_metrics(all_trades, min_trades=1)
+    validation = _run_fusion_validation(registry, settlements, rep_config, cascade, mode)
+
+    return {
+        "aggregate": all_metrics,
+        "validation": validation,
+        "n_signals_fused": len(registry),
+    }
+
+
+def _evaluate_fusion_station(
+    station: str,
+    registry: Dict[str, Any],
+    settlements: Dict[str, Any],
+    config: Dict,
+    cascade: UncertaintyWeightedCascade,
+    mode: str,
+) -> List[Dict]:
+    """Evaluate fusion for a single station."""
+    days = DataCache.get_metar_data(station)
+    if len(days) < 5:
+        return []
+    station_s = settlements.get(station, {})
+    if not station_s:
+        return []
+
+    trades = []
+    min_lb = 2
+    for idx in range(min_lb, len(days)):
+        date_str = days[idx]["date"]
+        if date_str not in station_s:
+            continue
+        actual_temp = station_s[date_str]
+        prev_date = days[idx - 1]["date"]
+        if prev_date not in station_s:
+            continue
+        diff = actual_temp - station_s[prev_date]
+        if diff == 0:
+            continue
+        actual_dir = 1 if diff > 0 else -1
+
+        # Collect predictions from all active signals
+        signal_predictions: Dict[str, Tuple[Union[str, int], float]] = {}
+        for sig_name, sig_obj in registry.items():
+            if sig_obj is None:
+                continue
+            try:
+                pd, cf = safe_signal_evaluate(sig_obj, idx, days)
+                if pd is not None and cf is not None and cf >= 0.5:
+                    signal_predictions[sig_name] = (pd, cf)
+            except Exception:
+                continue
+
+        if len(signal_predictions) < 2:
+            continue
+
+        if _VARIANCE_SIZING_ENABLED:
+            # Variance-weighted blending
+            sig_variances: Dict[str, float] = {}
+            for sig_name in signal_predictions:
+                sig_variances[sig_name] = 0.1  # default moderate variance
+
+            direction, confidence, weight_details = variance_weighted_blend(
+                signal_predictions, sig_variances,
+            )
+            if direction is None:
+                continue
+
+            # Determine market price for this station/date
+            market_type = DataCache.get_market_type(station, date_str)
+            market_price = 0.5  # Default midpoint
+            try:
+                from core.kalshi_price_fetcher import KalshiPriceFetcher
+                pricer = KalshiPriceFetcher()
+                mp = pricer.get_price(station, date_str, market_type)
+                if mp is not None:
+                    market_price = mp
+            except Exception:
+                pass
+
+            fee_per_contract = 0.02
+            edge = confidence - market_price - fee_per_contract
+            if edge <= 0:
+                continue
+
+            # Apply variance-adjusted Kelly sizing via position_sizing_model override
+            # Signal passes through to simulate_trade with adjusted confidence
+            # The variance multiplier will be applied in the trade sizing step
+            config_override = dict(config)
+            config_override['position_sizing_model'] = 5  # variance-sized
+            config_override['variance_multiplier'] = weight_details.get('directional_strength', 0.5)
+
+        elif mode == "uwc":
+            result = cascade.fuse(
+                signal_predictions=signal_predictions,
+                market_price=0.5,
+                fee_rate=KALSHI_REAL_FEE_RATE,
+                bankroll=10000.0,
+                hours_to_settlement=24.0,
+            )
+            if result["verdict"] != "TRADE" or result["direction"] is None:
+                continue
+            direction = result["direction"]
+            confidence = result["confidence"]
+        elif mode == "majority":
+            direction, confidence, _ = fuse_majority_vote(signal_predictions)
+            if direction is None:
+                continue
+        elif mode == "weighted":
+            direction, confidence, _ = fuse_weighted_vote(signal_predictions)
+            if direction is None:
+                continue
+        else:
+            continue
+
+        # Calibrate
+        cal_result = calibrate_confidence(station, direction, "fusion", confidence, date_str)
+        if cal_result is None:
+            continue
+        cal_conf, raw_conf = cal_result
+
+        # Use variance-weighted config override when variance sizing is active
+        effective_config = config
+        if _VARIANCE_SIZING_ENABLED:
+            try:
+                effective_config = config_override
+            except NameError:
+                effective_config = config
+
+        # Trade
+        trade = simulate_trade(direction, cal_conf, actual_dir, effective_config, station, date_str, signal_name='fusion')
+        if trade:
+            trade["raw_confidence"] = raw_conf
+            trade["calibrated_confidence"] = cal_conf
+            trades.append(trade)
+
+        # Record outcome for adaptive threshold learning
+        if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None:
+            was_correct = direction == actual_dir
+            _ADAPTIVE_REGISTRY.record_outcome('fusion', station, cal_conf, was_correct)
+
+    return trades
+
+
+def _run_fusion_validation(
+    registry: Dict[str, Any],
+    settlements: Dict[str, Any],
+    config: Dict,
+    cascade: UncertaintyWeightedCascade,
+    mode: str,
+) -> Dict[str, Any]:
+    """Run 3-stage validation for fusion mode."""
+    discovery, time_holdout = split_discovery_holdout(
+        settlements, holdout_frac=config.get("holdout_start_frac", 0.7)
+    )
+    all_st = sorted(settlements.keys())
+    n_h = max(1, len(all_st) // 4)
+    _, geo_holdout = split_geo_holdout(settlements, holdout_stations=all_st[:n_h])
+
+    disc_trades = []
+    for st in list(discovery.keys())[:5]:
+        disc_trades.extend(_evaluate_fusion_station(st, registry, discovery, config, cascade, mode))
+    time_trades = []
+    for st in list(time_holdout.keys())[:5]:
+        time_trades.extend(_evaluate_fusion_station(st, registry, time_holdout, config, cascade, mode))
+    geo_trades = []
+    for st in list(geo_holdout.keys())[:5]:
+        geo_trades.extend(_evaluate_fusion_station(st, registry, geo_holdout, config, cascade, mode))
+
+    return {
+        "discovery": compute_metrics(disc_trades, min_trades=1),
+        "time_holdout": compute_metrics(time_trades, min_trades=1),
+        "geo_holdout": compute_metrics(geo_trades, min_trades=1),
+    }
+
+
+if __name__ == "__main__":
+    main()

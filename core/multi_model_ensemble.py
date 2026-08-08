@@ -29,7 +29,7 @@ from .signal_config import DEFAULT_NWP_DB_PATH, DEFAULT_METAR_DB_PATH
 NWP_DB_PATH = DEFAULT_NWP_DB_PATH
 DB_PATH = DEFAULT_METAR_DB_PATH
 
-ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
+ALL_STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU','KLAS',
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',
                 'KSAT','KSEA','KSFO']
 
@@ -431,7 +431,6 @@ STATION_COORDS = {
     'KATL': (33.6407, -84.4277),
     'KAUS': (30.1945, -97.6699),
     'KBOS': (42.3656, -71.0096),
-    'KDAL': (32.8471, -96.8517),
     'KDCA': (38.8512, -77.0402),
     'KDEN': (39.8561, -104.6737),
     'KDFW': (32.8998, -97.0403),
@@ -529,15 +528,15 @@ class MultiModelEnsemble:
         """
         import sqlite3
         
-        # Auto-fetch prev_day_high if not provided
+        # Auto-fetch prev_day_high from METAR observations if not provided
         if prev_day_high is None:
             try:
                 conn = sqlite3.connect(self.metar_db_path)
                 conn.execute("PRAGMA busy_timeout=5000;")
                 cur = conn.cursor()
                 cur.execute("""
-                    SELECT kalshi_temp FROM kalshi_settlements
-                    WHERE station=? AND target_date=?
+                    SELECT MAX(temp_f) FROM metar_observations
+                    WHERE station=? AND date_utc=? AND temp_f IS NOT NULL
                 """, (station, self._prev_date(target_date)))
                 row = cur.fetchone()
                 if row and row[0] is not None:

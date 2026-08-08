@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Optional, Tuple, List, Dict
 from datetime import datetime, timezone
 import logging
+from .base_signal import BaseSignal
 
 logger = logging.getLogger(__name__)
 
@@ -420,7 +421,7 @@ def compute_signal_for_station(lat: float, lon: float, station: str,
         return None, 0.0
 
 
-class TemperatureAdvectionSignal:
+class TemperatureAdvectionSignal(BaseSignal):
     """
     850-mb Temperature Advection Signal.
 

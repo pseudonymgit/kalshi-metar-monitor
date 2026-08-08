@@ -1,0 +1,110 @@
+# REVIEW: A3 — core/bma_emos.py (BMA/EMOS Post-Processing)
+
+**Reviewer:** luna-pro (independent of builder glm-5.2)
+**Date:** 2026-08-05
+**Verdict:** REVISE
+
+---
+
+## Summary
+
+The module imports cleanly (`python3 -c "from core.bma_emos import bma_calibrate, emos_calibrate, calibrate_ensemble"` → OK) and the core EMOS math (predictive mean `mu = a + b*mean`, homoscedastic sigma, exceedance probability, heteroscedastic log-variance path) is correct. The BMA weighted-average path and the None-handling in `bma_calibrate()` are correct. However, there is **one critical bug** (inverted confidence interval), **two advertised-but-unimplemented features** (ridge regularization, empirical Bayes shrinkage), and **a broken public API** (two of the three module-level exports raise `NotImplementedError`). Edge-case handling for empty/NaN members is also weak.
+
+---
+
+## Findings
+
+### 1. CRITICAL — Confidence interval bounds are inverted (`emos_calibrate`, lines ~310-315)
+
+```python
+ci_lower = 1.0 - stats.norm.cdf(threshold, loc=mu, scale=sigma * 1.645)
+ci_upper = 1.0 - stats.norm.cdf(threshold, loc=mu, scale=sigma / 1.645)
+```
+
+For the common case **threshold > mu** (e.g. P(temp > 90°F) with mu=85): a *wider* sigma (σ·1.645) fattens the tail and *raises* the exceedance probability, and a *narrower* sigma (σ/1.645) *lowers* it. The code therefore assigns the larger value to `ci_lower` and the smaller to `ci_upper`.
+
+Verified at runtime:
+```
+EMOS: prob=0.0249, ci=(0.1165, 0.0006)   # ci_lower > ci_upper
+Full: prob=0.1564, ci=(0.2697, 0.0484)   # ci_lower > ci_upper
+```
+
+Note the inversion is direction-dependent: when threshold < mu the current order is accidentally correct (verified: t=80, mu=85 gives ci=(0.8445, 0.9969), which is right). So this bug is masked for cold-side thresholds and fires exactly on the hot-side exceedance use case this module was built for.
+
+**Fix (minimal, robust for both cases):**
+```python
+p_wide = 1.0 - stats.norm.cdf(threshold, loc=mu, scale=sigma * 1.645)
+p_narrow = 1.0 - stats.norm.cdf(threshold, loc=mu, scale=sigma / 1.645)
+ci_lower = min(p_wide, p_narrow)
+ci_upper = max(p_wide, p_narrow)
+```
+Verified: prob sits inside the band for both t>mu and t<mu.
+
+**Better (principled):** this sigma-perturbation band is a heuristic, not a true sampling CI. A proper 90% CI uses the standard error of the estimated mean, SE(μ) ≈ σ/√n, with the delta method: SE(p) ≈ φ(z)/√n where z=(t−μ)/σ, giving `p ± 1.645·φ(z)/√n`. The cache already stores per station-season `"n"` (30) — thread it through to `emos_calibrate` and use it. If you keep the heuristic, at least document that it is a spread-uncertainty band, not a sampling CI.
+
+### 2. MAJOR — Ridge regularization is declared but never implemented
+
+`self.regularization = regularization` (default 0.1) is set in `__init__` and **never referenced again**. The docstring claims "ridge regularization" support. There is no ridge regression anywhere (no training/fitting code exists in this module at all — parameters come only from cache/defaults). Either implement it in the fitting pipeline or remove the parameter so it stops implying behavior that doesn't exist. If the fitting lives in a separate training module, say so in the docstring and wire the parameter through.
+
+### 3. MAJOR — Empirical Bayes shrinkage is declared but never applied
+
+`BMAParams.shrinkage_alpha` is stored, loaded from cache (`wdict.get("shrinkage_alpha", 0.0)`), and defaulted to 1.0 in `_default_params`, but `bma_calibrate()` computes `w_gefs * gefs_frac + w_ecmwf * ecmwf_frac` with the raw weights and never shrinks anything. The cache also carries per-season `"shrinkage"` keys (e.g. 0.1429) that `load_cache()` ignores entirely. Implement the shrinkage (e.g. shrink weights toward 0.5: `w_shrunk = 0.5 + (w - 0.5) * (1 - alpha)`, or pool-toward-cluster estimates) or remove the field. Same verdict as #2: dead parameters advertise unimplemented statistics.
+
+### 4. MAJOR — Two of three advertised public exports raise NotImplementedError
+
+Module docstring advertises:
+```
+Exports:
+    bma_calibrate(station, raw_forecast) -> adjusted fraction
+    emos_calibrate(station, ensemble_mean, ensemble_var) -> (prob, ci_lower, ci_upper)
+    calibrate_ensemble(station, gefs_forecast, ecmwf_forecast) -> ...
+```
+but the module-level `emos_calibrate` and `calibrate_ensemble` are stubs that raise `NotImplementedError` ("requires threshold and date"). Only the instance methods on `BMAEMOSPostProcessor` work. This is a trap for callers who import the module API as documented. **Fix:** give the wrappers real signatures `(station, ensemble_mean, ensemble_var, threshold, date)` and `(station, gefs_forecast, ecmwf_forecast, threshold, date)` and delegate to the singleton — or drop them from the exports list and document the class as the API. (Also: the singleton `_get_processor()` hardcodes `mode="both"` with no way to pass `regularization`/`emos_method`.)
+
+### 5. BUG — Empty/all-NaN member arrays produce RuntimeWarning + NaN output
+
+`calibrate_ensemble` guards the fraction computation (`if len(...) else 0.5`) but not `compute_ensemble_stats`:
+```python
+np.nanmean(np.concatenate([[], []]))   # RuntimeWarning: Mean of empty slice -> nan
+```
+Verified: `calibrate_ensemble([], [], ...)` raises RuntimeWarning and returns `prob=nan, ci=(nan, nan)`. A single-member ensemble also yields `nan` variance (`nanvar(..., ddof=1)`). **Fix:** guard `compute_ensemble_stats` (return (0.0, 0.0) or fall back to `bma_weighted` when `len(all_members) < 2`), and/or wrap the stats call in a safe path so a degenerate ensemble degrades to the BMA fraction instead of NaN.
+
+### 6. MINOR — `decode_member_values` truncation check is dead code
+
+```python
+n_declared = values.attrs.get("n_members", n_expected) if hasattr(values, "attrs") else n_expected
+```
+numpy arrays have no `.attrs` (verified: AttributeError), so `hasattr` is always False and the >10%-missing warning never fires for the documented input type. Either drop the block or accept an explicit `n_members` parameter.
+
+### 7. MINOR — NaN members silently counted as "below threshold"
+
+`np.mean(gefs_members > threshold)` treats NaN as `False`. If a member is missing/NaN it silently votes "no exceedance", biasing the fraction down. Use nan-aware counting, e.g. `np.nanmean(gefs_members > threshold)` with a NaN-fraction guard, and warn when missingness is high.
+
+### 8. MINOR — Robustness and data notes
+
+- `bma_calibrate` output is not clipped to [0,1]; if a cache ever stores weights that don't sum to 1, the result silently leaves the probability space. Add `np.clip(..., 0.0, 1.0)` or normalize weights.
+- Current cache (`data/bma_emos_cache.json`) has **no `bma_weights_station` key** at all, so BMA silently degrades to 0.5/0.5 equal weighting everywhere. Not a code bug, but BMA is currently inert in production — confirm the training pipeline emits these weights.
+- Cache metadata `training_period: ["2025-01-01", "2025-01-150"]` — `"2025-01-150"` is not a valid date (day 150). Likely a serialization slip in the training side; worth a fix so downstream date parsing doesn't choke.
+- `get_station_cluster()` re-reads the JSON file on every call; cache the parsed mapping for repeated lookups.
+- Performance is otherwise fine: pure vectorized numpy/scipy, three `norm.cdf` calls per EMOS call, no loops over members. No changes needed.
+
+---
+
+## What's correct (no change needed)
+
+- `bma_calibrate()` math and None-fallback logic (single-model fallback, both-missing → 0.5) — correct.
+- EMOS predictive mean/sigma and exceedance probability — correct, including the heteroscedastic `sigma = exp((c + d·ln var)/2)` path.
+- `calibrate_ensemble()` pipeline ordering (decode → fractions → BMA → moments → EMOS) — correct structure; only the CI bug and empty-input guard affect output.
+- Clip of point probability to [0.001, 0.999] — sensible.
+- Imports, module layout, docstrings — clean. B-Mode compliant (pure numpy/scipy, no AI/ML).
+
+---
+
+## Required fixes before APPROVE
+
+1. **Invert/fix the CI ordering** in `emos_calibrate` (min/max fix or delta-method CI with n).
+2. **Implement or remove** ridge regularization and empirical Bayes shrinkage (and the `bma_method` "inverse_mae" claim — no such method exists).
+3. **Make the module-level `emos_calibrate`/`calibrate_ensemble` functional** (add threshold/date args) or remove them from the exported API.
+4. **Guard degenerate ensembles** (empty/single-member/all-NaN) so output degrades gracefully instead of NaN + RuntimeWarning.
+
+Items 1–3 are required; 4–8 are strongly recommended. After these, re-run the synthetic checks and confirm `ci_lower <= prob <= ci_upper` for both hot-side and cold-side thresholds.

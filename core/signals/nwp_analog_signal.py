@@ -26,6 +26,7 @@ from collections import defaultdict
 from typing import Optional, Tuple, Dict, List, Any
 import logging
 from datetime import datetime, timedelta
+from .base_signal import BaseSignal
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ if _nwp_env in ('1', 'true', 'yes'):
     NWP_ANALOG_ENABLED = True
 
 
-class NwpAnalogSignal:
+class NwpAnalogSignal(BaseSignal):
     """
     Deterministic k-NN analog ensemble signal using NWP forecast fields.
 

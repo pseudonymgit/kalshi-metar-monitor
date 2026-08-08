@@ -100,8 +100,8 @@ S3_OPERATIONAL_BASE = "https://noaa-gefs-pds.s3.amazonaws.com"
 # Reforecast members (5: control + 4 perturbations)
 REFORECAST_MEMBERS = ["c00", "p01", "p02", "p03", "p04"]
 
-# Operational members available in 0.25° surface fields
-OPERATIONAL_MEMBERS = ["gec00", "gep01", "gep02", "gep03", "gep04", "gep05"]
+# Operational members available in 0.25° surface fields (31 members)
+OPERATIONAL_MEMBERS = ["gec00"] + [f"gep{d:02d}" for d in range(1, 31)]
 
 # HTTP config
 HTTP_TIMEOUT = 60

@@ -61,6 +61,15 @@ if ENV_FILE.exists():
 from core.risk_controls import RiskManager, RiskConfig, TradeResult as RCTradeResult
 from core.stop_loss import StopLossMonitor, PRIMARY_DAY_LIMIT
 from core.market_cost_model import MARKET_COST_MODEL
+from core.station_registry import STATION_LIQUIDITY_TIERS, get_liquidity_tier, STATION_CLUSTERS, get_cluster_for_station
+
+# ─── Bias Correction Module (GR12 Phase A) ─────────────────────────────
+from core.ensemble_fraction import (
+    load_bias_corrections as _load_bias_table,
+    apply_bias_correction as _apply_bias_correction,
+    compute_ensemble_fraction as _compute_ensemble_fraction,
+)
+from core.forecast_confidence_modulator import ForecastConfidenceModulator
 
 
 # ─── Paths
@@ -77,6 +86,31 @@ CALIBRATION_TABLE = str(REPO_ROOT / "data" / "calibration_curves.json")
 # data/uhi_bias_table.json. Positive bias means GEFS overpredicts.
 # Corrected GEFS temp = GEFS_°F - bias. Applied before direction computation.
 _uhi_bias = None
+
+# ─── Module-level ensemble bias corrections (GR12 Phase A) ────────────────
+_BIAS_TABLE = None
+
+
+def _load_ensemble_bias() -> dict:
+    """Load ensemble bias correction table once at module level.
+    Falls back to UHI table if ensemble corrections unavailable.
+    """
+    global _BIAS_TABLE
+    if _BIAS_TABLE is not None:
+        return _BIAS_TABLE
+    try:
+        bias_path = str(REPO_ROOT / "data" / "ensemble_fraction_bias_corrections.json")
+        _BIAS_TABLE = _load_bias_table(bias_path)
+        _LOGGER.info(
+            "Loaded ensemble bias corrections: %d stations, %d matched pairs",
+            len(_BIAS_TABLE.get("bias_table", {})),
+            _BIAS_TABLE.get("matched_pairs", 0),
+        )
+    except Exception as e:
+        _LOGGER.warning(f"Ensemble bias correction table not loaded ({e}); falling back to UHI")
+        _BIAS_TABLE = {}
+    return _BIAS_TABLE
+
 
 def _load_uhi_bias():
     global _uhi_bias
@@ -226,28 +260,73 @@ EDGE_TIERS = [
 DEFAULT_EPOCH_CYCLE = "12Z"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Fee Model
-# ═══════════════════════════════════════════════════════════════════════════
-
-def kalshi_fee(contracts: int, price: float) -> float:
-    """Kalshi published taker fee: ceil(0.07 × P × (1-P) × 100) / 100 per contract.
+def apply_liquidity_adjustments(
+    station: str,
+    market_type: str,
+    position_size: int,
+    bankroll: float,
+    fill_probability_threshold: float = 0.7
+) -> int:
+    """Apply liquidity-based position sizing adjustments per Gap 2 design.
     
-    From Kalshi's published fee schedule (July 2026):
-    fee per contract = ceil(multiplier × price × (1-price) × 100) / 100
+    Cap position size using market_cost_model.estimate_slippage to ensure
+    fill_probability ≥ 0.7. Fall back to STATION_LIQUIDITY_TIERS when
+    market data unavailable.
     
-    For weather/climate markets, the taker multiplier is approximately 0.056
-    (peak ~1.4% at 50¢). We use 0.07 (standard taker rate) as a conservative
-    estimate since weather-specific multiplier data is not publicly published.
-    
-    The per-contract rounding (rather than total ceil) avoids the stair-step
-    discontinuity issue where adding 1 contract could triple the fee.
+    Args:
+        station: ICAO station code
+        market_type: "high" or "low"
+        position_size: Raw Kelly position size
+        bankroll: Current bankroll
+        fill_probability_threshold: Minimum acceptable fill probability
+        
+    Returns:
+        Adjusted position size capped by liquidity
     """
-    return MARKET_COST_MODEL.kalshi_fee(contracts, price)
+    ticker = f"KX{market_type.upper()}{station}"
+    
+    # Try to get market depth snapshot
+    try:
+        depth_snapshot = MARKET_COST_MODEL.get_market_depth_snapshot(ticker)
+        if depth_snapshot:
+            # Use binary search to find max contracts with fill_probability ≥ threshold
+            max_contracts = position_size
+            min_contracts = 1
+            
+            for _ in range(10):  # Max 10 iterations
+                mid = (min_contracts + max_contracts) // 2
+                slippage_est = MARKET_COST_MODEL.estimate_slippage(ticker, mid, is_buy=True)
+                
+                if slippage_est.fill_probability >= fill_probability_threshold:
+                    min_contracts = mid
+                else:
+                    max_contracts = mid
+                
+                if max_contracts - min_contracts <= 1:
+                    break
+            
+            # Cap position size at fill probability threshold
+            capped_size = min_contracts
+            _LOGGER.info(f"Liquidity cap: {station} {market_type} → {capped_size} contracts "
+                        f"(fill_prob={slippage_est.fill_probability:.3f})")
+            return capped_size
+    except Exception as e:
+        _LOGGER.warning(f"Market depth unavailable for {ticker}: {e}")
+    
+    # Fallback to STATION_LIQUIDITY_TIERS
+    tier = get_liquidity_tier(station)
+    tier_max = {"A": 200, "B": 100, "C": 50, "D": 20}
+    fallback_cap = tier_max.get(str(tier), 20)
+    
+    # For LOW markets, apply additional conservative reduction
+    if market_type == "low":
+        fallback_cap = max(1, int(fallback_cap * 0.7))
+    
+    capped_size = min(position_size, fallback_cap)
+    _LOGGER.info(f"Fallback liquidity cap: {station} {market_type} tier {tier} → {capped_size} contracts")
+    return capped_size
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Data Access
 # ═══════════════════════════════════════════════════════════════════════════
 
 def get_gefs_forecast(target_date: str) -> Dict[str, dict]:
@@ -430,8 +509,18 @@ def compute_ensemble_signal(
     
     gefs_mean_f = mean_c * 9/5 + 32
     
-    # P1.2: UHI bias correction (subtract per-station monthly bias)
-    gefs_mean_f = apply_uhi_correction(station, gefs_mean_f, target_date)
+    # P1.2: Bias correction (prefer ensemble seasonal bias over UHI)
+    # _apply_bias_correction handles per-station seasonal bias from 29K matched pairs
+    # Falls back to UHI correction if station not in bias table
+    try:
+        mean_f_arr = np.array([gefs_mean_f], dtype=np.float64)
+        ensemble_corrected = _apply_bias_correction(mean_f_arr, station, target_date)
+        if ensemble_corrected is not None and len(ensemble_corrected) > 0:
+            corrected_mean_f = float(ensemble_corrected[0])
+            if abs(corrected_mean_f - gefs_mean_f) < 50.0:
+                gefs_mean_f = corrected_mean_f
+    except Exception:
+        gefs_mean_f = apply_uhi_correction(station, gefs_mean_f, target_date)
     
     actual_dir = 1 if actual_temp_f > prev_temp_f else (-1 if actual_temp_f < prev_temp_f else 0)
     pred_dir = 1 if gefs_mean_f > prev_temp_f else (-1 if gefs_mean_f < prev_temp_f else 0)
@@ -451,9 +540,18 @@ def compute_ensemble_signal(
     # because it uses all 31 members, not just the mean.
     member_temps_c = gefs_data.get("member_temps_c")
     if member_temps_c and len(member_temps_c) >= 3:
-        member_temps_f = [t * 9/5 + 32 for t in member_temps_c]
-        n_up = sum(1 for t in member_temps_f if t > prev_temp_f)
-        fraction_up = n_up / len(member_temps_f)
+        # Use module's ensemble fraction with bias-corrected members
+        member_temps_f = np.array([t * 9/5 + 32 for t in member_temps_c], dtype=np.float64)
+        try:
+            corrected_members = _apply_bias_correction(member_temps_f, station, target_date)
+            if corrected_members is not None and len(corrected_members) == len(member_temps_f):
+                fraction_up = _compute_ensemble_fraction(corrected_members, prev_temp_f)
+            else:
+                n_up = int(np.sum(member_temps_f > prev_temp_f))
+                fraction_up = n_up / len(member_temps_f)
+        except Exception:
+            n_up = int(np.sum(member_temps_f > prev_temp_f))
+            fraction_up = n_up / len(member_temps_f)
         raw_confidence = max(fraction_up, 1.0 - fraction_up)
         # Keep direction from mean (more stable), confidence from fraction
     else:
@@ -468,10 +566,28 @@ def compute_ensemble_signal(
     
     # Market price from Kalshi API (backtest mode: 0.50 fair value)
     # Replaced old circular formula: market_price = 0.5 + confidence * 0.4
-    event_ticker = f"KXHIGH{station}"  # Simplified; actual ticker includes date
+    # Gap 1: Support both HIGH and LOW markets
+    market_type = "high" if pred_dir == 1 else "low"
+    event_ticker = f"KX{market_type.upper()}{station}"  # Simplified; actual ticker includes date
     market_price = get_kalshi_market_price(event_ticker)
     if market_price is None:
         market_price = 0.50  # Fair value fallback (no information)
+    
+    # Gap 1: HIGH/LOW asymmetry — Size from historical depth/spread
+    # LOW markets typically have thinner liquidity — apply sizing reduction
+    if market_type == "low":
+        # Reduce sizing for LOW markets by 40% (empirical estimate)
+        # This accounts for thinner liquidity and wider spreads
+        confidence *= 0.6  # Reduce confidence/edge for LOW markets
+    
+    # Gap 5: Geo concentration — Use station_registry liquidity tier
+    # Cap bankroll per climate group at 15-20%
+    tier = get_liquidity_tier(station)
+    # Apply tier-based sizing adjustment
+    if tier == 3:  # Thin liquidity
+        confidence *= 0.8  # Reduce by 20% for thin markets
+    elif tier == 2:  # Moderate liquidity
+        confidence *= 0.9  # Reduce by 10% for moderate markets
     
     if pred_dir == 1:
         # Buying YES contract — edge = P(UP) - YES_price = confidence - market_price
@@ -522,13 +638,18 @@ def compute_ensemble_signal(
     n_contracts = int(min(DEFAULT_MAX_CONTRACTS, max(1, kelly_pct * DEFAULT_KELLY_FRACTION * epoch_mult * tier_mult * 1000)))
     n_contracts = max(1, n_contracts)
     
+    # Gap 2: Position-size-to-depth gate — Use existing market_cost_model infrastructure
+    # Cap position where fill_probability < 0.7
+    # Use the apply_liquidity_adjustments function that also handles fallback tiers
+    n_contracts = apply_liquidity_adjustments(station, market_type, n_contracts, bankroll=10000.0, fill_probability_threshold=0.7)
+    
     correct = pred_dir == actual_dir
     gross_pnl = n_contracts * (1.0 if correct else 0.0)
     cost = n_contracts * entry_price
     
-    entry_fee = kalshi_fee(n_contracts, market_price)
+    entry_fee = MARKET_COST_MODEL.kalshi_fee(n_contracts, market_price)
     exit_price = 1.0 if correct else 0.0
-    exit_fee = kalshi_fee(n_contracts, exit_price)
+    exit_fee = MARKET_COST_MODEL.kalshi_fee(n_contracts, exit_price)
     total_fees = entry_fee + exit_fee
     net_pnl = gross_pnl - cost - total_fees
     
@@ -591,7 +712,9 @@ def init_trade_db(db_path: str) -> sqlite3.Connection:
             exit_fee REAL,
             total_fees REAL,
             net_pnl REAL,
-            bankroll_after REAL,
+            settlement_date TEXT,
+        settled_capital_after REAL,
+        unsettled_exposure_after REAL,
             timestamp TEXT NOT NULL
         )
     """)
@@ -622,8 +745,9 @@ def log_trade(conn: sqlite3.Connection, trade: dict, bankroll: float) -> None:
         (station, target_date, prev_date, pred_direction, actual_direction,
          confidence, gefs_mean_f, prev_temp_f, entry_price, market_price,
          edge, kelly_pct, contracts, correct, gross_pnl, cost,
-         entry_fee, exit_fee, total_fees, net_pnl, bankroll_after, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         entry_fee, exit_fee, total_fees, net_pnl, settlement_date,
+         settled_capital_after, unsettled_exposure_after, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         trade["station"], trade["target_date"], trade.get("prev_date", ""),
         trade["pred_direction"], trade.get("actual_direction", ""),
@@ -633,7 +757,9 @@ def log_trade(conn: sqlite3.Connection, trade: dict, bankroll: float) -> None:
         trade.get("correct"), trade.get("gross_pnl", 0),
         trade.get("cost", 0), trade.get("entry_fee", 0),
         trade.get("exit_fee", 0), trade.get("total_fees", 0),
-        trade.get("net_pnl", 0), round(bankroll, 2), now,
+        trade.get("net_pnl", 0), trade.get("settlement_date"),
+        trade.get("settled_capital_after"), trade.get("unsettled_exposure_after"),
+        now,
     ))
     conn.commit()
 
@@ -685,7 +811,10 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float, no_ri
     _LOGGER.info(f"Config: edge={DEFAULT_EDGE_THRESHOLD}, kelly={DEFAULT_KELLY_FRACTION}, "
                  f"ep_min={DEFAULT_ENTRY_PRICE_MIN}, ep_max={DEFAULT_ENTRY_PRICE_MAX}, "
                  f"max_contracts={DEFAULT_MAX_CONTRACTS}")
-    
+
+    # ── Pre-load bias correction table (GR12 Phase A) ──
+    _load_ensemble_bias()
+
     # ── Load settlements ──
     _LOGGER.info("Loading Kalshi settlement data...")
     conn_settle = sqlite3.connect(SETTLEMENTS_DB)
@@ -727,8 +856,42 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float, no_ri
     daily_pnl_tracker = defaultdict(float)
     bankroll = initial_bankroll
     
+    # Gap 4: Settlement timing — Track D+1 capital lock
+    # Capital is divided into settled (available) and unsettled (locked) amounts
+    settled_capital = initial_bankroll
+    unsettled_exposure = 0.0
+    settlement_tracker = defaultdict(list)  # date -> list of (cost, pnl)
+    
+    # Gap 5: Geo concentration — Track cluster exposure
+    cluster_exposure = defaultdict(float)  # cluster -> total cost exposure
+    city_pair_exposure = defaultdict(float)  # station -> total cost exposure (HIGH+LOW)
+    
+    def update_settlement(target_date: str):
+        """Settle trades from previous day (D+1 settlement)."""
+        nonlocal settled_capital, unsettled_exposure
+        settlement_date = (datetime.strptime(target_date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+        if settlement_date in settlement_tracker:
+            items = settlement_tracker[settlement_date]
+            for item in items:
+                cost = item["cost"]
+                pnl = item["pnl"]
+                station = item["station"]
+                cluster = item.get("cluster")
+                # Return locked capital plus P&L
+                settled_capital += cost + pnl
+                unsettled_exposure -= cost
+                # Reduce exposure tracking
+                if cluster:
+                    cluster_exposure[cluster] = max(0, cluster_exposure[cluster] - cost)
+                city_pair_exposure[station] = max(0, city_pair_exposure[station] - cost)
+            del settlement_tracker[settlement_date]
+            _LOGGER.debug(f"Settlement on {target_date}: settled {len(items)} trades")
+    
     for day_idx, target_date in enumerate(date_list):
         _LOGGER.debug(f"Day {day_idx + 1}/{len(date_list)}: {target_date}")
+        
+        # Update settlement for previous day's trades
+        update_settlement(target_date)
         
         # Get GEFS forecast for this date
         gefs_forecast = get_gefs_forecast(target_date)
@@ -769,25 +932,86 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float, no_ri
         day_fees = 0
         for trade in trades_today:
             net_pnl = trade["net_pnl"]
-            # Don't allow bet > 25% of bankroll per trade
             cost = trade["cost"]
-            if cost > bankroll * 0.25:
-                if cost > bankroll:
+            station = trade["station"]
+            
+            # Gap 5: Geo concentration — Cap bankroll per climate group at 15-20%
+            cluster = get_cluster_for_station(station)
+            if cluster:
+                # Check cluster exposure
+                cluster_cap = bankroll * 0.18  # 18% per cluster
+                if cluster_exposure[cluster] + cost > cluster_cap:
+                    # Scale down to respect cluster cap
+                    max_cost = max(0, cluster_cap - cluster_exposure[cluster])
+                    if max_cost <= 0:
+                        continue  # Skip trade, cluster already at cap
+                    scale = max_cost / cost
+                    trade["contracts"] = int(trade["contracts"] * scale)
+                    trade["cost"] = trade["contracts"] * trade["entry_price"]
+                    trade["gross_pnl"] = trade["contracts"] * (1.0 if trade["correct"] else 0.0)
+                    trade["entry_fee"] = MARKET_COST_MODEL.kalshi_fee(trade["contracts"], trade["market_price"])
+                    trade["exit_fee"] = MARKET_COST_MODEL.kalshi_fee(trade["contracts"], 1.0 if trade["correct"] else 0.0)
+                    trade["total_fees"] = trade["entry_fee"] + trade["exit_fee"]
+                    trade["net_pnl"] = trade["gross_pnl"] - trade["cost"] - trade["total_fees"]
+                    cost = trade["cost"]
+                    net_pnl = trade["net_pnl"]
+                # Update cluster exposure
+                cluster_exposure[cluster] += cost
+            
+            # City-pair exposure (HIGH+LOW) cap
+            city_pair_cap = bankroll * 0.08  # 8% per station pair
+            if city_pair_exposure[station] + cost > city_pair_cap:
+                max_cost = max(0, city_pair_cap - city_pair_exposure[station])
+                if max_cost <= 0:
                     continue
-                # Scale down
-                scale = (bankroll * 0.25) / cost
+                scale = max_cost / cost
                 trade["contracts"] = int(trade["contracts"] * scale)
                 trade["cost"] = trade["contracts"] * trade["entry_price"]
                 trade["gross_pnl"] = trade["contracts"] * (1.0 if trade["correct"] else 0.0)
-                trade["entry_fee"] = kalshi_fee(trade["contracts"], trade["market_price"])
-                trade["exit_fee"] = kalshi_fee(trade["contracts"], 1.0 if trade["correct"] else 0.0)
+                trade["entry_fee"] = MARKET_COST_MODEL.kalshi_fee(trade["contracts"], trade["market_price"])
+                trade["exit_fee"] = MARKET_COST_MODEL.kalshi_fee(trade["contracts"], 1.0 if trade["correct"] else 0.0)
                 trade["total_fees"] = trade["entry_fee"] + trade["exit_fee"]
                 trade["net_pnl"] = trade["gross_pnl"] - trade["cost"] - trade["total_fees"]
+                cost = trade["cost"]
+                net_pnl = trade["net_pnl"]
+            city_pair_exposure[station] += cost
             
+            # Don't allow bet > 25% of SETTLED capital per trade (Gap 4)
+            if cost > settled_capital * 0.25:
+                if cost > settled_capital:
+                    continue
+                # Scale down
+                scale = (settled_capital * 0.25) / cost
+                trade["contracts"] = int(trade["contracts"] * scale)
+                trade["cost"] = trade["contracts"] * trade["entry_price"]
+                trade["gross_pnl"] = trade["contracts"] * (1.0 if trade["correct"] else 0.0)
+                trade["entry_fee"] = MARKET_COST_MODEL.kalshi_fee(trade["contracts"], trade["market_price"])
+                trade["exit_fee"] = MARKET_COST_MODEL.kalshi_fee(trade["contracts"], 1.0 if trade["correct"] else 0.0)
+                trade["total_fees"] = trade["entry_fee"] + trade["exit_fee"]
+                trade["net_pnl"] = trade["gross_pnl"] - trade["cost"] - trade["total_fees"]
+                cost = trade["cost"]
+                net_pnl = trade["net_pnl"]
+            
+            # Gap 4: Settlement timing — Move capital from settled to unsettled
+            # Record trade for D+1 settlement
+            settlement_date = (datetime.strptime(target_date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+            settlement_tracker[settlement_date].append({
+                "cost": cost,
+                "pnl": net_pnl,
+                "station": station,
+                "cluster": cluster
+            })
+            settled_capital -= cost
+            unsettled_exposure += cost
+            
+            trade["settlement_date"] = settlement_date
+            trade["settled_capital_after"] = round(settled_capital, 2)
+            trade["unsettled_exposure_after"] = round(unsettled_exposure, 2)
             trade["bankroll_after"] = round(bankroll + net_pnl, 2)
             
             # Log to DB
             log_trade(trade_conn, trade, bankroll)
+            all_trades.append(trade)
             
             # Update risk controls (skip in baseline mode)
             if not no_risk_controls:
@@ -802,24 +1026,20 @@ def run_paper_trading(start_date: str, days: int, initial_bankroll: float, no_ri
             day_pnl += net_pnl
             day_fees += trade.get("total_fees", 0)
         
+        n_correct = sum(1 for t in trades_today if t.get("correct"))
         if day_pnl != 0:
             day_return_pct = day_pnl / bankroll if bankroll > 0 else 0.0
             daily_pnl_tracker[target_date] = day_return_pct
-            bankroll += day_pnl
-        
-        all_trades.extend(trades_today)
-        
-        # Log daily risk summary (skip in baseline mode)
-        if not no_risk_controls:
-            risk_state = risk_manager.evaluate()
-            if not risk_state.passed:
-                failed = risk_state.get_failed_checks()
-                for check_name, reason in failed:
-                    _LOGGER.warning(f"Risk check failed: {check_name} — {reason}")
-        
-        n_correct = sum(1 for t in trades_today if t.get("correct"))
-        _LOGGER.info(f"  {target_date}: {len(trades_today)} trades, "
-                     f"{n_correct} correct, PnL=${day_pnl:+.2f}, Bankroll=${bankroll:.2f}")
+            # Gap 4: Settlement timing — Bankroll updates happen after settlement (next day)
+            # Update bankroll variable to reflect total capital (settled + unsettled)
+            bankroll = settled_capital + unsettled_exposure
+            _LOGGER.info(f"  {target_date}: {len(trades_today)} trades, "
+                         f"{n_correct} correct, PnL=${day_pnl:+.2f}, "
+                         f"Bankroll=${bankroll:.2f} (Settled=${settled_capital:.2f}, Unsettled=${unsettled_exposure:.2f})")
+        else:
+            _LOGGER.info(f"  {target_date}: {len(trades_today)} trades, "
+                         f"{n_correct} correct, PnL=${day_pnl:+.2f}, "
+                         f"Bankroll=${bankroll:.2f} (Settled=${settled_capital:.2f}, Unsettled=${unsettled_exposure:.2f})")
     
     # ── Compute final metrics ──
     daily_return_pcts = []

@@ -30,6 +30,8 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Tuple
 from urllib.request import urlopen, Request
 
+from .base_signal import BaseSignal
+
 logger = logging.getLogger(__name__)
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -63,11 +65,12 @@ STATIONS = {
 }
 
 
-class ECMWFBiasCorrectedSignal:
+class ECMWFBiasCorrectedSignal(BaseSignal):
     """ECMWF IFS model fetcher with rolling bias correction."""
 
-    def __init__(self, config: Optional[dict] = None):
-        self.config = config or {}
+    def __init__(self, db_path: str = None):
+        super().__init__(db_path)
+        self.config = {}
         self._init_bias_db()
 
     def _init_bias_db(self):
@@ -294,6 +297,101 @@ class ECMWFBiasCorrectedSignal:
             "confidence": round(bias_confidence, 3),
             "bias_f": corrected["bias_f"],
         }
+
+    # ── BaseSignal interface ──────────────────────────────────────────
+
+    @property
+    def name(self) -> str:
+        """Canonical signal name."""
+        return "ecmwf_bias_corrected"
+
+    @property
+    def min_lookback(self) -> int:
+        """Minimum days of bias warmup required."""
+        return 14
+
+    def evaluate(self, idx: int, days: List[dict]) -> Tuple[Optional[str], float]:
+        """
+        Evaluate signal using METAR temperature trend from historical data.
+
+        Compares today's high with yesterday's high to determine direction,
+        with confidence based on trend consistency over the last 3 days.
+        For live evaluation with ECMWF bias-corrected data, use
+        evaluate_for_station() instead.
+
+        Returns:
+            (direction, confidence) where direction is 'up' or 'down',
+            or (None, 0.0) if insufficient data.
+        """
+        if idx < 1 or idx >= len(days):
+            return None, 0.0
+
+        today = days[idx].get('high')
+        yesterday = days[idx - 1].get('high')
+
+        if today is None or yesterday is None:
+            return None, 0.0
+
+        # Direction based on most recent temperature change
+        direction = 'up' if today > yesterday else 'down'
+
+        # Confidence based on trend consistency over last 3 days
+        consistent = 0
+        for i in range(max(1, idx - 2), idx + 1):
+            prev = days[i - 1].get('high')
+            curr = days[i].get('high')
+            if prev is not None and curr is not None:
+                if (curr > prev and direction == 'up') or (curr < prev and direction == 'down'):
+                    consistent += 1
+
+        confidence = 0.35 + (consistent * 0.1)
+        confidence = min(0.75, confidence)
+
+        return direction, round(confidence, 3)
+
+    def evaluate_for_station(self, station: str, date: str,
+                             conn: sqlite3.Connection = None) -> Tuple[Optional[str], float]:
+        """
+        Evaluate signal for a specific station and date using ECMWF bias-corrected forecast.
+
+        Fetches ECMWF forecast via get_daily_extremes(), applies rolling bias
+        correction, and returns direction based on the forecast temperature
+        relative to a neutral baseline.
+
+        Args:
+            station: Station code (e.g. 'KNYC')
+            date: ISO date string for the target forecast date
+            conn: Optional SQLite connection (not used by this signal)
+
+        Returns:
+            (direction, confidence) or (None, 0.0)
+        """
+        if station not in STATIONS:
+            return None, 0.0
+
+        lat, lon = STATIONS[station]
+
+        # Get bias-corrected ECMWF forecast extremes for the target date
+        extremes = self.get_daily_extremes(station, lat, lon, date)
+
+        if extremes['max_f'] is None or extremes['min_f'] is None:
+            return None, 0.0
+
+        # Direction: forecast mid-temp above 70°F neutral baseline → 'up', else 'down'
+        mid_temp = (extremes['max_f'] + extremes['min_f']) / 2.0
+        direction = 'up' if mid_temp > 70.0 else 'down'
+
+        # Confidence from bias correction quality + forecast strength
+        confidence = extremes['confidence']
+
+        # Amplify confidence if forecast is clearly above/below baseline
+        deviation = abs(mid_temp - 70.0)
+        if deviation > 10.0:
+            confidence = min(0.85, confidence + 0.1)
+        elif deviation < 3.0:
+            confidence = max(0.3, confidence - 0.1)  # Near neutral → lower confidence
+
+        return direction, round(confidence, 3)
 
     def record_settlement(self, station: str, settlement_date: str,
                           settlement_hour: int, actual_temp_f: float):
