@@ -61,6 +61,23 @@ from core.ensemble_fraction import (
 )
 from core.forecast_confidence_modulator import ForecastConfidenceModulator
 
+# ─── Nowcasting Signals (GR12 Phase A6) ────────────────────────────────
+try:
+    from core.signals.metar_nowcast_signal import MetarNowcastSignal
+    HAS_METAR_NOWCAST = True
+except ImportError as e:
+    print(f"Warning: MetarNowcastSignal import failed: {e}")
+    MetarNowcastSignal = None
+    HAS_METAR_NOWCAST = False
+
+try:
+    from core.signals.frontal_passage_nowcast_signal import FrontalPassageNowcastSignal
+    HAS_FRONTAL_PASSAGE_NOWCAST = True
+except ImportError as e:
+    print(f"Warning: FrontalPassageNowcastSignal import failed: {e}")
+    FrontalPassageNowcastSignal = None
+    HAS_FRONTAL_PASSAGE_NOWCAST = False
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))
@@ -107,6 +124,9 @@ class BacktestConfig:
     use_calibration: bool = False       # P1.5 empirical per-station, per-direction calibration
     calib_window_days: int = 180       # (unused; uses full-archive pre-computed curves)
     calib_min_samples: int = 40        # (unused; uses full-archive pre-computed curves)
+    use_nowcasting: bool = False        # P1.6: Enable nowcasting signals
+    use_nowcasting: bool = False       # P1.6: Enable nowcasting signals (confidence modulator)
+    metar_db_path: str = "data/metar_backfill.db"  # METAR DB for nowcasting evaluation
     use_risk_halts: bool = False        # production RiskManager halts on/off
     bankroll: float = INITIAL_BANKROLL
     station_sizing: Optional[Dict[str, float]] = None  # per-station contract multiplier, e.g. {"KLAS": 0.5}
@@ -329,8 +349,10 @@ def compute_signal(
     station: str, target_date: str, prev_date: str,
     gefs: dict, prev_temp_f: float, cfg: BacktestConfig,
     wf: WalkForwardCorrections,
+    metar_conn: Optional[sqlite3.Connection] = None,
 ) -> Optional[dict]:
     """Compute a single trade signal. Returns trade dict or None."""
+    _HAS_NOWCAST = HAS_METAR_NOWCAST and HAS_FRONTAL_PASSAGE_NOWCAST
     actual_temp_f = wf.settlements[station][target_date]
     mean_c = gefs.get("mean_c")
     if mean_c is None:
@@ -384,6 +406,27 @@ def compute_signal(
     if cfg.use_calibration:
         pred_dir_str = "up" if pred_dir == 1 else "down"
         confidence = calibrate_confidence(station, confidence, pred_dir_str)
+
+    # P1.6: Nowcasting confidence modulator
+    nowcast_boost = 0.0
+    nowcast_fired = False
+    if cfg.use_nowcasting and metar_conn is not None and _HAS_NOWCAST:
+        try:
+            fp_direction, fp_confidence = FrontalPassageNowcastSignal().evaluate_for_station(
+                station, target_date, metar_conn)
+            if fp_direction is not None and fp_confidence >= 0.25:
+                nowcast_fired = True
+                fp_dir_val = 1 if fp_direction == 'up' else -1
+                if fp_dir_val == pred_dir:
+                    # Nowcast agrees with GEFS — moderate boost proportional to nowcast confidence
+                    nowcast_boost = 0.03 + 0.03 * fp_confidence
+                else:
+                    # Nowcast disagrees — reduce confidence
+                    nowcast_boost = -0.03 - 0.03 * fp_confidence
+        except Exception:
+            pass
+        if nowcast_fired:
+            confidence = min(0.99, max(0.50, confidence + nowcast_boost))
 
     market_price = cfg.market_price
 
@@ -671,6 +714,20 @@ def run_backtest(cfg: BacktestConfig, start_date: str, days: int) -> Dict:
             initial_capital=cfg.bankroll,
         ))
 
+    # Open METAR DB if nowcasting enabled
+    metar_conn = None
+    if cfg.use_nowcasting:
+        metar_db = cfg.metar_db_path
+        if Path(metar_db).exists():
+            try:
+                metar_conn = sqlite3.connect(metar_db)
+                print(f"  📡 METAR DB opened for nowcasting ({metar_db})")
+            except Exception as e:
+                print(f"  ⚠ Failed to open METAR DB ({metar_db}): {e}")
+                metar_conn = None
+        else:
+            print(f"  ⚠ METAR DB not found ({metar_db}) — nowcasting disabled")
+
     for target_date in date_list:
         if risk_halted:
             break
@@ -698,7 +755,7 @@ def run_backtest(cfg: BacktestConfig, start_date: str, days: int) -> Dict:
                 continue
 
             trade = compute_signal(station, target_date, prev_date, gefs_data,
-                                   prev_temp_f, cfg, wf)
+                                   prev_temp_f, cfg, wf, metar_conn)
             if trade is None:
                 continue
 
@@ -789,6 +846,7 @@ def main():
     parser.add_argument("--epoch", action="store_true", help="Enable GLM 5.2 epoch Kelly schedule (P1.4)")
     parser.add_argument("--epoch-cycle", type=str, default="12Z", choices=["00Z", "06Z", "12Z", "18Z"])
     parser.add_argument("--calib", action="store_true", help="Enable direction-specific calibration from full-archive curves (P1.5)")
+    parser.add_argument("--nowcast", action="store_true", help="Enable nowcasting confidence modulator (P1.6)")
     parser.add_argument("--risk", action="store_true", help="Enable RiskManager halts (production-like)")
     parser.add_argument("--edge", type=float, default=0.02)
     parser.add_argument("--max-contracts", type=int, default=175)
@@ -813,6 +871,8 @@ def main():
         use_epoch=args.epoch,
         epoch_cycle=args.epoch_cycle,
         use_calibration=args.calib,
+        use_nowcasting=args.nowcast,
+        metar_db_path=str(REPO_ROOT / 'data' / 'metar_backfill.db'),
         use_risk_halts=args.risk,
         station_sizing=station_sizing,
     )
@@ -933,7 +993,7 @@ def _load_trades_from_result(result: Dict, start_date: str, days: int) -> List[d
             if prev_temp_f is None or gefs_data is None:
                 continue
             trade = compute_signal(station, target_date, prev_date, gefs_data,
-                                   prev_temp_f, cfg, wf)
+                                   prev_temp_f, cfg, wf, metar_conn)
             if trade is None:
                 continue
             cost = trade["cost"]
