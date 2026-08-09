@@ -115,7 +115,8 @@ def compute_matrix_from_vectors(signal_vectors: Dict[str, List]) -> Dict[str, Di
 
 def evaluate_signals_standalone(db_path: str) -> Dict:
     """Evaluate all signals from sweep registry against settlements."""
-    from scripts.big_sweep import build_signal_registry, STATIONS, METAR_DB
+    from scripts.sweep_engine import build_signal_registry, METAR_DB
+    from scripts.sweep.config import STATIONS
 
     registry = build_signal_registry()
     active = {k: v for k, v in registry.items() if v is not None}
