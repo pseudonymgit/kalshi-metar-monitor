@@ -53,6 +53,10 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+sys.path.insert(0, str(REPO_ROOT))
+
 # ─── Bias Correction Module (GR12 Phase A) ─────────────────────────────
 from core.ensemble_fraction import (
     load_bias_corrections as _load_bias_table,
@@ -77,10 +81,6 @@ except ImportError as e:
     print(f"Warning: FrontalPassageNowcastSignal import failed: {e}")
     FrontalPassageNowcastSignal = None
     HAS_FRONTAL_PASSAGE_NOWCAST = False
-
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent
-sys.path.insert(0, str(REPO_ROOT))
 
 GEFS_DB = str(REPO_ROOT / "data" / "gefs_archive.db")
 SETTLEMENTS_DB = str(REPO_ROOT / "data" / "kalshi_settlements.db")
