@@ -87,7 +87,10 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from station_registry import (
     get_all_stations as _get_all_stations,
     get_station_mapping as _get_station_mapping,
+<<<<<<< HEAD
     get_station_coordinates as _get_station_coordinates,
+=======
+>>>>>>> origin/main
     validate_station_registry as _validate_station_registry,
     get_cluster_for_station as _get_cluster_for_station,
     CLUSTER_BUDGET_USD as _CLUSTER_BUDGET_USD,
@@ -253,6 +256,7 @@ except ImportError as e:
 HAS_GOLDILOCKS_SIGNAL = HAS_SPIKE_REVERSION_SIGNAL
 GoldilocksSignal = SpikeReversionSignal
 
+<<<<<<< HEAD
 # ── ADVANCE Signal Imports (B-Mode integration) ──────────────────────────
 
 # ECMWF IFS Bias-Corrected Signal — NWP source via Open-Meteo (v1/ecmwf)
@@ -282,6 +286,8 @@ except ImportError as e:
     SpreadBasedEntryDetector = None
     HAS_SPREAD_BASED_ENTRY = False
 
+=======
+>>>>>>> origin/main
 # Attempt to import CalibrationPipeline - wrap in try/except to prevent crashes if sklearn/scipy not installed
 try:
     from core.calibration_pipeline import CalibrationPipeline
@@ -397,11 +403,14 @@ class PaperTrader:
         # Frontal Passage Nowcast Signal (Phase 4.1 — spatial nowcasting, lazy-loaded)
         self._frontal_passage_nowcast = None
 
+<<<<<<< HEAD
         # ── ADVANCE Signal instances (lazy-loaded) ──────────────────────────
         self._ecmwf_signal = None
         self._metar_nowcast = None
         self._spread_entry = None
 
+=======
+>>>>>>> origin/main
         # Initialize calibration pipeline
         # Define the signal names and possible city codes for the calibration
         self.signal_names = ["calendar_climatology", "late_day_momentum", "late_day_analysis"]
@@ -413,6 +422,7 @@ class PaperTrader:
         # Frontal passage nowcast signal (Phase 4.1)
         if HAS_FRONTAL_PASSAGE_NOWCAST:
             self.signal_names.append("frontal_passage_nowcast")
+<<<<<<< HEAD
         # ECMWF IFS Bias-Corrected signal (ADVANCE)
         if HAS_ECMWF_BIAS_CORRECTED:
             self.signal_names.append("ecmwf_bias_corrected")
@@ -422,6 +432,8 @@ class PaperTrader:
         # Spread-based entry (ADVANCE - execution layer)
         if HAS_SPREAD_BASED_ENTRY:
             self.signal_names.append("spread_based_entry")
+=======
+>>>>>>> origin/main
         # Define common weather stations for initial available locations
         self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']  # Common trade locations
 
@@ -1104,6 +1116,7 @@ class PaperTrader:
                     except Exception as e:
                         _LOGGER.warning(f"Failed to compute Frontal Passage Nowcast signal for {station} on {date}: {e}")
 
+<<<<<<< HEAD
             # ═══════════════════════════════════════════════════════════════
             # ADVANCE Signals (B-Mode integration)
             # ═══════════════════════════════════════════════════════════════
@@ -1171,6 +1184,10 @@ class PaperTrader:
                 except Exception as e:
                     _LOGGER.warning(f"Failed to initialize Spread-Based Entry Detector: {e}")
 
+=======
+        metar_conn.close()
+
+>>>>>>> origin/main
         # Filter signals based on station skill (T5 - per station skill gating)
         if self._skill_gate is not None:
             before_count = len(signals)
@@ -1225,12 +1242,15 @@ class PaperTrader:
                     base_confidence = 0.6
                 elif reason in ["spike_reversion", "goldilocks_spike_reversion"]:
                     base_confidence = 0.65
+<<<<<<< HEAD
                 elif reason in ["ecmwf_bias_corrected"]:
                     base_confidence = 0.7
                 elif reason in ["metar_nowcast"]:
                     base_confidence = 0.65
                 elif reason in ["spread_based_entry"]:
                     base_confidence = 0.6
+=======
+>>>>>>> origin/main
                 else:
                     base_confidence = 0.5
                 

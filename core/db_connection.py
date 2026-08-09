@@ -288,6 +288,34 @@ DB_REGISTRY: Dict[str, DBConfig] = {
         cache_size_kb=-32 * 1024,
         synchronous='NORMAL',
     ),
+<<<<<<< HEAD
+=======
+    'isd_lite_raw': DBConfig(
+        db_key='isd_lite_raw',
+        relative_path='isd_lite_raw.db',
+        description='ISD lite raw data',
+        busy_timeout_ms=20000,
+        cache_size_kb=-64 * 1024,
+        synchronous='NORMAL',
+    ),
+    'isd_log': DBConfig(
+        db_key='isd_log',
+        relative_path='isd_log.db',
+        description='ISD ingestion log',
+        busy_timeout_ms=10000,
+        cache_size_kb=-32 * 1024,
+        synchronous='NORMAL',
+    ),
+    'isd_raw': DBConfig(
+        db_key='isd_raw',
+        relative_path='isd_raw.db',
+        description='ISD raw data',
+        busy_timeout_ms=20000,
+        cache_size_kb=-64 * 1024,
+        mmap_size_bytes=64 * 1024 * 1024,
+        synchronous='NORMAL',
+    ),
+>>>>>>> origin/main
     'phase1_paper_trades': DBConfig(
         db_key='phase1_paper_trades',
         relative_path='phase1_paper_trades.db',

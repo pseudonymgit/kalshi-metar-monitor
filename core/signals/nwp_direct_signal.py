@@ -12,7 +12,10 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, List, Dict
 import logging
+<<<<<<< HEAD
 from .base_signal import BaseSignal
+=======
+>>>>>>> origin/main
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +25,11 @@ NWP_DB_DEFAULT = "data/nwp_forecasts.db"
 MODELS = ['GFS', 'ECMWF', 'ICON', 'GEM']
 
 
+<<<<<<< HEAD
 class NwpDirectSignal(BaseSignal):
+=======
+class NwpDirectSignal:
+>>>>>>> origin/main
 
     def __init__(self, db_path: str = None):
         if db_path and os.path.exists(db_path):

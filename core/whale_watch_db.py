@@ -25,7 +25,10 @@ B-Mode compliant. No AI/ML. All SQLite.
 import json
 import os
 import sqlite3
+<<<<<<< HEAD
 from core.db_utils import get_db as _utils_get_db
+=======
+>>>>>>> origin/main
 import time
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any, Tuple
@@ -149,10 +152,19 @@ CREATE INDEX IF NOT EXISTS idx_journal_station ON signal_journal(station, entry_
 
 
 def get_db(db_path: str = WHALE_DB) -> sqlite3.Connection:
+<<<<<<< HEAD
     """Get a connection to the WhaleWatch DB with fullsync+delete for reliability across process restarts."""
     conn = _utils_get_db(db_path, timeout=5, wal=False, busy_timeout=0)
     conn.execute("PRAGMA journal_mode=DELETE")
     conn.execute("PRAGMA synchronous=FULL")
+=======
+    """Get a connection to the WhaleWatch DB with WAL mode."""
+    os.makedirs(os.path.dirname(db_path) or '.', exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    conn.row_factory = sqlite3.Row
+>>>>>>> origin/main
     return conn
 
 

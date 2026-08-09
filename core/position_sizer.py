@@ -32,8 +32,13 @@ _LOGGER = logging.getLogger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 
+<<<<<<< HEAD
 MAX_BANKROLL_PCT = 0.05         # 5% cap per position (GLM 5.2 Gray Room R14 — corrected from 8%)
 MAX_DRAWDOWN_PCT = 0.15          # 15% trailing drawdown (GLM 5.2 — relaxed from 10% for smaller positions)
+=======
+MAX_BANKROLL_PCT = 0.08         # 8% cap per position (kelly_position_sizer.py)
+MAX_DRAWDOWN_PCT = 0.10          # 10% trailing drawdown
+>>>>>>> origin/main
 MAX_POSITION_PCT = 0.25          # 25% max of balance (legacy SH3 cap)
 
 # Round-trip fee = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
@@ -57,8 +62,13 @@ CONFIDENCE_TIERS = [
 MAX_CONTRACTS = 500
 
 # Entry price range limits (cap from R11 E2)
+<<<<<<< HEAD
 MIN_ENTRY_PRICE = 0.25
 MAX_ENTRY_PRICE = 0.75
+=======
+MIN_ENTRY_PRICE = 0.15
+MAX_ENTRY_PRICE = 0.85
+>>>>>>> origin/main
 
 # Confidence classification thresholds
 HIGH_CONF_THRESHOLD = 0.70
@@ -217,6 +227,7 @@ class PositionSizer:
         """Update the cost fraction (spread-based)."""
         self._cost_fraction = max(0.0, min(1.0, cost_fraction))
 
+<<<<<<< HEAD
     def calculate_kelly_fraction(self, win_rate: float, market_price: float = 0.50) -> float:
         """
         Calculate Kelly fraction for binary options.
@@ -231,10 +242,24 @@ class PositionSizer:
         Returns raw Kelly fraction (before adaptive scaling and caps).
         When market_price is not available (0.50 default), falls back to
         conservative estimate using win_rate.
+=======
+    def calculate_kelly_fraction(self, win_rate: float) -> float:
+        """
+        Calculate Kelly fraction.
+
+        f* = (p - c) / (1 - c)
+
+        where p is win probability and c is cost fraction.
+        This is the standard Kelly for binary outcomes with asymmetric payoff:
+        win → get (1-c) per contract, lose → forfeit full contract value.
+
+        Returns raw Kelly fraction (before adaptive scaling and caps).
+>>>>>>> origin/main
         """
         c = self._cost_fraction
         if c >= 1.0:
             return 0.0
+<<<<<<< HEAD
         
         # Calculate edge against market price
         # For binary options: edge = true_probability - market_price
@@ -250,6 +275,9 @@ class PositionSizer:
             return 0.0
         
         kelly = edge / (1.0 - c)
+=======
+        kelly = (win_rate - c) / (1.0 - c)
+>>>>>>> origin/main
         return max(0.0, min(1.0, kelly))
 
     # Fee-aware Kelly formula removed — Fix 3: use standard binary Kelly
@@ -290,8 +318,11 @@ class PositionSizer:
         win_rate: float,
         edge: float,
         use_kelly: bool = True,
+<<<<<<< HEAD
         market_price: Optional[float] = None,
         epoch_multiplier: float = 1.0,
+=======
+>>>>>>> origin/main
     ) -> Tuple[float, Dict]:
         """
         Compute the final position size in dollars.
@@ -334,9 +365,15 @@ class PositionSizer:
         # Edge-dependent tiered sizing (Oalkhadra R11 E2)
         # Replaces uniform fractional Kelly with edge-based tiers
         EDGE_TIERS = [
+<<<<<<< HEAD
             (0.10, 1.00, "100% Kelly — strong edge"),    # edge > 0.10
             (0.06, 0.75, "75% Kelly — moderate edge"),   # edge 0.06-0.10
             (0.03, 0.50, "50% Kelly — weak edge"),       # edge 0.03-0.06
+=======
+            (0.10, 0.75, "75% Kelly — strong edge"),    # edge > 0.10
+            (0.06, 0.50, "50% Kelly — moderate edge"),   # edge 0.06-0.10
+            (0.03, 0.25, "25% Kelly — weak edge"),       # edge 0.03-0.06
+>>>>>>> origin/main
         ]
         effective_kelly_multiplier = 0.0
         edge_tier_label = "NO TRADE — edge < 0.03"
@@ -368,9 +405,14 @@ class PositionSizer:
             return 0.0, details
 
         if use_kelly:
+<<<<<<< HEAD
             # 1. Raw Kelly (primary formula) — now references market price
             mp = market_price if market_price is not None else 0.50
             kelly = self.calculate_kelly_fraction(win_rate, market_price=mp)
+=======
+            # 1. Raw Kelly (primary formula)
+            kelly = self.calculate_kelly_fraction(win_rate)
+>>>>>>> origin/main
             details["kelly_fraction"] = round(kelly, 6)
             details["kelly_type"] = "p-c/1-c"
 
@@ -385,10 +427,16 @@ class PositionSizer:
         multiplier = self.set_adaptive_multiplier(confidence)
         details["adaptive_multiplier"] = multiplier
 
+<<<<<<< HEAD
         # 3. Combine edge multiplier, adaptive multiplier, and epoch multiplier
         combined_multiplier = effective_kelly_multiplier * multiplier * epoch_multiplier
         details["combined_multiplier"] = round(combined_multiplier, 6)
         details["epoch_multiplier"] = round(epoch_multiplier, 4)
+=======
+        # 3. Combine edge multiplier and adaptive multiplier
+        combined_multiplier = effective_kelly_multiplier * multiplier
+        details["combined_multiplier"] = round(combined_multiplier, 6)
+>>>>>>> origin/main
 
         adjusted_kelly = kelly * combined_multiplier
         details["adjusted_kelly"] = round(adjusted_kelly, 6)
@@ -561,11 +609,18 @@ if __name__ == "__main__":
 
     sizer = PositionSizer(bankroll=10000.0)
 
+<<<<<<< HEAD
     # 1. Kelly fraction: f* = edge / (1 - c), edge = |p - M| - c (fallback when M=0.50)
     k = sizer.calculate_kelly_fraction(win_rate=0.60)
     print(f"[1] Kelly fraction (win_rate=0.60, cost={DEFAULT_COST_FRACTION}) → f*={k:.4f}")
     # Fallback: edge = |0.60 - 0.50| - 0.0205 = 0.0795, kelly = 0.0795 / 0.9795 ≈ 0.0812
     expected = (0.10 - DEFAULT_COST_FRACTION) / (1.0 - DEFAULT_COST_FRACTION)
+=======
+    # 1. Kelly fraction: f* = (p - c) / (1 - c)
+    k = sizer.calculate_kelly_fraction(win_rate=0.60)
+    print(f"[1] Kelly fraction (win_rate=0.60, cost={DEFAULT_COST_FRACTION}) → f*={k:.4f}")
+    expected = (0.60 - DEFAULT_COST_FRACTION) / (1.0 - DEFAULT_COST_FRACTION)
+>>>>>>> origin/main
     assert abs(k - expected) < 1e-6, f"Expected {expected}, got {k}"
     print(f"    Expected: {expected:.4f} ✓")
 
@@ -589,13 +644,18 @@ if __name__ == "__main__":
         assert mult == exp, f"Expected {exp}, got {mult} for conf={conf}"
         print(f"[3] {label} → got {mult}× ✓")
 
+<<<<<<< HEAD
     # 4. Position size at 65% confidence, 60% win rate, edge=0.10
+=======
+    # 4. Position size at 65% confidence, 60% win rate
+>>>>>>> origin/main
     size, details = sizer.compute_position_size(
         confidence=0.65, win_rate=0.60, edge=0.10
     )
     print(f"[4] Position at conf=65%, win_rate=60%: ${size:.2f}")
     print(f"    Details: kelly={details['kelly_fraction']}, "
           f"mult={details['adaptive_multiplier']}, "
+<<<<<<< HEAD
           f"edge_mult={details['edge_multiplier']}, "
           f"final={details['final_position']}")
     # edge=0.10 → strong_edge (1.0x), conf=0.65 → adaptive=1.0x
@@ -603,6 +663,11 @@ if __name__ == "__main__":
     # raw = 0.0812 * $10000 = $812, cap = $500 (5%)
     # → position = $500
     assert abs(size - 500.0) < 1.0, f"Expected position ~$500, got ${size}"
+=======
+          f"final={details['final_position']}")
+    # Kelly ≈ (0.60 - 0.0205) / (1 - 0.0205) ≈ 0.5913, mult=1.0, cap=$800
+    assert size == 800.0, f"Expected cap $800, got ${size}"
+>>>>>>> origin/main
 
     # 5. (Fee-aware Kelly formula removed — Fix 3: use standard binary Kelly)
 

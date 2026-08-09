@@ -27,7 +27,10 @@ import logging
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, List, Dict
+<<<<<<< HEAD
 from .base_signal import BaseSignal
+=======
+>>>>>>> origin/main
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +48,11 @@ CLASSICAL_TEMP_FIELD_MAX = 'temperature_2m_max'
 CLASSICAL_TEMP_FIELD_MIN = 'temperature_2m_min'
 
 
+<<<<<<< HEAD
 class AiCompositeSignal(BaseSignal):
+=======
+class AiCompositeSignal:
+>>>>>>> origin/main
 
     def __init__(self, db_path: str = None):
         if db_path and os.path.exists(db_path):

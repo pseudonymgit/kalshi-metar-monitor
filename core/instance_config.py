@@ -25,6 +25,7 @@ from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+<<<<<<< HEAD
 # ─── Signal Configuration ──────────────────────────────────────────────
 # Centralized thresholds and parameters for weather engine signals.
 # Consolidated from previously hardcoded values in various modules.
@@ -47,6 +48,8 @@ DEFAULT_PAPER_TRADING_DB_PATH = str(REPO_ROOT / "data" / "paper_trading_dev.db")
 # Note: Instance-specific DB paths are available via INSTANCE_CONFIGS[instance].db_path
 
 
+=======
+>>>>>>> origin/main
 # ─── Default Webhook URLs (empty by default) ──────────────
 # Production/DEV/SBOX webhooks must be set via environment variables.
 _DEFAULT_WEBHOOKS = {

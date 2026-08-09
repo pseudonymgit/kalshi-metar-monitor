@@ -12,12 +12,15 @@ import sqlite3
 from datetime import datetime, timedelta
 from typing import Tuple, Optional
 
+<<<<<<< HEAD
 from .signal_config import (
     ROUND_NUMBER_THRESHOLDS,
     ROUND_NUMBER_SINGLE_THRESHOLD,
     ROUND_NUMBER_AGGREGATE_THRESHOLD
 )
 
+=======
+>>>>>>> origin/main
 
 def get_climatological_probability(station: str, date: str, threshold: int, market_type: str) -> float:
     """
@@ -36,10 +39,18 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
     try:
         # Connect to historical METAR database
         db_path = os.getenv('METAR_DB_PATH', '/var/lib/weather/metars.db')
+<<<<<<< HEAD
         with sqlite3.connect(db_path) as conn:
             conn.execute("PRAGMA journal_mode=WAL;")
             conn.execute("PRAGMA busy_timeout=5000;")
             
+=======
+        conn = sqlite3.connect(db_path)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
+        
+        try:
+>>>>>>> origin/main
             cursor = conn.cursor()
             # Get same month-day historically for the past N years
             target_date = datetime.strptime(date, '%Y-%m-%d')
@@ -96,6 +107,12 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
                 return favor_count / total_count
             else:
                 return 0.5
+<<<<<<< HEAD
+=======
+                
+        finally:
+            conn.close()
+>>>>>>> origin/main
             
     except Exception as e:
         print(f"Error calculating climatological probability: {str(e)}")
@@ -186,7 +203,11 @@ def check_round_number_arbitrage(station: str, date: str) -> Tuple[str, float, f
     station_code = station[1:]  # Remove K prefix 
     
     # Define round thresholds to analyze
+<<<<<<< HEAD
     thresholds = ROUND_NUMBER_THRESHOLDS
+=======
+    thresholds = [80, 85, 90, 95, 100]  # Only check meaningful thresholds
+>>>>>>> origin/main
     
     # For HIGH markets
     total_climat_probs = []
@@ -208,7 +229,11 @@ def check_round_number_arbitrage(station: str, date: str) -> Tuple[str, float, f
             price_diff = climat_prob - market_prob
             edge = abs(price_diff)  # Magnitude of mispricing
             
+<<<<<<< HEAD
             if abs(price_diff) > ROUND_NUMBER_SINGLE_THRESHOLD:  # More than 5% difference triggers action
+=======
+            if abs(price_diff) > 0.05:  # More than 5% difference triggers action
+>>>>>>> origin/main
                 if price_diff > 0:
                     # Climatological suggests outcome is MORE likely (LONG)
                     return 'LONG', max(0.5, climat_prob), edge
@@ -230,7 +255,11 @@ def check_round_number_arbitrage(station: str, date: str) -> Tuple[str, float, f
             price_diff = climat_prob - market_prob
             edge = abs(price_diff)
             
+<<<<<<< HEAD
             if abs(price_diff) > ROUND_NUMBER_SINGLE_THRESHOLD:  # 5% threshold
+=======
+            if abs(price_diff) > 0.05:  # 5% threshold
+>>>>>>> origin/main
                 if price_diff > 0:
                     return 'LONG', max(0.5, climat_prob), edge
                 else:
@@ -247,7 +276,11 @@ def check_round_number_arbitrage(station: str, date: str) -> Tuple[str, float, f
         avg_edge = sum(total_edges) / len(total_edges) if total_edges else 0
         
         price_diff = avg_climat - avg_market
+<<<<<<< HEAD
         if abs(price_diff) > ROUND_NUMBER_AGGREGATE_THRESHOLD:  # Smaller aggregate threshold
+=======
+        if abs(price_diff) > 0.025:  # Smaller aggregate threshold
+>>>>>>> origin/main
             if price_diff > 0:
                 return 'LONG', max(0.5, avg_climat), avg_edge
             else:

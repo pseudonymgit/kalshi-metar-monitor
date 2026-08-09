@@ -580,6 +580,7 @@ def main():
     print(f"Slope changes: Detected with {SLOPE_ACCELERATION_WINDOW}h dynamic analysis")
     
     # Example usage for same-day signal generation
+<<<<<<< HEAD
     with sqlite3.connect(DB_PATH, timeout=60) as conn:
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=5000;")
@@ -597,6 +598,26 @@ def main():
         print(f"Same-day analysis result: {json.dumps(same_day_result, indent=2, default=str)}")
         
         # Connection automatically closed
+=======
+    conn = sqlite3.connect(DB_PATH, timeout=60)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
+    
+    print("\nTesting same-day signal generation for sample station KATL...")
+    import time
+    sample_date = datetime.now(timezone.utc)
+    
+    same_day_result = same_day_signal_wrapper(
+        conn, 
+        'KATL', 
+        sample_date
+    )
+    
+    print(f"Same-day analysis result: {json.dumps(same_day_result, indent=2, default=str)}")
+    
+    # Close connection
+    conn.close()
+>>>>>>> origin/main
     
     print(f"\nFunction 'same_day_signal_wrapper' available for intraday signal generation")
     print(f"Function 'late_day_momentum_signal' maintained for tomorrow prediction (backward compatibility)")

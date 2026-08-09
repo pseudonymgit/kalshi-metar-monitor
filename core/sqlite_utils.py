@@ -79,6 +79,7 @@ def get_sqlite_connection(db_path: str, timeout: Optional[int] = 30) -> 'sqlite3
 
     db_key = _resolve_db_key(db_path)
 
+<<<<<<< HEAD
     # Always open a fresh connection — the connection manager shares
     # connections but signals independently call conn.close(), which
     # closes the manager's cached connection. Next signal gets a closed
@@ -87,6 +88,19 @@ def get_sqlite_connection(db_path: str, timeout: Optional[int] = 30) -> 'sqlite3
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA busy_timeout=5000;")
     return conn
+=======
+    try:
+        # Try using the new connection manager
+        conn_mgr = _get_connection(db_key)
+        # Need to manually enter the context manager to get the connection object
+        return conn_mgr.__enter__()
+    except (KeyError, Exception):
+        # Fallback: create connection directly
+        conn = _sqlite3.connect(db_path, timeout=timeout if timeout else 30)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
+        return conn
+>>>>>>> origin/main
 
 
 def get_readonly_sqlite_connection(db_path: str, timeout: Optional[int] = 30) -> 'sqlite3.Connection':

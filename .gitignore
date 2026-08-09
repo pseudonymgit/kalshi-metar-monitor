@@ -8,6 +8,7 @@ __pycache__/
 *.db
 *.json
 *.log
+<<<<<<< HEAD
 data/paper_trading_dev.db
 data/backtests/
 data/bmode_p1_execution_log.md
@@ -19,3 +20,5 @@ logs/weather_collector.log
 logs/*.log
 *.db-shm
 *.db-wal
+=======
+>>>>>>> origin/main

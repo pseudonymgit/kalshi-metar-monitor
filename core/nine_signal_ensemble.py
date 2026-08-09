@@ -30,9 +30,12 @@ from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from typing import Dict, List, Tuple, Optional
 
+<<<<<<< HEAD
 from .signal_config import ACTIVATION_THRESHOLD
 
 
+=======
+>>>>>>> origin/main
 
 class NineSignalEnsemble:
     """
@@ -79,7 +82,11 @@ class NineSignalEnsemble:
         }
         
         # Ensemble threshold for trade activation
+<<<<<<< HEAD
         self.activation_threshold = ACTIVATION_THRESHOLD  # ~8% consensus required to trade
+=======
+        self.activation_threshold = 0.08  # ~8% consensus required to trade
+>>>>>>> origin/main
     
     def get_all_signal_values(self, features: Dict) -> Dict[str, Tuple[Optional[str], float]]:
         """

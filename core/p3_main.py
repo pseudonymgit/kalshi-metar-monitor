@@ -36,12 +36,21 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 from . import p3_db_migration as p3db
+<<<<<<< HEAD
 from . import p3_feature_extractor as p3fe
 from . import p3_match_engine as p3me
 from . import p3_trajectory_tracer as p3tt
 from . import p3_calibration_engine as p3ce
 from . import p3_output_formatter as p3of
 from . import p3_scheduler as p3sch
+=======
+from core import p3_feature_extractor as p3fe
+from core import p3_match_engine as p3me
+from core import p3_trajectory_tracer as p3tt
+from core import p3_calibration_engine as p3ce
+from core import p3_output_formatter as p3of
+from core import p3_scheduler as p3sch
+>>>>>>> origin/main
 
 
 # Export all key components for easy importing
@@ -302,10 +311,18 @@ if __name__ == "__main__":
     elif cmd == "health":
         try:
             db_path = p3db._resolve_db_path()
+<<<<<<< HEAD
             with sqlite3.connect(db_path, timeout=1) as conn:
                 conn.execute("PRAGMA journal_mode=WAL;")
                 conn.execute("PRAGMA busy_timeout=5000;")
                 conn.execute("SELECT 1")
+=======
+            conn = sqlite3.connect(db_path, timeout=1)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA busy_timeout=5000;")
+            conn.execute("SELECT 1")
+            conn.close()
+>>>>>>> origin/main
             print("Health: OK")
             print(f"Database: {db_path}")
         except Exception as e:

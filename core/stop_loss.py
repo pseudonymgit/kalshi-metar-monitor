@@ -55,12 +55,17 @@ class StopLossMonitor:
     Multi-condition stop-loss monitor with structured recovery protocol.
     """
 
+<<<<<<< HEAD
     def __init__(self, budget: float = 250.0, enable_day_limit: bool = True):
         self.budget = budget
         # Day-limit stop is a live-trading control (30 calendar days elapsed).
         # Backtest windows replay historical dates, so wall-clock time is
         # meaningless — callers must disable it (enable_day_limit=False).
         self._enable_day_limit = enable_day_limit
+=======
+    def __init__(self, budget: float = 250.0):
+        self.budget = budget
+>>>>>>> origin/main
         self._trades: List[TradeRecord] = []
         self._cumulative_pnl: float = 0.0
         self._peak_pnl: float = 0.0
@@ -69,7 +74,11 @@ class StopLossMonitor:
         self._stop_reason: str = ""
         self._paper_trade_results: List[bool] = []
         self._cooldown_start: Optional[datetime] = None
+<<<<<<< HEAD
         _LOGGER.info("StopLossMonitor initialised — budget=$%.2f day_limit=%s", budget, self._enable_day_limit)
+=======
+        _LOGGER.info("StopLossMonitor initialised — budget=$%.2f", budget)
+>>>>>>> origin/main
 
     # ─── Public API ────────────────────────────────────────────────────────
 
@@ -116,11 +125,18 @@ class StopLossMonitor:
             _LOGGER.warning(reason)
             return True, reason, details
 
+<<<<<<< HEAD
         # 2. Primary stop: calendar days elapsed (simulation-relative)
         if self._enable_day_limit and len(self._trades) >= 2:
             first_date = self._trades[0].date
             last_date = self._trades[-1].date
             days_elapsed = (last_date - first_date).days
+=======
+        # 2. Primary stop: calendar days elapsed
+        if self._trades:
+            first_date = self._trades[0].date
+            days_elapsed = (datetime.utcnow() - first_date).days
+>>>>>>> origin/main
             details["days_elapsed"] = days_elapsed
             if days_elapsed >= PRIMARY_DAY_LIMIT:
                 reason = f"Primary stop: {days_elapsed} days >= {PRIMARY_DAY_LIMIT} day limit"
@@ -355,8 +371,12 @@ if __name__ == "__main__":
     #    Pattern: 35 wins (tiny +0.1) + 15 losses (large -0.8), arranged so the
     #    last 20 trades have 11 wins / 9 losses (55% >= 52%).
     #    Mean PnL is deeply negative → Sharpe < 0.5.
+<<<<<<< HEAD
     #    Disable day-limit (simulation-relative) to avoid triggering it first.
     slm5 = StopLossMonitor(budget=250.0, enable_day_limit=False)
+=======
+    slm5 = StopLossMonitor(budget=250.0)
+>>>>>>> origin/main
     base_date = datetime(2026, 7, 1)
     # First 30 trades: 24 wins, 6 losses
     first30 = [True] * 24 + [False] * 6
@@ -379,6 +399,7 @@ if __name__ == "__main__":
         slm6.record_trade(-1.0, False, f"2026-07-{i+1:02d}")
     stopped, _, _ = slm6.check_stop_conditions()
     assert stopped
+<<<<<<< HEAD
     # Stop date is set to utcnow (Aug 2026). Cooldown = 7 days from stop.
     # First attempt under 7 days
     recovered, reason = slm6.attempt_recovery("2026-08-05")
@@ -387,13 +408,26 @@ if __name__ == "__main__":
 
     # After 7+ days
     recovered, reason = slm6.attempt_recovery("2026-08-12")
+=======
+    # Attempt immediate recovery — cooldown not met
+    recovered, reason = slm6.attempt_recovery("2026-07-22")
+    print(f"[6a] Immediate recovery → recovered={recovered}: {reason}")
+    assert not recovered, "Should fail — cooldown not met"
+
+    # After 7 days
+    recovered, reason = slm6.attempt_recovery("2026-07-29")
+>>>>>>> origin/main
     print(f"[6b] Recovery after 7 days (no paper trades) → recovered={recovered}: {reason}")
     assert not recovered, "Should fail — paper trades incomplete"
 
     # Complete paper trades
     for _ in range(10):
         slm6.record_paper_trade(True)
+<<<<<<< HEAD
     recovered, reason = slm6.attempt_recovery("2026-08-12")
+=======
+    recovered, reason = slm6.attempt_recovery("2026-07-29")
+>>>>>>> origin/main
     print(f"[6c] Recovery after 7 days + 10 paper trades → recovered={recovered}: {reason}")
     assert recovered, "Should recover after cooldown + paper trades"
 

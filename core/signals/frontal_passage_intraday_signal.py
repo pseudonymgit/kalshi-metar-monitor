@@ -117,21 +117,32 @@ class FrontalPassageIntradaySignal(BaseSignal):
             conn = get_sqlite_connection(self.db_path)
             cur = conn.cursor()
 
+<<<<<<< HEAD
             # Constrain to time window within the day
             window_start = f"{date}T00:00:00"
             window_end = f"{date}T{hours:02d}:59:59"
 
+=======
+            # Get observations for this station and date, ordered by time
+>>>>>>> origin/main
             cur.execute("""
                 SELECT timestamp_utc, pressure_mb, wind_direction_deg, temp_f
                 FROM metar_observations
                 WHERE station = ?
                   AND date_utc = ?
+<<<<<<< HEAD
                   AND timestamp_utc >= ?
                   AND timestamp_utc <= ?
                   AND temp_f IS NOT NULL
                   AND pressure_mb IS NOT NULL
                 ORDER BY timestamp_utc ASC
             """, (station, date, window_start, window_end))
+=======
+                  AND temp_f IS NOT NULL
+                  AND pressure_mb IS NOT NULL
+                ORDER BY timestamp_utc ASC
+            """, (station, date))
+>>>>>>> origin/main
 
             obs = []
             for row in cur.fetchall():
@@ -275,9 +286,15 @@ class FrontalPassageIntradaySignal(BaseSignal):
         """
         Evaluate frontal passage signal at day index `idx`.
 
+<<<<<<< HEAD
         Uses METAR intraday data via evaluate_for_station() to detect
         frontal passages. Falls back to (None, 0.0) when station/date
         can't be extracted or no front is detected.
+=======
+        Note: This signal primarily works via evaluate_for_station() to access
+        intraday METAR data. The evaluate() method provides a daily-level
+        fallback using existing frontal_detector_signal logic.
+>>>>>>> origin/main
 
         Args:
             idx: Current day index in the days list
@@ -286,6 +303,7 @@ class FrontalPassageIntradaySignal(BaseSignal):
         Returns:
             (direction, confidence) or (None, 0.0)
         """
+<<<<<<< HEAD
         if idx < self.min_lookback or idx >= len(days):
             return None, 0.0
 
@@ -296,6 +314,16 @@ class FrontalPassageIntradaySignal(BaseSignal):
             return None, 0.0
 
         return self.evaluate_for_station(station, date)
+=======
+        # Fallback to daily-level detection when intraday data isn't available
+        # through the standard evaluate() path
+        if idx < self.min_lookback:
+            return None, 0.0
+
+        from .frontal_detector_signal import FrontalDetectorSignal
+        fallback = FrontalDetectorSignal(self.db_path)
+        return fallback.evaluate(idx, days)
+>>>>>>> origin/main
 
     def evaluate_for_station(
         self, station: str, date: str, conn: sqlite3.Connection = None, market_type: str = None
@@ -355,10 +383,13 @@ class FrontalPassageIntradaySignal(BaseSignal):
         else:  # 3 conditions
             confidence = CONFIDENCE_3_CONDITIONS
 
+<<<<<<< HEAD
         # Guard against (None, confidence > 0) — violates signal contract
         if direction is None:
             return None, 0.0
 
+=======
+>>>>>>> origin/main
         return direction, confidence
 
     @staticmethod
