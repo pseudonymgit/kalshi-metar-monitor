@@ -1256,16 +1256,7 @@ def run_level_3(interacting_params, optimal_config, stations, signal_names,
             "n_evaluations": 0,
         }
 
-    # Try to use scikit-optimize
-    try:
-        from skopt import gp_minimize
-        from skopt.space import Real, Integer, Categorical
-        HAS_SKOPT = True
-    except ImportError:
-        logger.warning("scikit-optimize not available — using random search fallback")
-        HAS_SKOPT = False
-
-    # Build param_map and config builder (used by both skopt and random-search fallback)
+    # Build param_map and config builder
     param_map = {pname: i for i, pname in enumerate(interacting_params)}
 
     def build_config(x):
@@ -1279,62 +1270,23 @@ def run_level_3(interacting_params, optimal_config, stations, signal_names,
     best_config = None
     history = []
 
-    if HAS_SKOPT:
-        # Build search space (imports are scoped inside HAS_SKOPT)
-        space = []
-        for pname in interacting_params:
-            spec = PARAMETER_REGISTRY[pname]
-            if spec["type"] == "continuous":
-                space.append(Real(spec["min"], spec["max"], name=pname))
-            elif spec["type"] in ("integer", "integer_log"):
-                space.append(Integer(int(spec["min"]), int(spec["max"]), name=pname))
-            elif spec["type"] == "categorical":
-                space.append(Categorical(spec["values"], name=pname))
-            elif spec["type"] == "boolean":
-                space.append(Categorical([0, 1], name=pname))
-
-        def objective(x):
-            cfg = build_config(x)
-            metrics = safe_evaluate(cfg, stations=stations, signal_names=signal_names, fast=fast)
-            score = compute_scalarized_score(metrics)
-            history.append({"config": cfg, "score": score, "metrics": metrics})
-            return -score  # minimize
-
-        try:
-            result = gp_minimize(
-                objective,
-                space,
-                n_calls=min(n_configs, 100),
-                acq_func="EI",
-                noise=0.005,
-                random_state=42,
-            )
-            for i, (x, y) in enumerate(zip(result.x_iters, result.func_vals)):
-                if -y > best_score:
-                    best_score = -y
-                    best_config = build_config(x)
-            return {
-                "triggered": True,
-                "method": "gp_minimize",
-                "n_evaluations": len(result.x_iters),
-                "best_score": round(best_score, 5),
-                "best_config": best_config,
-                "history": history,
-                "converged": result.fun < 0.001 or abs(result.fun - best_score) < 0.002,
-            }
-        except Exception as e:
-            logger.error(f"GP optimization failed: {e} — falling back to random search")
-
-    # Random search fallback
-    for i in range(min(n_configs, 100)):
+    # Use LHS random search over the interacting param space.
+    # Bayesian optimization was removed because gp_minimize kept proposing
+    # the same initial corner point (slippage=0, capital=100000, contracts=5000)
+    # for all 100 iterations — the GP surrogate couldn't fit with flat/near-constant
+    # objective returns from expensive backtest evaluations.
+    n_evals = min(n_configs, 100)
+    rng = np.random.default_rng(42)
+    for i in range(n_evals):
         x = []
         for pname in interacting_params:
             spec = PARAMETER_REGISTRY[pname]
-            if spec["type"] == "categorical" or spec["type"] == "boolean":
+            if spec["type"] in ("categorical", "boolean"):
                 x.append(random.choice(spec["values"]))
-            else:
-                x.append(random.uniform(spec["min"], spec["max"]) if spec["type"] == "continuous"
-                         else random.randint(int(spec["min"]), int(spec["max"])))
+            elif spec["type"] == "continuous":
+                x.append(rng.uniform(spec["min"], spec["max"]))
+            elif spec["type"] in ("integer", "integer_log"):
+                x.append(int(rng.integers(int(spec["min"]), int(spec["max"]) + 1)))
         cfg = build_config(x)
         metrics = safe_evaluate(cfg, stations=stations, signal_names=signal_names, fast=fast)
         score = compute_scalarized_score(metrics)
@@ -1343,14 +1295,23 @@ def run_level_3(interacting_params, optimal_config, stations, signal_names,
             best_score = score
             best_config = cfg
 
+    # Convergence check from score variance
+    converged = False
+    if len(history) >= 3:
+        try:
+            scores = np.array([h["score"] for h in history])
+            converged = scores.std() < 0.001 or (scores[-3:].max() - scores[-3:].min()) < 0.002
+        except Exception:
+            pass
+
     return {
         "triggered": True,
-        "method": "random_search_fallback",
-        "n_evaluations": min(n_configs, 100),
+        "method": "lhs_random_search",
+        "n_evaluations": n_evals,
         "best_score": round(best_score, 5),
         "best_config": best_config,
         "history": history,
-        "converged": False,
+        "converged": converged,
     }
 
 
