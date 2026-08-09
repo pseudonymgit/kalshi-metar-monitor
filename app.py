@@ -1881,7 +1881,6 @@ def _clear_request_execution_domain(_exc):
         reset_kalshi_execution_domain(token)
 
 
-<<<<<<< HEAD
 @app.route("/healthz", methods=["GET"])
 def healthz():
     return jsonify({
@@ -1892,8 +1891,6 @@ def healthz():
     }), 200
 
 
-=======
->>>>>>> origin/main
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "ok"}), 200

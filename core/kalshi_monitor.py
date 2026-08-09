@@ -799,7 +799,6 @@ def _derive_attention_phrase(epoch_context):
 
 
 def get_default_config():
-<<<<<<< HEAD
     import base64
     raw_pem = os.getenv("KALSHI_PRIVATE_KEY_PEM") or ""
     # Support base64-encoded PEM (single-line env-safe format)
@@ -811,12 +810,6 @@ def get_default_config():
         "base_url": (os.getenv("KALSHI_BASE_URL") or "").strip(),
         "key_id": (os.getenv("KALSHI_KEY_ID") or "").strip(),
         "key_pem": key_pem,
-=======
-    return {
-        "base_url": (os.getenv("KALSHI_BASE_URL") or "").strip(),
-        "key_id": (os.getenv("KALSHI_KEY_ID") or "").strip(),
-        "key_pem": os.getenv("KALSHI_PRIVATE_KEY_PEM") or "",
->>>>>>> origin/main
     }
 
 

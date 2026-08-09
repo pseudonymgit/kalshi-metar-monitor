@@ -34,7 +34,6 @@ _LOGGER = logging.getLogger(__name__)
 
 # ─── Default / Fallback Constants ────────────────────────────────────────
 
-<<<<<<< HEAD
 # MEASURED_MEAN_SPREAD: 3.1¢ measured across all Kalshi weather markets
 # Sample: 2,500+ trades across 20+ stations, measured 2024-2025
 # Methodology: Direct observation of bid-ask spreads during active trading hours
@@ -48,10 +47,6 @@ DEFAULT_SLIPPAGE = 0.005       # 0.5¢ fallback slippage
 
 # DEFAULT_COMMISSION: Kals极速赛车官网开奖结果hi charges no commission for weather markets
 # Verified: Kalshi fee schedule 2024-2025, confirmed via actual trades
-=======
-MEASURED_MEAN_SPREAD = 0.031  # 3.1¢ measured mean across all markets
-DEFAULT_SLIPPAGE = 0.005       # 0.5¢ fallback slippage
->>>>>>> origin/main
 DEFAULT_COMMISSION = 0.0       # Kalshi charges no commission
 
 # ─── Round-trip fee (single source of truth) ───────────────────────────────────
@@ -113,7 +108,6 @@ class MarketCostModel:
 
     # ─── Core cost calculations ──────────────────────────────────────────
 
-<<<<<<< HEAD
     def kalshi_fee(self, contracts: int, price: float) -> float:
         """Kalshi published taker fee: ceil(0.07 × P × (1-P) × 100) / 100 per contract.
         
@@ -132,8 +126,6 @@ class MarketCostModel:
         fee_per_contract = math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
         return fee_per_contract * contracts
 
-=======
->>>>>>> origin/main
     def round_trip_fraction(self) -> float:
         """
         Return the round-trip cost as a fraction of notional.

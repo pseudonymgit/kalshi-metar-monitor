@@ -28,7 +28,6 @@ Active signal count: 9 (after B-Mode Cycle 3 cleanup, verified by correlation ma
   - 1 spike-reversion lane signal (spike_reversion/goldilocks — separate lane)
   - 1 intraday frontal passage signal (frontal_passage_intraday — Sure Thing lane)
 
-<<<<<<< HEAD
 ADVANCE (wired into pipeline — operational, via integration layer):
   ecmwf_bias_corrected     — core/signals/ecmwf_bias_corrected_signal.py  (NWP source signal)
   metar_nowcast            — core/signals/metar_nowcast_signal.py        (intraday nowcast)
@@ -36,14 +35,9 @@ ADVANCE (wired into pipeline — operational, via integration layer):
 
 DISABLED (in codebase, removed from registry — need data infrastructure):
   temperature_advection, intraday_metar_confirmation    — NWP / ERA5 backfill
-  fogr_reversion, nwp_dtdt_fusion                       — HRRR / FOGR NWP data
-  volume_momentum, settlement_arbitrage                  — Kalshi API execution
-=======
-DISABLED (in codebase, removed from registry — need data infrastructure):
-  temperature_advection, intraday_metar_confirmation    — NWP / ERA5 backfill
   fogr_reversion, hrrr_bias_corrected, nwp_dtdt_fusion  — HRRR / FOGR NWP data
-  spread_based_entry, volume_momentum, settlement_arbitrage — Kalshi API execution
->>>>>>> origin/main
+  volume_momentum, settlement_arbitrage                  — Kalshi API execution
+  spread_based_entry                                     — Kalshi API execution
   frontal_detector                                       — deprecated
   ai_composite                                           — ML pipeline not deployed
 """
@@ -58,7 +52,6 @@ from .calendar_climatology_signal import CalendarClimatologySignal
 from .dual_polarity_signal import CorrectedPressureDeltaSignal
 from .frontal_passage_intraday_signal import FrontalPassageIntradaySignal
 
-<<<<<<< HEAD
 # ── Radiational Cooling Signal (v2026-08-06) ──
 from .radiational_cooling_signal import RadiationalCoolingSignal
 
@@ -69,8 +62,6 @@ from .ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
 from .metar_trend_signal import MetarTrendSignal
 from .cross_model_divergence_signal import CrossModelDivergenceSignal
 
-=======
->>>>>>> origin/main
 
 class SignalRegistry:
     """
@@ -89,7 +80,6 @@ class SignalRegistry:
             'forecast_disagreement': ForecastDisagreementSignal(db_path),  # 64.36%
             'calendar_climatology': CalendarClimatologySignal(db_path),    # 69.00% (best)
 
-<<<<<<< HEAD
             # ── WeatherAPI P0 Signals (independent from METAR) ──
             'cloud_cover_index': CloudCoverIndexSignal(db_path),        # P0-1: Cloud Cover Index
             'feels_like_delta': FeelsLikeDeltaSignal(db_path),           # P0-2: Feels-Like Delta
@@ -104,11 +94,6 @@ class SignalRegistry:
             # ── Radiational Cooling (LOW only) ──
             'radiational_cooling': RadiationalCoolingSignal(db_path),
 
-=======
-            # ── Sure Thing Lane (Lane 2) ──
-            'frontal_passage_intraday': FrontalPassageIntradaySignal(db_path),
-
->>>>>>> origin/main
             # SpikeReversionSignal removed — Fix 5: 49.85% accuracy (negative EV)
             # GoldilocksSignal removed — same signal, same negative EV
         }

@@ -8,11 +8,7 @@ more recent METAR data, and manages entry/exit using sequential triggers.
 
 Architecture (D1):
 - Stage A: METAR-based signals (FOGR, dT/dt, Pressure Tendency)
-<<<<<<< HEAD
 - Stage B: ECMWF bias-corrected (if ECMWF data available)
-=======
-- Stage B: HRRR bias-corrected (if HRRR data available)
->>>>>>> origin/main
 - Stage C: NWP+METAR fusion (confirmation/contradiction)
 - Stage D: Entry/Exit rules
 
@@ -66,13 +62,9 @@ NWP_DB = PROJECT_ROOT / "data" / "nwp_forecasts.db"
 
 # Intraday signal imports
 from core.signals.fogr_reversion_signal import FogrReversionSignal
-<<<<<<< HEAD
 from core.signals.ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
 from core.signals.metar_nowcast_signal import MetarNowcastSignal
 from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
-=======
-from core.signals.hrrr_bias_corrected_signal import HrrrBiasCorrectedSignal
->>>>>>> origin/main
 from core.signals.nwp_dtdt_fusion_signal import NwpDtdtFusionSignal
 
 # ── Configuration ──────────────────────────────────────────────
@@ -96,13 +88,8 @@ SPREAD_WIDENING_FULL_CLOSE = 0.75 # 75% spread widening = full close
 EDGE_SPREAD_MULTIPLIER = 2.0      # Edge requirement = 2x spread
 
 # Stage sequence
-<<<<<<< HEAD
 STAGE_A_SIGNALS = ['fogr_reversion', 'metar_nowcast']
 STAGE_B_SIGNALS = ['ecmwf_bias_corrected']
-=======
-STAGE_A_SIGNALS = ['fogr_reversion']
-STAGE_B_SIGNALS = ['hrrr_bias_corrected']
->>>>>>> origin/main
 STAGE_C_SIGNALS = ['nwp_dtdt_fusion']
 
 
@@ -152,11 +139,7 @@ class IntradayTradingLoop:
 
     Sequential trigger architecture (A→B→C→D):
     - Stage A: METAR-based signals (FOGR, dT/dt, Pressure Tendency)
-<<<<<<< HEAD
     - Stage B: ECMWF bias-corrected signal
-=======
-    - Stage B: HRRR bias-corrected signal
->>>>>>> origin/main
     - Stage C: NWP+METAR fusion signal
     - Stage D: Entry/Exit rules
     """
@@ -167,13 +150,9 @@ class IntradayTradingLoop:
 
         # Initialize signals
         self.fogr = FogrReversionSignal(db_path=self.metar_db_path)
-<<<<<<< HEAD
         self.ecmwf = ECMWFBiasCorrectedSignal(db_path=self.metar_db_path)
         self.metar_nowcast = MetarNowcastSignal()
         self.spread_entry = SpreadBasedEntryDetector()
-=======
-        self.hrrr = HrrrBiasCorrectedSignal(db_path=self.metar_db_path)
->>>>>>> origin/main
         self.fusion = NwpDtdtFusionSignal(db_path=self.metar_db_path, nwp_db_path=self.nwp_db_path)
 
         # Risk controls
@@ -206,7 +185,6 @@ class IntradayTradingLoop:
             if d is not None:
                 signals.append(('fogr', d, c))
 
-<<<<<<< HEAD
         # A2: METAR Nowcast (ADVANCE signal)
         try:
             result = self.metar_nowcast.evaluate(
@@ -222,8 +200,6 @@ class IntradayTradingLoop:
         except Exception as e:
             logger.debug(f"METAR nowcast Stage A failed for {station}: {e}")
 
-=======
->>>>>>> origin/main
         if not signals:
             return None, 0.0
 
@@ -246,28 +222,16 @@ class IntradayTradingLoop:
         # Mixed signals — no clear Stage A trigger
         return None, 0.0
 
-<<<<<<< HEAD
     # ── Stage B: ECMWF IFS Bias-Corrected ──────────────────────────
 
     def evaluate_stage_b(self, station: str, date: str, market_type: str) -> Tuple[Optional[str], float]:
         """
         Evaluate Stage B signal (ECMWF bias-corrected).
-=======
-    # ── Stage B: HRRR Bias-Corrected ──────────────────────────
-
-    def evaluate_stage_b(self, station: str, date: str, market_type: str) -> Tuple[Optional[str], float]:
-        """
-        Evaluate Stage B signal (HRRR bias-corrected).
->>>>>>> origin/main
 
         Returns:
             (direction, confidence) or (None, 0.0)
         """
-<<<<<<< HEAD
         return self.ecmwf.evaluate_for_station(station, date, market_type=market_type)
-=======
-        return self.hrrr.evaluate_for_station(station, date, market_type=market_type)
->>>>>>> origin/main
 
     # ── Stage C: NWP + METAR Fusion ──────────────────────────
 
@@ -440,7 +404,6 @@ class IntradayTradingLoop:
     # ── Stage D3: Spread-Based Entry Avoidance ────────────────
 
     def check_spread_entry_avoidance(self, current_spread: float,
-<<<<<<< HEAD
                                       historical_spread: float = None,
                                       station: str = None,
                                       bucket_temp_f: int = 75) -> Tuple[bool, float]:
@@ -456,22 +419,12 @@ class IntradayTradingLoop:
             historical_spread: Historical average spread for this market
             station: Station code (required for ADVANCE signal analysis)
             bucket_temp_f: Temperature bucket
-=======
-                                      historical_spread: float = None) -> Tuple[bool, float]:
-        """
-        Check if current market spread is widening and adjust edge requirement.
-
-        Args:
-            current_spread: Current Kalshi market spread
-            historical_spread: Historical average spread for this market
->>>>>>> origin/main
 
         Returns:
             (avoid_entry, edge_requirement)
         """
         edge_requirement = current_spread * EDGE_SPREAD_MULTIPLIER
 
-<<<<<<< HEAD
         # Use ADVANCE Spread-Based Entry Detector for percentile analysis
         if station is not None and hasattr(self, 'spread_entry'):
             try:
@@ -491,10 +444,6 @@ class IntradayTradingLoop:
 
         # Fallback: simple historical comparison
         if historical_spread is not None and current_spread > historical_spread:
-=======
-        if historical_spread is not None and current_spread > historical_spread:
-            # Spread is widening — require higher edge
->>>>>>> origin/main
             edge_requirement = max(edge_requirement, current_spread * 3.0)
             return True, edge_requirement
 
@@ -546,11 +495,7 @@ class IntradayTradingLoop:
 
         position.stage_a_fired = True
 
-<<<<<<< HEAD
         # Stage B: ECMWF IFS (if available)
-=======
-        # Stage B: HRRR (if available)
->>>>>>> origin/main
         stage_b_dir, stage_b_conf = self.evaluate_stage_b(station, date, market_type)
         result['stage_b'] = {'direction': stage_b_dir, 'confidence': stage_b_conf}
 
@@ -588,7 +533,6 @@ class IntradayTradingLoop:
         is_entry_eligible = False
         if position.stage == 0:
             spread_pass, iqr = self.check_spread_condition(station, date)
-<<<<<<< HEAD
 
             # Stage D3: Spread-Based Entry Avoidance check
             avoid_entry, edge_req = self.check_spread_entry_avoidance(
@@ -597,17 +541,12 @@ class IntradayTradingLoop:
                 bucket_temp_f=75,
             )
 
-=======
->>>>>>> origin/main
             min_confidence = 0.3
             is_entry_eligible = (
                 overall_direction is not None
                 and overall_confidence >= min_confidence
                 and spread_pass
-<<<<<<< HEAD
                 and not avoid_entry
-=======
->>>>>>> origin/main
             )
 
             if is_entry_eligible:
@@ -620,22 +559,15 @@ class IntradayTradingLoop:
                     'direction': overall_direction,
                     'confidence': overall_confidence,
                     'spread_iqr_c': iqr,
-<<<<<<< HEAD
                     'edge_requirement': edge_req,
                     'reason': 'sequential_triggers_met' if not avoid_entry else 'spread_too_wide',
-=======
-                    'reason': 'sequential_triggers_met'
->>>>>>> origin/main
                 }
             else:
                 result['entry_decision'] = {
                     'action': 'hold',
                     'reason': 'entry_conditions_not_met',
                     'spread_check': spread_pass,
-<<<<<<< HEAD
                     'spread_avoid_entry': avoid_entry,
-=======
->>>>>>> origin/main
                     'confidence': overall_confidence,
                     'min_confidence': min_confidence,
                 }

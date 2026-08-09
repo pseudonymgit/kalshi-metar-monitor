@@ -22,13 +22,9 @@ Usage:
 import logging
 import os
 import sys
-<<<<<<< HEAD
 from typing import Dict, List, Optional, Tuple
 
 from .base_signal import BaseSignal
-=======
-from typing import Dict, Optional, Tuple
->>>>>>> origin/main
 
 logger = logging.getLogger(__name__)
 
@@ -48,18 +44,11 @@ MIN_HOURS_TO_SETTLEMENT = 1.0
 MAX_SPREAD_PERCENTILE = 50  # percentile of historical spread distribution
 
 
-<<<<<<< HEAD
 class SpreadBasedEntryDetector(BaseSignal):
     """Detects profitable spread-based entry opportunities."""
 
     def __init__(self, db_path: str = None, config: Optional[dict] = None):
         super().__init__(db_path)
-=======
-class SpreadBasedEntryDetector:
-    """Detects profitable spread-based entry opportunities."""
-
-    def __init__(self, config: Optional[dict] = None):
->>>>>>> origin/main
         self.config = config or {}
         # Station-specific spread percentiles: {station: {bucket_temp_f: percentile_map}}
         self.spread_history: Dict[str, Dict[int, list]] = {}
@@ -83,7 +72,6 @@ class SpreadBasedEntryDetector:
         count_below = sum(1 for s in hist if s <= spread_cents)
         return count_below / len(hist)
 
-<<<<<<< HEAD
     @property
     def name(self) -> str:
         """Canonical name for this signal."""
@@ -118,8 +106,6 @@ class SpreadBasedEntryDetector:
         """
         return None, 0.0
 
-=======
->>>>>>> origin/main
     def check(self, bid: int, ask: int, volume_24h: float,
               hours_to_settlement: float, station: str,
               bucket_temp_f: int) -> Dict:

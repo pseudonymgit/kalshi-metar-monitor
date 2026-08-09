@@ -24,19 +24,12 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 import sqlite3
 
-<<<<<<< HEAD
 from .signal_config import DEFAULT_NWP_DB_PATH, DEFAULT_METAR_DB_PATH
 
 NWP_DB_PATH = DEFAULT_NWP_DB_PATH
 DB_PATH = DEFAULT_METAR_DB_PATH
 
 ALL_STATIONS = ['KATL','KAUS','KBOS','KDCA','KDEN','KDFW','KHOU','KLAS',
-=======
-NWP_DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
-DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/metar_backfill.db"
-
-ALL_STATIONS = ['KATL','KAUS','KBOS','KDAL','KDCA','KDEN','KDFW','KHOU','KLAS',
->>>>>>> origin/main
                 'KLAX','KMDW','KMIA','KMSP','KMSY','KNYC','KOKC','KPHL','KPHX',
                 'KSAT','KSEA','KSFO']
 
@@ -438,10 +431,6 @@ STATION_COORDS = {
     'KATL': (33.6407, -84.4277),
     'KAUS': (30.1945, -97.6699),
     'KBOS': (42.3656, -71.0096),
-<<<<<<< HEAD
-=======
-    'KDAL': (32.8471, -96.8517),
->>>>>>> origin/main
     'KDCA': (38.8512, -77.0402),
     'KDEN': (39.8561, -104.6737),
     'KDFW': (32.8998, -97.0403),
@@ -499,7 +488,6 @@ def live_multi_model_consensus(station, prev_day_high):
     return direction, confidence, consensus_temp, n_sources
 
 
-<<<<<<< HEAD
 # ─── MULTI-MODEL ENSEMBLE CLASS (for activation wiring) ─────────────────────
 
 class MultiModelEnsemble:
@@ -595,8 +583,6 @@ class MultiModelEnsemble:
         return list(ALL_STATIONS)
 
 
-=======
->>>>>>> origin/main
 # ─── BACKTEST ENGINE ────────────────────────────────────────────────────────
 
 def run_backtest():

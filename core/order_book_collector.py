@@ -47,7 +47,6 @@ STATIONS = [
     "KPHX", "KSAT", "KSEA", "KSFO",
 ]
 
-<<<<<<< HEAD
 # Series ticker patterns — uses kalshi_price_fetcher mapping
 # HIGH: KXHIGH{code}  (e.g., KXHIGHNY for KNYC)
 # LOW:  KXLOWT{code}  (e.g., KXLOWTNYC for KNYC — note: some use KXLOW{code})
@@ -74,13 +73,6 @@ except ImportError:
         prefix = "KXHIGH" if market_type.upper() == "HIGH" else "KXLOW"
         return f"{prefix}{code}"
 
-=======
-# Series ticker patterns
-# HIGH: KXHIGH{ICAO}  (e.g., KXHIGHNYC)
-# LOW:  KXLOW{ICAO}   (e.g., KXLOWNYC)
-SERIES_TYPES = ["HIGH", "LOW"]
-
->>>>>>> origin/main
 # Tiered polling config
 TIER_1_BUCKETS = 6       # Strike-adjacent: current temp ±3°F
 TIER_2_BUCKETS = 15      # Full range
@@ -116,17 +108,10 @@ def _kalshi_public_get(endpoint: str) -> Optional[dict]:
         return None
 
 
-<<<<<<< HEAD
 def _get_station_series_ticker(station: str, series_type: str) -> Optional[str]:
     """Get the Kalshi series ticker for a station and series type.
     Uses the canonical mapping from kalshi_price_fetcher."""
     return _series_ticker_for_station(station, series_type)
-=======
-def _get_station_series_ticker(station: str, series_type: str) -> str:
-    """Get the Kalshi series ticker for a station and series type."""
-    prefix = "KXHIGH" if series_type == "HIGH" else "KXLOW"
-    return f"{prefix}{station}"
->>>>>>> origin/main
 
 
 def _fetch_open_markets(series_ticker: str) -> Optional[List[dict]]:
@@ -160,7 +145,6 @@ def _parse_market_to_snapshot(market: dict, station: str, series_type: str) -> d
     # Actual temperature mapping depends on the day's baseline
     bucket_temp_f = _ticker_to_temperature(ticker, station, series_type)
 
-<<<<<<< HEAD
     yes_bid = market.get('yes_bid_dollars') or market.get('yes_bid')
     yes_ask = market.get('yes_ask_dollars') or market.get('yes_ask')
     no_bid = market.get('no_bid_dollars') or market.get('no_bid')
@@ -178,12 +162,6 @@ def _parse_market_to_snapshot(market: dict, station: str, series_type: str) -> d
 
     bid_size = float(str(market.get('yes_bid_size_fp', '0') or '0'))
     ask_size = float(str(market.get('yes_ask_size_fp', '0') or '0'))
-=======
-    yes_bid = market.get('yes_bid')
-    yes_ask = market.get('yes_ask')
-    no_bid = market.get('no_bid')
-    no_ask = market.get('no_ask')
->>>>>>> origin/main
 
     return {
         'station': station,
@@ -195,7 +173,6 @@ def _parse_market_to_snapshot(market: dict, station: str, series_type: str) -> d
         'yes_ask': yes_ask,
         'no_bid': no_bid,
         'no_ask': no_ask,
-<<<<<<< HEAD
         'yes_bid_size': bid_size,
         'yes_ask_size': ask_size,
         'no_bid_size': float(str(market.get('no_bid_size_fp', '0') or '0')),
@@ -205,26 +182,11 @@ def _parse_market_to_snapshot(market: dict, station: str, series_type: str) -> d
         'open_interest': float(str(market.get('open_interest_fp', '0') or '0')),
         'spread_cents': (yes_ask - yes_bid) if (yes_ask is not None and yes_bid is not None) else None,
         'bid_ask_ratio': bid_size / max(ask_size, 1.0) if bid_size > 0 and ask_size > 0 else None,
-=======
-        'yes_bid_size': market.get('yes_bid_size'),
-        'yes_ask_size': market.get('yes_ask_size'),
-        'no_bid_size': market.get('no_bid_size'),
-        'no_ask_size': market.get('no_ask_size'),
-        'last_price': market.get('last_price'),
-        'volume_24h': market.get('volume_24h_fp', 0),
-        'open_interest': market.get('open_interest'),
-        'spread_cents': (yes_ask - yes_bid) if (yes_ask is not None and yes_bid is not None) else None,
-        'bid_ask_ratio': (yes_bid_size / max(ask_size, 1))
-            if ((yes_bid_size := market.get('yes_bid_size', 0)) is not None
-                and (ask_size := market.get('yes_ask_size', 1)) is not None)
-            else None,
->>>>>>> origin/main
     }
 
 
 def _ticker_to_temperature(ticker: str, station: str, series_type: str) -> int:
     """
-<<<<<<< HEAD
     Kalshi ticker format: KXHIGH{code}-{YYYYMMDD}-{T/B}{temp}
     e.g. KXHIGHNY-26AUG07-T96 or KXHIGHNY-26AUG07-B95.5
 
@@ -243,31 +205,6 @@ def _ticker_to_temperature(ticker: str, station: str, series_type: str) -> int:
         # Fallback: try plain int
         try:
             return int(float(last))
-=======
-    Kalshi ticker format: KXHIGH{ICAO}-{increment}
-    Increment maps to temperature via daily baseline.
-
-    Since baseline varies daily, use a heuristic: for Kalshi, the increment
-    number represents the temperature in °F directly starting from a baseline.
-    Common convention: increment 0 = 0°F, each increment = 1°F.
-
-    For HIGH: increment = temperature - baseline_low
-    For LOW:  increment = baseline_high - temperature
-
-    Without the daily baseline from Kalshi, we extract the last segment.
-    """
-    # Fallback: extract the last number from ticker
-    parts = ticker.split('-')
-    if len(parts) >= 2:
-        try:
-            inc = int(parts[-1])
-            # High series: temperature = inc (approximately)
-            # Low series: temperature = 100-inc (approximately)
-            if series_type == "HIGH":
-                return inc
-            else:
-                return 100 - inc
->>>>>>> origin/main
         except ValueError:
             pass
     return 0
@@ -291,19 +228,12 @@ def _get_tier1_buckets(markets: List[dict], station: str, series_type: str,
         total = 0
         weighted = 0
         for m in markets:
-<<<<<<< HEAD
             bid_val = m.get('yes_bid_dollars') or m.get('yes_bid')
             if bid_val:
                 bid_float = float(bid_val) if isinstance(bid_val, str) else bid_val
                 temp = _ticker_to_temperature(m['ticker'], station, series_type)
                 total += bid_float
                 weighted += bid_float * temp
-=======
-            if m.get('yes_bid'):
-                temp = _ticker_to_temperature(m['ticker'], station, series_type)
-                total += m['yes_bid']
-                weighted += m['yes_bid'] * temp
->>>>>>> origin/main
         target = (weighted / total) if total > 0 else 50
 
     tier1 = []

@@ -4,11 +4,7 @@ from typing import Dict, List, Optional
 import numpy as np
 from datetime import datetime, timedelta
 import os
-<<<<<<< HEAD
 from core.db_utils import query_db, with_db
-=======
-import sqlite3
->>>>>>> origin/main
 import sys
 from pathlib import Path
 
@@ -116,23 +112,10 @@ class StationSkillGate:
         bss_matrix = {}
         
         try:
-<<<<<<< HEAD
             # Load database connection — get station list
             rows = query_db(self.metar_db_path,
                             "SELECT DISTINCT station FROM settlement_epochs")
             stations = [r['station'] for r in rows]
-=======
-            # Load database connection
-            conn = sqlite3.connect(self.metar_db_path)
-            conn.execute("PRAGMA journal_mode=WAL;")
-            conn.execute("PRAGMA busy_timeout=5000;")
-            
-            # Get all unique stations from the settlement_epochs table
-            cursor = conn.cursor()
-            cursor.execute("SELECT DISTINCT station FROM settlement_epochs")
-            stations = [row[0] for row in cursor.fetchall()]
-            conn.close()
->>>>>>> origin/main
             
             if not stations:
                 logger.warning("No stations found in settlement_epochs table")
@@ -150,22 +133,10 @@ class StationSkillGate:
                     
                     try:
                         # Establish new connection for this calculation
-<<<<<<< HEAD
                         with with_db(self.metar_db_path) as conn:
                             # Load the high/low data and market directions
                             days = load_daily_highs_lows(station, conn)
                             market_directions = load_market_directions(station, conn, market_type)
-=======
-                        conn = sqlite3.connect(self.metar_db_path)
-                        conn.execute("PRAGMA journal_mode=WAL;")
-                        conn.execute("PRAGMA busy_timeout=5000;")
-                        
-                        # Load the high/low data and market directions
-                        days = load_daily_highs_lows(station, conn)
-                        market_directions = load_market_directions(station, conn, market_type)
-                        
-                        conn.close()
->>>>>>> origin/main
                         
                         # Calculate the rolling BSS
                         results = compute_rolling_bss(

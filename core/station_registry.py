@@ -28,10 +28,7 @@ Usage:
 import json
 import os
 import sqlite3
-<<<<<<< HEAD
 from core.db_utils import query_db
-=======
->>>>>>> origin/main
 from functools import lru_cache
 from typing import Optional
 
@@ -106,18 +103,8 @@ def _try_cache_file():
 def _try_settlement_epochs():
     """Load station list from settlement_epochs table in metar_backfill.db."""
     try:
-<<<<<<< HEAD
         rows = query_db(_DB_PATH, "SELECT DISTINCT station FROM settlement_epochs ORDER BY station")
         stations = [r['station'] for r in rows]
-=======
-        conn = sqlite3.connect(_DB_PATH)
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
-        c = conn.cursor()
-        c.execute("SELECT DISTINCT station FROM settlement_epochs ORDER BY station")
-        stations = [r[0] for r in c.fetchall()]
-        conn.close()
->>>>>>> origin/main
         if stations:
             return stations
     except Exception:
@@ -234,7 +221,6 @@ _STATION_TO_CLUSTER = {
     for station in stations
 }
 
-<<<<<<< HEAD
 # Budget caps (bankroll-relative percentages)
 CLUSTER_BUDGET_PCT = 0.18  # 18% max total exposure per cluster
 CITY_PAIR_CAP_PCT = 0.08   # 8% max net exposure per city (HIGH+LOW pair)
@@ -242,11 +228,6 @@ CITY_PAIR_CAP_PCT = 0.08   # 8% max net exposure per city (HIGH+LOW pair)
 # Backward compatibility: convert USD caps to percentages based on $10k bankroll
 CLUSTER_BUDGET_USD = 1800.0  # 18% of $10k
 CITY_PAIR_CAP_USD = 800.0    # 8% of $10k
-=======
-# Budget caps
-CLUSTER_BUDGET_USD = 30.0   # max total exposure per cluster
-CITY_PAIR_CAP_USD = 12.0     # max net exposure per city (HIGH+LOW pair)
->>>>>>> origin/main
 
 
 def get_cluster_for_station(station: str) -> Optional[str]:

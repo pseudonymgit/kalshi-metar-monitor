@@ -21,10 +21,7 @@ from typing import Dict, Any, Optional, Tuple
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 from core.conviction import ConvictionScorer
-<<<<<<< HEAD
 from core.market_cost_model import MARKET_COST_MODEL
-=======
->>>>>>> origin/main
 
 
 class AlertFormatter:
@@ -50,11 +47,7 @@ class AlertFormatter:
         position_size: float,
         conviction_details: Dict[str, Any],  # From conviction module
         balance: float,
-<<<<<<< HEAD
         fee_rate: float = MARKET_COST_MODEL.round_trip_fraction(),
-=======
-        fee_rate: float = 0.001,
->>>>>>> origin/main
         instance_tag: str = "[DEV]"
     ) -> Dict[str, Any]:
         """
@@ -218,11 +211,7 @@ def format_alert(
     position_size: float,
     conviction_details: Dict[str, Any],
     balance: float,
-<<<<<<< HEAD
     fee_rate: float = MARKET_COST_MODEL.round_trip_fraction(),
-=======
-    fee_rate: float = 0.001,
->>>>>>> origin/main
     instance_tag: str = "[DEV]"
 ) -> Dict[str, Any]:
     """

@@ -28,11 +28,7 @@ import os
 import sqlite3
 import sys
 from datetime import datetime, timezone
-<<<<<<< HEAD
 from typing import Dict, List, Optional, Tuple
-=======
-from typing import Dict, Optional, Tuple
->>>>>>> origin/main
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +52,6 @@ METAR_FRESHNESS_HOURS = 2     # METAR older than this is stale
 METAR_DB_PATH = os.path.join(DATA_DIR, "metar_archive.db")
 
 
-<<<<<<< HEAD
 from .base_signal import BaseSignal
 
 
@@ -102,15 +97,6 @@ class MetarNowcastSignal(BaseSignal):
 
     # ---- Legacy station-level interface (preserved) ----
 
-=======
-class MetarNowcastSignal:
-    """Confidence-weighted nowcast based on live METAR vs forecast."""
-
-    def __init__(self, config: Optional[dict] = None):
-        self.config = config or {}
-        self._metar_cache: Dict[str, dict] = {}
-
->>>>>>> origin/main
     def _get_latest_metar(self, station: str) -> Optional[dict]:
         """Fetch latest METAR observation for a station from DB."""
         if not os.path.exists(METAR_DB_PATH):
@@ -148,13 +134,8 @@ class MetarNowcastSignal:
             logger.error(f"Failed to fetch METAR for {station}: {e}")
             return None
 
-<<<<<<< HEAD
     def evaluate_forecast(self, station: str, bucket_temp_f: int,
                           gefs_max_f: float, gefs_min_f: float) -> Dict:
-=======
-    def evaluate(self, station: str, bucket_temp_f: int,
-                 gefs_max_f: float, gefs_min_f: float) -> Dict:
->>>>>>> origin/main
         """
         Evaluate nowcast confidence based on current METAR vs forecast.
 
@@ -247,11 +228,7 @@ class MetarNowcastSignal:
         Evaluate whether current METAR temp supports a specific bucket.
         Returns confidence that this bucket will be settled.
         """
-<<<<<<< HEAD
         nowcast = self.evaluate_forecast(station, bucket_temp_f, gefs_max_f, gefs_min_f)
-=======
-        nowcast = self.evaluate(station, bucket_temp_f, gefs_max_f, gefs_min_f)
->>>>>>> origin/main
         if not nowcast["signal"]:
             return {"confidence": 0.0, "reason": nowcast["reason"]}
 
