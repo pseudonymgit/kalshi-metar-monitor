@@ -40,7 +40,7 @@ from core.signals.base_signal import BaseSignal
 # ── Detection Thresholds ──
 GRADIENT_THRESHOLD_C = 3.0           # Continental default: 3°C
 GRADIENT_THRESHOLD_COASTAL_C = 5.0  # Coastal: 5°C (sea breeze = 5-8°C daily)
-COASTAL_STATIONS = {"KSFO", "KLAX", "KMIA", "KSEA", "KPDX", "KNYC", "KBOS", "KPHL"}
+COASTAL_STATIONS = {"KSFO", "KLAX", "KMIA", "KSEA", "KPDX", "KNYC", "KBOS"}
 MIN_UPSTREAM_STATIONS = 2            # Need ≥2 upstream obs for robustness
 MAX_OBS_AGE_MINUTES = 30             # Enforced: reject obs older than 30 min
 BASE_CONFIDENCE = 0.40               # Starting confidence for minimal detection

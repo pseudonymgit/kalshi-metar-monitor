@@ -446,6 +446,7 @@ class DataCache:
 # 3. LHS WITH 18 PARAMS
 # ═══════════════════════════════════════════════════════════════
 def _latin_hypercube(n_samples, n_dims, seed=42):
+    rng = np.random.default_rng(seed)
     try:
         from scipy.stats import qmc
         sampler = qmc.LatinHypercube(d=n_dims, seed=seed)
@@ -487,7 +488,7 @@ def generate_sweep_configs(n_configs):
     n_dims = n_cont + n_cat
     random.seed(42)
     np.random.seed(42)  # Fixed seed for reproducible LHS config generation
-    samples = _latin_hypercube(n_configs, n_dims)
+    samples = _latin_hypercube(n_configs, n_dims, seed=42)
     configs = []
     for i in range(n_configs):
         s = samples[i]
@@ -636,6 +637,7 @@ def get_bias_corrections() -> dict:
 
 
 def _latin_hypercube(n_samples, n_dims, seed=42):
+    rng = np.random.default_rng(seed)
     try:
         from scipy.stats import qmc
         sampler = qmc.LatinHypercube(d=n_dims, seed=seed)
@@ -677,7 +679,7 @@ def generate_sweep_configs(n_configs):
     n_dims = n_cont + n_cat
     random.seed(42)
     np.random.seed(42)  # Fixed seed for reproducible LHS config generation
-    samples = _latin_hypercube(n_configs, n_dims)
+    samples = _latin_hypercube(n_configs, n_dims, seed=42)
     configs = []
     for i in range(n_configs):
         s = samples[i]
