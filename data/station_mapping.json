@@ -1,12 +1,10 @@
 {
-  "version": "2.1",
+  "version": "2.2",
   "last_verified": "2026-07-28T20:40:00Z",
-  "source": "Live Kalshi API (api.elections.kalshi.com/trade-api/v2) — settlement_sources from each series event",
-  "verification_method": "Fetched live events (settlement_sources field) for all 20 KXHIGH series. Verified every NWS site/issuedby pair matches the Kalshi API settlement_sources URL. These are the EXACT stations Kalshi uses for settlement. Note: Kalshi stations differ from Polymarket — e.g., Kalshi uses KMDW (Midway) for Chicago, not KORD (O'Hare).",
-  "kalshi_api_endpoint": "https://api.elections.kalshi.com/trade-api/v2",
+  "last_discovered": "2026-08-11T06:00:00Z",
+  "source": "Live Kalshi API — series endpoint discovery",
+  "discovery_method": "series_endpoint",
   "station_count": 20,
-  "notes": "KDAL removed — Kalshi settles Dallas on KDFW (Dallas/Fort Worth International). KDAL was a duplicate with identical settlement buckets. San Antonio uses KSAT (NWS issuedby=SAT, not SATX). NYC uses KNYC (Central Park, not JFK/LGA). Chicago uses KMDW (Midway, not O'Hare). These are Kalshi-specific settlement stations and differ from Polymarket's stations."
-,
   "stations": {
     "KATL": {"city_name": "Atlanta", "state": "GA", "lat": 33.6407, "lon": -84.4277, "kalshi_series": "KXHIGHTATL", "nws_issuedby": "ATL", "nws_site": "FFC", "station_name": "Hartsfield-Jackson Atlanta International Airport", "settlement_source_url": "https://forecast.weather.gov/product.php?site=FFC&product=CLI&issuedby=ATL"},
     "KAUS": {"city_name": "Austin", "state": "TX", "lat": 30.1945, "lon": -97.6699, "kalshi_series": "KXHIGHAUS", "nws_issuedby": "AUS", "nws_site": "EWX", "station_name": "Austin-Bergstrom International Airport", "settlement_source_url": "https://forecast.weather.gov/product.php?site=EWX&product=CLI&issuedby=AUS"},
