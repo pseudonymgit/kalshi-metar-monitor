@@ -147,6 +147,32 @@ def run_intraday_cycle(
     
     logger.info(f"Intraday cycle: hour={target_hour}UTC, dry_run={dry_run}")
     
+    # 0. Memory monitor — log RSS per cycle to detect leaks
+    try:
+        import psutil
+        _process = psutil.Process()
+        rss_mb = _process.memory_info().rss / 1024 / 1024
+        if rss_mb > 500:  # Alert if >500MB
+            logger.warning(f"Memory: {rss_mb:.0f}MB RSS — above 500MB threshold")
+        else:
+            logger.debug(f"Memory: {rss_mb:.0f}MB RSS")
+    except ImportError:
+        # Fallback: read from /proc/self/status
+        try:
+            with open('/proc/self/status') as f:
+                for line in f:
+                    if line.startswith('VmRSS:'):
+                        parts = line.strip().split()
+                        rss_kb = int(parts[1])
+                        rss_mb = rss_kb / 1024
+                        if rss_mb > 500:
+                            logger.warning(f"Memory: {rss_mb:.0f}MB RSS — above 500MB threshold")
+                        else:
+                            logger.debug(f"Memory: {rss_mb:.0f}MB RSS")
+                        break
+        except Exception as mem_err:
+            logger.debug(f"Memory check unavailable: {mem_err}")
+    
     # 1. Check freshness
     warnings = _check_data_freshness()
     for w in warnings:
@@ -459,6 +485,18 @@ def run_intraday_cycle(
             )
     except Exception as e:
         logger.warning(f"Exit logic failed: {e}")
+    
+    # 8. PnL dashboard — compute and persist per-cycle P&L snapshot
+    try:
+        from core.pnl_dashboard import run_pnl_dashboard, persist_pnl_report
+        pnl = run_pnl_dashboard(db_path=str(REPO_ROOT / "data" / "paper_trading.db"))
+        if pnl["total_trades"] > 0:
+            logger.info(f"PnL: {pnl['total_pnl']:.2f} across {pnl['total_trades']} trades (win_rate={pnl['win_rate']:.1%})")
+            persist_pnl_report(pnl, str(REPO_ROOT / "reports" / "paper_pnl.json"))
+        else:
+            logger.debug("PnL dashboard: no trades yet")
+    except Exception as e:
+        logger.warning(f"PnL dashboard failed: {e}")
     
     return {
         "hour": target_hour,

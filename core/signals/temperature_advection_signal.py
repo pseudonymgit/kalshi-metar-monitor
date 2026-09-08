@@ -333,6 +333,46 @@ def load_advection_history(db_path: str, station: str, window: int = ROLLING_WIN
     return history
 
 
+def _fetch_last_known_advection(db_path: str, station: str) -> Optional[float]:
+    """Check nwp_forecasts.db for an existing recent advection value.
+
+    Queries the DB for the most recent advection_850hPa value for this station.
+    Returns the value if found within the last 48 hours, else None.
+
+    Args:
+        db_path: Path to NWP forecasts DB
+        station: Station code (e.g. 'KATL')
+
+    Returns:
+        Most recent advection value, or None if not found or too old.
+    """
+    try:
+        conn = sqlite3.connect(db_path, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT value, target_date, fetch_timestamp
+            FROM nwp_forecasts
+            WHERE station = ? AND variable = 'advection_850hPa'
+            ORDER BY target_date DESC, id DESC
+            LIMIT 1
+        """, (station,))
+        row = c.fetchone()
+        conn.close()
+        if row is not None and row[0] is not None:
+            # Check freshness: target_date should be today or tomorrow
+            target_date = row[1]
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            from datetime import timedelta
+            tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
+            if target_date in (today, tomorrow):
+                logger.debug(f"Found cached advection for {station}: {row[0]:.6e} (target={target_date})")
+                return float(row[0])
+        return None
+    except Exception as e:
+        logger.debug(f"Could not check cached advection for {station}: {e}")
+        return None
+
+
 def store_advection(db_path: str, station: str, fetch_date: str, target_date: str,
                     advection: float, model: str = "gfs"):
     """Store computed advection value in NWP DB.
@@ -366,6 +406,9 @@ def compute_signal_for_station(lat: float, lon: float, station: str,
     """Compute temperature advection signal for a single station.
 
     This is the main entry point for the signal evaluation.
+    Checks nwp_forecasts.db first for cached advection data to avoid
+    hitting the Open-Meteo GFS API rate limit. Falls back to live GFS
+    fetch only when no recent cached data exists.
 
     Args:
         lat: Station latitude
@@ -377,22 +420,28 @@ def compute_signal_for_station(lat: float, lon: float, station: str,
         (direction, confidence) where direction is 'up' or 'down',
         or (None, 0.0) if signal does not fire.
     """
-    # Fetch GFS grid data
-    grid_data = fetch_gfs_grid_data(lat, lon)
-    if grid_data is None:
-        return None, 0.0
+    # Step 1: Check DB for cached advection first (avoid API rate limits)
+    cached_advection = _fetch_last_known_advection(db_path, station)
+    if cached_advection is not None:
+        advection = cached_advection
+        logger.debug(f"Using cached advection for {station}: {advection:.6e}")
+    else:
+        # Step 2: Fall back to live GFS API fetch
+        grid_data = fetch_gfs_grid_data(lat, lon)
+        if grid_data is None:
+            return None, 0.0
 
-    # Compute advection
-    advection = compute_advection(grid_data, lat)
-    if advection is None:
-        return None, 0.0
+        # Compute advection
+        advection = compute_advection(grid_data, lat)
+        if advection is None:
+            return None, 0.0
 
-    # Store for history
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    # Target date = tomorrow (the date the forecast is for)
-    from datetime import timedelta
-    tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
-    store_advection(db_path, station, today, tomorrow, advection)
+        # Store for history
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        # Target date = tomorrow (the date the forecast is for)
+        from datetime import timedelta
+        tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
+        store_advection(db_path, station, today, tomorrow, advection)
 
     # Load historical std for normalization
     history = load_advection_history(db_path, station)
