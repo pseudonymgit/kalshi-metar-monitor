@@ -1,0 +1,1 @@
+"""Per-signal test suite for all 29 registered weather engine signals."""
