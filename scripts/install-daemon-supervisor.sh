@@ -33,7 +33,7 @@ Requires=docker.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/docker exec ${CONTAINER_NAME} sh -lc 'if [ -f /tmp/intraday-daemon.pid ] && kill -0 $(cat /tmp/intraday-daemon.pid) 2>/dev/null; then exit 0; else cd /home/node/.openclaw/workspace/prototypes/weather-engine-source && nohup python3 scripts/intraday_daemon.py --interval-min 5 >> logs/intraday_daemon.log 2>&1 & echo $! > /tmp/intraday-daemon.pid; fi'
+ExecStart=/usr/bin/docker exec ${CONTAINER_NAME} sh -lc 'if [ -f /tmp/intraday-daemon.pid ] && kill -0 \$(cat /tmp/intraday-daemon.pid) 2>/dev/null; then exit 0; else cd /home/node/.openclaw/workspace/prototypes/weather-engine-source && nohup python3 scripts/intraday_daemon.py --interval-min 5 >> logs/intraday_daemon.log 2>&1 & echo \$! > /tmp/intraday-daemon.pid; fi'
 User=root
 SERVICEEOF
 
