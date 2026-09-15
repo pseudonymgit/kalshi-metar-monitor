@@ -1,4 +1,5 @@
 .env
+.env.webhooks
 .meta/
 logs/
 __pycache__/
@@ -6,19 +7,9 @@ __pycache__/
 .venv/
 *.bak
 *.db
-*.json
-*.log
-<<<<<<< HEAD
-data/paper_trading_dev.db
-data/backtests/
-data/bmode_p1_execution_log.md
-data/tigge_grib/*.grib
-data/tigge_grib/
-*.grib
-data/nwp_forecasts.db
-logs/weather_collector.log
-logs/*.log
 *.db-shm
 *.db-wal
-=======
->>>>>>> origin/main
+*.json
+*.log
+*.grib
+data/
