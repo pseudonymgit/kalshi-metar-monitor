@@ -9,7 +9,10 @@ __pycache__/
 *.db
 *.db-shm
 *.db-wal
-*.json
 *.log
 *.grib
+*.orig
+*.bk
 data/
+graphify-out/
+docs/weather-engine/backtests/

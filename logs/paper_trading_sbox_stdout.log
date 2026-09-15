@@ -1,8 +1,0 @@
-Cron failed: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
-Traceback (most recent call last):
-  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/dev_paper_trading_cron.py", line 52, in main
-    from multi_instance_paper_trader import MultiInstancePaperTrader
-  File "/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/multi_instance_paper_trader.py", line 52, in <module>
-    from position_sizing import (
-ImportError: cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
-[2026-07-10T02:13:09.223150+00:00] DEV: FAILED — cannot import name 'get_config_for_instance' from 'position_sizing' (/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/core/position_sizing.py)
