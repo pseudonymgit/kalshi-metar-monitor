@@ -58,6 +58,12 @@ ALL_STATIONS = [
 logger = logging.getLogger("intraday_bridge")
 
 # ─── Default anchor (fallback when no daily output) ──────────────────────
+# NOTE (2026-09-16, R8 bridge fail-closed): DEFAULT_ANCHOR is no longer written
+# automatically. When daily data is missing/stale, run_bridge() now HALTS with a
+# non-zero exit and writes NOTHING — the previous behavior silently pushed
+# NEUTRAL/0.5 ("default_fallback") as the h-24 anchor, which made the daily
+# anchor a silent no-op for ~10 days (producer dead since Sep 6) without anyone
+# noticing. Silent neutral is the exact "phantom success" pattern R6 kills.
 DEFAULT_ANCHOR = {
     "direction": "NEUTRAL",
     "confidence": 0.5,
@@ -180,12 +186,19 @@ def _aggregate_stations(per_station: Dict[str, Any]) -> tuple:
 
 
 def _build_anchor(daily_data: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-    """Build the h-24 anchor from daily LOOP output (or default fallback)."""
+    """Build the h-24 anchor from daily LOOP output.
+
+    `daily_data` must be non-None (the caller halts fail-closed before reaching
+    here). The None-fallback branch is retained as a defensive guard only; it
+    is not reachable through run_bridge().
+    """
     if daily_data is None:
+        # Defensive guard — should be unreachable via run_bridge() (which halts
+        # fail-closed on missing data). Retained so a direct call can't crash.
         anchor = dict(DEFAULT_ANCHOR)
         anchor["bridge_ts_utc"] = datetime.now(timezone.utc).isoformat()
         anchor["source"] = "default_fallback"
-        logger.info("Using default anchor (no daily output)")
+        logger.error("Building default anchor from None input (should be unreachable)")
         return anchor
 
     consensus = daily_data.get("consensus", {})
@@ -258,7 +271,12 @@ def _verify_anchor(anchor: Dict[str, Any]) -> List[str]:
 
 
 def run_bridge(dry_run: bool = False, force: bool = False) -> int:
-    """Run the bridge end-to-end. Returns exit code."""
+    """Run the bridge end-to-end. Returns exit code.
+
+    Fail-closed behavior (R8, 2026-09-16): when daily data is missing or stale
+    (and --force is not passed), the bridge HALTS with a non-zero exit code and
+    writes NOTHING. It does not silently fall back to a NEUTRAL/0.5 anchor.
+    """
     logger.info(
         f"Intraday bridge: dry_run={dry_run} force={force} "
         f"daily_source={DAILY_LOOP_OUTPUT}"
@@ -266,10 +284,22 @@ def run_bridge(dry_run: bool = False, force: bool = False) -> int:
 
     daily_data = _read_daily_loop()
 
-    if daily_data is not None and not force:
+    if daily_data is None:
+        logger.error(
+            "FAIL-CLOSED: daily LOOP output missing/unreadable — halting. "
+            "No anchor written. Restore the daily LOOP producer before re-running."
+        )
+        return 2
+
+    if not force:
         if not _check_freshness(daily_data):
-            logger.warning("Daily data stale — forcing use of default anchor")
-            daily_data = None
+            logger.error(
+                "FAIL-CLOSED: daily LOOP output is stale (beyond "
+                f"{MAX_DAILY_AGE_HOURS}h) — halting. No anchor written. "
+                "Investigate why the daily producer stopped (last known good: "
+                f"{daily_data.get('generated_at_utc') or daily_data.get('timestamp_utc') or 'unknown'})."
+            )
+            return 2
 
     anchor = _build_anchor(daily_data)
 
@@ -281,7 +311,7 @@ def run_bridge(dry_run: bool = False, force: bool = False) -> int:
 
     if warnings:
         logger.warning(f"Bridge complete with {len(warnings)} warning(s)")
-        return 0 if anchor["source"] == "daily_loop" else 1
+        return 3
 
     logger.info("Bridge complete — anchor pushed to hourly pipeline")
     return 0

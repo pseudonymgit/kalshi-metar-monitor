@@ -40,19 +40,49 @@ def get_connection() -> sqlite3.Connection:
 
 def find_overlapping_markets(cur) -> List[dict]:
     """
-    Find all (station, date, ticker) pairs present in both finalized and historical_api.
-    
-    Returns dicts with station, target_date, event_ticker, finalized_temp, historical_temp.
+    Find all (station, date, series) pairs present in both finalized and
+    historical_api.
+
+    Returns dicts with station, target_date, finalized_ticker, historical_ticker,
+    finalized_temp, historical_temp.
+
+    Join key: (station, target_date, normalized series).
+
+    NOTE (2026-09-16, R8 settlement JOIN fix):
+
+    1. The prior JOIN keyed on `event_ticker` alone (+station+date), which
+       silently produced ZERO overlap (reported 0 vs actual 1,014 station+date
+       pairs). Root cause: `event_ticker` encodes the market series AND the
+       settlement date (e.g. `KXHIGHLAX-26JUL27` vs `KXLOWTLAX-26JUL27`), so a
+       `finalized` row and a `historical_api` row for the *same* station+date
+       never share a ticker.
+
+    2. Joining on (station, target_date) WITHOUT series would produce 1,014
+       false-positive overlaps — all of them comparing HIGH temps against LOW
+       temps (median error 19°F, max 41°F). Those are NOT valid cross-validation
+       pairs. The settlement identity is (station, target_date, series); the
+       HIGH/LOW series is a distinct market with a distinct temperature.
+
+    3. The correct key is therefore (station, target_date, series-normalized).
+       With that key, the true overlap is currently ZERO — the finalized and
+       historical_api sources cover DISJOINT station sets over the same date
+       range (finalized HIGH = {KLAX,KNYC,KDFW,KDCA,KPHX,KSEA,KSFO,KOKC,KHOU,KMDW};
+       historical HIGH = {KATL,KBOS,KAUS,KDEN,KLAS,KMIA,KMSP,KMSY,KPHL,KSAT}).
+       So direct cross-validation is impossible with the current data — this is a
+       data-coverage gap, surfaced honestly by this fix rather than hidden.
     """
     cur.execute("""
-        SELECT f.station, f.target_date, f.event_ticker,
+        SELECT f.station, f.target_date,
+               f.event_ticker AS finalized_ticker,
+               h.event_ticker AS historical_ticker,
                f.kalshi_temp AS finalized_temp,
                h.kalshi_temp AS historical_temp
         FROM kalshi_settlements f
         JOIN kalshi_settlements h
-          ON f.event_ticker = h.event_ticker
-         AND f.station = h.station
+          ON f.station = h.station
          AND f.target_date = h.target_date
+         AND (CASE WHEN f.series LIKE 'KXHIGH%' THEN 'HIGH' ELSE 'LOW' END)
+           = (CASE WHEN h.series LIKE 'KXHIGH%' THEN 'HIGH' ELSE 'LOW' END)
         WHERE f.source_type = 'finalized'
           AND h.source_type = 'historical_api'
           AND f.kalshi_temp IS NOT NULL
@@ -64,10 +94,11 @@ def find_overlapping_markets(cur) -> List[dict]:
         {
             "station": r[0],
             "target_date": r[1],
-            "event_ticker": r[2],
-            "finalized_temp": r[3],
-            "historical_temp": r[4],
-            "abs_error": abs(r[3] - r[4]),
+            "finalized_ticker": r[2],
+            "historical_ticker": r[3],
+            "finalized_temp": r[4],
+            "historical_temp": r[5],
+            "abs_error": abs(r[4] - r[5]),
         }
         for r in rows
     ]
@@ -256,7 +287,8 @@ def main():
             large_errors = [o for o in overlaps if o["abs_error"] > 1.0]
             print(f"\n  ❌ Check 4: {len(large_errors)} markets with error > 1°F")
             for le in large_errors[:5]:
-                print(f"     {le['station']} {le['target_date']} ({le['event_ticker']}): "
+                print(f"     {le['station']} {le['target_date']} "
+                      f"(finalized={le['finalized_ticker']}, hist={le['historical_ticker']}): "
                       f"finalized={le['finalized_temp']}, hist={le['historical_temp']}")
 
         # Check 5: median error
@@ -266,8 +298,10 @@ def main():
         else:
             print(f"\n  ✅ Check 5 PASS: median error {median_err:.4f}°F ≤ 0.5°F")
     else:
-        print("  ⚠️ No overlapping (station, date) pairs between finalized and historical_api.")
-        print("  Direct cross-validation not possible. Running internal consistency checks.")
+        print("  ⚠️ No overlapping (station, date, series) pairs between finalized and historical_api.")
+        print("     Root cause: the two sources cover DISJOINT station sets over the same date")
+        print("     range, so same-series cross-validation is impossible with current data.")
+        print("     Direct cross-validation not possible. Running internal consistency checks.")
 
     # Internal consistency (always useful)
     print(f"\n  INTERNAL CONSISTENCY CHECKS:")

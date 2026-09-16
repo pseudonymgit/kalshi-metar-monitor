@@ -15,6 +15,30 @@ LOGGER = logging.getLogger("auth_check")
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
+
+def _load_env() -> None:
+    """Load .env into os.environ so getenv() calls see credentials.
+
+    Prior to this fix, the cron ran the script in a fresh shell without the
+    .env contents, so KALSHI_KEY_ID / KALSHI_PRIVATE_KEY_PEM / WEATHERAPI_KEY
+    were unset and the script reported a false 'not set' failure every hour.
+    Matches the collector convention (run_whalewatch_collector.py).
+    """
+    env_path = os.path.join(PROJECT_ROOT, '.env')
+    if not os.path.exists(env_path):
+        return
+    with open(env_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+            key, value = line.split('=', 1)
+            # Do not overwrite already-set env vars; .env is the fallback source.
+            os.environ.setdefault(key, value)
+
+
+_load_env()
+
 FAILURES: list[str] = []
 
 
