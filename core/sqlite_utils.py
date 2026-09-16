@@ -135,3 +135,30 @@ def close_connection(conn) -> None:
         conn.close()
     except Exception:
         pass
+
+def get_pooled_connection(db_path: str = None, timeout: Optional[int] = 30):
+    """Backward-compatible alias for path-based SQLite connection access."""
+    if db_path is None:
+        db_path = os.path.join(os.path.dirname(__file__), "..", "data", "metar_backfill.db")
+    return get_sqlite_connection(db_path, timeout=timeout)
+
+
+def ensure_schema(db_path: str):
+    """Compatibility schema initializer for legacy callers."""
+    from core.db_schema import ensure_all_tables
+    return ensure_all_tables(db_path)
+
+
+def run_migration_test(db_path: str):
+    """Compatibility migration check."""
+    return ensure_schema(db_path)
+
+
+def get_schema_report(db_path: str):
+    """Return a compact schema report for legacy callers."""
+    import sqlite3
+    conn=sqlite3.connect(db_path)
+    try:
+        return [row[0] for row in conn.execute("select name from sqlite_master where type='table' order by name")]
+    finally:
+        conn.close()
