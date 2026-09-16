@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 # ─── Trading Hours (UTC) ──────────────────────────────────────
 # Kalshi weather markets trade 10:00-16:00 ET = 14:00-20:00 UTC
-TRADING_HOUR_START_UTC = 14
-TRADING_HOUR_END_UTC = 21  # exclusive (last run at 20:30)
+TRADING_HOUR_START_UTC = 0
+TRADING_HOUR_END_UTC = 24  # Kalshi weather markets are 24/7
 
 # Settlement hour UTC
 SETTLEMENT_HOUR_UTC = 18
@@ -98,8 +98,8 @@ class EntryTimingEngine:
 
     @staticmethod
     def _is_trading_hour(hour_utc: int) -> bool:
-        """Check if the hour falls within Kalshi trading hours (UTC)."""
-        return TRADING_HOUR_START_UTC <= hour_utc < TRADING_HOUR_END_UTC
+        """Kalshi weather markets are 24/7 — always tradable."""
+        return True
 
     def _compute_kelly_size(
         self,

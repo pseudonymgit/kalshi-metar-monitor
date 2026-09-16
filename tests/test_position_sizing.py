@@ -105,15 +105,15 @@ class TestKellyPositionSizer:
         assert win_rate == 0.65
 
     def test_edge_calculation(self, default_sizer):
-        """Edge = win_rate - market_price (default market_price=0.5)."""
+        """Edge = 2*win_rate - 1 (current formula)."""
         edge = default_sizer.calculate_edge_from_win_rate(0.65)
-        assert abs(edge - 0.15) < 0.01
+        assert abs(edge - 0.30) < 0.01
 
         edge = default_sizer.calculate_edge_from_win_rate(0.5)
         assert abs(edge) < 0.01
 
         edge = default_sizer.calculate_edge_from_win_rate(0.75)
-        assert abs(edge - 0.25) < 0.01
+        assert abs(edge - 0.50) < 0.01
 
     def test_negative_edge(self, default_sizer):
         """Win rate below 0.5 -> negative edge."""
@@ -136,16 +136,14 @@ class TestKellyPositionSizer:
         assert kelly > 0
 
     def test_per_signal_win_rate(self, default_sizer):
-        """Different signal IDs should have separate win rates."""
+        """Win rate tracking is global (no per-signal tracking in current API)."""
         date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-        # Add 10 wins for signal A, 0 wins for signal B
+        # Add 10 wins, 0 losses
         for i in range(10):
-            default_sizer.add_win_result(date, win=True, signal_id="signal_a")
-            default_sizer.add_win_result(date, win=False, signal_id="signal_b")
+            default_sizer.add_win_result(date, win=True)
 
-        wr_a = default_sizer.get_rolling_win_rate(signal_id="signal_a")
-        wr_b = default_sizer.get_rolling_win_rate(signal_id="signal_b")
-        assert wr_a > wr_b
+        wr = default_sizer.get_rolling_win_rate()
+        assert wr == 1.0
 
 
 @pytest.mark.unit

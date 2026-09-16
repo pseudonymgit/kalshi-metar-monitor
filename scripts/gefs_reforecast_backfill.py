@@ -104,10 +104,14 @@ REFORECAST_MEMBERS = ["c00", "p01", "p02", "p03", "p04"]
 OPERATIONAL_MEMBERS = ["gec00"] + [f"gep{d:02d}" for d in range(1, 31)]
 
 # HTTP config
-HTTP_TIMEOUT = 60
+HTTP_TIMEOUT = 30
 RATE_LIMIT_DELAY = 0.5  # seconds between HTTP requests
 MAX_RETRIES = 3
 RETRY_DELAY = 5.0
+# Operational refresh is intentionally bounded: one init cycle, one lead, and
+# one station by default. Larger historical work must be explicitly chunked.
+DEFAULT_OPERATIONAL_STEPS = [24]
+
 
 # Checkpoint file
 CHECKPOINT_FILE = "data/gefs_backfill_checkpoint.json"
@@ -136,6 +140,10 @@ def parse_args():
                         help="Re-download even if data exists in DB")
     parser.add_argument("--delay", type=float, default=RATE_LIMIT_DELAY,
                         help=f"Delay between HTTP requests (default: {RATE_LIMIT_DELAY}s)")
+    parser.add_argument("--steps", default="24",
+                        help="Comma-separated forecast steps in hours (default: 24)")
+    parser.add_argument("--max-members", type=int, default=31,
+                        help="Maximum GEFS members per init/step (default: 31)")
     return parser.parse_args()
 
 
@@ -712,9 +720,13 @@ def main():
             # ── GEFS Operational (2021-present) ──────────────────────
             # Design: download each (date, member, step) file ONCE, extract all stations
             # This avoids downloading 20× per file
-            members = OPERATIONAL_MEMBERS
+            members = OPERATIONAL_MEMBERS[:max(1, min(args.max_members, len(OPERATIONAL_MEMBERS)))]
             current_date = src_start
-            day_steps = [24, 48, 72, 96, 120, 144, 168, 192, 216, 240]
+            day_steps = [int(value) for value in args.steps.split(",") if value.strip()]
+            if not day_steps or any(step <= 0 or step % 24 for step in day_steps):
+                print("Error: --steps must contain positive multiples of 24")
+                sys.exit(1)
+            day_steps = day_steps[:10]
 
             while current_date <= src_end:
                 date_label = current_date.isoformat()

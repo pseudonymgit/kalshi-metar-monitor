@@ -48,7 +48,7 @@ def get_registered_signals() -> Dict[str, Tuple[str, str, callable]]:
 # ─── Built-in Detectors ──────────────────────────────────────
 
 
-def _detect_pressure_tendency(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float]:
+def _detect_pressure_tendency(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float, Optional[float]]:
     """
     Detect signal from rapid pressure changes.
 
@@ -66,22 +66,22 @@ def _detect_pressure_tendency(station: str, date_str: str, hour_utc: int, metar_
             break
 
     if target is None or target.pressure_tendency_3h is None:
-        return None, 0.0
+        return None, 0.0, None
 
     tendency = target.pressure_tendency_3h
     if abs(tendency) < 1.5:
-        return None, 0.0
+        return None, 0.0, None
 
     confidence = min(0.6, 0.3 + abs(tendency) * 0.05)
     if tendency > 0:
         # Rising pressure → cold air settling → DOWN
-        return "down", confidence
+        return "down", confidence, abs(tendency)
     else:
         # Falling pressure → warm air approaching → UP
-        return "up", confidence
+        return "up", confidence, abs(tendency)
 
 
-def _detect_temp_trend(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float]:
+def _detect_temp_trend(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float, Optional[float]]:
     """
     Detect signal from rapid temperature changes.
 
@@ -97,20 +97,20 @@ def _detect_temp_trend(station: str, date_str: str, hour_utc: int, metar_data: D
             break
 
     if target is None or target.temp_trend_3h is None:
-        return None, 0.0
+        return None, 0.0, None
 
     trend = target.temp_trend_3h
     if abs(trend) < 2.0:
-        return None, 0.0
+        return None, 0.0, None
 
     confidence = min(0.55, 0.25 + abs(trend) * 0.05)
     if trend > 0:
-        return "up", confidence
+        return "up", confidence, abs(trend)
     else:
-        return "down", confidence
+        return "down", confidence, abs(trend)
 
 
-def _detect_wind_shift(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float]:
+def _detect_wind_shift(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float, Optional[float]]:
     """
     Detect signal from significant wind direction shifts.
 
@@ -124,13 +124,13 @@ def _detect_wind_shift(station: str, date_str: str, hour_utc: int, metar_data: D
             break
 
     if target is None or target.wind_direction_deg is None:
-        return None, 0.0
+        return None, 0.0, None
 
     # Check raw obs for wind variability
     raw_obs = metar_data.get("raw_obs_hour", {}).get(hour_utc, [])
     wind_dirs = [o.get("wind_direction_deg") for o in raw_obs if o.get("wind_direction_deg") is not None]
     if len(wind_dirs) < 3:
-        return None, 0.0
+        return None, 0.0, None
 
     # Compute max-min circular dispersion
     min_dir = min(wind_dirs)
@@ -140,18 +140,18 @@ def _detect_wind_shift(station: str, date_str: str, hour_utc: int, metar_data: D
         dispersion = 360 - dispersion
 
     if dispersion < 45:
-        return None, 0.0
+        return None, 0.0, None
 
     # Assess direction: northerly shift → cold front → DOWN
     #                    southerly shift → warm front → UP
     avg_dir = sum(wind_dirs) / len(wind_dirs)
     if avg_dir < 180:
-        return "down", min(0.55, 0.3 + dispersion * 0.002)
+        return "down", min(0.55, 0.3 + dispersion * 0.002), dispersion
     else:
-        return "up", min(0.55, 0.3 + dispersion * 0.002)
+        return "up", min(0.55, 0.3 + dispersion * 0.002), dispersion
 
 
-def _detect_cloud_cover(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float]:
+def _detect_cloud_cover(station: str, date_str: str, hour_utc: int, metar_data: Dict) -> Tuple[Optional[str], float, Optional[float]]:
     """
     Detect signal from cloud cover patterns.
 
@@ -166,27 +166,27 @@ def _detect_cloud_cover(station: str, date_str: str, hour_utc: int, metar_data: 
             break
 
     if target is None or target.cloud_cover_pct is None or target.pressure_mb is None:
-        return None, 0.0
+        return None, 0.0, None
 
     cloud = target.cloud_cover_pct
     if cloud > 0.7:
-        return None, 0.0  # Too cloudy — no clear signal
+        return None, 0.0, None  # Too cloudy — no clear signal
 
     if cloud < 0.2:
         # Clear skies — check pressure for direction
         if target.pressure_tendency_3h is not None and target.pressure_tendency_3h > 1.0:
-            return "down", 0.45
-        return "up", 0.35
+            return "down", 0.45, cloud
+        return "up", 0.35, cloud
 
-    return None, 0.0
+    return None, 0.0, None
 
 
 # ─── Register built-in signals ────────────────────────────────
 
 _register_signal("intraday_pressure_tendency", "heuristic", _detect_pressure_tendency)
-_register_signal("intraday_temp_trend", "heuristic", _detect_temp_trend)
-_register_signal("intraday_wind_shift", "heuristic", _detect_wind_shift)
-_register_signal("intraday_cloud_cover", "heuristic", _detect_cloud_cover)
+_register_signal("intraday_temp_trend", "metar_trend", _detect_temp_trend)
+_register_signal("intraday_wind_shift", "frontal", _detect_wind_shift)
+_register_signal("intraday_cloud_cover", "intraday", _detect_cloud_cover)
 
 
 # ─── Module-level helper ──────────────────────────────────────
@@ -252,10 +252,53 @@ class HourlySignalEvaluator:
         # results: {"intraday_pressure_tendency": ("up", 0.55), ...}
     """
 
-    def __init__(self, metar_db: str = ""):
+    def __init__(self, metar_db: str = "", confidence_map_path: str = ""):
         self.metar_db = metar_db
         self._signal_registry = _INTRADAY_SIGNALS
+        self._confidence_map = self._load_confidence_map(confidence_map_path)
         logger.info(f"HourlySignalEvaluator initialized: metar_db={metar_db}")
+
+    def _load_confidence_map(self, path: str) -> Dict:
+        """Load the empirical P(direction) map (Change 2, signal redesign)."""
+        import os
+        from pathlib import Path
+        if path:
+            p = Path(path)
+        else:
+            p = Path(__file__).resolve().parent.parent.parent / "data" / "intraday_confidence_map.json"
+        try:
+            with open(p) as f:
+                import json
+                return json.load(f)
+        except (FileNotFoundError, ValueError) as e:
+            logger.warning(f"Confidence map not loaded ({e}); detectors will fall back to heuristic confidence")
+            return {}
+
+    def _empirical_confidence(self, signal_name: str, direction: str, feature) -> float:
+        """Look up measured P(direction correct) for a fired signal.
+
+        Returns the empirical p_correct for the fired direction in the feature
+        bucket, or None if the detector has no valid/monotone entry (dead).
+        """
+        entry = self._confidence_map.get(signal_name)
+        if entry is None or not entry.get("monotone", False):
+            return None
+        if feature is None:
+            return None
+        try:
+            f = abs(float(feature))
+        except (TypeError, ValueError):
+            return None
+        for b in entry.get("buckets", []):
+            if b.get("min", 0.0) <= f <= b.get("max", 1e9):
+                if direction == "up":
+                    v = b.get("p_correct_up")
+                else:
+                    v = b.get("p_correct_down")
+                if v is None:
+                    return None
+                return float(v)
+        return None
 
     # ─── Data Loading ─────────────────────────────────────────
 
@@ -272,7 +315,7 @@ class HourlySignalEvaluator:
         This is the canonical data loading method for intraday signals.
         Uses HourlyPipeline internally for consistency.
         """
-        from .pipeline import HourlyPipeline
+        from .pipeline import HourlyPipeline, _cloud_cover_fraction
 
         pipeline = HourlyPipeline(
             metar_db=self.metar_db,
@@ -291,7 +334,7 @@ class HourlySignalEvaluator:
             cur = conn.cursor()
             cur.execute("""
                 SELECT timestamp_utc, temp_f, wind_direction_deg, pressure_mb,
-                       clouds_cover_pct, dewpoint_f, wind_speed_kt
+                       dewpoint_f, wind_speed_kt, raw_metar
                 FROM metar_observations
                 WHERE station = ? AND date_utc = ?
                   AND temp_f IS NOT NULL
@@ -308,7 +351,9 @@ class HourlySignalEvaluator:
                         continue
                 except (ValueError, IndexError):
                     continue
-                raw_obs.setdefault(h, []).append(dict(row))
+                obs_row = dict(row)
+                obs_row["clouds_cover_pct"] = _cloud_cover_fraction(row["raw_metar"])
+                raw_obs.setdefault(h, []).append(obs_row)
             conn.close()
         except Exception as e:
             logger.debug(f"Raw obs load failed for {station} {date_str}: {e}")
@@ -346,12 +391,16 @@ class HourlySignalEvaluator:
         results: Dict[str, Tuple[Optional[str], float]] = {}
         for name, (_, _, detector_fn) in self._signal_registry.items():
             try:
-                direction, confidence = detector_fn(station, date_str, hour, metar_data)
-                # Guard against (None, confidence>0) — invalid contract
+                direction, confidence, feature = detector_fn(station, date_str, hour, metar_data)
                 if direction is None:
                     results[name] = (None, 0.0)
+                    continue
+                # Change 2: substitute empirical P(direction) for heuristic confidence.
+                emp = self._empirical_confidence(name, direction, feature)
+                if emp is None:
+                    results[name] = (None, 0.0)  # dead detector — no monotone edge
                 else:
-                    results[name] = (direction, min(1.0, max(0.0, confidence)))
+                    results[name] = (direction, min(1.0, max(0.0, emp)))
             except Exception as e:
                 logger.warning(f"Signal '{name}' failed for {station} h{hour}: {e}")
                 results[name] = (None, 0.0)

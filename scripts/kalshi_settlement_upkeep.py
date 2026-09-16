@@ -192,6 +192,7 @@ def run_upkeep(days_back: int = 7, dry_run: bool = False) -> Dict[str, int]:
     stats = {"inserted": 0, "upgraded": 0, "skipped": 0, "errors": 0, "api_calls": 0}
 
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA busy_timeout = 30000")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -289,6 +290,11 @@ def run_upkeep(days_back: int = 7, dry_run: bool = False) -> Dict[str, int]:
             # Brief pause between events to avoid hammering
             time.sleep(0.1)
 
+        # Incremental commit per station — keeps write transactions short so
+        # concurrent readers (crons, dashboards) are never blocked mid-backfill.
+        if not dry_run:
+            conn.commit()
+
     if not dry_run:
         conn.commit()
     conn.close()
@@ -314,3 +320,5 @@ if __name__ == "__main__":
     stats = run_upkeep(days_back=args.days_back, dry_run=args.dry_run)
     print(f"\nSummary: {stats['inserted']} inserted, {stats['upgraded']} upgraded, "
           f"{stats['skipped']} skipped, {stats['errors']} errors, {stats['api_calls']} API calls")
+    # Nonzero exit on errors so cron command payloads mark the run failed.
+    sys.exit(1 if stats["errors"] else 0)

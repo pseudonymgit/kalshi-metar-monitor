@@ -221,35 +221,18 @@ class PositionSizer:
         """
         Calculate Kelly fraction for binary options.
 
-        f* = edge / (1 - c)   where edge = abs(win_rate - market_price)
+        f* = (p - c) / (1 - c)
 
-        For a YES contract at price M with true probability p:
-        - Edge = p - M (expected value vs market price)
-        - If edge <= 0: no trade (market already prices it fairly or overpriced)
-        - c = round-trip fee fraction
+        where p is win probability and c is cost fraction.
+        This is the standard Kelly for binary outcomes with asymmetric payoff:
+        win → get (1-c) per contract, lose → forfeit full contract value.
 
         Returns raw Kelly fraction (before adaptive scaling and caps).
-        When market_price is not available (0.50 default), falls back to
-        conservative estimate using win_rate.
         """
         c = self._cost_fraction
         if c >= 1.0:
             return 0.0
-        
-        # Calculate edge against market price
-        # For binary options: edge = true_probability - market_price
-        # We use abs to handle both UP (buy YES) and DOWN (buy NO) predictions
-        if market_price != 0.50 or abs(win_rate - 0.50) > 0.10:
-            # Market price is available or win_rate is significantly off-fair
-            edge = abs(win_rate - market_price)
-        else:
-            # Fallback: use deviation from 50%
-            edge = abs(win_rate - 0.50) - c
-        
-        if edge <= 0.0:
-            return 0.0
-        
-        kelly = edge / (1.0 - c)
+        kelly = (win_rate - c) / (1.0 - c)
         return max(0.0, min(1.0, kelly))
 
     # Fee-aware Kelly formula removed — Fix 3: use standard binary Kelly

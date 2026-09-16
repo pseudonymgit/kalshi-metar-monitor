@@ -102,8 +102,8 @@ def load_truth(db_path: str) -> Dict[Tuple[str, str], float]:
     if os.path.isfile(dbm):
         conn = sqlite3.connect(dbm)
         for row in conn.execute(
-            "SELECT station, bucket_date, bucket_high_f FROM settlement_epochs "
-            "WHERE bucket_high_f IS NOT NULL"
+            "SELECT station, local_trading_date, settlement_bucket FROM settlement_epochs "
+            "WHERE settlement_bucket IS NOT NULL"
         ):
             st, d, b = str(row[0]), str(row[1]), float(row[2])
             key = (st, d)

@@ -39,5 +39,5 @@ if __name__ == '__main__':
     if result:
         print(result)
         sys.exit(1)
-    print('fee formula verified: core/fees.py matches independent recomputation')
+    print('NO_REPLY')
     sys.exit(0)

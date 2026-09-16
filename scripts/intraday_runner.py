@@ -187,10 +187,12 @@ def run_intraday_cycle(
             nwp_db=str(NWP_DB),
         )
         all_vectors = []
+        station_hours: Dict[str, List[int]] = {}
         for st in stations:
             vectors = pipeline.build_for_station_date(st, datetime.now(timezone.utc).strftime('%Y-%m-%d'))
             if vectors:
                 all_vectors.extend(vectors)
+                station_hours[st] = [v.hour_utc for v in vectors]
         logger.info(f"Pipeline built: {len(all_vectors)} hourly vectors across {len(stations)} stations")
     except Exception as e:
         logger.error(f"Pipeline failed: {e}", exc_info=True)
@@ -206,14 +208,31 @@ def run_intraday_cycle(
             metar_db=str(METAR_DB),
         )
         date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        # Graceful fallback (M5/M7 fix 2026-09-15): the target hour's METAR vector
+        # does not exist yet at evaluation time (hour-H obs publish ~:51 and ingest
+        # ~1h later), so detectors found no target vector and returned zero signals.
+        # When target_hour is unavailable, evaluate the most recent complete METAR
+        # hour instead of returning no vectors.
+        effective_hours: Dict[str, int] = {}
+        for st in stations:
+            hours = station_hours.get(st) or []
+            eff_hour = target_hour
+            if hours and target_hour not in hours:
+                earlier = [h for h in hours if h <= target_hour]
+                eff_hour = max(earlier) if earlier else max(hours)
+                logger.info(
+                    f"Target-hour fallback: {st} target={target_hour} -> "
+                    f"hour {eff_hour} (most recent complete METAR hour)"
+                )
+            effective_hours[st] = eff_hour
         # Use pool-name mapped output so fusion engine's pool definitions match
         pool_signal_results = {}
         for st in stations:
-            pool_signal_results[st] = evaluator.evaluate_hour_with_pool_names(st, date_str, target_hour)
+            pool_signal_results[st] = evaluator.evaluate_hour_with_pool_names(st, date_str, effective_hours[st])
         # Also keep bare-named for logging
         signal_results = {}
         for st in stations:
-            raw = evaluator.evaluate_hour(st, date_str, target_hour)
+            raw = evaluator.evaluate_hour(st, date_str, effective_hours[st])
             signal_results[st] = raw
         logger.info(f"Signals evaluated: {len(pool_signal_results)} stations ({len(stations)} total)")
     except Exception as e:
@@ -226,7 +245,7 @@ def run_intraday_cycle(
         fusion_engine = HourlyFusionEngine()
         
         hours_before_settlement = {
-            st: max(0, 18 - target_hour)  # settlement ~18 UTC (12 ET)
+            st: max(0, 18 - effective_hours.get(st, target_hour))  # settlement ~18 UTC (12 ET)
             for st in stations
         }
         
@@ -251,7 +270,17 @@ def run_intraday_cycle(
             else:
                 fused_results[st] = None
         
-        logger.info(f"Fusion complete: {len(fused_results)} stations fused via LOOP")
+        n_fused_nonnull = sum(1 for result in fused_results.values() if result is not None)
+        n_fused_gated = sum(1 for result in fused_results.values() if result is not None and result.agreement_gate_passed)
+        n_fired_total = sum(
+            1 for station_signals in pool_signal_results.values()
+            for direction, confidence in station_signals.values()
+            if direction is not None and confidence > 0
+        )
+        logger.info(
+            "Fusion complete: nonnull=%d gated=%d/%d stations via LOOP; fired_signals=%d",
+            n_fused_nonnull, n_fused_gated, len(stations), n_fired_total,
+        )
     except Exception as e:
         logger.error(f"Fusion failed: {e}", exc_info=True)
         return {"error": f"Fusion: {e}", "signals": 0}
@@ -363,7 +392,7 @@ def run_intraday_cycle(
         loader = HourlyCalibrationLoader()
         for st in calibrated:
             corrector = loader.apply_nws_revision_correction(
-                calibrated[st]["probability"], st
+                st, calibrated[st]["probability"]
             )
             if corrector != calibrated[st]["probability"]:
                 logger.info(
@@ -506,6 +535,12 @@ def run_intraday_cycle(
         "entry_results": entry_results,
         "additive_applied": additive_applied,
         "fused_stations": len([s for s in fused_results.values() if s is not None and s.agreement_gate_passed]),
+        "fused_nonnull_stations": len([s for s in fused_results.values() if s is not None]),
+        "fired_signals": sum(
+            1 for station_signals in pool_signal_results.values()
+            for direction, confidence in station_signals.values()
+            if direction is not None and confidence > 0
+        ),
     }
 
 

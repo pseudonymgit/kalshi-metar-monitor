@@ -103,7 +103,8 @@ class SignalLayerAlertTests(unittest.TestCase):
             ]
         )
 
-        self.assertIn("goldilocks_reversion_alert", [row["signal_type"] for row in emitted])
+        # A3 rename: goldilocks_reversion → microstructure_spike_reversion
+        self.assertIn("microstructure_spike_reversion", [row["signal_type"] for row in emitted])
 
     def test_signal_sequence_is_replay_deterministic(self):
         observations = [

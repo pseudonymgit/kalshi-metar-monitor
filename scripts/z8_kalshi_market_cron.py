@@ -26,26 +26,28 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger("z8")
 
-# station -> list of possible HIGH series tickers to try
+# station -> list of possible HIGH + LOW series tickers to try
+# (HIGH candidates first, then verified LOW ticker; collector inserts from
+# every candidate that returns markets — ticker-fix 2026-09-15)
 STATION_SERIES: dict[str, list[str]] = {
-    "KATL": ["KXHIGHATL", "KXHIGHTATL"],
-    "KAUS": ["KXHIGHAUS"],
-    "KBOS": ["KXHIGHTBOS", "KXHIGHBOS"],
-    "KDCA": ["KXHIGHDCA", "KXHIGHTDC"],
-    "KDEN": ["KXHIGHDEN"],
-    "KDFW": ["KXHIGHTDAL", "KXHIGHDFW"],
-    "KHOU": ["KXHIGHTHOU", "KXHIGHHOU"],
-    "KLAS": ["KXHIGHTLV", "KXHIGHLAS"],
-    "KLAX": ["KXHIGHLAX"],
-    "KMDW": ["KXHIGHMDW"],
-    "KMIA": ["KXHIGHMIA"],
-    "KMSP": ["KXHIGHTMIN", "KXHIGHMSP"],
-    "KMSY": ["KXHIGHTNOLA", "KXHIGHMSY"],
-    "KNYC": ["KXHIGHNY0", "KXHIGHNY"],
-    "KOKC": ["KXHIGHOKC", "KXHIGHTOKC"],
-    "KPHX": ["KXHIGHTPHX", "KXHIGHPHX"],
-    "KSEA": ["KXHIGHTSEA", "KXHIGHSEA"],
-    "KSFO": ["KXHIGHTSFO", "KXHIGHSFO"],
+    "KATL": ["KXHIGHATL", "KXHIGHTATL", "KXLOWTATL"],
+    "KAUS": ["KXHIGHAUS", "KXLOWTAUS"],
+    "KBOS": ["KXHIGHTBOS", "KXHIGHBOS", "KXLOWTBOS"],
+    "KDCA": ["KXHIGHDCA", "KXHIGHTDC", "KXLOWTDC"],
+    "KDEN": ["KXHIGHDEN", "KXLOWTDEN"],
+    "KDFW": ["KXHIGHTDAL", "KXHIGHDFW", "KXLOWTDAL"],
+    "KHOU": ["KXHIGHTHOU", "KXHIGHHOU", "KXLOWTHOU"],
+    "KLAS": ["KXHIGHTLV", "KXHIGHLAS", "KXLOWTLV"],
+    "KLAX": ["KXHIGHLAX", "KXLOWTLAX"],
+    "KMDW": ["KXHIGHCHI", "KXLOWTCHI"],
+    "KMIA": ["KXHIGHMIA", "KXLOWTMIA"],
+    "KMSP": ["KXHIGHTMIN", "KXHIGHMSP", "KXLOWTMIN"],
+    "KMSY": ["KXHIGHTNOLA", "KXHIGHMSY", "KXLOWTNOLA"],
+    "KNYC": ["KXHIGHNY0", "KXHIGHNY", "KXLOWTNYC"],
+    "KOKC": ["KXHIGHOKC", "KXHIGHTOKC", "KXLOWTOKC"],
+    "KPHX": ["KXHIGHTPHX", "KXHIGHPHX", "KXLOWTPHX"],
+    "KSEA": ["KXHIGHTSEA", "KXHIGHSEA", "KXLOWTSEA"],
+    "KSFO": ["KXHIGHTSFO", "KXHIGHSFO", "KXLOWTSFO"],
 }
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -100,64 +102,58 @@ def main() -> int:
         _ensure_schema(conn)
         total, ok, fail = 0, 0, 0
         for station, tickers in sorted(STATION_SERIES.items()):
-            found = False
-            series_ticker = tickers[0]  # default to first
-            for t in tickers:
+            # Collect from EVERY resolvable series (HIGH + LOW), not just the
+            # first candidate with markets (ticker-fix 2026-09-15).
+            station_ok = 0
+            for series_ticker in tickers:
                 try:
-                    data = _kalshi_get(f"/markets?series_ticker={t}&limit=200")
+                    data = _kalshi_get(f"/markets?series_ticker={series_ticker}&limit=200")
                     markets = data.get("markets") or []
-                    if markets:
-                        found = True
-                        series_ticker = t
-                        break
-                except Exception:
-                    continue
-            if not found:
-                LOGGER.info("station=%s no active markets", station)
-                continue
-            try:
-                data = _kalshi_get(f"/markets?series_ticker={series_ticker}&limit=200")
-                markets = data.get("markets") or []
-                inserted = 0
-                for m in markets:
-                    ticker = m.get("ticker", "")
-                    strike = m.get("strike_price") or m.get("strike")
-                    bid = (m.get("yes_bid_dollars") or m.get("yes_bid"))
-                    ask = (m.get("yes_ask_dollars") or m.get("yes_ask"))
-                    if bid is not None:
-                        bid = float(bid)
-                    if ask is not None:
-                        ask = float(ask)
-                    mid = (bid + ask) / 2 if (bid is not None and ask is not None) else None
-                    vol = (m.get("volume_24h_fp") or m.get("volume_24h"))
-                    oi = (m.get("open_interest_fp") or m.get("open_interest"))
-                    if vol is not None:
-                        vol = float(vol)
-                    if oi is not None:
-                        oi = float(oi)
-                    ltv = m.get("last_traded_value")
-                    if ltv is not None:
-                        ltv = float(ltv)
-                    mtype = m.get("type") or m.get("market_type")
-                    if strike is not None:
-                        strike = float(strike)
-                    if not ticker:
-                        continue
-                    conn.execute("""
-                        INSERT INTO market_snapshots
-                            (snapshot_time, station, series_ticker, market_ticker,
-                             strike_temp, market_type, yes_bid, yes_ask, mid_price,
-                             volume_24h, open_interest, ltv)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (snap_ts, station, series_ticker, ticker,
-                          strike, mtype, bid, ask, mid, vol, oi, ltv))
-                    inserted += 1
-                total += inserted
+                    inserted = 0
+                    for m in markets:
+                        ticker = m.get("ticker", "")
+                        strike = m.get("strike_price") or m.get("strike")
+                        bid = (m.get("yes_bid_dollars") or m.get("yes_bid"))
+                        ask = (m.get("yes_ask_dollars") or m.get("yes_ask"))
+                        if bid is not None:
+                            bid = float(bid)
+                        if ask is not None:
+                            ask = float(ask)
+                        mid = (bid + ask) / 2 if (bid is not None and ask is not None) else None
+                        vol = (m.get("volume_24h_fp") or m.get("volume_24h"))
+                        oi = (m.get("open_interest_fp") or m.get("open_interest"))
+                        if vol is not None:
+                            vol = float(vol)
+                        if oi is not None:
+                            oi = float(oi)
+                        ltv = m.get("last_traded_value")
+                        if ltv is not None:
+                            ltv = float(ltv)
+                        mtype = m.get("type") or m.get("market_type")
+                        if strike is not None:
+                            strike = float(strike)
+                        if not ticker:
+                            continue
+                        conn.execute("""
+                            INSERT INTO market_snapshots
+                                (snapshot_time, station, series_ticker, market_ticker,
+                                 strike_temp, market_type, yes_bid, yes_ask, mid_price,
+                                 volume_24h, open_interest, ltv)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (snap_ts, station, series_ticker, ticker,
+                              strike, mtype, bid, ask, mid, vol, oi, ltv))
+                        inserted += 1
+                    if inserted:
+                        total += inserted
+                        station_ok += 1
+                        LOGGER.info("station=%s ticker=%s markets=%d", station, series_ticker, inserted)
+                except Exception as e:
+                    fail += 1
+                    LOGGER.warning("station=%s ticker=%s FAIL: %s", station, series_ticker, e)
+            if station_ok:
                 ok += 1
-                LOGGER.info("station=%s ticker=%s markets=%d", station, series_ticker, inserted)
-            except Exception as e:
-                fail += 1
-                LOGGER.warning("station=%s FAIL: %s", station, e)
+            else:
+                LOGGER.info("station=%s no active markets", station)
         conn.commit()
         LOGGER.info("DONE stations_ok=%d fail=%d total_markets=%d elapsed=%.1fs",
                     ok, fail, total, time.time() - t0)

@@ -117,6 +117,36 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
         baseline_correlation_to_gefs=0.50,
         freshness_hours=1.5,
     ),
+    "forecast_disagreement_signal": SignalEntry(
+        module_name="forecast_disagreement_signal",
+        family="A", pool="climatology",
+        description="Reversion-to-mean: yesterday high vs 7d rolling mean",
+        baseline_correlation_to_gefs=0.45,
+        freshness_hours=6.0,
+    ),
+    "metar_trend_signal": SignalEntry(
+        module_name="metar_trend_signal",
+        family="A", pool="metar_nowcast",
+        description="Day-over-day METAR high trend-following",
+        baseline_correlation_to_gefs=0.40,
+        freshness_hours=6.0,
+    ),
+    "radiational_cooling_signal": SignalEntry(
+        module_name="radiational_cooling_signal",
+        family="A", pool="metar_nowcast",
+        description="Clear-night radiational cooling → LOW prediction (METAR obs)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.30,
+        freshness_hours=3.0,
+    ),
+    "rdae_mos_signal": SignalEntry(
+        module_name="rdae_mos_signal",
+        family="A", pool="nwp_direct",
+        description="PARK — RDAE MOS skeleton, not wired (next-day predictor ~65% claimed)",
+        status="PARK",
+        baseline_correlation_to_gefs=0.65,
+        freshness_hours=6.0,
+    ),
 
     # ── Family B: Temperature Modulators (8 signals) ──────────────
     "cross_model_divergence_signal": SignalEntry(
@@ -167,6 +197,32 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
         family="B", pool=None,
         description="Pressure tendency (different timescale)",
         freshness_hours=3.0,
+    ),
+    "warm_momentum_signal": SignalEntry(
+        module_name="warm_momentum_signal",
+        family="B", pool=None,
+        description="Multi-day warm temperature momentum detection",
+        freshness_hours=6.0,
+    ),
+    "cooling_failure_signal": SignalEntry(
+        module_name="cooling_failure_signal",
+        family="B", pool=None,
+        description="Nighttime cooling failure → warm bias boost",
+        freshness_hours=6.0,
+    ),
+    "ghcn_calibration_signal": SignalEntry(
+        module_name="ghcn_calibration_signal",
+        family="B", pool=None,
+        description="PARK — GHCN long-term bias calibration stub",
+        status="PARK",
+        freshness_hours=24.0,
+    ),
+    "sensor_bias_correction_signal": SignalEntry(
+        module_name="sensor_bias_correction_signal",
+        family="B", pool=None,
+        description="PARK — METAR sensor bias correction stub",
+        status="PARK",
+        freshness_hours=24.0,
     ),
 
     # ── Family C: Microstructure / Market Signals (5 signals) ─────
@@ -242,6 +298,19 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
         family="D", pool=None,
         description="ML composite signal (GATED — off by default)",
         status="GATED",
+        freshness_hours=6.0,
+    ),
+    "trajectory_state_vector_signal": SignalEntry(
+        module_name="trajectory_state_vector_signal",
+        family="D", pool=None,
+        description="PARK — Upstream air trajectory state vector stub",
+        status="PARK",
+        freshness_hours=6.0,
+    ),
+    "weatherapi_base_signal": SignalEntry(
+        module_name="weatherapi_base_signal",
+        family="D", pool=None,
+        description="WeatherAPI archive base: climatological z-score (CCI/FeelsLike infra)",
         freshness_hours=6.0,
     ),
 
@@ -345,10 +414,11 @@ POOL_DEFINITIONS = {
     "climatology": {
         "signals": [
             "calendar_climatology_signal",
+            "forecast_disagreement_signal",
         ],
-        "rho_within": 1.0,
+        "rho_within": 0.50,
         "freshness_hours": 6.0,
-        "description": "Calendar-based climatology baseline",
+        "description": "Calendar-based climatology + rolling-mean reversion",
     },
     "hrrr": {
         "signals": [
@@ -361,10 +431,12 @@ POOL_DEFINITIONS = {
     "metar_nowcast": {
         "signals": [
             "metar_nowcast_signal",
+            "metar_trend_signal",
+            "radiational_cooling_signal",
         ],
-        "rho_within": 1.0,
+        "rho_within": 0.60,
         "freshness_hours": 1.5,
-        "description": "METAR observation nowcast (final 6h window)",
+        "description": "METAR observation nowcast + trend + radiational cooling",
     },
     "market": {
         "signals": [

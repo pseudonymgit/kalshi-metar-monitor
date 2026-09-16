@@ -90,14 +90,18 @@ def test_trade_execution():
 
 
 def test_paper_trading_engine():
-    """Item 5: paper_trading_engine fee_cost must use quantity-based calculation."""
+    """Item 5: paper_trading_engine fee_cost must be defined and use the Kalshi real fee model."""
     # Check the file directly
     we_root = os.path.join(os.path.dirname(__file__), "..")
     pte_path = os.path.join(we_root, "core", "paper_trading_engine.py")
     with open(pte_path) as f:
         source = f.read()
-    assert "fee_cost = abs(quantity * self.fee_rate)" in source, \
-        "paper_trading_engine fee_cost still uses position_size instead of quantity!"
+    # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side
+    assert "per_side_fee = math.ceil(0.07 * quantity * effective_price * (1.0 - effective_price))" in source, \
+        "paper_trading_engine missing Kalshi real fee model (per_side_fee)"
+    # fee_cost must be defined (was previously a dangling NameError)
+    assert "fee_cost = round_trip_fee" in source, \
+        "paper_trading_engine fee_cost is not defined (dangling reference in return dict)!"
 
 
 def test_pnl_tracking():

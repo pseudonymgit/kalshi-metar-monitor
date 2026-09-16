@@ -101,24 +101,10 @@ def _load_holidays() -> Set[date]:
 
 def is_trading_day(d: date) -> bool:
     """
-    Check if a date is a Kalshi trading day.
-    
-    Kalshi markets are typically open Monday-Friday, 7am-5pm ET.
-    They are closed on weekends and US federal holidays.
-    
-    Args:
-        d: Date to check
-        
-    Returns:
-        True if trading is expected, False otherwise
+    Check if Kalshi weather markets trade on this date.
+    Kalshi weather markets are 24/7/365 — always tradable.
     """
-    _load_holidays()
-    
-    # Weekends are closed
-    if d.weekday() >= 5:  # Saturday=5, Sunday=6
-        return False
-    
-    # Holidays are closed
+    return True
     if d in _LOADED_HOLIDAYS:
         return False
     

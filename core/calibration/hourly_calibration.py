@@ -115,6 +115,38 @@ class HourlyCalibrationLoader:
         # Fall back to NWS correction only
         return self.apply_nws_revision_correction(station, raw_prob)
 
+    def get_hour_aware_calibrated(self, station: str, hour: int, raw_prob: float) -> float:
+        """Hour-keyed calibration (Fix #1, 2026-09-15).
+
+        Maps a raw fused probability to a calibrated probability using isotonic
+        curves keyed by UTC evaluation hour (14-20), then applies NWS revision
+        correction. Falls back to NWS-only when no curve exists for the hour.
+
+        Args:
+            station: ICAO station code
+            hour: UTC evaluation hour (14-20)
+            raw_prob: raw fused probability [0, 1]
+        """
+        curves = self._load_curves()
+        station_curves = curves.get(station, {})
+        cal_key = f"h-{hour}"
+
+        curve = station_curves.get(cal_key)
+        if curve is None:
+            # Fall back to global (all-station) hour curve
+            curve = curves.get("_global", {}).get(cal_key)
+
+        if curve:
+            buckets = curve.get("buckets", [])
+            if buckets:
+                for bucket in buckets:
+                    if bucket.get("raw_min", 0.0) <= raw_prob <= bucket.get("raw_max", 1.0):
+                        return self.apply_nws_revision_correction(
+                            station, bucket.get("calibrated", raw_prob)
+                        )
+
+        return self.apply_nws_revision_correction(station, raw_prob)
+
 
 # ── HourlyCalibration (backward-compatible alias) ──
 

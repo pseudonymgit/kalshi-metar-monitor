@@ -27,9 +27,23 @@ from scipy.special import expit, logit
 logger = logging.getLogger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
-DEFAULT_AGREEMENT_THRESHOLD = 2    # Minimum pools agreeing for gate passage
+DEFAULT_AGREEMENT_THRESHOLD = 2    # Minimum pools agreeing for gate passage (>=2 distinct pools per signal-redesign spec)
 MIN_CONFIDENCE_THRESHOLD = 0.2     # Signals below this confidence are ignored
 PROBABILITY_RANGE = (0.01, 0.99)   # Clamp range for probabilities
+
+# Hour-aware base-rate priors (P(truth_up) by UTC evaluation hour), derived
+# from the P2 settlement interim walk-forward (2026-09-15). Applied AFTER LOOP
+# fusion and BEFORE the probability gate. Keyed by current UTC hour (14-20);
+# hours outside this range use 0.5 (neutral — the Bayesian revision is a no-op).
+HOUR_PRIORS = {
+    14: 0.520,
+    15: 0.493,
+    16: 0.476,
+    17: 0.453,
+    18: 0.416,
+    19: 0.373,
+    20: 0.341,
+}
 
 
 @dataclass
@@ -234,13 +248,27 @@ class HourlyFusionEngine:
         mean_probability = float(expit(fused_log_odds))
         mean_probability = np.clip(mean_probability, PROBABILITY_RANGE[0], PROBABILITY_RANGE[1])
 
-        # Determine direction
-        if mean_probability > 0.5:
+        # Determine direction from raw fused log-odds (BEFORE any prior shift).
+        # expit is monotone so this matches `mean_probability > 0.5`, but keeping
+        # the decision on fused_log_odds makes the direction robust to the
+        # hour-aware prior applied below (Fix #2, 2026-09-15).
+        if fused_log_odds >= 0:
             direction = "UP"
-        elif mean_probability < 0.5:
-            direction = "DOWN"
         else:
-            direction = "UP"  # Default to UP on tie
+            direction = "DOWN"
+
+        # Fix #2 (2026-09-15): hour-aware base-rate revision. Adjusts the
+        # probability magnitude (entry sizing / gate comparison) using the
+        # empirical P(truth_up) prior for this UTC hour. Direction is unchanged.
+        prior_up = HOUR_PRIORS.get(current_utc_hour, 0.5)
+        if 0.0 < prior_up < 1.0:
+            raw_p = mean_probability
+            num = raw_p * prior_up
+            den = num + (1.0 - raw_p) * (1.0 - prior_up)
+            if den > 0.0:
+                mean_probability = float(np.clip(num / den,
+                                                 PROBABILITY_RANGE[0],
+                                                 PROBABILITY_RANGE[1]))
 
         # Agreement gate: count pools agreeing on the majority direction
         majority_dir = direction  # "UP" or "DOWN"

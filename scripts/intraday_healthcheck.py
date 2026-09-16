@@ -57,7 +57,7 @@ PID_FILE = Path('/tmp/intraday-daemon.pid')
 DAEMON_LOG = REPO_ROOT / 'logs' / 'intraday_daemon.log'
 NWP_DB = REPO_ROOT / 'data' / 'nwp_forecasts.db'
 STATE_DB = REPO_ROOT / 'data' / 'signal_cache.db'
-DAEMON_HEALTH = REPO_ROOT / 'data' / 'intraday_daemon.health.json'
+DAEMON_HEALTH = REPO_ROOT / 'data' / 'intraday_health.json'
 
 
 QUICKCHECK_MAX_BYTES = 524288000

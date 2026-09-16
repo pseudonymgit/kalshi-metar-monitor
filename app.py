@@ -3881,18 +3881,6 @@ def integrity_replay_parity():
         return jsonify({"error": str(e)}), 500
 
 
-# ─── Health Check Endpoint ─────────────────────────────────────────────────
-
-@app.route("/healthz", methods=["GET"])
-def healthz():
-    """Simple health check endpoint for Render and monitoring."""
-    return jsonify({
-        "status": "ok",
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "uptime_seconds": int(monotonic() - START_TIME),
-    }), 200
-
-
 # Start collector daemon service on Render startup
 try:
     # Run weather data collection in background thread

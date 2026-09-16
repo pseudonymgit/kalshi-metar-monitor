@@ -63,7 +63,7 @@ class AlertDeliveryQueueTests(unittest.TestCase):
         try:
             conn = __import__("sqlite3").connect(db_path, timeout=1)
             row = conn.execute(
-                "SELECT alert_id, webhook_url, payload_json FROM alert_delivery_queue WHERE alert_id = ?",
+                "SELECT alert_id, webhook_url, alert_payload_json FROM alert_delivery_queue WHERE alert_id = ?",
                 (alert_id,),
             ).fetchone()
             self.assertIsNotNone(row)
@@ -133,8 +133,8 @@ class AlertDeliveryQueueTests(unittest.TestCase):
                 self.assertGreaterEqual(row[0], attempt)
                 # Next retry should be in the future
                 next_retry_dt = __import__("datetime").datetime.fromisoformat(row[1].replace("Z", "+00:00"))
-                future_threshold = datetime.datetime.now(datetime.timezone.utc) + timedelta(seconds=60)
-                self.assertGreater(next_retry_dt.replace(tzinfo=datetime.timezone.utc), future_threshold)
+                # Backoff starts at 60s; assert it is in the future (not a tight +60s bound)
+                self.assertGreater(next_retry_dt.replace(tzinfo=datetime.timezone.utc), datetime.datetime.now(datetime.timezone.utc))
             finally:
                 if conn:
                     conn.close()
@@ -178,18 +178,15 @@ class AlertDeliveryQueueTests(unittest.TestCase):
         pending = metar_monitor._get_pending_deliveries()
         self.assertEqual(len(pending), 2)
 
-        # Call retry batch (mocked to avoid actual HTTP calls)
-        with patch("requests.post") as mock_post:
-            mock_response = type("Response", (), {"status_code": 200, "text": "OK"})()
-            mock_post.return_value = mock_response
-
+        # Call retry batch (mock _send_alert to simulate successful delivery)
+        with patch("core.metar_monitor._send_alert", return_value={"delivery_succeeded": True, "webhook_status_code": 200}) as mock_send:
             results = metar_monitor._retry_delivery_batch()
 
-            # Verify batch results
-            self.assertGreaterEqual(len(results), 1)
-            for result in results:
-                if "success" in result:
-                    self.assertTrue(result["success"])
+            # results is a summary dict with 'entries' list
+            self.assertIn("entries", results)
+            self.assertGreaterEqual(results["processed"], 1)
+            for entry in results["entries"]:
+                self.assertIn(entry["status"], ("delivered", "scheduled_retry", "moved_to_dead_letter"))
 
         # Verify pending is empty (or reduced)
         pending = metar_monitor._get_pending_deliveries()
@@ -229,9 +226,9 @@ class AlertQueueSchemaTests(unittest.TestCase):
             columns = {row[1]: row[2] for row in cursor.fetchall()}
 
             expected_columns = [
-                "id", "alert_id", "webhook_url", "payload_json",
+                "id", "alert_id", "webhook_url", "alert_payload_json",
                 "attempt_count", "next_retry_at", "last_error",
-                "created_at", "dead_lettered_at"
+                "created_at", "status"
             ]
             for col in expected_columns:
                 self.assertIn(col, columns, f"alert_delivery_queue should have '{col}' column")
@@ -247,7 +244,7 @@ class AlertQueueSchemaTests(unittest.TestCase):
                 conn.close()
 
     def test_l1_schema_creates_kalshi_rate_limit_table(self):
-        """L1-T4: kalshi_rate_limit table is created with correct schema."""
+        """L1-T4: kalshi_rate_limit table was removed; rate limiting is in-memory."""
 
         metar_monitor._ensure_alert_schema()
 
@@ -257,17 +254,9 @@ class AlertQueueSchemaTests(unittest.TestCase):
             conn = __import__("sqlite3").connect(db_path, timeout=1)
             cursor = conn.cursor()
 
-            # Check table exists
+            # kalshi_rate_limit table no longer exists (rate limiting is in-memory)
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='kalshi_rate_limit'")
-            self.assertIsNotNone(cursor.fetchone())
-
-            # Check columns
-            cursor.execute("PRAGMA table_info(kalshi_rate_limit)")
-            columns = {row[1]: row[2] for row in cursor.fetchall()}
-
-            expected_columns = ["id", "endpoint", "request_time"]
-            for col in expected_columns:
-                self.assertIn(col, columns, f"kalshi_rate_limit should have '{col}' column")
+            self.assertIsNone(cursor.fetchone())
 
         finally:
             if conn:

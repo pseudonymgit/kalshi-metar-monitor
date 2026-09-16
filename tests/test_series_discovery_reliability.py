@@ -29,7 +29,9 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXDENHIGH"])
+        # Current discovery only recognizes the KXHIGH-prefix format;
+        # KXDENHIGH (KX{city}HIGH) is no longer matched.
+        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN"])
 
     def test_discovery_includes_low_only_series(self):
         series_items = {
@@ -53,7 +55,8 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN", "KXDENHIGH"])
+        # KXDENHIGH (KX{city}HIGH) is no longer matched; only KXHIGH/KXLOW prefixes.
+        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN"])
 
     def test_discovery_uses_market_derived_station_codes_outside_static_mapping(self):
         series_items = {

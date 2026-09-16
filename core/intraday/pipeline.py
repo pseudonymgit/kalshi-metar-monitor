@@ -20,6 +20,7 @@ Deterministic math only — no AI/ML.
 """
 
 import logging
+import re
 import sqlite3
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -82,6 +83,30 @@ def _hour_to_hour_before_settlement(hour_utc: int) -> int:
     return max(0, SETTLEMENT_HOUR_UTC - hour_utc)
 
 
+# ── Cloud cover parsing ──────────────────────────────────
+# metar_observations stores raw METAR text; cloud layers are encoded as
+# oktas groups (SKC/FEW/SCT/BKN/OVC/VV + height). Map to a 0-1 fraction,
+# taking the most-cover layer. Deterministic, B-Mode compliant.
+
+_CLOUD_LAYER_RE = re.compile(r"\b(CAVOK|SKC|NSC|NCD|CLR|FEW|SCT|BKN|OVC|VV)(\d{3})?\b")
+_CLOUD_COVER_MAP = {
+    "CAVOK": 0.0, "SKC": 0.0, "NSC": 0.0, "NCD": 0.0, "CLR": 0.0,
+    "FEW": 0.25, "SCT": 0.5, "BKN": 0.75, "OVC": 1.0, "VV": 1.0,
+}
+
+
+def _cloud_cover_fraction(raw_metar: Optional[str]) -> Optional[float]:
+    """Parse dominant cloud cover (0-1 fraction) from raw METAR text."""
+    if not raw_metar:
+        return None
+    covers = [
+        _CLOUD_COVER_MAP[m.group(1)]
+        for m in _CLOUD_LAYER_RE.finditer(raw_metar)
+        if m.group(1) in _CLOUD_COVER_MAP
+    ]
+    return max(covers) if covers else None
+
+
 class HourlyPipeline:
     """
     Build hourly feature vectors for a station+date from multiple DB sources.
@@ -126,11 +151,13 @@ class HourlyPipeline:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
 
-            # Query obs for this station and date
+            # Query obs for this station and date.
+            # Schema note: metar_observations has no clouds_cover_pct/ceil_humidity
+            # columns — cloud cover is parsed from raw_metar (oktas → 0-1 fraction).
             cur.execute("""
                 SELECT timestamp_utc, temp_f, dewpoint_f, wind_speed_kt,
-                       wind_direction_deg, pressure_mb, clouds_cover_pct,
-                       ceil_humidity, visibility_mi
+                       wind_direction_deg, pressure_mb, ceiling_ft,
+                       visibility_mi, raw_metar
                 FROM metar_observations
                 WHERE station = ? AND date_utc = ?
                   AND temp_f IS NOT NULL
@@ -153,6 +180,7 @@ class HourlyPipeline:
 
                 obs = dict(row)
                 obs.pop("timestamp_utc", None)  # Already captured via hour
+                obs["clouds_cover_pct"] = _cloud_cover_fraction(row["raw_metar"])
                 hourly_buckets.setdefault(hour_utc, []).append(obs)
 
             conn.close()
@@ -180,7 +208,7 @@ class HourlyPipeline:
 
         result = {
             "temperature_f": sum(temps) / len(temps) if temps else None,
-            "dewpoint_f": sum(dews) / len(devs) if dews else None,
+            "dewpoint_f": sum(dews) / len(dews) if dews else None,
             "wind_speed_kt": sum(winds) / len(winds) if winds else None,
             "wind_direction_deg": sum(wind_dirs) / len(wind_dirs) if wind_dirs else None,
             "pressure_mb": sum(pressures) / len(pressures) if pressures else None,

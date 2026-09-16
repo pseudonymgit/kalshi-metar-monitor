@@ -821,7 +821,7 @@ def _sign_request_rsa(private_key_pem, timestamp, method, path, body=""):
     )
     signature = private_key.sign(
         message,
-        padding.PKCS1v15(),
+        padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.DIGEST_LENGTH),
         hashes.SHA256(),
     )
     return base64.b64encode(signature).decode("utf-8")
@@ -835,18 +835,24 @@ def _kalshi_get(path):
 
     if not base_url:
         raise ValueError("KALSHI_BASE_URL is not configured")
-    if "/trade-api/v2" in path:
-        raise ValueError("path must not include /trade-api/v2")
     if not key_id or not key_pem:
         raise ValueError("Kalshi auth is not configured")
 
     normalized_path = path if path.startswith("/") else f"/{path}"
+    # Derive the full API path from base_url for signing (RSA-PSS requires full path)
+    # e.g., base_url=https://api.elections.kalshi.com/trade-api/v2 → sign /trade-api/v2/portfolio/balance
+    # Keep the request URL as base_url + normalized_path (same as before).
+    from urllib.parse import urlparse
+    parsed_base = urlparse(base_url)
+    api_prefix = parsed_base.path.rstrip("/")  # e.g., "/trade-api/v2"
+    signing_path = f"{api_prefix}{normalized_path}"
+
     timestamp = str(int(time.time() * 1000))
     signature = _sign_request_rsa(
         key_pem,
         timestamp,
         "GET",
-        normalized_path,
+        signing_path,
         "",
     )
 
@@ -1481,7 +1487,7 @@ def ensure_series_discovery_loaded():
             }
 
         record_connectivity_state = True
-        if _current_kalshi_execution_domain() != "production":
+        if _current_kalshi_execution_domain() != "prod":
             record_connectivity_state = False
         if has_request_context() and str(request.path or "").startswith("/observability/"):
             record_connectivity_state = False
@@ -1789,7 +1795,7 @@ def hydration_queue_snapshot(*, reference_ts: float | None = None) -> dict:
 def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict:
     global _last_hydration_request_ts
 
-    if _current_kalshi_execution_domain() != "production":
+    if _current_kalshi_execution_domain() != "prod":
         return {"status": "skipped", "reason": "non_production_domain"}
 
     now_ts = time.time()
@@ -1844,7 +1850,7 @@ def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict
 # Replay safety rule: hydration is production-only because it performs
 # live market reads; replay must use persisted deterministic history.
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
-    if _current_kalshi_execution_domain() != "production":
+    if _current_kalshi_execution_domain() != "prod":
         raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
 
     normalized_station = (station or "").strip().upper()

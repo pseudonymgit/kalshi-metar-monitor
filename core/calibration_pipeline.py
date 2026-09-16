@@ -59,6 +59,45 @@ class CalibrationPipeline:
         self.db_path = os.getenv("SIGNAL_CALIBRATION_DB", "/var/data/signal_calibration.db")
         self._init_history_db()
 
+    def _init_history_db(self):
+        """
+        Initialize the SQLite history database.
+        Creates the table if it doesn't exist.
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS calibration_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    signal TEXT,
+                    city TEXT,
+                    direction TEXT,
+                    raw_conf REAL,
+                    was_correct INTEGER,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
+    def persist_evaluation_to_db(self, signal, city, raw_conf, was_correct, direction=None):
+        """
+        Persist a calibration evaluation to the SQLite database.
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.execute(
+                'INSERT INTO calibration_history (signal, city, direction, raw_conf, was_correct) '
+                'VALUES (?, ?, ?, ?, ?)',
+                (signal, city, direction, raw_conf, 1 if was_correct else 0)
+            )
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
     def set_window_start(self, window_start):
         """
         Set the start of the current training window.

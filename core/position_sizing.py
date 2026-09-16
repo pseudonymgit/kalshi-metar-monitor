@@ -274,7 +274,9 @@ def compute_position_size(
         final_size = 0.0
     
     # Final clamping with config limits
-    final_size = min(config.max_size_usd, max(config.min_size_usd, final_size))
+    # min_size_usd floor should NOT resurrect a zero-size (no-trade) decision
+    if final_size > 0.0:
+        final_size = min(config.max_size_usd, max(config.min_size_usd, final_size))
     
     # Confidence tier classification  
     tier = classify_confidence(confidence, config)

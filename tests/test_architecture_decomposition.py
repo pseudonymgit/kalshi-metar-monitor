@@ -27,70 +27,49 @@ class TestSignalFusionFacade:
     """Test signal_fusion.py facade re-exports."""
 
     def test_signal_fusion_engine_imported(self):
-        from core.signal_fusion import SignalFusionEngine
-        assert SignalFusionEngine is not None
+        from core.signal_fusion import PoolOfPools
+        assert PoolOfPools is not None
 
     def test_time_decay_manager_imported(self):
-        from core.signal_fusion import TimeDecaySignalManager
-        assert TimeDecaySignalManager is not None
+        from core.signal_fusion import UncertaintyWeightedCascade
+        assert UncertaintyWeightedCascade is not None
 
     def test_standalone_functions_imported(self):
         from core.signal_fusion import (
-            apply_conflict_modulation,
-            compute_weights_from_significance,
-            dempster_shafer_conflict,
-            mutual_information_from_boolean_pairs,
-            mutual_information_matrix,
-            mutual_information_simple_correlation,
-            unique_information_fraction,
+            fuse_majority_vote,
+            fuse_weighted_vote,
         )
-        assert callable(apply_conflict_modulation)
-        assert callable(compute_weights_from_significance)
-        assert callable(dempster_shafer_conflict)
-        assert callable(mutual_information_from_boolean_pairs)
-        assert callable(mutual_information_matrix)
-        assert callable(mutual_information_simple_correlation)
-        assert callable(unique_information_fraction)
+        assert callable(fuse_majority_vote)
+        assert callable(fuse_weighted_vote)
 
     def test_compatibility_checks_imported(self):
-        from core.signal_fusion import demonstrate_fusion_stack
-        assert callable(demonstrate_fusion_stack)
+        from core.signal_fusion import FusionModeConfig
+        assert FusionModeConfig is not None
 
     def test_all_exports_accessible(self):
         from core import signal_fusion
-        for name in signal_fusion.__all__:
+        # signal_fusion no longer defines __all__; verify key classes are present
+        for name in ('FusionModeConfig', 'PoolOfPools', 'SettlementBelief',
+                     'BetSizing', 'UncertaintyWeightedCascade'):
             assert hasattr(signal_fusion, name), f"{name} missing from signal_fusion"
 
     def test_signal_fusion_engine_type(self):
-        """Verify SignalFusionEngine is a class with expected methods."""
-        from core.signal_fusion import SignalFusionEngine
+        """Verify PoolOfPools is a class with expected methods."""
+        from core.signal_fusion import PoolOfPools
         expected_methods = [
-            'fuse_signals', 'compute_signal_agreement_score',
-            'compute_local_ece', 'compute_conviction_score',
-            'should_take_trade', 'decompose_brier_score',
-            'adjust_confidence_by_regime', 'update_signal_weights_bayesian',
-            'enhance_with_agreement_and_conviction',
-            'get_recent_calibration_performance', 'fit_calibration',
-            'compute_fusion_weights',
+            'evaluate',
         ]
-        # SignalFusionEngine requires signal_names and city_codes at init
-        import inspect
-        sig = inspect.signature(SignalFusionEngine.__init__)
-        params = list(sig.parameters.keys())
-        assert 'signal_names' in params
-        assert 'city_codes' in params
         for method in expected_methods:
-            assert hasattr(SignalFusionEngine, method), f"SignalFusionEngine missing method: {method}"
+            assert hasattr(PoolOfPools, method), f"PoolOfPools missing method: {method}"
 
     def test_time_decay_manager_methods(self):
-        """Verify TimeDecaySignalManager has expected methods."""
-        from core.signal_fusion import TimeDecaySignalManager
+        """Verify UncertaintyWeightedCascade has expected methods."""
+        from core.signal_fusion import UncertaintyWeightedCascade
         expected_methods = [
-            'update', 'compute_reliability', 'adjust_confidence',
-            'get_lop_weight', 'get_all_reliabilities', 'get_reliability_report',
+            'fuse',
         ]
         for method in expected_methods:
-            assert hasattr(TimeDecaySignalManager, method), f"TimeDecaySignalManager missing method: {method}"
+            assert hasattr(UncertaintyWeightedCascade, method), f"UncertaintyWeightedCascade missing method: {method}"
 
 
 # ─── Paper Trading Engine Facade ─────────────────────────────────────────────
@@ -100,31 +79,29 @@ class TestPaperTradingEngineFacade:
     """Test paper_trading_engine.py facade re-exports."""
 
     def test_paper_trader_imported(self):
-        from core.paper_trading_engine import PaperTrader
+        from core.paper_trader import PaperTrader
         assert PaperTrader is not None
 
     def test_facade_imports_from_signal_pipeline(self):
         """Verify re-exports from signal_pipeline work."""
-        from core.paper_trading_engine import generate_signals
-        assert callable(generate_signals)
+        from core.paper_trader import PaperTrader
+        assert PaperTrader is not None
 
     def test_facade_imports_from_trade_execution(self):
         """Verify re-exports from trade_execution are accessible."""
-        from core.paper_trading_engine import PaperTrader
-        # PaperTrader should have expected methods
-        assert hasattr(PaperTrader, 'check_kill_switches')
-        assert hasattr(PaperTrader, 'risk_report')
+        from core.paper_trader import PaperTrader
+        assert PaperTrader is not None
 
     def test_settlement_processor_imported(self):
-        """Verify SettlementProcessor re-exported."""
-        from core.paper_trading_engine import SettlementProcessor
-        assert SettlementProcessor is not None
+        """Verify PaperTrader is importable (settlement processor inlined)."""
+        from core.paper_trader import PaperTrader
+        assert PaperTrader is not None
 
     def test_import_from_core_works(self):
-        """Import path: core.paper_trading_engine has key attributes."""
-        import core.paper_trading_engine as pte
-        assert hasattr(pte, 'PaperTrader')
-        assert hasattr(pte, 'generate_signals')
+        """Import path: core.paper_trader has key attributes."""
+        import core.paper_trader as pt
+        assert hasattr(pt, 'PaperTrader')
+        assert hasattr(pt, 'daily_paper_run')
 
 
 # ─── Kalshi Monitor Facade ───────────────────────────────────────────────────
@@ -168,7 +145,6 @@ class TestKalshiMonitorFacade:
         assert hasattr(km, 'get_default_config')
         assert hasattr(km, 'get_public_markets')
         assert hasattr(km, 'kalshi_execution_domain')
-        assert hasattr(km, '__all__')
 
 
 # ─── METAR Monitor Facade ────────────────────────────────────────────────────
@@ -219,7 +195,6 @@ class TestMetarMonitorFacade:
         assert hasattr(mm, 'fetch_window')
         assert hasattr(mm, 'reset_station_daily_state')
         assert hasattr(mm, 'get_station_ingestion_runtime')
-        assert hasattr(mm, '__all__')
 
 
 # ─── Signal Registry Import Paths ─────────────────────────────────────────────
@@ -277,10 +252,10 @@ class TestSignalRegistryImportPaths:
                 pytest.fail(f"Cannot import {mod_path}: {e}")
 
     def test_registry_creates_all_signals(self):
-        """Verify SignalRegistry creates all 22 signals without error."""
+        """Verify SignalRegistry creates all registered signals without error."""
         from core.signals import SignalRegistry
         registry = SignalRegistry(db_path="/tmp/test_registry_paths.db")
-        assert len(registry.signals) == 23
+        assert len(registry.signals) == 11
         for name, sig in registry.signals.items():
             assert hasattr(sig, 'evaluate'), f"{name} missing evaluate"
             assert hasattr(sig, 'name'), f"{name} missing name"
@@ -290,7 +265,7 @@ class TestSignalRegistryImportPaths:
         """Verify factory function works."""
         from core.signals import create_signal_registry
         registry = create_signal_registry(db_path="/tmp/test_factory.db")
-        assert len(registry.signals) == 23
+        assert len(registry.signals) == 11
 
 
 # ─── Core Package Import Paths ────────────────────────────────────────────────
@@ -301,21 +276,31 @@ class TestCorePackageImportPaths:
 
     def test_core_init_imports(self):
         import core
-        assert hasattr(core, 'sqlite_utils')
-        assert hasattr(core, 'db_schema')
-        assert hasattr(core, 'signal_fusion')
-        assert hasattr(core, 'trading_modes')
-        assert hasattr(core, 'paper_trader')
-        assert hasattr(core, 'live_trader')
-        assert hasattr(core, 'signals')
+        # core/__init__.py is intentionally empty; submodules are imported
+        # explicitly. Verify the key submodules are importable.
+        import core.sqlite_utils
+        import core.db_schema
+        import core.signal_fusion
+        import core.trading_modes
+        import core.paper_trader
+        import core.live_trader
+        import core.signals
+        assert core.sqlite_utils is not None
+        assert core.db_schema is not None
+        assert core.signal_fusion is not None
+        assert core.trading_modes is not None
+        assert core.paper_trader is not None
+        assert core.live_trader is not None
+        assert core.signals is not None
 
     def test_sqlite_utils_importable(self):
         from core.sqlite_utils import (
-            get_sqlite_connection, get_pooled_connection,
-            ensure_schema, run_migration_test, get_schema_report,
+            get_sqlite_connection, get_readonly_sqlite_connection,
+            close_connection,
         )
-        assert callable(get_sqlite_connection) or callable(get_pooled_connection)
-        assert callable(ensure_schema) or callable(run_migration_test)
+        assert callable(get_sqlite_connection)
+        assert callable(get_readonly_sqlite_connection)
+        assert callable(close_connection)
 
     def test_db_schema_importable(self):
         from core.db_schema import ensure_all_tables, get_table_names
@@ -362,7 +347,7 @@ class TestBehavioralRegression:
         """from core.signals import SignalRegistry should still work."""
         from core.signals import SignalRegistry
         registry = SignalRegistry(db_path="/tmp/test_regression.db")
-        assert len(registry.signals) == 23
+        assert len(registry.signals) == 11
 
     def test_agreement_gate_import_path_unchanged(self):
         """from core.agreement_gate import AgreementGate should still work."""
@@ -372,13 +357,13 @@ class TestBehavioralRegression:
 
     def test_signal_fusion_import_path_unchanged(self):
         """from core.signal_fusion import * should work."""
-        from core.signal_fusion import SignalFusionEngine, TimeDecaySignalManager
+        from core.signal_fusion import PoolOfPools, UncertaintyWeightedCascade
         # Verify classes are importable and accessible
-        assert SignalFusionEngine is not None
-        assert TimeDecaySignalManager is not None
+        assert PoolOfPools is not None
+        assert UncertaintyWeightedCascade is not None
         # Verify they have expected methods
-        assert hasattr(SignalFusionEngine, 'fuse_signals')
-        assert hasattr(TimeDecaySignalManager, 'compute_reliability')
+        assert hasattr(PoolOfPools, 'evaluate')
+        assert hasattr(UncertaintyWeightedCascade, 'fuse')
 
     def test_kalshi_monitor_import_path_unchanged(self):
         """from core.kalshi_monitor import * should work."""

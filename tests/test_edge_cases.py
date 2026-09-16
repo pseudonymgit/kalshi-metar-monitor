@@ -536,9 +536,9 @@ class TestSignalFactoryEdgeCases:
         from core.signals import SignalRegistry, create_signal_registry
 
         registry = SignalRegistry(db_path=None)
-        # Count updated from 20→10 after B-Mode Cycle 3 signal cleanup
+        # Count updated from 20→10→11 after B-Mode Cycle 3 signal cleanup
         # (removed 6 dead signals + 10 non-firing signals from registry)
-        assert len(registry.signals) == 10
+        assert len(registry.signals) == 11
         for name, sig in registry.signals.items():
             assert hasattr(sig, 'evaluate')
 
@@ -556,8 +556,8 @@ class TestSignalFactoryEdgeCases:
 
         registry = SignalRegistry(db_path="/tmp/test_get_all.db")
         signals = registry.get_all_signals()
-        # Count updated from 20→10 after B-Mode Cycle 3 signal cleanup
-        assert len(signals) == 10
+        # Count updated from 20→10→11 after B-Mode Cycle 3 signal cleanup
+        assert len(signals) == 11
 
     def test_add_signal_valid(self):
         """Adding a valid signal should work."""
@@ -573,7 +573,7 @@ class TestSignalFactoryEdgeCases:
         registry = SignalRegistry(db_path="/tmp/test_add.db")
         registry.add_signal("test_signal", TestSignal())
         assert registry.get_signal("test_signal") is not None
-        assert len(registry.signals) == 11  # 10 base + 1 added
+        assert len(registry.signals) == 12  # 11 base + 1 added
 
     def test_add_signal_invalid_type(self):
         """Adding a non-BaseSignal object should raise TypeError."""

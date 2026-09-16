@@ -61,25 +61,21 @@ class SchemaMigrationTests(unittest.TestCase):
             # Verify market_cache table exists
             self.assertIn("market_cache", tables, "market_cache table should exist")
 
-            # Verify existing tables still exist
-            expected_tables = ["transition_events", "alerts", "settlement_epochs"]
-            for table in expected_tables:
-                self.assertIn(table, tables, f"Existing table '{table}' should still exist")
+            # Verify alert_delivery_queue table exists
+            self.assertIn("alert_delivery_queue", tables, "alert_delivery_queue table should exist")
 
-            # Verify signal_layer_state schema (additive only)
+            # Verify signal_layer_state schema (signal_name is PRIMARY KEY)
             cursor.execute("PRAGMA table_info(signal_layer_state)")
             columns = {row[1]: row[2] for row in cursor.fetchall()}
 
-            self.assertIn("id", columns, "signal_layer_state should have id column")
             self.assertIn("signal_name", columns, "signal_layer_state should have signal_name column")
             self.assertIn("state_json", columns, "signal_layer_state should have state_json column")
             self.assertIn("updated_at", columns, "signal_layer_state should have updated_at column")
 
-            # Verify market_cache schema (additive only)
+            # Verify market_cache schema (market_id is PRIMARY KEY)
             cursor.execute("PRAGMA table_info(market_cache)")
             columns = {row[1]: row[2] for row in cursor.fetchall()}
 
-            self.assertIn("id", columns, "market_cache should have id column")
             self.assertIn("market_id", columns, "market_cache should have market_id column")
             self.assertIn("station", columns, "market_cache should have station column")
             self.assertIn("cache_json", columns, "market_cache should have cache_json column")
@@ -103,21 +99,14 @@ class SchemaMigrationTests(unittest.TestCase):
             columns = cursor.fetchall()
             column_names = [col[1] for col in columns]
 
-            # Verify expected columns
-            expected_columns = ["id", "signal_name", "state_json", "updated_at"]
+            # Verify expected columns (signal_name is PRIMARY KEY, no id column)
+            expected_columns = ["signal_name", "state_json", "updated_at"]
             for col in expected_columns:
                 self.assertIn(col, column_names, f"signal_layer_state should have '{col}' column")
 
-            # Verify id is primary key
-            primary_keys = [col[5] for col in columns if col[5] == 1]
-            self.assertEqual(len(primary_keys), 1, "signal_layer_state should have exactly one primary key")
-            self.assertEqual(primary_keys[0], 1, "Primary key should be auto-incrementing")
-
-            # Verify unique constraint on signal_name
-            cursor.execute("PRAGMA table_info(signal_layer_state)")
-            for col in columns:
-                if col[1] == "signal_name":
-                    self.assertEqual(col[3], 1, "signal_name should have UNIQUE constraint")
+            # Verify signal_name is primary key
+            primary_keys = [col[1] for col in columns if col[5] == 1]
+            self.assertEqual(primary_keys, ["signal_name"], "signal_name should be the primary key")
 
         finally:
             conn.close()
@@ -136,20 +125,14 @@ class SchemaMigrationTests(unittest.TestCase):
             columns = cursor.fetchall()
             column_names = [col[1] for col in columns]
 
-            # Verify expected columns
-            expected_columns = ["id", "market_id", "station", "cache_json", "discovered_at", "updated_at"]
+            # Verify expected columns (market_id is PRIMARY KEY, no id column)
+            expected_columns = ["market_id", "station", "cache_json", "discovered_at", "updated_at"]
             for col in expected_columns:
                 self.assertIn(col, column_names, f"market_cache should have '{col}' column")
 
-            # Verify id is primary key
-            primary_keys = [col[5] for col in columns if col[5] == 1]
-            self.assertEqual(len(primary_keys), 1, "market_cache should have exactly one primary key")
-
-            # Verify unique constraint on market_id
-            cursor.execute("PRAGMA table_info(market_cache)")
-            for col in columns:
-                if col[1] == "market_id":
-                    self.assertEqual(col[3], 1, "market_id should have UNIQUE constraint")
+            # Verify market_id is primary key
+            primary_keys = [col[1] for col in columns if col[5] == 1]
+            self.assertEqual(primary_keys, ["market_id"], "market_id should be the primary key")
 
         finally:
             conn.close()
@@ -199,7 +182,7 @@ class SchemaMigrationTests(unittest.TestCase):
             conn.close()
 
     def test_existing_tables_unchanged(self):
-        """Verify that existing tables (transition_events, alerts, settlement_epochs) are unchanged."""
+        """Verify that _ensure_alert_schema does not create legacy tables (transition_events, alerts)."""
 
         metar_monitor._ensure_alert_schema()
 
@@ -208,25 +191,13 @@ class SchemaMigrationTests(unittest.TestCase):
         try:
             cursor = conn.cursor()
 
-            # Verify transition_events still has expected columns
-            cursor.execute("PRAGMA table_info(transition_events)")
-            columns = {col[1]: col[2] for col in cursor.fetchall()}
+            # transition_events and alerts are no longer created by _ensure_alert_schema
+            # (they are created lazily by their respective modules).
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='transition_events'")
+            self.assertIsNone(cursor.fetchone(), "transition_events should not be created by _ensure_alert_schema")
 
-            expected_transition_columns = ["id", "created_utc", "station", "transition_type",
-                                          "instant_bucket_before", "instant_bucket_after",
-                                          "settlement_bucket", "running_max", "current_temp", "metadata_json"]
-            for col in expected_transition_columns:
-                self.assertIn(col, columns, f"transition_events should still have '{col}' column")
-
-            # Verify alerts still has expected columns
-            cursor.execute("PRAGMA table_info(alerts)")
-            columns = {col[1]: col[2] for col in cursor.fetchall()}
-
-            expected_alert_columns = ["id", "created_utc", "station", "market_type",
-                                     "event_ticker", "alert_type", "direction",
-                                     "temp_f", "bucket_index", "metadata_json"]
-            for col in expected_alert_columns:
-                self.assertIn(col, columns, f"alerts should still have '{col}' column")
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='alerts'")
+            self.assertIsNone(cursor.fetchone(), "alerts should not be created by _ensure_alert_schema")
 
         finally:
             conn.close()

@@ -151,7 +151,7 @@ class TestMetarNowcast:
     def test_evaluate_no_metar(self, signal):
         """Graceful degradation when no METAR data available."""
         # KXYZ doesn't exist — should return no signal gracefully
-        result = signal.evaluate(
+        result = signal.evaluate_forecast(
             station="KXYZ",
             bucket_temp_f=75,
             gefs_max_f=85.0,
@@ -165,8 +165,8 @@ class TestMetarNowcast:
                    for msg in ["No METAR", "stale", "too far"])
 
     def test_evaluate_returns_expected_keys(self, signal):
-        """Evaluate returns all expected keys."""
-        result = signal.evaluate(
+        """evaluate_forecast returns all expected keys."""
+        result = signal.evaluate_forecast(
             station="KNYC",
             bucket_temp_f=75,
             gefs_max_f=85.0,
@@ -178,20 +178,23 @@ class TestMetarNowcast:
             assert key in result, f"Missing key: {key}"
 
     def test_evaluate_bucket_returns_expected_keys(self, signal):
-        """evaluate_bucket returns all expected keys."""
+        """evaluate_bucket returns confidence and reason (direction/metar_temp_f only when METAR present)."""
         result = signal.evaluate_bucket(
             station="KNYC",
             bucket_temp_f=80,
             gefs_max_f=85.0,
             gefs_min_f=65.0,
         )
-        expected_keys = {"confidence", "direction", "metar_temp_f", "reason"}
-        for key in expected_keys:
-            assert key in result, f"Missing key: {key}"
+        # confidence and reason are always present
+        assert "confidence" in result, f"Missing key: confidence"
+        assert "reason" in result, f"Missing key: reason"
+        # direction and metar_temp_f are only present when METAR data exists
+        if "direction" in result:
+            assert result["direction"] in ("HIGH", "LOW", None)
 
     def test_confidence_range(self, signal):
         """Confidence is always in [0.0, 1.0]."""
-        result = signal.evaluate(
+        result = signal.evaluate_forecast(
             station="KNYC",
             bucket_temp_f=75,
             gefs_max_f=85.0,

@@ -1923,6 +1923,7 @@ class PaperTrader:
         # Round trip = 2 × per-side fee
         per_side_fee = math.ceil(0.07 * quantity * effective_price * (1.0 - effective_price))
         round_trip_fee = per_side_fee * 2
+        fee_cost = round_trip_fee
         net_cost = position_size + round_trip_fee * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 
         # Record the trade in our log with enhanced analytics
