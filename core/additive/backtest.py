@@ -102,8 +102,8 @@ def load_truth(db_path: str) -> Dict[Tuple[str, str], float]:
     if os.path.isfile(dbm):
         conn = sqlite3.connect(dbm)
         for row in conn.execute(
-            "SELECT station, bucket_date, bucket_high_f FROM settlement_epochs "
-            "WHERE bucket_high_f IS NOT NULL"
+            "SELECT station, local_trading_date, settlement_bucket FROM settlement_epochs "
+            "WHERE settlement_bucket IS NOT NULL"
         ):
             st, d, b = str(row[0]), str(row[1]), float(row[2])
             key = (st, d)
@@ -197,8 +197,12 @@ def run_range(
     verbose: bool = False,
 ) -> dict:
     """Run the backtest over a range of dates/stations."""
-    truth = load_truth(str(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "data")))
-    base_all = load_base_forecasts(str(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "data")))
+    # `backtest.py` lives at <repo>/core/additive; data is under <repo>/data.
+    # Keep this path anchored to the recovery worktree rather than its parent.
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+    data_root = os.path.join(repo_root, "data")
+    truth = load_truth(data_root)
+    base_all = load_base_forecasts(data_root)
     all_stations = stations or SETTLE_STATIONS
 
     results_by_day: Dict[tuple, List] = {}
@@ -211,7 +215,6 @@ def run_range(
     cooccurrence.reset_state()
 
     for y, m in month_range(start, end):
-        ey, em = (end.year, end.month) if (y, m) >= (end.year, end.month) else None
         dates = []
         d0 = date_cls(y, m, 1)
         d1 = date_cls(y + 1, 1, 1) if m == 12 else date_cls(y, m + 1, 1)

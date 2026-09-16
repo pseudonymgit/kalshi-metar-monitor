@@ -51,6 +51,7 @@ from .forecast_disagreement_signal import ForecastDisagreementSignal
 from .calendar_climatology_signal import CalendarClimatologySignal
 from .dual_polarity_signal import CorrectedPressureDeltaSignal
 from .frontal_passage_intraday_signal import FrontalPassageIntradaySignal
+from .persistence_signal import PersistenceSignal
 
 # ── Radiational Cooling Signal (v2026-08-06) ──
 from .radiational_cooling_signal import RadiationalCoolingSignal

@@ -275,6 +275,8 @@ def run_intraday_cycle(
             try:
                 ctx = AdditiveContext(st, date_str)
                 results = additive_evaluate_all(ctx)
+                from core.additive.monitor import persist_results
+                persist_results(str(REPO_ROOT / 'data'), st, date_str, results)
                 # Apply enabled additive signals (all disabled by default)
                 stack = apply_additive_offsets(results, enabled=list(ENABLED_BY_DEFAULT))
                 ctx.close()

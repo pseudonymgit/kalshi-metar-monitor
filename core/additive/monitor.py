@@ -21,6 +21,8 @@ Drift alarm thresholds (die, not wink):
 
 import json
 import math
+import os
+import sqlite3
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -34,6 +36,9 @@ __all__ = [
     "persist",
     "render_text",
     "run_daily_dashboard",
+    "persist_results",
+    "load_persisted_results",
+    "link_t_plus_one_outcomes",
 ]
 
 logger = __import__("logging").getLogger(__name__)
@@ -199,6 +204,112 @@ def persist(report: dict, path: str) -> None:
         json.dump(report, f, indent=2, default=str)
 
 
+def _results_db_path(data_path: str) -> str:
+    """Return the additive-results DB path under the supplied data root."""
+    return os.path.join(data_path, "intraday", "additive_results.db")
+
+
+def persist_results(data_path: str, station: str, date: str, results: List[AdditiveSignalResult]) -> int:
+    """Persist one station/date additive evaluation batch idempotently."""
+    path = _results_db_path(data_path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with sqlite3.connect(path) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS additive_results (
+                station TEXT NOT NULL,
+                local_date TEXT NOT NULL,
+                signal TEXT NOT NULL,
+                offset_f REAL NOT NULL,
+                confidence REAL NOT NULL,
+                fired INTEGER NOT NULL,
+                reason TEXT NOT NULL,
+                meta_json TEXT NOT NULL,
+                evaluated_at TEXT NOT NULL,
+                PRIMARY KEY (station, local_date, signal)
+            )
+        """)
+        evaluated_at = datetime.now(timezone.utc).isoformat()
+        for result in results:
+            conn.execute("""
+                INSERT INTO additive_results
+                    (station, local_date, signal, offset_f, confidence, fired,
+                     reason, meta_json, evaluated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(station, local_date, signal) DO UPDATE SET
+                    offset_f=excluded.offset_f,
+                    confidence=excluded.confidence,
+                    fired=excluded.fired,
+                    reason=excluded.reason,
+                    meta_json=excluded.meta_json,
+                    evaluated_at=excluded.evaluated_at
+            """, (station, date, result.signal, result.offset_f,
+                  result.confidence, int(result.fired), result.reason,
+                  json.dumps(result.meta, sort_keys=True, default=str), evaluated_at))
+        conn.commit()
+    return len(results)
+
+
+def load_persisted_results(data_path: str):
+    """Load persisted additive results into the dashboard's report shape."""
+    path = _results_db_path(data_path)
+    if not os.path.exists(path):
+        return {}, {}
+    results_by_day = {}
+    errors_by_day = {}
+    with sqlite3.connect(path) as conn:
+        rows = conn.execute("""
+            SELECT station, local_date, signal, offset_f, confidence, fired, reason, meta_json
+            FROM additive_results ORDER BY station, local_date, signal
+        """).fetchall()
+    for station, local_date, signal, offset_f, confidence, fired, reason, meta_json in rows:
+        key = (station, local_date)
+        results_by_day.setdefault(key, []).append(AdditiveSignalResult(
+            signal=signal, offset_f=offset_f, confidence=confidence,
+            fired=bool(fired), reason=reason, meta=json.loads(meta_json or "{}")))
+    return results_by_day, errors_by_day
+
+
+def link_t_plus_one_outcomes(data_path: str) -> dict:
+    """Join additive rows to read-only settlement_epochs outcomes.
+
+    The settlement database is evidence-only; only the additive-results DB is
+    updated. Rows without a finalized/closed epoch remain explicitly unmatched.
+    """
+    result_db = _results_db_path(data_path)
+    settlement_db = os.path.join(data_path, "metar_backfill.db")
+    if not os.path.exists(result_db) or not os.path.exists(settlement_db):
+        return {"matched": 0, "unmatched": 0, "source": settlement_db, "available": False}
+    with sqlite3.connect(settlement_db) as source:
+        outcomes = {(str(st), str(day)): (bucket, status)
+                    for st, day, bucket, status in source.execute(
+                        "SELECT station, local_trading_date, settlement_bucket, epoch_status "
+                        "FROM settlement_epochs "
+                        "WHERE settlement_bucket IS NOT NULL AND epoch_status = 'closed'")}
+    with sqlite3.connect(result_db) as conn:
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(additive_results)")}
+        for name, definition in (
+            ("outcome_bucket", "INTEGER"),
+            ("outcome_status", "TEXT"),
+            ("outcome_source", "TEXT"),
+        ):
+            if name not in columns:
+                conn.execute(f"ALTER TABLE additive_results ADD COLUMN {name} {definition}")
+        conn.commit()
+    matched = unmatched = 0
+    with sqlite3.connect(result_db) as conn:
+        rows = conn.execute("SELECT station, local_date FROM additive_results").fetchall()
+        for station, day in rows:
+            outcome = outcomes.get((station, day))
+            if outcome:
+                conn.execute("UPDATE additive_results SET outcome_bucket=?, outcome_status=?, outcome_source=? WHERE station=? AND local_date=?",
+                             (outcome[0], outcome[1], "metar_backfill.settlement_epochs", station, day))
+                matched += 1
+            else:
+                unmatched += 1
+        conn.commit()
+    return {"matched": matched, "unmatched": unmatched, "source": settlement_db, "available": True}
+
+
 def render_text(report: dict) -> str:
     """Render the dashboard report as human-readable text."""
     lines = []
@@ -261,8 +372,12 @@ def run_daily_dashboard(db_path: str) -> dict:
         from datetime import datetime as _dt
 
         now = _dt.now(timezone.utc)
-        # Build empty report (no results-by-day available in live cron mode)
-        report = build_report({}, {})
+        t1_receipt = link_t_plus_one_outcomes(db_path)
+        results_by_day, errors_by_day = load_persisted_results(db_path)
+        report = build_report(results_by_day, errors_by_day)
+        report["summary"]["persistence_source"] = _results_db_path(db_path)
+        report["summary"]["persistence_rows"] = sum(len(v) for v in results_by_day.values())
+        report["summary"]["t_plus_one"] = t1_receipt
 
         dashboard_dir = _os.path.join(db_path, "intraday", "dashboard")
         snapshot_path = _os.path.join(dashboard_dir, "G8_last_snapshot.json")

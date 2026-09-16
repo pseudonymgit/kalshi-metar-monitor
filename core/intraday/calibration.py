@@ -19,6 +19,7 @@ import json
 import logging
 import math
 import os
+from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -85,7 +86,55 @@ class HourlyCalibration:
         self.curves_path = curves_path or DEFAULT_CURVES_PATH
         self._curves: Dict[str, Dict] = {}  # station -> {hour_before: {alpha, beta, n}}
         self._loaded = False
+        self.loaded_station_count = 0
         self._load_curves()
+
+    @staticmethod
+    def _is_numeric(value: object) -> bool:
+        """Return whether a calibration scalar is a finite real number."""
+        # bool is an int subclass, but is never a valid calibration parameter.
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+    @classmethod
+    def _is_valid_hourly_curve_cell(cls, curve: object) -> bool:
+        """Validate the complete producer cell before it can enter consumer state."""
+        if not isinstance(curve, dict):
+            return False
+        return all(
+            cls._is_numeric(curve.get(field))
+            for field in ("alpha", "beta", "n")
+        )
+
+    @classmethod
+    def _is_hourly_curve_map(cls, value: object) -> bool:
+        """Return whether a station entry is a complete hourly Platt map.
+
+        JSON object keys are part of the producer contract.  Unsupported keys
+        (including directional ``up``/``down`` or aliases such as ``hb6``)
+        reject the whole station rather than being skipped and allowing a
+        partially compatible map into consumer state.
+        """
+        if not isinstance(value, dict):
+            return False
+        numeric_cells = []
+        seen_hours = set()
+        for hour_key, curve in value.items():
+            # Accept only canonical decimal hour keys in the supported 0..12
+            # domain; reject malformed, out-of-range, and duplicate-equivalent
+            # keys (e.g. "6"/"06") rather than allowing ambiguity.
+            if not isinstance(hour_key, str) or not hour_key.isdecimal():
+                return False
+            try:
+                hour = int(hour_key)
+            except (TypeError, ValueError):
+                return False
+            if hour_key != str(hour) or not 0 <= hour <= 12:
+                return False
+            if hour in seen_hours:
+                return False
+            seen_hours.add(hour)
+            numeric_cells.append(curve)
+        return bool(numeric_cells) and all(cls._is_valid_hourly_curve_cell(cell) for cell in numeric_cells)
 
     def _load_curves(self) -> None:
         """Load calibration curves from JSON file."""
@@ -97,6 +146,23 @@ class HourlyCalibration:
         try:
             with open(self.curves_path) as f:
                 data = json.load(f)
+            if not isinstance(data, dict):
+                raise ValueError("top-level calibration artifact must be a mapping")
+
+            # A wrapper is a contract boundary, not a hint.  If present, it
+            # must be a mapping with an unambiguous shape and known metadata;
+            # do not silently select a valid sibling or reinterpret malformed
+            # wrapper content as direct station data.
+            wrapper_keys = {key for key in ("curves", "stations") if key in data}
+            if len(wrapper_keys) > 1:
+                raise ValueError("top-level calibration wrapper must name one station section")
+            if wrapper_keys and any(not isinstance(data[key], dict) for key in wrapper_keys):
+                raise ValueError("top-level calibration wrapper must contain mappings")
+            if wrapper_keys:
+                if "version" in data and data["version"] != 2:
+                    raise ValueError("unsupported calibration wrapper version")
+                if "type" in data and data["type"] != "hourly_platt":
+                    raise ValueError("unsupported calibration wrapper type")
             self._curves = {}
 
             # Support both old and new format
@@ -104,16 +170,26 @@ class HourlyCalibration:
             # Try direct station mapping
             if isinstance(curves_section, dict):
                 for station, hb_data in curves_section.items():
-                    if isinstance(hb_data, dict):
-                        self._curves[station.upper()] = hb_data
+                    if self._is_hourly_curve_map(hb_data):
+                        # json.load() may be fixture/mock supplied, so do not
+                        # retain aliases into caller-owned decoded payloads.
+                        # Runtime calibration state must be isolated after load.
+                        self._curves[station.upper()] = deepcopy(hb_data)
                     else:
-                        logger.debug(f"Skipping non-dict curve data for {station}")
+                        logger.debug(
+                            "Skipping non-hourly calibration data for %s "
+                            "(expected numeric hour -> alpha/beta cell)", station
+                        )
 
+            self.loaded_station_count = len(self._curves)
             self._loaded = True
-            n_stations = len(self._curves)
-            logger.info(f"Loaded calibration curves for {n_stations} stations from {self.curves_path}")
+            logger.info(
+                f"Loaded hourly calibration curves for "
+                f"{self.loaded_station_count} stations from {self.curves_path}"
+            )
         except Exception as e:
             logger.warning(f"Failed to load calibration curves: {e}")
+            self.loaded_station_count = 0
             self._loaded = False
 
     def _get_hour_before_key(self, hb: int) -> str:
