@@ -28,8 +28,8 @@ if [ ! -f "$DAEMON_SCRIPT" ]; then
 fi
 
 mkdir -p logs
-nohup python3 "$DAEMON_SCRIPT" --interval-min 5 > logs/intraday_daemon.log 2>&1 &
-NEW_PID=$!
-echo "$(date '+%Y-%m-%d %H:%M:%S') [RESTART] Daemon restarted: PID=$NEW_PID" >> "$LOG_FILE"
-echo "$NEW_PID" > "$PID_FILE"
-exit 0
+# setsid escapes the spawning session's process group — children survive turn end.
+# >> (append) preserves daemon log history across watchdog restarts.
+# NOTE: do NOT write $PID_FILE here — the daemon writes/cleans its own pid file;
+# stamping a child that instantly exited left stale pids that blocked restarts.
+setsid nohup python3 "$DAEMON_SCRIPT" --interval-min 5 >> logs/intraday_daemon.log 2>&1 < /dev/null &
