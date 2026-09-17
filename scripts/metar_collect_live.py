@@ -122,17 +122,23 @@ def parse_metar(raw_text):
             continue  # Observation timestamp
 
         # Temperature/Dewpoint: 25/18, M03/M05, 25////
-        if '/' in token and len(token) >= 3:
+        # Guard against false positives: only match the *temperature group*
+        # ("[M]DD/[M]DD" form), not wind-peak ("PK WND 36034/2032") or
+        # runway-visual-range ("R01/5000VP6000FT") or visibility ("1 1/2SM") tokens.
+        if _is_temp_dewpoint_token(token):
             parts = token.split('/')
-            if len(parts) == 2:
-                temp_c = _parse_temp_c(parts[0])
-                dew_c = _parse_temp_c(parts[1])
-                if temp_c is not None:
-                    temp_f = temp_c * 9/5 + 32
-                if dew_c is not None:
-                    dewpoint_f = dew_c * 9/5 + 32
-                if temp_c is not None or dew_c is not None:
-                    continue
+            temp_c = _parse_temp_c(parts[0])
+            dew_c = _parse_temp_c(parts[1])
+            if temp_c is not None:
+                temp_f = temp_c * 9/5 + 32
+                if not (-60.0 <= temp_f <= 150.0):
+                    temp_f = None  # reject garbage (e.g. wind token parsed as °C)
+            if dew_c is not None:
+                dewpoint_f = dew_c * 9/5 + 32
+                if not (-60.0 <= dewpoint_f <= 150.0):
+                    dewpoint_f = None
+            if temp_c is not None or dew_c is not None:
+                continue
 
         # Wind: 18010KT, VRB05KT, 18010G20KT
         if token.endswith('KT'):
@@ -213,6 +219,37 @@ def parse_metar(raw_text):
         'raw_metar': metar_line,
         'obs_datetime_utc': metar_time,
     }
+
+
+def _is_temp_dewpoint_token(token):
+    """True only for a genuine METAR temperature/dewpoint group.
+
+    Valid METAR temperature groups are of the form ``[M]DD/[M]DD``,
+    ``[M]DD/``, ``[M]DD///``, ``MM/MM``, etc. — i.e. two temperature
+    strings separated by a single slash where each side is an optional
+    ``M`` sign followed by 1-3 digits (or all slashes for missing).
+
+    This deliberately EXCLUDES wind-peak tokens (``PK WND 36034/2032``),
+    runway-visual-range tokens (``R01/5000VP6000FT``), and fractional
+    visibility (``1 1/2SM``), all of which also contain a slash but are
+    not temperatures. Without this guard, ``36034`` from a ``PK WND``
+    token was parsed as 36034.0 °C and converted to ~64893 °F, corrupting
+    ``temp_f`` / ``daily_stats.max_temp_f``.
+    """
+    if '/' not in token:
+        return False
+    # Reject fractional-visibility like '1/2SM' (RHS has trailing letters).
+    if token.endswith('SM'):
+        return False
+    # Reject runway-visual-range like 'R01/5000VP6000FT' (starts with 'R').
+    if token.startswith('R') and re.match(r'^R\d{2}', token):
+        return False
+    # Split and require exactly two parts that each look like a temperature.
+    parts = token.split('/')
+    if len(parts) != 2:
+        return False
+    _TEMP_PART = re.compile(r'^M?\d{1,3}$')
+    return bool(_TEMP_PART.match(parts[0]) and _TEMP_PART.match(parts[1]))
 
 
 def _parse_temp_c(s):
@@ -311,6 +348,12 @@ def init_db(db_path):
 def save_observation(db_path, station, parsed):
     """Save a single observation. Returns True on success."""
     if not parsed or parsed.get('temp_f') is None:
+        return False
+
+    # Reject physically-impossible temperatures (defense in depth against
+    # parser misreads). Valid Earth surface temps stay well within [-60, 150]°F.
+    temp_f = parsed.get('temp_f')
+    if temp_f is not None and not (-60.0 <= temp_f <= 150.0):
         return False
 
     obs_time = parsed['obs_datetime_utc']
