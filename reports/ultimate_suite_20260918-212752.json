@@ -1,0 +1,657 @@
+{
+  "generated_utc": "2026-09-18T21:25:01Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "suite": "R/T-1 ultimate sweep/test/calibrate",
+  "axis": "strike-crossing (settlement_temp vs strike) \u2014 core/settlement_outcome",
+  "truth_source": "reconstruct",
+  "n_labels": 1537,
+  "label_distribution": {
+    "up": 1264,
+    "down": 273
+  },
+  "temp_source_distribution": {
+    "ghcn": 1298,
+    "kalshi_finalized": 79,
+    "weatherapi": 160
+  },
+  "stations": 20,
+  "dry_run": false,
+  "layers_requested": [
+    "calibration",
+    "crossfeed",
+    "directional",
+    "entry_timing",
+    "exit_logic",
+    "fusion",
+    "intraday",
+    "predictions",
+    "risk_sizing",
+    "trajectory"
+  ],
+  "sweeps": [
+    "calibration",
+    "lane_gate",
+    "signal"
+  ],
+  "results": {
+    "signal": {
+      "radiational_cooling": {
+        "accuracy": 0.333333,
+        "mcc": 0.0,
+        "n": 6,
+        "tp": 0,
+        "fp": 0,
+        "tn": 2,
+        "fn": 4,
+        "sharpe": -5.612486080160912,
+        "n_returns": 6
+      },
+      "gaussian": {
+        "accuracy": 0.266667,
+        "mcc": 0.003842,
+        "n": 300,
+        "tp": 32,
+        "fp": 7,
+        "tn": 48,
+        "fn": 213,
+        "sharpe": -8.376102369783416,
+        "n_returns": 300
+      },
+      "gaussian_v2": {
+        "accuracy": 0.587004,
+        "mcc": 0.015543,
+        "n": 908,
+        "tp": 468,
+        "fp": 103,
+        "tn": 65,
+        "fn": 272,
+        "sharpe": 2.805098547495827,
+        "n_returns": 908
+      },
+      "pressure_delta": {
+        "accuracy": 0.577947,
+        "mcc": 0.022513,
+        "n": 526,
+        "tp": 266,
+        "fp": 53,
+        "tn": 38,
+        "fn": 169,
+        "sharpe": 2.5053640888379283,
+        "n_returns": 526
+      },
+      "forecast_disagreement": {
+        "accuracy": 0.616562,
+        "mcc": 0.031427,
+        "n": 1111,
+        "tp": 610,
+        "fp": 131,
+        "tn": 75,
+        "fn": 295,
+        "sharpe": 3.8055720917102747,
+        "n_returns": 1111
+      },
+      "calendar_climatology": {
+        "accuracy": 0.215686,
+        "mcc": 0.006429,
+        "n": 204,
+        "tp": 10,
+        "fp": 2,
+        "tn": 34,
+        "fn": 158,
+        "sharpe": -10.97341829563192,
+        "n_returns": 204
+      },
+      "frontal_passage_intraday": {
+        "accuracy": 0.357977,
+        "mcc": -0.007159,
+        "n": 514,
+        "tp": 58,
+        "fp": 25,
+        "tn": 126,
+        "fn": 305,
+        "sharpe": -4.702808008206934,
+        "n_returns": 514
+      },
+      "dual_polarity": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "cloud_cover_index": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "feels_like_delta": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "metar_trend": {
+        "accuracy": 0.454481,
+        "mcc": -0.014206,
+        "n": 1417,
+        "tp": 502,
+        "fp": 117,
+        "tn": 142,
+        "fn": 656,
+        "sharpe": -1.4512001158533985,
+        "n_returns": 1417
+      },
+      "cross_model_divergence": {
+        "accuracy": 0.478615,
+        "mcc": 0.043246,
+        "n": 982,
+        "tp": 366,
+        "fp": 68,
+        "tn": 104,
+        "fn": 444,
+        "sharpe": -0.6795722802193644,
+        "n_returns": 982
+      },
+      "nwp_analog": {
+        "accuracy": 0.297812,
+        "mcc": -0.070414,
+        "n": 1417,
+        "tp": 235,
+        "fp": 72,
+        "tn": 187,
+        "fn": 923,
+        "sharpe": -7.018707289692685,
+        "n_returns": 1417
+      },
+      "wind_direction_shift": {
+        "accuracy": 0.48,
+        "mcc": -0.288547,
+        "n": 50,
+        "tp": 23,
+        "fp": 12,
+        "tn": 1,
+        "fn": 14,
+        "sharpe": -0.6354889093022424,
+        "n_returns": 50
+      },
+      "corrected_pressure_delta": {
+        "accuracy": 0.422053,
+        "mcc": -0.022513,
+        "n": 526,
+        "tp": 169,
+        "fp": 38,
+        "tn": 53,
+        "fn": 266,
+        "sharpe": -2.5053640888379283,
+        "n_returns": 526
+      },
+      "spike_reversion": {
+        "accuracy": 0.186937,
+        "mcc": 0.0,
+        "n": 444,
+        "tp": 0,
+        "fp": 0,
+        "tn": 83,
+        "fn": 361,
+        "sharpe": -12.747423768577972,
+        "n_returns": 444
+      },
+      "goldilocks": {
+        "accuracy": 0.514029,
+        "mcc": 0.034113,
+        "n": 891,
+        "tp": 375,
+        "fp": 72,
+        "tn": 83,
+        "fn": 361,
+        "sharpe": 0.4455881126087301,
+        "n_returns": 891
+      },
+      "pressure_tendency": {
+        "accuracy": 0.510204,
+        "mcc": -0.284641,
+        "n": 49,
+        "tp": 25,
+        "fp": 18,
+        "tn": 0,
+        "fn": 6,
+        "sharpe": 0.32403703492039315,
+        "n_returns": 49
+      },
+      "metar_dtdt": {
+        "accuracy": 0.365183,
+        "mcc": -0.033561,
+        "n": 764,
+        "tp": 188,
+        "fp": 47,
+        "tn": 91,
+        "fn": 438,
+        "sharpe": -4.444925887532882,
+        "n_returns": 764
+      },
+      "volume_momentum": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "settlement_arbitrage": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "intraday_metar_confirmation": {
+        "skipped": "slow_or_live_api"
+      },
+      "fogr_reversion": {
+        "accuracy": 0.812995,
+        "mcc": 0.0,
+        "n": 631,
+        "tp": 513,
+        "fp": 118,
+        "tn": 0,
+        "fn": 0,
+        "sharpe": 12.742882663614662,
+        "n_returns": 631
+      },
+      "esdr": {
+        "skipped": "slow_or_live_api"
+      },
+      "frontal_detector": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "ai_composite": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "frontal_passage_detector": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "nwp_direct": {
+        "skipped": "slow_or_live_api"
+      },
+      "nwp_dtdt_fusion": {
+        "accuracy": 0.498113,
+        "mcc": 0.037496,
+        "n": 1325,
+        "tp": 526,
+        "fp": 103,
+        "tn": 134,
+        "fn": 562,
+        "sharpe": -0.059904229787315924,
+        "n_returns": 1325
+      },
+      "metar_nowcast": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "spread_based_entry": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "dewpoint_depression": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "regime": {
+        "accuracy": 1.0,
+        "mcc": 0.0,
+        "n": 2,
+        "tp": 2,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "sharpe": 0.0,
+        "n_returns": 2
+      },
+      "frontal_passage_nowcast": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "temperature_advection": {
+        "skipped": "slow_or_live_api"
+      },
+      "seasonal_regime": {
+        "error": "import_failed"
+      },
+      "cooling_failure": {
+        "accuracy": 0.857143,
+        "mcc": 0.0,
+        "n": 63,
+        "tp": 54,
+        "fp": 9,
+        "tn": 0,
+        "fn": 0,
+        "sharpe": 16.201851746019663,
+        "n_returns": 63
+      },
+      "warm_momentum": {
+        "accuracy": 0.798923,
+        "mcc": 0.0,
+        "n": 557,
+        "tp": 445,
+        "fp": 112,
+        "tn": 0,
+        "fn": 0,
+        "sharpe": 11.839285441920955,
+        "n_returns": 557
+      },
+      "trajectory_state_vector": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "nwp_analog_ensemble": {
+        "accuracy": 0.297812,
+        "mcc": -0.070414,
+        "n": 1417,
+        "tp": 235,
+        "fp": 72,
+        "tn": 187,
+        "fn": 923,
+        "sharpe": -7.018707289692685,
+        "n_returns": 1417
+      },
+      "eighty_two_member_ensemble": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "eighty_two_member_ensemble_ece": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      },
+      "eighty_two_member_ensemble_pooled": {
+        "accuracy": 0.0,
+        "mcc": 0.0,
+        "n": 0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0
+      }
+    },
+    "lane_gate": {
+      "lanes": {
+        "forecasting_ensemble": {
+          "available": true,
+          "status": "available"
+        },
+        "sure_thing": {
+          "available": true,
+          "status": "available"
+        },
+        "goldilocks": {
+          "available": true,
+          "status": "available"
+        },
+        "trajectory": {
+          "available": true,
+          "status": "available"
+        },
+        "nowcasting": {
+          "available": true,
+          "status": "available"
+        },
+        "radiational_cooling": {
+          "available": true,
+          "status": "available"
+        }
+      },
+      "gates": {
+        "agreement": {
+          "available": true,
+          "status": "available"
+        },
+        "settlement_execution": {
+          "available": true,
+          "status": "available"
+        },
+        "production": {
+          "available": true,
+          "status": "available"
+        },
+        "station_skill": {
+          "available": true,
+          "status": "available"
+        },
+        "liquidity": {
+          "available": true,
+          "status": "available"
+        },
+        "trajectory_confirmation": {
+          "available": true,
+          "status": "available"
+        },
+        "spatial_coherence": {
+          "available": true,
+          "status": "available"
+        },
+        "adaptive_thresholds": {
+          "available": true,
+          "status": "available"
+        },
+        "crossfeed": {
+          "available": true,
+          "status": "available"
+        }
+      },
+      "fusion_modes": {
+        "none": {
+          "available": true,
+          "status": "available"
+        },
+        "uwc": {
+          "available": true,
+          "status": "available"
+        },
+        "majority": {
+          "available": true,
+          "status": "available"
+        },
+        "weighted": {
+          "available": true,
+          "status": "available"
+        }
+      },
+      "calibration_modes": {
+        "platt": {
+          "available": true,
+          "status": "available"
+        },
+        "bma": {
+          "available": true,
+          "status": "available"
+        },
+        "emos": {
+          "available": true,
+          "status": "available"
+        },
+        "both": {
+          "available": true,
+          "status": "available"
+        }
+      }
+    },
+    "calibration": {
+      "radiational_cooling": {
+        "brier": 0.2364,
+        "ece": 0.1373,
+        "n": 6
+      },
+      "gaussian": {
+        "brier": 0.7333,
+        "ece": 0.7333,
+        "n": 300
+      },
+      "gaussian_v2": {
+        "brier": 0.3972,
+        "ece": 0.4143,
+        "n": 908
+      },
+      "pressure_delta": {
+        "brier": 0.2841,
+        "ece": 0.2636,
+        "n": 526
+      },
+      "forecast_disagreement": {
+        "brier": 0.3839,
+        "ece": 0.3843,
+        "n": 1111
+      },
+      "calendar_climatology": {
+        "brier": 0.3084,
+        "ece": 0.4004,
+        "n": 204
+      },
+      "frontal_passage_intraday": {
+        "brier": 0.2832,
+        "ece": 0.2547,
+        "n": 514
+      },
+      "metar_trend": {
+        "brier": 0.2461,
+        "ece": 0.3019,
+        "n": 1417
+      },
+      "cross_model_divergence": {
+        "brier": 0.44,
+        "ece": 0.461,
+        "n": 982
+      },
+      "nwp_analog": {
+        "brier": 0.2979,
+        "ece": 0.3693,
+        "n": 1417
+      },
+      "wind_direction_shift": {
+        "brier": 0.2912,
+        "ece": 0.3026,
+        "n": 50
+      },
+      "corrected_pressure_delta": {
+        "brier": 0.3719,
+        "ece": 0.3904,
+        "n": 526
+      },
+      "spike_reversion": {
+        "brier": 0.6191,
+        "ece": 0.6441,
+        "n": 444
+      },
+      "goldilocks": {
+        "brier": 0.4482,
+        "ece": 0.4817,
+        "n": 891
+      },
+      "pressure_tendency": {
+        "brier": 0.2698,
+        "ece": 0.1977,
+        "n": 49
+      },
+      "metar_dtdt": {
+        "brier": 0.4171,
+        "ece": 0.4633,
+        "n": 764
+      },
+      "fogr_reversion": {
+        "brier": 0.4549,
+        "ece": 0.5373,
+        "n": 631
+      },
+      "nwp_dtdt_fusion": {
+        "brier": 0.33,
+        "ece": 0.3649,
+        "n": 1325
+      },
+      "regime": {
+        "brier": 0.1934,
+        "ece": 0.3944,
+        "n": 2
+      },
+      "cooling_failure": {
+        "brier": 0.3314,
+        "ece": 0.4571,
+        "n": 63
+      },
+      "warm_momentum": {
+        "brier": 0.25,
+        "ece": 0.2989,
+        "n": 557
+      },
+      "nwp_analog_ensemble": {
+        "brier": 0.2979,
+        "ece": 0.3693,
+        "n": 1417
+      }
+    }
+  },
+  "elapsed_seconds": 173.33
+}
