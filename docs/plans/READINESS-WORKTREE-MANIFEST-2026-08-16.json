@@ -1,0 +1,2074 @@
+{
+  "bytes_by_status": {
+    " D": 0,
+    " M": 11828287,
+    "??": 27792194
+  },
+  "counts": {
+    " D": 265,
+    " M": 82,
+    "??": 282
+  },
+  "entries": [
+    {
+      "bytes": 159801,
+      "path": "app.py",
+      "sha256": "617a79c69b4a1d0a22da01cd9dc13ffcc681b3f35aff03ae614cb3390f1ce45b",
+      "status": " M"
+    },
+    {
+      "bytes": 27243,
+      "path": "core/calibration_pipeline.py",
+      "sha256": "59afc3d6d1569082a8839d681dd42e7a7b0f50ad491c981fd1b5fe5ff8ee1504",
+      "status": " M"
+    },
+    {
+      "bytes": 11420,
+      "path": "core/continuous_kelly.py",
+      "sha256": "1ca68427394f2887a656ae13951d3781d808e528ee0776f7a43e2531716c05c5",
+      "status": " M"
+    },
+    {
+      "bytes": 211,
+      "path": "core/dewpoint_modulator.py",
+      "sha256": "637a374c6df94c16b4ec5e7fd1b38a3a8ca0dbdaf47e94b8d4720ab46bec1776",
+      "status": " M"
+    },
+    {
+      "bytes": 222,
+      "path": "core/forecast_confidence_modulator.py",
+      "sha256": "293ebe873a5436a207026cb152ad0b2cce54bdaed4c203c62014d13e9af10000",
+      "status": " M"
+    },
+    {
+      "bytes": 53662,
+      "path": "core/fusion_logic.py",
+      "sha256": "fd68583adcd1bc83b8b1254613c296b0164abc27695cd0c73fc7582f8ea1e800",
+      "status": " M"
+    },
+    {
+      "bytes": 17266,
+      "path": "core/gate_pipeline.py",
+      "sha256": "14cda6150d91caec87124e7a686d7c93985a863c1188652aab5dbcd7d7f768c1",
+      "status": " M"
+    },
+    {
+      "bytes": 113390,
+      "path": "core/kalshi_monitor.py",
+      "sha256": "21bc0702d62b165fc46e6f866e5f6efc6d9a91ced2b0c3ded76cd751e52c0a3b",
+      "status": " M"
+    },
+    {
+      "bytes": 8883,
+      "path": "core/lever_manager.py",
+      "sha256": "f0809090a238a04669e3693612196badb6d2e3f23ac09f57507218fe7704b089",
+      "status": " M"
+    },
+    {
+      "bytes": 18129,
+      "path": "core/market_cost_model.py",
+      "sha256": "45542ea707cbeffdea19c078b2bcbde203e5adfb524432ea17fe56dbac7d8850",
+      "status": " M"
+    },
+    {
+      "bytes": 216225,
+      "path": "core/metar_monitor.py",
+      "sha256": "910fac86338e038111faa0cb7e8e81becceab33871c1185eb13a0e92bef2f0f5",
+      "status": " M"
+    },
+    {
+      "bytes": 25951,
+      "path": "core/multi_model_ensemble.py",
+      "sha256": "820aecc4a6dcb005b5b036789919821073e52030b1ed151fc94fef667a6fd923",
+      "status": " M"
+    },
+    {
+      "bytes": 180,
+      "path": "core/p3_api.py",
+      "sha256": "c2f53136a9b2c5e329da5308ba79de9fea464f89c4aed0d47151ede2623ad569",
+      "status": " M"
+    },
+    {
+      "bytes": 211,
+      "path": "core/p3_calibration_engine.py",
+      "sha256": "e3abb8e39a390b8ed3f10cc4626f93edca1671521365c5232f031fa78dce71d5",
+      "status": " M"
+    },
+    {
+      "bytes": 200,
+      "path": "core/p3_db_migration.py",
+      "sha256": "e7445349daa3a7ddfff2205e1c9e13cdf19ee12cb06219dc565d4147973f12fa",
+      "status": " M"
+    },
+    {
+      "bytes": 214,
+      "path": "core/p3_feature_extractor.py",
+      "sha256": "f8b4f75b0719c6382d882f2075f997dfcb9c73bc6f8190b73501056d7a058f72",
+      "status": " M"
+    },
+    {
+      "bytes": 189,
+      "path": "core/p3_main.py",
+      "sha256": "91fd46ac2a6800e6ea599978de9f0579b79f4978d8077bef8c5373b88500ef13",
+      "status": " M"
+    },
+    {
+      "bytes": 196,
+      "path": "core/p3_match_engine.py",
+      "sha256": "d70888b2a378c96418684e9f0eb595c1f42ddd7d6ddd519a39c3f58c82f0af25",
+      "status": " M"
+    },
+    {
+      "bytes": 210,
+      "path": "core/p3_output_formatter.py",
+      "sha256": "0dc2b992f59d3268cbbcad313bcb1014b046afd4d98d47f2d3b40598357d914a",
+      "status": " M"
+    },
+    {
+      "bytes": 198,
+      "path": "core/p3_scheduler.py",
+      "sha256": "68c9157a289d9891e60817806441ea851f061831e6f83da5f12e8e9c493abed0",
+      "status": " M"
+    },
+    {
+      "bytes": 211,
+      "path": "core/p3_trajectory_tracer.py",
+      "sha256": "b92ae793aa4a115a2c317c0e70e61d3a067b749b19f7db7fc8f8c3e908e4851f",
+      "status": " M"
+    },
+    {
+      "bytes": 159440,
+      "path": "core/paper_trading_engine.py",
+      "sha256": "8be2c7f99ddacc3d3c5e7719490ea68b45509c9a85ec9a0010f53d472d538643",
+      "status": " M"
+    },
+    {
+      "bytes": 236,
+      "path": "core/polymarket_kalshi_feeder.py",
+      "sha256": "de971e5f31fecd0635f28d64db5e736b5f37276c9c095252fe259a2be1586e8f",
+      "status": " M"
+    },
+    {
+      "bytes": 225,
+      "path": "core/polymarket_whale_db.py",
+      "sha256": "de3e99c4352863de08d83dd11f200abd624f469c1512b218166f3b860029c87f",
+      "status": " M"
+    },
+    {
+      "bytes": 28282,
+      "path": "core/position_sizer.py",
+      "sha256": "d4f7d59e94c8f048d7b27a4621bd403a91933272e277c454909575c89e941bc7",
+      "status": " M"
+    },
+    {
+      "bytes": 372,
+      "path": "core/position_sizing.py",
+      "sha256": "afb2962cb809b94cfa3b6000ec26a5eaa3d8105df42c1a3a98ef0d0973f7e3ce",
+      "status": " M"
+    },
+    {
+      "bytes": 31611,
+      "path": "core/signal_families.py",
+      "sha256": "4bcbbb58f6aec48d235e9c015ee90de8d34a0b5913825c7bb3fe015f3b40a377",
+      "status": " M"
+    },
+    {
+      "bytes": 47444,
+      "path": "core/signal_fusion.py",
+      "sha256": "f5762409ac43eed5fbf4f4d7c8733643d6e87a367ca02687021a155aea058d68",
+      "status": " M"
+    },
+    {
+      "bytes": 31969,
+      "path": "core/signal_pipeline.py",
+      "sha256": "51f5175e94dd835b9181f62395092ca354035862627ef7e35668f62672462f3b",
+      "status": " M"
+    },
+    {
+      "bytes": 19591,
+      "path": "core/signals/__init__.py",
+      "sha256": "82123ce0738be2046405cfdbdc4cacccdd379f342c3f4bc8423fe73a9ae03132",
+      "status": " M"
+    },
+    {
+      "bytes": 29753,
+      "path": "core/signals/dual_polarity_signal.py",
+      "sha256": "57084ae5ac1d5ddda1165ea0d1765c8b36e0b9393f94aa394a2f6c9bc855e739",
+      "status": " M"
+    },
+    {
+      "bytes": 14722,
+      "path": "core/signals/ecmwf_bias_corrected_signal.py",
+      "sha256": "f3d16dbf75558017614b3e2ae098f872d41a28a9bfa255da2263bfd7a2792669",
+      "status": " M"
+    },
+    {
+      "bytes": 16346,
+      "path": "core/signals/eighty_two_member_ensemble_signal.py",
+      "sha256": "5c201731d26639f4e9da6350f19ad3b24b32e17c437e745179206700384b8140",
+      "status": " M"
+    },
+    {
+      "bytes": 20725,
+      "path": "core/signals/frontal_passage_nowcast_signal.py",
+      "sha256": "4dd04fbaa7ee79d413bcab864ddbbb04e6037fa8954286c8b409f9ebaa6d980b",
+      "status": " M"
+    },
+    {
+      "bytes": 8391,
+      "path": "core/signals/pressure_delta_signal.py",
+      "sha256": "972cfad1d9a22fe45fbcd7024bac645d90f925622fa15075bf96a47849960fbc",
+      "status": " M"
+    },
+    {
+      "bytes": 41984,
+      "path": "core/signals/radiational_cooling_signal.py",
+      "sha256": "8e8cab21f45295a8286f2d1d74c00b56b6d6f92e34ff3c44bf9b2a3d71c3135e",
+      "status": " M"
+    },
+    {
+      "bytes": 13888,
+      "path": "core/signals/wind_direction_shift.py",
+      "sha256": "f93833442812998a61b2bf6ceff72a6d136f484b8c8729e4109f62dfa69cbf85",
+      "status": " M"
+    },
+    {
+      "bytes": 17847,
+      "path": "core/station_registry.py",
+      "sha256": "d41fca42295f7ee56d68a1149ec0ec10ead4eab6f159191f242c417e6fe713b1",
+      "status": " M"
+    },
+    {
+      "bytes": 7469,
+      "path": "core/station_time.py",
+      "sha256": "89dae9a333caa39aed2a9b4fbd374a3678b68ff6e34649b576d406279b7d1b49",
+      "status": " M"
+    },
+    {
+      "bytes": 29831,
+      "path": "core/unified_backtest.py",
+      "sha256": "ad18ea84c06fbf765378b930d939a49d2bd7cf4dcd04a689ed25f7290f6e995e",
+      "status": " M"
+    },
+    {
+      "bytes": 34099,
+      "path": "core/variance_weighted_sizing.py",
+      "sha256": "7289007d5dcad25c3081e39aeee6b182c286f5f96f1ce8db02a02b331d00a36f",
+      "status": " M"
+    },
+    {
+      "bytes": 7823360,
+      "path": "data/forecast_disagreement_live.db",
+      "sha256": "7a8c0488118652179594abf6d3ef173f327ad50bc4790612e20639e1ce33ad30",
+      "status": " M"
+    },
+    {
+      "bytes": 2614,
+      "path": "data/sweep_convergence_log.csv",
+      "sha256": "a9de2fa616d0f2cd373fcfc5829e2332e1b1fe7057178fa5d755e89dbc9868f6",
+      "status": " M"
+    },
+    {
+      "bytes": 13878,
+      "path": "docs/plans/A-MODE-RUNBOOK.md",
+      "sha256": "cf8086b746b1177202d0cb9a7ba04d63e27918364d24d02c7c007713ebf692ee",
+      "status": " M"
+    },
+    {
+      "bytes": 5091,
+      "path": "docs/plans/FORMAL-SUCCESS-CRITERIA.md",
+      "sha256": "843d30314bb373c1cd12697a12057049c802961ace776667c62e94adc7614a33",
+      "status": " M"
+    },
+    {
+      "bytes": 4832,
+      "path": "docs/weather-engine/SIGNAL_CORRELATION_MATRIX.md",
+      "sha256": "e4ae7d901401ef12a542f427a453e3831edc9704997452a0ccbe4943ab753661",
+      "status": " M"
+    },
+    {
+      "bytes": 1401139,
+      "path": "graphify-out/cache/stat-index.json",
+      "sha256": "bcd27cb99c4eac6b2ff3514fc939087cba8acec750165193724e88f3d92142a4",
+      "status": " M"
+    },
+    {
+      "bytes": 353840,
+      "path": "graphify-out/graph.json",
+      "sha256": "6d214cc126741fc91276b8415262422e0bade1f6ee140d5bba82fbd598b6cc4b",
+      "status": " M"
+    },
+    {
+      "bytes": 153325,
+      "path": "graphify-out/manifest.json",
+      "sha256": "198b38f2f41b33f946f0303e4a33beac4125cf91c922c00b6260bca8c0d33431",
+      "status": " M"
+    },
+    {
+      "bytes": 101121,
+      "path": "logs/forecast_disagreement_collector.log",
+      "sha256": "0225b08f0b813d0c213ee6539c77843cae09a2caa344c7d33bba159777db6a8c",
+      "status": " M"
+    },
+    {
+      "bytes": 23471,
+      "path": "scripts/apply_gaussian_fusion.py",
+      "sha256": "b615077ca4bca05f745f39ef9bc168e2a3dcceaf4ca01e96e6cdd4a045d201c8",
+      "status": " M"
+    },
+    {
+      "bytes": 41680,
+      "path": "scripts/big_sweep.py",
+      "sha256": "5894e4a6c97e16290522b56c124e544f41df04e8c7e95c908cb6447cf3d7f969",
+      "status": " M"
+    },
+    {
+      "bytes": 77429,
+      "path": "scripts/bmode_p1_backtest.py",
+      "sha256": "1dcc63f1d068a9721b2ef004c6c6f895e659e11d2c8231092ca34b96b68378f7",
+      "status": " M"
+    },
+    {
+      "bytes": 11556,
+      "path": "scripts/compute_signal_correlation_matrix.py",
+      "sha256": "b42d0ffd4ce1fd2212d2021fa91526fc9687139fa743ed4c06c91aa8526de8ca",
+      "status": " M"
+    },
+    {
+      "bytes": 20970,
+      "path": "scripts/ensemble_v11_calibration_fusion.py",
+      "sha256": "9da7e05354fe65886f200d818753133033ae59da210f751fd70f0bf188cb1846",
+      "status": " M"
+    },
+    {
+      "bytes": 12401,
+      "path": "scripts/gefs_gray_room_validation.py",
+      "sha256": "8704aa59e3eb23468f649e3b7db72affe38cf2ccbeff2dd6f1c2f7307b0507bf",
+      "status": " M"
+    },
+    {
+      "bytes": 51286,
+      "path": "scripts/gefs_paper_trading_cron.py",
+      "sha256": "eb89b57fb6b500842eb0e5e0958eb3ccbdfbc805147d4b303fe3cfb9f5ea9078",
+      "status": " M"
+    },
+    {
+      "bytes": 17352,
+      "path": "scripts/gefs_walk_forward_backtest.py",
+      "sha256": "6cf085420c1700a4cbb6a522326d9aeda9317501eccbf0ce37707903fd925698",
+      "status": " M"
+    },
+    {
+      "bytes": 26707,
+      "path": "scripts/gefs_walk_forward_corrected.py",
+      "sha256": "84fc54e4a18a5fddc19f0bb1f58aa32cb24feecc19b1accf9d52012ad98a79ff",
+      "status": " M"
+    },
+    {
+      "bytes": 89243,
+      "path": "scripts/per_parameter_sweep.py",
+      "sha256": "1199303a9b36436f2f57a10a6ea44bae6f273d17722f338a85ca62c59ae03c34",
+      "status": " M"
+    },
+    {
+      "bytes": 30189,
+      "path": "scripts/phase1_paper_trading_cron.py",
+      "sha256": "39d92a3471d5d5b1eb21c8f107afb4f7cc14288e42b8a88b27eae62b39c95031",
+      "status": " M"
+    },
+    {
+      "bytes": 25699,
+      "path": "scripts/research_cascade_v1.py",
+      "sha256": "5c97af10ad1f410659393529290ab5af628081e1f9b2237d892cf2b878741400",
+      "status": " M"
+    },
+    {
+      "bytes": 6143,
+      "path": "scripts/sweep/config.py",
+      "sha256": "63a67895a4cef35c4d77a1c5134de0a8d89257395fffbeef03a1b9f1bd20fcbd",
+      "status": " M"
+    },
+    {
+      "bytes": 26244,
+      "path": "scripts/sweep/gefs_grid_sweep.py",
+      "sha256": "803909f3a1c4da54c8967614e5cef241c22b89723efadc7ff4de93fa13528324",
+      "status": " M"
+    },
+    {
+      "bytes": 26769,
+      "path": "scripts/sweep/kalshi_sweep_eval.py",
+      "sha256": "aeded838625f27d5c39f2a3fa2df1a12135cfd8122fb3487565fa10372926804",
+      "status": " M"
+    },
+    {
+      "bytes": 14437,
+      "path": "scripts/sweep/old_signal_validation.py",
+      "sha256": "fa60a9b85ad5e82b3ba923a0baf1f9b29f59bc87b83b11e71f468cda454e7889",
+      "status": " M"
+    },
+    {
+      "bytes": 24595,
+      "path": "scripts/sweep_engine.py",
+      "sha256": "ce7129c624e728669271fe1d9e1a26426175107741b3ad6c57a3dca589f3da9f",
+      "status": " M"
+    },
+    {
+      "bytes": 9451,
+      "path": "scripts/sweep_fusion.py",
+      "sha256": "b27f0a658bd684bafdf0461c18535784b077b09c0422fe4575a2d5f1c605ed9a",
+      "status": " M"
+    },
+    {
+      "bytes": 20558,
+      "path": "scripts/sweep_metrics.py",
+      "sha256": "ca123ae71761d3cbbc98bb2f7dd2149bfe19ba1ede675103a832abe544e514b7",
+      "status": " M"
+    },
+    {
+      "bytes": 30863,
+      "path": "scripts/sweep_validation.py",
+      "sha256": "5f14d849d0e7d8d818278b3bceebba926bf10c93095afd708d02f0136f469014",
+      "status": " M"
+    },
+    {
+      "bytes": 12897,
+      "path": "scripts/test_climatology.py",
+      "sha256": "e4cbe5206676f90dc3e8d83cd151c3e761d69199d7fb8cebbb5bca4073b18cfd",
+      "status": " M"
+    },
+    {
+      "bytes": 12329,
+      "path": "scripts/test_disagreement.py",
+      "sha256": "6ee4280faccabc6e59263599cd5241128d64fc952d585f8b5f57b9005b53bcfa",
+      "status": " M"
+    },
+    {
+      "bytes": 14036,
+      "path": "scripts/test_frontal.py",
+      "sha256": "8a87972849ba7f7bafa7bfcfe8f6dfee27671f7d5404459a38542959b475f19a",
+      "status": " M"
+    },
+    {
+      "bytes": 23998,
+      "path": "scripts/test_fused_ensemble.py",
+      "sha256": "7503e8233eab519aa043b0c1ff849b13c57764a39d25379353e495f8111ca02f",
+      "status": " M"
+    },
+    {
+      "bytes": 12148,
+      "path": "scripts/test_gaussian.py",
+      "sha256": "933366d2df5a16f2b9d789030907410b081138c9ec6e90a12e5ec30088ce0f3e",
+      "status": " M"
+    },
+    {
+      "bytes": 14724,
+      "path": "scripts/test_member_weights.py",
+      "sha256": "b612fc147634780c34b38b7c6e08261acf70f16ecd8a6e9de5417500bf2b9680",
+      "status": " M"
+    },
+    {
+      "bytes": 17667,
+      "path": "scripts/test_multi_model.py",
+      "sha256": "14f5e7efdbbf2b1a9d8da360aab76a0e0bc2679c056798d3caf841390871e454",
+      "status": " M"
+    },
+    {
+      "bytes": 14633,
+      "path": "scripts/test_spatial_coherence.py",
+      "sha256": "27c4f52ed326b8183236a846859b6d306434ed7773e38216a758cae5b5830036",
+      "status": " M"
+    },
+    {
+      "bytes": 13823,
+      "path": "scripts/test_trajectory_gate.py",
+      "sha256": "889793599452c46529331e9dbf46c8ba27e45546cbc65c9252d5c10cda9de8e3",
+      "status": " M"
+    },
+    {
+      "bytes": 18969,
+      "path": "scripts/validate_aggregation.py",
+      "sha256": "a4cacf40c77f45a19a6427d83c8042df5a98bfab7ba6116437b4df974d86ae5d",
+      "status": " M"
+    },
+    {
+      "bytes": 6555,
+      "path": "signal_correlation_matrix.json",
+      "sha256": "fb6df8c51aae32ba44488bb4a8c942baec6d46f1ec7b566316a31ec91a46bac3",
+      "status": " M"
+    },
+    {
+      "bytes": 11828,
+      "path": "tests/test_fee_consistency.py",
+      "sha256": "171276acab8979e9ba4b59f2691496474a4ed0617805013c962d5c98bb5ab2ef",
+      "status": " M"
+    },
+    {
+      "bytes": 222,
+      "path": "alert_builder.py",
+      "sha256": "baed3bc1aa9f1388c68572fc35bcc9dd6dc0d234c64bbcd3fa3cc4977f5041e8",
+      "status": "??"
+    },
+    {
+      "bytes": 1202,
+      "path": "check_climatology_table.py",
+      "sha256": "8c8ca0a5772c1f49d9a5fc848e374b876f4748c10238151d7d9918c60d475264",
+      "status": "??"
+    },
+    {
+      "bytes": 1404,
+      "path": "core/_archive_compat.py",
+      "sha256": "8b583b4c7efbda92522d55b4493bf018b986b4814002a7f03ba11c13ab497cbd",
+      "status": "??"
+    },
+    {
+      "bytes": 5977,
+      "path": "core/_pava.py",
+      "sha256": "4b90c33e3b53b6af6663e33f457e3cdb66661d770ce5ce12124b012f3ba9b0da",
+      "status": "??"
+    },
+    {
+      "bytes": 16222,
+      "path": "core/consensus_scoring.py",
+      "sha256": "571dcf9232d14c974edc380d54cc56fc1c15c0e221878d519156e95a3fe6d779",
+      "status": "??"
+    },
+    {
+      "bytes": 54785,
+      "path": "core/degradation_monitor.py",
+      "sha256": "891e22606d597b61fb90e8d5a38fe6423ff7b9fda9a2f4fd2a087b1c92c14ac0",
+      "status": "??"
+    },
+    {
+      "bytes": 6902,
+      "path": "core/direction_weighted_adapter.py",
+      "sha256": "78c8ad39d8fa960f5107ae028bea3b0cb372f605f42178f7c8ebcefea2569afb",
+      "status": "??"
+    },
+    {
+      "bytes": 39171,
+      "path": "core/kalman_temperature_tracker.py",
+      "sha256": "7737c9e9ebf0d107f6cfb647b6116ee11c85a0fc0ec17d939716b3e0c7314533",
+      "status": "??"
+    },
+    {
+      "bytes": 23318,
+      "path": "core/logodds_consensus_boost.py",
+      "sha256": "ac54eab87af5f070d7fa70998a409025e2a6f0ff1e72d1cc7d8cb480d85ec85b",
+      "status": "??"
+    },
+    {
+      "bytes": 10410,
+      "path": "core/regime_switching_hmm.py",
+      "sha256": "01a54cab2d47934d8eda65fbc1284247886284a12888243f12cefd813f69f34d",
+      "status": "??"
+    },
+    {
+      "bytes": 20864,
+      "path": "core/signals/asos_microstructure_signal.py",
+      "sha256": "35553b16330a0756467d55adb3797c81fbc374f02c0d7cbfd4514fd35ae9037d",
+      "status": "??"
+    },
+    {
+      "bytes": 11033,
+      "path": "core/signals/confidence_modulators.py",
+      "sha256": "16e606d2193569e35d8709528817d27a4cf24509dd63e35fe5a09caf2fb77c8e",
+      "status": "??"
+    },
+    {
+      "bytes": 6612,
+      "path": "core/signals/cooling_failure_signal.py",
+      "sha256": "80d3bb05483bd110b780c2dd43dafe6d3ca3f00a56ed251d789100416108f15c",
+      "status": "??"
+    },
+    {
+      "bytes": 2271,
+      "path": "core/signals/honest_trend_signal.py",
+      "sha256": "b766ef9ce014d3558242b71bb50b01e54066150ab95aefe8c7c26e96e8330810",
+      "status": "??"
+    },
+    {
+      "bytes": 29922,
+      "path": "core/signals/temperature_trend_signal.py",
+      "sha256": "5f185ca49d65797b5323a80660e4861663ffdb1005187837776c339b915e125c",
+      "status": "??"
+    },
+    {
+      "bytes": 5342,
+      "path": "core/signals/warm_momentum_signal.py",
+      "sha256": "5309d2e07929913803be8b38055433551fbe67197c7a72387f8498e1ca3ef132",
+      "status": "??"
+    },
+    {
+      "bytes": 12634,
+      "path": "core/statistical_significance.py",
+      "sha256": "056f51ad669b4936cb81a4ff49f87d40ea4920fe2d401cec82d74a97d917ee38",
+      "status": "??"
+    },
+    {
+      "bytes": 9456,
+      "path": "core/walk_forward_optimizer.py",
+      "sha256": "572a70939e49ed889453586cb943ac01b127c42df375fe8be136acb891e155af",
+      "status": "??"
+    },
+    {
+      "bytes": 19698640,
+      "path": "data/gefs_direct_temperature_evaluation_rows_20260815.jsonl",
+      "sha256": "0e640f7ae8cd9a8f3502d64a5e80d8bc3061e109720aa1bd49b92f1715f28d00",
+      "status": "??"
+    },
+    {
+      "bytes": 7080,
+      "path": "docs/CALIBRATION_CEILING.md",
+      "sha256": "a87ef15619310622489095d03330c551b92ff41747680cb12adb0334a89cc2f2",
+      "status": "??"
+    },
+    {
+      "bytes": 3376,
+      "path": "docs/plans/ASOS-CALIBRATION-SUPPLEMENT.md",
+      "sha256": "f1ee3f2101e42fc0e19b65de0e4f87d5805183dc6ba7af1bc0320d25ca086026",
+      "status": "??"
+    },
+    {
+      "bytes": 3215,
+      "path": "docs/plans/BUILD-CONFIRMATION-ITEMS-1-2.md",
+      "sha256": "86a0f676cbeea26a1d2abeaaf53c7565d0cf207821a993ce322023c4b0a15dbd",
+      "status": "??"
+    },
+    {
+      "bytes": 14143,
+      "path": "docs/plans/BUILD-QC-REMEDIATION-EVIDENCE-2026-08-13.txt",
+      "sha256": "0c903d9b6a660e44dee1bf12d0281994e99f7d3af8b62adce8a06211fae45aef",
+      "status": "??"
+    },
+    {
+      "bytes": 17491,
+      "path": "docs/plans/CALIBRATED-PRESSURE-DELTA-RELIABILITY-RERUN-SPEC-2026-08-15.md",
+      "sha256": "024348a7740eaa6fd2128a13b218015e4a5f426a09ec4ffa2c953ef127e95d60",
+      "status": "??"
+    },
+    {
+      "bytes": 3160,
+      "path": "docs/plans/CALIBRATION-LABEL-SEPARATION-SPEC-2026-08-15.md",
+      "sha256": "b0beeeb53fe38058f0528aa7ee41eccfaa412477b59522deef17f920a3a8476f",
+      "status": "??"
+    },
+    {
+      "bytes": 5076,
+      "path": "docs/plans/CALIBRATION-TEMPORAL-SEPARATION-CORRECTION-2026-08-15.md",
+      "sha256": "2fd1732913925ee21cfb6b0ce6e2fc313f20924c5301614e3bd6354f0bd8f818",
+      "status": "??"
+    },
+    {
+      "bytes": 3425,
+      "path": "docs/plans/CORE-READINESS-GATE-MATRIX-2026-08-15.md",
+      "sha256": "040e147580403f3a74795761946041704da39789e8bcf45a06e61e35837788d0",
+      "status": "??"
+    },
+    {
+      "bytes": 3716,
+      "path": "docs/plans/EVALUATOR-LABEL-SAFETY-FIX-SPEC-2026-08-15.md",
+      "sha256": "4e3650bf5cd62c34aa11bdf5871ef581d253a3b23672f89edf2e8d4b0d5cf86b",
+      "status": "??"
+    },
+    {
+      "bytes": 7473,
+      "path": "docs/plans/EXECUTION-SNAPSHOT-RECONCILIATION-SPEC-2026-08-15.md",
+      "sha256": "5582c185429514c64a41f2b36915adafb1dfe9660902e1e6eda7a0f46e57d9f3",
+      "status": "??"
+    },
+    {
+      "bytes": 5857,
+      "path": "docs/plans/FIX-CHAIN-DEFERRED-SPEC.md",
+      "sha256": "9208f6aa50c59e6316b150b26f7ad1d4adeba8bfc96a5fd07246687a14ee6f3f",
+      "status": "??"
+    },
+    {
+      "bytes": 3259,
+      "path": "docs/plans/FP-DEAD-SIGNALS-SPEC.md",
+      "sha256": "f6367f380883bcec2afa0404670c831cc196121011a6922e61d62b9609d90f50",
+      "status": "??"
+    },
+    {
+      "bytes": 2251,
+      "path": "docs/plans/FP-FORECAST-DISAGREEMENT-SPEC.md",
+      "sha256": "c38dc3815d38652991b62846259292505c8461d18301034c68931aa3a54d3c6f",
+      "status": "??"
+    },
+    {
+      "bytes": 2303,
+      "path": "docs/plans/FP-GOLDILOCKS-LANE-SPEC.md",
+      "sha256": "a0f2690a6006cc60244eab3fd11a7ba1298e83cdc48967a8c9ff06b42a2937f5",
+      "status": "??"
+    },
+    {
+      "bytes": 3408,
+      "path": "docs/plans/FP-HMM-SPEC.md",
+      "sha256": "54ce765e8a567725b13fca32ed5565eece9b90a4b924b3e4aedadbbda9dc5933",
+      "status": "??"
+    },
+    {
+      "bytes": 4013,
+      "path": "docs/plans/FP-OPTIONS-EXPLORATION-SPEC.md",
+      "sha256": "aa90aca6c0a3f0c75c8d2c8e33faa8a631638879bbc3c42612c02e2fb0229743",
+      "status": "??"
+    },
+    {
+      "bytes": 6119,
+      "path": "docs/plans/FP-SYSTEM-ARCHITECTURE.md",
+      "sha256": "b65d82f06b0fe6c4c0f4bde4d4eecf2e5d2dfd96fb75c393f74503915dc52d28",
+      "status": "??"
+    },
+    {
+      "bytes": 4061,
+      "path": "docs/plans/FP-TRAJECTORY-MULTI-SIGNAL-SPEC.md",
+      "sha256": "0eef3f48545f85ddd44fcf91a7c427a9582e58860342669b5fd95f6d3339c818",
+      "status": "??"
+    },
+    {
+      "bytes": 2803,
+      "path": "docs/plans/FP-WALK-FORWARD-2-BUCKET-SPEC.md",
+      "sha256": "e4efc87184f6ee6ad3b238593502bda781655c1cf74b85431a93777bc78a8ef4",
+      "status": "??"
+    },
+    {
+      "bytes": 3604,
+      "path": "docs/plans/FP-WEIGHTED-ENSEMBLE-SPEC.md",
+      "sha256": "acab4a6c6969f5a3a2b496fa716c32df982826f432ba6110b431c20b5026a66d",
+      "status": "??"
+    },
+    {
+      "bytes": 6262,
+      "path": "docs/plans/FULL-SWEEP-RESULTS.md",
+      "sha256": "1d2aea290de97e9c3856e4b906c560cfe1adbae080169eff35c5c28911e87cef",
+      "status": "??"
+    },
+    {
+      "bytes": 9717,
+      "path": "docs/plans/GEFS-DIRECT-TEMPERATURE-EVALUATION-SPEC-2026-08-15.md",
+      "sha256": "97cb926102932910372a8eb290821c5a57714a2493adb9dc411a5ff3284ddd56",
+      "status": "??"
+    },
+    {
+      "bytes": 7517,
+      "path": "docs/plans/GEFS-TEMPERATURE-F057-RECOVERY-SPEC-2026-08-15.md",
+      "sha256": "3b439268065818970bace74b60fbc14527afba105bdea2336c302c7e5f65aa80",
+      "status": "??"
+    },
+    {
+      "bytes": 6795,
+      "path": "docs/plans/GEFS-TEMPERATURE-GEOMETRY-FIX-SPEC-2026-08-15.md",
+      "sha256": "fc4733e904650506fa51d9dc6c6191ecbfe4be829b7d1e74fc0e187ff11ffdc8",
+      "status": "??"
+    },
+    {
+      "bytes": 11018,
+      "path": "docs/plans/GEFS-TEMPERATURE-PILOT-ACQUISITION-SPEC-2026-08-15.md",
+      "sha256": "7c50ba701b20ba269889c2dd73b5eeabb6e09b9efa7b0bca60f25d5c101ae49a",
+      "status": "??"
+    },
+    {
+      "bytes": 25418,
+      "path": "docs/plans/GEFS-TEMPERATURE-REBUILD-EXPERT-SPEC-2026-08-15.md",
+      "sha256": "ea8bc92336be216d7c9a4358da25f5fd16c40daf5e37a5327fdd6a2ddc0d83a3",
+      "status": "??"
+    },
+    {
+      "bytes": 24558,
+      "path": "docs/plans/GEFS-TEMPERATURE-REBUILD-QC-SPEC-2026-08-15.md",
+      "sha256": "7c7c5a62f183393033aae71bd53afd023ae5ebec6ab884cdf386714597a8d924",
+      "status": "??"
+    },
+    {
+      "bytes": 1557,
+      "path": "docs/plans/GEFS-TEMPERATURE-REBUILD-ROADMAP-2026-08-15.md",
+      "sha256": "0b9dbd84aecedf827f6d2fe36506e6059d0cd2f799b342526f04edd778a32018",
+      "status": "??"
+    },
+    {
+      "bytes": 2813,
+      "path": "docs/plans/GHCN-DAILY-CALIBRATION-SOURCE-ACQUISITION-SPEC-2026-08-15.md",
+      "sha256": "d5e2fd431d0fe4d7702fa749ea117e414a56a94d64c0c1f8bcd13eb90c392a62",
+      "status": "??"
+    },
+    {
+      "bytes": 13586,
+      "path": "docs/plans/GHCN-KALSHI-EQUIVALENCE-QC-SPEC-2026-08-15.md",
+      "sha256": "b2f046e75d666d1cc467a33258406d8d99157d3aef10cdc3ed2da8f7f3840c12",
+      "status": "??"
+    },
+    {
+      "bytes": 2917,
+      "path": "docs/plans/GHCN-KALSHI-TARGET-EQUIVALENCE-AUDIT-SPEC-2026-08-15.md",
+      "sha256": "fa36f598116655ffcce20b02c6f2084f7fe2cd3c7d2afb66ba74681de4a255e9",
+      "status": "??"
+    },
+    {
+      "bytes": 8430,
+      "path": "docs/plans/GOLDILOCKS-EXPERT-SPEC-REVISION-1.md",
+      "sha256": "89ec117008970cc46b2d3c891274e330600e09ff0fe4501680742aeac1f233cd",
+      "status": "??"
+    },
+    {
+      "bytes": 23040,
+      "path": "docs/plans/GRAND-SWEEP-COMPREHENSIVE-PLAN.md",
+      "sha256": "71834de64cd4b45218c592b6c4dc751459553a58a19dbd0d47cb644c1d947fa8",
+      "status": "??"
+    },
+    {
+      "bytes": 8821,
+      "path": "docs/plans/GRAY-ROOM-SWEEP-DESIGN-2026-08-10.md",
+      "sha256": "4fb6437d05f93e18a0eeb1d84e1299a73e57d3fddc662f062945670a5f4da7b0",
+      "status": "??"
+    },
+    {
+      "bytes": 4502,
+      "path": "docs/plans/HONEST-SIGNAL-DIAGNOSIS-SPEC-2026-08-15.md",
+      "sha256": "89717a30f2eed21879060291f53b56a1af3f5858512690c42679fa781be85bed",
+      "status": "??"
+    },
+    {
+      "bytes": 4922,
+      "path": "docs/plans/INDEPENDENT-CALIBRATION-LABEL-SOURCE-AUDIT-2026-08-15.md",
+      "sha256": "27fe3014c850c89e4118a9511456068e73539f56c02a8528b0fb9481c554c6ce",
+      "status": "??"
+    },
+    {
+      "bytes": 4543,
+      "path": "docs/plans/INDEPENDENT-CALIBRATION-LABEL-SOURCE-SPEC-2026-08-15.md",
+      "sha256": "bbecedc49969f3a0e8a23996928b3e8f9135fa4ab2b2bd8b7b7bad398b1d24d5",
+      "status": "??"
+    },
+    {
+      "bytes": 23024,
+      "path": "docs/plans/KALSHI-NWS-TARGET-CONTRACT-EXPERT-REVIEW-2026-08-15.md",
+      "sha256": "191a1373d7a4f8e560d72fc8d93beb417c2b5df86b0ebcdca2f7e370b27f6cdc",
+      "status": "??"
+    },
+    {
+      "bytes": 10219,
+      "path": "docs/plans/KNYC-SWEEP-RESULTS.md",
+      "sha256": "1cd9c48d0beef7c6f896c09741c7c0772be5dd04cfe308c311967ecc7db913c0",
+      "status": "??"
+    },
+    {
+      "bytes": 8897,
+      "path": "docs/plans/LAYER-2D-UWC-LLOP-COMPARISON-SPEC-2026-08-15.md",
+      "sha256": "e5c95d1108c65c4f7393db1ec3d12e6adbea4c3dc2dd259f022882d35b4961fd",
+      "status": "??"
+    },
+    {
+      "bytes": 2461,
+      "path": "docs/plans/LAYER2D-FULL-FUSION-MUTATION-QC-2026-08-15.md",
+      "sha256": "910ad70993001a13827a9526fa8577ae5905a8f862dc0b278910e26d5d9487c2",
+      "status": "??"
+    },
+    {
+      "bytes": 2322,
+      "path": "docs/plans/LAYER2D-UWC-ADAPTER-CONTRACT-2026-08-15.md",
+      "sha256": "927935aac660d4e45a6566efe1da669fb8d5d565b32798f56ff834751a31f4fb",
+      "status": "??"
+    },
+    {
+      "bytes": 6645,
+      "path": "docs/plans/LAYER5-ADJACENT-RUNTIME-REMEDIATION-SPEC-2026-08-15.md",
+      "sha256": "44bb494ae125cbd6242f3b5ae358a10f8e8cba98482d2fab317e56da0ec83245",
+      "status": "??"
+    },
+    {
+      "bytes": 2817,
+      "path": "docs/plans/LAYER5-RUNTIME-HARDENING-FIX-SPEC-2026-08-15.md",
+      "sha256": "0299ae9734adb5a611ae6ea726278beadae015dfcf9b29982da7181ec87c8878",
+      "status": "??"
+    },
+    {
+      "bytes": 5180,
+      "path": "docs/plans/LLOP-FROZEN-REPLICATION-OUTOFTIME-SPEC-2026-08-15.md",
+      "sha256": "8664eb20e2378a35ccf09f711f099c3d1c3649e4f4ba846a595e6a46539cade1",
+      "status": "??"
+    },
+    {
+      "bytes": 15782,
+      "path": "docs/plans/NWS-CLI-FULL-BACKFILL-DISCOVERY-SPEC-2026-08-15.md",
+      "sha256": "4e74fb14ddb2c0e6d1ef8989c8db46c7492948dc6bbef479889b9063ad1aca91",
+      "status": "??"
+    },
+    {
+      "bytes": 4173,
+      "path": "docs/plans/NWS-CLI-HISTORICAL-PILOT-SPEC-2026-08-15.md",
+      "sha256": "b71463df2d4ee4847b86264ab17ff902adb698abeff2faf81405741b4131bf60",
+      "status": "??"
+    },
+    {
+      "bytes": 9397,
+      "path": "docs/plans/NWS-CLI-LCD-PILOT-ACQUISITION-SPEC-2026-08-15.md",
+      "sha256": "67e1e29880c654c7fca20543b74e3cb704c987d7c8ad683719101895caef70cd",
+      "status": "??"
+    },
+    {
+      "bytes": 19501,
+      "path": "docs/plans/PIPELINE-TRACE-2026-08-13.md",
+      "sha256": "77f8c3e6d8abce9069161f2b16048fc3990a5aa06082d6e0324d0155d6658b5a",
+      "status": "??"
+    },
+    {
+      "bytes": 11190,
+      "path": "docs/plans/PIPELINE-TRACE-2026-08-14-FINAL.md",
+      "sha256": "16380e184bfd043cb74590341d9e06c047c1ab756853ded99a998f3b14998853",
+      "status": "??"
+    },
+    {
+      "bytes": 5860,
+      "path": "docs/plans/PRE-SWEEP-BUILD-CONFIRM-2026-08-14.md",
+      "sha256": "c8e877e35f471636ba8e0cc28d66352da0cc8d2aa35ed0877bc0c7ae2a194660",
+      "status": "??"
+    },
+    {
+      "bytes": 5650,
+      "path": "docs/plans/PREDICTION-METHOD-TEST-RESULTS.md",
+      "sha256": "692ce05a406a571c2be6b088eea1ece0c383e48bee62a9deda07d39c2e57a7f2",
+      "status": "??"
+    },
+    {
+      "bytes": 6966,
+      "path": "docs/plans/PRESSURE-DELTA-MATCHED-COMPARISON-SPEC-2026-08-15.md",
+      "sha256": "b2f83c4a6befc9abd0031f09076cb87a4ba9e6fcc6c8a0b9e7bdde2a86f728bb",
+      "status": "??"
+    },
+    {
+      "bytes": 3890,
+      "path": "docs/plans/PRESSURE-DELTA-RELIABILITY-REVIEW-SPEC-2026-08-15.md",
+      "sha256": "53954363c671b02304284ef8824fa73ba7fcba550b82af2cffde7ba8af7a28c5",
+      "status": "??"
+    },
+    {
+      "bytes": 3778,
+      "path": "docs/plans/QC-REVIEW-FP-SPECS.md",
+      "sha256": "ff079f4f2600ff9a093a68e89527d03f5e1c4d725e03f6ab46ea585db2e55137",
+      "status": "??"
+    },
+    {
+      "bytes": 37224,
+      "path": "docs/plans/RETIRED-CONCEPTS-REVIEW.md",
+      "sha256": "a6d2a12be43e4a908794ed15c2af1cdd71a900060c9e7f1b29e0927374f4fe86",
+      "status": "??"
+    },
+    {
+      "bytes": 4170,
+      "path": "docs/plans/ROADMAP-STATUS-2026-08-15.md",
+      "sha256": "ae1e6b539170fe1ebba914a5d6e1970cfe34bae0e29275208ad8b86be314da7d",
+      "status": "??"
+    },
+    {
+      "bytes": 12117,
+      "path": "docs/plans/SETTLEMENT-FIX-REPORT.md",
+      "sha256": "b5cf20664b0aa08c257bd415885dbb66bd747077f4e4bf708e85ecab5628dc6a",
+      "status": "??"
+    },
+    {
+      "bytes": 5843,
+      "path": "docs/plans/SPEC-DATA-FILE-UPDATES.md",
+      "sha256": "5f801a7b4eb120922e39134307288d6746e280946c209847078a3404c36bf595",
+      "status": "??"
+    },
+    {
+      "bytes": 12796,
+      "path": "docs/plans/SPEC-DYNAMIC-STATION-MAPPING.md",
+      "sha256": "11f3b74efe0a2f272627afc34ae66bd14cecbf309ddbe25a82400f516aea9ea5",
+      "status": "??"
+    },
+    {
+      "bytes": 1380,
+      "path": "docs/plans/SPEC-FIX-DUAL-KELLY.md",
+      "sha256": "d2f6496b044b402b19b02a89154ab418ed60cef8dd67cd55059e868a009d0785",
+      "status": "??"
+    },
+    {
+      "bytes": 1368,
+      "path": "docs/plans/SPEC-FIX-FEE-CENTS.md",
+      "sha256": "f1d08c33157c77b27ef5d5c116c13cdba565284cb2bef11c2a588c7111440deb",
+      "status": "??"
+    },
+    {
+      "bytes": 9216,
+      "path": "docs/plans/SPEC-FIX-GATE-RESULT.md",
+      "sha256": "7c956da303ed910620428c0fe84c62f3d6f21c85b16261e5ba69fe41d6b3149b",
+      "status": "??"
+    },
+    {
+      "bytes": 1356,
+      "path": "docs/plans/SPEC-FIX-SEASONAL-REGIME.md",
+      "sha256": "8f408e33d7b5e015fd2b45b310a91c2386ea2b31d47d3011f4f0be9626c53869",
+      "status": "??"
+    },
+    {
+      "bytes": 1662,
+      "path": "docs/plans/SPEC-FIX-SIGNAL-CAMPS.md",
+      "sha256": "fa5d792db1ce359d80849e66ccdee28c3390e360eaa63ac7f9967062e867d6db",
+      "status": "??"
+    },
+    {
+      "bytes": 10289,
+      "path": "docs/plans/SPEC-FUSION-AB-SWEEP.md",
+      "sha256": "c98a9e98c7856b01af3a8fc9298b830cb98575b0292138353cbf80aee81397f9",
+      "status": "??"
+    },
+    {
+      "bytes": 8284,
+      "path": "docs/plans/SPEC-PTE-IMPORT-FIXES.md",
+      "sha256": "941d6320518e8e1b92e8783ee3180e5aca4011aed34174659802c5c52158de14",
+      "status": "??"
+    },
+    {
+      "bytes": 16216,
+      "path": "docs/plans/SPEC-WS5-SWEEP-SCRIPTS.md",
+      "sha256": "11c78da8fdc131f59cc93b1dad00bc8ff9775f51d8751c7ccc5f0108dad90872",
+      "status": "??"
+    },
+    {
+      "bytes": 5982,
+      "path": "docs/plans/SRRS-BACKFILL-OPTIMIZATION-BENCHMARK-SPEC-2026-08-15.md",
+      "sha256": "9585a8b5d6675a8d57b06b8d085d430b5140e90dcf2a222b2cc78a9cb347fe45",
+      "status": "??"
+    },
+    {
+      "bytes": 6770,
+      "path": "docs/plans/SRRS-BACKFILL-OPTIMIZATION-SPEC-2026-08-15.md",
+      "sha256": "880de94f4ea9d82df1e07cec566c8f93572b14bf1a5b22c1cc5287d6157dc42a",
+      "status": "??"
+    },
+    {
+      "bytes": 5689,
+      "path": "docs/plans/SRRS-BACKFILL-RESUME-AFTER-KHOU-CCA-2026-08-15.md",
+      "sha256": "382430bf3a859d6751b4adfacd6035c8263164b3bec4775f7761b0424e55714b",
+      "status": "??"
+    },
+    {
+      "bytes": 2790,
+      "path": "docs/plans/SRRS-BACKFILL-V2-PHASE1-PROOF-2026-08-15.md",
+      "sha256": "494185289235683ad360dcb502ecbfbce3d344617adf7140ae6b98feb5ebc6d7",
+      "status": "??"
+    },
+    {
+      "bytes": 4440,
+      "path": "docs/plans/SRRS-BACKFILL-V2-RESUME-CORRECTION-SPEC-2026-08-15.md",
+      "sha256": "b7908eaa86797404636fa5c345acfe098ed6251988c11282acde71a992926658",
+      "status": "??"
+    },
+    {
+      "bytes": 4545,
+      "path": "docs/plans/SRRS-CLI-FULL-BACKFILL-EXECUTION-SPEC-2026-08-15.md",
+      "sha256": "7f58915f24011788560225dc80b3007919f6945d9cb75cedc80e87af124da95e",
+      "status": "??"
+    },
+    {
+      "bytes": 10616,
+      "path": "docs/plans/SRRS-CLI-FULL-BACKFILL-SPEC-2026-08-15.md",
+      "sha256": "d61a16c934162d168a8596624510707f4f273ef4abc8a42f2cf87f28093b7d7b",
+      "status": "??"
+    },
+    {
+      "bytes": 6667,
+      "path": "docs/plans/SRRS-CLI-REPORT-LINEAGE-QC-2026-08-15.md",
+      "sha256": "ecc221f1689a69a00dcc27f34c0bf3ab7510796edc2b51d4f81c8299e9c33b8e",
+      "status": "??"
+    },
+    {
+      "bytes": 7108,
+      "path": "docs/plans/SRRS-DUAL-PATH-BACKFILL-SPEC-2026-08-15.md",
+      "sha256": "2d01bc9df032387a57f845fef7b4f31c5183b26ffc4840d1f167e5bb1cade2cf",
+      "status": "??"
+    },
+    {
+      "bytes": 24129,
+      "path": "docs/plans/SRRS-FULL-BACKFILL-INDEPENDENT-QC-SPEC-2026-08-15.md",
+      "sha256": "fd8baf9017db078b9f33323270b4bf2c8162a7f8c12f83e1bb60023d6b6dcf4b",
+      "status": "??"
+    },
+    {
+      "bytes": 6994,
+      "path": "docs/plans/SRRS-KHOU-CONFLICT-REVIEW-SPEC-2026-08-15.md",
+      "sha256": "879d2b2f32383dc0edb21514d532b758f1105204756d7fc03cbb1edda3454faf",
+      "status": "??"
+    },
+    {
+      "bytes": 5101,
+      "path": "docs/plans/SRRS-OPTIMIZED-CHECKPOINT-IMPORT-SPEC-2026-08-15.md",
+      "sha256": "082d459eafe27365fd761180b59338a0bb5d29058c7e99ce4f1c784c3d5e15e2",
+      "status": "??"
+    },
+    {
+      "bytes": 2992,
+      "path": "docs/plans/SWEEP-AUDIT-SPEC.md",
+      "sha256": "909582b6821a266504755e07c10e6b7cda522b9ba1911bc73bd4ce169cff8d2b",
+      "status": "??"
+    },
+    {
+      "bytes": 8386,
+      "path": "docs/plans/SWEEP-READINESS-REVIEW-2026-08-14.md",
+      "sha256": "45c7bcced08c80175a698446d5a480309ae3e67ce6a32b16550e9da776b39516",
+      "status": "??"
+    },
+    {
+      "bytes": 9901,
+      "path": "docs/plans/SWEEP-REPORT-2026-08-14.md",
+      "sha256": "fcbf98c0a8c81d9f3e0669ce0765ab793a8a1fe0bd3302918cfdcd959a347404",
+      "status": "??"
+    },
+    {
+      "bytes": 5034,
+      "path": "docs/plans/SWEEP-WIRE-SPEC.md",
+      "sha256": "ccbe2e7ad4281e651a1f681d1b302dde4e545adc26a710272135ea30c5f4fdd6",
+      "status": "??"
+    },
+    {
+      "bytes": 2368,
+      "path": "docs/plans/SWEEP-all-15-signals-SPEC.md",
+      "sha256": "a58b9e6c019561ee0a5dca7463e6426d40f587ec0b3dbff4a11bb5c5d4b52719",
+      "status": "??"
+    },
+    {
+      "bytes": 1805,
+      "path": "docs/plans/SWEEP-fix-station-list-SPEC.md",
+      "sha256": "2d1c5e27c9128b5d6c1be0b2512296f6ff5cde15442358d592a12ab664678f96",
+      "status": "??"
+    },
+    {
+      "bytes": 20349,
+      "path": "docs/plans/TEMPERATURE-GEOMETRY-TOURNAMENT-EXPERT-REVIEW-2026-08-15.md",
+      "sha256": "d6eac09f348fa1841e7d857f15eb0345d91eabb47b279b5c3e2f5de427c1ed01",
+      "status": "??"
+    },
+    {
+      "bytes": 28639,
+      "path": "docs/plans/TEMPERATURE-GEOMETRY-TOURNAMENT-QC-SPEC-2026-08-15.md",
+      "sha256": "8ebcce34b29cd7fb4f72e0ccc81f94f1c16fe79e46159d9db33b8b91b741257b",
+      "status": "??"
+    },
+    {
+      "bytes": 1902,
+      "path": "docs/plans/TEMPERATURE-GEOMETRY-TOURNAMENT-ROADMAP-2026-08-15.md",
+      "sha256": "d37a5dc57e708476581ad0536586f88d42e2524389fc422047b473bcd6fb3b94",
+      "status": "??"
+    },
+    {
+      "bytes": 13586,
+      "path": "docs/plans/TEMPERATURE-LINEAGE-RECOVERY-SPEC-2026-08-15.md",
+      "sha256": "e9816a19ac6a20b44a6e8a5b75f20eeda84755c2557c06bb16716c60283ba517",
+      "status": "??"
+    },
+    {
+      "bytes": 21370,
+      "path": "docs/plans/TEMPERATURE-PREDICTION-SHADOW-EXPERT-REVIEW-2026-08-15.md",
+      "sha256": "f1b16d77f198190f057bf8570f95f6eac67c4d5f19132bf95cfbdc4554031d07",
+      "status": "??"
+    },
+    {
+      "bytes": 21625,
+      "path": "docs/plans/TEMPERATURE-PREDICTION-SHADOW-QC-SPEC-2026-08-15.md",
+      "sha256": "edabd782efc357169acd45134562d1e1c4fc7e63d57b3fe37085042b633ae4a4",
+      "status": "??"
+    },
+    {
+      "bytes": 5045,
+      "path": "docs/plans/TEMPERATURE-SHADOW-ROADMAP-2026-08-15.md",
+      "sha256": "3237b80aeb24b51368974f8695b8ac3af0f057681190897ee4e30b23c852c391",
+      "status": "??"
+    },
+    {
+      "bytes": 6733,
+      "path": "docs/plans/TEMPERATURE-TREND-OVERLAY-SPEC.md",
+      "sha256": "1517f4f9c1e8e71bb9b28b1c9410491fa8eadb3b7760eb9e512b605fa8708f4c",
+      "status": "??"
+    },
+    {
+      "bytes": 13217,
+      "path": "docs/plans/TEMPERATURE-VINTAGE-ALIGNMENT-SPEC-2026-08-15.md",
+      "sha256": "e37684ed25a18f343e28ef6fe7daf0e470f0870ff368ec0b9cf1823bf68d34ca",
+      "status": "??"
+    },
+    {
+      "bytes": 23293,
+      "path": "docs/plans/TRAJECTORY-DTW-EXPERT-REVIEW-2026-08-15.md",
+      "sha256": "cc3a3f24ddd7c92fe459be03dc048dcae352906f74aa28975c986642a713f896",
+      "status": "??"
+    },
+    {
+      "bytes": 27576,
+      "path": "docs/plans/TRAJECTORY-DTW-QC-SPEC-2026-08-15.md",
+      "sha256": "96e01096c9f9967670f4cc54808d4ccf75b49e522d37f01758e78ff2c3f80f84",
+      "status": "??"
+    },
+    {
+      "bytes": 9148,
+      "path": "docs/plans/TRAJECTORY-DTW-REPLAY-BUILD-SPEC-2026-08-15.md",
+      "sha256": "7d70f41c215b4e835be10c9e0ffe9b7989c9456122d3e910544e57baf7611050",
+      "status": "??"
+    },
+    {
+      "bytes": 2949,
+      "path": "docs/plans/TRAJECTORY-DTW-ROADMAP-2026-08-15.md",
+      "sha256": "b1715d880b051f41e8b60af19a0826edbc967b70c826a78accbffc5648d544b1",
+      "status": "??"
+    },
+    {
+      "bytes": 7022,
+      "path": "docs/plans/TRAJECTORY-DTW-ROLLING-CRPS-EXPANDED-COHORT-QC-ADDENDUM-2026-08-15.md",
+      "sha256": "02690bb66ba438ba915ef08fe80b1cd1a9c6a2bfb48ce578458d98e91ca90e01",
+      "status": "??"
+    },
+    {
+      "bytes": 11599,
+      "path": "docs/plans/TRAJECTORY-DTW-ROLLING-CRPS-SPEC-2026-08-15.md",
+      "sha256": "121b818031178578117c44aed6a2a4794c74c45926048da2c81fd224933b6bb5",
+      "status": "??"
+    },
+    {
+      "bytes": 4249,
+      "path": "docs/plans/UNATTENDED-SWEEP-RUNNER-SPEC-2026-08-15.md",
+      "sha256": "1d7ca9033d27b34e632eb6318b92e0aa1422fac7173ba59f13a93bafcdb7c36d",
+      "status": "??"
+    },
+    {
+      "bytes": 11410,
+      "path": "docs/plans/WS1-P3-RETEST.md",
+      "sha256": "0d0243932021695047dc6f9adecb6f9c194fbda8dc51e3c6ab12c45374227733",
+      "status": "??"
+    },
+    {
+      "bytes": 4968,
+      "path": "docs/plans/WS6-ARTIFACT-MANIFEST-2026-08-15.md",
+      "sha256": "facc7bc332c1b2eba13b3bf0561c1284cea1006f3c9a140ae1058be0d9710275",
+      "status": "??"
+    },
+    {
+      "bytes": 5206,
+      "path": "docs/plans/WS9-ARTIFACT-MANIFEST-2026-08-15.md",
+      "sha256": "f7cdc4cd7f54c4efcdb6e5772fe789aff7205e551921e388275838d3ca5798f4",
+      "status": "??"
+    },
+    {
+      "bytes": 6290,
+      "path": "docs/weather-engine/FULL_FIRE_RATE_AUDIT_SUMMARY.md",
+      "sha256": "643736fc3f92ccbed899ecb0d20769a9d64417ce2e2257aac5c48f08620e2690",
+      "status": "??"
+    },
+    {
+      "bytes": 13416,
+      "path": "docs/weather-engine/NON_FIRING_SIGNALS_DISPOSITION.md",
+      "sha256": "138d99dd74bca71845d6925bc9d1f21b7a8f7577fb4e6be30a6394208a765605",
+      "status": "??"
+    },
+    {
+      "bytes": 22593,
+      "path": "docs/weather-engine/PREDICTION_METHODS_EXPLORATION.md",
+      "sha256": "913dbdd10849a11d44bd1499899480056ecfec3e16eb58e333918e6078b042a0",
+      "status": "??"
+    },
+    {
+      "bytes": 3349,
+      "path": "docs/weather-engine/SIGNAL-CORRELATION-RESOLVED.md",
+      "sha256": "9999947759b23a9f2918a63da99aba2883c22bcbd04eec990e6096efd33d7afa",
+      "status": "??"
+    },
+    {
+      "bytes": 15287,
+      "path": "docs/weather-engine/SIGNAL_COMBINATION_ANALYSIS.md",
+      "sha256": "0f8090b4052391007541713a5b08c474f83ff3cc1d22c1010858b1d723e5826e",
+      "status": "??"
+    },
+    {
+      "bytes": 13587,
+      "path": "docs/weather-engine/STRATIFIED-SWEEP-REPORT.md",
+      "sha256": "1715082cf27f42e73c6587e40b349336ae9ba569c6e2c62e29ab8928db70ae53",
+      "status": "??"
+    },
+    {
+      "bytes": 2193159,
+      "path": "graphify-snapshots-2026-08-09-180236.tar.gz",
+      "sha256": "f0c63578ed185498c68dda01d22e4b5c6db38aab11885c3be6d49b4ca892e60b",
+      "status": "??"
+    },
+    {
+      "bytes": 3154560,
+      "path": "graphify-snapshots-20260812T232048Z.tar.gz",
+      "sha256": "270987159e7c444a88aa386b3931ae7f2db81438fb5cdf94cbf31f5de6b107aa",
+      "status": "??"
+    },
+    {
+      "bytes": 27466,
+      "path": "run_p3_backtest.py",
+      "sha256": "a3cd46cb885fa31cbb0917ba04ed7f9f3165aebe54e1ed3c5a76f89678c196fa",
+      "status": "??"
+    },
+    {
+      "bytes": 9197,
+      "path": "scripts/_ws5_readiness_diagnostics.py",
+      "sha256": "25e2cc8952a6ee5a6ab1d8950f0954780693a1abe2c292c09d0647b242d1556b",
+      "status": "??"
+    },
+    {
+      "bytes": 20263,
+      "path": "scripts/audit_all_signals.py",
+      "sha256": "9268e76dbce9f2109caf1f5c878ab82c46a358b4330798b6640b8ffd5c862601",
+      "status": "??"
+    },
+    {
+      "bytes": 1734,
+      "path": "scripts/audit_calibration_temporal_separation.py",
+      "sha256": "994208a7297d63f44f0b414d89ce60d970f30cb0fbd2d41c8c9cbdf56e668eab",
+      "status": "??"
+    },
+    {
+      "bytes": 1031,
+      "path": "scripts/audit_evaluator_label_safety.py",
+      "sha256": "52e2a4886dc47b5863bd500ea56f797f63d4a787c60234dfc00dc8e5503be74e",
+      "status": "??"
+    },
+    {
+      "bytes": 5183,
+      "path": "scripts/audit_gefs_temperature_pilot.py",
+      "sha256": "1ae3e430113e33c93146187c93c06c6454877731a980db47c93d7cef7a3d9db2",
+      "status": "??"
+    },
+    {
+      "bytes": 19449,
+      "path": "scripts/audit_gefs_temperature_pilot_geometry.py",
+      "sha256": "ba0cda367f4377ddcada6542138cc3082f5b2d2d4e3ef8eca65779e4451ed37d",
+      "status": "??"
+    },
+    {
+      "bytes": 3663,
+      "path": "scripts/audit_ghcn_daily_calibration_source.py",
+      "sha256": "1829a30eabb175cd02ae49f084397e1a5f0edb6058cfe2e64361e2dabac99a8e",
+      "status": "??"
+    },
+    {
+      "bytes": 8567,
+      "path": "scripts/audit_ghcn_kalshi_target_equivalence.py",
+      "sha256": "a45067eeb283fd926dcf502610a67d685538ef09c816aa0b17258bb3612be01b",
+      "status": "??"
+    },
+    {
+      "bytes": 5632,
+      "path": "scripts/audit_per_station_spread.py",
+      "sha256": "246ccdfe1b9a7add00e7618f67c0b38cd1907aebcadc79e43059a1bdbec7485a",
+      "status": "??"
+    },
+    {
+      "bytes": 5583,
+      "path": "scripts/audit_risk_control_interaction.py",
+      "sha256": "1c34be4f8822be776d51466c2b5ff0b1a9e8d37e5fb664873faf64fc57cdc1d1",
+      "status": "??"
+    },
+    {
+      "bytes": 5473,
+      "path": "scripts/audit_srrs_cli.py",
+      "sha256": "cf8d315e1024c184f127e9c0b6a1ca2ef14855090e625bddf612ebad70f361ab",
+      "status": "??"
+    },
+    {
+      "bytes": 12899,
+      "path": "scripts/audit_station_definitions.py",
+      "sha256": "427a5ff6d4d30f52d9e5c9597df43004db6ecc71b639d8b2d30ab97d73578c66",
+      "status": "??"
+    },
+    {
+      "bytes": 39966,
+      "path": "scripts/backfill_iem_asos.py",
+      "sha256": "4a2f94fa1656b2eff26a2523f19aeb3887f556bfaa0e8e26b9c6c7e1f8b0cae7",
+      "status": "??"
+    },
+    {
+      "bytes": 11702,
+      "path": "scripts/backfill_srrs_cli_v2.py",
+      "sha256": "633d85dfc5a8752bc512c885781e7180ef64cd2d89427b3e0bc3e9a18dab3e9e",
+      "status": "??"
+    },
+    {
+      "bytes": 39628,
+      "path": "scripts/backfill_srrs_cli_v2_optimized.py",
+      "sha256": "d4614dc6145b455a9100c616041a8b8caf62899270e36b6c3c0c5b463d7d50f1",
+      "status": "??"
+    },
+    {
+      "bytes": 35832,
+      "path": "scripts/backfill_srrs_cli_v2_phase2.py",
+      "sha256": "1bd79a7737a777ccee59cfa4e02c5591a4debff9da7ff679adf650b826c71cbf",
+      "status": "??"
+    },
+    {
+      "bytes": 21551,
+      "path": "scripts/backtest_temperature_trend.py",
+      "sha256": "f919fd5b78662eb3078f60755211a64fcd2d7faf38d31f36a2dbfd9b86d856a5",
+      "status": "??"
+    },
+    {
+      "bytes": 26801,
+      "path": "scripts/build_gefs_temperature_pilot_receipt.py",
+      "sha256": "5fd13a3220cede9fbd3852b2619086275860cee4f0daeda1150e20ce03073248",
+      "status": "??"
+    },
+    {
+      "bytes": 7542,
+      "path": "scripts/compute_calibration_ceiling.py",
+      "sha256": "482218bdf057a1784c0fc6b9a8a1cade456a2fd1057e62710edd43ecef1bc652",
+      "status": "??"
+    },
+    {
+      "bytes": 6308,
+      "path": "scripts/compute_calibration_stability.py",
+      "sha256": "328cf52bff9cbce862b5883bac76b30bd01cb325ba924bb2171bf89e67c9e0a2",
+      "status": "??"
+    },
+    {
+      "bytes": 6522,
+      "path": "scripts/compute_reliability_curves.py",
+      "sha256": "3299750228b894b1704477805f0221bf0c218ab3d4d21379ccb721cdebc5e7dd",
+      "status": "??"
+    },
+    {
+      "bytes": 3271,
+      "path": "scripts/compute_stability_surface.py",
+      "sha256": "78585040d639c14579a36d5c84b7d90d43821e2bae32e1a43dd17e1180296e5d",
+      "status": "??"
+    },
+    {
+      "bytes": 6417,
+      "path": "scripts/compute_tail_calibration.py",
+      "sha256": "6a876ff4d36e14d06a5afb7b7715c4abb3544a22a8d10e79fa8930ef117cec11",
+      "status": "??"
+    },
+    {
+      "bytes": 5550,
+      "path": "scripts/compute_temperature_magnitude_gap.py",
+      "sha256": "a873b29add8ab4f18b4c2b3a9b06df750923b3041ccafbc5645e3ca7f89d11b6",
+      "status": "??"
+    },
+    {
+      "bytes": 17764,
+      "path": "scripts/compute_trade_correlation.py",
+      "sha256": "2f1dd4f7b889dfcf54fe3b3ab929d7694256af5c7645fd35ad84b78f3c8c78a9",
+      "status": "??"
+    },
+    {
+      "bytes": 12524,
+      "path": "scripts/degradation_monitor_cron.py",
+      "sha256": "60f8aa84f916fcd7d8ce91db4ef5dcd1157772c38d7b5fc1a3f906d396e8ade6",
+      "status": "??"
+    },
+    {
+      "bytes": 13775,
+      "path": "scripts/ecmwf_shadow_test.py",
+      "sha256": "31f93564b01b09fd52f3ee35d7495f768009b94c4849f0278b1c3d6af52b76ba",
+      "status": "??"
+    },
+    {
+      "bytes": 20976,
+      "path": "scripts/fetch_srrs_cli.py",
+      "sha256": "f6c35a664be14e6324498ccc9001ba736ac7b862913796d060ac04444e9adf04",
+      "status": "??"
+    },
+    {
+      "bytes": 18472,
+      "path": "scripts/gefs_direct_temperature_evaluation.py",
+      "sha256": "0b770537b57b377caf8f14badd540272cdf43a97a5baf75ef44e5a84026b4694",
+      "status": "??"
+    },
+    {
+      "bytes": 12189,
+      "path": "scripts/gefs_temperature_pilot.py",
+      "sha256": "35dc0ba250834b5206e74e3dc777fe5759839cf0e3864bc359810e5283720ff4",
+      "status": "??"
+    },
+    {
+      "bytes": 21602,
+      "path": "scripts/goldilocks_bucket_analysis.py",
+      "sha256": "902ad83702f1a3f36087386b061dccab8026fcec32ace1de70c5b50e99759358",
+      "status": "??"
+    },
+    {
+      "bytes": 51115,
+      "path": "scripts/goldilocks_bucket_analysis_v2.py",
+      "sha256": "75603f7ecd04d745eb3e414051b567d30522f20466bd2db503877a40ddfe51aa",
+      "status": "??"
+    },
+    {
+      "bytes": 6427,
+      "path": "scripts/honest_signal_diagnosis.py",
+      "sha256": "568770240d36b2e87bf58b18e2f016a22b32a3dab974b7f5f2d585eac1d184ab",
+      "status": "??"
+    },
+    {
+      "bytes": 9065,
+      "path": "scripts/kalshi_settlement_low_fetch.py",
+      "sha256": "5a26270fbe57cff9032a619cb0d92bd0629408935b50e41060126d7f2bbb8d93",
+      "status": "??"
+    },
+    {
+      "bytes": 26109,
+      "path": "scripts/l2_shared.py",
+      "sha256": "1608b773b6ea35f1b2f3c1c901a02d42467d7d1593c57cacab0ec3c74e635505",
+      "status": "??"
+    },
+    {
+      "bytes": 1938,
+      "path": "scripts/l2a_signal_isolation.py",
+      "sha256": "2f88ab55489bd0d4a5d19e0a1031566e9b2d813057d7626a57b7cb8589f6edef",
+      "status": "??"
+    },
+    {
+      "bytes": 6019,
+      "path": "scripts/l2b_pair_screen.py",
+      "sha256": "90e7eec379fabe40e887aef2ec5d1c8f4b69d74325f188cd632a88c67d9e592c",
+      "status": "??"
+    },
+    {
+      "bytes": 3562,
+      "path": "scripts/l2c_agreement_ablations.py",
+      "sha256": "ab93d46b25d9fe2432baa19014a9ea22cbfba34d24635c5bb071ee6f9cef130d",
+      "status": "??"
+    },
+    {
+      "bytes": 708,
+      "path": "scripts/l2d_ensemble.py",
+      "sha256": "eadb8b95841373fb5890f69d8851232a5417a3a207ecfa5a455f21413750bbeb",
+      "status": "??"
+    },
+    {
+      "bytes": 1752,
+      "path": "scripts/l2e_cluster_diagnostics.py",
+      "sha256": "a9da9399f35942bc4a608c7d8aef8538491dec4eecaa4479e296f8967ec1146e",
+      "status": "??"
+    },
+    {
+      "bytes": 687,
+      "path": "scripts/l3_beam_search.py",
+      "sha256": "50e9822e1bbdddf521787c042e762558625fa476878a4900e65eccab0f2d60b9",
+      "status": "??"
+    },
+    {
+      "bytes": 9944,
+      "path": "scripts/label_stratification.py",
+      "sha256": "61120cc359214b348df4f750a97c6795cea73e4c6e2f66fa0623b49dbe7f434d",
+      "status": "??"
+    },
+    {
+      "bytes": 8301,
+      "path": "scripts/llop_frozen_replication_overtime.py",
+      "sha256": "a4f38db56870bb4fbabad1cc384c14fc7c7dc9151a5631227a673c26d54e0211",
+      "status": "??"
+    },
+    {
+      "bytes": 20396,
+      "path": "scripts/pressure_delta_calibrated_reliability_review.py",
+      "sha256": "2db9ccff25e9e65bacf53737b611e520365ea8f666896239dc347079ef14e3bd",
+      "status": "??"
+    },
+    {
+      "bytes": 6873,
+      "path": "scripts/pressure_delta_matched_comparison.py",
+      "sha256": "3a4a9f36847b1f5b5e5057deb54fb6bd42741413d39b880d0fc04b4db24c341e",
+      "status": "??"
+    },
+    {
+      "bytes": 5731,
+      "path": "scripts/pressure_delta_reliability_review.py",
+      "sha256": "7d6377a3210b378cef321e49d1389ce3626bb073626587d16ee235691bf07322",
+      "status": "??"
+    },
+    {
+      "bytes": 10440,
+      "path": "scripts/propagate_gray_room_decision.py",
+      "sha256": "6811a7659cd23ada32df6d433a198a39276751b97c4dfc630c1daba57e9c2e26",
+      "status": "??"
+    },
+    {
+      "bytes": 10237,
+      "path": "scripts/qc_gefs_temperature_pilot.py",
+      "sha256": "381c49f94ed1637211337b09e3f3820e0d3485738b81016e1a3e5078f836b2aa",
+      "status": "??"
+    },
+    {
+      "bytes": 1281,
+      "path": "scripts/qc_pressure_delta_matched_spec.py",
+      "sha256": "3f31fe20a15ce0f0e593d6acf1fc546ef736be8ea965c3ab21717fecaea68c98",
+      "status": "??"
+    },
+    {
+      "bytes": 1332,
+      "path": "scripts/qc_pressure_delta_reliability_review.py",
+      "sha256": "119236a68cad35a144a84a59e1cd94ad320af5aa2c4f82e467affec2de53ed28",
+      "status": "??"
+    },
+    {
+      "bytes": 5388,
+      "path": "scripts/reclassify_srrs_cli_lineage.py",
+      "sha256": "3c8f1eb215acc7ae14f41a62c854f46ff6e7fe75539bab20ec2eb639f7631328",
+      "status": "??"
+    },
+    {
+      "bytes": 8778,
+      "path": "scripts/resume_srrs_after_khou_cca.py",
+      "sha256": "7f7a17b652e313995fa2fc1a2c30ec16f6e55598a70515ad4455973b730e30f5",
+      "status": "??"
+    },
+    {
+      "bytes": 7668,
+      "path": "scripts/run_coinflip_null.py",
+      "sha256": "ab1e0caad417a5b1146ef935e5efc54933982c08e0dcfcc7ee6c5d44d8606e7e",
+      "status": "??"
+    },
+    {
+      "bytes": 5345,
+      "path": "scripts/run_market_baseline.py",
+      "sha256": "21af13d52e5e556748df84d783ba31c614e779bcf6145e06b5b40473cacc6647",
+      "status": "??"
+    },
+    {
+      "bytes": 2447,
+      "path": "scripts/run_nws_cli_historical_pilot.py",
+      "sha256": "e25390fc70fd20c108736f3aaf6f8374a8fd0a72e3fa00d61c7b6a97d71dd6cf",
+      "status": "??"
+    },
+    {
+      "bytes": 9384,
+      "path": "scripts/run_persistence_baseline.py",
+      "sha256": "2491b1790ce8ed3cd139651ce15e7a11db5ff44482da1f423acb6bb162c246d1",
+      "status": "??"
+    },
+    {
+      "bytes": 51363,
+      "path": "scripts/run_sweep.py",
+      "sha256": "b9eabe311c919ecc3b584f906ffcf159eb73c12edae9481374275b149864f791",
+      "status": "??"
+    },
+    {
+      "bytes": 8369,
+      "path": "scripts/run_unattended_sweep.py",
+      "sha256": "bb76705566f79220438ff0714f638601a3ec2ebe85da9d3b0f574e6582222ab5",
+      "status": "??"
+    },
+    {
+      "bytes": 10552,
+      "path": "scripts/srrs_khou_conflict_review.py",
+      "sha256": "5b799e3256f598dfb027f28d501290ad3e41a3e9ad17205593c4c72695cbe82f",
+      "status": "??"
+    },
+    {
+      "bytes": 14668,
+      "path": "scripts/temperature_lineage_recovery_audit.py",
+      "sha256": "8eda72af7cf43884dd192eadc1dd8505d8ea0cb6889e1fe08f469755aec5dc13",
+      "status": "??"
+    },
+    {
+      "bytes": 11477,
+      "path": "scripts/test_calibration_harness.py",
+      "sha256": "6785ff1167a562f773d156ba8a80594d93bc0c13a68a14234fc68488e3484b1a",
+      "status": "??"
+    },
+    {
+      "bytes": 4480,
+      "path": "scripts/test_calibration_lookahead.py",
+      "sha256": "e04b1564f67f1b396cfb1ff44e2ce755f02b6d631a6162ac8fdb7a6e197a0da8",
+      "status": "??"
+    },
+    {
+      "bytes": 7361,
+      "path": "scripts/test_directional_asymmetry.py",
+      "sha256": "0696b7301d3106ca5aeda5fda9b7416fe887cabb3f169740624e5847e637c235",
+      "status": "??"
+    },
+    {
+      "bytes": 8410,
+      "path": "scripts/test_entry_price_harness.py",
+      "sha256": "8ca164422dd39383892644ebff9f902339a8c98737c8573f4b4e727bd494ca7c",
+      "status": "??"
+    },
+    {
+      "bytes": 8391,
+      "path": "scripts/test_full_integration.py",
+      "sha256": "15adaac41e21c43dd629647e9005c1cd013d3096be525b05ea85840bb11ba19b",
+      "status": "??"
+    },
+    {
+      "bytes": 5442,
+      "path": "scripts/test_fusion_harness.py",
+      "sha256": "7f3e1265b1fa1b48e66a831dc1a7a4ab1c7af1ca895e01483052901e9644790c",
+      "status": "??"
+    },
+    {
+      "bytes": 7958,
+      "path": "scripts/test_goldilocks_harness.py",
+      "sha256": "f58d994dd31973333d319efcd2d49f45242dd1521c11c9dad7df87be32432c3f",
+      "status": "??"
+    },
+    {
+      "bytes": 17120,
+      "path": "scripts/test_iem_asos_trial.py",
+      "sha256": "2c8df33fe78e1f11881e7976c78c625fec6974fbd941a7a4133492f47b478d9b",
+      "status": "??"
+    },
+    {
+      "bytes": 7559,
+      "path": "scripts/test_kl_dro_harness.py",
+      "sha256": "ba6bde899e676ee640e16d72b3788189b5dcc33731c776dbc61ffe42f0b3f2e1",
+      "status": "??"
+    },
+    {
+      "bytes": 8277,
+      "path": "scripts/test_member_weighting_harness.py",
+      "sha256": "5363c29acd728e4cfe274d1a94205f95c6cb9a4e1825290b369a18c7718e6e47",
+      "status": "??"
+    },
+    {
+      "bytes": 7426,
+      "path": "scripts/test_mod_gate_harness.py",
+      "sha256": "ab1a03e44627fbdfa48f8afcd1a872d19fccaed8bb3a0ed38bd6c137e1762013",
+      "status": "??"
+    },
+    {
+      "bytes": 7123,
+      "path": "scripts/test_signal_accuracy.py",
+      "sha256": "d0f48442ec7eb2d557cebf2c76cb76e3c1e910081f59604f3cdfb0e998050e45",
+      "status": "??"
+    },
+    {
+      "bytes": 4158,
+      "path": "scripts/test_signal_fusion.py",
+      "sha256": "d65bd5e40e7ce1c8426d499bb8a0d1b4d30fb7d6133f7cca1434c7caccf7c693",
+      "status": "??"
+    },
+    {
+      "bytes": 3495,
+      "path": "scripts/test_signal_independence.py",
+      "sha256": "5f58e4faeba7301e99e57f70ad6e904c987f24a635b28433fbab276f5978ad0a",
+      "status": "??"
+    },
+    {
+      "bytes": 9550,
+      "path": "scripts/test_spatial_coherence_harness.py",
+      "sha256": "07f74fe589515df7f5d4e00f44fc33adfc16fd03fa7726d28412f4ba45f92b55",
+      "status": "??"
+    },
+    {
+      "bytes": 10537,
+      "path": "scripts/test_trade_flow_through.py",
+      "sha256": "88242286d6e1137698402cdf1c5ff0a6d8427b5fe96c0bbe04b2bfbb0ba53969",
+      "status": "??"
+    },
+    {
+      "bytes": 7873,
+      "path": "scripts/test_trajectory_harness.py",
+      "sha256": "6537c712103c7f8a1e98d912cf43a72153b70606cd191686f1773a4af74f3307",
+      "status": "??"
+    },
+    {
+      "bytes": 20129,
+      "path": "scripts/trajectory_dtw_replay.py",
+      "sha256": "d1344ce09f41c62ff0e5fe080218a58593a1dae3747995999811d54dba1bacf7",
+      "status": "??"
+    },
+    {
+      "bytes": 30212,
+      "path": "scripts/trajectory_dtw_rolling_crps.py",
+      "sha256": "376933d87bfdb962dfabf845ddc5a3a5c2ba8d61c002f13fe8324a41a34ea47d",
+      "status": "??"
+    },
+    {
+      "bytes": 31215,
+      "path": "scripts/trajectory_dtw_rolling_crps_expanded.py",
+      "sha256": "695a908600d9635cfb4e28426ee6dfc2422acae6b507c2a5d0f324ac26e3fbd8",
+      "status": "??"
+    },
+    {
+      "bytes": 2028,
+      "path": "scripts/update_station_mapping.py",
+      "sha256": "566ab22c2ffc099ff76cecd264572aaffe049be8c3c90f70638758cb78d2bdd3",
+      "status": "??"
+    },
+    {
+      "bytes": 23760,
+      "path": "scripts/validate_gefs_temperature_geometry_fix.py",
+      "sha256": "22732a27a3f22ed8b9bc83db0dd071347b49211982462050d51c329ada9bb8ef",
+      "status": "??"
+    },
+    {
+      "bytes": 8428,
+      "path": "scripts/validate_phase2_sweep.py",
+      "sha256": "736371495009b649755aa6ad0210eea1a05e4191b4619a894dbe26d2e1b84ca6",
+      "status": "??"
+    },
+    {
+      "bytes": 36487,
+      "path": "scripts/verify_pipeline_identity.py",
+      "sha256": "970dad27e5bfbfb3b7252b20f820faf8333191d1634c1478b9237c753a0e7512",
+      "status": "??"
+    },
+    {
+      "bytes": 53372,
+      "path": "scripts/ws5_common.py",
+      "sha256": "68bdc329bef8d184eacea834035ec6efc33dc0851ba09b5c9a651f87ce3e019b",
+      "status": "??"
+    },
+    {
+      "bytes": 17349,
+      "path": "scripts/ws5_presweep_check.py",
+      "sha256": "96a192f262b5dd8c426ce18e50740956d5441ca7b554370ca57b13ada994317b",
+      "status": "??"
+    },
+    {
+      "bytes": 7407,
+      "path": "scripts/ws5_review_harness.py",
+      "sha256": "b8841af7a131cafdfb934b406548af3f3b717e5840f8d5181dea1788c1bd3920",
+      "status": "??"
+    },
+    {
+      "bytes": 4023,
+      "path": "scripts/ws6_run.py",
+      "sha256": "d4ddd55f0e3c9165d5d5c96f4855d6a2cd20e6c177907765ce2bb15883a53c62",
+      "status": "??"
+    },
+    {
+      "bytes": 11893,
+      "path": "scripts/ws7_ablation_beam_corrected.py",
+      "sha256": "6a85c6d95836db476eaa65500edc1924b49f359875d6b42bc85e68f2b8065c51",
+      "status": "??"
+    },
+    {
+      "bytes": 13197,
+      "path": "scripts/ws7_authoritative_run.py",
+      "sha256": "856d80761b5d81d1260f10b5fb7ce132d73f7c09c2567e669c4597fce3585bc7",
+      "status": "??"
+    },
+    {
+      "bytes": 8721,
+      "path": "scripts/ws7_run.py",
+      "sha256": "86ff67a35e34d50258a1a5a63ac542256612de60ad247f1d48853ddd57c6d7b8",
+      "status": "??"
+    },
+    {
+      "bytes": 10458,
+      "path": "scripts/ws7_v2_run.py",
+      "sha256": "4d324852cc39ac1904e6de11d4b77599f0a95d7ded12bb9767f4886b90ffa263",
+      "status": "??"
+    },
+    {
+      "bytes": 7749,
+      "path": "scripts/ws9_run.py",
+      "sha256": "2bcd8f4b7a08735d9dbcb9bd40c77b1cacf617fd3d19d0b1b2eb7ed183b330f5",
+      "status": "??"
+    },
+    {
+      "bytes": 3980,
+      "path": "test_calibration_fix.py",
+      "sha256": "8f43e5dbae4ae71007c1f9116d9d1473e199eef9e3eeffbf712baca71396ca33",
+      "status": "??"
+    },
+    {
+      "bytes": 3575,
+      "path": "tests/integration_test.py",
+      "sha256": "9644281eafb2cd8c57e854629552218cd79c9c8fa5dc8cf1a2b8ea862e067d20",
+      "status": "??"
+    },
+    {
+      "bytes": 7268,
+      "path": "tests/qc_items_1_2.py",
+      "sha256": "1ba7fd5dbfc9f77d51c498c98ec87d7e7789472e4a814a7701abe61cdd72f376",
+      "status": "??"
+    },
+    {
+      "bytes": 6751,
+      "path": "tests/qc_items_1_2_no_hmm.py",
+      "sha256": "d7ea1a4f9940e4e4830c7481ae16e1ada9b88ecb52fa4644eb63d038e4da397a",
+      "status": "??"
+    },
+    {
+      "bytes": 18452,
+      "path": "tests/run_signalregistry_backtest.py",
+      "sha256": "a16319e2ade2a38b4ca316a878f8d9cb17244f97cfb92e17f0ac944b7d91b3bf",
+      "status": "??"
+    },
+    {
+      "bytes": 35942,
+      "path": "tests/stats.py",
+      "sha256": "3df2fe637a436ff0762c6e629674761d5a8ead8822994981f4d5b40a8e2e44e4",
+      "status": "??"
+    },
+    {
+      "bytes": 4610,
+      "path": "tests/test_ablation_beam_correction.py",
+      "sha256": "ead3021bf15eafc21e3b6512e86a4a2bf1cb9f54949bccc91c320cdc855bf784",
+      "status": "??"
+    },
+    {
+      "bytes": 4641,
+      "path": "tests/test_calibration_temporal_separation.py",
+      "sha256": "8e2da6e9090ccc9460d7fb73cbfbf55fb8ea8e42383fa59c40393823d11a70bd",
+      "status": "??"
+    },
+    {
+      "bytes": 17505,
+      "path": "tests/test_consensus_scoring.py",
+      "sha256": "242b88870c4cf30f867c48546b58a6fa6dc6691a47d8865f7bacf25858475286",
+      "status": "??"
+    },
+    {
+      "bytes": 6102,
+      "path": "tests/test_degenerate_selector.py",
+      "sha256": "e146a9a45059e2ad568bf0f272c25d62d69d418d86a1df9c77fb9d5d5937b8f6",
+      "status": "??"
+    },
+    {
+      "bytes": 4522,
+      "path": "tests/test_direction_weighted_adapter.py",
+      "sha256": "36b3039f9601fef5b765b956387d5a6de4471ca64a6ce066d389fd1194e91286",
+      "status": "??"
+    },
+    {
+      "bytes": 1855,
+      "path": "tests/test_evaluator_label_safety.py",
+      "sha256": "42bfd8e0a06cf159526ae7f5c373b1556c51f7cb706bf80766587964eedbc69e",
+      "status": "??"
+    },
+    {
+      "bytes": 10656,
+      "path": "tests/test_failure_accounting_reconciliation.py",
+      "sha256": "8ccc338a55c4f13aefd790b9b1bf11bf92230f8c835f5f6c93b3fb2172bb7f7f",
+      "status": "??"
+    },
+    {
+      "bytes": 2469,
+      "path": "tests/test_fee_cents_consistency.py",
+      "sha256": "6125cc99f01a5e7f31ec11600bcb76cab1ad7c8aa78b76cb6ff77a7f412d9889",
+      "status": "??"
+    },
+    {
+      "bytes": 31624,
+      "path": "tests/test_frontal_passage_nowcast.py",
+      "sha256": "cc0137b90305cff96d78ff4e794f1b8b71be1df8c1c5840fa88f5c92371943a0",
+      "status": "??"
+    },
+    {
+      "bytes": 2121,
+      "path": "tests/test_gefs_direct_temperature_evaluation.py",
+      "sha256": "e79b95501fd75a3c0c4257f8724e53bd4b9bb68784ac5fd3c6079f9009ece9e9",
+      "status": "??"
+    },
+    {
+      "bytes": 1537,
+      "path": "tests/test_gefs_temperature_geometry_fix.py",
+      "sha256": "2ad09c5eb0d7f5c05a7adb67107a9d38b92f0412c2a24b4c3c9839ad00eb6a9b",
+      "status": "??"
+    },
+    {
+      "bytes": 22557,
+      "path": "tests/test_layer0_remediation.py",
+      "sha256": "1605ffb2f146eb22e38807afbfcd6414c8f22cf13ea2889199aa3f7fa1f75408",
+      "status": "??"
+    },
+    {
+      "bytes": 3506,
+      "path": "tests/test_layer2d_full_fusion_mutation_qc.py",
+      "sha256": "4b185503b22f470894e0d040b4d8c85d58717ff4201556af2ba823c6237ef186",
+      "status": "??"
+    },
+    {
+      "bytes": 2395,
+      "path": "tests/test_layer2d_uwc_adapter_contract_qc.py",
+      "sha256": "1939c672271dd2734de7067fb56d649e6c9f8abc9dfe2aa4290aa9aa1f93b125",
+      "status": "??"
+    },
+    {
+      "bytes": 4326,
+      "path": "tests/test_matched_outcome.py",
+      "sha256": "13232a0ab3d5ee7f6177460103d9e72b46ee63a5b622c9cb358c2cb4ccdb23e3",
+      "status": "??"
+    },
+    {
+      "bytes": 28559,
+      "path": "tests/test_pre_sweep_build.py",
+      "sha256": "34a8eef41b1de953e0c4a7389566e02e09909802f77844ec4d75b0bd8e2ef387",
+      "status": "??"
+    },
+    {
+      "bytes": 22508,
+      "path": "tests/test_qc_check.py",
+      "sha256": "be170ddb9478c2b12ac64224a3c3dbc217494337fc8d0fceebaaba59ebeacd07",
+      "status": "??"
+    },
+    {
+      "bytes": 6541,
+      "path": "tests/test_runner_integration.py",
+      "sha256": "9cfc6b7950afe105c00aeb2efc1a6df0b3548b87bea2feeb21f3c07b487c86ed",
+      "status": "??"
+    },
+    {
+      "bytes": 5653,
+      "path": "tests/test_signal_repairs_acceptance.py",
+      "sha256": "0b35c1e1db67fc3a254be8fbef7b9985d8166a9bfd2206f2dbe3443687ad1068",
+      "status": "??"
+    },
+    {
+      "bytes": 10613,
+      "path": "tests/test_smoke_reporting_blocker.py",
+      "sha256": "6df10098b9b0d92b53c52c9ab1599fc83a7d7a0b7e85d1a31f3bb9784d29b876",
+      "status": "??"
+    },
+    {
+      "bytes": 3959,
+      "path": "tests/test_srrs_cli_lineage.py",
+      "sha256": "e793410b118e34a5f956e3be4c507a47c36d3d2cac47038fd5ec6dc9bf2cd897",
+      "status": "??"
+    },
+    {
+      "bytes": 2308,
+      "path": "tests/test_srrs_khou_conflict_review.py",
+      "sha256": "2a71386fe17e75ea077c8362eedd3feacfcc0bed96af5eccd490b2700bae9c5b",
+      "status": "??"
+    },
+    {
+      "bytes": 4147,
+      "path": "tests/test_srrs_optimized_checkpoint_import.py",
+      "sha256": "c0dd6ddd59360082d231d4a0ab6c4b89da56cb9c45769e9adfce31f2ba10a7aa",
+      "status": "??"
+    },
+    {
+      "bytes": 4852,
+      "path": "tests/test_statistical_significance.py",
+      "sha256": "d5874361e5a6defc6c75cac82ca9de0518b2eecf6c5846c1fa0952b447913284",
+      "status": "??"
+    },
+    {
+      "bytes": 22736,
+      "path": "tests/test_stats_validation.py",
+      "sha256": "35a06f403e403282b3c3f1d3a2069f7025ec9fb662ead6a420c2c3ce19d3a129",
+      "status": "??"
+    },
+    {
+      "bytes": 4627,
+      "path": "tests/test_trajectory_dtw_replay.py",
+      "sha256": "414d6bc35068b1fe5bc45a2fe863c2d1f93a780dfe3fe46f493fb8a3943e2608",
+      "status": "??"
+    },
+    {
+      "bytes": 8942,
+      "path": "tests/test_trend_baseline_label_safety.py",
+      "sha256": "ab6f3066392fbb96cdd25986bc3a1ab5a98a2355253a176b6c14ef80e3faf450",
+      "status": "??"
+    },
+    {
+      "bytes": 1843,
+      "path": "tests/test_unattended_sweep_runner.py",
+      "sha256": "695efa6cea087e111e6f3fb5113c7bf9b055104dad9f07f7c596f3015db22873",
+      "status": "??"
+    },
+    {
+      "bytes": 3283,
+      "path": "tests/test_ws7_scope.py",
+      "sha256": "718af98b928899fb42ac73f9d27fa428dfc7328dea383455ff440e3a50830c96",
+      "status": "??"
+    }
+  ],
+  "generated_utc": "2026-08-16T14:00:00Z",
+  "schema": "weather-readiness-worktree-v1"
+}

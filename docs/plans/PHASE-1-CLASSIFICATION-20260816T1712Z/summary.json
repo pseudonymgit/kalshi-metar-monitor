@@ -1,0 +1,90 @@
+{
+  "phase": "Weather Engine Phase 1 classification only",
+  "freeze_root": "docs/plans/PHASE-0-FREEZE-20260816T170551Z",
+  "freeze_utc": "20260816T170551Z",
+  "classification_utc": "20260816T1712Z",
+  "input_file_count": 574267,
+  "input_bytes": 23555604737,
+  "disposition_counts": {
+    "UNKNOWN/DO-NOT-TOUCH": 30,
+    "KEEP/CANONICAL": 839,
+    "KEEP/RECEIPT": 29599,
+    "REGENERABLE-DERIVED": 6753,
+    "KEEP/RESEARCH-DATA": 536946,
+    "ARCHIVE-CANDIDATE": 100
+  },
+  "disposition_bytes": {
+    "UNKNOWN/DO-NOT-TOUCH": 17909038,
+    "KEEP/CANONICAL": 11511615,
+    "KEEP/RECEIPT": 1679172955,
+    "REGENERABLE-DERIVED": 868079329,
+    "KEEP/RESEARCH-DATA": 20977113499,
+    "ARCHIVE-CANDIDATE": 1818301
+  },
+  "by_disposition_and_git_status": {
+    "ARCHIVE-CANDIDATE|untracked": {
+      "count": 100,
+      "bytes": 1818301
+    },
+    "KEEP/CANONICAL|tracked-clean": {
+      "count": 533,
+      "bytes": 7120749
+    },
+    "KEEP/CANONICAL|tracked-modified": {
+      "count": 79,
+      "bytes": 2034542
+    },
+    "KEEP/CANONICAL|untracked": {
+      "count": 227,
+      "bytes": 2356324
+    },
+    "KEEP/RECEIPT|tracked-clean": {
+      "count": 636,
+      "bytes": 119245703
+    },
+    "KEEP/RECEIPT|tracked-modified": {
+      "count": 5,
+      "bytes": 2014257
+    },
+    "KEEP/RECEIPT|untracked": {
+      "count": 28958,
+      "bytes": 1557912995
+    },
+    "KEEP/RESEARCH-DATA|tracked-clean": {
+      "count": 51935,
+      "bytes": 521780998
+    },
+    "KEEP/RESEARCH-DATA|tracked-modified": {
+      "count": 3,
+      "bytes": 7828629
+    },
+    "KEEP/RESEARCH-DATA|untracked": {
+      "count": 485008,
+      "bytes": 20447503872
+    },
+    "REGENERABLE-DERIVED|untracked": {
+      "count": 6753,
+      "bytes": 868079329
+    },
+    "UNKNOWN/DO-NOT-TOUCH|tracked-clean": {
+      "count": 26,
+      "bytes": 17841231
+    },
+    "UNKNOWN/DO-NOT-TOUCH|tracked-modified": {
+      "count": 1,
+      "bytes": 6555
+    },
+    "UNKNOWN/DO-NOT-TOUCH|untracked": {
+      "count": 3,
+      "bytes": 61252
+    }
+  },
+  "unresolved_path_count": 30,
+  "review_required_path_count": 130,
+  "candidate_counts": {
+    "REGENERABLE-DERIVED": 6753,
+    "ARCHIVE-CANDIDATE": 100
+  },
+  "transaction_performed": false,
+  "stop_condition": "No transaction until Dan reviews and authorizes Phase 2."
+}
