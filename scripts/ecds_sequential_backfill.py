@@ -470,6 +470,16 @@ def main():
     print(f"{'='*60}")
     conn.close()
 
+    # ── Fail-closed exit semantics (R6 phantom-success prevention) ─────────
+    # A "successful" TIGGE backfill must reflect real progress. If every
+    # batch failed (failed_batches == len(batches)), exit non-zero instead of
+    # reporting a narrative "success" with 0 real rows written.
+    total_batches = len(batches)
+    if total_batches > 0 and failed_batches >= total_batches:
+        print(f"[ecds-tigge] FATAL: all {total_batches} batches failed — exiting 2")
+        sys.exit(2)
+    sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

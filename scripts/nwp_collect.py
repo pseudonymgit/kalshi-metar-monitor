@@ -15,6 +15,7 @@ endpoint: /v1/gfs, /v1/ecmwf, /v1/dwd-icon, /v1/gem.
 """
 
 import sqlite3
+import sys
 import urllib.request
 import urllib.error
 import json
@@ -347,6 +348,21 @@ def main():
 
     conn.close()
     print(f"\nDone at {datetime.now(timezone.utc).isoformat()}")
+
+    # ── Fail-closed exit semantics (R6 phantom-success prevention) ─────────
+    # A "successful" cron run must reflect real work, not a narrative.
+    #   * Zero values stored  → total failure → exit 2 (distinct from generic 1).
+    #   * >50% of expected station/model fetches errored → exit 1 (partial, alert).
+    #   * Otherwise (healthy write) → exit 0.
+    expected_fetches = len(MODELS) * len(CITIES)
+    failed_fetches = len(total_errors)
+    if total_stored == 0:
+        print(f"[nwp-collect] FATAL: 0 values stored ({failed_fetches}/{expected_fetches} fetches errored) — exiting 2")
+        sys.exit(2)
+    if failed_fetches > expected_fetches * 0.5:
+        print(f"[nwp-collect] WARN: {failed_fetches}/{expected_fetches} fetches errored (>50%) — exiting 1")
+        sys.exit(1)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
