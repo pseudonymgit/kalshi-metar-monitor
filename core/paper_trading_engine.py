@@ -1919,9 +1919,10 @@ class PaperTrader:
         effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
         quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
 
-        # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side
+        # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side,
+        # in DOLLARS (order-level ceil), matching core/fees.py::kalshi_fee.
         # Round trip = 2 × per-side fee
-        per_side_fee = math.ceil(0.07 * quantity * effective_price * (1.0 - effective_price))
+        per_side_fee = math.ceil(0.07 * quantity * effective_price * (1.0 - effective_price)) / 100.0
         round_trip_fee = per_side_fee * 2
         fee_cost = round_trip_fee
         net_cost = position_size + round_trip_fee * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
@@ -2965,7 +2966,7 @@ class PaperTrader:
             trades = self._get_daily_trades()
 
         if len(trades) < 2:
-            return 1.0  # Default to 1.0 for insufficient data
+            return 0.0  # Default to 0.0 for insufficient data (matches pnl_tracking.compute_sharpe)
 
         # Calculate returns
         returns = [t.get('pnl', 0) / max(abs(t.get('position_size_usd', 100)), 1) for t in trades]

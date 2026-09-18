@@ -490,3 +490,16 @@ def record_outcome(signal_name: str, station: str,
 def filter_signals(signals: List[dict]) -> List[dict]:
     """Legacy: filter signals by adaptive threshold."""
     return get_registry().filter_signals(signals)
+
+
+def filter_signals_by_adaptive_threshold(signals: List[dict],
+                                          trade_journal=None) -> List[dict]:
+    """Filter signals by adaptive threshold (paper_trading_engine entry point).
+
+    This is the name paper_trading_engine imports. It is an alias of the
+    module-level ``filter_signals`` and delegates to the registry's filtering
+    logic. The optional ``trade_journal`` argument was added to the call site
+    (Phase 4.4) but is not consumed by the current filtering implementation,
+    so it is accepted and ignored for backward compatibility.
+    """
+    return get_registry().filter_signals(signals)

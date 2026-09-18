@@ -106,11 +106,12 @@ class KellyState:
 
 def kalshi_fee(contracts: int, price: float) -> float:
     """Kalshi exchange fee per trade side.
-    Formula: ceil(0.07 * P * (1-P) * 100) / 100 per contract.
+    Formula: ceil(0.07 * P * (1-P) * C) / 100 dollars (order-level ceil),
+    matching the canonical `core/fees.py::kalshi_fee`.
     """
     if price <= 0.0 or price >= 1.0:
         return 0.0
-    return math.ceil(KALSHI_FEE_RATE * contracts * price * (1.0 - price))
+    return math.ceil(KALSHI_FEE_RATE * contracts * price * (1.0 - price)) / 100.0
 
 
 # ─── Edge calculation ──────────────────────────────────────────
