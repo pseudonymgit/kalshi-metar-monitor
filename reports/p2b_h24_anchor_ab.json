@@ -1,0 +1,53 @@
+{
+  "truth_labels": 1537,
+  "up_base_rate": 0.8224,
+  "anchor_stations": 20,
+  "anchor_date": "2026-09-17",
+  "arms": {
+    "A_prior_only": {
+      "n": 1537,
+      "accuracy": 0.56864,
+      "mcc": -0.08645,
+      "tp": 804,
+      "fp": 203,
+      "tn": 70,
+      "fn": 460,
+      "ece": 0.348334,
+      "sharpe": -2.051585
+    },
+    "A_update": {
+      "n": 1537,
+      "accuracy": 0.56864,
+      "mcc": -0.08645,
+      "tp": 804,
+      "fp": 203,
+      "tn": 70,
+      "fn": 460,
+      "ece": 0.319813,
+      "sharpe": -2.051585
+    },
+    "B_flat": {
+      "n": 1537,
+      "accuracy": 0.177619,
+      "mcc": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 273,
+      "fn": 1264,
+      "ece": 0.322381,
+      "sharpe": -13.390262
+    },
+    "B_empirical": {
+      "n": 1537,
+      "accuracy": 0.822381,
+      "mcc": 0.0,
+      "tp": 1264,
+      "fp": 273,
+      "tn": 0,
+      "fn": 0,
+      "ece": 0.076931,
+      "sharpe": 13.390262
+    }
+  },
+  "note": "Anchor is a single cross-section (2026-09-17) used as a static per-station prior across the 43-date truth set. A_update uses a signal-neutral update (new_prob=0.5) so the prior dominates \u2014 isolates the anchor's marginal directional pull."
+}
