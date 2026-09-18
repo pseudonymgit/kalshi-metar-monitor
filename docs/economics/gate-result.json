@@ -1,0 +1,222 @@
+{
+  "gate_timestamp": "2026-08-23T20:21:00Z",
+  "seed": 42,
+  "c1": {
+    "status": "PASS",
+    "detail": "Valid snapshots: 5\nSpread mismatches: 0\nAccuracy: 100.0% (threshold: 90.0%)\n  TWAS KNYC: 0.0300\u00a2 (2 snapshots)\n  TWAS KOKC: 0.1250\u00a2 (2 snapshots)",
+    "valid_snapshots": 5,
+    "errors_count": 0,
+    "accuracy_pct": 100.0,
+    "threshold_pct": 90.0,
+    "spread_mismatches": []
+  },
+  "c2": {
+    "status": "PASS",
+    "detail": "Test cases: 10 passed, 0 failed\nFixture checks: 6/6 OK",
+    "test_case_count": 10,
+    "fixture_check_count": 6,
+    "test_case_errors": [],
+    "fixture_fee_errors": []
+  },
+  "c3": {
+    "status": "FAIL",
+    "detail": "Buckets checked: 5\n  KLAX/LOW: obs=0.0%, pred=6.7%, diff=-6.7pp [FAIL]\n  KNYC/HIGH: obs=100.0%, pred=13.5%, diff=86.5pp [FAIL]\n  KOKC/HIGH: obs=0.0%, pred=6.8%, diff=-6.8pp [FAIL]\n  KOKC/LOW: obs=100.0%, pred=11.2%, diff=88.8pp [FAIL]\n  KORD/LOW: obs=0.0%, pred=3.4%, diff=-3.4pp [PASS]",
+    "buckets": [
+      {
+        "station": "KLAX",
+        "market_type": "LOW",
+        "attempts": 1,
+        "full_fills": 0,
+        "observed_pct": 0.0,
+        "predicted_pct": 6.7,
+        "diff_pp": -6.7,
+        "status": "FAIL"
+      },
+      {
+        "station": "KNYC",
+        "market_type": "HIGH",
+        "attempts": 2,
+        "full_fills": 2,
+        "observed_pct": 100.0,
+        "predicted_pct": 13.5,
+        "diff_pp": 86.5,
+        "status": "FAIL"
+      },
+      {
+        "station": "KOKC",
+        "market_type": "HIGH",
+        "attempts": 1,
+        "full_fills": 0,
+        "observed_pct": 0.0,
+        "predicted_pct": 6.8,
+        "diff_pp": -6.8,
+        "status": "FAIL"
+      },
+      {
+        "station": "KOKC",
+        "market_type": "LOW",
+        "attempts": 1,
+        "full_fills": 1,
+        "observed_pct": 100.0,
+        "predicted_pct": 11.2,
+        "diff_pp": 88.8,
+        "status": "FAIL"
+      },
+      {
+        "station": "KORD",
+        "market_type": "LOW",
+        "attempts": 1,
+        "full_fills": 0,
+        "observed_pct": 0.0,
+        "predicted_pct": 3.4,
+        "diff_pp": -3.4,
+        "status": "PASS"
+      }
+    ],
+    "errors": [
+      "KLAX/LOW: obs=0.0%, pred=6.7%, diff=-6.7pp",
+      "KNYC/HIGH: obs=100.0%, pred=13.5%, diff=86.5pp",
+      "KOKC/HIGH: obs=0.0%, pred=6.8%, diff=-6.8pp",
+      "KOKC/LOW: obs=100.0%, pred=11.2%, diff=88.8pp"
+    ],
+    "thin_buckets": [
+      {
+        "station": "KLAX",
+        "market_type": "LOW",
+        "attempts": 1,
+        "full_fills": 0,
+        "observed_pct": 0.0,
+        "predicted_pct": 6.7,
+        "diff_pp": -6.7,
+        "status": "FAIL"
+      },
+      {
+        "station": "KNYC",
+        "market_type": "HIGH",
+        "attempts": 2,
+        "full_fills": 2,
+        "observed_pct": 100.0,
+        "predicted_pct": 13.5,
+        "diff_pp": 86.5,
+        "status": "FAIL"
+      },
+      {
+        "station": "KOKC",
+        "market_type": "HIGH",
+        "attempts": 1,
+        "full_fills": 0,
+        "observed_pct": 0.0,
+        "predicted_pct": 6.8,
+        "diff_pp": -6.8,
+        "status": "FAIL"
+      },
+      {
+        "station": "KOKC",
+        "market_type": "LOW",
+        "attempts": 1,
+        "full_fills": 1,
+        "observed_pct": 100.0,
+        "predicted_pct": 11.2,
+        "diff_pp": 88.8,
+        "status": "FAIL"
+      },
+      {
+        "station": "KORD",
+        "market_type": "LOW",
+        "attempts": 1,
+        "full_fills": 0,
+        "observed_pct": 0.0,
+        "predicted_pct": 3.4,
+        "diff_pp": -3.4,
+        "status": "PASS"
+      }
+    ]
+  },
+  "c4": {
+    "status": "FAIL",
+    "detail": "Trades: 4, Conservative: 3/4 = 75.0% (threshold 80%)",
+    "trades_checked": 4,
+    "conservative_count": 3,
+    "conservative_pct": 75.0,
+    "threshold_pct": 80.0,
+    "mismatches": [
+      {
+        "fill_id": "fill-004",
+        "scenario": "partial_fill_thin",
+        "estimated": 0.05,
+        "actual": 3.0,
+        "underestimate": 2.95
+      }
+    ]
+  },
+  "c5": {
+    "status": "FAIL",
+    "detail": "Cost uncertainty check:\n  trade-001: cost_std=0.0100, edge=15.0000, ratio=0.0007 PASS\n  trade-002: cost_std=0.0760, edge=-0.2500, ratio=0.3041 FAIL\n  trade-003: cost_std=0.2503, edge=1.0000, ratio=0.2503 FAIL",
+    "trade_uncertainties": [
+      {
+        "trade_id": "trade-001",
+        "cost_est": 4.5,
+        "total_edge": 15.0,
+        "cost_std": 0.01,
+        "ratio": 0.0007,
+        "pass": true
+      },
+      {
+        "trade_id": "trade-002",
+        "cost_est": 0.85,
+        "total_edge": -0.25,
+        "cost_std": 0.076,
+        "ratio": 0.3041,
+        "pass": false
+      },
+      {
+        "trade_id": "trade-003",
+        "cost_est": 4.0,
+        "total_edge": 1.0,
+        "cost_std": 0.2503,
+        "ratio": 0.2503,
+        "pass": false
+      }
+    ]
+  },
+  "c6": {
+    "status": "PASS",
+    "detail": "All 8 schema tables created successfully. All nullable columns support NULL. FK-compatible design (trade_legs.trade_id references trade_journal).",
+    "tables_created": [
+      "quote_snapshots",
+      "fill_attempts",
+      "trade_journal",
+      "twas_computed",
+      "fee_tiers",
+      "fill_rate_estimates",
+      "slippage_estimates",
+      "trade_legs"
+    ],
+    "issues": []
+  },
+  "c7": {
+    "status": "PASS",
+    "detail": "PnL arithmetic errors: 0\nSignal\u2192Trade reconciliation: 3/3 signal IDs map to trade IDs \u2713\nTrade PnL arithmetic:\n  trade-001 (profitable): gross=$15.00, fees=$4.00, spread=$0.50, slippage=$0.00, net=$10.50\n    Expected net: $15.00 - $4.00 - $0.50 - $0.00 = $10.50 \u2713\n  trade-002 (losing): gross=-$0.50, fees=$0.20, spread=$0.50, slippage=$0.15, net=-$1.35\n    Expected net: -$0.50 - $0.20 - $0.50 - $0.15 = -$1.35 \u2713\n  trade-003 (break-even-ish): gross=$1.00, fees=$2.00, spread=$1.50, slippage=$0.50, net=-$3.00\n    Expected net: $1.00 - $2.00 - $1.50 - $0.50 = -$3.00 \u2713",
+    "pnl_errors": [],
+    "fee_formula_match_meta": true,
+    "signal_trades_mapped": 3
+  },
+  "stop_conditions": {
+    "c3_thin_data": "Thin data: 5 buckets with <4 samples: ['KLAX/LOW', 'KNYC/HIGH', 'KOKC/HIGH', 'KOKC/LOW', 'KORD/LOW']"
+  },
+  "overall": {
+    "status": "FAIL",
+    "passed_count": 4,
+    "total_criteria": 7,
+    "detail": "Passed: 4/7 criteria. FAILED: ['c3', 'c4', 'c5']",
+    "criteria": {
+      "c1": "PASS",
+      "c2": "PASS",
+      "c3": "FAIL",
+      "c4": "FAIL",
+      "c5": "FAIL",
+      "c6": "PASS",
+      "c7": "PASS"
+    }
+  }
+}

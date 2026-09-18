@@ -1,0 +1,224 @@
+=== TEST SUITE 1: test_pre_sweep_build.py ===
+============================================================
+PRE-SWEEP IMPLEMENTATION — TARGETED TESTS
+============================================================
+  S6-AT6.2 PASS: days[idx] mutation invariant (dir=None, conf=0.0000)
+  S6-AT6.1 PASS: No 'today_temp' in cooling_failure_signal.py
+  S6-AT6.1.2 PASS: 'yesterday_temp' present in cooling_failure_signal.py
+  S6-AT6.3 PASS: Confidence uses hist_z_scores (no target-day lookahead)
+  S7-AT7.0 PASS: P&L zeroing invariant (rank: [(('cf', 0.6), ('fusion', 'llop'), ('kf', 1.0)), (('cf', 0.5), ('fusion', 'llop'), ('kf', 0.25)), (('cf', 0.55), ('fusion', 'uwc'), ('kf', 0.5))])
+  S5-AT5.6 PASS: Zero-trade config excluded from ranking
+    Valid configs: 2/3
+    Zero-trade excluded: ['uwc']
+  S1 PASS: is_calibrated() tracks calibration refitted state correctly
+  S3-AT3.2 PASS: Brier on identical index sets (n=5, raw=0.7325, cal=0.7442)
+    Brier improvement: -0.0117
+  S4 PASS: exclude_degenerate default is False (degenerates included)
+  S1-AT1.3 PASS: CALIBRATION_PIPELINE_OPTIONS = ['isotonic']
+  S1-AT1.3.2 PASS: DEFAULT_CALIBRATION_PIPELINE = isotonic
+    Fold 1: 2025-05-01..2025-08-31  -> Fold 2: 2025-09-01..2025-11-30
+    Fold 2: 2025-09-01..2025-11-30  -> Fold 3: 2025-12-01..2026-02-28
+    Fold 3: 2025-12-01..2026-02-28  -> Fold 4: 2026-03-01..2026-05-14
+  S2 PASS: 4 folds, contiguous eval windows
+  S5 PASS: Registry coverage assertion pattern found
+  S7 PASS: (PROXY) labels and ranking_metric present
+  E2E-AT1 PASS: Fold date semantics — 4 folds, 379 eval, 91 holdout dates, all disjoint
+  E2E-AT2 PASS: Nonzero eval trades — 28 trades
+  E2E-AT3 PASS: Outer holdout isolation — 0 trades
+  E2E-AT4 PASS: Brier/ECE present — brier_raw=0.2200, ece=0.450000
+  E2E-AT5 PASS: Degenerate comparison — 28 trades
+  E2E-AT6 PASS: Failure accounting — all 5 counters present and int
+  E2E-AT7 PASS: Ranking invariant — P&L zeroing does not affect rank
+  E2E-ALL PASS: Full end-to-end fixture test passed
+
+============================================================
+RESULTS: 13 passed, 0 failed, 13 total
+============================================================
+
+=== TEST SUITE 2: test_qc_check.py ===
+======================================================================
+BUILD QC — TARGETED VALIDATION GATES
+======================================================================
+
+
+──────────────────────────────────────────────────────────────────────
+GATE 1: All 12 pre-sweep tests pass
+──────────────────────────────────────────────────────────────────────
+  S6-AT6.2 PASS: days[idx] mutation invariant (dir=None, conf=0.0000)
+  S6-AT6.1 PASS: No 'today_temp' in cooling_failure_signal.py
+  S6-AT6.1.2 PASS: 'yesterday_temp' present in cooling_failure_signal.py
+  S6-AT6.3 PASS: Confidence uses hist_z_scores (no target-day lookahead)
+  S7-AT7.0 PASS: P&L zeroing invariant (rank: [(('cf', 0.6), ('fusion', 'llop'), ('kf', 1.0)), (('cf', 0.5), ('fusion', 'llop'), ('kf', 0.25)), (('cf', 0.55), ('fusion', 'uwc'), ('kf', 0.5))])
+  S5-AT5.6 PASS: Zero-trade config excluded from ranking
+    Valid configs: 2/3
+    Zero-trade excluded: ['uwc']
+  S1 PASS: is_calibrated() tracks calibration refitted state correctly
+  S3-AT3.2 PASS: Brier on identical index sets (n=5, raw=0.7325, cal=0.7442)
+    Brier improvement: -0.0117
+  S4 PASS: exclude_degenerate default is False (degenerates included)
+  S1-AT1.3 PASS: CALIBRATION_PIPELINE_OPTIONS = ['isotonic']
+  S1-AT1.3.2 PASS: DEFAULT_CALIBRATION_PIPELINE = isotonic
+    Fold 1: 2025-05-01..2025-08-31  -> Fold 2: 2025-09-01..2025-11-30
+    Fold 2: 2025-09-01..2025-11-30  -> Fold 3: 2025-12-01..2026-02-28
+    Fold 3: 2025-12-01..2026-02-28  -> Fold 4: 2026-03-01..2026-05-14
+  S2 PASS: 4 folds, contiguous eval windows
+  S5 PASS: Registry coverage assertion pattern found
+  S7 PASS: (PROXY) labels and ranking_metric present
+  PASS: S6-AT6.2: mutation invariance
+  PASS: S6-AT6.1: no today_temp
+  PASS: S6-AT6.3: hist_z_scores
+  PASS: S7-AT7.0: P&L zeroing
+  PASS: S5-AT5.6: zero-trade guard
+  PASS: S1: is_calibrated
+  PASS: S3-AT3.2: Brier index sets
+  PASS: S4: degenerate default
+  PASS: S1-AT1.3: isotonic grid
+  PASS: S2: fold definitions
+  PASS: S5: registry assertion
+  PASS: S7: proxy labels
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 2: Compile/import all 7 modified files
+──────────────────────────────────────────────────────────────────────
+  PASS: scripts/run_sweep.py
+  PASS: scripts/ws5_common.py
+  PASS: scripts/sweep/config.py
+  PASS: core/fusion_logic.py
+  PASS: core/signals/cooling_failure_signal.py
+  PASS: scripts/ws5_review_harness.py
+  PASS: scripts/_ws5_readiness_diagnostics.py
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 3: Fold geometry — each inner eval >0 trades, outer holdout separate
+──────────────────────────────────────────────────────────────────────
+  Fold 1: eval [2025-05-01, 2025-08-31] holdout [2025-09-01, 2025-11-30] — SEPARATE
+  Fold 2: eval [2025-09-01, 2025-11-30] holdout [2025-12-01, 2026-02-28] — SEPARATE
+  Fold 3: eval [2025-12-01, 2026-02-28] holdout [2026-03-01, 2026-05-14] — SEPARATE
+  Fold 4: eval [2026-03-01, 2026-05-14] holdout [2026-05-15, 2026-08-13] — SEPARATE
+  Outer holdout: [2026-05-15, 2026-08-13] — same as Fold 4 holdout (correct: never used in selection)
+  Fold 1 eval_end=2025-08-31 -> Fold 2 eval_start=2025-09-01
+  Fold 2 eval_end=2025-11-30 -> Fold 3 eval_start=2025-12-01
+  Fold 3 eval_end=2026-02-28 -> Fold 4 eval_start=2026-03-01
+  Date disjointness: all fold eval/holdout sets are disjoint (PASS)
+  Per-fold zero-trade guard assertion found in run_sweep_nested
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 4: Fold call semantics & date disjointness
+──────────────────────────────────────────────────────────────────────
+  evaluate_config_on_fold params: ['config', 'settlements', 'metar_batched', 'registry', 'station_list', 'calibration_cutoff', 'holdout_start', 'holdout_end', 'period', 'exclude_degenerate']
+  Period separation logic (eval vs holdout): PRESENT
+  Fold 1->2: contiguous (eval_end+1 = 2025-09-01 == eval_start 2025-09-01)
+  Fold 2->3: contiguous (eval_end+1 = 2025-12-01 == eval_start 2025-12-01)
+  Fold 3->4: contiguous (eval_end+1 = 2026-03-01 == eval_start 2026-03-01)
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 5: Brier raw/calibrated sample counts equal prediction index set
+──────────────────────────────────────────────────────────────────────
+  Per-signal collection: raw_conf_eval, cal_conf_eval, correct_eval parallel
+    (all appended per fired signal per date — guaranteed same index set)
+  Brier formula uses n_eval = min(raw, cal, correct) as defensive guard
+  Global Brier: pooled weighted average across signals (n_eval weight)
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 6: Degenerate comparison has identical eval dates
+──────────────────────────────────────────────────────────────────────
+  comparison_excluding_degenerates uses identical NESTED_FOLDS iteration
+  Runs best config on same fold geometry, only toggling exclude_degenerate
+  Same evaluate_config_on_fold call signature (period='eval')
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 7: Exception counters surfaced; zero-trade configs cannot rank
+──────────────────────────────────────────────────────────────────────
+  failure_counters documented in compute_fusion_accuracy return dict
+  Counter n_signal_exceptions: PRESENT
+  Counter n_fusion_exceptions: PRESENT
+  Counter n_dates_skipped_flat: PRESENT
+  Counter n_dates_skipped_no_metar: PRESENT
+  Counter n_no_fusion_output: PRESENT
+  WARNING logging for n_signal_exceptions, n_fusion_exceptions > 0
+  Zero-trade guard: PRESENT (blocked from ranking via if-failed check)
+  Zero-trade guard in run_sweep_nested: assert cr.get('trades', 0) > 0
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 8: Ranking invariant is accuracy-only
+──────────────────────────────────────────────────────────────────────
+  assert_s7_ranking_invariant params: ['config_results']
+  Sort keys: x['accuracy'] (single-split) and x['mean_accuracy'] (nested)
+  PROXY_PNL_KEYS (7 keys) are ZEROED before sort check
+  assert_s7_ranking_invariant asserts rank_before == rank_after
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 9: Output schema/proxy labels/ranking_metric
+──────────────────────────────────────────────────────────────────────
+  _disclaimer with (PROXY): PRESENT in compute_pnl_metrics()
+  ranking_metric: 'accuracy' (single-split), 'mean_fold_directional_accuracy' (nested)
+  JSON output: directional_metrics.primary='accuracy'
+  Console output: (PROXY) labels present for P&L display
+
+  → ✅ PASS
+
+──────────────────────────────────────────────────────────────────────
+GATE 10: Git diff inspection for unintended changes
+──────────────────────────────────────────────────────────────────────
+--- Target file diff analysis ---
+  scripts/run_sweep.py: 0 changed lines
+  scripts/ws5_common.py: 0 changed lines
+  scripts/sweep/config.py: 139 changed lines
+    (diff present — expected per pre-sweep build plan)
+  core/fusion_logic.py: 13 changed lines
+    (diff present — expected per pre-sweep build plan)
+  core/signals/cooling_failure_signal.py: 0 changed lines
+  scripts/ws5_review_harness.py: 0 changed lines
+  scripts/_ws5_readiness_diagnostics.py: 0 changed lines
+  tests/test_pre_sweep_build.py: 0 changed lines
+
+--- UNRELATED WORKING-TREE CHANGES (NOT part of pre-sweep build) ---
+  334 files changed outside target scope:
+    .../20260808-000237/graphify-out/.graphify_root
+    .../split_backtest_current.cpython-311.pyc
+    ...0179a03307a24e29ef948409dc7580f685ae3ffff0.json
+    ...01da439bf20488709928edc74d63f2889bd5151789.json
+    ...020bfa9a19b2dd795784a720edd13ead719ee062b3.json
+    ...033f954d87e256ccb5918c1f5b7bd3ee26de182a09.json
+    ...0356cc83bc89e7bc2088535ceaf47cf2b05a4b045d.json
+    ...074cb0cfb629e1cf2d4b08a8efc5b14dd93bd4dcab.json
+    ...0792ec574a558460a2f6a014686e2fa1ef6828f2a9.json
+    ...0b12c3ba0017e50ea75f1278143d47265eff544e64.json
+    ...0bc54532d8056c6476a2583b486dd05d337d50ae5b.json
+    ...0bdbc4831143108b418a9688c63c553aa7d3d41987.json
+    ...0dc87a0aa1f7901bfc81a1017c376165d3ab592023.json
+    ...0fa8d4ce53301f7e6ee1e1476591f628d6af16d33b.json
+    ...10cfa4539f3bb5f0987e4560e7cbbf43ddc70c96d2.json
+    ...1266d2facf14d9deebc0f5d045d48e3021178b95d0.json
+    ...16ed14a17aa66554e46cb2b0345253c74ba3ca95e5.json
+    ...18a04d429f85a57418933018994c6ef28338b2d3f9.json
+    ...18a07f7afebe41b44f39ad56a26ee6131467d05364.json
+    ...1c94397ac5d7657b2a50f9e4090a939745836caf96.json
+    ... and 314 more
+
+  Note: These are pre-existing working-tree changes, NOT deleted/removed.
+  They do not block the pre-sweep build QC, but should be reviewed separately.
+
+  → ✅ PASS
+
+======================================================================
+BUILD QC RESULTS: 10 passed, 0 failed, 10 total
+======================================================================
+
+✅ ALL GATES PASS — BUILD-QC GO

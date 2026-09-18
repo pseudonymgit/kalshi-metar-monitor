@@ -1,0 +1,9 @@
+{
+  "generated": "2026-09-02 05:15 UTC",
+  "total_signals_in_registry": 52,
+  "registered_signals": 31,
+  "additional_in_signal_registry_not_in_31": 21,
+  "killed_orphaned": 12,
+  "active_not_in_31": 9,
+  "gated": 1
+}
