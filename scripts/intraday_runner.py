@@ -386,6 +386,29 @@ def run_intraday_cycle(
         logger.error(f"Calibration failed: {e}", exc_info=True)
         return {"error": f"Calibration: {e}", "signals": 0}
     
+    # 5a. h-24 daily-LOOP anchor prior (P2-B wire-in, 2026-09-19) — combine the
+    # calibrated intraday probability with the daily anchor as a Bayesian prior.
+    # Fail-graceful: a missing/stale anchor yields no prior (flat fallback).
+    anchor_combined = 0
+    try:
+        from core.intraday.anchor_prior import load_anchor_prior, combine_with_anchor
+        anchor_prior = load_anchor_prior()
+        for st in list(calibrated.keys()):
+            intraday_prob = calibrated[st]["probability"]
+            combined_prob, _ = combine_with_anchor(st, intraday_prob, anchor_prior)
+            if abs(combined_prob - intraday_prob) > 1e-6:
+                anchor_combined += 1
+                logger.info(
+                    f"h-24 anchor prior: {st} {intraday_prob:.4f} -> {combined_prob:.4f}"
+                )
+            calibrated[st]["probability"] = combined_prob
+        logger.info(
+            f"h-24 anchor prior: {anchor_combined}/{len(calibrated)} stations combined "
+            f"(prior_stations={len(anchor_prior)})"
+        )
+    except Exception as anchor_err:
+        logger.warning(f"h-24 anchor prior failed (non-blocking): {anchor_err}")
+    
     # 5c. NWS revision correction — apply per-station probability shift
     try:
         from core.calibration.hourly_calibration import HourlyCalibrationLoader

@@ -19,6 +19,7 @@ from .fusion import HourlyFusionEngine, FusedResult
 from .calibration import HourlyCalibration
 from .entry_engine import EntryTimingEngine, EntrySignal, RiskGuardrails
 from .recalibration_loop import ContinuousRecalibrationLoop
+from .anchor_prior import load_anchor_prior, combine_with_anchor
 
 __all__ = [
     "HourlyPipeline",
@@ -30,4 +31,6 @@ __all__ = [
     "EntrySignal",
     "RiskGuardrails",
     "ContinuousRecalibrationLoop",
+    "load_anchor_prior",
+    "combine_with_anchor",
 ]
