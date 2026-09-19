@@ -5,8 +5,8 @@ goldilocks_feature_engineering.py — Feature computation for Goldilocks Predict
 Computes all 29+ features from Section 3 of GOLDILOCKS-PREDICTIVE.md using
 existing local data sources:
   - METAR DB  (data/metar_backfill.db)     — wind, cloud, dewpoint, pressure
-  - ERA5 DB   (data/era5_archive.db)       — daily temp range as stability proxy
   - NWP DB    (data/nwp_forecasts.db)      — cloud cover, wind speed, MSLP
+  - (ERA5 dependency REMOVED 2026-09-19: same-day temp range was a lookahead leak)
 
 Outputs a clean feature matrix (Parquet/CSV) ready for ML training.
 
@@ -30,7 +30,6 @@ import pandas as pd
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 METAR_DB = os.path.join(REPO_ROOT, "data", "metar_backfill.db")
-ERA5_DB = os.path.join(REPO_ROOT, "data", "era5_archive.db")
 NWP_DB = os.path.join(REPO_ROOT, "data", "nwp_forecasts.db")
 OUT_DIR = os.path.join(REPO_ROOT, "data")
 
@@ -203,14 +202,10 @@ class GoldilocksFeatureEngine:
     def __init__(self, station: str = DEFAULT_STATION):
         self.station = station
         self.metar_db = METAR_DB
-        self.era5_db = ERA5_DB
         self.nwp_db = NWP_DB
 
     def _get_metar_conn(self) -> sqlite3.Connection:
         return sqlite3.connect(f"file:{self.metar_db}?mode=ro", uri=True)
-
-    def _get_era5_conn(self) -> sqlite3.Connection:
-        return sqlite3.connect(f"file:{self.era5_db}?mode=ro", uri=True)
 
     def _get_nwp_conn(self) -> sqlite3.Connection:
         return sqlite3.connect(f"file:{self.nwp_db}?mode=ro", uri=True)
@@ -392,18 +387,17 @@ class GoldilocksFeatureEngine:
         features['longwave_flux_est'] = _estimate_longwave_flux(
             lw_dp_dep, features.get('cloud_cover_frac') or 0.5)
 
-        # ========== C. Stability (from ERA5) ==========
-        era5_row = self._get_era5_day(local_date_str)
-        if era5_row:
-            features['daily_temp_range_C'] = (era5_row['daily_max_t2m'] -
-                                              era5_row['daily_min_t2m'])
+        # ========== C. Stability ==========
+        # NOTE (P0-G data-integrity fix): daily_temp_range_C must NOT be sourced
+        # from ERA5 reanalysis-of-today — that is a same-day lookahead leak.
+        # The ERA5 archive has no fetch/availability column, so same-day rows
+        # are post-hoc reanalysis. Source this feature from same-day METAR only.
+        # (ERA5 dependency for the goldilocks signal is REMOVED.)
+        if len(temps_f) > 0:
+            features['daily_temp_range_C'] = (float(temps_f.max()) -
+                                              float(temps_f.min())) * 5 / 9
         else:
-            # Approximate from METAR
-            if len(temps_f) > 0:
-                features['daily_temp_range_C'] = (float(temps_f.max()) -
-                                                  float(temps_f.min())) * 5 / 9
-            else:
-                features['daily_temp_range_C'] = None
+            features['daily_temp_range_C'] = None
 
         # Lapse rate proxy from NWP 850hPa temp vs surface
         features['lapse_rate_850_925'] = self._get_nwp_lapse_proxy(local_date_str)
@@ -506,27 +500,6 @@ class GoldilocksFeatureEngine:
         }
         f['local_date'] = local_date_str
         return f
-
-    def _get_era5_day(self, local_date_str: str) -> Optional[dict]:
-        """Get ERA5 daily data for a given date and station."""
-        conn = self._get_era5_conn()
-        try:
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT daily_max_t2m, daily_min_t2m, daily_mean_t2m
-                FROM era5_archive
-                WHERE station = ? AND target_date = ?
-            """, (self.station, local_date_str))
-            row = cur.fetchone()
-            if row:
-                return {
-                    'daily_max_t2m': row[0],
-                    'daily_min_t2m': row[1],
-                    'daily_mean_t2m': row[2],
-                }
-            return None
-        finally:
-            conn.close()
 
     def _get_nwp_cloud_cover(self, local_date_str: str) -> Optional[float]:
         """Get NWP daily mean cloud cover from GEFS/ECMWF."""
