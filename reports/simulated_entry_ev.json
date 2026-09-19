@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-09-19T18:17:50.794425Z",
+  "directive": "Dan 2026-09-19: simulate entry price if no real last-traded price",
+  "finding_real_data": {
+    "ltv_last_traded": "NULL for all 868328 rows (no real last-traded price)",
+    "yes_bid_nonzero": "28427 / 868328 (~3%)",
+    "mid_price_skew": "95% massed in 0.50-0.60 band (not a real order book)",
+    "yes_ask_skew": "95% massed in 0.90-1.00 band (YES/NO legs conflated)",
+    "verdict": "real usable entry price NOT available -> simulation required"
+  },
+  "method": {
+    "entry_model": "P - offset + Uniform[-delta,+delta], offset=0.05",
+    "nominal_P": "empirical side win-rate (calibrated from settlement truth)",
+    "delta": 0.02,
+    "offset": 0.05,
+    "mode": "directional",
+    "fee": 0.01,
+    "n_draws": 1
+  },
+  "reproducibility": {
+    "seed": 20260919,
+    "prng": "xorshift32, per-contract key = sha256(contract identity) ^ seed"
+  },
+  "counts": {
+    "settlement_truth_rows": 1239518,
+    "distinct_contracts": 9895,
+    "settled_contracts": 9397,
+    "parse_fail": 0
+  },
+  "results_by_side": {
+    "HIGH-T": {
+      "n_contracts_draws": 1722,
+      "nominal_P": 0.4639953542392567,
+      "avg_simulated_entry": 0.41415332374330444,
+      "avg_ev": 0.039842030495951426,
+      "avg_pnl": 0.03984203049595144,
+      "ev_edge_vs_pinned": 0.04984203049595143
+    },
+    "HIGH-B": {
+      "n_contracts_draws": 3355,
+      "nominal_P": 0.520715350223547,
+      "avg_simulated_entry": 0.47099919045824895,
+      "avg_ev": 0.039716159765298305,
+      "avg_pnl": 0.03971615976529825,
+      "ev_edge_vs_pinned": 0.04971615976529831
+    },
+    "LOW-T": {
+      "n_contracts_draws": 1468,
+      "nominal_P": 0.6743869209809265,
+      "avg_simulated_entry": 0.6248895606312452,
+      "avg_ev": 0.039497360349680814,
+      "avg_pnl": 0.03949736034968075,
+      "ev_edge_vs_pinned": 0.049497360349680816
+    },
+    "LOW-B": {
+      "n_contracts_draws": 2852,
+      "nominal_P": 0.26367461430575034,
+      "avg_simulated_entry": 0.2135319036018518,
+      "avg_ev": 0.04014271070389858,
+      "avg_pnl": 0.04014271070389858,
+      "ev_edge_vs_pinned": 0.050142710703898585
+    }
+  }
+}
