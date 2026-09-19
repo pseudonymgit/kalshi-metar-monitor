@@ -38,9 +38,10 @@ METAR_DB_DEFAULT = "data/metar_backfill.db"
 # Enabled for deterministic k-NN v2.0 (replaces disabled XGBoost version).
 # See docs/plans/GRAY-ROOM-ROUND3-EXPERT4-METEOROLOGY.md for architecture.
 # ── B-Mode R8 Cycle 2.7: NWP Analog excluded from paper test ──
-# Set to False to exclude NWP analog signal from paper test trading decisions.
+# Revived 2026-09-18: nwp_forecasts.db is now populated, so the data-gating
+# condition that previously forced this False is no longer applicable.
 # Can be overridden via environment variable.
-NWP_ANALOG_ENABLED = False
+NWP_ANALOG_ENABLED = True
 _nwp_env = os.environ.get('NWP_ANALOG_ENABLED', '').lower()
 if _nwp_env in ('1', 'true', 'yes'):
     NWP_ANALOG_ENABLED = True
@@ -62,23 +63,27 @@ class NwpAnalogSignal(BaseSignal):
       min_fire = 10  analogs to produce a non-null signal
     """
 
-    # ── Feature weights (Expert 4 spec §2 — renormalised for 5-feature set) ──
-    # Wind (u10/v10, weight 0.15) is excluded because wind fields only have
-    # ~65 dates per station in the NWP DB (2026-05-09 through 2026-07-12).
-    # Including it would cut the historical pool from ~150 to ~65 — too small
-    # for a K=50 search. When wind data accumulates, add:
-    #   'u10': 0.075/0.85, 'v10': 0.075/0.85
-    # and set _HAS_WIND = True.
+    # ── Feature weights (upper-air-only, contemporaneous-gated) ──
     #
-    # Renormalised from the original spec weights (sum=0.85) so that the
-    # effective weight vector sums to 1.0, keeping the distance metric
-    # scale-independent.
+    # REBUILT 2026-09-19 (Dan directive: stop parking, build + test).
+    #
+    # The original 5-field set required cloud_cover / dew_point_2m /
+    # temperature_2m_max — surface fields whose contemporaneous coverage
+    # ends at only ~626 dates and does NOT reach the Aug-Sep 2026 label
+    # window.  Requiring them made the signal structurally unable to fire
+    # (0 fires on the strike-crossing axis).
+    #
+    # The upper-air fields (500hPa geopotential height + 850hPa temperature)
+    # ARE contemporaneously available across the full label window (1000
+    # station-dates with BOTH fields in Aug-Sep 2026).  These are also the
+    # fields that were most lookahead-contaminated (upper-air 92.5% lookahead
+    # per P0-F) — so the contemporaneous gate is mandatory and is applied at
+    # read time in _load_nwp_features() via contemporaneous_where().
+    #
+    # Renormalised to sum to 1.0 for scale-independence of the distance metric.
     FIELD_WEIGHTS = {
-        'temperature_850hPa_daily_mean':      0.30 / 0.85,  # 0.353
-        'geopotential_height_500hPa_daily_mean': 0.20 / 0.85,  # 0.235
-        'cloud_cover_daily_mean':             0.15 / 0.85,  # 0.176
-        'temperature_2m_max':                 0.10 / 0.85,  # 0.118
-        'dew_point_2m_daily_mean':            0.10 / 0.85,  # 0.118
+        'temperature_850hPa_daily_mean':           0.60,  # primary thermal signal
+        'geopotential_height_500hPa_daily_mean':   0.40,  # synoptic-height signal
     }
 
     # NWP DB variable names needed (before any decomposition)
@@ -187,16 +192,22 @@ class NwpAnalogSignal(BaseSignal):
                        WHERE fetch_date <= target_date ORDER BY target_date""")
         dates = sorted([r[0] for r in cur.fetchall()])
 
-        # Build feature dict: average across all models per (station, date, field)
-        from ..nwp_lookahead_gate import contemporaneous_where
+        # Build feature dict: average across all models per (station, date, field).
+        #
+        # Contemporaneous-only gate (P0-F) MUST be inside the WHERE clause
+        # (fetch_date <= target_date), NOT appended after GROUP BY.  The prior
+        # placement appended the predicate after the GROUP BY clause, which
+        # SQLite parses as part of the GROUP BY expression — silently breaking
+        # the filter and collapsing the feature pool to a handful of rows.
         features = defaultdict(dict)
         for field in self.NWP_FIELDS:
             cur.execute("""
                 SELECT station, target_date, AVG(value)
                 FROM nwp_forecasts
                 WHERE variable = ? AND value IS NOT NULL
+                  AND fetch_date <= target_date
                 GROUP BY station, target_date
-            """ + contemporaneous_where(""), (field,))
+            """, (field,))
             for station, tdate, val in cur.fetchall():
                 features[(station, tdate)][field] = val
 

@@ -1,0 +1,113 @@
+{
+  "generated_utc": "2026-09-19T14:17:28Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "axis": "strike-crossing (T-contract greater/less) \u2014 settlement_temp vs strike, core/settlement_outcome.contract_is_itm",
+  "label_universe": "kalshi_market_snapshots.db T-contract tickers x settlement_truth temps",
+  "n_labels": 1537,
+  "label_distribution": {
+    "up": 1264,
+    "down": 273
+  },
+  "temp_source_distribution": {
+    "ghcn": 1298,
+    "kalshi_finalized": 79,
+    "weatherapi": 160
+  },
+  "stations": 20,
+  "nwp_analog_enabled": true,
+  "signals": {
+    "trajectory_state_vector": {
+      "accuracy": 0.327338,
+      "mcc": -0.008495,
+      "n": 1390,
+      "tp": 261,
+      "fp": 61,
+      "tn": 194,
+      "fn": 874,
+      "minority_class": "down",
+      "minority_precision": 0.1816,
+      "minority_share": 0.1835,
+      "fired": 1390
+    },
+    "rdae_mos": {
+      "accuracy": 0.58837,
+      "mcc": -0.083026,
+      "n": 1307,
+      "tp": 714,
+      "fp": 181,
+      "tn": 55,
+      "fn": 357,
+      "minority_class": "down",
+      "minority_precision": 0.1335,
+      "minority_share": 0.1806,
+      "fired": 1307
+    },
+    "sensor_bias_correction": {
+      "accuracy": 0.51827,
+      "mcc": 0.036644,
+      "n": 1341,
+      "tp": 561,
+      "fp": 118,
+      "tn": 134,
+      "fn": 528,
+      "minority_class": "down",
+      "minority_precision": 0.2024,
+      "minority_share": 0.1879,
+      "fired": 1341
+    },
+    "goldilocks": {
+      "accuracy": 0.512115,
+      "mcc": 0.035846,
+      "n": 908,
+      "tp": 380,
+      "fp": 72,
+      "tn": 85,
+      "fn": 371,
+      "minority_class": "down",
+      "minority_precision": 0.1864,
+      "minority_share": 0.1729,
+      "fired": 908
+    },
+    "persistence": {
+      "accuracy": 0.454481,
+      "mcc": -0.014206,
+      "n": 1417,
+      "tp": 502,
+      "fp": 117,
+      "tn": 142,
+      "fn": 656,
+      "minority_class": "down",
+      "minority_precision": 0.1779,
+      "minority_share": 0.1828,
+      "fired": 1417
+    },
+    "ghcn_calibration": {
+      "accuracy": 0.186163,
+      "mcc": 0.0,
+      "n": 1402,
+      "tp": 0,
+      "fp": 0,
+      "tn": 261,
+      "fn": 1141,
+      "minority_class": "down",
+      "minority_precision": 0.1862,
+      "minority_share": 0.1862,
+      "fired": 1402
+    },
+    "nwp_analog": {
+      "accuracy": 0.322882,
+      "mcc": -0.10572,
+      "n": 1499,
+      "tp": 317,
+      "fp": 103,
+      "tn": 167,
+      "fn": 912,
+      "minority_class": "down",
+      "minority_precision": 0.1548,
+      "minority_share": 0.1801,
+      "fired": 1499
+    }
+  },
+  "read_only": true
+}
