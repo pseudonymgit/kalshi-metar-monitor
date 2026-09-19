@@ -61,6 +61,7 @@ from .feels_like_delta_signal import FeelsLikeDeltaSignal
 from .ecmwf_bias_corrected_signal import ECMWFBiasCorrectedSignal
 from .metar_trend_signal import MetarTrendSignal
 from .cross_model_divergence_signal import CrossModelDivergenceSignal
+from .subhourly_trajectory_signal import SubhourlyTrajectorySignal
 
 
 class SignalRegistry:
@@ -72,6 +73,12 @@ class SignalRegistry:
 
     def __init__(self, db_path: str):
         self.db_path = db_path
+        # ── Sub-hourly trajectory nowcast (OOS-validated ef1e9d8c0) ──
+        # Registered for scoring only. NOT wired into the live/paper trading path
+        # (separate Dan-gated step). Scored via evaluate_nowcast(), not the daily
+        # evaluate(idx, days) interface.
+        self.subhourly_trajectory = SubhourlyTrajectorySignal(db_path)
+
         self.signals = {
             # ── Forecasting Ensemble (Lane 1) ──
             'gaussian': GaussianSignal(db_path),               # 66.53% settlement-validated
