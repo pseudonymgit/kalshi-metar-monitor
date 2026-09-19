@@ -58,6 +58,12 @@ class WeatherAPIBaseSignal(BaseSignal):
 
     def __init__(self, db_path: str = None):
         super().__init__(db_path)
+        # Per-instance cache of the aggregated daily series keyed by
+        # (db_path, station).  `evaluate_for_station` is called once per
+        # (station, label) in the sweep; caching avoids re-scanning the
+        # (large) WeatherAPI archive for every label.  Deterministic and
+        # in-memory only — no persistence.
+        self._series_cache: Dict[Tuple[str, str], List[Dict]] = {}
 
     # ── abstract ──────────────────────────────────────────────────────────
     @property
@@ -181,25 +187,33 @@ class WeatherAPIBaseSignal(BaseSignal):
         if not db_path or not os.path.exists(db_path):
             return None, 0.0
 
-        own_conn = conn is None
-        if own_conn:
-            conn = sqlite3.connect(db_path)
-        try:
-            rows = self._load_hourly(station, conn)
-            if not rows:
-                return None, 0.0
-            series = self._build_daily_series(rows)
-            target_idx = None
-            for i, d in enumerate(series):
-                if d["date"] == date:
-                    target_idx = i
-                    break
-            if target_idx is None:
-                return None, 0.0
-            # `evaluate()` treats pandas-free `days[idx-1]` as the last
-            # completed (current) day. To evaluate the *target* day itself,
-            # pass target_idx + 1 so that days[(target_idx+1)-1] == target.
-            return self.evaluate(target_idx + 1, series)
-        finally:
-            if own_conn and conn:
-                conn.close()
+        cache_key = (db_path, station)
+        series = self._series_cache.get(cache_key)
+        if series is None:
+            own_conn = conn is None
+            if own_conn:
+                conn = sqlite3.connect(db_path)
+            try:
+                rows = self._load_hourly(station, conn)
+                if not rows:
+                    series = []
+                else:
+                    series = self._build_daily_series(rows)
+                self._series_cache[cache_key] = series
+            finally:
+                if own_conn and conn:
+                    conn.close()
+
+        if not series:
+            return None, 0.0
+        target_idx = None
+        for i, d in enumerate(series):
+            if d["date"] == date:
+                target_idx = i
+                break
+        if target_idx is None:
+            return None, 0.0
+        # `evaluate()` treats pandas-free `days[idx-1]` as the last
+        # completed (current) day. To evaluate the *target* day itself,
+        # pass target_idx + 1 so that days[(target_idx+1)-1] == target.
+        return self.evaluate(target_idx + 1, series)
