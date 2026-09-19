@@ -1,0 +1,1000 @@
+{
+  "generated_utc": "2026-09-19T20:56:11Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "suite": "R/T-1 ultimate sweep/test/calibrate",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) \u2014 core/settlement_outcome.strike_crossing_direction",
+  "truth_source": "settlement_truth.strike_price (14,305 rows via /historical backfill)",
+  "n_labels": 14130,
+  "label_distribution": {
+    "down": 9275,
+    "up": 4855
+  },
+  "base_rate_up": 0.343595,
+  "base_rate_by_market_type": {
+    "HIGH": 0.1013,
+    "LOW": 0.946433
+  },
+  "stations": 20,
+  "temp_source_distribution": {
+    "ghcn": 13889,
+    "kalshi_finalized": 79,
+    "weatherapi": 162
+  },
+  "excluded": {
+    "between_excluded": 54,
+    "untrusted_excluded": 80,
+    "no_temp": 0,
+    "unknown_market_type": 0
+  },
+  "dry_run": false,
+  "layers_requested": [
+    "calibration",
+    "crossfeed",
+    "directional",
+    "entry_timing",
+    "exit_logic",
+    "experiment",
+    "fusion",
+    "intraday",
+    "predictions",
+    "risk_sizing",
+    "trajectory"
+  ],
+  "sweeps": [
+    "calibration",
+    "experiment",
+    "lane_gate",
+    "signal"
+  ],
+  "results": {
+    "signal": {
+      "ai_composite": {
+        "accuracy": 0.506739,
+        "mcc": 0.013028,
+        "n": 4823,
+        "tp": 1281,
+        "fp": 1218,
+        "tn": 1163,
+        "fn": 1161,
+        "base_rate_accuracy": 0.960398,
+        "base_rate_delta": -0.45366,
+        "ece": 0.460492,
+        "sharpe": 0.213962,
+        "n_returns": 4823,
+        "up_ratio_predicted": 0.5181,
+        "status": "NO_EDGE"
+      },
+      "calendar_climatology": {
+        "accuracy": 0.473684,
+        "mcc": -0.197323,
+        "n": 3078,
+        "tp": 194,
+        "fp": 810,
+        "tn": 1264,
+        "fn": 810,
+        "base_rate_accuracy": 0.907732,
+        "base_rate_delta": -0.434048,
+        "ece": 0.438523,
+        "sharpe": -0.83666,
+        "n_returns": 3078,
+        "up_ratio_predicted": 0.3262,
+        "status": "NO_EDGE"
+      },
+      "cloud_cover_index": {
+        "accuracy": 0.555005,
+        "mcc": 0.010709,
+        "n": 6054,
+        "tp": 715,
+        "fp": 1453,
+        "tn": 2645,
+        "fn": 1241,
+        "base_rate_accuracy": 0.911298,
+        "base_rate_delta": -0.356293,
+        "ece": 0.428212,
+        "sharpe": 1.757017,
+        "n_returns": 6054,
+        "up_ratio_predicted": 0.3581,
+        "status": "NO_EDGE"
+      },
+      "cooling_failure": {
+        "accuracy": 0.355224,
+        "mcc": 0.0,
+        "n": 670,
+        "tp": 238,
+        "fp": 432,
+        "tn": 0,
+        "fn": 0,
+        "base_rate_accuracy": 0.913433,
+        "base_rate_delta": -0.558209,
+        "ece": 0.426849,
+        "sharpe": -4.802216,
+        "n_returns": 670,
+        "up_ratio_predicted": 1.0,
+        "status": "NO_EDGE"
+      },
+      "corrected_pressure_delta": {
+        "accuracy": 0.494081,
+        "mcc": -0.008761,
+        "n": 7602,
+        "tp": 1246,
+        "fp": 2595,
+        "tn": 2510,
+        "fn": 1251,
+        "base_rate_accuracy": 0.90121,
+        "base_rate_delta": -0.40713,
+        "ece": 0.43733,
+        "sharpe": -0.187951,
+        "n_returns": 7602,
+        "up_ratio_predicted": 0.5053,
+        "status": "NO_EDGE"
+      },
+      "cross_model_divergence": {
+        "accuracy": 0.5126,
+        "mcc": 0.023103,
+        "n": 3611,
+        "tp": 1053,
+        "fp": 974,
+        "tn": 798,
+        "fn": 786,
+        "base_rate_accuracy": 0.959014,
+        "base_rate_delta": -0.446414,
+        "ece": 0.459125,
+        "sharpe": 0.400177,
+        "n_returns": 3611,
+        "up_ratio_predicted": 0.5613,
+        "status": "NO_EDGE"
+      },
+      "dewpoint_depression": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "dual_polarity": {
+        "accuracy": 0.494081,
+        "mcc": -0.008761,
+        "n": 7602,
+        "tp": 1246,
+        "fp": 2595,
+        "tn": 2510,
+        "fn": 1251,
+        "base_rate_accuracy": 0.90121,
+        "base_rate_delta": -0.40713,
+        "ece": 0.477553,
+        "sharpe": -0.187951,
+        "n_returns": 7602,
+        "up_ratio_predicted": 0.5053,
+        "status": "NO_EDGE"
+      },
+      "eighty_two_member_ensemble": {
+        "accuracy": 0.58017,
+        "mcc": -0.004048,
+        "n": 13515,
+        "tp": 1128,
+        "fp": 2267,
+        "tn": 6713,
+        "fn": 3407,
+        "base_rate_accuracy": 0.910322,
+        "base_rate_delta": -0.330152,
+        "ece": 0.491788,
+        "sharpe": 2.578688,
+        "n_returns": 13515,
+        "up_ratio_predicted": 0.2512,
+        "status": "NO_EDGE"
+      },
+      "eighty_two_member_ensemble_ece": {
+        "accuracy": 0.58017,
+        "mcc": -0.004048,
+        "n": 13515,
+        "tp": 1128,
+        "fp": 2267,
+        "tn": 6713,
+        "fn": 3407,
+        "base_rate_accuracy": 0.910322,
+        "base_rate_delta": -0.330152,
+        "ece": 0.491788,
+        "sharpe": 2.578688,
+        "n_returns": 13515,
+        "up_ratio_predicted": 0.2512,
+        "status": "NO_EDGE"
+      },
+      "eighty_two_member_ensemble_pooled": {
+        "accuracy": 0.541324,
+        "mcc": -0.004348,
+        "n": 13515,
+        "tp": 1657,
+        "fp": 3321,
+        "tn": 5659,
+        "fn": 2878,
+        "base_rate_accuracy": 0.910322,
+        "base_rate_delta": -0.368997,
+        "ece": 0.495014,
+        "sharpe": 1.316515,
+        "n_returns": 13515,
+        "up_ratio_predicted": 0.3683,
+        "status": "NO_EDGE"
+      },
+      "esdr": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "feels_like_delta": {
+        "accuracy": 0.500834,
+        "mcc": 0.05374,
+        "n": 4197,
+        "tp": 871,
+        "fp": 1544,
+        "tn": 1231,
+        "fn": 551,
+        "base_rate_accuracy": 0.90803,
+        "base_rate_delta": -0.407196,
+        "ece": 0.414801,
+        "sharpe": 0.026476,
+        "n_returns": 4197,
+        "up_ratio_predicted": 0.5754,
+        "status": "NO_EDGE"
+      },
+      "fogr_reversion": {
+        "accuracy": 0.338552,
+        "mcc": 0.0,
+        "n": 7154,
+        "tp": 2422,
+        "fp": 4732,
+        "tn": 0,
+        "fn": 0,
+        "base_rate_accuracy": 0.908163,
+        "base_rate_delta": -0.569611,
+        "ece": 0.413427,
+        "sharpe": -5.415927,
+        "n_returns": 7154,
+        "up_ratio_predicted": 1.0,
+        "status": "NO_EDGE"
+      },
+      "forecast_disagreement": {
+        "accuracy": 0.489744,
+        "mcc": -0.00121,
+        "n": 4680,
+        "tp": 1062,
+        "fp": 1530,
+        "tn": 1230,
+        "fn": 858,
+        "base_rate_accuracy": 0.915385,
+        "base_rate_delta": -0.425641,
+        "ece": 0.426684,
+        "sharpe": -0.325699,
+        "n_returns": 4680,
+        "up_ratio_predicted": 0.5538,
+        "status": "NO_EDGE"
+      },
+      "frontal_detector": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "frontal_passage_detector": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "frontal_passage_intraday": {
+        "accuracy": 0.658241,
+        "mcc": 0.10809,
+        "n": 2809,
+        "tp": 200,
+        "fp": 261,
+        "tn": 1649,
+        "fn": 699,
+        "base_rate_accuracy": 0.897472,
+        "base_rate_delta": -0.239231,
+        "ece": 0.395495,
+        "sharpe": 5.296244,
+        "n_returns": 2809,
+        "up_ratio_predicted": 0.1641,
+        "status": "NO_EDGE"
+      },
+      "frontal_passage_nowcast": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "gaussian": {
+        "accuracy": 0.498922,
+        "mcc": -0.151519,
+        "n": 5568,
+        "tp": 386,
+        "fp": 1364,
+        "tn": 2392,
+        "fn": 1426,
+        "base_rate_accuracy": 0.904634,
+        "base_rate_delta": -0.405711,
+        "ece": 0.592126,
+        "sharpe": -0.034212,
+        "n_returns": 5568,
+        "up_ratio_predicted": 0.3143,
+        "status": "NO_EDGE"
+      },
+      "gaussian_v2": {
+        "accuracy": 0.507417,
+        "mcc": -0.044898,
+        "n": 9438,
+        "tp": 1217,
+        "fp": 2678,
+        "tn": 3572,
+        "fn": 1971,
+        "base_rate_accuracy": 0.907925,
+        "base_rate_delta": -0.400509,
+        "ece": 0.505667,
+        "sharpe": 0.235503,
+        "n_returns": 9438,
+        "up_ratio_predicted": 0.4127,
+        "status": "NO_EDGE"
+      },
+      "goldilocks": {
+        "accuracy": 0.492647,
+        "mcc": -0.028408,
+        "n": 7344,
+        "tp": 1236,
+        "fp": 2260,
+        "tn": 2382,
+        "fn": 1466,
+        "base_rate_accuracy": 0.90482,
+        "base_rate_delta": -0.412173,
+        "ece": 0.409438,
+        "sharpe": -0.233474,
+        "n_returns": 7344,
+        "up_ratio_predicted": 0.476,
+        "status": "NO_EDGE"
+      },
+      "intraday_metar_confirmation": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "metar_dtdt": {
+        "accuracy": 0.601995,
+        "mcc": 0.009252,
+        "n": 8221,
+        "tp": 342,
+        "fp": 543,
+        "tn": 4607,
+        "fn": 2729,
+        "base_rate_accuracy": 0.907067,
+        "base_rate_delta": -0.305072,
+        "ece": 0.417753,
+        "sharpe": 3.30779,
+        "n_returns": 8221,
+        "up_ratio_predicted": 0.1077,
+        "status": "NO_EDGE"
+      },
+      "metar_nowcast": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "metar_trend": {
+        "accuracy": 0.51612,
+        "mcc": 0.027108,
+        "n": 14020,
+        "tp": 2441,
+        "fp": 4424,
+        "tn": 4795,
+        "fn": 2360,
+        "base_rate_accuracy": 0.912126,
+        "base_rate_delta": -0.396006,
+        "ece": 0.422443,
+        "sharpe": 0.512055,
+        "n_returns": 14020,
+        "up_ratio_predicted": 0.4897,
+        "status": "NO_EDGE"
+      },
+      "nwp_analog": {
+        "accuracy": 0.490779,
+        "mcc": -0.022501,
+        "n": 4609,
+        "tp": 1371,
+        "fp": 1369,
+        "tn": 891,
+        "fn": 978,
+        "base_rate_accuracy": 0.962031,
+        "base_rate_delta": -0.471252,
+        "ece": 0.462317,
+        "sharpe": -0.29281,
+        "n_returns": 4609,
+        "up_ratio_predicted": 0.5945,
+        "status": "NO_EDGE"
+      },
+      "nwp_analog_ensemble": {
+        "accuracy": 0.490779,
+        "mcc": -0.022501,
+        "n": 4609,
+        "tp": 1371,
+        "fp": 1369,
+        "tn": 891,
+        "fn": 978,
+        "base_rate_accuracy": 0.962031,
+        "base_rate_delta": -0.471252,
+        "ece": 0.462317,
+        "sharpe": -0.29281,
+        "n_returns": 4609,
+        "up_ratio_predicted": 0.5945,
+        "status": "NO_EDGE"
+      },
+      "nwp_direct": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "nwp_dtdt_fusion": {
+        "accuracy": 0.589785,
+        "mcc": 0.106165,
+        "n": 9829,
+        "tp": 1392,
+        "fp": 1540,
+        "tn": 4405,
+        "fn": 2492,
+        "base_rate_accuracy": 0.915658,
+        "base_rate_delta": -0.325872,
+        "ece": 0.43679,
+        "sharpe": 2.897698,
+        "n_returns": 9829,
+        "up_ratio_predicted": 0.2983,
+        "status": "NO_EDGE"
+      },
+      "pressure_delta": {
+        "accuracy": 0.506057,
+        "mcc": 0.00905,
+        "n": 7594,
+        "tp": 1250,
+        "fp": 2507,
+        "tn": 2593,
+        "fn": 1244,
+        "base_rate_accuracy": 0.901238,
+        "base_rate_delta": -0.39518,
+        "ece": 0.407451,
+        "sharpe": 0.192331,
+        "n_returns": 7594,
+        "up_ratio_predicted": 0.4947,
+        "status": "NO_EDGE"
+      },
+      "pressure_tendency": {
+        "accuracy": 0.573348,
+        "mcc": 0.033245,
+        "n": 893,
+        "tp": 103,
+        "fp": 187,
+        "tn": 409,
+        "fn": 194,
+        "base_rate_accuracy": 0.853303,
+        "base_rate_delta": -0.279955,
+        "ece": 0.349921,
+        "sharpe": 2.354204,
+        "n_returns": 893,
+        "up_ratio_predicted": 0.3247,
+        "status": "NO_EDGE"
+      },
+      "radiational_cooling": {
+        "accuracy": 0.770833,
+        "mcc": 0.0,
+        "n": 144,
+        "tp": 0,
+        "fp": 0,
+        "tn": 111,
+        "fn": 33,
+        "base_rate_accuracy": 0.909722,
+        "base_rate_delta": -0.138889,
+        "ece": 0.423865,
+        "sharpe": 10.229312,
+        "n_returns": 144,
+        "up_ratio_predicted": 0.0,
+        "status": "NO_EDGE"
+      },
+      "regime": {
+        "accuracy": 0.578431,
+        "mcc": -0.135336,
+        "n": 204,
+        "tp": 6,
+        "fp": 57,
+        "tn": 112,
+        "fn": 29,
+        "base_rate_accuracy": 0.941176,
+        "base_rate_delta": -0.362745,
+        "ece": 0.489358,
+        "sharpe": 2.521332,
+        "n_returns": 204,
+        "up_ratio_predicted": 0.3088,
+        "status": "NO_EDGE"
+      },
+      "seasonal_regime": {
+        "accuracy": 0.464135,
+        "mcc": 0.055161,
+        "n": 9243,
+        "tp": 2344,
+        "fp": 4090,
+        "tn": 1946,
+        "fn": 863,
+        "base_rate_accuracy": 0.920697,
+        "base_rate_delta": -0.456562,
+        "ece": 0.396131,
+        "sharpe": -1.141618,
+        "n_returns": 9243,
+        "up_ratio_predicted": 0.6961,
+        "status": "NO_EDGE"
+      },
+      "settlement_arbitrage": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "spike_reversion": {
+        "accuracy": 0.619023,
+        "mcc": 0.0,
+        "n": 3848,
+        "tp": 0,
+        "fp": 0,
+        "tn": 2382,
+        "fn": 1466,
+        "base_rate_accuracy": 0.891372,
+        "base_rate_delta": -0.272349,
+        "ece": 0.435568,
+        "sharpe": 3.890701,
+        "n_returns": 3848,
+        "up_ratio_predicted": 0.0,
+        "status": "NO_EDGE"
+      },
+      "spread_based_entry": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "temperature_advection": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "trajectory_state_vector": {
+        "accuracy": 0.494907,
+        "mcc": -0.014849,
+        "n": 13057,
+        "tp": 2192,
+        "fp": 4252,
+        "tn": 4270,
+        "fn": 2343,
+        "base_rate_accuracy": 0.912078,
+        "base_rate_delta": -0.417171,
+        "ece": 0.439389,
+        "sharpe": -0.161708,
+        "n_returns": 13057,
+        "up_ratio_predicted": 0.4935,
+        "status": "NO_EDGE"
+      },
+      "volume_momentum": {
+        "status": "NO_FIRES",
+        "reason": "signal never produced a direction on any label"
+      },
+      "warm_momentum": {
+        "accuracy": 0.353751,
+        "mcc": 0.0,
+        "n": 6759,
+        "tp": 2391,
+        "fp": 4368,
+        "tn": 0,
+        "fn": 0,
+        "base_rate_accuracy": 0.905607,
+        "base_rate_delta": -0.551857,
+        "ece": 0.413269,
+        "sharpe": -4.855633,
+        "n_returns": 6759,
+        "up_ratio_predicted": 1.0,
+        "status": "NO_EDGE"
+      },
+      "wind_direction_shift": {
+        "accuracy": 0.49904,
+        "mcc": 0.032189,
+        "n": 1563,
+        "tp": 245,
+        "fp": 591,
+        "tn": 535,
+        "fn": 192,
+        "base_rate_accuracy": 0.893794,
+        "base_rate_delta": -0.394754,
+        "ece": 0.392637,
+        "sharpe": -0.030469,
+        "n_returns": 1563,
+        "up_ratio_predicted": 0.5349,
+        "status": "NO_EDGE"
+      }
+    },
+    "lane_gate": {
+      "lanes": {
+        "forecasting_ensemble": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "sure_thing": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "goldilocks": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "trajectory": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "nowcasting": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "radiational_cooling": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        }
+      },
+      "gates": {
+        "agreement": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "settlement_execution": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "production": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "station_skill": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "liquidity": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "trajectory_confirmation": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "spatial_coherence": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "adaptive_thresholds": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        },
+        "crossfeed": {
+          "reachable": true,
+          "status": "reachable",
+          "reason": null
+        }
+      },
+      "fusion_modes": {
+        "none": {
+          "reachable": true,
+          "status": "reachable"
+        },
+        "uwc": {
+          "reachable": true,
+          "status": "reachable"
+        },
+        "majority": {
+          "reachable": true,
+          "status": "reachable"
+        },
+        "weighted": {
+          "reachable": true,
+          "status": "reachable"
+        }
+      },
+      "calibration_modes": {
+        "platt": {
+          "reachable": true,
+          "status": "reachable"
+        },
+        "bma": {
+          "reachable": true,
+          "status": "reachable"
+        },
+        "emos": {
+          "reachable": true,
+          "status": "reachable"
+        },
+        "both": {
+          "reachable": true,
+          "status": "reachable"
+        }
+      }
+    },
+    "calibration": {
+      "ai_composite": {
+        "status": "SCORED",
+        "brier": 0.4024,
+        "ece": 0.3794,
+        "n": 4823
+      },
+      "calendar_climatology": {
+        "status": "SCORED",
+        "brier": 0.2633,
+        "ece": 0.1458,
+        "n": 3078
+      },
+      "cloud_cover_index": {
+        "status": "SCORED",
+        "brier": 0.2492,
+        "ece": 0.1469,
+        "n": 6054
+      },
+      "cooling_failure": {
+        "status": "SCORED",
+        "brier": 0.231,
+        "ece": 0.0448,
+        "n": 670
+      },
+      "corrected_pressure_delta": {
+        "status": "SCORED",
+        "brier": 0.3809,
+        "ece": 0.353,
+        "n": 7602
+      },
+      "cross_model_divergence": {
+        "status": "SCORED",
+        "brier": 0.3969,
+        "ece": 0.3617,
+        "n": 3611
+      },
+      "dewpoint_depression": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "dual_polarity": {
+        "status": "SCORED",
+        "brier": 0.4098,
+        "ece": 0.3716,
+        "n": 7602
+      },
+      "eighty_two_member_ensemble": {
+        "status": "SCORED",
+        "brier": 0.3782,
+        "ece": 0.3678,
+        "n": 13515
+      },
+      "eighty_two_member_ensemble_ece": {
+        "status": "SCORED",
+        "brier": 0.3782,
+        "ece": 0.3678,
+        "n": 13515
+      },
+      "eighty_two_member_ensemble_pooled": {
+        "status": "SCORED",
+        "brier": 0.3721,
+        "ece": 0.3496,
+        "n": 13515
+      },
+      "esdr": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "feels_like_delta": {
+        "status": "SCORED",
+        "brier": 0.2578,
+        "ece": 0.1632,
+        "n": 4197
+      },
+      "fogr_reversion": {
+        "status": "SCORED",
+        "brier": 0.2365,
+        "ece": 0.0882,
+        "n": 7154
+      },
+      "forecast_disagreement": {
+        "status": "SCORED",
+        "brier": 0.3951,
+        "ece": 0.3597,
+        "n": 4680
+      },
+      "frontal_detector": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "frontal_passage_detector": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "frontal_passage_intraday": {
+        "status": "SCORED",
+        "brier": 0.2374,
+        "ece": 0.1429,
+        "n": 2809
+      },
+      "frontal_passage_nowcast": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "gaussian": {
+        "status": "SCORED",
+        "brier": 0.5011,
+        "ece": 0.5011,
+        "n": 5568
+      },
+      "gaussian_v2": {
+        "status": "SCORED",
+        "brier": 0.4209,
+        "ece": 0.3889,
+        "n": 9438
+      },
+      "goldilocks": {
+        "status": "SCORED",
+        "brier": 0.2749,
+        "ece": 0.1479,
+        "n": 7344
+      },
+      "intraday_metar_confirmation": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "metar_dtdt": {
+        "status": "SCORED",
+        "brier": 0.2835,
+        "ece": 0.2126,
+        "n": 8221
+      },
+      "metar_nowcast": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "metar_trend": {
+        "status": "SCORED",
+        "brier": 0.256,
+        "ece": 0.1667,
+        "n": 14020
+      },
+      "nwp_analog": {
+        "status": "SCORED",
+        "brier": 0.259,
+        "ece": 0.0777,
+        "n": 4609
+      },
+      "nwp_analog_ensemble": {
+        "status": "SCORED",
+        "brier": 0.259,
+        "ece": 0.0777,
+        "n": 4609
+      },
+      "nwp_direct": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "nwp_dtdt_fusion": {
+        "status": "SCORED",
+        "brier": 0.2786,
+        "ece": 0.2051,
+        "n": 9829
+      },
+      "pressure_delta": {
+        "status": "SCORED",
+        "brier": 0.3279,
+        "ece": 0.2776,
+        "n": 7594
+      },
+      "pressure_tendency": {
+        "status": "SCORED",
+        "brier": 0.2625,
+        "ece": 0.1393,
+        "n": 893
+      },
+      "radiational_cooling": {
+        "status": "SCORED",
+        "brier": 0.4249,
+        "ece": 0.4785,
+        "n": 144
+      },
+      "regime": {
+        "status": "SCORED",
+        "brier": 0.291,
+        "ece": 0.3485,
+        "n": 204
+      },
+      "seasonal_regime": {
+        "status": "SCORED",
+        "brier": 0.3711,
+        "ece": 0.341,
+        "n": 9243
+      },
+      "settlement_arbitrage": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "spike_reversion": {
+        "status": "SCORED",
+        "brier": 0.286,
+        "ece": 0.1793,
+        "n": 3848
+      },
+      "spread_based_entry": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "temperature_advection": {
+        "status": "SKIPPED",
+        "reason": "slow_or_live_api"
+      },
+      "trajectory_state_vector": {
+        "status": "SCORED",
+        "brier": 0.3406,
+        "ece": 0.2937,
+        "n": 13057
+      },
+      "volume_momentum": {
+        "status": "NO_FIRES",
+        "reason": "no predictions produced"
+      },
+      "warm_momentum": {
+        "status": "SCORED",
+        "brier": 0.25,
+        "ece": 0.1462,
+        "n": 6759
+      },
+      "wind_direction_shift": {
+        "status": "SCORED",
+        "brier": 0.3279,
+        "ece": 0.3235,
+        "n": 1563
+      }
+    },
+    "experiment": {
+      "dtw": {
+        "present": [
+          "a1_dtw_directional.py",
+          "a2_dtw_normalize.py",
+          "a3_dtw_matching.py",
+          "a4_dtw_seasonal_check.py",
+          "a5_dtw_scaletest.py"
+        ],
+        "missing": [],
+        "status": "present"
+      },
+      "gaussian": {
+        "present": [
+          "apply_gaussian_fusion.py"
+        ],
+        "missing": [],
+        "status": "present"
+      },
+      "goldilocks": {
+        "present": [
+          "goldilocks_feature_engineering.py"
+        ],
+        "missing": [],
+        "status": "present"
+      },
+      "kalman": {
+        "present": [
+          "experiment_option2_kalman_smoothing.py"
+        ],
+        "missing": [],
+        "status": "present"
+      },
+      "trajectory": {
+        "present": [
+          "trajectory_dtw_replay.py"
+        ],
+        "missing": [],
+        "status": "present"
+      },
+      "nwp_analog": {
+        "present": [
+          "backtest_nwp_analog_knn.py"
+        ],
+        "missing": [],
+        "status": "present"
+      }
+    }
+  },
+  "elapsed_seconds": 1456.2
+}
