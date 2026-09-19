@@ -119,23 +119,30 @@ def load_nwp_features(conn_nwp):
 
 
 def load_metar_directions(conn_metar):
-    """Load daily HIGH temperature directions from settlement_epochs.
-    direction = 'up' if settlement_bucket > prior_settlement_bucket.
+    """Load daily HIGH temperature directions from settlement_truth.
+    direction = 'up' if settlement_temp_f > strike_price (strike-crossing).
     Returns dict: {station: {date: 'up'/'down'}}"""
     cur = conn_metar.cursor()
     cur.execute("""
-        SELECT station, local_trading_date, settlement_bucket, prior_settlement_bucket
-        FROM settlement_epochs
-        WHERE market_type='HIGH' 
-          AND prior_settlement_bucket IS NOT NULL
-          AND epoch_status='closed'
+        SELECT station, local_trading_date, settlement_temp_f, strike_price
+        FROM settlement_truth
+        WHERE market_type='HIGH'
+          AND trustworthy = 1
+          AND strike_price IS NOT NULL
         ORDER BY local_trading_date
     """)
     
     directions = defaultdict(dict)
-    for station, date, bucket, prior in cur.fetchall():
-        if bucket is not None and prior is not None:
-            directions[station][date] = 'up' if bucket > prior else 'down'
+    for station, date, bucket, strike in cur.fetchall():
+        if bucket is not None and strike is not None:
+            directions[station][date] = 'up' if bucket > strike else 'down'
+    
+    return directions
+    
+    directions = defaultdict(dict)
+    for station, date, bucket, strike in cur.fetchall():
+        if bucket is not None and strike is not None:
+            directions[station][date] = 'up' if bucket > strike else 'down'
     
     return directions
 

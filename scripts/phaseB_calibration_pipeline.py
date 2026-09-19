@@ -33,6 +33,7 @@ from core.unified_backtest import (
     compute_sharpe, compute_brier, compute_ece
 )
 from core.signals import SignalRegistry
+from core.settlement_outcome import strike_crossing_direction
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s', stream=sys.stdout)
 logger = logging.getLogger(__name__)
@@ -161,10 +162,14 @@ def run_phaseB_calibration(db_path: str, output_path: str) -> dict:
                 actual = market.get(date)
                 if actual is None or actual['settlement_bucket'] is None:
                     continue
-                prev_bucket = actual.get('prev_bucket')
-                if prev_bucket is None:
+                if actual.get('trustworthy') == 0:
                     continue
-                actual_direction = 'up' if actual['settlement_bucket'] > prev_bucket else 'down'
+                # Strike-crossing ground truth (HIGH). None => skip (do not fall back
+                # to day-over-day; that was the axis conflation).
+                actual_direction = strike_crossing_direction(
+                    actual['settlement_bucket'], actual.get('strike_price'), 'HIGH')
+                if actual_direction is None:
+                    continue
                 total_trading_days.add((station, date))
 
                 for sig_name, sig in signal_objects.items():

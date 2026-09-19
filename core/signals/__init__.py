@@ -94,13 +94,15 @@ class SignalRegistry:
             # ── Radiational Cooling (LOW only) ──
             'radiational_cooling': RadiationalCoolingSignal(db_path),
 
+            # ── Physics-Corrected Pressure Delta (revived 2026-09-18) ──
+            'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
+
             # SpikeReversionSignal removed — Fix 5: 49.85% accuracy (negative EV)
             # GoldilocksSignal removed — same signal, same negative EV
         }
 
         # REMOVED from registry (verified by settlement validation 2026-07-25):
         # wind_direction_shift         — 49.72% settlement accuracy (below coin flip)
-        # corrected_pressure_delta     — MCC=-0.2167 (actively harmful)
 
     def get_signal(self, signal_name: str):
         """Get a signal by name."""

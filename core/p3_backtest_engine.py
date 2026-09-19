@@ -28,6 +28,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from core.p3_feature_extractor import extract_features_from_epoch, FeatureVector
+from core.settlement_outcome import strike_crossing_direction
 from core.p3_match_engine import find_similar_epochs, get_top_analogs
 from core.p3_trajectory_tracer import trace_all_trajectories
 from core.p3_calibration_engine import calculate_confidence
@@ -223,8 +224,13 @@ class Phase3BacktestEngine:
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
-    def determine_direction(self, bucket: int, prior_bucket: Optional[int]) -> str:
-        """Determine direction based on bucket change."""
+    def determine_direction(self, bucket: int, prior_bucket: Optional[int], strike_price: Optional[float] = None, market_type: str = "HIGH") -> str:
+        """Determine direction via strike-crossing (ground truth) when a strike is
+        available; otherwise fall back to day-over-day (best effort for legacy
+        callers that do not yet supply a strike)."""
+        d = strike_crossing_direction(bucket, strike_price, market_type)
+        if d is not None:
+            return d
         if prior_bucket is None:
             return 'flat'
         if bucket > prior_bucket:
@@ -322,10 +328,11 @@ class Phase3BacktestEngine:
                 predicted_direction = 'flat'
                 predicted_bucket = query_epoch.get('settlement_bucket', 0)
             
-            # Determine actual direction
+            # Determine actual direction (strike-crossing when strike is present)
             actual_bucket = query_epoch.get('settlement_bucket', 0)
             prior_bucket = query_epoch.get('prior_settlement_bucket')
-            actual_direction = self.determine_direction(actual_bucket, prior_bucket)
+            strike_price = query_epoch.get('strike_price')
+            actual_direction = self.determine_direction(actual_bucket, prior_bucket, strike_price, 'HIGH')
             
             # Calculate trajectory from analogs
             analog_trajectory = []

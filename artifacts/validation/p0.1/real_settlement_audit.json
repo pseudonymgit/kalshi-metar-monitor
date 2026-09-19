@@ -1,0 +1,27 @@
+{
+  "audit_version": "settlement-audit-2026-08-20-v1",
+  "blockers": [
+    "no raw settlement payload per row",
+    "no contract rule/version hash per row",
+    "no finalization timestamp per row",
+    "no source publication/availability evidence per row",
+    "series-to-station rule mapping requires external contract evidence"
+  ],
+  "conclusion": "REAL_DERIVED_SETTLEMENT_TABLE_BUT_NOT_CONTRACT_PROOF",
+  "db": "data/kalshi_settlements.db",
+  "db_sha256": "53b7438acc362d239305d73e4029df69755e4c1a76e398a473aaedc69442b496",
+  "duplicate_event_keys": 1,
+  "max_target_date": "2026-08-16",
+  "min_target_date": "2021-08-19",
+  "nonproduction_station_rows": 1,
+  "row_count": 9607,
+  "rows_without_finalized_count": 7106,
+  "rows_without_temp": 1635,
+  "series_count": 40,
+  "source_type_counts": {
+    "finalized": 2510,
+    "historical_api": 7097
+  },
+  "station_count": 21,
+  "usable_for_p0.1": false
+}

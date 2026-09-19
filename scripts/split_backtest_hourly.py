@@ -41,6 +41,8 @@ import json
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+from core.settlement_outcome import strike_crossing_direction
 METAR_DB = str(REPO_ROOT / "data" / "metar_backfill.db")
 NWP_DB = str(REPO_ROOT / "data" / "nwp_forecasts.db")
 CLIMATE_DATA_DIR = str(REPO_ROOT / "data" / "climate_indices")
@@ -274,7 +276,7 @@ def load_settlement_data(start_date=None, end_date=None):
     query = """
         SELECT ds.station, ds.date_utc, ds.max_temp_f, ds.min_temp_f,
                se.settlement_bucket, se.prior_settlement_bucket,
-               se.local_trading_date
+               se.local_trading_date, se.strike_price
         FROM daily_stats ds
         JOIN settlement_epochs se
         ON ds.date_utc = se.local_trading_date AND ds.station = se.station
@@ -361,8 +363,12 @@ def load_climate_indices():
     return indices
 
 
-def get_actual_direction(settlement, prior):
-    """Determine actual direction from settlement data."""
+def get_actual_direction(settlement, prior, strike=None, market_type='HIGH'):
+    """Determine actual direction — strike-crossing (ground truth) when strike is
+    known, else day-over-day fallback (legacy)."""
+    d = strike_crossing_direction(settlement, strike, market_type)
+    if d is not None:
+        return d
     if settlement > prior:
         return 'up'
     elif settlement < prior:
@@ -775,12 +781,12 @@ def main():
             if args.verbose and idx % 500 == 0:  # Show progress for large datasets
                 print(f"  Processing row {idx+1}/{len(station_rows)} for {station}")
 
-            st, date, max_temp, min_temp, settlement, prior, trade_date = row
+            st, date, max_temp, min_temp, settlement, prior, trade_date, strike = row
 
             # Determine realized direction for the next tradable observation.
             next_row = station_rows[idx + 1]
-            _, _, _, _, next_settlement, next_prior, _ = next_row
-            actual_dir = get_actual_direction(next_settlement, next_prior)
+            _, _, _, _, next_settlement, next_prior, _, next_strike = next_row
+            actual_dir = get_actual_direction(next_settlement, next_prior, next_strike, 'HIGH')
             if actual_dir == 'flat': continue  # Skip when no clear direction
 
             # Get predictions from each signal and record trades

@@ -1,14 +1,18 @@
 """
 signal_families.py — Signal Taxonomy Registry for Multi-Signal Fusion
 
-Maps all 39 registered signals into families, pools, and metadata per the
+Maps all 48 unique registered signals into families, pools, and metadata per the
 Multi-Signal Fusion Spec (docs/plans/MULTI-SIGNAL-FUSION-SPEC.md).
 
-Family A: Temperature Prediction (10 signals) — fused in Layer 1
-Family B: Temperature Modulators (8 signals)  — modulate Layer 1 output in Layer 2
+Family A: Temperature Prediction (14 signals) — fused in Layer 1
+Family B: Temperature Modulators (12 signals) — modulate Layer 1 output in Layer 2
 Family C: Microstructure / Market (5 signals) — enter Layer 3 (bet sizing)
-Family D: Regime / State (6 signals)          — precision modulators (Layer 1/Layer 4)
-Family E: Dead / Killed / Orphaned (10 signals) — excluded from fusion
+Family D: Regime / State (8 signals)          — precision modulators (Layer 1/Layer 4)
+Family E: Dead / Killed / Orphaned (9 signals) — excluded from fusion
+
+NOTE: This is a TAXONOMY/metadata layer, not an execution registry. The live
+execution registry is core/signals/__init__.py::SignalRegistry (12 wired signals).
+See docs/plans/SIGNAL-REGISTRY-RECONCILIATION-2026-09-17.md for the reconciliation.
 """
 
 import logging
@@ -89,8 +93,8 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
     "nwp_analog_signal": SignalEntry(
         module_name="nwp_analog_signal",
         family="A", pool="nwp_direct",
-        description="k-NN historical analog (KILLED — 32.63% accuracy)",
-        status="KILLED",
+        description="k-NN historical analog (revived 2026-09-18 — testable, nwp_forecasts.db populated)",
+        status="ACTIVE",
         baseline_correlation_to_gefs=0.32,
         freshness_hours=6.0,
     ),
@@ -324,8 +328,18 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
     "goldilocks_signal": SignalEntry(
         module_name="goldilocks_signal",
         family="E", pool=None,
-        description="KILLED — 49.85% negative EV",
+        description="KILLED — 49.85% negative EV (daily goldilocks)",
         status="KILLED",
+    ),
+    "microstructure_spike_reversion": SignalEntry(
+        module_name="microstructure_spike_reversion",
+        family="C", pool="market",
+        description="Real-time intraday spike-reversion edge (separated from killed daily goldilocks; wired via alert_schema + position_sizing 0.80 weight)",
+        status="ACTIVE",
+        timescale="intraday",
+        baseline_correlation_to_gefs=0.0,
+        freshness_hours=1.0,
+        module_path="core",
     ),
     "late_day_momentum": SignalEntry(
         module_name="late_day_momentum",
@@ -334,12 +348,9 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
         status="KILLED",
         module_path="core",
     ),
-    "nwp_analog_signal": SignalEntry(
-        module_name="nwp_analog_signal",
-        family="E", pool=None,
-        description="KILLED — 32.63% (also in Family A)",
-        status="KILLED",
-    ),
+    # NOTE: `nwp_analog_signal` duplicate (Family E) removed 2026-09-17 —
+    # the authoritative entry is the Family A KILLED entry above. The code path
+    # still exists (core/signals/nwp_analog_signal.py, gated by NWP_ANALOG_ENABLED).
     "intraday_metar_confirmation": SignalEntry(
         module_name="intraday_metar_confirmation",
         family="E", pool=None,

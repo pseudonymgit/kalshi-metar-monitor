@@ -32,6 +32,7 @@ from core.unified_backtest import (
     compute_sharpe, compute_brier, compute_ece, max_drawdown
 )
 from core.signals import SignalRegistry
+from core.settlement_outcome import strike_crossing_direction
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
@@ -100,11 +101,14 @@ def run_single_signal_backtest(
                 actual = market.get(date)
                 if actual is None or actual['settlement_bucket'] is None:
                     continue
-
-                prev_bucket = actual.get('prev_bucket')
-                if prev_bucket is None:
+                if actual.get('trustworthy') == 0:
                     continue
-                actual_direction = 'up' if actual['settlement_bucket'] > prev_bucket else 'down'
+
+                # Strike-crossing ground truth (HIGH). None => skip.
+                actual_direction = strike_crossing_direction(
+                    actual['settlement_bucket'], actual.get('strike_price'), 'HIGH')
+                if actual_direction is None:
+                    continue
                 total_possible += 1
 
                 try:
@@ -197,7 +201,6 @@ def run_single_signal_backtest(
             continue
         st_trades = 0
         st_correct = 0
-        prev_bucket = None
         start = train_days
         while start + test_days <= len(days2):
             for idx in range(start, min(start + test_days, len(days2))):
@@ -205,10 +208,12 @@ def run_single_signal_backtest(
                 actual = market2.get(date)
                 if actual is None or actual['settlement_bucket'] is None:
                     continue
-                prev_bucket = actual.get('prev_bucket')
-                if prev_bucket is None:
+                if actual.get('trustworthy') == 0:
                     continue
-                actual_direction = 'up' if actual['settlement_bucket'] > prev_bucket else 'down'
+                actual_direction = strike_crossing_direction(
+                    actual['settlement_bucket'], actual.get('strike_price'), 'HIGH')
+                if actual_direction is None:
+                    continue
                 try:
                     direction, confidence = sig.evaluate(idx, days2)
                 except Exception:

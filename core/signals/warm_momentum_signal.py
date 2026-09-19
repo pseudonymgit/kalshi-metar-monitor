@@ -4,6 +4,10 @@ Warm Momentum Signal — Detects sustained warm temperature momentum
 using multi-day temperature trends.
 
 B-Mode compliant. No AI/ML.
+
+STATUS: BACKTEST-ONLY (2026-09-17 reconciliation). evaluate() has real logic;
+evaluate_for_station() is a hollow stub (return None, 0.5). Not wired to the live
+hourly loop — do NOT treat as live.
 """
 from typing import Optional, Tuple, List, Dict
 from .base_signal import BaseSignal, _safe_get, validate_signal
@@ -44,5 +48,5 @@ class WarmMomentumSignal(BaseSignal):
         return None, 0.0
 
     def evaluate_for_station(self, station: str, date: str, conn=None) -> Tuple[Optional[str], float]:
-        """Station-level evaluation."""
+        """Station-level evaluation. BACKTEST-ONLY — hollow stub, not wired to live loop."""
         return None, 0.5

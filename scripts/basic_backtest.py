@@ -82,13 +82,14 @@ def run_backtest():
     
     print("Loading settlement data...")
     
-    # Get settlement data (date, station, true direction)  
+    # Get settlement data (date, station, true direction) — strike-crossing (truth).
     cursor.execute("""
         SELECT DATE(local_trading_date) as trade_date, station, 
-               CASE WHEN settlement_bucket > prior_settlement_bucket THEN 1 ELSE 0 END as true_direction
-        FROM settlement_epochs
-        WHERE epoch_status='closed' AND market_type='HIGH'
-        AND prior_settlement_bucket IS NOT NULL
+               CASE WHEN settlement_temp_f > strike_price THEN 1 ELSE 0 END as true_direction
+        FROM settlement_truth
+        WHERE market_type='HIGH'
+        AND trustworthy = 1
+        AND strike_price IS NOT NULL
         AND station IN ({})
         ORDER BY local_trading_date ASC
     """.format(','.join(['?' for _ in stations])), stations)

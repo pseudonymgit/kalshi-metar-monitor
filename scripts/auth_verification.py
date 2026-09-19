@@ -71,8 +71,11 @@ def check_weatherapi():
         if not key:
             FAILURES.append("WEATHERAPI_KEY not set")
             return
+        # q must be a WeatherAPI-recognized location (city or lat,lon), NOT an
+        # ICAO code. "KNYC" returned 400/1006 "No matching location found",
+        # which was a false auth failure — the key itself is valid.
         resp = requests.get(
-            f"https://api.weatherapi.com/v1/current.json?key={key}&q=KNYC",
+            f"https://api.weatherapi.com/v1/current.json?key={key}&q=New York",
             timeout=15
         )
         if resp.status_code == 200:

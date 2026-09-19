@@ -29,6 +29,7 @@ if CORE_DIR not in sys.path:
 import logging
 
 from core.signals import SignalRegistry
+from core.settlement_outcome import strike_crossing_direction
 
 logger = logging.getLogger(__name__)
 from core.signal_fusion import SignalFusionEngine, TimeDecaySignalManager
@@ -90,19 +91,27 @@ def load_station_data(station, conn):
         })
 
     cur.execute("""
-        SELECT local_trading_date, settlement_bucket, reversion_occurred
-        FROM settlement_epochs
-        WHERE station=? AND market_type='HIGH' AND epoch_status='closed'
-           AND settlement_bucket IS NOT NULL
-        ORDER BY local_trading_date ASC
+        SELECT st.local_trading_date, st.settlement_temp_f, st.strike_price, st.strike_type,
+               st.trustworthy, se.reversion_occurred
+        FROM settlement_truth st
+        LEFT JOIN settlement_epochs se
+          ON se.station = st.station
+         AND se.market_type = st.market_type
+         AND se.local_trading_date = st.local_trading_date
+        WHERE st.station=? AND st.market_type='HIGH'
+           AND st.settlement_temp_f IS NOT NULL
+        ORDER BY st.local_trading_date ASC
     """, (station,))
     market = {}
     prev_bucket = None
     for r in cur.fetchall():
         market[r[0]] = {
-            'settlement_bucket': r[1],
-            'reversion': r[2] if r[2] is not None else 0,
-            'prev_bucket': prev_bucket
+            'settlement_bucket': r[1],  # settlement_temp_f (Kalshi finalized / GHCN truth)
+            'reversion': r[5] if r[5] is not None else 0,
+            'prev_bucket': prev_bucket,
+            'strike_price': r[2],
+            'strike_type': r[3],
+            'trustworthy': r[4],
         }
         prev_bucket = r[1]
     return days, market
@@ -275,10 +284,15 @@ def run_backtest(
                 # scripts/phase8_combinatorial_search.py
                 if actual['settlement_bucket'] is None:
                     continue
-                prev_bucket = actual.get('prev_bucket')
-                if prev_bucket is None:
-                    continue  # No previous day to compare
-                actual_direction = 'up' if actual['settlement_bucket'] > prev_bucket else 'down'
+                # Skip S5-flagged untrustworthy dates (2026-05-28 / 2026-08-10).
+                if actual.get('trustworthy') == 0:
+                    continue
+                # Strike-crossing ground truth (HIGH market). None => skip, do not
+                # fall back to day-over-day (that was the axis conflation).
+                actual_direction = strike_crossing_direction(
+                    actual['settlement_bucket'], actual.get('strike_price'), 'HIGH')
+                if actual_direction is None:
+                    continue
 
                 # Evaluate all signals
                 signal_outputs = []

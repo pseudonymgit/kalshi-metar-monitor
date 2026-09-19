@@ -24,6 +24,7 @@ if CORE_DIR not in sys.path:
 
 from signals import SignalRegistry
 from calibration_pipeline import CalibrationPipeline
+from settlement_outcome import strike_crossing_direction
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
@@ -72,17 +73,25 @@ def load_station_data(station, conn):
         })
 
     cur.execute("""
-        SELECT local_trading_date, settlement_bucket, reversion_occurred
-        FROM settlement_epochs
-        WHERE station=? AND market_type='HIGH' AND epoch_status='closed'
-           AND settlement_bucket IS NOT NULL
-        ORDER BY local_trading_date ASC
+        SELECT st.local_trading_date, st.settlement_temp_f, st.strike_price, st.strike_type,
+               st.trustworthy, se.reversion_occurred
+        FROM settlement_truth st
+        LEFT JOIN settlement_epochs se
+          ON se.station = st.station
+         AND se.market_type = st.market_type
+         AND se.local_trading_date = st.local_trading_date
+        WHERE st.station=? AND st.market_type='HIGH'
+           AND st.settlement_temp_f IS NOT NULL
+        ORDER BY st.local_trading_date ASC
     """, (station,))
     market = {}
     for r in cur.fetchall():
         market[r[0]] = {
-            'settlement_bucket': r[1],
-            'reversion': r[2] if r[2] is not None else 0
+            'settlement_bucket': r[1],  # settlement_temp_f (Kalshi finalized / GHCN truth)
+            'strike_price': r[2],
+            'strike_type': r[3],
+            'trustworthy': r[4],
+            'reversion': r[5] if r[5] is not None else 0,
         }
     return days, market
 
@@ -133,15 +142,11 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
             if len(days) < TRAIN_DAYS + TEST_DAYS:
                 continue
 
-            # Compute strike price from training data
-            training_temps = [
-                market[d['date']]['settlement_bucket']
-                for d in days[:TRAIN_DAYS]
-                if d['date'] in market and market[d['date']]['settlement_bucket'] is not None
-            ]
-            if not training_temps:
-                continue
-            strike = statistics.median(training_temps)
+            # NOTE (2026-09-18, Priority-0 axis correction): the previous code
+            # computed "strike" as statistics.median(training_temps) — a median-
+            # temperature PROXY, NOT the real Kalshi strike. Ground truth must be
+            # strike-crossing against the persisted Kalshi strike (settlement_epochs.
+            # strike_price). We no longer derive a proxy here.
 
             # Walk-forward backtest
             start = TRAIN_DAYS
@@ -151,8 +156,18 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
                     actual = market.get(date)
                     if actual is None or actual['settlement_bucket'] is None:
                         continue
+                    # Skip S5-flagged untrustworthy dates (Kalshi finalized disagrees
+                    # with weather truth by ~20-30 F on 2026-05-28 / 2026-08-10).
+                    if actual.get('trustworthy') == 0:
+                        continue
 
-                    actual_direction = 'up' if actual['settlement_bucket'] > strike else 'down'
+                    # Strike-crossing ground truth (HIGH market). None => strike
+                    # not persisted for this epoch; skip rather than mislabel.
+                    strike = actual.get('strike_price')
+                    actual_direction = strike_crossing_direction(
+                        actual['settlement_bucket'], strike, 'HIGH')
+                    if actual_direction is None:
+                        continue
 
                     try:
                         direction, confidence = signal_obj.evaluate(idx, days)

@@ -8,6 +8,16 @@ at each station, stores in data/kalshi_market_snapshots.db.
 Usage:
     python3 scripts/z8_kalshi_market_cron.py              # run once
     python3 scripts/z8_kalshi_market_cron.py --once        # same
+
+NOTE — naming disambiguation (z8 collision):
+    This "Z.8" / z8 label refers ONLY to this live Kalshi market snapshot
+    collector. It is DISTINCT from the abstract "z8" provenance tier named in
+    docs/plans/H1-H2-PREREGISTRATION-2026-09-17.md — that z8 is a
+    hash-pinned, point-in-time-frozen, provenance-tagged dataset tier (a
+    "lineage freeze"), which is forward-referenced and NOT yet built. This
+    script produces a live, mutating snapshot DB, not a frozen/hash-pinned
+    artifact, and does NOT satisfy that prereg requirement. Do not conflate
+    the two.
 """
 
 import argparse
@@ -45,7 +55,9 @@ STATION_SERIES: dict[str, list[str]] = {
     "KMSY": ["KXHIGHTNOLA", "KXHIGHMSY", "KXLOWTNOLA"],
     "KNYC": ["KXHIGHNY0", "KXHIGHNY", "KXLOWTNYC"],
     "KOKC": ["KXHIGHOKC", "KXHIGHTOKC", "KXLOWTOKC"],
+    "KPHL": ["KXHIGHPHIL", "KXLOWTPHIL"],
     "KPHX": ["KXHIGHTPHX", "KXHIGHPHX", "KXLOWTPHX"],
+    "KSAT": ["KXHIGHTSATX", "KXHIGHTSDF", "KXLOWTSATX", "KXLOWTSDF"],
     "KSEA": ["KXHIGHTSEA", "KXHIGHSEA", "KXLOWTSEA"],
     "KSFO": ["KXHIGHTSFO", "KXHIGHSFO", "KXLOWTSFO"],
 }

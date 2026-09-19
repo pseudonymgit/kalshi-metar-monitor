@@ -32,8 +32,12 @@ from typing import Dict, List, Optional, Tuple
 
 import requests
 
-# ── Paths ──
+# ── Canonical series map (single source of truth) ──
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(_REPO_ROOT, "scripts"))
+import kalshi_series_map as _ksm  # noqa: E402
+
+# ── Paths ──
 _DATA_DIR = os.path.join(_REPO_ROOT, "data")
 DB_PATH = os.path.join(_DATA_DIR, "kalshi_settlements.db")
 
@@ -54,7 +58,11 @@ _RATE_LIMIT_LOCK = threading.Lock()
 _LAST_REQUEST_TIME: float = 0.0
 _MIN_INTERVAL = 0.55  # ~1.8 req/sec — safe for Kalshi public tier
 
-# ── Station → Series mapping ──
+# ── Station iteration & aliasing (series resolution is CANONICAL via _ksm) ──
+# STATION_TO_KALSHI_CODE is now only the STATION ITERATION SET + resolve_station
+# aliasing. The actual series ticker is resolved by series_ticker() through the
+# canonical map (scripts/kalshi_series_map.py), which fixes the prior KXLOW<code>
+# (no 'T') bug that produced dead LOW tickers for 7 cities.
 STATION_TO_KALSHI_CODE = {
     "KATL": "TATL", "KAUS": "AUS", "KBOS": "TBOS", "KDCA": "TDC",
     "KDEN": "DEN", "KDFW": "TDAL", "KHOU": "THOU", "KLAS": "TLV",
@@ -86,12 +94,19 @@ def resolve_station(station: str) -> str:
 
 
 def series_ticker(station: str, market_type: str = "HIGH") -> Optional[str]:
+    """Return the CANONICAL live series ticker for a station and market type.
+
+    Resolves through the canonical map (scripts/kalshi_series_map.py) so the
+    correct live ticker is always used — including the KXLOWT<code> (leading 'T')
+    LOW form and the NYC 'TNYC' (not 'TNY') alias. This fixes the prior bug where
+    KXLOW<code> (no 'T') was constructed, producing dead LOW tickers for 7 cities.
+    """
     st = resolve_station(station)
-    code = STATION_TO_KALSHI_CODE.get(st)
-    if code is None:
-        return None
-    prefix = "KXHIGH" if market_type.upper() == "HIGH" else "KXLOW"
-    return f"{prefix}{code}"
+    aliases = _ksm.aliases_for(st)
+    live = aliases.get(market_type.upper(), [])
+    # Prefer the current (live) alias: first entry in the 'aliases'/'low_aliases'
+    # list (not the legacy/dead variants).
+    return live[0] if live else None
 
 
 def event_ticker(station: str, date_obj: datetime, market_type: str = "HIGH") -> Optional[str]:

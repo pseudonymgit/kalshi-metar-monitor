@@ -84,13 +84,14 @@ def _get_analytical_probability(self, station, date, signal_direction):
 
     c.execute("""
         SELECT
-            avg(CASE WHEN settlement_bucket > prior_settlement_bucket THEN 1.0 ELSE 0.0 END) as up_rate,
+            avg(CASE WHEN settlement_temp_f > strike_price THEN 1.0 ELSE 0.0 END) as up_rate,
             count(*) as sample_size
-        FROM settlement_epochs
+        FROM settlement_truth
         WHERE station = ?
+        AND market_type = 'HIGH'
         AND substr(local_trading_date, 6, 5) = ?
-        AND epoch_status = 'closed'
-        AND settlement_bucket IS NOT NULL AND prior_settlement_bucket IS NOT NULL
+        AND trustworthy = 1
+        AND settlement_temp_f IS NOT NULL AND strike_price IS NOT NULL
     """, (station, target_month_day))
 
     climatology_row = c.fetchone()
@@ -101,13 +102,14 @@ def _get_analytical_probability(self, station, date, signal_direction):
     current_month_day = date[5:10]
     c.execute("""
         SELECT
-            AVG(CASE WHEN settlement_bucket > prior_settlement_bucket THEN 1.0 ELSE 0.0 END) as trend_prob,
+            AVG(CASE WHEN settlement_temp_f > strike_price THEN 1.0 ELSE 0.0 END) as trend_prob,
             COUNT(*) as trend_samples
-        FROM settlement_epochs
+        FROM settlement_truth
         WHERE station = ?
+        AND market_type = 'HIGH'
         AND local_trading_date BETWEEN date(?, '-7 days') AND ?
-        AND epoch_status = 'closed'
-        AND settlement_bucket IS NOT NULL AND prior_settlement_bucket IS NOT NULL
+        AND trustworthy = 1
+        AND settlement_temp_f IS NOT NULL AND strike_price IS NOT NULL
     """, (station, date, date))
 
     trend_row = c.fetchone()
@@ -117,12 +119,13 @@ def _get_analytical_probability(self, station, date, signal_direction):
     # Get rolling window of last 30 days for station stability.
     # SQLite has no built-in STDDEV, so fetch the flags and compute volatility in Python.
     c.execute("""
-        SELECT CASE WHEN settlement_bucket > prior_settlement_bucket THEN 1.0 ELSE 0.0 END as up_flag
-        FROM settlement_epochs
+        SELECT CASE WHEN settlement_temp_f > strike_price THEN 1.0 ELSE 0.0 END as up_flag
+        FROM settlement_truth
         WHERE station = ?
+        AND market_type = 'HIGH'
         AND local_trading_date BETWEEN date(?, '-30 days') AND ?
-        AND epoch_status = 'closed'
-        AND settlement_bucket IS NOT NULL AND prior_settlement_bucket IS NOT NULL
+        AND trustworthy = 1
+        AND settlement_temp_f IS NOT NULL AND strike_price IS NOT NULL
     """, (station, date, date))
 
     rolling_flags = [row[0] for row in c.fetchall() if row[0] is not None]

@@ -23,15 +23,15 @@ def load_data(station: str, conn: sqlite3.Connection) -> Tuple[Dict, Dict, Dict]
     """Load LOW market data, daily HIGH temps, and daily LOW temps."""
     cur = conn.cursor()
     
-    # LOW market directions from settlement_epochs
+    # LOW market directions from settlement_truth — strike-crossing (temp < strike).
     cur.execute("""
         SELECT local_trading_date,
-               CASE WHEN settlement_bucket > prior_settlement_bucket THEN 'up'
-                    WHEN settlement_bucket < prior_settlement_bucket THEN 'down'
-                    ELSE 'flat' END as direction
-        FROM settlement_epochs
-        WHERE station = ? AND market_type = 'LOW' AND epoch_status = 'closed'
-          AND settlement_bucket IS NOT NULL AND prior_settlement_bucket IS NOT NULL
+               CASE WHEN settlement_temp_f < strike_price THEN 'down'
+                    ELSE 'up' END as direction
+        FROM settlement_truth
+        WHERE station = ? AND market_type = 'LOW'
+          AND trustworthy = 1
+          AND settlement_temp_f IS NOT NULL AND strike_price IS NOT NULL
         ORDER BY local_trading_date
     """, (station,))
     low_markets = {r[0]: r[1] for r in cur.fetchall()}

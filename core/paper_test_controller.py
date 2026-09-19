@@ -44,6 +44,7 @@ import sqlite3
 import time
 
 from core.sqlite_utils import get_sqlite_connection
+from core.settlement_outcome import strike_crossing_direction
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -561,6 +562,8 @@ class PaperTestController:
         prev_settlement_value: float,
         signal_name: str,
         lane: str = "directional",
+        strike_price: Optional[float] = None,
+        strike_type: Optional[str] = None,
     ) -> Dict:
         """
         Record a post-settlement accuracy check.
@@ -577,20 +580,25 @@ class PaperTestController:
             predicted_direction: 'up' or 'down'
             predicted_confidence: Confidence at prediction time
             settlement_value: Actual settlement temperature
-            prev_settlement_value: Previous settlement temp for comparison
+            prev_settlement_value: Previous settlement temp (retained for audit only)
             signal_name: Signal that generated this trade
             lane: Trading lane
+            strike_price: Kalshi strike for this market (ground-truth axis).
+            strike_type: 'greater'/'less'/'between'.
 
         Returns:
             Dict with settlement accuracy result
+
+        NOTE (Priority-0, 2026-09-18): "actual_direction" is now STRIKE-CROSSING,
+        not day-over-day. "flat" means "did not cross the strike", not "same temp
+        as yesterday". When strike_price is missing we mark the outcome 'unknown'
+        rather than mislabel a day-over-day move as the target.
         """
-        # Determine actual direction from settlement data
-        if settlement_value > prev_settlement_value:
-            actual_direction = "up"
-        elif settlement_value < prev_settlement_value:
-            actual_direction = "down"
-        else:
-            actual_direction = "flat"
+        # Determine actual direction via strike-crossing (ground truth).
+        actual_direction = strike_crossing_direction(
+            settlement_value, strike_price, market_type)
+        if actual_direction is None:
+            actual_direction = "unknown"
 
         was_correct = 1 if predicted_direction == actual_direction else 0
 
@@ -602,6 +610,8 @@ class PaperTestController:
             "predicted_direction": predicted_direction,
             "predicted_confidence": round(predicted_confidence, 4),
             "settlement_value": settlement_value,
+            "strike_price": strike_price,
+            "strike_type": strike_type,
             "prev_settlement_value": prev_settlement_value,
             "actual_direction": actual_direction,
             "was_correct": was_correct,
@@ -807,7 +817,7 @@ def _self_test():
         assert summary["shadow_trades"] == 1
         print(f"Test 6 PASS: shadow summary={summary['shadow_trades']} trades")
 
-        # Test 7: Record settlement
+        # Test 7: Record settlement (strike-crossing: 88 > strike 85 => 'up')
         settlement = ctrl.record_settlement(
             epoch_id="2026-07-24_KATL_HIGH",
             station="KATL",
@@ -818,6 +828,8 @@ def _self_test():
             settlement_value=88.0,
             prev_settlement_value=85.0,
             signal_name="gaussian",
+            strike_price=85.0,
+            strike_type="greater",
         )
         assert settlement["actual_direction"] == "up"
         assert settlement["was_correct"] == 1

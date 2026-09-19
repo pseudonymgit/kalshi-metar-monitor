@@ -263,7 +263,9 @@ class ClimatologyPillar:
                 settlement_bucket,
                 prior_settlement_bucket,
                 local_trading_date as trade_date,
-                ABS(settlement_bucket - prior_settlement_bucket) as absolute_change
+                ABS(settlement_bucket - prior_settlement_bucket) as absolute_change,
+                strike_price,
+                strike_type
             FROM settlement_epochs
             WHERE station = ?
             AND substr(local_trading_date, 6, 5) = ?  -- Match MM-DD
@@ -284,12 +286,24 @@ class ClimatologyPillar:
         priors = [row[1] for row in results if row[1] is not None]
         absolute_changes = [row[3] for row in results if row[3] is not None]
         dates = [row[2] for row in results if row[2] is not None]
+        strikes = [row[4] for row in results if len(row) > 4]
         
-        # Calculate direction probabilities
-        up_count = sum(1 for settlement, prior in zip(settlements, priors) 
-                      if settlement > prior)
-        down_count = sum(1 for settlement, prior in zip(settlements, priors) 
-                        if settlement < prior) 
+        # Calculate direction probabilities — strike-crossing where strike is known,
+        # else fall back to day-over-day (best effort; NULL strike rows are rare).
+        up_count = 0
+        down_count = 0
+        for i, settlement in enumerate(settlements):
+            strike = strikes[i] if i < len(strikes) else None
+            if strike is not None:
+                if settlement > strike:
+                    up_count += 1
+                else:
+                    down_count += 1
+            elif i < len(priors) and priors[i] is not None:
+                if settlement > priors[i]:
+                    up_count += 1
+                else:
+                    down_count += 1
         flat_count = len(settlements) - up_count - down_count
         
         sample_size = len(settlements)

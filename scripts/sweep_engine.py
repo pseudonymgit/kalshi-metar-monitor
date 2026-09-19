@@ -334,7 +334,7 @@ def build_signal_registry():
     # _reg("persistence", "persistence_signal", "PersistenceSignal")
     # _reg("simple_trend", "simple_trend_signal", "SimpleTrendSignal")
     _reg("wind_direction_shift", "wind_direction_shift", "WindDirectionShiftSignal")
-    _reg("corrected_pressure_delta", "dual_polarity_signal", "DualPolaritySignal", wrapped_signal=None)
+    _reg("corrected_pressure_delta", "dual_polarity_signal", "CorrectedPressureDeltaSignal")
     _reg("spike_reversion", "spike_reversion_signal", "SpikeReversionSignal")
     _reg("goldilocks", "goldilocks_signal", "GoldilocksSignal")
     _reg("pressure_tendency", "pressure_tendency_signal", "PressureTendencySignal")
