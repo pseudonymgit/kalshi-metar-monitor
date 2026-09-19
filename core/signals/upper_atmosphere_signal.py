@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from core.signals.base_signal import BaseSignal, validate_signal
+from core.nwp_lookahead_gate import contemporaneous_where
 
 logger = logging.getLogger(__name__)
 
@@ -59,14 +60,20 @@ def _resolve_db(db_path: Optional[str]) -> str:
 
 def _fetch_series(conn: sqlite3.Connection, station: str, variable: str,
                  end_date: str, limit: int) -> List[Tuple[str, float]]:
-    """Return (date, value) pairs for a variable, ascending, up to end_date."""
+    """Return (date, value) pairs for a variable, ascending, up to end_date.
+
+    Contemporaneous-only gate (P0-F): only rows with fetch_date <= target_date
+    are admissible.  The upper-air fields (geopotential_height_500hPa_daily_mean,
+    temperature_850hPa_daily_mean) were 37,260 contaminated (station,target_date)
+    keys vs 2,800 contemporaneous — 34,460 keys existed ONLY via lookahead
+    (reanalysis/backfill with fetch_date > target_date).
+    """
     cur = conn.execute(
         """
         SELECT target_date, value
         FROM nwp_forecasts
         WHERE station = ? AND variable = ? AND target_date <= ?
-        ORDER BY target_date DESC LIMIT ?
-        """,
+        """ + contemporaneous_where("") + " ORDER BY target_date DESC LIMIT ?",
         (station, variable, end_date, limit),
     )
     rows = cur.fetchall()

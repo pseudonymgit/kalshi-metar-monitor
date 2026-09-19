@@ -32,6 +32,7 @@ from typing import Dict, List, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 from .base_signal import BaseSignal
+from ..nwp_lookahead_gate import contemporaneous_where
 
 # Default DB paths
 DEFAULT_NWP_DB_PATH = "/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/nwp_forecasts.db"
@@ -88,7 +89,6 @@ class CrossModelDivergenceSignal(BaseSignal):
 
             # Get the most recent forecast for this model/station/date
             # Contemporaneous-only gate (P0-F): exclude lookahead rows.
-            from ..nwp_lookahead_gate import contemporaneous_where
             cur.execute("""
                 SELECT value
                 FROM nwp_forecasts
@@ -170,9 +170,8 @@ class CrossModelDivergenceSignal(BaseSignal):
                     SELECT value FROM nwp_forecasts
                     WHERE station = ? AND target_date = ?
                       AND model = ? AND variable = 'temperature_2m_max'
-                    ORDER BY fetch_timestamp DESC
-                    LIMIT 1
-                """, (station, date_str, model))
+                """ + contemporaneous_where("") + " ORDER BY fetch_timestamp DESC LIMIT 1",
+                    (station, date_str, model))
 
                 row = nwp_cur.fetchone()
                 if row and row[0] is not None:

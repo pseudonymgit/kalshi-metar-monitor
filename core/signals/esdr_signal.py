@@ -34,6 +34,7 @@ from datetime import datetime, timedelta
 import math
 
 from .base_signal import BaseSignal, validate_signal
+from ..nwp_lookahead_gate import contemporaneous_where
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +129,7 @@ class EsdrSignal(BaseSignal):
                 FROM nwp_forecasts
                 WHERE station = ? AND model = 'ensemble'
                   AND member_index IS NOT NULL AND member_index != 0
-            """, (station,))
+            """ + contemporaneous_where(""), (station,))
             member_count = cur.fetchone()[0]
 
             if member_count < 10:
@@ -143,9 +144,8 @@ class EsdrSignal(BaseSignal):
                 WHERE station = ? AND model = 'ensemble'
                   AND variable = 'temperature_2m_max'
                   AND member_index IS NOT NULL
-                ORDER BY target_date ASC
-                LIMIT 7
-            """, (station,))
+            """ + contemporaneous_where("") + " ORDER BY target_date ASC LIMIT 7",
+                (station,))
             target_dates = [r[0] for r in cur.fetchall()]
 
             if len(target_dates) < 4:
@@ -175,7 +175,7 @@ class EsdrSignal(BaseSignal):
                       AND target_date = ?
                       AND variable = 'temperature_2m_max'
                       AND member_index IS NOT NULL AND member_index != 0
-                """, (station, td))
+                """ + contemporaneous_where(""), (station, td))
                 values = [r[0] for r in cur.fetchall() if r[0] is not None]
 
                 if len(values) >= 10:

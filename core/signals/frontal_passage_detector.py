@@ -52,12 +52,19 @@ def get_temperature_gradient_at_station(station_code, date, nwp_db_path):
         date_start = date.strftime('%Y-%m-%d')
         date_end = (date + timedelta(days=1)).strftime('%Y-%m-%d')
         
-        # Query to find nearby stations within 500km radius
+        # Query to find nearby stations within 500km radius.
+        # NOTE: this query references a legacy schema (date/station_code/
+        # latitude/longitude/temp_c) that does not match nwp_forecasts.db
+        # (fetch_date/target_date/station/variable/value), so it yields no
+        # rows against the live DB and returns None via the except below.
+        # Contemporaneous-only gate (P0-F) is still applied for correctness
+        # if the schema is ever reconciled.
         query = '''
         SELECT latitude, longitude, temp_c
         FROM nwp_forecasts 
         WHERE date BETWEEN ? AND ?
         AND station_code LIKE ?
+        AND fetch_date <= target_date
         LIMIT 10
         '''  # Limit to prevent over-processing
         

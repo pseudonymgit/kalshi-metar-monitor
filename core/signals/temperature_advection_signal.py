@@ -29,6 +29,7 @@ from typing import Optional, Tuple, List, Dict
 from datetime import datetime, timezone
 import logging
 from .base_signal import BaseSignal
+from ..nwp_lookahead_gate import contemporaneous_where
 
 logger = logging.getLogger(__name__)
 
@@ -317,12 +318,12 @@ def load_advection_history(db_path: str, station: str, window: int = ROLLING_WIN
         conn = sqlite3.connect(db_path, timeout=10)
         c = conn.cursor()
         # Query advection values from dedicated table
+        # Contemporaneous-only gate (P0-F): exclude lookahead rows.
         c.execute("""
             SELECT value FROM nwp_forecasts
             WHERE station = ? AND variable = 'advection_850hPa'
-            ORDER BY target_date DESC
-            LIMIT ?
-        """, (station, window))
+        """ + contemporaneous_where("") + " ORDER BY target_date DESC LIMIT ?",
+            (station, window))
         for row in c.fetchall():
             if row[0] is not None:
                 history.append(float(row[0]))
@@ -353,9 +354,8 @@ def _fetch_last_known_advection(db_path: str, station: str) -> Optional[float]:
             SELECT value, target_date, fetch_timestamp
             FROM nwp_forecasts
             WHERE station = ? AND variable = 'advection_850hPa'
-            ORDER BY target_date DESC, id DESC
-            LIMIT 1
-        """, (station,))
+        """ + contemporaneous_where("") + " ORDER BY target_date DESC, id DESC LIMIT 1",
+            (station,))
         row = c.fetchone()
         conn.close()
         if row is not None and row[0] is not None:
