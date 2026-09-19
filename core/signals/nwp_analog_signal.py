@@ -179,10 +179,16 @@ class NwpAnalogSignal(BaseSignal):
         cur.execute("SELECT DISTINCT station FROM nwp_forecasts ORDER BY station")
         stations = [r[0] for r in cur.fetchall()]
 
-        cur.execute("SELECT DISTINCT target_date FROM nwp_forecasts ORDER BY target_date")
+        # Contemporaneous-only gate (P0-F): analog feature pool must be built
+        # from forecasts available at/before their target date.  Without this
+        # gate, reanalysis/backfill rows (fetch_date > target_date) contaminate
+        # the historical analog library with lookahead.
+        cur.execute("""SELECT DISTINCT target_date FROM nwp_forecasts
+                       WHERE fetch_date <= target_date ORDER BY target_date""")
         dates = sorted([r[0] for r in cur.fetchall()])
 
         # Build feature dict: average across all models per (station, date, field)
+        from ..nwp_lookahead_gate import contemporaneous_where
         features = defaultdict(dict)
         for field in self.NWP_FIELDS:
             cur.execute("""
@@ -190,7 +196,7 @@ class NwpAnalogSignal(BaseSignal):
                 FROM nwp_forecasts
                 WHERE variable = ? AND value IS NOT NULL
                 GROUP BY station, target_date
-            """, (field,))
+            """ + contemporaneous_where(""), (field,))
             for station, tdate, val in cur.fetchall():
                 features[(station, tdate)][field] = val
 

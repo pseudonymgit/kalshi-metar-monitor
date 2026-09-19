@@ -112,16 +112,21 @@ class GHCNCalibrationSignal(BaseSignal):
             cur = conn.cursor()
 
             # Query GHCN records near this day-of-year, NOT year-specific
-            # GHCN is a long-term climatology reference
+            # GHCN is a long-term climatology reference.
+            # Contemporaneous-only gate (P0-H sibling): exclude observations with
+            # date > target_date so future-year records cannot inform a past
+            # prediction (lookahead in the day-of-year climatology normal).
             cur.execute("""
                 SELECT high_f, low_f
                 FROM ghcn_settlements
                 WHERE station = ? AND CAST(strftime('%j', date) AS INTEGER) BETWEEN ? AND ?
+                AND date <= ?
                 AND high_f IS NOT NULL AND low_f IS NOT NULL
             """, (
                 station.upper(),
                 max(1, target_doy - window),
                 min(366, target_doy + window),
+                target_date,
             ))
 
             rows = cur.fetchall()
@@ -135,11 +140,13 @@ class GHCNCalibrationSignal(BaseSignal):
                     SELECT high_f, low_f
                     FROM ghcn_settlements
                     WHERE station = ? AND CAST(strftime('%j', date) AS INTEGER) BETWEEN ? AND ?
+                    AND date <= ?
                     AND high_f IS NOT NULL AND low_f IS NOT NULL
                 """, (
                     station.upper(),
                     max(1, target_doy - window * 2),
                     min(366, target_doy + window * 2),
+                    target_date,
                 ))
                 rows = cur.fetchall()
                 conn.close()

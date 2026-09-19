@@ -87,14 +87,15 @@ class CrossModelDivergenceSignal(BaseSignal):
             cur = conn.cursor()
 
             # Get the most recent forecast for this model/station/date
+            # Contemporaneous-only gate (P0-F): exclude lookahead rows.
+            from ..nwp_lookahead_gate import contemporaneous_where
             cur.execute("""
                 SELECT value
                 FROM nwp_forecasts
                 WHERE station = ? AND target_date = ?
                   AND model = ? AND variable = 'temperature_2m_max'
-                ORDER BY fetch_timestamp DESC
-                LIMIT 1
-            """, (station, target_date, model))
+            """ + contemporaneous_where("") + " ORDER BY fetch_timestamp DESC LIMIT 1",
+                (station, target_date, model))
 
             row = cur.fetchone()
             conn.close()

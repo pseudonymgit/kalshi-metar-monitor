@@ -107,6 +107,7 @@ def load_nwp_features(conn_nwp):
         FROM nwp_forecasts
         WHERE variable IN ({','.join('?' * len(resolved_vars))})
           AND model IN ({model_placeholders})
+          AND fetch_date <= target_date
         GROUP BY station, target_date, variable
     """, resolved_vars + MODELS)
     

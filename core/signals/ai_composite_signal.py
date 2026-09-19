@@ -335,11 +335,12 @@ class AiCompositeSignal(BaseSignal):
         try:
             conn = sqlite3.connect(str(self.nwp_db_path), timeout=30)
             cur = conn.cursor()
+            from ..nwp_lookahead_gate import contemporaneous_where
             cur.execute("""
                 SELECT AVG(value) FROM nwp_forecasts
                 WHERE station = ? AND target_date = ? AND LOWER(model) = ? AND variable = ?
                 AND value IS NOT NULL AND value > -100 AND value < 150
-            """, (station, target_date, model.lower(), field))
+            """ + contemporaneous_where(""), (station, target_date, model.lower(), field))
             row = cur.fetchone()
             conn.close()
             if row and row[0] is not None:
