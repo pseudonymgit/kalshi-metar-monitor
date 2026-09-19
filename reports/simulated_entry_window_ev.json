@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-09-19T19:06:06.722704Z",
+  "directive": "Dan 2026-09-19: entry-WINDOW discipline re-run (drop offset, add no-bet days)",
+  "method": {
+    "entry_window": [
+      0.45,
+      0.8
+    ],
+    "hard_ceiling": 0.8,
+    "no_offset": true,
+    "entry_model": "Uniform[P-delta, P+delta], delta=0.02, symmetric (no discount)",
+    "P_model": "logistic on z-scored strike distance (empirical, non-degenerate, no offset)",
+    "fee_model": "roundtrip",
+    "spread_cost": 0.0205,
+    "n_draws": 1
+  },
+  "reproducibility": {
+    "seed": 20260919,
+    "prng": "xorshift32, per-contract key = sha256(contract identity) ^ seed"
+  },
+  "counts": {
+    "settlement_truth_rows": 1239518,
+    "distinct_contracts": 9895,
+    "settled_contracts": 9397,
+    "parse_fail": 0
+  },
+  "calibration": {
+    "HIGH-T": {
+      "a": 4.0,
+      "b": -2.6
+    },
+    "HIGH-B": {
+      "a": -3.4,
+      "b": 2.2
+    },
+    "LOW-T": {
+      "a": 2.4,
+      "b": -3.8
+    },
+    "LOW-B": {
+      "a": -2.2,
+      "b": 2.8
+    }
+  },
+  "results_by_side": {
+    "HIGH-T": {
+      "n_bet_draws": 803,
+      "n_nobet_draws": 919,
+      "n_total_draws": 1722,
+      "nobet_fraction": 0.5337,
+      "avg_P": 0.4789,
+      "avg_entry": 0.4791,
+      "ev_with_nobet": -0.02112,
+      "ev_alwaysbet": -0.020665,
+      "ev_bias_delta": 0.000455,
+      "ev_out_of_window": -0.020267,
+      "window_selects_better": -0.000853,
+      "realized_ev_on_capital": -0.009849,
+      "pnl_with_nobet": 0.006394,
+      "pnl_alwaysbet": -0.035606
+    },
+    "HIGH-B": {
+      "n_bet_draws": 2100,
+      "n_nobet_draws": 1255,
+      "n_total_draws": 3355,
+      "nobet_fraction": 0.3741,
+      "avg_P": 0.5132,
+      "avg_entry": 0.5135,
+      "ev_with_nobet": -0.021264,
+      "ev_alwaysbet": -0.020784,
+      "ev_bias_delta": 0.000481,
+      "ev_out_of_window": -0.01998,
+      "window_selects_better": -0.001285,
+      "realized_ev_on_capital": -0.01331,
+      "pnl_with_nobet": -0.006205,
+      "pnl_alwaysbet": -0.013263
+    },
+    "LOW-T": {
+      "n_bet_draws": 677,
+      "n_nobet_draws": 791,
+      "n_total_draws": 1468,
+      "nobet_fraction": 0.5388,
+      "avg_P": 0.6734,
+      "avg_entry": 0.6738,
+      "ev_with_nobet": -0.020924,
+      "ev_alwaysbet": -0.020861,
+      "ev_bias_delta": 6.3e-05,
+      "ev_out_of_window": -0.020807,
+      "window_selects_better": -0.000117,
+      "realized_ev_on_capital": -0.009649,
+      "pnl_with_nobet": -0.046908,
+      "pnl_alwaysbet": -0.019878
+    },
+    "LOW-B": {
+      "n_bet_draws": 320,
+      "n_nobet_draws": 2532,
+      "n_total_draws": 2852,
+      "nobet_fraction": 0.8878,
+      "avg_P": 0.267,
+      "avg_entry": 0.2669,
+      "ev_with_nobet": -0.021505,
+      "ev_alwaysbet": -0.020362,
+      "ev_bias_delta": 0.001143,
+      "ev_out_of_window": -0.020218,
+      "window_selects_better": -0.001287,
+      "realized_ev_on_capital": -0.002413,
+      "pnl_with_nobet": -0.023959,
+      "pnl_alwaysbet": -0.023686
+    },
+    "__OVERALL__": {
+      "n_bet_draws": 3900,
+      "n_nobet_draws": 5497,
+      "n_total_draws": 9397,
+      "nobet_fraction": 0.585,
+      "ev_with_nobet": -0.021195,
+      "ev_alwaysbet": -0.020646,
+      "ev_bias_delta": 0.000549,
+      "realized_ev_on_capital": -0.008797,
+      "pnl_with_nobet": -0.012134,
+      "pnl_alwaysbet": -0.021554
+    }
+  },
+  "verdict": {
+    "positive_net_ev_sides_with_nobet": [],
+    "real_edge_sides_realized_capital": [],
+    "overall_ev_with_nobet": -0.021195,
+    "overall_ev_alwaysbet": -0.020646,
+    "overall_ev_bias_delta": 0.000549,
+    "overall_realized_ev_on_capital": -0.008797,
+    "overall_nobet_fraction": 0.585
+  }
+}
