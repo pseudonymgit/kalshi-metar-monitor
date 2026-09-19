@@ -1447,8 +1447,8 @@ def _extract_station_from_ticker(ticker: str) -> str | None:
         "DC": "KDCA",
         "DCA": "KDCA",
         "DEN": "KDEN",
-        "DAL": "KDAL",  # Kalshi uses KXHIGHTDAL
-        "DFW": "KDAL",  # DFW airport code → DAL ticker token
+        "DAL": "KDFW",  # Kalshi uses KXHIGHTDAL; settle at canonical KDFW (KDAL is a duplicate, removed)
+        "DFW": "KDFW",  # DFW airport code → canonical KDFW station (settlement station)
         "HOU": "KHOU",  # Houston Hobby
         "LAS": "KLAS",
         "LAX": "KLAX",
