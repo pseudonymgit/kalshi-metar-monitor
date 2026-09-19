@@ -53,6 +53,9 @@ DB_PATH = os.environ.get(
 )
 FEE_RATE = MARKET_COST_MODEL.round_trip_fraction()
 
+# Synthetic fixture stations (e.g. 'TEST') excluded from all scoring paths.
+EXCLUDED_STATIONS = {"TEST"}
+
 
 def load_station_data(station, conn):
     """Load daily aggregated data and settlement market data for a station.
@@ -65,6 +68,8 @@ def load_station_data(station, conn):
     Direction is NOT computed here — callers must compare settlement_bucket
     to the strike price to determine actual market outcome.
     """
+    if str(station).upper() in EXCLUDED_STATIONS:
+        return [], {}
     cur = conn.cursor()
     cur.execute("""
         SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low,

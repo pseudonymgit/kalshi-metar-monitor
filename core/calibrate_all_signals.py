@@ -44,9 +44,14 @@ TRAIN_DAYS = 180
 TEST_DAYS = 30
 MIN_TRADES_FOR_CAL = 10
 
+# Synthetic fixture stations (e.g. 'TEST') excluded from all scoring paths.
+EXCLUDED_STATIONS = {"TEST"}
+
 
 def load_station_data(station, conn):
     """Load daily aggregated weather data and settlement market data for a station."""
+    if str(station).upper() in EXCLUDED_STATIONS:
+        return [], {}
     cur = conn.cursor()
     cur.execute("""
         SELECT date_utc, MAX(temp_f) as high, MIN(temp_f) as low,

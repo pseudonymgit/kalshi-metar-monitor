@@ -744,6 +744,7 @@ class PaperTrader:
             SELECT DISTINCT(station) FROM settlement_epochs
             WHERE local_trading_date = ?
             AND epoch_status = 'closed'
+            AND station != 'TEST'
             ORDER BY station
         """, (target_date,))
 
