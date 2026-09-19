@@ -299,8 +299,10 @@ class SeasonalRegimeClassifier(BaseSignal):
 
         current_year, current_month = days[idx]['date'][:7].split('-')
         current_month = int(current_month)
-        current_temp = _safe_get(days, idx, 'temp')
-        
+        current_temp = _safe_get(days, idx, 'temp_f')
+        if current_temp is None:
+            current_temp = _safe_get(days, idx, 'temp')
+
         if current_temp is None:
             return None, 0.0
 
@@ -345,7 +347,7 @@ class CorrectedPressureDeltaSignal(BaseSignal):
 
     @property  
     def name(self) -> str:
-        return "pressure_delta_phy_corrected"
+        return "corrected_pressure_delta"
 
     @property
     def min_lookback(self) -> int:

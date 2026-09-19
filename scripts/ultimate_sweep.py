@@ -78,6 +78,7 @@ from core.settlement_outcome import strike_crossing_direction, UP, DOWN
 METAR_DB = os.path.join(BASE, "data", "metar_backfill.db")
 NWP_DB = os.path.join(BASE, "data", "nwp_forecasts.db")
 SNAP_DB = os.path.join(BASE, "data", "kalshi_market_snapshots.db")
+WEATHERAPI_DB = os.path.join(BASE, "data", "weatherapi_archive.db")
 REPORTS_DIR = os.path.join(BASE, "reports")
 
 STATIONS = [
@@ -216,7 +217,15 @@ def _safe_import_signal(rel_module, class_name):
 def _try_instantiate(cls, **extra_kw):
     if cls is None:
         return None
-    for kw in [{**extra_kw, "db_path": METAR_DB}, {"db_path": METAR_DB}, {}]:
+    # Try in order: (1) caller's explicit kwargs as-is (respects an explicit
+    # db_path such as NWP/WeatherAPI DB), (2) with a METAR_DB db_path fallback
+    # (only when the caller didn't already supply one), (3) db_path=METAR_DB
+    # alone, (4) no kwargs.  Never clobber an explicit db_path.
+    attempts = [dict(extra_kw)]
+    if "db_path" not in extra_kw:
+        attempts.append({**extra_kw, "db_path": METAR_DB})
+    attempts += [{"db_path": METAR_DB}, {}]
+    for kw in attempts:
         try:
             return cls(**kw)
         except Exception:
@@ -235,6 +244,8 @@ def build_signal_registry():
     nwp_db = NWP_DB
     registry = {}
     status = {}
+
+    from core.signals.dual_polarity_signal import CorrectedPressureDeltaSignal as _CorrectedPressureDelta
 
     def _reg(name, rel_module, class_name, **extra):
         cls = _safe_import_signal(rel_module, class_name)
@@ -272,9 +283,10 @@ def build_signal_registry():
     _reg("forecast_disagreement", "forecast_disagreement_signal", "ForecastDisagreementSignal")
     _reg("calendar_climatology", "calendar_climatology_signal", "CalendarClimatologySignal")
     _reg("frontal_passage_intraday", "frontal_passage_intraday_signal", "FrontalPassageIntradaySignal")
-    _reg("dual_polarity", "dual_polarity_signal", "DualPolaritySignal", wrapped_signal=None)
-    _reg("cloud_cover_index", "cloud_cover_index_signal", "CloudCoverIndexSignal")
-    _reg("feels_like_delta", "feels_like_delta_signal", "FeelsLikeDeltaSignal")
+    _reg("dual_polarity", "dual_polarity_signal", "DualPolaritySignal",
+         wrapped_signal=_CorrectedPressureDelta(db_path=METAR_DB))
+    _reg("cloud_cover_index", "cloud_cover_index_signal", "CloudCoverIndexSignal", db_path=WEATHERAPI_DB)
+    _reg("feels_like_delta", "feels_like_delta_signal", "FeelsLikeDeltaSignal", db_path=WEATHERAPI_DB)
 
     # Built not in registry
     _reg("metar_trend", "metar_trend_signal", "MetarTrendSignal", db_path=METAR_DB)
@@ -295,7 +307,7 @@ def build_signal_registry():
     _reg("fogr_reversion", "fogr_reversion_signal", "FogrReversionSignal")
     _reg("esdr", "esdr_signal", "EsdrSignal", nwp_db_path=nwp_db)
     _reg("frontal_detector", "frontal_detector_signal", "FrontalDetectorSignal")
-    _reg("ai_composite", "ai_composite_signal", "AiCompositeSignal")
+    _reg("ai_composite", "ai_composite_signal", "AiCompositeSignal", db_path=nwp_db)
     _reg_func("frontal_passage_detector", "frontal_passage_detector", "evaluate")
     _reg("nwp_direct", "nwp_direct_signal", "NwpDirectSignal")
     _reg("nwp_dtdt_fusion", "nwp_dtdt_fusion_signal", "NwpDtdtFusionSignal", nwp_db_path=nwp_db)
@@ -307,7 +319,7 @@ def build_signal_registry():
     _reg("temperature_advection", "temperature_advection_signal", "TemperatureAdvectionSignal", db_path=METAR_DB)
 
     # Recovered / recently-revived targets
-    _reg("seasonal_regime", "seasonal_regime_signal", "SeasonalRegimeSignal")
+    _reg("seasonal_regime", "seasonal_regime_signal", "SeasonalRegimeClassifier")
     _reg("cooling_failure", "cooling_failure_signal", "CoolingFailureSignal")
     _reg("warm_momentum", "warm_momentum_signal", "WarmMomentumSignal")
     _reg("trajectory_state_vector", "trajectory_state_vector_signal", "TrajectoryStateVectorSignal")
@@ -348,6 +360,13 @@ STANDARD_EVALUATE_SIGNALS = {
     'seasonal_regime',
 }
 
+# Signals that read from their OWN database (not the METAR conn passed by the
+# sweep).  The sweep's `conn` is the METAR DB; these signals must self-connect
+# to their own archive (e.g. weatherapi_archive.db) rather than reuse it.
+SIGNALS_WITH_OWN_DB = {
+    'cloud_cover_index', 'feels_like_delta',
+}
+
 
 def evaluate_signal(sig, sig_name, station, idx, date, days, conn):
     """Route signal evaluation correctly (from phaseB_calibration_pipeline)."""
@@ -355,6 +374,14 @@ def evaluate_signal(sig, sig_name, station, idx, date, days, conn):
         if hasattr(sig, 'evaluate_for_station'):
             try:
                 return sig.evaluate_for_station(station, date, conn=conn)
+            except Exception:
+                pass
+        return None, 0.0
+    if sig_name in SIGNALS_WITH_OWN_DB:
+        # These signals connect to their own archive (not the METAR conn).
+        if hasattr(sig, 'evaluate_for_station'):
+            try:
+                return sig.evaluate_for_station(station, date, conn=None)
             except Exception:
                 pass
         return None, 0.0
@@ -374,7 +401,13 @@ def evaluate_signal(sig, sig_name, station, idx, date, days, conn):
 
 
 def load_daily_series(conn, station):
-    """Daily METAR series (mirror of killed_signal_retest loader)."""
+    """Daily METAR series (mirror of killed_signal_retest loader).
+
+    Emits BOTH °C and °F temperature fields.  `settlement_temp_f` (the strike-
+    crossing axis) is in °F; °F-native signals (e.g. eighty_two_member_ensemble,
+    seasonal_regime) must read the °F fields, so we also expose `high_f`,
+    `low_f`, and `temp_f` computed from the stored °C values.
+    """
     cur = conn.cursor()
     cur.execute("""
         SELECT date_utc, MAX(temp_c) AS high, MIN(temp_c) AS low, AVG(temp_c) AS temp,
@@ -382,9 +415,18 @@ def load_daily_series(conn, station):
                AVG(wind_speed_kt) AS wind_speed
         FROM metar_observations WHERE station = ? GROUP BY date_utc ORDER BY date_utc ASC
     """, (station,))
-    return [{'date': r[0], 'high': r[1], 'low': r[2], 'temp': r[3],
-             'pressure': r[4], 'wind_dir': r[5], 'wind_speed': r[6]}
-            for r in cur.fetchall()]
+    out = []
+    for r in cur.fetchall():
+        high_c, low_c, temp_c = r[1], r[2], r[3]
+        out.append({
+            'date': r[0], 'station': station,
+            'high': high_c, 'low': low_c, 'temp': temp_c,
+            'high_f': (high_c * 9.0 / 5.0 + 32.0) if high_c is not None else None,
+            'low_f': (low_c * 9.0 / 5.0 + 32.0) if low_c is not None else None,
+            'temp_f': (temp_c * 9.0 / 5.0 + 32.0) if temp_c is not None else None,
+            'pressure': r[4], 'wind_dir': r[5], 'wind_speed': r[6],
+        })
+    return out
 
 
 # ─────────────────────────────────────────────────────────────────────────

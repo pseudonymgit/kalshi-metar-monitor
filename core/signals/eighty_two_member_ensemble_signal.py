@@ -140,9 +140,12 @@ class EightyTwoMemberEnsembleSignal(BaseSignal):
         if self._threshold is not None:
             return self._threshold
         
-        # Read from days[idx-1]['high'] — previous day's actual high, avoids look-ahead bias
+        # Read from days[idx-1]['high_f'] — previous day's actual high in °F,
+        # avoids look-ahead bias and matches the GEFS/TIGGE member units (°F).
         if days is not None and idx >= 1 and idx < len(days):
-            high = days[idx - 1].get('high')
+            high = days[idx - 1].get('high_f')
+            if high is None:
+                high = days[idx - 1].get('high')
             if high is not None:
                 return high
         
