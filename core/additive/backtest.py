@@ -75,12 +75,20 @@ def month_range(start: date_cls, end: date_cls) -> List[Tuple[int, int]]:
     return out
 
 
+# Stations to exclude from ALL truth/scoring/calibration paths (synthetic fixtures).
+# 'TEST' exists in settlement_epochs + kalshi_settlements (1 row each) and would
+# pollute scoring if ingested. Excluded centrally and at every truth-loading seam.
+EXCLUDED_STATIONS = {"TEST"}
+
+
 def load_truth(db_path: str) -> Dict[Tuple[str, str], float]:
     """
     (station, date) -> actual high degF. Kalshi authoritative first,
     settlement_epochs bucket fallback (verified apprx degF, bad 2026-08-10 ingest
     day excluded). Sanity band [-60, 135] degF guards against DB corruption
     seen in settlement ingest 2026-07-07..12 (values like 39678.8).
+
+    EXCLUDED_STATIONS (e.g. 'TEST') are dropped at the load seam.
     """
     truth: Dict[Tuple[str, str], float] = {}
 
@@ -93,6 +101,8 @@ def load_truth(db_path: str) -> Dict[Tuple[str, str], float]:
             "WHERE source_type='finalized' AND kalshi_temp IS NOT NULL"
         ):
             st, d, t = str(row[0]), str(row[1]), float(row[2])
+            if st.upper() in EXCLUDED_STATIONS:
+                continue
             if -60 <= t <= 135:
                 truth[(st, d)] = t
         conn.close()
@@ -106,6 +116,8 @@ def load_truth(db_path: str) -> Dict[Tuple[str, str], float]:
             "WHERE settlement_bucket IS NOT NULL"
         ):
             st, d, b = str(row[0]), str(row[1]), float(row[2])
+            if st.upper() in EXCLUDED_STATIONS:
+                continue
             key = (st, d)
             if key not in truth and -60 <= b <= 135:
                 truth[key] = b

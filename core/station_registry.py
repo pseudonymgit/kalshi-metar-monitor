@@ -70,8 +70,10 @@ STATIC_MAPPING = {
 }
 
 
-# Stations removed from registry (duplicates only)
-_REMOVED_STATIONS = {"KDAL"}
+# Stations removed from registry (duplicates + synthetic test fixtures).
+# 'TEST' is a synthetic fixture station present in settlement_epochs and
+# kalshi_settlements (1 row each) — it must never enter scoring/calibration.
+_REMOVED_STATIONS = {"KDAL", "TEST"}
 
 
 def _try_kalshi_discovery():

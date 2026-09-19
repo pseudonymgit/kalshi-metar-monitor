@@ -115,7 +115,7 @@ class StationSkillGate:
             # Load database connection — get station list
             rows = query_db(self.metar_db_path,
                             "SELECT DISTINCT station FROM settlement_epochs")
-            stations = [r['station'] for r in rows]
+            stations = [r['station'] for r in rows if str(r['station']).upper() != 'TEST']
             
             if not stations:
                 logger.warning("No stations found in settlement_epochs table")

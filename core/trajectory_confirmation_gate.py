@@ -320,6 +320,8 @@ class EpochBuilder:
                         "SELECT station, target_date, kalshi_temp FROM kalshi_settlements")
         result: Dict[str, Dict[str, float]] = defaultdict(dict)
         for r in rows:
+            if str(r['station']).upper() == 'TEST':
+                continue
             if r['kalshi_temp'] is not None:
                 result[r['station']][r['target_date']] = float(r['kalshi_temp'])
         return dict(result)
