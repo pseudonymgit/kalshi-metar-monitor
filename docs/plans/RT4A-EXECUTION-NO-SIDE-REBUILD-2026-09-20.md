@@ -185,7 +185,9 @@ Every number in this rebuild is on the **strike-crossing / bucket axis**, not
 - files: `scripts/intraday_entry_stub.py` (rebuild),
   `scripts/rt4a_noside_qc.py` (independent QC),
   `docs/plans/RT4A-EXECUTION-NO-SIDE-REBUILD-2026-09-20.md` (this receipt)
-- commit hash: `470135970edf9f448fa7977055c2693bb82743d5`
+- commit hash: `470135970edf9f448fa7977055c2693bb82743d5` (substantive work commit —
+  rebuild + QC + receipt). Final hash-recording commit `649fff2af655385ca071d72efa0fb77d9cea9fe2`
+  only backfills this hash; working tree is git-clean.
 
 ## Safety / boundaries honored
 
