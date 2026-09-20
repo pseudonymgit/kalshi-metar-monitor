@@ -32,11 +32,20 @@
 #   feasible, not a kill.
 #
 # LOOKAHEAD:
-#   Contemporaneous-only gate (`fetch_date <= target_date`) via
-#   `core/nwp_lookahead_gate.contemporaneous_where` — already wired.
+#   STRICT AS-OF GATE (R/R-1c): `fetch_timestamp < target_date T00:00:00` via
+#   `core/nwp_lookahead_gate.strict_asof_predicate` / `strict_asof_bound`.  The
+#   prior `fetch_date <= target_date` gate is INSECURE — `fetch_date` is a
+#   corrupted as-of key (47% mismatch vs `fetch_timestamp`) that admits same-day
+#   late nowcasts (post-high fetches).  The strict gate admits only rows fetched
+#   strictly before the target day began.
+#
+#   MIXED-UNITS HYGIENE (R/R-1c): `_apply_unit_hygiene` normalizes any
+#   mis-stored °F value (> +50 in the nominally-°C field) back to °C before the
+#   °C -> °F signal conversion.
 #
 # CHANGELOG:
 #   R/R-1b (2026-09-20): re-spec'd day-over-day -> strike-crossing axis.
+#   R/R-1c (2026-09-20): strict fetch_timestamp as-of gate + mixed-units hygiene.
 #
 
 import sqlite3
@@ -204,7 +213,21 @@ class NwpDirectSignal(BaseSignal):
 
     def _get_temp(self, station: str, target_date: str, model: str,
                   field: str = 'temperature_2m_max') -> Optional[float]:
-        """Get the target-day extremum forecast (°C) from the NWP DB."""
+        """Get the target-day extremum forecast (°C) from the NWP DB.
+
+        STRICT AS-OF GATE (R/R-1c): the row must have been fetched strictly
+        BEFORE the target day began (`fetch_timestamp < target_date T00:00:00`).
+        This excludes same-day late nowcasts (rows fetched on the target day,
+        after the day's high/low has already occurred), which are textbook
+        lookahead for a same-day strike-crossing prediction.
+
+        MIXED-UNITS HYGIENE (R/R-1c): the `temperature_2m_max`/`_min` field is
+        nominally °C, but `nws_mos` stores °F in the same field (range up to
+        +115.3).  A legitimate °C daily extremum is ~-40..+55; any value > +50
+        is °F mis-stored in the °C field and is converted °F -> °C before the
+        °C -> °F signal conversion (defense-in-depth: the four signal models
+        GFS/ECMWF/ICON/GEM are clean °C, but this guards any broadening).
+        """
         key = (station, target_date, model, field)
         if key in self._cache:
             return self._cache[key]
@@ -215,19 +238,19 @@ class NwpDirectSignal(BaseSignal):
         try:
             conn = sqlite3.connect(str(self.nwp_db_path), timeout=30)
             cur = conn.cursor()
-            # Contemporaneous-only gate (P0-F): exclude lookahead rows where
-            # fetch_date > target_date (reanalysis/backfill masquerading as a
-            # forecast).
-            from ..nwp_lookahead_gate import contemporaneous_where
+            from ..nwp_lookahead_gate import strict_asof_predicate, strict_asof_bound
             cur.execute("""
                 SELECT AVG(value) FROM nwp_forecasts
                 WHERE station = ? AND target_date = ? AND LOWER(model) = ? AND variable = ?
                 AND value IS NOT NULL AND value > -100 AND value < 150
-            """ + contemporaneous_where(""), (station, target_date, model.lower(), field))
+                AND """ + strict_asof_predicate(),
+                (station, target_date, model.lower(), field,
+                 strict_asof_bound(target_date)))
             row = cur.fetchone()
             conn.close()
             if row and row[0] is not None:
                 val = float(row[0])
+                val = self._apply_unit_hygiene(val)
                 self._cache[key] = val
                 return val
         except Exception as e:
@@ -235,6 +258,18 @@ class NwpDirectSignal(BaseSignal):
 
         self._cache[key] = None
         return None
+
+    @staticmethod
+    def _apply_unit_hygiene(val_c_or_f: float) -> float:
+        """Return the value normalized to °C.
+
+        A value > +50 in a nominally-°C daily-extremum field is °F mis-stored
+        in a °C column; convert °F -> °C.  Values in the legitimate °C range
+        (~-40..+55) pass through unchanged.
+        """
+        if val_c_or_f > 50.0:
+            return (val_c_or_f - 32.0) * 5.0 / 9.0
+        return val_c_or_f
 
     def get_calibration_key(self) -> str:
         return self.name

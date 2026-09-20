@@ -1,0 +1,63 @@
+{
+  "generated_utc": "2026-09-20T15:06:56Z",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) \u2014 core/settlement_outcome.strike_crossing_direction",
+  "truth_source": "settlement_truth.strike_price (real strikes, NOT day-over-day)",
+  "gate": "STRICT as-of: fetch_timestamp < target_date T00:00 (NOT fetch_date <= target_date)",
+  "units": "mixed-units hygiene: \u00b0F-in-\u00b0C-field (> +50) normalized \u00b0F->\u00b0C before \u00b0C->\u00b0F signal conversion",
+  "respec": "nwp_direct_signal strike-crossing (HIGH: temp_2m_max vs strike; LOW: temp_2m_min vs strike)",
+  "strike_passed": "strike_price passed to nwp_direct + nwp_dtdt_fusion (correct axis); metar_dtdt scored without strike",
+  "label_exclusions": {
+    "between_excluded": 54,
+    "untrusted_excluded": 80,
+    "no_temp": 0,
+    "unknown_market_type": 0
+  },
+  "scores": {
+    "nwp_direct": {
+      "accuracy": 0.96088,
+      "mcc": 0.921727,
+      "n": 2045,
+      "tp": 1041,
+      "fp": 51,
+      "tn": 924,
+      "fn": 29,
+      "base_rate_accuracy": 0.971638,
+      "base_rate_delta": -0.010758,
+      "sharpe": 37.735956,
+      "n_returns": 2045,
+      "up_ratio_predicted": 0.534,
+      "status": "NO_EDGE"
+    },
+    "nwp_dtdt_fusion": {
+      "accuracy": 0.702452,
+      "mcc": 0.338851,
+      "n": 9259,
+      "tp": 1212,
+      "fp": 438,
+      "tn": 5292,
+      "fn": 2317,
+      "base_rate_accuracy": 0.92105,
+      "base_rate_delta": -0.218598,
+      "sharpe": 7.029665,
+      "n_returns": 9259,
+      "up_ratio_predicted": 0.1782,
+      "status": "NO_EDGE"
+    },
+    "metar_dtdt": {
+      "accuracy": 0.60955,
+      "mcc": 0.021376,
+      "n": 8398,
+      "tp": 379,
+      "fp": 580,
+      "tn": 4740,
+      "fn": 2699,
+      "base_rate_accuracy": 0.916171,
+      "base_rate_delta": -0.306621,
+      "sharpe": 3.564715,
+      "n_returns": 8398,
+      "up_ratio_predicted": 0.1142,
+      "status": "NO_EDGE"
+    }
+  },
+  "elapsed_seconds": 340.64
+}
