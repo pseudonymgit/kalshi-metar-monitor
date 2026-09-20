@@ -24,6 +24,7 @@ import logging
 from datetime import datetime, timezone, timedelta
 
 from .base_signal import BaseSignal, validate_signal
+from core.observational_asof_gate import settlement_window_open
 
 logger = logging.getLogger(__name__)
 
@@ -91,15 +92,22 @@ class MetarDtdtSignal(BaseSignal):
             # In both cases, we want the last 3 hours of data
 
             # Get the most recent observations for this station and date
-            # Order by timestamp descending to get the latest first
+            # Order by timestamp descending to get the latest first.
+            # ── R/R-1a as-of gate ──────────────────────────────────────────
+            # A same-day strike-crossing prediction must NOT read observations
+            # at-or-after the settlement window opens (settlement day 00:00 UTC).
+            # Those observations already contain the day's extremum that defines
+            # the outcome.  Gate at read time; do not delete data.
+            window_open = settlement_window_open(date)
             cur.execute("""
                 SELECT temp_f, timestamp_utc
                 FROM metar_observations
                 WHERE station = ? AND date_utc = ?
+                  AND timestamp_utc < ?
                   AND temp_f IS NOT NULL
                 ORDER BY timestamp_utc DESC
                 LIMIT 20
-            """, (station, date))
+            """, (station, date, window_open))
 
             rows = cur.fetchall()
             if len(rows) < 2:

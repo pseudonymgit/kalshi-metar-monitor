@@ -39,7 +39,16 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class SignalConfig:
-    """Per-signal adaptive threshold configuration."""
+    """Per-signal adaptive threshold configuration.
+
+    NOTE (R/R-1a): `tau_min` / `tau_max` are EXPLICIT POLICY TARGETS, not
+    measured empirical accuracy.  They encode the *desired* floor/ceiling for
+    the adaptive controller's confidence threshold, chosen by design (see
+    FP-ADAPTIVE-THRESHOLDS.md), NOT derived from corrected-axis sweep data.
+    R/T-3 showed actual corrected-axis accuracies are 47–66% with MCC <= 0,
+    so these targets are ASPIRATIONAL and must not be cited as evidence of
+    measured skill.
+    """
     tau_min: float = 0.55
     tau_max: float = 0.90
     fast_halflife_days: int = 25      # Fast EMA halflife
@@ -49,74 +58,80 @@ class SignalConfig:
     description: str = ""
 
 
-# Default signal configurations from FP 6.4 Section 6.1
+# Default signal configurations from FP 6.4 Section 6.1.
+#
+# R/R-1a: the `description=` strings previously claimed empirical accuracy floors
+# ("70-72%", "71-73%", etc.) that were NEVER derived from corrected-axis data.
+# They are now relabeled as *policy targets* (aspirational), NOT measured
+# accuracy.  The actual corrected-axis accuracies (R/T-3) are 47–66% with
+# MCC <= 0 for every active signal.
 SIGNAL_CONFIGS: Dict[str, SignalConfig] = {
     'calendar_climatology': SignalConfig(
         tau_min=0.55, tau_max=0.90, fast_halflife_days=30, slow_halflife_days=120,
-        seasonal_gamma=0.30, prior_n=60, description="Daily, every station, 70-72% accuracy"
+        seasonal_gamma=0.30, prior_n=60, description="TARGET (not measured): daily, every station"
     ),
     'gaussian': SignalConfig(
         tau_min=0.55, tau_max=0.90, fast_halflife_days=25, slow_halflife_days=100,
-        seasonal_gamma=0.30, prior_n=50, description="Daily, most stations, 71-73% accuracy"
+        seasonal_gamma=0.30, prior_n=50, description="TARGET (not measured): daily, most stations"
     ),
     'gaussian_v2': SignalConfig(
         tau_min=0.55, tau_max=0.90, fast_halflife_days=25, slow_halflife_days=100,
-        seasonal_gamma=0.30, prior_n=50, description="Daily, most stations, 71-73% accuracy"
+        seasonal_gamma=0.30, prior_n=50, description="TARGET (not measured): daily, most stations"
     ),
     'pressure_delta': SignalConfig(
         tau_min=0.55, tau_max=0.90, fast_halflife_days=20, slow_halflife_days=90,
-        seasonal_gamma=0.25, prior_n=40, description="Daily, most stations, 65-68% accuracy"
+        seasonal_gamma=0.25, prior_n=40, description="TARGET (not measured): daily, most stations"
     ),
     'forecast_disagreement': SignalConfig(
         tau_min=0.55, tau_max=0.85, fast_halflife_days=15, slow_halflife_days=60,
-        seasonal_gamma=0.20, prior_n=30, description="NWP-based, model run, 62-65% accuracy"
+        seasonal_gamma=0.20, prior_n=30, description="TARGET (not measured): NWP-based, model run"
     ),
     'spike_reversion': SignalConfig(
         tau_min=0.55, tau_max=0.85, fast_halflife_days=20, slow_halflife_days=90,
-        seasonal_gamma=0.20, prior_n=30, description="Derivative, ~20% of days, 60-65% accuracy"
+        seasonal_gamma=0.20, prior_n=30, description="TARGET (not measured): derivative, ~20% of days"
     ),
     'goldilocks': SignalConfig(
         tau_min=0.55, tau_max=0.85, fast_halflife_days=20, slow_halflife_days=90,
-        seasonal_gamma=0.20, prior_n=30, description="Derivative, daily, 60-65% accuracy"
+        seasonal_gamma=0.20, prior_n=30, description="TARGET (not measured): derivative, daily"
     ),
     'wind_direction_shift': SignalConfig(
         tau_min=0.55, tau_max=0.85, fast_halflife_days=20, slow_halflife_days=90,
-        seasonal_gamma=0.20, prior_n=25, description="Daily, most stations"
+        seasonal_gamma=0.20, prior_n=25, description="TARGET (not measured): daily, most stations"
     ),
     'frontal_passage_intraday': SignalConfig(
         tau_min=0.55, tau_max=0.80, fast_halflife_days=15, slow_halflife_days=90,
-        seasonal_gamma=0.15, prior_n=15, description="Observational, ~10% of days, 58-63%"
+        seasonal_gamma=0.15, prior_n=15, description="TARGET (not measured): observational, ~10% of days"
     ),
     'frontal_detector': SignalConfig(
         tau_min=0.55, tau_max=0.80, fast_halflife_days=15, slow_halflife_days=90,
-        seasonal_gamma=0.15, prior_n=15, description="Physical, ~15% of days, 60-65%"
+        seasonal_gamma=0.15, prior_n=15, description="TARGET (not measured): physical, ~15% of days"
     ),
     'dewpoint_depression': SignalConfig(
         tau_min=0.55, tau_max=0.80, fast_halflife_days=15, slow_halflife_days=90,
-        seasonal_gamma=0.15, prior_n=20, description="Physical, ~30% of days, 60-64%"
+        seasonal_gamma=0.15, prior_n=20, description="TARGET (not measured): physical, ~30% of days"
     ),
     'temperature_advection': SignalConfig(
         tau_min=0.55, tau_max=0.85, fast_halflife_days=20, slow_halflife_days=60,
-        seasonal_gamma=0.20, prior_n=25, description="NWP-based, daily, 61-64%"
+        seasonal_gamma=0.20, prior_n=25, description="TARGET (not measured): NWP-based, daily"
     ),
     'persistence_signal': SignalConfig(
         tau_min=0.55, tau_max=0.80, fast_halflife_days=10, slow_halflife_days=45,
-        seasonal_gamma=0.15, prior_n=20, description="Daily, every station, 58-62%"
+        seasonal_gamma=0.15, prior_n=20, description="TARGET (not measured): daily, every station"
     ),
     'spread_based_entry': SignalConfig(
         tau_min=0.55, tau_max=0.85, fast_halflife_days=20, slow_halflife_days=90,
-        seasonal_gamma=0.20, prior_n=20, description="Derivative, ~20% of days, 60-65%"
+        seasonal_gamma=0.20, prior_n=20, description="TARGET (not measured): derivative, ~20% of days"
     ),
     'nowcasting': SignalConfig(
         tau_min=0.55, tau_max=0.80, fast_halflife_days=15, slow_halflife_days=90,
-        seasonal_gamma=0.15, prior_n=15, description="Nowcasting, ~10% of days"
+        seasonal_gamma=0.15, prior_n=15, description="TARGET (not measured): nowcasting, ~10% of days"
     ),
 }
 
 # Default config for unknown signals
 DEFAULT_CONFIG = SignalConfig(
     tau_min=0.55, tau_max=0.85, fast_halflife_days=20, slow_halflife_days=90,
-    seasonal_gamma=0.20, prior_n=30, description="Default for unregistered signals"
+    seasonal_gamma=0.20, prior_n=30, description="TARGET (not measured): default for unregistered signals"
 )
 
 

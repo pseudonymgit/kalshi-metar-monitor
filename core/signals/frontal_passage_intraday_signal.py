@@ -28,6 +28,7 @@ import logging
 
 from .base_signal import BaseSignal, validate_signal
 from core.sqlite_utils import get_sqlite_connection
+from core.observational_asof_gate import is_asof_safe, settlement_window_open
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +122,13 @@ class FrontalPassageIntradaySignal(BaseSignal):
             window_start = f"{date}T00:00:00"
             window_end = f"{date}T{hours:02d}:59:59"
 
+            # ── R/R-1a as-of gate ──────────────────────────────────────────
+            # A same-day strike-crossing prediction must NOT read observations
+            # at-or-after the settlement window opens (settlement day 00:00 UTC),
+            # because those observations already contain the day's extremum that
+            # determines the outcome.  Gate at read time; do not delete data.
+            window_open = settlement_window_open(date)
+
             cur.execute("""
                 SELECT timestamp_utc, pressure_mb, wind_direction_deg, temp_f
                 FROM metar_observations
@@ -128,14 +136,18 @@ class FrontalPassageIntradaySignal(BaseSignal):
                   AND date_utc = ?
                   AND timestamp_utc >= ?
                   AND timestamp_utc <= ?
+                  AND timestamp_utc < ?
                   AND temp_f IS NOT NULL
                   AND pressure_mb IS NOT NULL
                 ORDER BY timestamp_utc ASC
-            """, (station, date, window_start, window_end))
+            """, (station, date, window_start, window_end, window_open))
 
             obs = []
             for row in cur.fetchall():
                 ts, pressure, wind_dir, temp = row
+                # Belt-and-suspenders as-of check (defense in depth).
+                if not is_asof_safe(ts, date):
+                    continue
                 obs.append({
                     'time': ts,
                     'pressure_mb': float(pressure) if pressure is not None else None,

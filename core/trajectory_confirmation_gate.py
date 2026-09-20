@@ -29,6 +29,7 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 
 from core.db_utils import query_db, with_db
+from core.observational_asof_gate import settlement_window_open
 
 # -- Paths --------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -226,6 +227,15 @@ class EpochBuilder:
         with with_db(self.metar_db, row_factory=True, commit=False) as conn:
             cur = conn.cursor()
 
+            # ── R/R-1a as-of gate ──────────────────────────────────────────
+            # The epoch feature vector is built from the settlement day's own
+            # observations (max/min/avg temp + intraday METAR rows).  For a
+            # same-day strike-crossing prediction this is lookahead: those rows
+            # already contain the day's extremum that determines the outcome.
+            # Gate at read time — only observations strictly before the
+            # settlement window opens (settlement day 00:00 UTC) are admitted.
+            window_open = settlement_window_open(date)
+
             cur.execute("SELECT * FROM daily_stats WHERE station=? AND date_utc=?",
                          (station, date))
             day_row = cur.fetchone()
@@ -248,8 +258,9 @@ class EpochBuilder:
                        END as cloud_cover
                 FROM metar_observations mo
                 WHERE mo.station=? AND mo.date_utc=?
+                  AND mo.timestamp_utc < ?
                 ORDER BY mo.timestamp_utc
-            """, (station, date))
+            """, (station, date, window_open))
             rows = cur.fetchall()
 
         if len(rows) < 6:

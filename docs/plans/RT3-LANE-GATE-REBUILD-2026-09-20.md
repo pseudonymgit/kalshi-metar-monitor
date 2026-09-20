@@ -62,8 +62,8 @@ JSON receipt.
   - HIGH (`greater`): `up` iff `settlement_temp > strike` (strict `>`; tie = loss).
   - LOW (`less`): `down` iff `settlement_temp < strike` (strict `<`; tie = loss).
   - `between` bins (54) have no single-strike greater/less semantics → excluded.
-- **Real strikes:** `settlement_truth.strike_price` (14,305 rows: 10,079 `greater`
-  + 4,051 `less` + 54 `between`), from the P0-B Kalshi `/historical/markets` strike-
+- **Real strikes:** `settlement_truth.strike_price` (14,305 rows: 10,139 `greater`
+  + 4,112 `less` + 54 `between`), from the P0-B Kalshi `/historical/markets` strike-
   ladder backfill (commit `ac99d6127`). **NOT** day-over-day temp change — the prior
   "warmer-than-yesterday" axis is WRONG and is not used anywhere in this pass.
 - **Temp source ladder:** date-tiered GHCN → Kalshi finalized → WeatherAPI
@@ -189,8 +189,8 @@ self-checking.
 1. **Axis spot-check** — 10 labels recomputed by hand from raw `settlement_temp_f` vs
    `strike_price` vs `market_type`; 10/10 matched `strike_crossing_direction`. Strict
    `>`/`<` (tie = loss) confirmed. No day-over-day temp used anywhere.
-2. **Strike provenance** — `settlement_truth.strike_price` = 14,305 rows (10,079
-   greater + 4,051 less + 54 between), sourced from the P0-B Kalshi strike-ladder
+2. **Strike provenance** — `settlement_truth.strike_price` = 14,305 rows (10,139
+   greater + 4,112 less + 54 between), sourced from the P0-B Kalshi strike-ladder
    backfill (commit `ac99d6127`). Independently re-counted; matches.
 3. **Base rate** — global up = 34.36%; HIGH up = 10.0%; LOW up = 94.6%. Always-down
    null = 65.64% acc / Sharpe ≈ 5.25. Independent recompute.
