@@ -162,4 +162,4 @@ loop; no AI calls inside the loop.
 - R/T-3 strike-row correction: `docs/plans/RT3-LANE-GATE-REBUILD-2026-09-20.md`
 - This doc: `docs/plans/RR1A-POST-REVIEW-FIX-2026-09-20.md`
 
-**Commit:** `<hash-filled-after-commit>`
+**Commit:** `6cbc97e84825ee573c751dfedd526bedd65476ca`
