@@ -163,7 +163,7 @@ calls inside the loop.
 - Re-score JSON: `reports/rr1a_asof_redo_20260920-143957.json`
 - This doc: `docs/plans/RR1A-PART1-ASOF-FIX-2026-09-20.md`
 
-**Commit:** `<recorded post-commit>` (see §8)
+**Commit:** `898eaf4ff`
 
 ---
 
