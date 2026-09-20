@@ -1,0 +1,67 @@
+{
+  "experiment": "trajectory_lane_tuning",
+  "note": "Simulation-based estimation. Actual results may differ.",
+  "results": [
+    {
+      "max_w_traj": 0.0,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 58.35,
+      "delta_pp": 0.0
+    },
+    {
+      "max_w_traj": 0.05,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 58.91,
+      "delta_pp": 0.57
+    },
+    {
+      "max_w_traj": 0.1,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 59.49,
+      "delta_pp": 1.14
+    },
+    {
+      "max_w_traj": 0.15,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 60.05,
+      "delta_pp": 1.7
+    },
+    {
+      "max_w_traj": 0.2,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 60.62,
+      "delta_pp": 2.27
+    },
+    {
+      "max_w_traj": 0.25,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 61.19,
+      "delta_pp": 2.84
+    },
+    {
+      "max_w_traj": 0.3,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 61.76,
+      "delta_pp": 3.41
+    },
+    {
+      "max_w_traj": 0.4,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 62.89,
+      "delta_pp": 4.54
+    },
+    {
+      "max_w_traj": 0.5,
+      "baseline_accuracy": 58.35,
+      "tuned_accuracy": 64.02,
+      "delta_pp": 5.67
+    }
+  ],
+  "best": {
+    "max_w_traj": 0.5,
+    "baseline_accuracy": 58.35,
+    "tuned_accuracy": 64.02,
+    "delta_pp": 5.67
+  },
+  "recommendation": "MAX_W_TRAJ=0.5 (estimated accuracy: 64.02%, delta: +5.67pp)"
+}

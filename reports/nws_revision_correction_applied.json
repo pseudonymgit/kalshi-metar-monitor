@@ -1,0 +1,473 @@
+{
+  "generated": "2026-09-07T05:49:29.607643+00:00",
+  "item": 6,
+  "title": "NWS Revision Correction Applied to Backtest P&L",
+  "audit_source": "reports/nws_revision_audit.json",
+  "correction_method": "per_station",
+  "correction_note": "Per-station correction factors from NWS revision audit (revision_coverage_filtered signed_mean_f per station). GLOBAL correction is aggregate robust core signed mean. Applied as: adjusted_initial_temp = gefs_mean_f + correction_factor. The correction adjusts the GEFS-predicted temperature upward by the NWS revision amount, since final GHCN-Daily values (which approximate Kalshi settlements) are systematically +0.73\u00b0F above initial METAR reports.",
+  "aggregate_revision_findings": {
+    "n": 18800,
+    "signed_mean_f": 0.73,
+    "signed_median_f": 0.94,
+    "mae_f": 0.758,
+    "revised_up": 13128,
+    "revised_down": 1631,
+    "unchanged": 4041,
+    "share_changed_any": 0.785,
+    "share_gt_0p5f": 0.613,
+    "strike_bucket_change_rate": 0.613,
+    "direction_flip_rate": 0.116
+  },
+  "per_station_correction_factors": {
+    "GLOBAL": 0.73,
+    "KATL": 0.754,
+    "KAUS": 0.744,
+    "KBOS": 0.651,
+    "KDCA": 0.732,
+    "KDEN": 0.934,
+    "KDFW": 0.677,
+    "KHOU": 0.738,
+    "KLAS": 0.648,
+    "KLAX": 0.83,
+    "KMDW": 0.585,
+    "KMIA": 0.805,
+    "KMSP": 0.58,
+    "KMSY": 0.664,
+    "KNYC": 0.627,
+    "KOKC": 0.642,
+    "KPHL": 0.623,
+    "KPHX": 1.069,
+    "KSAT": 0.763,
+    "KSEA": 0.703,
+    "KSFO": 0.84
+  },
+  "aggregate": {
+    "before_correction": {
+      "n_observations": 13420,
+      "strike_accuracy": 0.1276,
+      "directional_accuracy": 0.7853,
+      "net_pnl": 11569.88
+    },
+    "after_correction": {
+      "n_observations": 13420,
+      "strike_accuracy": 0.1336,
+      "directional_accuracy": 0.8037,
+      "net_pnl": -11569.88
+    },
+    "delta": {
+      "strike_accuracy_delta": 0.006,
+      "directional_accuracy_delta": 0.0184,
+      "net_pnl_delta": -23139.76,
+      "strike_bucket_shifts": {
+        "0": {
+          "count": 8857,
+          "pct": 66.0
+        },
+        "1": {
+          "count": 4563,
+          "pct": 34.0
+        }
+      }
+    }
+  },
+  "per_station": {
+    "KATL": {
+      "n_obs": 731,
+      "correction_factor_f": 0.754,
+      "before": {
+        "strike_accuracy": 0.015,
+        "directional_accuracy": 0.5663,
+        "net_pnl": -860.4
+      },
+      "after": {
+        "strike_accuracy": 0.0342,
+        "directional_accuracy": 0.5787,
+        "net_pnl": 860.4
+      },
+      "delta": {
+        "strike_accuracy": 0.0192,
+        "directional_accuracy": 0.0123,
+        "net_pnl": 1720.8
+      }
+    },
+    "KAUS": {
+      "n_obs": 1142,
+      "correction_factor_f": 0.744,
+      "before": {
+        "strike_accuracy": 0.0333,
+        "directional_accuracy": 0.732,
+        "net_pnl": -1193.12
+      },
+      "after": {
+        "strike_accuracy": 0.0412,
+        "directional_accuracy": 0.7916,
+        "net_pnl": 1193.12
+      },
+      "delta": {
+        "strike_accuracy": 0.0079,
+        "directional_accuracy": 0.0595,
+        "net_pnl": 2386.24
+      }
+    },
+    "KBOS": {
+      "n_obs": 745,
+      "correction_factor_f": 0.651,
+      "before": {
+        "strike_accuracy": 0.1785,
+        "directional_accuracy": 0.8604,
+        "net_pnl": 922.2
+      },
+      "after": {
+        "strike_accuracy": 0.1664,
+        "directional_accuracy": 0.8658,
+        "net_pnl": -922.2
+      },
+      "delta": {
+        "strike_accuracy": -0.0121,
+        "directional_accuracy": 0.0054,
+        "net_pnl": -1844.4
+      }
+    },
+    "KDCA": {
+      "n_obs": 799,
+      "correction_factor_f": 0.732,
+      "before": {
+        "strike_accuracy": 0.1277,
+        "directional_accuracy": 0.8473,
+        "net_pnl": 1207.8
+      },
+      "after": {
+        "strike_accuracy": 0.1389,
+        "directional_accuracy": 0.8673,
+        "net_pnl": -1207.8
+      },
+      "delta": {
+        "strike_accuracy": 0.0113,
+        "directional_accuracy": 0.02,
+        "net_pnl": -2415.6
+      }
+    },
+    "KDEN": {
+      "n_obs": 1158,
+      "correction_factor_f": 0.934,
+      "before": {
+        "strike_accuracy": 0.0907,
+        "directional_accuracy": 0.8247,
+        "net_pnl": 1879.0
+      },
+      "after": {
+        "strike_accuracy": 0.1131,
+        "directional_accuracy": 0.8437,
+        "net_pnl": -1879.0
+      },
+      "delta": {
+        "strike_accuracy": 0.0225,
+        "directional_accuracy": 0.019,
+        "net_pnl": -3758.0
+      }
+    },
+    "KDFW": {
+      "n_obs": 645,
+      "correction_factor_f": 0.677,
+      "before": {
+        "strike_accuracy": 0.1442,
+        "directional_accuracy": 0.8109,
+        "net_pnl": 2102.0
+      },
+      "after": {
+        "strike_accuracy": 0.1891,
+        "directional_accuracy": 0.8109,
+        "net_pnl": -2102.0
+      },
+      "delta": {
+        "strike_accuracy": 0.045,
+        "directional_accuracy": 0.0,
+        "net_pnl": -4204.0
+      }
+    },
+    "KHOU": {
+      "n_obs": 626,
+      "correction_factor_f": 0.738,
+      "before": {
+        "strike_accuracy": 0.0431,
+        "directional_accuracy": 0.7125,
+        "net_pnl": -1074.0
+      },
+      "after": {
+        "strike_accuracy": 0.0495,
+        "directional_accuracy": 0.7125,
+        "net_pnl": 1074.0
+      },
+      "delta": {
+        "strike_accuracy": 0.0064,
+        "directional_accuracy": 0.0,
+        "net_pnl": 2148.0
+      }
+    },
+    "KLAS": {
+      "n_obs": 653,
+      "correction_factor_f": 0.648,
+      "before": {
+        "strike_accuracy": 0.1409,
+        "directional_accuracy": 0.9663,
+        "net_pnl": 1856.0
+      },
+      "after": {
+        "strike_accuracy": 0.1409,
+        "directional_accuracy": 0.9663,
+        "net_pnl": -1856.0
+      },
+      "delta": {
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.0,
+        "net_pnl": -3712.0
+      }
+    },
+    "KLAX": {
+      "n_obs": 1092,
+      "correction_factor_f": 0.83,
+      "before": {
+        "strike_accuracy": 0.0412,
+        "directional_accuracy": 0.739,
+        "net_pnl": 1525.8
+      },
+      "after": {
+        "strike_accuracy": 0.0925,
+        "directional_accuracy": 0.7619,
+        "net_pnl": -1525.8
+      },
+      "delta": {
+        "strike_accuracy": 0.0513,
+        "directional_accuracy": 0.0229,
+        "net_pnl": -3051.6
+      }
+    },
+    "KMDW": {
+      "n_obs": 1193,
+      "correction_factor_f": 0.585,
+      "before": {
+        "strike_accuracy": 0.1894,
+        "directional_accuracy": 0.8743,
+        "net_pnl": 436.2
+      },
+      "after": {
+        "strike_accuracy": 0.2096,
+        "directional_accuracy": 0.8676,
+        "net_pnl": -436.2
+      },
+      "delta": {
+        "strike_accuracy": 0.0201,
+        "directional_accuracy": -0.0067,
+        "net_pnl": -872.4
+      }
+    },
+    "KMIA": {
+      "n_obs": 267,
+      "correction_factor_f": 0.805,
+      "before": {
+        "strike_accuracy": 0.0262,
+        "directional_accuracy": 0.3184,
+        "net_pnl": 151.0
+      },
+      "after": {
+        "strike_accuracy": 0.0337,
+        "directional_accuracy": 0.3745,
+        "net_pnl": -151.0
+      },
+      "delta": {
+        "strike_accuracy": 0.0075,
+        "directional_accuracy": 0.0562,
+        "net_pnl": -302.0
+      }
+    },
+    "KMSP": {
+      "n_obs": 335,
+      "correction_factor_f": 0.58,
+      "before": {
+        "strike_accuracy": 0.0806,
+        "directional_accuracy": 0.7403,
+        "net_pnl": -465.2
+      },
+      "after": {
+        "strike_accuracy": 0.0537,
+        "directional_accuracy": 0.7313,
+        "net_pnl": 465.2
+      },
+      "delta": {
+        "strike_accuracy": -0.0269,
+        "directional_accuracy": -0.009,
+        "net_pnl": 930.4
+      }
+    },
+    "KMSY": {
+      "n_obs": 293,
+      "correction_factor_f": 0.664,
+      "before": {
+        "strike_accuracy": 0.0068,
+        "directional_accuracy": 0.4232,
+        "net_pnl": -767.68
+      },
+      "after": {
+        "strike_accuracy": 0.0137,
+        "directional_accuracy": 0.4915,
+        "net_pnl": 767.68
+      },
+      "delta": {
+        "strike_accuracy": 0.0068,
+        "directional_accuracy": 0.0683,
+        "net_pnl": 1535.36
+      }
+    },
+    "KNYC": {
+      "n_obs": 783,
+      "correction_factor_f": 0.627,
+      "before": {
+        "strike_accuracy": 0.272,
+        "directional_accuracy": 0.9183,
+        "net_pnl": 2922.2
+      },
+      "after": {
+        "strike_accuracy": 0.2759,
+        "directional_accuracy": 0.9361,
+        "net_pnl": -2922.2
+      },
+      "delta": {
+        "strike_accuracy": 0.0038,
+        "directional_accuracy": 0.0179,
+        "net_pnl": -5844.4
+      }
+    },
+    "KOKC": {
+      "n_obs": 677,
+      "correction_factor_f": 0.642,
+      "before": {
+        "strike_accuracy": 0.0281,
+        "directional_accuracy": 0.7075,
+        "net_pnl": -1163.92
+      },
+      "after": {
+        "strike_accuracy": 0.0281,
+        "directional_accuracy": 0.7134,
+        "net_pnl": 1163.92
+      },
+      "delta": {
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.0059,
+        "net_pnl": 2327.84
+      }
+    },
+    "KPHL": {
+      "n_obs": 332,
+      "correction_factor_f": 0.623,
+      "before": {
+        "strike_accuracy": 0.0633,
+        "directional_accuracy": 0.8705,
+        "net_pnl": -382.0
+      },
+      "after": {
+        "strike_accuracy": 0.0693,
+        "directional_accuracy": 0.8765,
+        "net_pnl": 382.0
+      },
+      "delta": {
+        "strike_accuracy": 0.006,
+        "directional_accuracy": 0.006,
+        "net_pnl": 764.0
+      }
+    },
+    "KPHX": {
+      "n_obs": 548,
+      "correction_factor_f": 1.069,
+      "before": {
+        "strike_accuracy": 0.5547,
+        "directional_accuracy": 0.9672,
+        "net_pnl": 2833.52
+      },
+      "after": {
+        "strike_accuracy": 0.3796,
+        "directional_accuracy": 0.9891,
+        "net_pnl": -2833.52
+      },
+      "delta": {
+        "strike_accuracy": -0.1752,
+        "directional_accuracy": 0.0219,
+        "net_pnl": -5667.04
+      }
+    },
+    "KSAT": {
+      "n_obs": 267,
+      "correction_factor_f": 0.763,
+      "before": {
+        "strike_accuracy": 0.1835,
+        "directional_accuracy": 0.6704,
+        "net_pnl": -244.52
+      },
+      "after": {
+        "strike_accuracy": 0.1049,
+        "directional_accuracy": 0.7004,
+        "net_pnl": 244.52
+      },
+      "delta": {
+        "strike_accuracy": -0.0787,
+        "directional_accuracy": 0.03,
+        "net_pnl": 489.04
+      }
+    },
+    "KSEA": {
+      "n_obs": 432,
+      "correction_factor_f": 0.703,
+      "before": {
+        "strike_accuracy": 0.1458,
+        "directional_accuracy": 0.838,
+        "net_pnl": 680.0
+      },
+      "after": {
+        "strike_accuracy": 0.213,
+        "directional_accuracy": 0.8426,
+        "net_pnl": -680.0
+      },
+      "delta": {
+        "strike_accuracy": 0.0671,
+        "directional_accuracy": 0.0046,
+        "net_pnl": -1360.0
+      }
+    },
+    "KSFO": {
+      "n_obs": 702,
+      "correction_factor_f": 0.84,
+      "before": {
+        "strike_accuracy": 0.1923,
+        "directional_accuracy": 0.7849,
+        "net_pnl": 1205.0
+      },
+      "after": {
+        "strike_accuracy": 0.2023,
+        "directional_accuracy": 0.8376,
+        "net_pnl": -1205.0
+      },
+      "delta": {
+        "strike_accuracy": 0.01,
+        "directional_accuracy": 0.0527,
+        "net_pnl": -2410.0
+      }
+    }
+  },
+  "nws_audit_summary": {
+    "audit_version": "2026-09-04",
+    "global_signed_mean_f": 0.73,
+    "global_mae_f": 0.758,
+    "strike_change_rate": 0.613,
+    "direction_flip_rate": 0.116,
+    "revised_up_vs_down": [
+      13128,
+      1631
+    ]
+  },
+  "limitations": [
+    "Correction applied to GEFS mean temperature, not LOOP fused posterior distribution",
+    "PNL impact estimated via direction-flip rule; does not account for edge/market_price changes",
+    "Kalshi settlements use NWS CLI/SRRS reports, approximated here by GHCN-Daily TMAX",
+    "Single correction factor per station; does not model seasonal or regime-dependent variation",
+    "Live LOOP output at hourly resolution may have different correction dynamics"
+  ]
+}

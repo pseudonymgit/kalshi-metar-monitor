@@ -1,0 +1,290 @@
+{
+  "generated_utc": "2026-09-19T15:08:12Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "purpose": "re-score parked/killed signals on the R/T-1 correct universe",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) \u2014 core/settlement_outcome.strike_crossing_direction",
+  "truth_source": "settlement_truth.strike_price",
+  "n_labels": 14130,
+  "label_distribution": {
+    "down": 9275,
+    "up": 4855
+  },
+  "market_type_distribution": {
+    "HIGH": 10079,
+    "LOW": 4051
+  },
+  "base_rate_by_market_type": {
+    "HIGH_up": 0.10129973211628138,
+    "LOW_up": 0.9464329795112318
+  },
+  "temp_source_distribution": {
+    "ghcn": 13889,
+    "kalshi_finalized": 79,
+    "weatherapi": 162
+  },
+  "excluded": {
+    "between_excluded": 54,
+    "untrusted_excluded": 80,
+    "no_temp": 0,
+    "unknown_market_type": 0
+  },
+  "round_trip_fee": 0.0205,
+  "daily_series_unit": "fahrenheit (temp_f) \u2014 native unit for these signals",
+  "note": "R/T-1 ultimate_sweep.load_daily_series() fed temp_c into these in-memory signals (unit mismatch -> NO_FIRES). This re-score uses temp_f, matching the parked/killed build and signal semantics.",
+  "signals": {
+    "trajectory_state_vector": {
+      "accuracy": 0.490747,
+      "mcc": 0.001856,
+      "n": 12212,
+      "tp": 2266,
+      "fp": 4245,
+      "tn": 3727,
+      "fn": 1974,
+      "fired": 12212,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 8653,
+          "pred_min": 4631,
+          "actual_min": 877,
+          "caught_min": 530,
+          "precision": 0.1144461239473116,
+          "recall": 0.6043329532497149,
+          "delta": 0.013146391831030224,
+          "ev": -0.017353608168969775
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 3559,
+          "pred_min": 1679,
+          "actual_min": 196,
+          "caught_min": 52,
+          "precision": 0.030970815961882073,
+          "recall": 0.2653061224489796,
+          "delta": -0.022596204526886085,
+          "ev": -0.053096204526886084
+        }
+      }
+    },
+    "rdae_mos": {
+      "accuracy": 0.443789,
+      "mcc": -0.002173,
+      "n": 13227,
+      "tp": 3053,
+      "fp": 5880,
+      "tn": 2817,
+      "fn": 1477,
+      "fired": 13227,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 9445,
+          "pred_min": 6320,
+          "actual_min": 955,
+          "caught_min": 582,
+          "precision": 0.09208860759493671,
+          "recall": 0.6094240837696335,
+          "delta": -0.009211124521344663,
+          "ev": -0.03971112452134466
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 3782,
+          "pred_min": 1169,
+          "actual_min": 207,
+          "caught_min": 65,
+          "precision": 0.055603079555175364,
+          "recall": 0.3140096618357488,
+          "delta": 0.002036059066407206,
+          "ev": -0.028463940933592793
+        }
+      }
+    },
+    "sensor_bias_correction": {
+      "accuracy": 0.498358,
+      "mcc": -0.041794,
+      "n": 11269,
+      "tp": 1637,
+      "fp": 3291,
+      "tn": 3979,
+      "fn": 2362,
+      "fired": 11269,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 7895,
+          "pred_min": 3572,
+          "actual_min": 803,
+          "caught_min": 346,
+          "precision": 0.09686450167973125,
+          "recall": 0.43088418430884184,
+          "delta": -0.004435230436550128,
+          "ev": -0.03493523043655013
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 3374,
+          "pred_min": 2018,
+          "actual_min": 178,
+          "caught_min": 113,
+          "precision": 0.05599603567888999,
+          "recall": 0.6348314606741573,
+          "delta": 0.0024290151901218346,
+          "ev": -0.028070984809878165
+        }
+      }
+    },
+    "goldilocks": {
+      "accuracy": 0.494104,
+      "mcc": -0.029888,
+      "n": 9243,
+      "tp": 1495,
+      "fp": 2850,
+      "tn": 3072,
+      "fn": 1826,
+      "fired": 9243,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 6469,
+          "pred_min": 3083,
+          "actual_min": 710,
+          "caught_min": 294,
+          "precision": 0.09536166072007785,
+          "recall": 0.4140845070422535,
+          "delta": -0.005938071396203531,
+          "ev": -0.03643807139620353
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 2774,
+          "pred_min": 1512,
+          "actual_min": 163,
+          "caught_min": 102,
+          "precision": 0.06746031746031746,
+          "recall": 0.6257668711656442,
+          "delta": 0.013893296971549299,
+          "ev": -0.016606703028450708
+        }
+      }
+    },
+    "persistence": {
+      "accuracy": 0.51612,
+      "mcc": 0.027865,
+      "n": 14020,
+      "tp": 2449,
+      "fp": 4432,
+      "tn": 4787,
+      "fn": 2352,
+      "fired": 14020,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 10021,
+          "pred_min": 4850,
+          "actual_min": 1017,
+          "caught_min": 541,
+          "precision": 0.11154639175257731,
+          "recall": 0.5319567354965585,
+          "delta": 0.010246659636295938,
+          "ev": -0.02025334036370406
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 3999,
+          "pred_min": 1968,
+          "actual_min": 215,
+          "caught_min": 92,
+          "precision": 0.046747967479674794,
+          "recall": 0.42790697674418604,
+          "delta": -0.0068190530090933635,
+          "ev": -0.03731905300909336
+        }
+      }
+    },
+    "nwp_analog": {
+      "accuracy": 0.491518,
+      "mcc": -0.021014,
+      "n": 4716,
+      "tp": 1415,
+      "fp": 1412,
+      "tn": 903,
+      "fn": 986,
+      "fired": 4716,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 2361,
+          "pred_min": 1414,
+          "actual_min": 113,
+          "caught_min": 59,
+          "precision": 0.04172560113154172,
+          "recall": 0.5221238938053098,
+          "delta": -0.059574130984739654,
+          "ev": -0.09007413098473965
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 2355,
+          "pred_min": 942,
+          "actual_min": 67,
+          "caught_min": 10,
+          "precision": 0.010615711252653927,
+          "recall": 0.14925373134328357,
+          "delta": -0.04295130923611423,
+          "ev": -0.07345130923611423
+        }
+      }
+    },
+    "late_day_momentum": {
+      "accuracy": 0.529412,
+      "mcc": 0.117698,
+      "n": 17,
+      "tp": 5,
+      "fp": 6,
+      "tn": 4,
+      "fn": 2,
+      "fired": 17,
+      "per_market_type": {
+        "HIGH": {
+          "minority": "up",
+          "base": 0.10129973211628138,
+          "n_total": 11,
+          "pred_min": 7,
+          "actual_min": 2,
+          "caught_min": 2,
+          "precision": 0.2857142857142857,
+          "recall": 1.0,
+          "delta": 0.18441455359800432,
+          "ev": 0.1539145535980043
+        },
+        "LOW": {
+          "minority": "down",
+          "base": 0.05356702048876816,
+          "n_total": 6,
+          "pred_min": 2,
+          "actual_min": 1,
+          "caught_min": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "delta": -0.05356702048876816,
+          "ev": -0.08406702048876816
+        }
+      }
+    }
+  },
+  "read_only": true
+}

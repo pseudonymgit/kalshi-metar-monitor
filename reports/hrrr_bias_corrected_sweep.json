@@ -1,0 +1,1446 @@
+{
+  "generated": "2026-09-07T17:09:42.579862Z",
+  "method": "HRRR bias-corrected hourly forecast sweep \u2014 per-window strike accuracy vs raw",
+  "bias_offsets_used": {
+    "KATL": -10.8,
+    "KAUS": -12.9,
+    "KBOS": -9.05,
+    "KDCA": -9.57,
+    "KDEN": -15.48,
+    "KDFW": -10.34,
+    "KHOU": -9.16,
+    "KLAS": -10.66,
+    "KLAX": -7.53,
+    "KMDW": -8.38,
+    "KMIA": -7.97,
+    "KMSP": -10.42,
+    "KMSY": -9.3,
+    "KNYC": -6.8,
+    "KOKC": -12.16,
+    "KPHL": -9.85,
+    "KPHX": -10.9,
+    "KSAT": -11.66,
+    "KSEA": -11.48,
+    "KSFO": -7.3
+  },
+  "total_observations_hrrr": 28840,
+  "per_window": {
+    "h-1_corrected": {
+      "strike_accuracy": 0.0178,
+      "directional_accuracy": 0.3847,
+      "bucket_distance_mae": 7.81,
+      "n_obs": 1180
+    },
+    "h-1_raw": {
+      "strike_accuracy": 0.0407,
+      "directional_accuracy": 0.7797,
+      "bucket_distance_mae": 4.02,
+      "n_obs": 1180
+    },
+    "h-2_corrected": {
+      "strike_accuracy": 0.028,
+      "directional_accuracy": 0.3085,
+      "bucket_distance_mae": 8.77,
+      "n_obs": 1180
+    },
+    "h-2_raw": {
+      "strike_accuracy": 0.0271,
+      "directional_accuracy": 0.7178,
+      "bucket_distance_mae": 4.75,
+      "n_obs": 1180
+    },
+    "h-3_corrected": {
+      "strike_accuracy": 0.011,
+      "directional_accuracy": 0.2619,
+      "bucket_distance_mae": 9.64,
+      "n_obs": 1180
+    },
+    "h-3_raw": {
+      "strike_accuracy": 0.0347,
+      "directional_accuracy": 0.6237,
+      "bucket_distance_mae": 5.42,
+      "n_obs": 1180
+    },
+    "h-4_corrected": {
+      "strike_accuracy": 0.0102,
+      "directional_accuracy": 0.2331,
+      "bucket_distance_mae": 10.25,
+      "n_obs": 1180
+    },
+    "h-4_raw": {
+      "strike_accuracy": 0.0271,
+      "directional_accuracy": 0.5576,
+      "bucket_distance_mae": 5.91,
+      "n_obs": 1180
+    },
+    "h-6_corrected": {
+      "strike_accuracy": 0.0042,
+      "directional_accuracy": 0.1975,
+      "bucket_distance_mae": 11.06,
+      "n_obs": 2360
+    },
+    "h-6_raw": {
+      "strike_accuracy": 0.0301,
+      "directional_accuracy": 0.4966,
+      "bucket_distance_mae": 6.53,
+      "n_obs": 2360
+    },
+    "h-8_corrected": {
+      "strike_accuracy": 0.0017,
+      "directional_accuracy": 0.1758,
+      "bucket_distance_mae": 11.9,
+      "n_obs": 2360
+    },
+    "h-8_raw": {
+      "strike_accuracy": 0.0411,
+      "directional_accuracy": 0.4216,
+      "bucket_distance_mae": 7.19,
+      "n_obs": 2360
+    },
+    "h-12_corrected": {
+      "strike_accuracy": 0.0019,
+      "directional_accuracy": 0.1714,
+      "bucket_distance_mae": 12.63,
+      "n_obs": 4720
+    },
+    "h-12_raw": {
+      "strike_accuracy": 0.0559,
+      "directional_accuracy": 0.3669,
+      "bucket_distance_mae": 7.78,
+      "n_obs": 4720
+    },
+    "improvement": {
+      "h-1": {
+        "strike_accuracy_delta_pp": -2.29,
+        "directional_accuracy_delta_pp": -39.5,
+        "bucket_distance_mae_delta": 3.79
+      },
+      "h-2": {
+        "strike_accuracy_delta_pp": 0.09,
+        "directional_accuracy_delta_pp": -40.93,
+        "bucket_distance_mae_delta": 4.02
+      },
+      "h-3": {
+        "strike_accuracy_delta_pp": -2.37,
+        "directional_accuracy_delta_pp": -36.18,
+        "bucket_distance_mae_delta": 4.22
+      },
+      "h-4": {
+        "strike_accuracy_delta_pp": -1.69,
+        "directional_accuracy_delta_pp": -32.45,
+        "bucket_distance_mae_delta": 4.34
+      },
+      "h-6": {
+        "strike_accuracy_delta_pp": -2.59,
+        "directional_accuracy_delta_pp": -29.91,
+        "bucket_distance_mae_delta": 4.53
+      },
+      "h-8": {
+        "strike_accuracy_delta_pp": -3.94,
+        "directional_accuracy_delta_pp": -24.58,
+        "bucket_distance_mae_delta": 4.71
+      },
+      "h-12": {
+        "strike_accuracy_delta_pp": -5.4,
+        "directional_accuracy_delta_pp": -19.55,
+        "bucket_distance_mae_delta": 4.85
+      }
+    }
+  },
+  "per_station": {
+    "KATL": {
+      "bias_offset_f": -10.8,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 9.44,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 10.31,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 11.07,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 11.61,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 12.23,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 12.87,
+          "raw_strike_accuracy": 0.0593,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -5.93
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 13.36,
+          "raw_strike_accuracy": 0.0636,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -6.36
+        }
+      },
+      "overall_corrected_strike_acc": 0.0014,
+      "overall_raw_strike_acc": 0.041,
+      "overall_n": 708
+    },
+    "KAUS": {
+      "bias_offset_f": -12.9,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 9.8,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 11.17,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 3.39
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 12.15,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 12.83,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 14.09,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 15.19,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 16.03,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -1.69
+        }
+      },
+      "overall_corrected_strike_acc": 0.0042,
+      "overall_raw_strike_acc": 0.0056,
+      "overall_n": 708
+    },
+    "KBOS": {
+      "bias_offset_f": -9.05,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.2373,
+          "bucket_distance_mae": 8.63,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.7
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 9.31,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1017,
+          "bucket_distance_mae": 9.97,
+          "raw_strike_accuracy": 0.1017,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -10.17
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0847,
+          "bucket_distance_mae": 10.41,
+          "raw_strike_accuracy": 0.0847,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -8.47
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0847,
+          "bucket_distance_mae": 10.98,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0593,
+          "bucket_distance_mae": 11.52,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -0.85
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0763,
+          "bucket_distance_mae": 11.17,
+          "raw_strike_accuracy": 0.0297,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -2.97
+        }
+      },
+      "overall_corrected_strike_acc": 0.0014,
+      "overall_raw_strike_acc": 0.0367,
+      "overall_n": 708
+    },
+    "KDCA": {
+      "bias_offset_f": -9.57,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.2034,
+          "bucket_distance_mae": 9.2,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 10.0,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 10.46,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1017,
+          "bucket_distance_mae": 10.93,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0847,
+          "bucket_distance_mae": 11.48,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0593,
+          "bucket_distance_mae": 12.04,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0551,
+          "bucket_distance_mae": 12.23,
+          "raw_strike_accuracy": 0.0424,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -4.24
+        }
+      },
+      "overall_corrected_strike_acc": 0.0014,
+      "overall_raw_strike_acc": 0.0353,
+      "overall_n": 708
+    },
+    "KDEN": {
+      "bias_offset_f": -15.48,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.5085,
+          "bucket_distance_mae": 11.41,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.2542,
+          "bucket_distance_mae": 13.31,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 14.98,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 15.93,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1102,
+          "bucket_distance_mae": 17.02,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1017,
+          "bucket_distance_mae": 18.08,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1017,
+          "bucket_distance_mae": 19.56,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -0.85
+        }
+      },
+      "overall_corrected_strike_acc": 0.0028,
+      "overall_raw_strike_acc": 0.0042,
+      "overall_n": 708
+    },
+    "KDFW": {
+      "bias_offset_f": -10.34,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.339,
+          "bucket_distance_mae": 7.66,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.2373,
+          "bucket_distance_mae": 8.53,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0847,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 9.36,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 8.47
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 10.0,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 3.39
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 10.95,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 12.14,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 13.46,
+          "raw_strike_accuracy": 0.0593,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -5.93
+        }
+      },
+      "overall_corrected_strike_acc": 0.0127,
+      "overall_raw_strike_acc": 0.024,
+      "overall_n": 708
+    },
+    "KHOU": {
+      "bias_offset_f": -9.16,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 7.85,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 8.75,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 9.41,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 9.83,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 10.53,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 11.12,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1356,
+          "bucket_distance_mae": 11.78,
+          "raw_strike_accuracy": 0.0424,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -4.24
+        }
+      },
+      "overall_corrected_strike_acc": 0.0071,
+      "overall_raw_strike_acc": 0.0353,
+      "overall_n": 708
+    },
+    "KLAS": {
+      "bias_offset_f": -10.66,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.8305,
+          "bucket_distance_mae": 6.46,
+          "raw_strike_accuracy": 0.1525,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -13.56
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.8475,
+          "bucket_distance_mae": 7.14,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.7119,
+          "bucket_distance_mae": 8.81,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.5424,
+          "bucket_distance_mae": 9.58,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.2542,
+          "bucket_distance_mae": 10.58,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1271,
+          "bucket_distance_mae": 12.0,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -0.85
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0127,
+          "directional_accuracy": 0.1017,
+          "bucket_distance_mae": 13.72,
+          "raw_strike_accuracy": 0.0466,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -3.39
+        }
+      },
+      "overall_corrected_strike_acc": 0.0155,
+      "overall_raw_strike_acc": 0.0353,
+      "overall_n": 708
+    },
+    "KLAX": {
+      "bias_offset_f": -7.53,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 6.15,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 7.1,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 7.98,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 8.37,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 8.72,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 9.23,
+          "raw_strike_accuracy": 0.0593,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -5.93
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 9.61,
+          "raw_strike_accuracy": 0.072,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -7.2
+        }
+      },
+      "overall_corrected_strike_acc": 0.0,
+      "overall_raw_strike_acc": 0.0523,
+      "overall_n": 708
+    },
+    "KMDW": {
+      "bias_offset_f": -8.38,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.8475,
+          "bucket_distance_mae": 7.41,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 8.32,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.5593,
+          "bucket_distance_mae": 8.92,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.5085,
+          "bucket_distance_mae": 9.32,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.4153,
+          "bucket_distance_mae": 9.85,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.3305,
+          "bucket_distance_mae": 10.6,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.2669,
+          "bucket_distance_mae": 11.1,
+          "raw_strike_accuracy": 0.0805,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -8.05
+        }
+      },
+      "overall_corrected_strike_acc": 0.0,
+      "overall_raw_strike_acc": 0.0593,
+      "overall_n": 708
+    },
+    "KMIA": {
+      "bias_offset_f": -7.97,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0847,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 4.66,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 3.39
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0678,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 4.97,
+          "raw_strike_accuracy": 0.1017,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 5.24,
+          "raw_strike_accuracy": 0.1864,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -15.25
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 5.46,
+          "raw_strike_accuracy": 0.1695,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -13.56
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 5.61,
+          "raw_strike_accuracy": 0.1949,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -17.8
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 5.75,
+          "raw_strike_accuracy": 0.1864,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -16.95
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 5.67,
+          "raw_strike_accuracy": 0.2161,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -19.92
+        }
+      },
+      "overall_corrected_strike_acc": 0.0297,
+      "overall_raw_strike_acc": 0.178,
+      "overall_n": 708
+    },
+    "KMSP": {
+      "bias_offset_f": -10.42,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.2712,
+          "bucket_distance_mae": 7.86,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1864,
+          "bucket_distance_mae": 9.22,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 3.39
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 10.37,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 11.07,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 11.81,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 12.93,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -0.85
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 13.96,
+          "raw_strike_accuracy": 0.0593,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -5.93
+        }
+      },
+      "overall_corrected_strike_acc": 0.0056,
+      "overall_raw_strike_acc": 0.0339,
+      "overall_n": 708
+    },
+    "KMSY": {
+      "bias_offset_f": -9.3,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 8.25,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 9.08,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 9.61,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 9.98,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 10.63,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -0.85
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 11.02,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 11.46,
+          "raw_strike_accuracy": 0.0932,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -9.32
+        }
+      },
+      "overall_corrected_strike_acc": 0.0028,
+      "overall_raw_strike_acc": 0.0438,
+      "overall_n": 708
+    },
+    "KNYC": {
+      "bias_offset_f": -6.8,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.7627,
+          "bucket_distance_mae": 6.75,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0678,
+          "directional_accuracy": 0.678,
+          "bucket_distance_mae": 7.08,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 6.78
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.661,
+          "bucket_distance_mae": 7.41,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.5763,
+          "bucket_distance_mae": 7.83,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.5424,
+          "bucket_distance_mae": 8.21,
+          "raw_strike_accuracy": 0.0254,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -2.54
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.4322,
+          "bucket_distance_mae": 8.84,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0042,
+          "directional_accuracy": 0.428,
+          "bucket_distance_mae": 8.86,
+          "raw_strike_accuracy": 0.0381,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -3.39
+        }
+      },
+      "overall_corrected_strike_acc": 0.0071,
+      "overall_raw_strike_acc": 0.0268,
+      "overall_n": 708
+    },
+    "KOKC": {
+      "bias_offset_f": -12.16,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.3898,
+          "bucket_distance_mae": 8.76,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1864,
+          "bucket_distance_mae": 10.27,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.7
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 11.32,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 5.08
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 12.12,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 5.08
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 13.32,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 14.45,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 15.8,
+          "raw_strike_accuracy": 0.0042,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -0.42
+        }
+      },
+      "overall_corrected_strike_acc": 0.0113,
+      "overall_raw_strike_acc": 0.0085,
+      "overall_n": 708
+    },
+    "KPHL": {
+      "bias_offset_f": -9.85,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.4237,
+          "bucket_distance_mae": 9.37,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.7
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.2373,
+          "bucket_distance_mae": 10.12,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1864,
+          "bucket_distance_mae": 10.51,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 10.93,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 11.5,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0678,
+          "bucket_distance_mae": 12.03,
+          "raw_strike_accuracy": 0.0763,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -7.63
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.0593,
+          "bucket_distance_mae": 12.11,
+          "raw_strike_accuracy": 0.0551,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -5.51
+        }
+      },
+      "overall_corrected_strike_acc": 0.0028,
+      "overall_raw_strike_acc": 0.0395,
+      "overall_n": 708
+    },
+    "KPHX": {
+      "bias_offset_f": -10.9,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.6102,
+          "bucket_distance_mae": 6.76,
+          "raw_strike_accuracy": 0.1525,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -13.56
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.5254,
+          "bucket_distance_mae": 7.63,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.322,
+          "bucket_distance_mae": 8.54,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -5.08
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.2542,
+          "bucket_distance_mae": 9.17,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 10.47,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -1.7
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 11.69,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -1.7
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0042,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 13.22,
+          "raw_strike_accuracy": 0.0424,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -3.82
+        }
+      },
+      "overall_corrected_strike_acc": 0.0127,
+      "overall_raw_strike_acc": 0.048,
+      "overall_n": 708
+    },
+    "KSAT": {
+      "bias_offset_f": -11.66,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 8.24,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.7
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 9.73,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.69
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 10.64,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 11.42,
+          "raw_strike_accuracy": 0.0,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 12.9,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -1.69
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 14.03,
+          "raw_strike_accuracy": 0.0424,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -4.24
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 14.89,
+          "raw_strike_accuracy": 0.0805,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -8.05
+        }
+      },
+      "overall_corrected_strike_acc": 0.0071,
+      "overall_raw_strike_acc": 0.041,
+      "overall_n": 708
+    },
+    "KSEA": {
+      "bias_offset_f": -11.48,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0169,
+          "directional_accuracy": 0.3729,
+          "bucket_distance_mae": 6.78,
+          "raw_strike_accuracy": 0.0847,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.3559,
+          "bucket_distance_mae": 7.51,
+          "raw_strike_accuracy": 0.0847,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -8.47
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.2712,
+          "bucket_distance_mae": 8.63,
+          "raw_strike_accuracy": 0.0339,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -3.39
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.1695,
+          "bucket_distance_mae": 9.97,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 3.39
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 11.4,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": 2.54
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 12.97,
+          "raw_strike_accuracy": 0.0085,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -0.85
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1525,
+          "bucket_distance_mae": 14.41,
+          "raw_strike_accuracy": 0.0466,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -4.66
+        }
+      },
+      "overall_corrected_strike_acc": 0.0113,
+      "overall_raw_strike_acc": 0.0367,
+      "overall_n": 708
+    },
+    "KSFO": {
+      "bias_offset_f": -7.3,
+      "per_window": {
+        "h-1": {
+          "corrected_strike_accuracy": 0.0339,
+          "directional_accuracy": 0.2881,
+          "bucket_distance_mae": 4.73,
+          "raw_strike_accuracy": 0.0169,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 1.7
+        },
+        "h-2": {
+          "corrected_strike_accuracy": 0.0508,
+          "directional_accuracy": 0.2034,
+          "bucket_distance_mae": 5.88,
+          "raw_strike_accuracy": 0.0508,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": 0.0
+        },
+        "h-3": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.2034,
+          "bucket_distance_mae": 7.36,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-4": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1864,
+          "bucket_distance_mae": 8.15,
+          "raw_strike_accuracy": 0.0678,
+          "n_obs": 59,
+          "strike_accuracy_improvement_pp": -6.78
+        },
+        "h-6": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 8.89,
+          "raw_strike_accuracy": 0.0424,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -4.24
+        },
+        "h-8": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 9.54,
+          "raw_strike_accuracy": 0.0593,
+          "n_obs": 118,
+          "strike_accuracy_improvement_pp": -5.93
+        },
+        "h-12": {
+          "corrected_strike_accuracy": 0.0,
+          "directional_accuracy": 0.1186,
+          "bucket_distance_mae": 10.21,
+          "raw_strike_accuracy": 0.0212,
+          "n_obs": 236,
+          "strike_accuracy_improvement_pp": -2.12
+        }
+      },
+      "overall_corrected_strike_acc": 0.0071,
+      "overall_raw_strike_acc": 0.041,
+      "overall_n": 708
+    }
+  },
+  "summary": {
+    "best_corrected_window": "h-2",
+    "best_corrected_accuracy": 0.028,
+    "best_raw_window": "h-12",
+    "best_raw_accuracy": 0.0559,
+    "overall_corrected_strike_accuracy": 0.0072,
+    "overall_raw_strike_accuracy": 0.0413,
+    "overall_strike_accuracy_improvement_pp": -3.41,
+    "total_matched_corrected": 27180,
+    "total_matched_raw": 27180,
+    "no_settlement_obs": 460,
+    "unknown_station_obs": 0,
+    "no_bias_obs": 0
+  }
+}

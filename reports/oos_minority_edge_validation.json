@@ -1,0 +1,273 @@
+{
+  "generated": "2026-09-19",
+  "signal": "pressure_tendency",
+  "market_type": "LOW",
+  "direction": "down",
+  "round_trip_fee": 0.0205,
+  "pooled_base_rate": 0.05356702048876816,
+  "temporal_oos": {
+    "train_n": 107,
+    "train_precision": 0.21495327102803738,
+    "train_station_matched_lift": 1.7375400176551357,
+    "test_n": 46,
+    "test_hits": 7,
+    "test_precision": 0.15217391304347827,
+    "test_wilson_lo": 0.07572186234017478,
+    "test_wilson_hi": 0.28224417406315094,
+    "test_station_matched_lift": 0.9400404614585361,
+    "test_ev_measured": 0.06810689255471011,
+    "test_ev_wilson_lb": -0.008345158148593379
+  },
+  "station_stability": {
+    "table": [
+      {
+        "station": "KDEN",
+        "preds": 47,
+        "hits": 22,
+        "precision": 0.46808510638297873,
+        "base": 0.3236363636363636,
+        "lift": 1.4463303848912266,
+        "note": ""
+      },
+      {
+        "station": "KAUS",
+        "preds": 18,
+        "hits": 4,
+        "precision": 0.2222222222222222,
+        "base": 0.16,
+        "lift": 1.3888888888888888,
+        "note": ""
+      },
+      {
+        "station": "KNYC",
+        "preds": 17,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.044444444444444446,
+        "lift": 0.0,
+        "note": ""
+      },
+      {
+        "station": "KPHL",
+        "preds": 16,
+        "hits": 1,
+        "precision": 0.0625,
+        "base": 0.02181818181818182,
+        "lift": 2.864583333333333,
+        "note": ""
+      },
+      {
+        "station": "KMDW",
+        "preds": 11,
+        "hits": 1,
+        "precision": 0.09090909090909091,
+        "base": 0.04363636363636364,
+        "lift": 2.083333333333333,
+        "note": ""
+      },
+      {
+        "station": "KBOS",
+        "preds": 6,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.030303030303030304,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KLAX",
+        "preds": 6,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.0036363636363636364,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KOKC",
+        "preds": 5,
+        "hits": 1,
+        "precision": 0.2,
+        "base": 0.03048780487804878,
+        "lift": 6.5600000000000005,
+        "note": "small-n"
+      },
+      {
+        "station": "KDFW",
+        "preds": 5,
+        "hits": 1,
+        "precision": 0.2,
+        "base": 0.036585365853658534,
+        "lift": 5.466666666666668,
+        "note": "small-n"
+      },
+      {
+        "station": "KMIA",
+        "preds": 5,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.025454545454545455,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KLAS",
+        "preds": 4,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.012269938650306749,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KSAT",
+        "preds": 4,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.042682926829268296,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KMSP",
+        "preds": 3,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.012195121951219513,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KDCA",
+        "preds": 2,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.0,
+        "lift": Infinity,
+        "note": "no-down-station (base=0)"
+      },
+      {
+        "station": "KHOU",
+        "preds": 2,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.042682926829268296,
+        "lift": 0.0,
+        "note": "small-n"
+      },
+      {
+        "station": "KATL",
+        "preds": 1,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.0,
+        "lift": Infinity,
+        "note": "no-down-station (base=0)"
+      },
+      {
+        "station": "KSEA",
+        "preds": 1,
+        "hits": 0,
+        "precision": 0.0,
+        "base": 0.0,
+        "lift": Infinity,
+        "note": "no-down-station (base=0)"
+      }
+    ],
+    "top_station": "KDEN",
+    "top_station_share": 0.30718954248366015,
+    "n_stations": 17
+  },
+  "walk_forward": {
+    "window": 30,
+    "min": 0.13333333333333333,
+    "max": 0.4,
+    "mean": 0.2107526881720429,
+    "first_half_mean": 0.24247311827956963,
+    "second_half_mean": 0.179032258064516,
+    "timeline": [
+      {
+        "date": "2026-01-31",
+        "precision": 0.23333333333333334
+      },
+      {
+        "date": "2026-02-23",
+        "precision": 0.3333333333333333
+      },
+      {
+        "date": "2026-03-10",
+        "precision": 0.4
+      },
+      {
+        "date": "2026-03-19",
+        "precision": 0.26666666666666666
+      },
+      {
+        "date": "2026-03-24",
+        "precision": 0.16666666666666666
+      },
+      {
+        "date": "2026-03-29",
+        "precision": 0.16666666666666666
+      },
+      {
+        "date": "2026-04-05",
+        "precision": 0.16666666666666666
+      },
+      {
+        "date": "2026-04-17",
+        "precision": 0.2
+      },
+      {
+        "date": "2026-04-27",
+        "precision": 0.16666666666666666
+      },
+      {
+        "date": "2026-05-15",
+        "precision": 0.2
+      },
+      {
+        "date": "2026-06-07",
+        "precision": 0.16666666666666666
+      },
+      {
+        "date": "2026-06-18",
+        "precision": 0.16666666666666666
+      },
+      {
+        "date": "2026-08-03",
+        "precision": 0.13333333333333333
+      }
+    ]
+  },
+  "pressure_delta_crosscheck": {
+    "n": 1015,
+    "hits": 97,
+    "precision": 0.09556650246305419,
+    "wilson_lo": 0.07897437742710482,
+    "wilson_hi": 0.11520850634992195,
+    "naive_lift": 1.7840548455199672,
+    "station_matched_lift": 1.595191327541898,
+    "ev_measured": 0.011499481974286033,
+    "ev_wilson_lb": -0.005092643061663328,
+    "test_n": 305,
+    "test_precision": 0.05245901639344262,
+    "test_station_matched_lift": 1.078676202396437
+  },
+  "pressure_tendency_full": {
+    "n": 153,
+    "hits": 30,
+    "precision": 0.19607843137254902,
+    "wilson_lo": 0.14094165512787293,
+    "wilson_hi": 0.26610341454751935,
+    "station_matched_expected_hits": 20.683593181553686,
+    "station_matched_lift": 1.4504249690404372
+  },
+  "verdict": {
+    "real_or_artifact": "ARTIFACT",
+    "station_matched_lift": 1.4504249690404372,
+    "non_kden_precision": 0.07547169811320754,
+    "non_kden_wilson_lo": 0.03873637400565599,
+    "reasoning": "The 3.7x lift was an artifact of pooling heterogeneous stations.   - KDEN alone resolves LOW-'down' 32.4% of the time (not 5.36%).   - KDEN drives 47/153 of signal predictions and 22/30 of hits.   - Station-matched lift = 1.45x, not 3.66x.   - Non-KDEN subset: 8/106 hits, precision=0.0755 (Wilson [0.0387,0.1419]) \u2014 LB below 5.36% base."
+  }
+}

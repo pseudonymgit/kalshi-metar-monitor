@@ -1,0 +1,5389 @@
+{
+  "generated": "2026-09-07T09:00:20.254002+00:00",
+  "method": "NWP multi-lead backfill + strike bucket comparison",
+  "n_observations": 25965,
+  "n_pool_observations": 5600,
+  "n_stations": 20,
+  "parameters": {
+    "models": [
+      "gfs",
+      "ecmwf",
+      "gem",
+      "icon",
+      "era5"
+    ],
+    "lead_days": "0d through 6d",
+    "strike_bucket_method": "2degF buckets from strike_map.json strike prices",
+    "settlement_priority": "Kalshi finalized > GHCN daily high",
+    "ensemble_method": "Simple pool-of-pools mean temperature across available models",
+    "window_classification": {
+      "lead_0d_1d": "h-24",
+      "lead_2d_3d": "h-48",
+      "lead_4d_6d": "h-72+"
+    }
+  },
+  "per_model_per_lead": {
+    "gfs": {
+      "lead_0d": {
+        "n_obs": 860,
+        "n_stations": 20,
+        "strike_accuracy": 0.2872,
+        "directional_accuracy": 0.8477,
+        "bucket_distance_mae": 2.3058,
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 840,
+        "n_stations": 20,
+        "strike_accuracy": 0.2345,
+        "directional_accuracy": 0.844,
+        "bucket_distance_mae": 2.5119,
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 820,
+        "n_stations": 20,
+        "strike_accuracy": 0.1537,
+        "directional_accuracy": 0.8439,
+        "bucket_distance_mae": 3.128,
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 800,
+        "n_stations": 20,
+        "strike_accuracy": 0.1537,
+        "directional_accuracy": 0.8387,
+        "bucket_distance_mae": 3.2563,
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 780,
+        "n_stations": 20,
+        "strike_accuracy": 0.1538,
+        "directional_accuracy": 0.8346,
+        "bucket_distance_mae": 3.2808,
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 760,
+        "n_stations": 20,
+        "strike_accuracy": 0.1368,
+        "directional_accuracy": 0.8303,
+        "bucket_distance_mae": 3.3842,
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 740,
+        "n_stations": 20,
+        "strike_accuracy": 0.1527,
+        "directional_accuracy": 0.8284,
+        "bucket_distance_mae": 3.3649,
+        "low_confidence": false
+      }
+    },
+    "ecmwf": {
+      "lead_0d": {
+        "n_obs": 860,
+        "n_stations": 20,
+        "strike_accuracy": 0.1826,
+        "directional_accuracy": 0.8302,
+        "bucket_distance_mae": 2.6837,
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 840,
+        "n_stations": 20,
+        "strike_accuracy": 0.1786,
+        "directional_accuracy": 0.8226,
+        "bucket_distance_mae": 2.7833,
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 820,
+        "n_stations": 20,
+        "strike_accuracy": 0.1756,
+        "directional_accuracy": 0.8268,
+        "bucket_distance_mae": 2.872,
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 800,
+        "n_stations": 20,
+        "strike_accuracy": 0.19,
+        "directional_accuracy": 0.825,
+        "bucket_distance_mae": 2.9525,
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 780,
+        "n_stations": 20,
+        "strike_accuracy": 0.1846,
+        "directional_accuracy": 0.8179,
+        "bucket_distance_mae": 3.0756,
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 760,
+        "n_stations": 20,
+        "strike_accuracy": 0.1553,
+        "directional_accuracy": 0.8105,
+        "bucket_distance_mae": 3.1632,
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 740,
+        "n_stations": 20,
+        "strike_accuracy": 0.1284,
+        "directional_accuracy": 0.7946,
+        "bucket_distance_mae": 3.2608,
+        "low_confidence": false
+      }
+    },
+    "gem": {
+      "lead_0d": {
+        "n_obs": 860,
+        "n_stations": 20,
+        "strike_accuracy": 0.1779,
+        "directional_accuracy": 0.8488,
+        "bucket_distance_mae": 2.5488,
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 840,
+        "n_stations": 20,
+        "strike_accuracy": 0.1738,
+        "directional_accuracy": 0.8405,
+        "bucket_distance_mae": 2.7202,
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 820,
+        "n_stations": 20,
+        "strike_accuracy": 0.1476,
+        "directional_accuracy": 0.8305,
+        "bucket_distance_mae": 2.7878,
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 800,
+        "n_stations": 20,
+        "strike_accuracy": 0.1412,
+        "directional_accuracy": 0.8175,
+        "bucket_distance_mae": 2.9337,
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 780,
+        "n_stations": 20,
+        "strike_accuracy": 0.1141,
+        "directional_accuracy": 0.809,
+        "bucket_distance_mae": 2.9295,
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 760,
+        "n_stations": 20,
+        "strike_accuracy": 0.1395,
+        "directional_accuracy": 0.8026,
+        "bucket_distance_mae": 3.0158,
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 740,
+        "n_stations": 20,
+        "strike_accuracy": 0.123,
+        "directional_accuracy": 0.8,
+        "bucket_distance_mae": 3.1878,
+        "low_confidence": false
+      }
+    },
+    "icon": {
+      "lead_0d": {
+        "n_obs": 860,
+        "n_stations": 20,
+        "strike_accuracy": 0.243,
+        "directional_accuracy": 0.8477,
+        "bucket_distance_mae": 2.3884,
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 840,
+        "n_stations": 20,
+        "strike_accuracy": 0.231,
+        "directional_accuracy": 0.8452,
+        "bucket_distance_mae": 2.5167,
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 820,
+        "n_stations": 20,
+        "strike_accuracy": 0.2195,
+        "directional_accuracy": 0.8415,
+        "bucket_distance_mae": 2.6549,
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 800,
+        "n_stations": 20,
+        "strike_accuracy": 0.2137,
+        "directional_accuracy": 0.8425,
+        "bucket_distance_mae": 2.8213,
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 780,
+        "n_stations": 20,
+        "strike_accuracy": 0.2,
+        "directional_accuracy": 0.841,
+        "bucket_distance_mae": 2.8718,
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 760,
+        "n_stations": 20,
+        "strike_accuracy": 0.1882,
+        "directional_accuracy": 0.8316,
+        "bucket_distance_mae": 3.0105,
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 720,
+        "n_stations": 20,
+        "strike_accuracy": 0.1708,
+        "directional_accuracy": 0.8278,
+        "bucket_distance_mae": 3.1861,
+        "low_confidence": false
+      }
+    },
+    "era5": {
+      "lead_0d": {
+        "n_obs": 3585,
+        "n_stations": 17,
+        "strike_accuracy": 0.2678,
+        "directional_accuracy": 0.9197,
+        "bucket_distance_mae": 1.3707,
+        "low_confidence": false
+      },
+      "lead_1d": null,
+      "lead_2d": null,
+      "lead_3d": null,
+      "lead_4d": null,
+      "lead_5d": null,
+      "lead_6d": null
+    }
+  },
+  "ensemble_mean": {
+    "lead_0d": {
+      "n_obs": 860,
+      "strike_accuracy": 0.2442,
+      "directional_accuracy": 0.8488,
+      "bucket_distance_mae": 2.3291,
+      "avg_models_per_pool": 4.0,
+      "low_confidence": false
+    },
+    "lead_1d": {
+      "n_obs": 840,
+      "strike_accuracy": 0.2405,
+      "directional_accuracy": 0.8429,
+      "bucket_distance_mae": 2.4381,
+      "avg_models_per_pool": 4.0,
+      "low_confidence": false
+    },
+    "lead_2d": {
+      "n_obs": 820,
+      "strike_accuracy": 0.2037,
+      "directional_accuracy": 0.8402,
+      "bucket_distance_mae": 2.5988,
+      "avg_models_per_pool": 4.0,
+      "low_confidence": false
+    },
+    "lead_3d": {
+      "n_obs": 800,
+      "strike_accuracy": 0.215,
+      "directional_accuracy": 0.84,
+      "bucket_distance_mae": 2.69,
+      "avg_models_per_pool": 4.0,
+      "low_confidence": false
+    },
+    "lead_4d": {
+      "n_obs": 780,
+      "strike_accuracy": 0.2192,
+      "directional_accuracy": 0.8346,
+      "bucket_distance_mae": 2.6974,
+      "avg_models_per_pool": 4.0,
+      "low_confidence": false
+    },
+    "lead_5d": {
+      "n_obs": 760,
+      "strike_accuracy": 0.2224,
+      "directional_accuracy": 0.8316,
+      "bucket_distance_mae": 2.7697,
+      "avg_models_per_pool": 4.0,
+      "low_confidence": false
+    },
+    "lead_6d": {
+      "n_obs": 740,
+      "strike_accuracy": 0.2054,
+      "directional_accuracy": 0.8284,
+      "bucket_distance_mae": 2.8703,
+      "avg_models_per_pool": 3.97,
+      "low_confidence": false
+    }
+  },
+  "fusion_proxy": {
+    "pool_of_pools_lead0d": {
+      "strike_accuracy": 0.2442,
+      "directional_accuracy": 0.8488,
+      "n_obs": 860,
+      "avg_models_per_pool": 4.0
+    },
+    "pool_of_pools_lead1d": {
+      "strike_accuracy": 0.2405,
+      "directional_accuracy": 0.8429,
+      "n_obs": 840,
+      "avg_models_per_pool": 4.0
+    },
+    "pool_of_pools_lead2d": {
+      "strike_accuracy": 0.2037,
+      "directional_accuracy": 0.8402,
+      "n_obs": 820,
+      "avg_models_per_pool": 4.0
+    },
+    "pool_of_pools_lead3d": {
+      "strike_accuracy": 0.215,
+      "directional_accuracy": 0.84,
+      "n_obs": 800,
+      "avg_models_per_pool": 4.0
+    },
+    "pool_of_pools_lead4d": {
+      "strike_accuracy": 0.2192,
+      "directional_accuracy": 0.8346,
+      "n_obs": 780,
+      "avg_models_per_pool": 4.0
+    },
+    "pool_of_pools_lead5d": {
+      "strike_accuracy": 0.2224,
+      "directional_accuracy": 0.8316,
+      "n_obs": 760,
+      "avg_models_per_pool": 4.0
+    },
+    "pool_of_pools_lead6d": {
+      "strike_accuracy": 0.2054,
+      "directional_accuracy": 0.8284,
+      "n_obs": 740,
+      "avg_models_per_pool": 3.97
+    }
+  },
+  "per_window": {
+    "h-24": {
+      "n_obs": 10385,
+      "strike_accuracy": 0.2324,
+      "directional_accuracy": 0.8681,
+      "bucket_distance_mae": 2.1471,
+      "per_model": {
+        "gfs": {
+          "n_obs": 1700,
+          "strike_accuracy": 0.2612,
+          "directional_accuracy": 0.8459
+        },
+        "ecmwf": {
+          "n_obs": 1700,
+          "strike_accuracy": 0.1806,
+          "directional_accuracy": 0.8265
+        },
+        "gem": {
+          "n_obs": 1700,
+          "strike_accuracy": 0.1759,
+          "directional_accuracy": 0.8447
+        },
+        "icon": {
+          "n_obs": 1700,
+          "strike_accuracy": 0.2371,
+          "directional_accuracy": 0.8465
+        },
+        "era5": {
+          "n_obs": 3585,
+          "strike_accuracy": 0.2678,
+          "directional_accuracy": 0.9197
+        }
+      },
+      "low_confidence": false
+    },
+    "h-48": {
+      "n_obs": 6480,
+      "strike_accuracy": 0.1744,
+      "directional_accuracy": 0.8333,
+      "bucket_distance_mae": 2.925,
+      "per_model": {
+        "gfs": {
+          "n_obs": 1620,
+          "strike_accuracy": 0.1537,
+          "directional_accuracy": 0.8414
+        },
+        "ecmwf": {
+          "n_obs": 1620,
+          "strike_accuracy": 0.1827,
+          "directional_accuracy": 0.8259
+        },
+        "gem": {
+          "n_obs": 1620,
+          "strike_accuracy": 0.1444,
+          "directional_accuracy": 0.8241
+        },
+        "icon": {
+          "n_obs": 1620,
+          "strike_accuracy": 0.2167,
+          "directional_accuracy": 0.842
+        }
+      },
+      "low_confidence": false
+    },
+    "h-72+": {
+      "n_obs": 9100,
+      "strike_accuracy": 0.1541,
+      "directional_accuracy": 0.8191,
+      "bucket_distance_mae": 3.1423,
+      "per_model": {
+        "gfs": {
+          "n_obs": 2280,
+          "strike_accuracy": 0.1478,
+          "directional_accuracy": 0.8311
+        },
+        "ecmwf": {
+          "n_obs": 2280,
+          "strike_accuracy": 0.1566,
+          "directional_accuracy": 0.8079
+        },
+        "gem": {
+          "n_obs": 2280,
+          "strike_accuracy": 0.1254,
+          "directional_accuracy": 0.8039
+        },
+        "icon": {
+          "n_obs": 2260,
+          "strike_accuracy": 0.1867,
+          "directional_accuracy": 0.8336
+        }
+      },
+      "low_confidence": false
+    }
+  },
+  "ensemble_per_window": {
+    "h-24": {
+      "n_obs": 1700,
+      "strike_accuracy": 0.2424,
+      "directional_accuracy": 0.8459,
+      "low_confidence": false
+    },
+    "h-48": {
+      "n_obs": 1620,
+      "strike_accuracy": 0.2093,
+      "directional_accuracy": 0.8401,
+      "low_confidence": false
+    },
+    "h-72+": {
+      "n_obs": 2280,
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.8316,
+      "low_confidence": false
+    }
+  },
+  "per_station_per_lead": {
+    "KATL": {
+      "lead_0d": {
+        "n_obs": 251,
+        "strike_accuracy": 0.2032,
+        "directional_accuracy": 0.8685,
+        "bucket_distance_mae": 2.0598,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4651,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 1.907
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2326,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.1395
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0465,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 3.093
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.4651
+          },
+          "era5": {
+            "n_obs": 79,
+            "strike_accuracy": 0.1899,
+            "directional_accuracy": 0.9367,
+            "bucket_distance_mae": 1.3165
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2083,
+        "directional_accuracy": 0.8333,
+        "bucket_distance_mae": 2.6488,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.4286
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.4286
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1429,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 3.0238
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.7143
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1585,
+        "directional_accuracy": 0.8293,
+        "bucket_distance_mae": 2.9512,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1707,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.2683
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2195,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.3171
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0732,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.3171
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1707,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.9024
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1625,
+        "directional_accuracy": 0.8187,
+        "bucket_distance_mae": 3.1313,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.2,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.275
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.65
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.8,
+            "bucket_distance_mae": 3.55
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.15,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.05
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1667,
+        "directional_accuracy": 0.8141,
+        "bucket_distance_mae": 3.109,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.3333
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2821,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.5128
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0256,
+            "directional_accuracy": 0.7949,
+            "bucket_distance_mae": 3.5128
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.0769
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.125,
+        "directional_accuracy": 0.7895,
+        "bucket_distance_mae": 3.2961,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.4737
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.6316
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0263,
+            "directional_accuracy": 0.7368,
+            "bucket_distance_mae": 3.8684
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.7895,
+            "bucket_distance_mae": 3.2105
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.102,
+        "directional_accuracy": 0.7823,
+        "bucket_distance_mae": 3.5102,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0811,
+            "directional_accuracy": 0.7838,
+            "bucket_distance_mae": 3.5135
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.027
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.7568,
+            "bucket_distance_mae": 3.8649
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.0833,
+            "directional_accuracy": 0.7778,
+            "bucket_distance_mae": 3.6389
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KAUS": {
+      "lead_0d": {
+        "n_obs": 580,
+        "strike_accuracy": 0.1621,
+        "directional_accuracy": 0.8879,
+        "bucket_distance_mae": 1.95,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.8837
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.814
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1163,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.7907
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3721,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.5814
+          },
+          "era5": {
+            "n_obs": 408,
+            "strike_accuracy": 0.1471,
+            "directional_accuracy": 0.9093,
+            "bucket_distance_mae": 1.6054
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2083,
+        "directional_accuracy": 0.8333,
+        "bucket_distance_mae": 2.7738,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2143,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.7619
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.5952
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0714,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 3.0238
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3095,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.7143
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2134,
+        "directional_accuracy": 0.8293,
+        "bucket_distance_mae": 3.0122,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.561
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2683,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.7805
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0732,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.9512
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3171,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.7561
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.2375,
+        "directional_accuracy": 0.825,
+        "bucket_distance_mae": 3.0688,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.75
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.3,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.7
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.125
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.4,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.7
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.25,
+        "directional_accuracy": 0.8205,
+        "bucket_distance_mae": 3.1795,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.7692
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.3333,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.8462
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1026,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.1282
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.359,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.9744
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.2237,
+        "directional_accuracy": 0.8158,
+        "bucket_distance_mae": 3.2763,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.6579
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2368,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.0526
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.2105
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.3421,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.1842
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.2245,
+        "directional_accuracy": 0.8095,
+        "bucket_distance_mae": 3.3197,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2162,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.7297
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1622,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 2.973
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.3243
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.3889,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 3.25
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KBOS": {
+      "lead_0d": {
+        "n_obs": 250,
+        "strike_accuracy": 0.308,
+        "directional_accuracy": 0.948,
+        "bucket_distance_mae": 1.724,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2791,
+            "directional_accuracy": 0.9535,
+            "bucket_distance_mae": 1.8605
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.186,
+            "directional_accuracy": 0.9535,
+            "bucket_distance_mae": 2.186
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3488,
+            "directional_accuracy": 0.9535,
+            "bucket_distance_mae": 2.093
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2093,
+            "directional_accuracy": 0.9535,
+            "bucket_distance_mae": 2.093
+          },
+          "era5": {
+            "n_obs": 78,
+            "strike_accuracy": 0.4231,
+            "directional_accuracy": 0.9359,
+            "bucket_distance_mae": 0.9872
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.244,
+        "directional_accuracy": 0.9524,
+        "bucket_distance_mae": 2.2381,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2143,
+            "directional_accuracy": 0.9524,
+            "bucket_distance_mae": 2.119
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1905,
+            "directional_accuracy": 0.9524,
+            "bucket_distance_mae": 2.2381
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2857,
+            "directional_accuracy": 0.9524,
+            "bucket_distance_mae": 2.5714
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2857,
+            "directional_accuracy": 0.9524,
+            "bucket_distance_mae": 2.0238
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1037,
+        "directional_accuracy": 0.9512,
+        "bucket_distance_mae": 2.5732,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0732,
+            "directional_accuracy": 0.9512,
+            "bucket_distance_mae": 2.4878
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.9512,
+            "bucket_distance_mae": 2.5122
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.9512,
+            "bucket_distance_mae": 2.7561
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.9512,
+            "bucket_distance_mae": 2.5366
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.15,
+        "directional_accuracy": 0.95,
+        "bucket_distance_mae": 2.7625,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.2,
+            "directional_accuracy": 0.95,
+            "bucket_distance_mae": 2.4
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.2,
+            "directional_accuracy": 0.95,
+            "bucket_distance_mae": 2.75
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.025,
+            "directional_accuracy": 0.95,
+            "bucket_distance_mae": 3.05
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.95,
+            "bucket_distance_mae": 2.85
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.0962,
+        "directional_accuracy": 0.9295,
+        "bucket_distance_mae": 3.1474,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.8974,
+            "bucket_distance_mae": 2.9744
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.9487,
+            "bucket_distance_mae": 3.3846
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.9231,
+            "bucket_distance_mae": 3.2564
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1026,
+            "directional_accuracy": 0.9487,
+            "bucket_distance_mae": 2.9744
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.0789,
+        "directional_accuracy": 0.9408,
+        "bucket_distance_mae": 3.1579,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0263,
+            "directional_accuracy": 0.9474,
+            "bucket_distance_mae": 3.1579
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.9474,
+            "bucket_distance_mae": 3.2105
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.9211,
+            "bucket_distance_mae": 3.2105
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.9474,
+            "bucket_distance_mae": 3.0526
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1156,
+        "directional_accuracy": 0.9388,
+        "bucket_distance_mae": 3.3197,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.9189,
+            "bucket_distance_mae": 3.1892
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.9459,
+            "bucket_distance_mae": 3.4865
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.9459,
+            "bucket_distance_mae": 3.2973
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.0556,
+            "directional_accuracy": 0.9444,
+            "bucket_distance_mae": 3.3056
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KDCA": {
+      "lead_0d": {
+        "n_obs": 265,
+        "strike_accuracy": 0.2189,
+        "directional_accuracy": 0.9019,
+        "bucket_distance_mae": 2.3925,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1628,
+            "directional_accuracy": 0.9302,
+            "bucket_distance_mae": 2.0698
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1628,
+            "directional_accuracy": 0.9302,
+            "bucket_distance_mae": 2.186
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3023,
+            "directional_accuracy": 0.9302,
+            "bucket_distance_mae": 2.0233
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2558,
+            "directional_accuracy": 0.9302,
+            "bucket_distance_mae": 2.0
+          },
+          "era5": {
+            "n_obs": 93,
+            "strike_accuracy": 0.2151,
+            "directional_accuracy": 0.8495,
+            "bucket_distance_mae": 2.9892
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2321,
+        "directional_accuracy": 0.9286,
+        "bucket_distance_mae": 2.4048,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.9286,
+            "bucket_distance_mae": 2.3333
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 0.9286,
+            "bucket_distance_mae": 2.4762
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.9286,
+            "bucket_distance_mae": 2.5476
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.9286,
+            "bucket_distance_mae": 2.2619
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1951,
+        "directional_accuracy": 0.9268,
+        "bucket_distance_mae": 2.4268,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1707,
+            "directional_accuracy": 0.9268,
+            "bucket_distance_mae": 2.4634
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2683,
+            "directional_accuracy": 0.9268,
+            "bucket_distance_mae": 2.4878
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.9268,
+            "bucket_distance_mae": 2.6341
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2195,
+            "directional_accuracy": 0.9268,
+            "bucket_distance_mae": 2.122
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1875,
+        "directional_accuracy": 0.9187,
+        "bucket_distance_mae": 2.8687,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.925,
+            "bucket_distance_mae": 3.275
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.2,
+            "directional_accuracy": 0.925,
+            "bucket_distance_mae": 2.775
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.9,
+            "bucket_distance_mae": 2.7
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 0.925,
+            "bucket_distance_mae": 2.725
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.2244,
+        "directional_accuracy": 0.9231,
+        "bucket_distance_mae": 2.6667,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.3077,
+            "directional_accuracy": 0.9231,
+            "bucket_distance_mae": 2.9487
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.9231,
+            "bucket_distance_mae": 2.5641
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.9231,
+            "bucket_distance_mae": 2.5641
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2564,
+            "directional_accuracy": 0.9231,
+            "bucket_distance_mae": 2.5897
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1118,
+        "directional_accuracy": 0.9211,
+        "bucket_distance_mae": 3.0395,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.9211,
+            "bucket_distance_mae": 3.4211
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.9211,
+            "bucket_distance_mae": 2.7632
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.9211,
+            "bucket_distance_mae": 2.8684
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.9211,
+            "bucket_distance_mae": 3.1053
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.102,
+        "directional_accuracy": 0.9116,
+        "bucket_distance_mae": 3.2585,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1892,
+            "directional_accuracy": 0.8919,
+            "bucket_distance_mae": 3.2162
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.9189,
+            "bucket_distance_mae": 3.5946
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.027,
+            "directional_accuracy": 0.9189,
+            "bucket_distance_mae": 3.3243
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1944,
+            "directional_accuracy": 0.9167,
+            "bucket_distance_mae": 2.8889
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KDEN": {
+      "lead_0d": {
+        "n_obs": 579,
+        "strike_accuracy": 0.2591,
+        "directional_accuracy": 0.9102,
+        "bucket_distance_mae": 2.0017,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3256,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 2.9535
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2093,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 3.0233
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 3.2558
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0465,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 3.5814
+          },
+          "era5": {
+            "n_obs": 407,
+            "strike_accuracy": 0.2973,
+            "directional_accuracy": 0.9312,
+            "bucket_distance_mae": 1.4939
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.1429,
+        "directional_accuracy": 0.8571,
+        "bucket_distance_mae": 3.3333,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 3.0
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0952,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 3.4286
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1429,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 3.2857
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0714,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 3.619
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.128,
+        "directional_accuracy": 0.8537,
+        "bucket_distance_mae": 3.5122,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1707,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 3.6098
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 3.4634
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 3.3902
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 3.5854
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1,
+        "directional_accuracy": 0.85,
+        "bucket_distance_mae": 3.7687,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.15,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 3.925
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.05,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 3.775
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.075,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 3.675
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 3.7
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1218,
+        "directional_accuracy": 0.8462,
+        "bucket_distance_mae": 3.8077,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 4.1282
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 3.5641
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0256,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 3.8974
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 3.641
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1118,
+        "directional_accuracy": 0.8421,
+        "bucket_distance_mae": 4.1316,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1053,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 4.4737
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 4.1579
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2105,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 3.7105
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 4.1842
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1224,
+        "directional_accuracy": 0.8367,
+        "bucket_distance_mae": 4.2313,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1892,
+            "directional_accuracy": 0.8378,
+            "bucket_distance_mae": 4.6757
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0541,
+            "directional_accuracy": 0.8378,
+            "bucket_distance_mae": 4.0
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8378,
+            "bucket_distance_mae": 3.973
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1111,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 4.2778
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KDFW": {
+      "lead_0d": {
+        "n_obs": 243,
+        "strike_accuracy": 0.2346,
+        "directional_accuracy": 0.8601,
+        "bucket_distance_mae": 2.5267,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3488,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.2326
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3023,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.4884
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.5814
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4186,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.3488
+          },
+          "era5": {
+            "n_obs": 71,
+            "strike_accuracy": 0.0986,
+            "directional_accuracy": 0.9155,
+            "bucket_distance_mae": 2.8028
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2679,
+        "directional_accuracy": 0.8333,
+        "bucket_distance_mae": 2.5119,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3333,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.3571
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1905,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.5952
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1429,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.6429
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.4048,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.4524
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2195,
+        "directional_accuracy": 0.8232,
+        "bucket_distance_mae": 2.9268,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0488,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.5366
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2927,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.7805
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.7317
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3415,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.6585
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.2125,
+        "directional_accuracy": 0.825,
+        "bucket_distance_mae": 3.0312,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.1,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.7
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.275,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.775
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.875
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.35,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.775
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1731,
+        "directional_accuracy": 0.8205,
+        "bucket_distance_mae": 3.109,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.6154
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2564,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.8462
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0513,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.9487
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.0256
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1908,
+        "directional_accuracy": 0.8158,
+        "bucket_distance_mae": 3.1382,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.5789
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2105,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.8947
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.9474
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2632,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.1316
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1769,
+        "directional_accuracy": 0.8095,
+        "bucket_distance_mae": 3.2041,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.7568
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2432,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 2.8108
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0811,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.2162
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.2778,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 3.0278
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KHOU": {
+      "lead_0d": {
+        "n_obs": 244,
+        "strike_accuracy": 0.2992,
+        "directional_accuracy": 0.8566,
+        "bucket_distance_mae": 1.7418,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2791,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.186
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3256,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.0
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2326,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.093
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4884,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 1.814
+          },
+          "era5": {
+            "n_obs": 72,
+            "strike_accuracy": 0.2222,
+            "directional_accuracy": 0.9028,
+            "bucket_distance_mae": 1.0694
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.3036,
+        "directional_accuracy": 0.8274,
+        "bucket_distance_mae": 2.2381,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.4286
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3333,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.119
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.1905
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.381,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.2143
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2134,
+        "directional_accuracy": 0.8293,
+        "bucket_distance_mae": 2.7195,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 4.0488
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3171,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.1707
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2927,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.2195
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2439,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.439
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.25,
+        "directional_accuracy": 0.8187,
+        "bucket_distance_mae": 2.8813,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.05,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 4.15
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.275,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.3
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.375,
+            "directional_accuracy": 0.8,
+            "bucket_distance_mae": 2.575
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.3,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.5
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1603,
+        "directional_accuracy": 0.8141,
+        "bucket_distance_mae": 3.0833,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 4.3077
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2564,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.2821
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.7949,
+            "bucket_distance_mae": 2.9744
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.7692
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1842,
+        "directional_accuracy": 0.8092,
+        "bucket_distance_mae": 3.0132,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0263,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 4.0526
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2105,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.3684
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2632,
+            "directional_accuracy": 0.7895,
+            "bucket_distance_mae": 2.7895
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2368,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.8421
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1633,
+        "directional_accuracy": 0.8095,
+        "bucket_distance_mae": 3.0408,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0541,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 4.1081
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2432,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 2.2703
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.0
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.2222,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 2.7778
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KLAS": {
+      "lead_0d": {
+        "n_obs": 272,
+        "strike_accuracy": 0.2537,
+        "directional_accuracy": 0.9081,
+        "bucket_distance_mae": 1.8235,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4419,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 2.093
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1395,
+            "directional_accuracy": 0.8837,
+            "bucket_distance_mae": 2.4186
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2791,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 2.3023
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2558,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 2.2558
+          },
+          "era5": {
+            "n_obs": 100,
+            "strike_accuracy": 0.21,
+            "directional_accuracy": 0.98,
+            "bucket_distance_mae": 1.06
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2976,
+        "directional_accuracy": 0.869,
+        "bucket_distance_mae": 2.3214,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.4286,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 2.2857
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2857,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 2.3095
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2857,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 2.4524
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1905,
+            "directional_accuracy": 0.9048,
+            "bucket_distance_mae": 2.2381
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2927,
+        "directional_accuracy": 0.8659,
+        "bucket_distance_mae": 2.4634,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1463,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 2.8293
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3415,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 2.3415
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3659,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 2.4878
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3171,
+            "directional_accuracy": 0.9024,
+            "bucket_distance_mae": 2.1951
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.2875,
+        "directional_accuracy": 0.8562,
+        "bucket_distance_mae": 2.6375,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.2,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 2.875
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.45,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 2.45
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.225,
+            "directional_accuracy": 0.85,
+            "bucket_distance_mae": 2.975
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.275,
+            "directional_accuracy": 0.875,
+            "bucket_distance_mae": 2.25
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.2949,
+        "directional_accuracy": 0.8526,
+        "bucket_distance_mae": 2.6859,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 2.9231
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.3846,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 2.5897
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 2.9487
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.4103,
+            "directional_accuracy": 0.8718,
+            "bucket_distance_mae": 2.2821
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.2829,
+        "directional_accuracy": 0.8487,
+        "bucket_distance_mae": 2.8355,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2632,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 3.1053
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.3421,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 2.6316
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.8421,
+            "bucket_distance_mae": 3.1579
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.3684,
+            "directional_accuracy": 0.8684,
+            "bucket_distance_mae": 2.4474
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1633,
+        "directional_accuracy": 0.8367,
+        "bucket_distance_mae": 3.1633,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2162,
+            "directional_accuracy": 0.8378,
+            "bucket_distance_mae": 3.3784
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1622,
+            "directional_accuracy": 0.8378,
+            "bucket_distance_mae": 2.9459
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1622,
+            "directional_accuracy": 0.8378,
+            "bucket_distance_mae": 3.4595
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1111,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.8611
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KLAX": {
+      "lead_0d": {
+        "n_obs": 586,
+        "strike_accuracy": 0.2372,
+        "directional_accuracy": 0.8549,
+        "bucket_distance_mae": 1.7918,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4186,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 1.2093
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 5.907
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0233,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.7907
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.3488
+          },
+          "era5": {
+            "n_obs": 414,
+            "strike_accuracy": 0.2802,
+            "directional_accuracy": 0.8623,
+            "bucket_distance_mae": 1.2633
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.0952,
+        "directional_accuracy": 0.8333,
+        "bucket_distance_mae": 3.1667,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2143,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 1.4524
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 6.1667
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0714,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.7619
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0952,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.2857
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.0915,
+        "directional_accuracy": 0.8293,
+        "bucket_distance_mae": 3.3232,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2683,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 1.5122
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 6.3415
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0244,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.878
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0732,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.561
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1313,
+        "directional_accuracy": 0.825,
+        "bucket_distance_mae": 3.4188,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.275,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 1.625
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 6.65
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.2,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.425
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.05,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.975
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1154,
+        "directional_accuracy": 0.8205,
+        "bucket_distance_mae": 3.3141,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 1.7949
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 6.8974
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 1.5385
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0256,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.0256
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1184,
+        "directional_accuracy": 0.8158,
+        "bucket_distance_mae": 3.2566,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2632,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 1.8684
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 6.2632
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 1.7632
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.1316
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1565,
+        "directional_accuracy": 0.8095,
+        "bucket_distance_mae": 3.0748,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2703,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 1.9189
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 5.0541
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2973,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 1.8649
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.0556,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 3.4722
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KMDW": {
+      "lead_0d": {
+        "n_obs": 583,
+        "strike_accuracy": 0.2899,
+        "directional_accuracy": 0.9708,
+        "bucket_distance_mae": 1.3328,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3488,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 1.4884
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2558,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 1.6977
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0698,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.186
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3488,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 1.5814
+          },
+          "era5": {
+            "n_obs": 411,
+            "strike_accuracy": 0.3041,
+            "directional_accuracy": 0.9586,
+            "bucket_distance_mae": 1.163
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.1786,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 1.9881,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2143,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 1.9048
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.119,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.0714
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.119,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2381
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 1.7381
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2073,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.1402,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2683,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.0976
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1463
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2195
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2439,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.0976
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1437,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.3438,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.625
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.15,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.275
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.05,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.325
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.15
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1538,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.2628,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2308
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.3333
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1282
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.359
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1513,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.3158,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1053
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.6579
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.0789
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.4211
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1565,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.585,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2432
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1622,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.8649
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2432,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1892
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.0833,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 3.0556
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KMIA": {
+      "lead_0d": {
+        "n_obs": 537,
+        "strike_accuracy": 0.2365,
+        "directional_accuracy": 0.7356,
+        "bucket_distance_mae": 1.8082,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.4651,
+            "bucket_distance_mae": 3.6279
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.4651,
+            "bucket_distance_mae": 3.5116
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1163,
+            "directional_accuracy": 0.4651,
+            "bucket_distance_mae": 3.4419
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0698,
+            "directional_accuracy": 0.4884,
+            "bucket_distance_mae": 3.5581
+          },
+          "era5": {
+            "n_obs": 365,
+            "strike_accuracy": 0.3151,
+            "directional_accuracy": 0.8603,
+            "bucket_distance_mae": 0.9945
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.0714,
+        "directional_accuracy": 0.4643,
+        "bucket_distance_mae": 3.5119,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0238,
+            "directional_accuracy": 0.5,
+            "bucket_distance_mae": 3.5952
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.4048,
+            "bucket_distance_mae": 3.4048
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1905,
+            "directional_accuracy": 0.4762,
+            "bucket_distance_mae": 3.5238
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0714,
+            "directional_accuracy": 0.4762,
+            "bucket_distance_mae": 3.5238
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1402,
+        "directional_accuracy": 0.4817,
+        "bucket_distance_mae": 3.5732,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2683,
+            "directional_accuracy": 0.4878,
+            "bucket_distance_mae": 3.9512
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.4634,
+            "bucket_distance_mae": 3.3902
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 0.4878,
+            "bucket_distance_mae": 3.4878
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.4878,
+            "bucket_distance_mae": 3.4634
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1313,
+        "directional_accuracy": 0.4813,
+        "bucket_distance_mae": 3.5,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 0.5,
+            "bucket_distance_mae": 3.825
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.375,
+            "bucket_distance_mae": 3.275
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.5,
+            "bucket_distance_mae": 3.45
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.1,
+            "directional_accuracy": 0.55,
+            "bucket_distance_mae": 3.45
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.0833,
+        "directional_accuracy": 0.5,
+        "bucket_distance_mae": 3.4359,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.5128,
+            "bucket_distance_mae": 3.7949
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.4615,
+            "bucket_distance_mae": 3.4103
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.5128,
+            "bucket_distance_mae": 3.2564
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0769,
+            "directional_accuracy": 0.5128,
+            "bucket_distance_mae": 3.2821
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.0855,
+        "directional_accuracy": 0.5132,
+        "bucket_distance_mae": 3.3289,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1053,
+            "directional_accuracy": 0.5,
+            "bucket_distance_mae": 3.6842
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0263,
+            "directional_accuracy": 0.5,
+            "bucket_distance_mae": 3.2632
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.5263,
+            "bucket_distance_mae": 3.1053
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.5263,
+            "bucket_distance_mae": 3.2632
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.0884,
+        "directional_accuracy": 0.4966,
+        "bucket_distance_mae": 3.2653,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0811,
+            "directional_accuracy": 0.5405,
+            "bucket_distance_mae": 3.3784
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.027,
+            "directional_accuracy": 0.3784,
+            "bucket_distance_mae": 3.2973
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.5405,
+            "bucket_distance_mae": 3.2432
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1389,
+            "directional_accuracy": 0.5278,
+            "bucket_distance_mae": 3.1389
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KMSP": {
+      "lead_0d": {
+        "n_obs": 172,
+        "strike_accuracy": 0.1977,
+        "directional_accuracy": 0.814,
+        "bucket_distance_mae": 2.4593,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2326,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.3256
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2093,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.4186
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.186,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.7674
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1628,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.3256
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.1607,
+        "directional_accuracy": 0.8036,
+        "bucket_distance_mae": 2.7976,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.7143
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.8095
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1429,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 3.0714
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.7857,
+            "bucket_distance_mae": 2.5952
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.0976,
+        "directional_accuracy": 0.7866,
+        "bucket_distance_mae": 3.2256,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0488,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 4.4878
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0488,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.8293
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.7561,
+            "bucket_distance_mae": 3.0488
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 0.7805,
+            "bucket_distance_mae": 2.5366
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.15,
+        "directional_accuracy": 0.7812,
+        "bucket_distance_mae": 2.9937,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.075,
+            "directional_accuracy": 0.8,
+            "bucket_distance_mae": 4.125
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.8,
+            "bucket_distance_mae": 2.55
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.75,
+            "bucket_distance_mae": 2.75
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.225,
+            "directional_accuracy": 0.775,
+            "bucket_distance_mae": 2.55
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1474,
+        "directional_accuracy": 0.7885,
+        "bucket_distance_mae": 2.75,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0513,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.7179
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 0.7692,
+            "bucket_distance_mae": 2.6667
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.7436,
+            "bucket_distance_mae": 2.4872
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.1282
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1513,
+        "directional_accuracy": 0.7566,
+        "bucket_distance_mae": 3.0329,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 3.8947
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2368,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 2.6316
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.7105,
+            "bucket_distance_mae": 3.0789
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.7895,
+            "bucket_distance_mae": 2.5263
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1156,
+        "directional_accuracy": 0.7483,
+        "bucket_distance_mae": 3.1905,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.6486
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.7568,
+            "bucket_distance_mae": 3.0541
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.5946,
+            "bucket_distance_mae": 3.2703
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.0833,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.7778
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KMSY": {
+      "lead_0d": {
+        "n_obs": 172,
+        "strike_accuracy": 0.2442,
+        "directional_accuracy": 0.7907,
+        "bucket_distance_mae": 2.3372,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3488,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.3721
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0465,
+            "directional_accuracy": 0.7442,
+            "bucket_distance_mae": 2.8372
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3023,
+            "directional_accuracy": 0.7907,
+            "bucket_distance_mae": 2.0698
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2791,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.0698
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2083,
+        "directional_accuracy": 0.7619,
+        "bucket_distance_mae": 2.4821,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.7619,
+            "bucket_distance_mae": 2.6667
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0238,
+            "directional_accuracy": 0.7143,
+            "bucket_distance_mae": 2.7381
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3095,
+            "directional_accuracy": 0.7619,
+            "bucket_distance_mae": 2.2619
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3333,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.2619
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1707,
+        "directional_accuracy": 0.7561,
+        "bucket_distance_mae": 2.6524,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2439,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.6585
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.7073,
+            "bucket_distance_mae": 2.878
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1463,
+            "directional_accuracy": 0.7805,
+            "bucket_distance_mae": 2.561
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2927,
+            "directional_accuracy": 0.7317,
+            "bucket_distance_mae": 2.5122
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1313,
+        "directional_accuracy": 0.7625,
+        "bucket_distance_mae": 2.7062,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.775,
+            "bucket_distance_mae": 2.95
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.05,
+            "directional_accuracy": 0.75,
+            "bucket_distance_mae": 2.625
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.75,
+            "bucket_distance_mae": 2.55
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.775,
+            "bucket_distance_mae": 2.7
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1731,
+        "directional_accuracy": 0.7436,
+        "bucket_distance_mae": 2.7244,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.7692,
+            "bucket_distance_mae": 2.9231
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.6923,
+            "bucket_distance_mae": 2.7949
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.7179,
+            "bucket_distance_mae": 2.6667
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2821,
+            "directional_accuracy": 0.7949,
+            "bucket_distance_mae": 2.5128
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1447,
+        "directional_accuracy": 0.7434,
+        "bucket_distance_mae": 2.7829,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.7895,
+            "bucket_distance_mae": 2.9211
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.6579,
+            "bucket_distance_mae": 3.1316
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 2.5789
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2105,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 2.5
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1293,
+        "directional_accuracy": 0.7483,
+        "bucket_distance_mae": 2.8231,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.7838,
+            "bucket_distance_mae": 3.0811
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0811,
+            "directional_accuracy": 0.6757,
+            "bucket_distance_mae": 2.9189
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.7838,
+            "bucket_distance_mae": 2.6486
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.2222,
+            "directional_accuracy": 0.75,
+            "bucket_distance_mae": 2.6389
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KNYC": {
+      "lead_0d": {
+        "n_obs": 637,
+        "strike_accuracy": 0.3061,
+        "directional_accuracy": 0.967,
+        "bucket_distance_mae": 1.6028,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2558,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1395
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2558,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.0698
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.186,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.0233
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4186,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 1.7674
+          },
+          "era5": {
+            "n_obs": 465,
+            "strike_accuracy": 0.3161,
+            "directional_accuracy": 0.9548,
+            "bucket_distance_mae": 1.4559
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2262,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.244,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2857
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1905,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2857
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2381
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1667
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2012,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.3659,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1463,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.6341
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2927,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.1707
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.4146
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2439,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.2439
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1938,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.5063,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.15,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.425
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.375
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.4
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.825
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.141,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.7885,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.6667
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2564,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.7692
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1026,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.7949
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0513,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.9231
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1579,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.8026,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.9474
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.7105
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.7895
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.7632
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1633,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 3.0204,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.8919
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1622,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 3.2432
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0811,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 3.027
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.2778,
+            "directional_accuracy": 1.0,
+            "bucket_distance_mae": 2.9167
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KOKC": {
+      "lead_0d": {
+        "n_obs": 244,
+        "strike_accuracy": 0.1557,
+        "directional_accuracy": 0.8648,
+        "bucket_distance_mae": 2.5328,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1628,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.9767
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.9535
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0465,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 3.0698
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.186,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 3.1163
+          },
+          "era5": {
+            "n_obs": 72,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.9306,
+            "bucket_distance_mae": 1.3472
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2381,
+        "directional_accuracy": 0.8333,
+        "bucket_distance_mae": 3.0833,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3571,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.7857
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3571,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.8333
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0714,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 3.3333
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 3.381
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1585,
+        "directional_accuracy": 0.8293,
+        "bucket_distance_mae": 3.6159,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0244,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 4.6585
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2439,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.0976
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1707,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.0976
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 3.6098
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1875,
+        "directional_accuracy": 0.825,
+        "bucket_distance_mae": 3.7625,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.025,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 4.975
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.3,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.225
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.275
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 3.575
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.141,
+        "directional_accuracy": 0.8205,
+        "bucket_distance_mae": 3.8526,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0513,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 4.8974
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0769,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.5385
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.3333
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2564,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.641
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1842,
+        "directional_accuracy": 0.8158,
+        "bucket_distance_mae": 3.875,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 4.8421
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2632,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.4737
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.5
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2368,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 3.6842
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1429,
+        "directional_accuracy": 0.8095,
+        "bucket_distance_mae": 4.068,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 4.7568
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1892,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.4595
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.8649
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1111,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 4.1944
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KPHL": {
+      "lead_0d": {
+        "n_obs": 537,
+        "strike_accuracy": 0.2551,
+        "directional_accuracy": 0.9683,
+        "bucket_distance_mae": 1.5382,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.9767,
+            "bucket_distance_mae": 2.3721
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.9767,
+            "bucket_distance_mae": 2.5814
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3256,
+            "directional_accuracy": 0.9767,
+            "bucket_distance_mae": 2.093
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.093,
+            "directional_accuracy": 0.9767,
+            "bucket_distance_mae": 2.2791
+          },
+          "era5": {
+            "n_obs": 365,
+            "strike_accuracy": 0.3041,
+            "directional_accuracy": 0.9644,
+            "bucket_distance_mae": 1.1644
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.1131,
+        "directional_accuracy": 0.9762,
+        "bucket_distance_mae": 2.4583,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0952,
+            "directional_accuracy": 0.9762,
+            "bucket_distance_mae": 2.4762
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0476,
+            "directional_accuracy": 0.9762,
+            "bucket_distance_mae": 2.5238
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.119,
+            "directional_accuracy": 0.9762,
+            "bucket_distance_mae": 2.5714
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1905,
+            "directional_accuracy": 0.9762,
+            "bucket_distance_mae": 2.2619
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1402,
+        "directional_accuracy": 0.9756,
+        "bucket_distance_mae": 2.5854,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2439,
+            "directional_accuracy": 0.9756,
+            "bucket_distance_mae": 2.4634
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.9756,
+            "bucket_distance_mae": 2.6829
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.9756,
+            "bucket_distance_mae": 2.4878
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.9756,
+            "bucket_distance_mae": 2.7073
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1625,
+        "directional_accuracy": 0.975,
+        "bucket_distance_mae": 2.6938,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 0.975,
+            "bucket_distance_mae": 2.45
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.075,
+            "directional_accuracy": 0.975,
+            "bucket_distance_mae": 2.725
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.1,
+            "directional_accuracy": 0.975,
+            "bucket_distance_mae": 2.775
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.225,
+            "directional_accuracy": 0.975,
+            "bucket_distance_mae": 2.825
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1667,
+        "directional_accuracy": 0.9744,
+        "bucket_distance_mae": 2.8462,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.9744,
+            "bucket_distance_mae": 2.6154
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.9744,
+            "bucket_distance_mae": 3.0513
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.9744,
+            "bucket_distance_mae": 2.8718
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 0.9744,
+            "bucket_distance_mae": 2.8462
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1118,
+        "directional_accuracy": 0.9737,
+        "bucket_distance_mae": 2.9671,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0526,
+            "directional_accuracy": 0.9737,
+            "bucket_distance_mae": 3.3158
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1053,
+            "directional_accuracy": 0.9737,
+            "bucket_distance_mae": 3.0789
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.9737,
+            "bucket_distance_mae": 2.7895
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2105,
+            "directional_accuracy": 0.9737,
+            "bucket_distance_mae": 2.6842
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1088,
+        "directional_accuracy": 0.9728,
+        "bucket_distance_mae": 3.1293,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1892,
+            "directional_accuracy": 0.973,
+            "bucket_distance_mae": 2.8108
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.027,
+            "directional_accuracy": 0.973,
+            "bucket_distance_mae": 3.4054
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.973,
+            "bucket_distance_mae": 3.027
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1111,
+            "directional_accuracy": 0.9722,
+            "bucket_distance_mae": 3.2778
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KPHX": {
+      "lead_0d": {
+        "n_obs": 250,
+        "strike_accuracy": 0.224,
+        "directional_accuracy": 0.828,
+        "bucket_distance_mae": 2.272,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4419,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.4651
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2791,
+            "directional_accuracy": 0.7907,
+            "bucket_distance_mae": 2.4884
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1395,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.9535
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2326,
+            "directional_accuracy": 0.814,
+            "bucket_distance_mae": 2.4884
+          },
+          "era5": {
+            "n_obs": 78,
+            "strike_accuracy": 0.1154,
+            "directional_accuracy": 0.8718,
+            "bucket_distance_mae": 1.5513
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.244,
+        "directional_accuracy": 0.8155,
+        "bucket_distance_mae": 2.631,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2619,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.5952
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2857,
+            "directional_accuracy": 0.7857,
+            "bucket_distance_mae": 2.5952
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1429,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.9286
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2857,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 2.4048
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2195,
+        "directional_accuracy": 0.8171,
+        "bucket_distance_mae": 2.7683,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.9512
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2927,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.6829
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1463,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.9512
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3171,
+            "directional_accuracy": 0.8537,
+            "bucket_distance_mae": 2.4878
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.2188,
+        "directional_accuracy": 0.8125,
+        "bucket_distance_mae": 2.8,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.1,
+            "directional_accuracy": 0.8,
+            "bucket_distance_mae": 3.075
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.325,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.6
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.1,
+            "directional_accuracy": 0.8,
+            "bucket_distance_mae": 3.075
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.35,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.45
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.2372,
+        "directional_accuracy": 0.8205,
+        "bucket_distance_mae": 2.7436,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.7949,
+            "bucket_distance_mae": 3.0769
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.3333,
+            "directional_accuracy": 0.7949,
+            "bucket_distance_mae": 2.5385
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 2.7949
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2564,
+            "directional_accuracy": 0.8462,
+            "bucket_distance_mae": 2.5641
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.2368,
+        "directional_accuracy": 0.7895,
+        "bucket_distance_mae": 2.9013,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.7895,
+            "bucket_distance_mae": 3.2632
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.3158,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 2.6842
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 0.7895,
+            "bucket_distance_mae": 3.0263
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2895,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.6316
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1701,
+        "directional_accuracy": 0.7823,
+        "bucket_distance_mae": 3.1905,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.7838,
+            "bucket_distance_mae": 3.4865
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2973,
+            "directional_accuracy": 0.7568,
+            "bucket_distance_mae": 3.1622
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.0811,
+            "directional_accuracy": 0.7838,
+            "bucket_distance_mae": 3.2432
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1944,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 2.8611
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KSAT": {
+      "lead_0d": {
+        "n_obs": 172,
+        "strike_accuracy": 0.3605,
+        "directional_accuracy": 0.8372,
+        "bucket_distance_mae": 2.1977,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.4651,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.0698
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3488,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.2791
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2326,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.3023
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3953,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.1395
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.3155,
+        "directional_accuracy": 0.8333,
+        "bucket_distance_mae": 2.2798,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.381,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.1667
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3333,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.2619
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1429,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.5238
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.4048,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.1667
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.2744,
+        "directional_accuracy": 0.8293,
+        "bucket_distance_mae": 2.4939,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2195,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.7805
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2927,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.3659
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1951,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.4878
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.3902,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.3415
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.2437,
+        "directional_accuracy": 0.825,
+        "bucket_distance_mae": 2.6437,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.225,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.775
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.325,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.45
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.75
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.25,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.6
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.2115,
+        "directional_accuracy": 0.8205,
+        "bucket_distance_mae": 2.7885,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2308,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 3.0256
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.7179
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1282,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.7692
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2821,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.641
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.25,
+        "directional_accuracy": 0.8158,
+        "bucket_distance_mae": 2.8289,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2895,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.9211
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2632,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.7368
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2105,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.7105
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.2368,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.9474
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.2449,
+        "directional_accuracy": 0.8095,
+        "bucket_distance_mae": 2.8435,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2703,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 3.1081
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.2973,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 2.5405
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.8108,
+            "bucket_distance_mae": 2.8378
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.2778,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 2.8889
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KSEA": {
+      "lead_0d": {
+        "n_obs": 179,
+        "strike_accuracy": 0.1899,
+        "directional_accuracy": 0.7598,
+        "bucket_distance_mae": 3.0335,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2791,
+            "directional_accuracy": 0.7674,
+            "bucket_distance_mae": 2.8605
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1163,
+            "directional_accuracy": 0.7209,
+            "bucket_distance_mae": 3.2093
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2558,
+            "directional_accuracy": 0.7907,
+            "bucket_distance_mae": 3.093
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1395,
+            "directional_accuracy": 0.7442,
+            "bucket_distance_mae": 3.0698
+          },
+          "era5": {
+            "n_obs": 7,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.8571,
+            "bucket_distance_mae": 2.4286
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.2083,
+        "directional_accuracy": 0.75,
+        "bucket_distance_mae": 3.1369,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.2381,
+            "directional_accuracy": 0.7857,
+            "bucket_distance_mae": 3.0952
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.119,
+            "directional_accuracy": 0.7381,
+            "bucket_distance_mae": 3.2619
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.3095,
+            "directional_accuracy": 0.7857,
+            "bucket_distance_mae": 3.119
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.6905,
+            "bucket_distance_mae": 3.0714
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1159,
+        "directional_accuracy": 0.7561,
+        "bucket_distance_mae": 3.4207,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 4.0
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0976,
+            "directional_accuracy": 0.7561,
+            "bucket_distance_mae": 3.1951
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1463,
+            "directional_accuracy": 0.7317,
+            "bucket_distance_mae": 3.3171
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.7317,
+            "bucket_distance_mae": 3.1707
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.1187,
+        "directional_accuracy": 0.7375,
+        "bucket_distance_mae": 3.6437,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.1,
+            "directional_accuracy": 0.75,
+            "bucket_distance_mae": 4.575
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.175,
+            "directional_accuracy": 0.725,
+            "bucket_distance_mae": 3.35
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.075,
+            "directional_accuracy": 0.725,
+            "bucket_distance_mae": 3.45
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.75,
+            "bucket_distance_mae": 3.2
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.1282,
+        "directional_accuracy": 0.7372,
+        "bucket_distance_mae": 3.6603,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0513,
+            "directional_accuracy": 0.7692,
+            "bucket_distance_mae": 4.4872
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.2051,
+            "directional_accuracy": 0.7179,
+            "bucket_distance_mae": 3.3077
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0769,
+            "directional_accuracy": 0.7436,
+            "bucket_distance_mae": 3.4615
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1795,
+            "directional_accuracy": 0.7179,
+            "bucket_distance_mae": 3.3846
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.1053,
+        "directional_accuracy": 0.7237,
+        "bucket_distance_mae": 3.9145,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1316,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 4.4211
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0263,
+            "directional_accuracy": 0.7368,
+            "bucket_distance_mae": 3.7105
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.7105,
+            "bucket_distance_mae": 3.8158
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1842,
+            "directional_accuracy": 0.6842,
+            "bucket_distance_mae": 3.7105
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1156,
+        "directional_accuracy": 0.7143,
+        "bucket_distance_mae": 3.8707,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1351,
+            "directional_accuracy": 0.7568,
+            "bucket_distance_mae": 4.027
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.027,
+            "directional_accuracy": 0.6757,
+            "bucket_distance_mae": 3.7838
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1081,
+            "directional_accuracy": 0.7027,
+            "bucket_distance_mae": 3.8378
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.1944,
+            "directional_accuracy": 0.7222,
+            "bucket_distance_mae": 3.8333
+          }
+        },
+        "low_confidence": false
+      }
+    },
+    "KSFO": {
+      "lead_0d": {
+        "n_obs": 272,
+        "strike_accuracy": 0.2353,
+        "directional_accuracy": 0.8309,
+        "bucket_distance_mae": 1.7169,
+        "per_model": {
+          "gfs": {
+            "n_obs": 43,
+            "strike_accuracy": 0.2093,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 2.0233
+          },
+          "ecmwf": {
+            "n_obs": 43,
+            "strike_accuracy": 0.0698,
+            "directional_accuracy": 0.6047,
+            "bucket_distance_mae": 2.4651
+          },
+          "gem": {
+            "n_obs": 43,
+            "strike_accuracy": 0.1628,
+            "directional_accuracy": 0.8605,
+            "bucket_distance_mae": 1.9535
+          },
+          "icon": {
+            "n_obs": 43,
+            "strike_accuracy": 0.3023,
+            "directional_accuracy": 0.8372,
+            "bucket_distance_mae": 1.8837
+          },
+          "era5": {
+            "n_obs": 100,
+            "strike_accuracy": 0.32,
+            "directional_accuracy": 0.91,
+            "bucket_distance_mae": 1.09
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_1d": {
+        "n_obs": 168,
+        "strike_accuracy": 0.125,
+        "directional_accuracy": 0.756,
+        "bucket_distance_mae": 2.4107,
+        "per_model": {
+          "gfs": {
+            "n_obs": 42,
+            "strike_accuracy": 0.119,
+            "directional_accuracy": 0.8095,
+            "bucket_distance_mae": 2.7857
+          },
+          "ecmwf": {
+            "n_obs": 42,
+            "strike_accuracy": 0.0952,
+            "directional_accuracy": 0.619,
+            "bucket_distance_mae": 2.5238
+          },
+          "gem": {
+            "n_obs": 42,
+            "strike_accuracy": 0.119,
+            "directional_accuracy": 0.7619,
+            "bucket_distance_mae": 2.0952
+          },
+          "icon": {
+            "n_obs": 42,
+            "strike_accuracy": 0.1667,
+            "directional_accuracy": 0.8333,
+            "bucket_distance_mae": 2.2381
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_2d": {
+        "n_obs": 164,
+        "strike_accuracy": 0.1402,
+        "directional_accuracy": 0.7439,
+        "bucket_distance_mae": 2.4634,
+        "per_model": {
+          "gfs": {
+            "n_obs": 41,
+            "strike_accuracy": 0.1463,
+            "directional_accuracy": 0.8049,
+            "bucket_distance_mae": 2.561
+          },
+          "ecmwf": {
+            "n_obs": 41,
+            "strike_accuracy": 0.0244,
+            "directional_accuracy": 0.6341,
+            "bucket_distance_mae": 2.8049
+          },
+          "gem": {
+            "n_obs": 41,
+            "strike_accuracy": 0.122,
+            "directional_accuracy": 0.7073,
+            "bucket_distance_mae": 2.3171
+          },
+          "icon": {
+            "n_obs": 41,
+            "strike_accuracy": 0.2683,
+            "directional_accuracy": 0.8293,
+            "bucket_distance_mae": 2.1707
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_3d": {
+        "n_obs": 160,
+        "strike_accuracy": 0.0938,
+        "directional_accuracy": 0.7312,
+        "bucket_distance_mae": 2.6562,
+        "per_model": {
+          "gfs": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.35
+          },
+          "ecmwf": {
+            "n_obs": 40,
+            "strike_accuracy": 0.05,
+            "directional_accuracy": 0.7,
+            "bucket_distance_mae": 2.775
+          },
+          "gem": {
+            "n_obs": 40,
+            "strike_accuracy": 0.075,
+            "directional_accuracy": 0.575,
+            "bucket_distance_mae": 2.925
+          },
+          "icon": {
+            "n_obs": 40,
+            "strike_accuracy": 0.125,
+            "directional_accuracy": 0.825,
+            "bucket_distance_mae": 2.575
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_4d": {
+        "n_obs": 156,
+        "strike_accuracy": 0.0769,
+        "directional_accuracy": 0.6667,
+        "bucket_distance_mae": 2.8333,
+        "per_model": {
+          "gfs": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0769,
+            "directional_accuracy": 0.7949,
+            "bucket_distance_mae": 2.3846
+          },
+          "ecmwf": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0,
+            "directional_accuracy": 0.641,
+            "bucket_distance_mae": 2.8974
+          },
+          "gem": {
+            "n_obs": 39,
+            "strike_accuracy": 0.0769,
+            "directional_accuracy": 0.4103,
+            "bucket_distance_mae": 3.2564
+          },
+          "icon": {
+            "n_obs": 39,
+            "strike_accuracy": 0.1538,
+            "directional_accuracy": 0.8205,
+            "bucket_distance_mae": 2.7949
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_5d": {
+        "n_obs": 152,
+        "strike_accuracy": 0.0921,
+        "directional_accuracy": 0.6447,
+        "bucket_distance_mae": 2.9737,
+        "per_model": {
+          "gfs": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1579,
+            "directional_accuracy": 0.7632,
+            "bucket_distance_mae": 2.5789
+          },
+          "ecmwf": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0789,
+            "directional_accuracy": 0.5526,
+            "bucket_distance_mae": 3.2105
+          },
+          "gem": {
+            "n_obs": 38,
+            "strike_accuracy": 0.0263,
+            "directional_accuracy": 0.4474,
+            "bucket_distance_mae": 3.3158
+          },
+          "icon": {
+            "n_obs": 38,
+            "strike_accuracy": 0.1053,
+            "directional_accuracy": 0.8158,
+            "bucket_distance_mae": 2.7895
+          }
+        },
+        "low_confidence": false
+      },
+      "lead_6d": {
+        "n_obs": 147,
+        "strike_accuracy": 0.1088,
+        "directional_accuracy": 0.6259,
+        "bucket_distance_mae": 2.898,
+        "per_model": {
+          "gfs": {
+            "n_obs": 37,
+            "strike_accuracy": 0.1622,
+            "directional_accuracy": 0.7838,
+            "bucket_distance_mae": 2.3784
+          },
+          "ecmwf": {
+            "n_obs": 37,
+            "strike_accuracy": 0.027,
+            "directional_accuracy": 0.4595,
+            "bucket_distance_mae": 3.3243
+          },
+          "gem": {
+            "n_obs": 37,
+            "strike_accuracy": 0.027,
+            "directional_accuracy": 0.4595,
+            "bucket_distance_mae": 3.2432
+          },
+          "icon": {
+            "n_obs": 36,
+            "strike_accuracy": 0.2222,
+            "directional_accuracy": 0.8056,
+            "bucket_distance_mae": 2.6389
+          }
+        },
+        "low_confidence": false
+      }
+    }
+  },
+  "summary": {
+    "overall_strike_accuracy_all_models": 0.1904,
+    "overall_directional_accuracy_all_models": 0.8422,
+    "overall_strike_accuracy_pool_of_pools": 0.222,
+    "overall_directional_accuracy_pool_of_pools": 0.8384,
+    "pool_of_pools_lead0d_strike_accuracy": 0.2442,
+    "overall_strike_accuracy_gfs_0d": 0.2872,
+    "accuracy_degradation_per_day": -0.0049,
+    "best_window_per_model": {
+      "gfs": "lead_0d",
+      "ecmwf": "lead_3d",
+      "gem": "lead_0d",
+      "icon": "lead_0d",
+      "era5": "lead_0d"
+    },
+    "best_window_pool_of_pools": "pool_of_pools_lead0d",
+    "strike_vs_directional_gap": 0.6518,
+    "total_observations": 25965,
+    "pool_total_observations": 5600,
+    "stations_analyzed": 20,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "low_confidence_pairs": [],
+    "date_range_forecasts": {
+      "min": "2025-01-01",
+      "max": "2026-09-05"
+    },
+    "date_range_settlements": {
+      "min": "2025-01-01",
+      "max": "2026-09-05"
+    }
+  },
+  "station_metadata": {
+    "KATL": {
+      "station_mean": 79.8,
+      "n_days": 279
+    },
+    "KAUS": {
+      "station_mean": 84.9,
+      "n_days": 1162
+    },
+    "KBOS": {
+      "station_mean": 66.5,
+      "n_days": 278
+    },
+    "KDCA": {
+      "station_mean": 72.7,
+      "n_days": 293
+    },
+    "KDEN": {
+      "station_mean": 69.5,
+      "n_days": 640
+    },
+    "KDFW": {
+      "station_mean": 85.7,
+      "n_days": 271
+    },
+    "KHOU": {
+      "station_mean": 84.4,
+      "n_days": 272
+    },
+    "KLAS": {
+      "station_mean": 88.5,
+      "n_days": 298
+    },
+    "KLAX": {
+      "station_mean": 71.3,
+      "n_days": 608
+    },
+    "KMDW": {
+      "station_mean": 64.0,
+      "n_days": 1808
+    },
+    "KMIA": {
+      "station_mean": 85.2,
+      "n_days": 1144
+    },
+    "KMSP": {
+      "station_mean": 76.5,
+      "n_days": 183
+    },
+    "KMSY": {
+      "station_mean": 85.5,
+      "n_days": 183
+    },
+    "KNYC": {
+      "station_mean": 64.8,
+      "n_days": 1853
+    },
+    "KOKC": {
+      "station_mean": 82.0,
+      "n_days": 272
+    },
+    "KPHL": {
+      "station_mean": 68.3,
+      "n_days": 589
+    },
+    "KPHX": {
+      "station_mean": 95.3,
+      "n_days": 277
+    },
+    "KSAT": {
+      "station_mean": 87.0,
+      "n_days": 183
+    },
+    "KSEA": {
+      "station_mean": 67.4,
+      "n_days": 206
+    },
+    "KSFO": {
+      "station_mean": 65.9,
+      "n_days": 298
+    }
+  }
+}

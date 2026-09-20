@@ -1,0 +1,348 @@
+{
+  "metadata": {
+    "script": "scripts/era5_persistence_baseline.py",
+    "task": "0.2",
+    "description": "ERA5 persistence baseline \u2014 \"yesterday ERA5 = today forecast\" directional accuracy vs LIOP fusion",
+    "liop_directional_accuracy": 0.6096
+  },
+  "summary": {
+    "persistence_accuracy": 0.5659,
+    "persistence_95ci": [
+      0.5214,
+      0.6733
+    ],
+    "liop_fusion_accuracy": 0.6096,
+    "liop_minus_persistence": 0.0437,
+    "red_flag": false,
+    "interpretation": "Persistence baseline gets direction right 56.6% of the time (95% CI: 52.1%\u201367.3%). LIOP fusion is 61.0%. Difference: LIOP is +4.4% vs persistence. \u2713 LIOP fusion beats naive persistence.",
+    "total_pairs": 3177,
+    "n_stations": 17
+  },
+  "seasonal": {
+    "winter": {
+      "accuracy": 0.5547,
+      "n_pairs": 869
+    },
+    "spring": {
+      "accuracy": 0.5774,
+      "n_pairs": 1285
+    },
+    "summer": {
+      "accuracy": 0.5226,
+      "n_pairs": 553
+    },
+    "fall": {
+      "accuracy": 0.6064,
+      "n_pairs": 470
+    }
+  },
+  "per_station": {
+    "KATL": {
+      "accuracy": 0.3623,
+      "n_pairs": 69,
+      "n_correct": 25,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.381,
+          "n": 21
+        },
+        "spring": {
+          "accuracy": 0.3542,
+          "n": 48
+        }
+      }
+    },
+    "KAUS": {
+      "accuracy": 0.5242,
+      "n_pairs": 351,
+      "n_correct": 184,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5,
+          "n": 96
+        },
+        "spring": {
+          "accuracy": 0.5227,
+          "n": 132
+        },
+        "summer": {
+          "accuracy": 0.5556,
+          "n": 72
+        },
+        "fall": {
+          "accuracy": 0.5294,
+          "n": 51
+        }
+      }
+    },
+    "KBOS": {
+      "accuracy": 0.4868,
+      "n_pairs": 76,
+      "n_correct": 37,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.4348,
+          "n": 23
+        },
+        "spring": {
+          "accuracy": 0.5094,
+          "n": 53
+        }
+      }
+    },
+    "KDCA": {
+      "accuracy": 0.8415,
+      "n_pairs": 82,
+      "n_correct": 69,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.6364,
+          "n": 33
+        },
+        "spring": {
+          "accuracy": 0.9796,
+          "n": 49
+        }
+      }
+    },
+    "KDEN": {
+      "accuracy": 0.5135,
+      "n_pairs": 370,
+      "n_correct": 190,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5732,
+          "n": 82
+        },
+        "spring": {
+          "accuracy": 0.4929,
+          "n": 140
+        },
+        "summer": {
+          "accuracy": 0.4535,
+          "n": 86
+        },
+        "fall": {
+          "accuracy": 0.5645,
+          "n": 62
+        }
+      }
+    },
+    "KDFW": {
+      "accuracy": 0.9032,
+      "n_pairs": 62,
+      "n_correct": 56,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.8462,
+          "n": 13
+        },
+        "spring": {
+          "accuracy": 0.9184,
+          "n": 49
+        }
+      }
+    },
+    "KHOU": {
+      "accuracy": 0.5424,
+      "n_pairs": 59,
+      "n_correct": 32,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5714,
+          "n": 14
+        },
+        "spring": {
+          "accuracy": 0.5333,
+          "n": 45
+        }
+      }
+    },
+    "KLAS": {
+      "accuracy": 0.3846,
+      "n_pairs": 91,
+      "n_correct": 35,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.4286,
+          "n": 42
+        },
+        "spring": {
+          "accuracy": 0.3469,
+          "n": 49
+        }
+      }
+    },
+    "KLAX": {
+      "accuracy": 0.6334,
+      "n_pairs": 341,
+      "n_correct": 216,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.6889,
+          "n": 90
+        },
+        "spring": {
+          "accuracy": 0.6172,
+          "n": 128
+        },
+        "summer": {
+          "accuracy": 0.5694,
+          "n": 72
+        },
+        "fall": {
+          "accuracy": 0.6667,
+          "n": 51
+        }
+      }
+    },
+    "KMDW": {
+      "accuracy": 0.462,
+      "n_pairs": 368,
+      "n_correct": 170,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.4505,
+          "n": 91
+        },
+        "spring": {
+          "accuracy": 0.4783,
+          "n": 138
+        },
+        "summer": {
+          "accuracy": 0.4643,
+          "n": 84
+        },
+        "fall": {
+          "accuracy": 0.4364,
+          "n": 55
+        }
+      }
+    },
+    "KMIA": {
+      "accuracy": 0.5987,
+      "n_pairs": 299,
+      "n_correct": 179,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5325,
+          "n": 77
+        },
+        "spring": {
+          "accuracy": 0.527,
+          "n": 74
+        },
+        "summer": {
+          "accuracy": 0.5758,
+          "n": 66
+        },
+        "fall": {
+          "accuracy": 0.7439,
+          "n": 82
+        }
+      }
+    },
+    "KNYC": {
+      "accuracy": 0.6335,
+      "n_pairs": 442,
+      "n_correct": 280,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.6063,
+          "n": 127
+        },
+        "spring": {
+          "accuracy": 0.741,
+          "n": 139
+        },
+        "summer": {
+          "accuracy": 0.5341,
+          "n": 88
+        },
+        "fall": {
+          "accuracy": 0.6023,
+          "n": 88
+        }
+      }
+    },
+    "KOKC": {
+      "accuracy": 0.4697,
+      "n_pairs": 66,
+      "n_correct": 31,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.3571,
+          "n": 14
+        },
+        "spring": {
+          "accuracy": 0.5,
+          "n": 52
+        }
+      }
+    },
+    "KPHL": {
+      "accuracy": 0.5506,
+      "n_pairs": 336,
+      "n_correct": 185,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.506,
+          "n": 83
+        },
+        "spring": {
+          "accuracy": 0.5402,
+          "n": 87
+        },
+        "summer": {
+          "accuracy": 0.5294,
+          "n": 85
+        },
+        "fall": {
+          "accuracy": 0.6296,
+          "n": 81
+        }
+      }
+    },
+    "KPHX": {
+      "accuracy": 0.8769,
+      "n_pairs": 65,
+      "n_correct": 57,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.9048,
+          "n": 21
+        },
+        "spring": {
+          "accuracy": 0.8636,
+          "n": 44
+        }
+      }
+    },
+    "KSEA": {
+      "accuracy": 0.8,
+      "n_pairs": 5,
+      "n_correct": 4,
+      "seasonal": {
+        "spring": {
+          "accuracy": 0.8,
+          "n": 5
+        }
+      }
+    },
+    "KSFO": {
+      "accuracy": 0.5053,
+      "n_pairs": 95,
+      "n_correct": 48,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5714,
+          "n": 42
+        },
+        "spring": {
+          "accuracy": 0.4528,
+          "n": 53
+        }
+      }
+    }
+  }
+}

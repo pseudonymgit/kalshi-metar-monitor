@@ -1,0 +1,135 @@
+{
+  "gaussian": {
+    "accuracy": 0.6636902470941421,
+    "sharpe": 10.15566420260596,
+    "trades": 12991,
+    "brier": 0.3363097529058579,
+    "drawdown": 0.11508958338980356
+  },
+  "gaussian_v2": {
+    "accuracy": 0.6388369080178494,
+    "sharpe": 10.598932271539605,
+    "trades": 20841,
+    "brier": 0.3611630919821506,
+    "drawdown": 0.10239734518337762
+  },
+  "pressure_delta": {
+    "accuracy": 0.3893428472781678,
+    "sharpe": -10.139762075925665,
+    "trades": 17378,
+    "brier": 0.6106571527218322,
+    "drawdown": 142.23926724411342
+  },
+  "forecast_disagreement": {
+    "accuracy": 0.6456489386700086,
+    "sharpe": 8.890636958192847,
+    "trades": 12767,
+    "brier": 0.3543510613299914,
+    "drawdown": 0.07782276203328896
+  },
+  "calendar_climatology": {
+    "accuracy": 0.6868539816567186,
+    "sharpe": 9.124480876514804,
+    "trades": 6869,
+    "brier": 0.31314601834328143,
+    "drawdown": 0.0653033421687813
+  },
+  "corrected_pressure_delta": {
+    "accuracy": 0.3893428472781678,
+    "sharpe": -10.139762075925665,
+    "trades": 17378,
+    "brier": 0.6106571527218322,
+    "drawdown": 142.23926724411342
+  },
+  "seasonal_regime": {
+    "accuracy": 0.4345541401273885,
+    "sharpe": -7.040819004485418,
+    "trades": 18840,
+    "brier": 0.5654458598726114,
+    "drawdown": 121.50306496223918
+  },
+  "ecmwf_bias_corrected": {
+    "accuracy": 0.5104793867008851,
+    "sharpe": -1.1972775182481241,
+    "trades": 30393,
+    "brier": 0.48952061329911495,
+    "drawdown": 18.62846670079868
+  },
+  "metar_trend": {
+    "accuracy": 0.5104793867008851,
+    "sharpe": -1.1972775182481241,
+    "trades": 30393,
+    "brier": 0.48952061329911495,
+    "drawdown": 18.62846670079868
+  },
+  "wind_direction_shift": {
+    "accuracy": 0.49910434393193015,
+    "sharpe": -1.1315277722115697,
+    "trades": 4466,
+    "brier": 0.5008956560680698,
+    "drawdown": 6.580859028042859
+  },
+  "eighty_two_member_ensemble": {
+    "accuracy": 0.0,
+    "sharpe": 0.0,
+    "trades": 0,
+    "brier": 1.0,
+    "drawdown": 0.0
+  },
+  "spike_reversion": {
+    "accuracy": 0.533462990504519,
+    "sharpe": 0.7664422546687408,
+    "trades": 8741,
+    "brier": 0.46653700949548105,
+    "drawdown": 0.941555786228812
+  },
+  "radiational_cooling": {
+    "accuracy": 0.45806451612903226,
+    "sharpe": -2.3416362459821376,
+    "trades": 1395,
+    "brier": 0.5419354838709678,
+    "drawdown": 7.041240000000127
+  },
+  "warm_momentum": {
+    "accuracy": 0.36222316865417375,
+    "sharpe": -7.979510236464208,
+    "trades": 4696,
+    "brier": 0.6377768313458262,
+    "drawdown": 59.4614399999977
+  },
+  "cooling_failure": {
+    "accuracy": 0.2262210796915167,
+    "sharpe": -14.072081939699256,
+    "trades": 2723,
+    "brier": 0.7737789203084833,
+    "drawdown": 64.10571999999867
+  },
+  "asos_microstructure": {
+    "accuracy": 0.0,
+    "sharpe": 0.0,
+    "trades": 0,
+    "brier": 1.0,
+    "drawdown": 0.0
+  },
+  "temperature_trend": {
+    "accuracy": 0.0,
+    "sharpe": 0.0,
+    "trades": 0,
+    "brier": 1.0,
+    "drawdown": 0.0
+  },
+  "calendar_climatology+gaussian_v2+seasonal_regime": {
+    "accuracy": 0.5817510548523207,
+    "sharpe": 6.082972181299009,
+    "trades": 26544,
+    "brier": 0.43408221714428624,
+    "drawdown": 0.23146593552162859
+  },
+  "calendar_climatology+gaussian_v2": {
+    "accuracy": 0.6388369080178494,
+    "sharpe": 10.598932271539605,
+    "trades": 20841,
+    "brier": 0.3611630919821506,
+    "drawdown": 0.10239734518337762
+  }
+}

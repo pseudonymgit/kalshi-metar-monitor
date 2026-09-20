@@ -1,0 +1,544 @@
+{
+  "metadata": {
+    "script": "scripts/nws_rolling_bias_correction.py",
+    "task": "RC.2",
+    "description": "30-day rolling bias correction \u2014 baseline validator for Bayesian calibration"
+  },
+  "summary": {
+    "rolling_beats_raw": false,
+    "bayesian_available": true,
+    "interpretation": "30-day rolling bias correction improves directional accuracy by 0.000 on average. This is a lightweight baseline. Compare against Bayesian hierarchical calibration for the full picture."
+  },
+  "per_model": {
+    "gfs": {
+      "raw_accuracy": 0.7285,
+      "rolling_bias_accuracy": 0.7285,
+      "improvement": 0.0,
+      "n_pairs": 1985,
+      "n_stations": 20,
+      "per_station": {
+        "KATL": {
+          "raw_accuracy": 0.5773,
+          "rolling_accuracy": 0.5773,
+          "n_pairs": 97
+        },
+        "KAUS": {
+          "raw_accuracy": 0.7273,
+          "rolling_accuracy": 0.7273,
+          "n_pairs": 99
+        },
+        "KBOS": {
+          "raw_accuracy": 0.8,
+          "rolling_accuracy": 0.8,
+          "n_pairs": 105
+        },
+        "KDCA": {
+          "raw_accuracy": 0.7048,
+          "rolling_accuracy": 0.7048,
+          "n_pairs": 105
+        },
+        "KDEN": {
+          "raw_accuracy": 0.7453,
+          "rolling_accuracy": 0.7453,
+          "n_pairs": 106
+        },
+        "KDFW": {
+          "raw_accuracy": 0.6489,
+          "rolling_accuracy": 0.6489,
+          "n_pairs": 94
+        },
+        "KHOU": {
+          "raw_accuracy": 0.6771,
+          "rolling_accuracy": 0.6771,
+          "n_pairs": 96
+        },
+        "KLAS": {
+          "raw_accuracy": 0.7474,
+          "rolling_accuracy": 0.7474,
+          "n_pairs": 95
+        },
+        "KLAX": {
+          "raw_accuracy": 0.7558,
+          "rolling_accuracy": 0.7558,
+          "n_pairs": 86
+        },
+        "KMDW": {
+          "raw_accuracy": 0.8119,
+          "rolling_accuracy": 0.8119,
+          "n_pairs": 101
+        },
+        "KMIA": {
+          "raw_accuracy": 0.7442,
+          "rolling_accuracy": 0.7442,
+          "n_pairs": 86
+        },
+        "KMSP": {
+          "raw_accuracy": 0.729,
+          "rolling_accuracy": 0.729,
+          "n_pairs": 107
+        },
+        "KMSY": {
+          "raw_accuracy": 0.7253,
+          "rolling_accuracy": 0.7253,
+          "n_pairs": 91
+        },
+        "KNYC": {
+          "raw_accuracy": 0.8108,
+          "rolling_accuracy": 0.8108,
+          "n_pairs": 111
+        },
+        "KOKC": {
+          "raw_accuracy": 0.6792,
+          "rolling_accuracy": 0.6792,
+          "n_pairs": 106
+        },
+        "KPHL": {
+          "raw_accuracy": 0.7767,
+          "rolling_accuracy": 0.7767,
+          "n_pairs": 103
+        },
+        "KPHX": {
+          "raw_accuracy": 0.7714,
+          "rolling_accuracy": 0.7714,
+          "n_pairs": 105
+        },
+        "KSAT": {
+          "raw_accuracy": 0.764,
+          "rolling_accuracy": 0.764,
+          "n_pairs": 89
+        },
+        "KSEA": {
+          "raw_accuracy": 0.6415,
+          "rolling_accuracy": 0.6415,
+          "n_pairs": 106
+        },
+        "KSFO": {
+          "raw_accuracy": 0.7216,
+          "rolling_accuracy": 0.7216,
+          "n_pairs": 97
+        }
+      }
+    },
+    "ecmwf": {
+      "raw_accuracy": 0.7129,
+      "rolling_bias_accuracy": 0.7129,
+      "improvement": 0.0,
+      "n_pairs": 1818,
+      "n_stations": 20,
+      "per_station": {
+        "KATL": {
+          "raw_accuracy": 0.625,
+          "rolling_accuracy": 0.625,
+          "n_pairs": 88
+        },
+        "KAUS": {
+          "raw_accuracy": 0.6304,
+          "rolling_accuracy": 0.6304,
+          "n_pairs": 92
+        },
+        "KBOS": {
+          "raw_accuracy": 0.7396,
+          "rolling_accuracy": 0.7396,
+          "n_pairs": 96
+        },
+        "KDCA": {
+          "raw_accuracy": 0.7158,
+          "rolling_accuracy": 0.7158,
+          "n_pairs": 95
+        },
+        "KDEN": {
+          "raw_accuracy": 0.7188,
+          "rolling_accuracy": 0.7188,
+          "n_pairs": 96
+        },
+        "KDFW": {
+          "raw_accuracy": 0.7209,
+          "rolling_accuracy": 0.7209,
+          "n_pairs": 86
+        },
+        "KHOU": {
+          "raw_accuracy": 0.7356,
+          "rolling_accuracy": 0.7356,
+          "n_pairs": 87
+        },
+        "KLAS": {
+          "raw_accuracy": 0.7701,
+          "rolling_accuracy": 0.7701,
+          "n_pairs": 87
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6125,
+          "rolling_accuracy": 0.6125,
+          "n_pairs": 80
+        },
+        "KMDW": {
+          "raw_accuracy": 0.7692,
+          "rolling_accuracy": 0.7692,
+          "n_pairs": 91
+        },
+        "KMIA": {
+          "raw_accuracy": 0.7125,
+          "rolling_accuracy": 0.7125,
+          "n_pairs": 80
+        },
+        "KMSP": {
+          "raw_accuracy": 0.6869,
+          "rolling_accuracy": 0.6869,
+          "n_pairs": 99
+        },
+        "KMSY": {
+          "raw_accuracy": 0.6667,
+          "rolling_accuracy": 0.6667,
+          "n_pairs": 84
+        },
+        "KNYC": {
+          "raw_accuracy": 0.8137,
+          "rolling_accuracy": 0.8137,
+          "n_pairs": 102
+        },
+        "KOKC": {
+          "raw_accuracy": 0.6875,
+          "rolling_accuracy": 0.6875,
+          "n_pairs": 96
+        },
+        "KPHL": {
+          "raw_accuracy": 0.7684,
+          "rolling_accuracy": 0.7684,
+          "n_pairs": 95
+        },
+        "KPHX": {
+          "raw_accuracy": 0.8125,
+          "rolling_accuracy": 0.8125,
+          "n_pairs": 96
+        },
+        "KSAT": {
+          "raw_accuracy": 0.7073,
+          "rolling_accuracy": 0.7073,
+          "n_pairs": 82
+        },
+        "KSEA": {
+          "raw_accuracy": 0.6875,
+          "rolling_accuracy": 0.6875,
+          "n_pairs": 96
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6444,
+          "rolling_accuracy": 0.6444,
+          "n_pairs": 90
+        }
+      }
+    },
+    "gem": {
+      "raw_accuracy": 0.7112,
+      "rolling_bias_accuracy": 0.7112,
+      "improvement": 0.0,
+      "n_pairs": 1745,
+      "n_stations": 20,
+      "per_station": {
+        "KATL": {
+          "raw_accuracy": 0.6667,
+          "rolling_accuracy": 0.6667,
+          "n_pairs": 84
+        },
+        "KAUS": {
+          "raw_accuracy": 0.6932,
+          "rolling_accuracy": 0.6932,
+          "n_pairs": 88
+        },
+        "KBOS": {
+          "raw_accuracy": 0.7609,
+          "rolling_accuracy": 0.7609,
+          "n_pairs": 92
+        },
+        "KDCA": {
+          "raw_accuracy": 0.7912,
+          "rolling_accuracy": 0.7912,
+          "n_pairs": 91
+        },
+        "KDEN": {
+          "raw_accuracy": 0.6848,
+          "rolling_accuracy": 0.6848,
+          "n_pairs": 92
+        },
+        "KDFW": {
+          "raw_accuracy": 0.7195,
+          "rolling_accuracy": 0.7195,
+          "n_pairs": 82
+        },
+        "KHOU": {
+          "raw_accuracy": 0.7143,
+          "rolling_accuracy": 0.7143,
+          "n_pairs": 84
+        },
+        "KLAS": {
+          "raw_accuracy": 0.8452,
+          "rolling_accuracy": 0.8452,
+          "n_pairs": 84
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6053,
+          "rolling_accuracy": 0.6053,
+          "n_pairs": 76
+        },
+        "KMDW": {
+          "raw_accuracy": 0.7386,
+          "rolling_accuracy": 0.7386,
+          "n_pairs": 88
+        },
+        "KMIA": {
+          "raw_accuracy": 0.6282,
+          "rolling_accuracy": 0.6282,
+          "n_pairs": 78
+        },
+        "KMSP": {
+          "raw_accuracy": 0.7188,
+          "rolling_accuracy": 0.7188,
+          "n_pairs": 96
+        },
+        "KMSY": {
+          "raw_accuracy": 0.7,
+          "rolling_accuracy": 0.7,
+          "n_pairs": 80
+        },
+        "KNYC": {
+          "raw_accuracy": 0.8163,
+          "rolling_accuracy": 0.8163,
+          "n_pairs": 98
+        },
+        "KOKC": {
+          "raw_accuracy": 0.6522,
+          "rolling_accuracy": 0.6522,
+          "n_pairs": 92
+        },
+        "KPHL": {
+          "raw_accuracy": 0.6923,
+          "rolling_accuracy": 0.6923,
+          "n_pairs": 91
+        },
+        "KPHX": {
+          "raw_accuracy": 0.7717,
+          "rolling_accuracy": 0.7717,
+          "n_pairs": 92
+        },
+        "KSAT": {
+          "raw_accuracy": 0.7051,
+          "rolling_accuracy": 0.7051,
+          "n_pairs": 78
+        },
+        "KSEA": {
+          "raw_accuracy": 0.6304,
+          "rolling_accuracy": 0.6304,
+          "n_pairs": 92
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6552,
+          "rolling_accuracy": 0.6552,
+          "n_pairs": 87
+        }
+      }
+    },
+    "icon": {
+      "raw_accuracy": 0.6954,
+      "rolling_bias_accuracy": 0.6954,
+      "improvement": 0.0,
+      "n_pairs": 1707,
+      "n_stations": 20,
+      "per_station": {
+        "KATL": {
+          "raw_accuracy": 0.6463,
+          "rolling_accuracy": 0.6463,
+          "n_pairs": 82
+        },
+        "KAUS": {
+          "raw_accuracy": 0.6552,
+          "rolling_accuracy": 0.6552,
+          "n_pairs": 87
+        },
+        "KBOS": {
+          "raw_accuracy": 0.7444,
+          "rolling_accuracy": 0.7444,
+          "n_pairs": 90
+        },
+        "KDCA": {
+          "raw_accuracy": 0.764,
+          "rolling_accuracy": 0.764,
+          "n_pairs": 89
+        },
+        "KDEN": {
+          "raw_accuracy": 0.7,
+          "rolling_accuracy": 0.7,
+          "n_pairs": 90
+        },
+        "KDFW": {
+          "raw_accuracy": 0.75,
+          "rolling_accuracy": 0.75,
+          "n_pairs": 80
+        },
+        "KHOU": {
+          "raw_accuracy": 0.6341,
+          "rolling_accuracy": 0.6341,
+          "n_pairs": 82
+        },
+        "KLAS": {
+          "raw_accuracy": 0.7561,
+          "rolling_accuracy": 0.7561,
+          "n_pairs": 82
+        },
+        "KLAX": {
+          "raw_accuracy": 0.6081,
+          "rolling_accuracy": 0.6081,
+          "n_pairs": 74
+        },
+        "KMDW": {
+          "raw_accuracy": 0.7558,
+          "rolling_accuracy": 0.7558,
+          "n_pairs": 86
+        },
+        "KMIA": {
+          "raw_accuracy": 0.6753,
+          "rolling_accuracy": 0.6753,
+          "n_pairs": 77
+        },
+        "KMSP": {
+          "raw_accuracy": 0.6383,
+          "rolling_accuracy": 0.6383,
+          "n_pairs": 94
+        },
+        "KMSY": {
+          "raw_accuracy": 0.6026,
+          "rolling_accuracy": 0.6026,
+          "n_pairs": 78
+        },
+        "KNYC": {
+          "raw_accuracy": 0.7604,
+          "rolling_accuracy": 0.7604,
+          "n_pairs": 96
+        },
+        "KOKC": {
+          "raw_accuracy": 0.6444,
+          "rolling_accuracy": 0.6444,
+          "n_pairs": 90
+        },
+        "KPHL": {
+          "raw_accuracy": 0.7191,
+          "rolling_accuracy": 0.7191,
+          "n_pairs": 89
+        },
+        "KPHX": {
+          "raw_accuracy": 0.7667,
+          "rolling_accuracy": 0.7667,
+          "n_pairs": 90
+        },
+        "KSAT": {
+          "raw_accuracy": 0.6842,
+          "rolling_accuracy": 0.6842,
+          "n_pairs": 76
+        },
+        "KSEA": {
+          "raw_accuracy": 0.7,
+          "rolling_accuracy": 0.7,
+          "n_pairs": 90
+        },
+        "KSFO": {
+          "raw_accuracy": 0.6706,
+          "rolling_accuracy": 0.6706,
+          "n_pairs": 85
+        }
+      }
+    },
+    "era5": {
+      "raw_accuracy": 0.8036,
+      "rolling_bias_accuracy": 0.8036,
+      "improvement": 0.0,
+      "n_pairs": 3177,
+      "n_stations": 17,
+      "per_station": {
+        "KATL": {
+          "raw_accuracy": 0.9275,
+          "rolling_accuracy": 0.9275,
+          "n_pairs": 69
+        },
+        "KAUS": {
+          "raw_accuracy": 0.8177,
+          "rolling_accuracy": 0.8177,
+          "n_pairs": 351
+        },
+        "KBOS": {
+          "raw_accuracy": 0.9342,
+          "rolling_accuracy": 0.9342,
+          "n_pairs": 76
+        },
+        "KDCA": {
+          "raw_accuracy": 0.6585,
+          "rolling_accuracy": 0.6585,
+          "n_pairs": 82
+        },
+        "KDEN": {
+          "raw_accuracy": 0.8784,
+          "rolling_accuracy": 0.8784,
+          "n_pairs": 370
+        },
+        "KDFW": {
+          "raw_accuracy": 0.5968,
+          "rolling_accuracy": 0.5968,
+          "n_pairs": 62
+        },
+        "KHOU": {
+          "raw_accuracy": 0.9661,
+          "rolling_accuracy": 0.9661,
+          "n_pairs": 59
+        },
+        "KLAS": {
+          "raw_accuracy": 0.8571,
+          "rolling_accuracy": 0.8571,
+          "n_pairs": 91
+        },
+        "KLAX": {
+          "raw_accuracy": 0.7067,
+          "rolling_accuracy": 0.7067,
+          "n_pairs": 341
+        },
+        "KMDW": {
+          "raw_accuracy": 0.8886,
+          "rolling_accuracy": 0.8886,
+          "n_pairs": 368
+        },
+        "KMIA": {
+          "raw_accuracy": 0.6957,
+          "rolling_accuracy": 0.6957,
+          "n_pairs": 299
+        },
+        "KNYC": {
+          "raw_accuracy": 0.776,
+          "rolling_accuracy": 0.776,
+          "n_pairs": 442
+        },
+        "KOKC": {
+          "raw_accuracy": 0.8939,
+          "rolling_accuracy": 0.8939,
+          "n_pairs": 66
+        },
+        "KPHL": {
+          "raw_accuracy": 0.8393,
+          "rolling_accuracy": 0.8393,
+          "n_pairs": 336
+        },
+        "KPHX": {
+          "raw_accuracy": 0.6308,
+          "rolling_accuracy": 0.6308,
+          "n_pairs": 65
+        },
+        "KSEA": {
+          "raw_accuracy": 0.6,
+          "rolling_accuracy": 0.6,
+          "n_pairs": 5
+        },
+        "KSFO": {
+          "raw_accuracy": 0.8,
+          "rolling_accuracy": 0.8,
+          "n_pairs": 95
+        }
+      }
+    }
+  }
+}

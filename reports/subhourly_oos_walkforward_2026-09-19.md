@@ -15,8 +15,8 @@ lookahead-free, Wilson-lower-bound-clearing signal** — but the defensible edge
 
 ## 1. Out-of-sample (temporal walk-forward)
 
-- Train events: 27811; Test events: 57411
-- **Base rate is NON-STATIONARY**: train 0.1511 → test 0.0620
+- Train events: 27811; Test events: 57530
+- **Base rate is NON-STATIONARY**: train 0.1511 → test 0.0619
 - Bettable cells re-derived on TRAIN: ['gap1-3|0.05-0.10', 'gap<1|0.02-0.05', 'gap<1|slope<0.02']
 - Train combined P(cross): **0.6905** (n=475)
 - **OOS test combined: n=275, P(cross)=0.7855, net EV=0.265, Wilson LB=0.7332**

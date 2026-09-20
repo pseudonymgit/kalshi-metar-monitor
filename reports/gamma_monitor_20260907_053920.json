@@ -1,0 +1,89 @@
+{
+  "generated_utc": "2026-09-07T05:39:20.106315+00:00",
+  "n_cycles": 0,
+  "signals": [
+    {
+      "name": "g1_cloud_clearing",
+      "n_evaluated": 0,
+      "n_fired": 0,
+      "fire_rate": 0.0,
+      "spec_target": 0.1,
+      "hit_rate": null,
+      "hit_lift": null,
+      "directional_bias_f": null,
+      "n_up": 0,
+      "n_down": 0,
+      "drift_60d": null
+    },
+    {
+      "name": "g2_dryline_cooling",
+      "n_evaluated": 0,
+      "n_fired": 0,
+      "fire_rate": 0.0,
+      "spec_target": 0.065,
+      "hit_rate": null,
+      "hit_lift": null,
+      "directional_bias_f": null,
+      "n_up": 0,
+      "n_down": 0,
+      "drift_60d": null
+    },
+    {
+      "name": "g3_wind_shift_ramp",
+      "n_evaluated": 0,
+      "n_fired": 0,
+      "fire_rate": 0.0,
+      "spec_target": 0.125,
+      "hit_rate": null,
+      "hit_lift": null,
+      "directional_bias_f": null,
+      "n_up": 0,
+      "n_down": 0,
+      "drift_60d": null
+    },
+    {
+      "name": "g4_ramp_acceleration",
+      "n_evaluated": 0,
+      "n_fired": 0,
+      "fire_rate": 0.0,
+      "spec_target": 1.0,
+      "hit_rate": null,
+      "hit_lift": null,
+      "directional_bias_f": null,
+      "n_up": 0,
+      "n_down": 0,
+      "drift_60d": null
+    },
+    {
+      "name": "g5_inversion_breakout",
+      "n_evaluated": 0,
+      "n_fired": 0,
+      "fire_rate": 0.0,
+      "spec_target": 0.065,
+      "hit_rate": null,
+      "hit_lift": null,
+      "directional_bias_f": null,
+      "n_up": 0,
+      "n_down": 0,
+      "drift_60d": null
+    },
+    {
+      "name": "g6_gust_front_pressure",
+      "n_evaluated": 0,
+      "n_fired": 0,
+      "fire_rate": 0.0,
+      "spec_target": 0.1,
+      "hit_rate": null,
+      "hit_lift": null,
+      "directional_bias_f": null,
+      "n_up": 0,
+      "n_down": 0,
+      "drift_60d": null
+    }
+  ],
+  "summary": {
+    "n_evaluated_days": 0,
+    "n_signals_live": 0,
+    "fired_day_share": 0.0
+  }
+}

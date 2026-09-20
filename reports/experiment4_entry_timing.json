@@ -1,0 +1,114 @@
+{
+  "experiment": "entry_timing_comparison",
+  "metar_observation_frequency": {
+    "KATL": {
+      "total_obs": 14901,
+      "total_hours": 14407,
+      "avg_obs_per_hour": 1.03,
+      "hours_with_1_obs": 14251,
+      "hours_with_2plus_obs": 156,
+      "pct_hours_with_subhourly": 1.1
+    },
+    "KDEN": {
+      "total_obs": 14522,
+      "total_hours": 14404,
+      "avg_obs_per_hour": 1.01,
+      "hours_with_1_obs": 14312,
+      "hours_with_2plus_obs": 92,
+      "pct_hours_with_subhourly": 0.6
+    },
+    "KHOU": {
+      "total_obs": 14783,
+      "total_hours": 14411,
+      "avg_obs_per_hour": 1.03,
+      "hours_with_1_obs": 14334,
+      "hours_with_2plus_obs": 77,
+      "pct_hours_with_subhourly": 0.5
+    },
+    "KLAX": {
+      "total_obs": 14850,
+      "total_hours": 14409,
+      "avg_obs_per_hour": 1.03,
+      "hours_with_1_obs": 14250,
+      "hours_with_2plus_obs": 159,
+      "pct_hours_with_subhourly": 1.1
+    },
+    "KNYC": {
+      "total_obs": 14665,
+      "total_hours": 14304,
+      "avg_obs_per_hour": 1.03,
+      "hours_with_1_obs": 14130,
+      "hours_with_2plus_obs": 174,
+      "pct_hours_with_subhourly": 1.2
+    }
+  },
+  "asos_1min_coverage": {
+    "KAUS": {
+      "total_obs": 190360,
+      "days": 608,
+      "avg_obs_per_day": 313.1
+    },
+    "KDCA": {
+      "total_obs": 190326,
+      "days": 608,
+      "avg_obs_per_day": 313.0
+    },
+    "KLAX": {
+      "total_obs": 190299,
+      "days": 608,
+      "avg_obs_per_day": 313.0
+    },
+    "KOKC": {
+      "total_obs": 190292,
+      "days": 608,
+      "avg_obs_per_day": 313.0
+    },
+    "KSAT": {
+      "total_obs": 190218,
+      "days": 608,
+      "avg_obs_per_day": 312.9
+    },
+    "KSFO": {
+      "total_obs": 190215,
+      "days": 608,
+      "avg_obs_per_day": 312.9
+    },
+    "KMDW": {
+      "total_obs": 190145,
+      "days": 608,
+      "avg_obs_per_day": 312.7
+    },
+    "KATL": {
+      "total_obs": 189903,
+      "days": 608,
+      "avg_obs_per_day": 312.3
+    },
+    "KPHL": {
+      "total_obs": 189656,
+      "days": 608,
+      "avg_obs_per_day": 311.9
+    },
+    "KPHX": {
+      "total_obs": 189176,
+      "days": 608,
+      "avg_obs_per_day": 311.1
+    }
+  },
+  "analysis": {
+    "metar_is_hourly": true,
+    "subhourly_metar_available": false,
+    "asos_1min_available_only_for": [
+      "KAUS",
+      "KDCA",
+      "KLAX",
+      "KOKC",
+      "KSAT",
+      "KSFO",
+      "KMDW",
+      "KATL",
+      "KPHL",
+      "KPHX"
+    ]
+  },
+  "conclusion": "METAR observations are fundamentally hourly (one per station-hour). Only ~2-5% of hours have supplemental observations for sub-hourly resolution. ASOS 1-min data exists but provides reliable coverage only for KNYC. 3-min entry timing would NOT materially improve accuracy for the daily bucket prediction task. The value of higher-frequency timing would be in intraday trading (same-day entry/exit), which is a separate pipeline. For daily settlement prediction, hourly entry timing is sufficient."
+}

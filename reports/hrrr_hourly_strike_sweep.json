@@ -1,0 +1,68 @@
+{
+  "generated": "2026-09-07T16:10:39.464523+00:00",
+  "method": "HRRR hourly v2",
+  "total_observed": 10800,
+  "per_window": {
+    "h-1": {
+      "strike_accuracy": 0.2142,
+      "directional_accuracy": 0.4653,
+      "bucket_distance_mae": 5.49,
+      "n_obs": 1200
+    },
+    "h-2": {
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.4678,
+      "bucket_distance_mae": 5.49,
+      "n_obs": 1200
+    },
+    "h-3": {
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.4746,
+      "bucket_distance_mae": 5.49,
+      "n_obs": 1200
+    },
+    "h-4": {
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.478,
+      "bucket_distance_mae": 5.5,
+      "n_obs": 1200
+    },
+    "h-6": {
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.4873,
+      "bucket_distance_mae": 5.5,
+      "n_obs": 1200
+    },
+    "h-8": {
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.4864,
+      "bucket_distance_mae": 5.5,
+      "n_obs": 1200
+    },
+    "h-12": {
+      "strike_accuracy": 0.2158,
+      "directional_accuracy": 0.4814,
+      "bucket_distance_mae": 5.5,
+      "n_obs": 1200
+    },
+    "h-18": {
+      "strike_accuracy": 0.2025,
+      "directional_accuracy": 0,
+      "bucket_distance_mae": 5.71,
+      "n_obs": 1200
+    },
+    "h-24": {
+      "strike_accuracy": 0.2025,
+      "directional_accuracy": 0.4576,
+      "bucket_distance_mae": 5.71,
+      "n_obs": 1200
+    }
+  },
+  "summary": {
+    "best_window": "h-2",
+    "best_accuracy": 0.2158,
+    "overall_strike_accuracy": 0.2127,
+    "total_observations": 10800,
+    "settlement_sources": "Kalshi=9866,GHCN=87531"
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "metadata": {
+    "script": "scripts/d2_uwc_retest.py",
+    "task": "D.2",
+    "description": "UWC Fusion Retest with calibrated NWP inputs from B.4 calibration",
+    "thresholds": {
+      "loop_best_gfs_calibrated": 0.7285,
+      "pass_threshold": 0.7085,
+      "pass_condition": "UWC >= LOOP - 0.02"
+    }
+  },
+  "per_model_directional": {
+    "ecmwf": {
+      "accuracy": 0.7125,
+      "correct": 1296,
+      "total_directional_pairs": 1819,
+      "n_stations": 20,
+      "delta_from_loop_best": -0.016,
+      "note": "ecmwf: 0.7125 directional accuracy (n=1819 pairs, 20 stations). Calibration applied: bias correction + variance from per-station RMSE."
+    },
+    "gefs_ens": {
+      "accuracy": 0.5611,
+      "correct": 4699,
+      "total_directional_pairs": 8375,
+      "n_stations": 20,
+      "delta_from_loop_best": -0.1674,
+      "note": "gefs_ens: 0.5611 directional accuracy (n=8375 pairs, 20 stations). Calibration applied: bias correction + variance from per-station RMSE."
+    },
+    "gem": {
+      "accuracy": 0.7108,
+      "correct": 1241,
+      "total_directional_pairs": 1746,
+      "n_stations": 20,
+      "delta_from_loop_best": -0.0177,
+      "note": "gem: 0.7108 directional accuracy (n=1746 pairs, 20 stations). Calibration applied: bias correction + variance from per-station RMSE."
+    },
+    "gfs": {
+      "accuracy": 0.7286,
+      "correct": 1447,
+      "total_directional_pairs": 1986,
+      "n_stations": 20,
+      "delta_from_loop_best": 0.0001,
+      "note": "gfs: 0.7286 directional accuracy (n=1986 pairs, 20 stations). Calibration applied: bias correction + variance from per-station RMSE."
+    },
+    "icon": {
+      "accuracy": 0.6956,
+      "correct": 1188,
+      "total_directional_pairs": 1708,
+      "n_stations": 20,
+      "delta_from_loop_best": -0.0329,
+      "note": "icon: 0.6956 directional accuracy (n=1708 pairs, 20 stations). Calibration applied: bias correction + variance from per-station RMSE."
+    }
+  },
+  "uwc_fusion": {
+    "five_model_overlap": {
+      "accuracy": 0.7043,
+      "correct": 948,
+      "total_directional_pairs": 1346,
+      "n_stations": 20,
+      "bootstrap_ci_95": [
+        0.6798,
+        0.7288
+      ],
+      "delta_from_loop_best": -0.0242,
+      "note": "UWC fused accuracy: 0.7043 (95% CI: 0.6798\u20130.7288). Delta vs LOOP (GFS 0.7285): -0.0242. FAIL: UWC outside 2pp of LOOP.",
+      "per_station": {
+        "KATL": {
+          "correct": 41,
+          "total": 65,
+          "accuracy": 0.6308
+        },
+        "KAUS": {
+          "correct": 43,
+          "total": 70,
+          "accuracy": 0.6143
+        },
+        "KBOS": {
+          "correct": 57,
+          "total": 72,
+          "accuracy": 0.7917
+        },
+        "KDCA": {
+          "correct": 56,
+          "total": 71,
+          "accuracy": 0.7887
+        },
+        "KDEN": {
+          "correct": 51,
+          "total": 71,
+          "accuracy": 0.7183
+        },
+        "KDFW": {
+          "correct": 50,
+          "total": 67,
+          "accuracy": 0.7463
+        },
+        "KHOU": {
+          "correct": 42,
+          "total": 63,
+          "accuracy": 0.6667
+        },
+        "KLAS": {
+          "correct": 44,
+          "total": 63,
+          "accuracy": 0.6984
+        },
+        "KLAX": {
+          "correct": 34,
+          "total": 57,
+          "accuracy": 0.5965
+        },
+        "KMDW": {
+          "correct": 43,
+          "total": 66,
+          "accuracy": 0.6515
+        },
+        "KMIA": {
+          "correct": 43,
+          "total": 60,
+          "accuracy": 0.7167
+        },
+        "KMSP": {
+          "correct": 51,
+          "total": 76,
+          "accuracy": 0.6711
+        },
+        "KMSY": {
+          "correct": 46,
+          "total": 61,
+          "accuracy": 0.7541
+        },
+        "KNYC": {
+          "correct": 61,
+          "total": 75,
+          "accuracy": 0.8133
+        },
+        "KOKC": {
+          "correct": 45,
+          "total": 70,
+          "accuracy": 0.6429
+        },
+        "KPHL": {
+          "correct": 56,
+          "total": 70,
+          "accuracy": 0.8
+        },
+        "KPHX": {
+          "correct": 51,
+          "total": 71,
+          "accuracy": 0.7183
+        },
+        "KSAT": {
+          "correct": 44,
+          "total": 61,
+          "accuracy": 0.7213
+        },
+        "KSEA": {
+          "correct": 49,
+          "total": 71,
+          "accuracy": 0.6901
+        },
+        "KSFO": {
+          "correct": 41,
+          "total": 66,
+          "accuracy": 0.6212
+        }
+      }
+    },
+    "any_model_overlap": {
+      "accuracy": 0.7095,
+      "correct": 1409,
+      "total_directional_pairs": 1986,
+      "n_stations": 20,
+      "bootstrap_ci_95": [
+        0.6893,
+        0.7296
+      ],
+      "delta_from_loop_best": -0.019,
+      "note": "UWC broader fused accuracy: 0.7095 (95% CI: 0.6893\u20130.7296). Delta vs LOOP (GFS 0.7285): -0.0190. PASS: UWC within 2pp of LOOP.",
+      "per_station": {
+        "KATL": {
+          "correct": 63,
+          "total": 97,
+          "accuracy": 0.6495
+        },
+        "KAUS": {
+          "correct": 61,
+          "total": 99,
+          "accuracy": 0.6162
+        },
+        "KBOS": {
+          "correct": 80,
+          "total": 105,
+          "accuracy": 0.7619
+        },
+        "KDCA": {
+          "correct": 81,
+          "total": 105,
+          "accuracy": 0.7714
+        },
+        "KDEN": {
+          "correct": 70,
+          "total": 106,
+          "accuracy": 0.6604
+        },
+        "KDFW": {
+          "correct": 69,
+          "total": 94,
+          "accuracy": 0.734
+        },
+        "KHOU": {
+          "correct": 66,
+          "total": 96,
+          "accuracy": 0.6875
+        },
+        "KLAS": {
+          "correct": 70,
+          "total": 95,
+          "accuracy": 0.7368
+        },
+        "KLAX": {
+          "correct": 52,
+          "total": 86,
+          "accuracy": 0.6047
+        },
+        "KMDW": {
+          "correct": 71,
+          "total": 101,
+          "accuracy": 0.703
+        },
+        "KMIA": {
+          "correct": 65,
+          "total": 87,
+          "accuracy": 0.7471
+        },
+        "KMSP": {
+          "correct": 72,
+          "total": 107,
+          "accuracy": 0.6729
+        },
+        "KMSY": {
+          "correct": 66,
+          "total": 91,
+          "accuracy": 0.7253
+        },
+        "KNYC": {
+          "correct": 91,
+          "total": 111,
+          "accuracy": 0.8198
+        },
+        "KOKC": {
+          "correct": 69,
+          "total": 106,
+          "accuracy": 0.6509
+        },
+        "KPHL": {
+          "correct": 81,
+          "total": 103,
+          "accuracy": 0.7864
+        },
+        "KPHX": {
+          "correct": 81,
+          "total": 105,
+          "accuracy": 0.7714
+        },
+        "KSAT": {
+          "correct": 63,
+          "total": 89,
+          "accuracy": 0.7079
+        },
+        "KSEA": {
+          "correct": 75,
+          "total": 106,
+          "accuracy": 0.7075
+        },
+        "KSFO": {
+          "correct": 63,
+          "total": 97,
+          "accuracy": 0.6495
+        }
+      }
+    }
+  },
+  "verdict": {
+    "pass_threshold": 0.7085,
+    "loop_best": 0.7285,
+    "conditional": {
+      "five_model_overlap": {
+        "pass": false,
+        "uwc_accuracy": 0.7043,
+        "delta_vs_loop": -0.0242,
+        "95_ci": [
+          0.6798,
+          0.7288
+        ]
+      },
+      "any_model_overlap": {
+        "pass": true,
+        "uwc_accuracy": 0.7095,
+        "delta_vs_loop": -0.019,
+        "95_ci": [
+          0.6893,
+          0.7296
+        ]
+      }
+    },
+    "passes_pre_registered_threshold": true,
+    "overall_message": "PASS: Best UWC accuracy = 0.7095 vs LOOP 0.7285 (threshold 0.7085)."
+  }
+}

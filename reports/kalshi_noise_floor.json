@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "script": "scripts/kalshi_noise_floor.py",
+    "task": "0.6",
+    "description": "Compute Kalshi noise floor \u2014 how much directional error is Kalshi noise vs signal error"
+  },
+  "summary": {
+    "era5_vs_kalshi": {
+      "mean_bias": -0.237,
+      "mae": 2.906,
+      "rmse": 4.208,
+      "bootstrap_95ci_bias": [
+        -0.372,
+        -0.1
+      ],
+      "bootstrap_95ci_mae": [
+        2.807,
+        3.007
+      ],
+      "n_pairs": 3581,
+      "interpretation": "ERA5 (reanalysis) vs Kalshi settlements has MAE of 2.91\u00b0F. This is the Kalshi noise floor \u2014 even perfect model-information about the weather can't do better than \u00b12.91\u00b0F because Kalshi itself has measurement noise."
+    },
+    "multi_model_consensus": {
+      "mean_bias": 7.956,
+      "mae": 9.282,
+      "n_pairs": 2139,
+      "interpretation": "Multi-model (ECMWF+GEM+GFS+ICON) consensus vs Kalshi has MAE of 9.28\u00b0F. This is the NWP noise floor \u2014 averaging multiple models barely beats ERA5."
+    },
+    "directional_noise_floor": {
+      "kalshi_era5_disagreement_rate": 0.2226,
+      "disagreed_pairs": 767,
+      "agreed_pairs": 2679,
+      "mean_temp_shift_when_disagree": 3.05,
+      "interpretation": "Kalshi settlements disagree with ERA5 reanalysis on temperature direction 22.3% of the time. This means ~22% of our \"directional errors\" may actually be Kalshi noise, not model error. When they disagree, the mean Kalshi temp shift is 3.1\u00b0F, suggesting small-magnitude direction changes are the most noise-prone."
+    },
+    "effective_ceiling": {
+      "estimated_max_realizable_accuracy": 0.7774,
+      "era5_accuracy_if_kalshi_perfect": null,
+      "n_stations": 17,
+      "era5_directional_accuracy_vs_kalshi": 0.7774,
+      "observation": "Even ERA5 reanalysis (perfect model) gets direction right only 77.7% of the time against Kalshi settlements. This is the KALSHI NOISE FLOOR on directional accuracy. The remaining 22% is Kalshi measurement noise, microclimate, NWP grid-cell averaging error, and temporal sampling mismatch."
+    }
+  },
+  "per_station": {
+    "KAUS": {
+      "bias": -0.98,
+      "mae": 3.06,
+      "n": 408
+    },
+    "KMDW": {
+      "bias": -1.01,
+      "mae": 2.73,
+      "n": 411
+    },
+    "KDEN": {
+      "bias": 0.81,
+      "mae": 3.3,
+      "n": 407
+    },
+    "KPHL": {
+      "bias": -0.06,
+      "mae": 2.5,
+      "n": 365
+    },
+    "KLAX": {
+      "bias": -0.55,
+      "mae": 2.39,
+      "n": 410
+    },
+    "KNYC": {
+      "bias": 0.1,
+      "mae": 3.69,
+      "n": 465
+    },
+    "KOKC": {
+      "bias": -0.52,
+      "mae": 2.49,
+      "n": 72
+    },
+    "KATL": {
+      "bias": -1.66,
+      "mae": 2.34,
+      "n": 79
+    },
+    "KMIA": {
+      "bias": 0.45,
+      "mae": 2.08,
+      "n": 365
+    },
+    "KSFO": {
+      "bias": 0.23,
+      "mae": 2.2,
+      "n": 100
+    },
+    "KDFW": {
+      "bias": -0.75,
+      "mae": 5.34,
+      "n": 71
+    },
+    "KLAS": {
+      "bias": -0.31,
+      "mae": 1.81,
+      "n": 100
+    },
+    "KPHX": {
+      "bias": -0.65,
+      "mae": 2.82,
+      "n": 78
+    },
+    "KHOU": {
+      "bias": -0.19,
+      "mae": 1.84,
+      "n": 72
+    },
+    "KDCA": {
+      "bias": 0.39,
+      "mae": 6.65,
+      "n": 93
+    },
+    "KBOS": {
+      "bias": -0.97,
+      "mae": 2.33,
+      "n": 78
+    },
+    "KSEA": {
+      "bias": 0.65,
+      "mae": 4.17,
+      "n": 7
+    }
+  }
+}

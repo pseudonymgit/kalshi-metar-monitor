@@ -1,0 +1,200 @@
+{
+  "generated_utc": "2026-09-19T02:47:26Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "suite": "R/T-1 ultimate sweep/test/calibrate",
+  "axis": "strike-crossing (settlement_temp vs strike) \u2014 core/settlement_outcome",
+  "truth_source": "settlement",
+  "n_labels": 56,
+  "label_distribution": {
+    "down": 43,
+    "up": 13
+  },
+  "temp_source_distribution": {
+    "ghcn": 56
+  },
+  "stations": 17,
+  "dry_run": true,
+  "layers_requested": [
+    "calibration",
+    "crossfeed",
+    "directional",
+    "entry_timing",
+    "exit_logic",
+    "fusion",
+    "intraday",
+    "predictions",
+    "risk_sizing",
+    "trajectory"
+  ],
+  "sweeps": [
+    "calibration",
+    "lane_gate",
+    "signal"
+  ],
+  "results": {
+    "signal": {
+      "enumerated": 43,
+      "present": [
+        "ai_composite",
+        "calendar_climatology",
+        "cloud_cover_index",
+        "cooling_failure",
+        "corrected_pressure_delta",
+        "cross_model_divergence",
+        "dewpoint_depression",
+        "dual_polarity",
+        "eighty_two_member_ensemble",
+        "eighty_two_member_ensemble_ece",
+        "eighty_two_member_ensemble_pooled",
+        "esdr",
+        "feels_like_delta",
+        "fogr_reversion",
+        "forecast_disagreement",
+        "frontal_detector",
+        "frontal_passage_detector",
+        "frontal_passage_intraday",
+        "frontal_passage_nowcast",
+        "gaussian",
+        "gaussian_v2",
+        "goldilocks",
+        "intraday_metar_confirmation",
+        "metar_dtdt",
+        "metar_nowcast",
+        "metar_trend",
+        "nwp_analog",
+        "nwp_analog_ensemble",
+        "nwp_direct",
+        "nwp_dtdt_fusion",
+        "pressure_delta",
+        "pressure_tendency",
+        "radiational_cooling",
+        "regime",
+        "settlement_arbitrage",
+        "spike_reversion",
+        "spread_based_entry",
+        "temperature_advection",
+        "trajectory_state_vector",
+        "volume_momentum",
+        "warm_momentum",
+        "wind_direction_shift"
+      ],
+      "missing_import": [
+        "seasonal_regime"
+      ],
+      "note": "dry-run: signals enumerated, not scored"
+    },
+    "lane_gate": {
+      "lanes": {
+        "forecasting_ensemble": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "sure_thing": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "goldilocks": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "trajectory": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "nowcasting": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "radiational_cooling": {
+          "available": true,
+          "status": "enumerated"
+        }
+      },
+      "gates": {
+        "agreement": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "settlement_execution": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "production": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "station_skill": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "liquidity": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "trajectory_confirmation": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "spatial_coherence": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "adaptive_thresholds": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "crossfeed": {
+          "available": true,
+          "status": "enumerated"
+        }
+      },
+      "fusion_modes": {
+        "none": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "uwc": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "majority": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "weighted": {
+          "available": true,
+          "status": "enumerated"
+        }
+      },
+      "calibration_modes": {
+        "platt": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "bma": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "emos": {
+          "available": true,
+          "status": "enumerated"
+        },
+        "both": {
+          "available": true,
+          "status": "enumerated"
+        }
+      }
+    },
+    "calibration": {
+      "note": "dry-run: calibration modes enumerated (see lanes/gates sweep)",
+      "calibration_modes": [
+        "platt",
+        "bma",
+        "emos",
+        "both"
+      ]
+    }
+  },
+  "elapsed_seconds": 0.88
+}

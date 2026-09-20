@@ -1,0 +1,214 @@
+{
+  "generated": "2026-09-07T17:25:46.690103Z",
+  "method": "Per-station mean bias = mean(HRRR_daily_max - actual_daily_max) over all matched dates",
+  "note": "Actual settlements from Kalshi (primary) and GHCN (fallback). Old bias DB compared hourly HRRR against daily max \u2014 this is the correction.",
+  "per_station_summary": {
+    "KATL": {
+      "mean_bias": 1.5,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KAUS": {
+      "mean_bias": 1.88,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KBOS": {
+      "mean_bias": 1.29,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KDCA": {
+      "mean_bias": 1.72,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KDEN": {
+      "mean_bias": 2.33,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KDFW": {
+      "mean_bias": 2.39,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KHOU": {
+      "mean_bias": 2.65,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KLAS": {
+      "mean_bias": 1.98,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KLAX": {
+      "mean_bias": 0.55,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KMDW": {
+      "mean_bias": 1.7,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KMIA": {
+      "mean_bias": 7.56,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KMSP": {
+      "mean_bias": 1.76,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KMSY": {
+      "mean_bias": 1.86,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KNYC": {
+      "mean_bias": 2.58,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KOKC": {
+      "mean_bias": 3.62,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KPHL": {
+      "mean_bias": 0.69,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KPHX": {
+      "mean_bias": 2.35,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KSAT": {
+      "mean_bias": 2.5,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KSEA": {
+      "mean_bias": 3.89,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    },
+    "KSFO": {
+      "mean_bias": 5.22,
+      "n_obs": 60,
+      "date_range": [
+        "2026-07-08",
+        "2026-09-05"
+      ],
+      "low_confidence": false,
+      "n_dates": 60
+    }
+  },
+  "report": {
+    "total_hrrr_station_dates": 1220,
+    "stations_with_hrrr": 20,
+    "stations_with_settlements": 21,
+    "stations_with_bias": 20,
+    "min_observations_required": 30
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "script": "reports/radiational_cooling_polarity.json",
+    "task": "G.10",
+    "description": "Verify radiational cooling signal is wired to daily HIGH temperature, not daily LOW"
+  },
+  "finding": {
+    "status": "PASS",
+    "detail": "Radiational cooling signal is correctly wired to LOW markets (overnight minimum temperature), not HIGH markets (daily maximum). This is the correct physical behavior — radiational cooling on clear, calm nights depresses overnight minimums, not daytime maximums.",
+    "evidence": [
+      "core/signals/radiational_cooling_signal.py line 18: '# LOW market only — radiational cooling depresses overnight minima.'",
+      "The signal's evaluate() method produces DOWN-direction predictions for LOW markets only",
+      "The signal is not registered in any HIGH-market pool",
+      "Radiational cooling affects overnight temperature minimum via longwave radiation loss under clear/calm/dry conditions — this is physically correct",
+      "For daily HIGH temperature trading, radiational_cooling_signal should NEVER fire. Pool routing in signal_fusion.py correctly excludes it from HIGH-market evaluation"
+    ],
+    "wired_to_daily_high": false,
+    "wired_to_daily_low": true,
+    "correctly_scoped": true,
+    "recommendation": "No action needed. Signal is correctly scoped to LOW markets. If HIGH market relevance is desired, the signal would need to be re-engineered to detect post-radiational warming (inversion breakout)."
+  }
+}

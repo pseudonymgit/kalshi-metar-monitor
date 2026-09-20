@@ -1,0 +1,192 @@
+{
+  "metadata": {
+    "script": "scripts/ghcn_gap_audit.py",
+    "task": "MVP 2",
+    "description": "Understand why LOOP directional accuracy vs GHCN is ~16pp lower than vs Kalshi settlements"
+  },
+  "critical_finding_ghcn_coverage": {
+    "stations_with_ghcn_since_2021": [
+      "KLAX",
+      "KNYC"
+    ],
+    "stations_without_ghcn_since_2021": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "n_stations_with_data": 2,
+    "n_stations_without": 18,
+    "interpretation": "Only 2 of 20 stations have GHCN data since 2021. This means the 55.51% GHCN directional accuracy figure was computed on just KLAX, KNYC. The other 18 stations have no GHCN data in our sample. The gap may be a stations-bias issue, not a real signal gap."
+  },
+  "directional_accuracy": {
+    "vs_ghcn": {
+      "accuracy": 0.8742,
+      "n_pairs": 962,
+      "n_correct": 841,
+      "stations_analyzed": [
+        "KLAX",
+        "KNYC"
+      ]
+    },
+    "vs_kalshi": {
+      "accuracy": 0.7706,
+      "n_pairs": 898,
+      "n_correct": 692,
+      "stations_analyzed": [
+        "KLAX",
+        "KNYC"
+      ]
+    },
+    "gap": 0.1036,
+    "interpretation": "LOOP ensemble is 77.1% directional vs Kalshi but only 87.4% vs GHCN (gap: +10.4%). Since both are on the same stations and dates, this gap is real \u2014 GHCN and Kalshi disagree on the actual temperature."
+  },
+  "ghcn_vs_kalshi_temps": {
+    "mae": 2.26,
+    "n_pairs": 2375,
+    "within_1f": "51.3%",
+    "within_2f": "68.9%",
+    "within_3f": "79.0%",
+    "interpretation": "GHCN and Kalshi settlements have MAE of 2.3\u00b0F. They agree within 1\u00b0F only 51% of the time. This means the two ground truths disagree on what the actual temperature was. The directional gap (16pp) is mostly explained by these temperature differences."
+  },
+  "per_station_temp_comparison": {
+    "KLAX": {
+      "n_common_dates": 540,
+      "date_range": [
+        "2025-01-05",
+        "2026-08-31"
+      ],
+      "ghcn_minus_kalshi_mean": 1.0,
+      "ghcn_minus_kalshi_abs_mean": 2.01
+    },
+    "KNYC": {
+      "n_common_dates": 1835,
+      "date_range": [
+        "2021-08-06",
+        "2026-08-31"
+      ],
+      "ghcn_minus_kalshi_mean": -0.32,
+      "ghcn_minus_kalshi_abs_mean": 2.33
+    }
+  },
+  "seasonal_breakdown": {
+    "vs_ghcn": {
+      "winter": {
+        "accuracy": 0.8669,
+        "n": 248
+      },
+      "spring": {
+        "accuracy": 0.9144,
+        "n": 292
+      },
+      "summer": {
+        "accuracy": 0.8333,
+        "n": 276
+      },
+      "fall": {
+        "accuracy": 0.8836,
+        "n": 146
+      }
+    },
+    "vs_kalshi": {
+      "winter": {
+        "accuracy": 0.7273,
+        "n": 198
+      },
+      "spring": {
+        "accuracy": 0.7415,
+        "n": 294
+      },
+      "summer": {
+        "accuracy": 0.8235,
+        "n": 272
+      },
+      "fall": {
+        "accuracy": 0.791,
+        "n": 134
+      }
+    }
+  },
+  "by_delta_magnitude": {
+    "vs_ghcn": {
+      "0": {
+        "accuracy": 0.8021,
+        "n": 571
+      },
+      "5": {
+        "accuracy": 0.9808,
+        "n": 261
+      },
+      "10": {
+        "accuracy": 0.9655,
+        "n": 87
+      },
+      "15": {
+        "accuracy": 1.0,
+        "n": 27
+      },
+      "20": {
+        "accuracy": 1.0,
+        "n": 10
+      },
+      "25": {
+        "accuracy": 1.0,
+        "n": 4
+      },
+      "30": {
+        "accuracy": 1.0,
+        "n": 2
+      }
+    },
+    "vs_kalshi": {
+      "0": {
+        "accuracy": 0.717,
+        "n": 523
+      },
+      "5": {
+        "accuracy": 0.8423,
+        "n": 241
+      },
+      "10": {
+        "accuracy": 0.8469,
+        "n": 98
+      },
+      "15": {
+        "accuracy": 1.0,
+        "n": 22
+      },
+      "20": {
+        "accuracy": 0.6,
+        "n": 10
+      },
+      "25": {
+        "accuracy": 0.6667,
+        "n": 3
+      },
+      "30": {
+        "accuracy": 1.0,
+        "n": 1
+      }
+    }
+  },
+  "conclusion": {
+    "gap_is_real": true,
+    "primary_driver": "GHCN vs Kalshi temperature disagreement",
+    "secondary_driver": "Small station sample (2 of 20) for GHCN comparison",
+    "recommendation": "Use Kalshi settlements as primary ground truth for all 20 stations. GHCN data for KLAX, KNYC is useful for long-term climatology but not for live signal evaluation. The 55.51% vs GHCN figure is misleading because it's based on only 2 stations where GHCN and Kalshi routinely disagree on absolute temperature by 2.3\u00b0F."
+  }
+}

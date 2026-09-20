@@ -1,0 +1,270 @@
+{
+  "script": "d4_nwp_analog_retest.py",
+  "timestamp": "2026-09-04T19:38:35Z",
+  "description": "D.4 NWP Analog Retest \u2014 ERA5 Calibrated",
+  "original_kill_date": "2026-09-02",
+  "original_accuracy_pct": 32.63,
+  "threshold_pct": 55.0,
+  "raw": {
+    "total_correct": 3120,
+    "total_pairs": 5834,
+    "accuracy": 0.5348,
+    "accuracy_pct": 53.48,
+    "threshold_pct": 55.0,
+    "passed": false,
+    "per_station": {
+      "KATL": {
+        "correct": 113,
+        "total": 195,
+        "accuracy": 0.5795,
+        "accuracy_pct": 57.95
+      },
+      "KAUS": {
+        "correct": 273,
+        "total": 515,
+        "accuracy": 0.5301,
+        "accuracy_pct": 53.01
+      },
+      "KBOS": {
+        "correct": 106,
+        "total": 194,
+        "accuracy": 0.5464,
+        "accuracy_pct": 54.64
+      },
+      "KDCA": {
+        "correct": 113,
+        "total": 209,
+        "accuracy": 0.5407,
+        "accuracy_pct": 54.07
+      },
+      "KDEN": {
+        "correct": 283,
+        "total": 517,
+        "accuracy": 0.5474,
+        "accuracy_pct": 54.74
+      },
+      "KDFW": {
+        "correct": 101,
+        "total": 187,
+        "accuracy": 0.5401,
+        "accuracy_pct": 54.01
+      },
+      "KHOU": {
+        "correct": 97,
+        "total": 188,
+        "accuracy": 0.516,
+        "accuracy_pct": 51.6
+      },
+      "KLAS": {
+        "correct": 116,
+        "total": 216,
+        "accuracy": 0.537,
+        "accuracy_pct": 53.7
+      },
+      "KLAX": {
+        "correct": 296,
+        "total": 521,
+        "accuracy": 0.5681,
+        "accuracy_pct": 56.81
+      },
+      "KMDW": {
+        "correct": 254,
+        "total": 518,
+        "accuracy": 0.4903,
+        "accuracy_pct": 49.03
+      },
+      "KMIA": {
+        "correct": 239,
+        "total": 469,
+        "accuracy": 0.5096,
+        "accuracy_pct": 50.96
+      },
+      "KMSP": {
+        "correct": 64,
+        "total": 114,
+        "accuracy": 0.5614,
+        "accuracy_pct": 56.14
+      },
+      "KMSY": {
+        "correct": 58,
+        "total": 114,
+        "accuracy": 0.5088,
+        "accuracy_pct": 50.88
+      },
+      "KNYC": {
+        "correct": 311,
+        "total": 572,
+        "accuracy": 0.5437,
+        "accuracy_pct": 54.37
+      },
+      "KOKC": {
+        "correct": 96,
+        "total": 188,
+        "accuracy": 0.5106,
+        "accuracy_pct": 51.06
+      },
+      "KPHL": {
+        "correct": 251,
+        "total": 470,
+        "accuracy": 0.534,
+        "accuracy_pct": 53.4
+      },
+      "KPHX": {
+        "correct": 93,
+        "total": 194,
+        "accuracy": 0.4794,
+        "accuracy_pct": 47.94
+      },
+      "KSAT": {
+        "correct": 65,
+        "total": 114,
+        "accuracy": 0.5702,
+        "accuracy_pct": 57.02
+      },
+      "KSEA": {
+        "correct": 63,
+        "total": 123,
+        "accuracy": 0.5122,
+        "accuracy_pct": 51.22
+      },
+      "KSFO": {
+        "correct": 128,
+        "total": 216,
+        "accuracy": 0.5926,
+        "accuracy_pct": 59.26
+      }
+    }
+  },
+  "calibrated": {
+    "total_correct": 3112,
+    "total_pairs": 5813,
+    "accuracy": 0.5354,
+    "accuracy_pct": 53.54,
+    "threshold_pct": 55.0,
+    "passed": false,
+    "per_station": {
+      "KATL": {
+        "correct": 114,
+        "total": 195,
+        "accuracy": 0.5846,
+        "accuracy_pct": 58.46
+      },
+      "KAUS": {
+        "correct": 272,
+        "total": 515,
+        "accuracy": 0.5282,
+        "accuracy_pct": 52.82
+      },
+      "KBOS": {
+        "correct": 113,
+        "total": 194,
+        "accuracy": 0.5825,
+        "accuracy_pct": 58.25
+      },
+      "KDCA": {
+        "correct": 110,
+        "total": 209,
+        "accuracy": 0.5263,
+        "accuracy_pct": 52.63
+      },
+      "KDEN": {
+        "correct": 283,
+        "total": 517,
+        "accuracy": 0.5474,
+        "accuracy_pct": 54.74
+      },
+      "KDFW": {
+        "correct": 109,
+        "total": 187,
+        "accuracy": 0.5829,
+        "accuracy_pct": 58.29
+      },
+      "KHOU": {
+        "correct": 98,
+        "total": 188,
+        "accuracy": 0.5213,
+        "accuracy_pct": 52.13
+      },
+      "KLAS": {
+        "correct": 115,
+        "total": 216,
+        "accuracy": 0.5324,
+        "accuracy_pct": 53.24
+      },
+      "KLAX": {
+        "correct": 300,
+        "total": 521,
+        "accuracy": 0.5758,
+        "accuracy_pct": 57.58
+      },
+      "KMDW": {
+        "correct": 262,
+        "total": 518,
+        "accuracy": 0.5058,
+        "accuracy_pct": 50.58
+      },
+      "KMIA": {
+        "correct": 239,
+        "total": 469,
+        "accuracy": 0.5096,
+        "accuracy_pct": 50.96
+      },
+      "KMSP": {
+        "correct": 52,
+        "total": 107,
+        "accuracy": 0.486,
+        "accuracy_pct": 48.6
+      },
+      "KMSY": {
+        "correct": 48,
+        "total": 107,
+        "accuracy": 0.4486,
+        "accuracy_pct": 44.86
+      },
+      "KNYC": {
+        "correct": 316,
+        "total": 572,
+        "accuracy": 0.5524,
+        "accuracy_pct": 55.24
+      },
+      "KOKC": {
+        "correct": 96,
+        "total": 188,
+        "accuracy": 0.5106,
+        "accuracy_pct": 51.06
+      },
+      "KPHL": {
+        "correct": 251,
+        "total": 470,
+        "accuracy": 0.534,
+        "accuracy_pct": 53.4
+      },
+      "KPHX": {
+        "correct": 95,
+        "total": 194,
+        "accuracy": 0.4897,
+        "accuracy_pct": 48.97
+      },
+      "KSAT": {
+        "correct": 47,
+        "total": 107,
+        "accuracy": 0.4393,
+        "accuracy_pct": 43.93
+      },
+      "KSEA": {
+        "correct": 66,
+        "total": 123,
+        "accuracy": 0.5366,
+        "accuracy_pct": 53.66
+      },
+      "KSFO": {
+        "correct": 126,
+        "total": 216,
+        "accuracy": 0.5833,
+        "accuracy_pct": 58.33
+      }
+    }
+  },
+  "verdict": "FAIL \u2014 NWP analog signal KILLED permanently (< 55%)",
+  "threshold_met": false
+}

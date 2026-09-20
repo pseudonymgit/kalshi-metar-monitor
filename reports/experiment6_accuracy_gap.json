@@ -1,0 +1,127 @@
+{
+  "experiment": "accuracy_gap_tracker",
+  "timestamp": "2026-09-03T14:39:23.563835+00:00",
+  "backtest_baseline": {
+    "backtest_accuracy": 57.36,
+    "backtest_trades": 2997,
+    "backtest_correct": 1719
+  },
+  "paper_trading": {
+    "dev": {
+      "source": "DEV",
+      "total": 244,
+      "note": "Settled trades count. Binary accuracy requires bucket boundary matching which is market-specific."
+    },
+    "sbox": {
+      "source": "SBOX",
+      "total": 18,
+      "note": "Settled trades count. Binary accuracy requires bucket boundary matching which is market-specific."
+    },
+    "prod": {
+      "error": "PROD: 0 trades with settlement"
+    }
+  },
+  "accuracy_gaps": {
+    "dev": {
+      "paper_settled_trades": 244,
+      "backtest_baseline_accuracy": 57.36,
+      "gap": null,
+      "alert": false,
+      "note": "Binary accuracy comparison requires bucket-boundary matching per market type. Paper trades have settlement temperatures but not yet matched to bucket outcomes."
+    },
+    "sbox": {
+      "paper_settled_trades": 18,
+      "backtest_baseline_accuracy": 57.36,
+      "gap": null,
+      "alert": false,
+      "note": "Binary accuracy comparison requires bucket-boundary matching per market type. Paper trades have settlement temperatures but not yet matched to bucket outcomes."
+    },
+    "prod": {
+      "gap": null,
+      "alert": false,
+      "note": "No paper trading data"
+    }
+  },
+  "signal_comparison": {
+    "station_counts": {
+      "KATL": {
+        "total": 10,
+        "accuracy": 0.0,
+        "up_pct": 90.0
+      },
+      "KAUS": {
+        "total": 16,
+        "accuracy": 0.0,
+        "up_pct": 93.8
+      },
+      "KBOS": {
+        "total": 18,
+        "accuracy": 0.0,
+        "up_pct": 77.8
+      },
+      "KDEN": {
+        "total": 19,
+        "accuracy": 0.0,
+        "up_pct": 84.2
+      },
+      "KDFW": {
+        "total": 11,
+        "accuracy": 0.0,
+        "up_pct": 81.8
+      },
+      "KHOU": {
+        "total": 11,
+        "accuracy": 0.0,
+        "up_pct": 100.0
+      },
+      "KLAX": {
+        "total": 13,
+        "accuracy": 0.0,
+        "up_pct": 100.0
+      },
+      "KMDW": {
+        "total": 20,
+        "accuracy": 0.0,
+        "up_pct": 80.0
+      },
+      "KMIA": {
+        "total": 15,
+        "accuracy": 0.0,
+        "up_pct": 93.3
+      },
+      "KMSP": {
+        "total": 11,
+        "accuracy": 0.0,
+        "up_pct": 81.8
+      },
+      "KNYC": {
+        "total": 21,
+        "accuracy": 0.0,
+        "up_pct": 81.0
+      },
+      "KPHL": {
+        "total": 21,
+        "accuracy": 0.0,
+        "up_pct": 71.4
+      },
+      "KPHX": {
+        "total": 23,
+        "accuracy": 0.0,
+        "up_pct": 100.0
+      },
+      "KSEA": {
+        "total": 19,
+        "accuracy": 0.0,
+        "up_pct": 89.5
+      },
+      "KSFO": {
+        "total": 16,
+        "accuracy": 0.0,
+        "up_pct": 93.8
+      }
+    },
+    "total": 244,
+    "up_pct": 87.3,
+    "down_pct": 12.7
+  }
+}

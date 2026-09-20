@@ -1,0 +1,615 @@
+{
+  "metadata": {
+    "script": "scripts/d8_era5_persistence_benchmark.py",
+    "task": "D.8",
+    "description": "ERA5 persistence benchmark \u2014 full extension: can any signal beat yesterday ERA5 high?",
+    "signal_cache_available": false,
+    "fallback_mode": true,
+    "n_stations": 20,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ]
+  },
+  "summary": {
+    "era5_persistence_directional_accuracy": 0.5659,
+    "era5_persistence_ci_95": [
+      0.5486,
+      0.5829
+    ],
+    "era5_persistence_total_pairs": 3177,
+    "n_signals_evaluated": 6,
+    "n_signals_beating_persistence": 5,
+    "n_signals_trailing_persistence": 0,
+    "critical_finding": false,
+    "interpretation": "ERA5 persistence gets direction right 56.6% of the time (95% CI: 54.9%\u201358.3%). 5 signal(s) beat persistence. gfs_direct at 69.6% (\u0394=+13.0%) ecmwf_direct at 65.0% (\u0394=+8.4%) gem_direct at 63.5% (\u0394=+7.0%) icon_direct at 66.1% (\u0394=+9.5%) gefs_ens_mean at 57.1% (\u0394=+0.5%)See per-signal details below."
+  },
+  "signals": {
+    "era5_persistence": {
+      "signal_name": "era5_persistence",
+      "signal_type": "persistence",
+      "overall_accuracy": 0.5659,
+      "ci_95": [
+        0.5486,
+        0.5829
+      ],
+      "accuracy_mean_by_station": 0.5934,
+      "ci_95_by_station": [
+        0.5195,
+        0.6751
+      ],
+      "total_pairs": 3177,
+      "n_correct": 1798,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5547,
+          "ci_95": [
+            0.5201,
+            0.5869
+          ],
+          "n_pairs": 869,
+          "n_correct": 482
+        },
+        "spring": {
+          "accuracy": 0.5774,
+          "ci_95": [
+            0.5502,
+            0.6047
+          ],
+          "n_pairs": 1285,
+          "n_correct": 742
+        },
+        "summer": {
+          "accuracy": 0.5226,
+          "ci_95": [
+            0.481,
+            0.5642
+          ],
+          "n_pairs": 553,
+          "n_correct": 289
+        },
+        "fall": {
+          "accuracy": 0.6064,
+          "ci_95": [
+            0.5617,
+            0.6511
+          ],
+          "n_pairs": 470,
+          "n_correct": 285
+        }
+      },
+      "meta": {
+        "domain_dates": "2025-01-01 to 2026-04-23",
+        "note": "ERA5 persistence: yesterday's ERA5 max = today's forecast"
+      }
+    },
+    "gfs_direct": {
+      "signal_name": "gfs_direct",
+      "signal_type": "nwp_direct",
+      "overall_accuracy": 0.6957,
+      "ci_95": [
+        0.6751,
+        0.7159
+      ],
+      "accuracy_mean_by_station": 0.6955,
+      "ci_95_by_station": [
+        0.6757,
+        0.7166
+      ],
+      "total_pairs": 1985,
+      "n_correct": 1381,
+      "seasonal": {
+        "spring": {
+          "accuracy": 0.8538,
+          "ci_95": [
+            0.8179,
+            0.8872
+          ],
+          "n_pairs": 390,
+          "n_correct": 333
+        },
+        "summer": {
+          "accuracy": 0.6562,
+          "ci_95": [
+            0.6325,
+            0.6786
+          ],
+          "n_pairs": 1562,
+          "n_correct": 1025
+        },
+        "fall": {
+          "accuracy": 0.697,
+          "ci_95": [
+            0.5455,
+            0.8485
+          ],
+          "n_pairs": 33,
+          "n_correct": 23
+        }
+      },
+      "meta": {
+        "domain_dates": "2026-05-09 to 2026-09-10"
+      }
+    },
+    "ecmwf_direct": {
+      "signal_name": "ecmwf_direct",
+      "signal_type": "nwp_direct",
+      "overall_accuracy": 0.6502,
+      "ci_95": [
+        0.6282,
+        0.6716
+      ],
+      "accuracy_mean_by_station": 0.6478,
+      "ci_95_by_station": [
+        0.6228,
+        0.6716
+      ],
+      "total_pairs": 1818,
+      "n_correct": 1182,
+      "seasonal": {
+        "spring": {
+          "accuracy": 0.843,
+          "ci_95": [
+            0.7937,
+            0.8879
+          ],
+          "n_pairs": 223,
+          "n_correct": 188
+        },
+        "summer": {
+          "accuracy": 0.6242,
+          "ci_95": [
+            0.6005,
+            0.6485
+          ],
+          "n_pairs": 1562,
+          "n_correct": 975
+        },
+        "fall": {
+          "accuracy": 0.5758,
+          "ci_95": [
+            0.3939,
+            0.7576
+          ],
+          "n_pairs": 33,
+          "n_correct": 19
+        }
+      },
+      "meta": {
+        "domain_dates": "2026-05-19 to 2026-09-10"
+      }
+    },
+    "gem_direct": {
+      "signal_name": "gem_direct",
+      "signal_type": "nwp_direct",
+      "overall_accuracy": 0.6355,
+      "ci_95": [
+        0.6132,
+        0.6585
+      ],
+      "accuracy_mean_by_station": 0.6345,
+      "ci_95_by_station": [
+        0.6115,
+        0.6632
+      ],
+      "total_pairs": 1745,
+      "n_correct": 1109,
+      "seasonal": {
+        "spring": {
+          "accuracy": 0.7733,
+          "ci_95": [
+            0.7067,
+            0.84
+          ],
+          "n_pairs": 150,
+          "n_correct": 116
+        },
+        "summer": {
+          "accuracy": 0.6216,
+          "ci_95": [
+            0.5967,
+            0.646
+          ],
+          "n_pairs": 1562,
+          "n_correct": 971
+        },
+        "fall": {
+          "accuracy": 0.6667,
+          "ci_95": [
+            0.5152,
+            0.8182
+          ],
+          "n_pairs": 33,
+          "n_correct": 22
+        }
+      },
+      "meta": {
+        "domain_dates": "2026-05-23 to 2026-09-10"
+      }
+    },
+    "icon_direct": {
+      "signal_name": "icon_direct",
+      "signal_type": "nwp_direct",
+      "overall_accuracy": 0.6608,
+      "ci_95": [
+        0.6385,
+        0.6825
+      ],
+      "accuracy_mean_by_station": 0.6598,
+      "ci_95_by_station": [
+        0.6355,
+        0.6872
+      ],
+      "total_pairs": 1707,
+      "n_correct": 1128,
+      "seasonal": {
+        "spring": {
+          "accuracy": 0.8929,
+          "ci_95": [
+            0.8304,
+            0.9464
+          ],
+          "n_pairs": 112,
+          "n_correct": 100
+        },
+        "summer": {
+          "accuracy": 0.6428,
+          "ci_95": [
+            0.6184,
+            0.6671
+          ],
+          "n_pairs": 1562,
+          "n_correct": 1004
+        },
+        "fall": {
+          "accuracy": 0.7273,
+          "ci_95": [
+            0.5758,
+            0.8788
+          ],
+          "n_pairs": 33,
+          "n_correct": 24
+        }
+      },
+      "meta": {
+        "domain_dates": "2026-05-25 to 2026-09-10"
+      }
+    },
+    "gefs_ens_mean": {
+      "signal_name": "gefs_ens_mean",
+      "signal_type": "gaussian_like",
+      "overall_accuracy": 0.5713,
+      "ci_95": [
+        0.5607,
+        0.5823
+      ],
+      "accuracy_mean_by_station": 0.5747,
+      "ci_95_by_station": [
+        0.5458,
+        0.6066
+      ],
+      "total_pairs": 8249,
+      "n_correct": 4713,
+      "seasonal": {
+        "winter": {
+          "accuracy": 0.5713,
+          "ci_95": [
+            0.5483,
+            0.5956
+          ],
+          "n_pairs": 1647,
+          "n_correct": 941
+        },
+        "spring": {
+          "accuracy": 0.5833,
+          "ci_95": [
+            0.5642,
+            0.6019
+          ],
+          "n_pairs": 2570,
+          "n_correct": 1499
+        },
+        "summer": {
+          "accuracy": 0.5561,
+          "ci_95": [
+            0.5372,
+            0.5751
+          ],
+          "n_pairs": 2584,
+          "n_correct": 1437
+        },
+        "fall": {
+          "accuracy": 0.5773,
+          "ci_95": [
+            0.5518,
+            0.6029
+          ],
+          "n_pairs": 1448,
+          "n_correct": 836
+        }
+      },
+      "paired_era5_persistence": {
+        "accuracy": 0.596,
+        "n_pairs": 17,
+        "n_correct": 10
+      },
+      "delta_vs_era5_persistence": -0.0246,
+      "beats_persistence": false,
+      "meta": {
+        "domain_dates": "2021-01-02 to 2026-08-14",
+        "description": "GEFS 6-member ensemble mean as gaussian-like signal"
+      }
+    }
+  },
+  "signals_beating_persistence": [
+    {
+      "signal": "gfs_direct",
+      "accuracy": 0.6957,
+      "delta": 0.1298,
+      "ci_95": [
+        0.6751,
+        0.7159
+      ]
+    },
+    {
+      "signal": "ecmwf_direct",
+      "accuracy": 0.6502,
+      "delta": 0.0843,
+      "ci_95": [
+        0.6282,
+        0.6716
+      ]
+    },
+    {
+      "signal": "gem_direct",
+      "accuracy": 0.6355,
+      "delta": 0.0696,
+      "ci_95": [
+        0.6132,
+        0.6585
+      ]
+    },
+    {
+      "signal": "icon_direct",
+      "accuracy": 0.6608,
+      "delta": 0.0949,
+      "ci_95": [
+        0.6385,
+        0.6825
+      ]
+    },
+    {
+      "signal": "gefs_ens_mean",
+      "accuracy": 0.5713,
+      "delta": 0.0054,
+      "ci_95": [
+        0.5607,
+        0.5823
+      ]
+    }
+  ],
+  "signals_trailing_persistence": [],
+  "paired_overlap_results": {
+    "era5_persistence": {
+      "accuracy": 0.5659,
+      "n_pairs": 3177
+    },
+    "gefs_ens_mean": {
+      "accuracy": 0.5889,
+      "n_pairs": 3177
+    },
+    "paired_wins": {
+      "era5_wins": 441,
+      "gefs_wins": 514,
+      "ties": 2222
+    }
+  },
+  "spread_analysis": null,
+  "per_station_era5_persistence": {
+    "KATL": {
+      "accuracy": 0.3623,
+      "n_pairs": 69,
+      "n_correct": 25,
+      "seasonal": {
+        "winter": 0.381,
+        "spring": 0.3542,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KAUS": {
+      "accuracy": 0.5242,
+      "n_pairs": 351,
+      "n_correct": 184,
+      "seasonal": {
+        "winter": 0.5,
+        "spring": 0.5227,
+        "summer": 0.5556,
+        "fall": 0.5294
+      }
+    },
+    "KBOS": {
+      "accuracy": 0.4868,
+      "n_pairs": 76,
+      "n_correct": 37,
+      "seasonal": {
+        "winter": 0.4348,
+        "spring": 0.5094,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KDCA": {
+      "accuracy": 0.8415,
+      "n_pairs": 82,
+      "n_correct": 69,
+      "seasonal": {
+        "winter": 0.6364,
+        "spring": 0.9796,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KDEN": {
+      "accuracy": 0.5135,
+      "n_pairs": 370,
+      "n_correct": 190,
+      "seasonal": {
+        "winter": 0.5732,
+        "spring": 0.4929,
+        "summer": 0.4535,
+        "fall": 0.5645
+      }
+    },
+    "KDFW": {
+      "accuracy": 0.9032,
+      "n_pairs": 62,
+      "n_correct": 56,
+      "seasonal": {
+        "winter": 0.8462,
+        "spring": 0.9184,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KHOU": {
+      "accuracy": 0.5424,
+      "n_pairs": 59,
+      "n_correct": 32,
+      "seasonal": {
+        "winter": 0.5714,
+        "spring": 0.5333,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KLAS": {
+      "accuracy": 0.3846,
+      "n_pairs": 91,
+      "n_correct": 35,
+      "seasonal": {
+        "winter": 0.4286,
+        "spring": 0.3469,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KLAX": {
+      "accuracy": 0.6334,
+      "n_pairs": 341,
+      "n_correct": 216,
+      "seasonal": {
+        "winter": 0.6889,
+        "spring": 0.6172,
+        "summer": 0.5694,
+        "fall": 0.6667
+      }
+    },
+    "KMDW": {
+      "accuracy": 0.462,
+      "n_pairs": 368,
+      "n_correct": 170,
+      "seasonal": {
+        "winter": 0.4505,
+        "spring": 0.4783,
+        "summer": 0.4643,
+        "fall": 0.4364
+      }
+    },
+    "KMIA": {
+      "accuracy": 0.5987,
+      "n_pairs": 299,
+      "n_correct": 179,
+      "seasonal": {
+        "winter": 0.5325,
+        "spring": 0.527,
+        "summer": 0.5758,
+        "fall": 0.7439
+      }
+    },
+    "KNYC": {
+      "accuracy": 0.6335,
+      "n_pairs": 442,
+      "n_correct": 280,
+      "seasonal": {
+        "winter": 0.6063,
+        "spring": 0.741,
+        "summer": 0.5341,
+        "fall": 0.6023
+      }
+    },
+    "KOKC": {
+      "accuracy": 0.4697,
+      "n_pairs": 66,
+      "n_correct": 31,
+      "seasonal": {
+        "winter": 0.3571,
+        "spring": 0.5,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KPHL": {
+      "accuracy": 0.5506,
+      "n_pairs": 336,
+      "n_correct": 185,
+      "seasonal": {
+        "winter": 0.506,
+        "spring": 0.5402,
+        "summer": 0.5294,
+        "fall": 0.6296
+      }
+    },
+    "KPHX": {
+      "accuracy": 0.8769,
+      "n_pairs": 65,
+      "n_correct": 57,
+      "seasonal": {
+        "winter": 0.9048,
+        "spring": 0.8636,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KSEA": {
+      "accuracy": 0.8,
+      "n_pairs": 5,
+      "n_correct": 4,
+      "seasonal": {
+        "winter": null,
+        "spring": 0.8,
+        "summer": null,
+        "fall": null
+      }
+    },
+    "KSFO": {
+      "accuracy": 0.5053,
+      "n_pairs": 95,
+      "n_correct": 48,
+      "seasonal": {
+        "winter": 0.5714,
+        "spring": 0.4528,
+        "summer": null,
+        "fall": null
+      }
+    }
+  }
+}

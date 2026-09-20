@@ -1,0 +1,189 @@
+{
+  "generated_utc": "2026-09-18T11:07:01Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "input": "data/platt_calibration_liop_v4.json",
+  "output": "data/platt_calibration_liop_v4_shrunk.json",
+  "method": "hierarchical_partial_pooling",
+  "prior": "direction_pooled_empirical",
+  "tau": 200,
+  "n_floor": 200,
+  "parent_priors": {
+    "up": {
+      "key": "up_HIGH_heuristic",
+      "alpha": 0.01,
+      "beta": 2.0846,
+      "n": 284
+    },
+    "down": {
+      "key": "down_HIGH_heuristic",
+      "alpha": 0.0404,
+      "beta": 0.1997,
+      "n": 1183
+    }
+  },
+  "cells": [
+    {
+      "cell": "up_HIGH_heuristic_desert",
+      "direction": "up",
+      "group": "desert",
+      "n_raw": 71,
+      "n_eff": 271,
+      "clears_floor": true,
+      "k": 0.262,
+      "alpha_raw": 0.0612,
+      "beta_raw": 0.6509,
+      "alpha_shrunk": 0.0234,
+      "beta_shrunk": 1.709,
+      "parent": {
+        "key": "up_HIGH_heuristic",
+        "n": 284,
+        "alpha": 0.01,
+        "beta": 2.0846
+      }
+    },
+    {
+      "cell": "up_HIGH_heuristic_coastal_warm",
+      "direction": "up",
+      "group": "coastal_warm",
+      "n_raw": 64,
+      "n_eff": 264,
+      "clears_floor": true,
+      "k": 0.2424,
+      "alpha_raw": 0.837,
+      "beta_raw": -0.494,
+      "alpha_shrunk": 0.2105,
+      "beta_shrunk": 1.4595,
+      "parent": {
+        "key": "up_HIGH_heuristic",
+        "n": 284,
+        "alpha": 0.01,
+        "beta": 2.0846
+      }
+    },
+    {
+      "cell": "up_HIGH_heuristic_continental",
+      "direction": "up",
+      "group": "continental",
+      "n_raw": 105,
+      "n_eff": 305,
+      "clears_floor": true,
+      "k": 0.3443,
+      "alpha_raw": 0.01,
+      "beta_raw": 0.7965,
+      "alpha_shrunk": 0.01,
+      "beta_shrunk": 1.6412,
+      "parent": {
+        "key": "up_HIGH_heuristic",
+        "n": 284,
+        "alpha": 0.01,
+        "beta": 2.0846
+      }
+    },
+    {
+      "cell": "down_HIGH_heuristic_desert",
+      "direction": "down",
+      "group": "desert",
+      "n_raw": 251,
+      "n_eff": 451,
+      "clears_floor": true,
+      "k": 0.5565,
+      "alpha_raw": 0.01,
+      "beta_raw": 0.3654,
+      "alpha_shrunk": 0.0235,
+      "beta_shrunk": 0.2919,
+      "parent": {
+        "key": "down_HIGH_heuristic",
+        "n": 1183,
+        "alpha": 0.0404,
+        "beta": 0.1997
+      }
+    },
+    {
+      "cell": "down_HIGH_heuristic_coastal_warm",
+      "direction": "down",
+      "group": "coastal_warm",
+      "n_raw": 198,
+      "n_eff": 398,
+      "clears_floor": true,
+      "k": 0.4975,
+      "alpha_raw": 0.7755,
+      "beta_raw": -0.6803,
+      "alpha_shrunk": 0.4061,
+      "beta_shrunk": -0.2381,
+      "parent": {
+        "key": "down_HIGH_heuristic",
+        "n": 1183,
+        "alpha": 0.0404,
+        "beta": 0.1997
+      }
+    },
+    {
+      "cell": "down_HIGH_heuristic_coastal_humid",
+      "direction": "down",
+      "group": "coastal_humid",
+      "n_raw": 135,
+      "n_eff": 335,
+      "clears_floor": true,
+      "k": 0.403,
+      "alpha_raw": 0.01,
+      "beta_raw": -0.239,
+      "alpha_shrunk": 0.0281,
+      "beta_shrunk": 0.0229,
+      "parent": {
+        "key": "down_HIGH_heuristic",
+        "n": 1183,
+        "alpha": 0.0404,
+        "beta": 0.1997
+      }
+    },
+    {
+      "cell": "down_HIGH_heuristic_continental",
+      "direction": "down",
+      "group": "continental",
+      "n_raw": 331,
+      "n_eff": 531,
+      "clears_floor": true,
+      "k": 0.6234,
+      "alpha_raw": 0.0846,
+      "beta_raw": 0.2593,
+      "alpha_shrunk": 0.068,
+      "beta_shrunk": 0.2369,
+      "parent": {
+        "key": "down_HIGH_heuristic",
+        "n": 1183,
+        "alpha": 0.0404,
+        "beta": 0.1997
+      }
+    },
+    {
+      "cell": "down_HIGH_heuristic_interior",
+      "direction": "down",
+      "group": "interior",
+      "n_raw": 268,
+      "n_eff": 468,
+      "clears_floor": true,
+      "k": 0.5726,
+      "alpha_raw": 0.01,
+      "beta_raw": 0.1954,
+      "alpha_shrunk": 0.023,
+      "beta_shrunk": 0.1972,
+      "parent": {
+        "key": "down_HIGH_heuristic",
+        "n": 1183,
+        "alpha": 0.0404,
+        "beta": 0.1997
+      }
+    }
+  ],
+  "summary": {
+    "total_cells": 8,
+    "thin_cells_before": 5,
+    "thin_cells_cleared": 5,
+    "thin_cells_remaining_below_floor": 0,
+    "min_n_eff": 264,
+    "max_n_eff": 531
+  },
+  "deterministic": true,
+  "no_mutation_of_inputs": true
+}

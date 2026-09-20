@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "script": "scripts/calibrated_vs_raw_ab.py",
+    "gate": "GATE DECISION \u2014 Weather Engine",
+    "description": "Directional accuracy comparison: raw GEFS ensemble mean vs calibrated GEFS (minus per-station bias) vs ERA5 ceiling. PASS requires calibrated \u2265 raw + 0.01 (1pp) with CI lower bound > 0.",
+    "nwp_db": "data/nwp_forecasts.db",
+    "kalshi_db": "data/kalshi_settlements.db",
+    "calibration_file": "data/nwp_calibration.json",
+    "n_bootstrap": 10000,
+    "timestamp": "NVRM version: NVIDIA"
+  },
+  "gate_decision": {
+    "status": "FAIL",
+    "threshold": "calibrated >= raw + 0.01 AND 95% CI lower > 0",
+    "calibrated_vs_raw_diff_mean": 0.002,
+    "calibrated_vs_raw_diff_ci_lower": -0.0101,
+    "calibrated_vs_raw_diff_ci_upper": 0.014,
+    "calibrated_vs_raw_diff_pct_above_zero": 0.6205
+  },
+  "overall_accuracy": {
+    "raw_gefs": 0.5351,
+    "calibrated_gefs": 0.537,
+    "era5_ceiling": 0.7674,
+    "calibrated_vs_raw_improvement": 0.002,
+    "era5_vs_raw_gap": 0.2323,
+    "era5_vs_cal_gap": 0.2304
+  },
+  "bootstrap_ci": {
+    "calibrated_vs_raw": {
+      "mean_diff": 0.002,
+      "ci_lower_95": -0.0101,
+      "ci_upper_95": 0.014,
+      "pct_diff_above_zero": 0.6205
+    },
+    "era5_vs_raw": {
+      "mean_diff": 0.2322,
+      "ci_lower_95": 0.2138,
+      "ci_upper_95": 0.2503,
+      "pct_diff_above_zero": 1.0
+    },
+    "era5_vs_calibrated": {
+      "mean_diff": 0.2302,
+      "ci_lower_95": 0.2121,
+      "ci_upper_95": 0.2486,
+      "pct_diff_above_zero": 1.0
+    }
+  },
+  "summary": {
+    "total_pairs": 3564,
+    "stations_analyzed": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSEA",
+      "KSFO"
+    ],
+    "n_stations": 17
+  },
+  "station_results": {
+    "KATL": {
+      "n_pairs": 78,
+      "raw_acc": 0.5,
+      "calibrated_acc": 0.3974,
+      "era5_acc": 0.8077,
+      "improvement": -0.1026
+    },
+    "KAUS": {
+      "n_pairs": 407,
+      "raw_acc": 0.4767,
+      "calibrated_acc": 0.4717,
+      "era5_acc": 0.6855,
+      "improvement": -0.0049
+    },
+    "KBOS": {
+      "n_pairs": 77,
+      "raw_acc": 0.5974,
+      "calibrated_acc": 0.6104,
+      "era5_acc": 0.9221,
+      "improvement": 0.013
+    },
+    "KDCA": {
+      "n_pairs": 92,
+      "raw_acc": 0.7609,
+      "calibrated_acc": 0.7283,
+      "era5_acc": 0.7717,
+      "improvement": -0.0326
+    },
+    "KDEN": {
+      "n_pairs": 406,
+      "raw_acc": 0.4926,
+      "calibrated_acc": 0.4877,
+      "era5_acc": 0.8744,
+      "improvement": -0.0049
+    },
+    "KDFW": {
+      "n_pairs": 70,
+      "raw_acc": 0.7714,
+      "calibrated_acc": 0.5571,
+      "era5_acc": 0.7,
+      "improvement": -0.2143
+    },
+    "KHOU": {
+      "n_pairs": 71,
+      "raw_acc": 0.4225,
+      "calibrated_acc": 0.338,
+      "era5_acc": 0.7465,
+      "improvement": -0.0845
+    },
+    "KLAS": {
+      "n_pairs": 99,
+      "raw_acc": 0.4141,
+      "calibrated_acc": 0.4343,
+      "era5_acc": 0.7778,
+      "improvement": 0.0202
+    },
+    "KLAX": {
+      "n_pairs": 409,
+      "raw_acc": 0.5575,
+      "calibrated_acc": 0.5281,
+      "era5_acc": 0.6919,
+      "improvement": -0.0293
+    },
+    "KMDW": {
+      "n_pairs": 410,
+      "raw_acc": 0.4561,
+      "calibrated_acc": 0.561,
+      "era5_acc": 0.8049,
+      "improvement": 0.1049
+    },
+    "KMIA": {
+      "n_pairs": 364,
+      "raw_acc": 0.5055,
+      "calibrated_acc": 0.5467,
+      "era5_acc": 0.6319,
+      "improvement": 0.0412
+    },
+    "KNYC": {
+      "n_pairs": 464,
+      "raw_acc": 0.6358,
+      "calibrated_acc": 0.6293,
+      "era5_acc": 0.8017,
+      "improvement": -0.0065
+    },
+    "KOKC": {
+      "n_pairs": 71,
+      "raw_acc": 0.4225,
+      "calibrated_acc": 0.3944,
+      "era5_acc": 0.8873,
+      "improvement": -0.0282
+    },
+    "KPHL": {
+      "n_pairs": 364,
+      "raw_acc": 0.5852,
+      "calibrated_acc": 0.5797,
+      "era5_acc": 0.8187,
+      "improvement": -0.0055
+    },
+    "KPHX": {
+      "n_pairs": 77,
+      "raw_acc": 0.5325,
+      "calibrated_acc": 0.5325,
+      "era5_acc": 0.7143,
+      "improvement": 0.0
+    },
+    "KSEA": {
+      "n_pairs": 6,
+      "raw_acc": 0.8333,
+      "calibrated_acc": 0.6667,
+      "era5_acc": 0.8333,
+      "improvement": -0.1667
+    },
+    "KSFO": {
+      "n_pairs": 99,
+      "raw_acc": 0.5051,
+      "calibrated_acc": 0.5253,
+      "era5_acc": 0.8182,
+      "improvement": 0.0202
+    }
+  },
+  "seasonal_results": {
+    "winter": {
+      "n_pairs": 980,
+      "raw_acc": 0.5429,
+      "calibrated_acc": 0.5449,
+      "era5_acc": 0.7776,
+      "improvement": 0.002
+    },
+    "spring": {
+      "n_pairs": 1406,
+      "raw_acc": 0.5334,
+      "calibrated_acc": 0.5349,
+      "era5_acc": 0.8058,
+      "improvement": 0.0014
+    },
+    "summer": {
+      "n_pairs": 644,
+      "raw_acc": 0.514,
+      "calibrated_acc": 0.5342,
+      "era5_acc": 0.7034,
+      "improvement": 0.0202
+    },
+    "fall": {
+      "n_pairs": 534,
+      "raw_acc": 0.5506,
+      "calibrated_acc": 0.5318,
+      "era5_acc": 0.7247,
+      "improvement": -0.0187
+    }
+  }
+}

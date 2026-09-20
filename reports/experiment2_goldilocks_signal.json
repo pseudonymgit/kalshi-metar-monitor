@@ -1,0 +1,227 @@
+{
+  "experiment": "goldilocks_redesign",
+  "overall": {
+    "total_trades": 2997,
+    "liop_accuracy": 57.36,
+    "corrected_accuracy": 57.36,
+    "delta_pp": 0.0
+  },
+  "goldilocks_subset": {
+    "trades": 810,
+    "pct_of_total": 27.03,
+    "liop_accuracy": 46.42,
+    "corrected_accuracy": 46.42,
+    "delta_pp": 0.0
+  },
+  "per_station": {
+    "KATL": {
+      "total": 161,
+      "liop_acc": 44.1,
+      "corrected_acc": 44.1,
+      "delta": 0.0,
+      "gl_trades": 60,
+      "gl_liop_acc": 35.0,
+      "gl_corrected_acc": 35.0,
+      "gl_delta": 0.0
+    },
+    "KAUS": {
+      "total": 256,
+      "liop_acc": 48.44,
+      "corrected_acc": 48.44,
+      "delta": 0.0,
+      "gl_trades": 66,
+      "gl_liop_acc": 37.88,
+      "gl_corrected_acc": 37.88,
+      "gl_delta": 0.0
+    },
+    "KBOS": {
+      "total": 168,
+      "liop_acc": 57.14,
+      "corrected_acc": 57.14,
+      "delta": 0.0,
+      "gl_trades": 49,
+      "gl_liop_acc": 59.18,
+      "gl_corrected_acc": 59.18,
+      "gl_delta": 0.0
+    },
+    "KDCA": {
+      "total": 175,
+      "liop_acc": 60.57,
+      "corrected_acc": 60.57,
+      "delta": 0.0,
+      "gl_trades": 69,
+      "gl_liop_acc": 49.28,
+      "gl_corrected_acc": 49.28,
+      "gl_delta": 0.0
+    },
+    "KDEN": {
+      "total": 264,
+      "liop_acc": 61.74,
+      "corrected_acc": 61.74,
+      "delta": 0.0,
+      "gl_trades": 112,
+      "gl_liop_acc": 47.32,
+      "gl_corrected_acc": 47.32,
+      "gl_delta": 0.0
+    },
+    "KDFW": {
+      "total": 145,
+      "liop_acc": 69.66,
+      "corrected_acc": 69.66,
+      "delta": 0.0,
+      "gl_trades": 28,
+      "gl_liop_acc": 78.57,
+      "gl_corrected_acc": 78.57,
+      "gl_delta": 0.0
+    },
+    "KHOU": {
+      "total": 138,
+      "liop_acc": 39.13,
+      "corrected_acc": 39.13,
+      "delta": 0.0,
+      "gl_trades": 23,
+      "gl_liop_acc": 21.74,
+      "gl_corrected_acc": 21.74,
+      "gl_delta": 0.0
+    },
+    "KLAS": {
+      "total": 144,
+      "liop_acc": 70.14,
+      "corrected_acc": 70.14,
+      "delta": 0.0,
+      "gl_trades": 85,
+      "gl_liop_acc": 64.71,
+      "gl_corrected_acc": 64.71,
+      "gl_delta": 0.0
+    },
+    "KLAX": {
+      "total": 241,
+      "liop_acc": 58.92,
+      "corrected_acc": 58.92,
+      "delta": 0.0,
+      "gl_trades": 48,
+      "gl_liop_acc": 54.17,
+      "gl_corrected_acc": 54.17,
+      "gl_delta": 0.0
+    },
+    "KMDW": {
+      "total": 259,
+      "liop_acc": 53.67,
+      "corrected_acc": 53.67,
+      "delta": 0.0,
+      "gl_trades": 58,
+      "gl_liop_acc": 39.66,
+      "gl_corrected_acc": 39.66,
+      "gl_delta": 0.0
+    },
+    "KMIA": {
+      "total": 61,
+      "liop_acc": 47.54,
+      "corrected_acc": 47.54,
+      "delta": 0.0,
+      "gl_trades": 31,
+      "gl_liop_acc": 45.16,
+      "gl_corrected_acc": 45.16,
+      "gl_delta": 0.0
+    },
+    "KMSP": {
+      "total": 75,
+      "liop_acc": 44.0,
+      "corrected_acc": 44.0,
+      "delta": 0.0,
+      "gl_trades": 31,
+      "gl_liop_acc": 38.71,
+      "gl_corrected_acc": 38.71,
+      "gl_delta": 0.0
+    },
+    "KMSY": {
+      "total": 64,
+      "liop_acc": 37.5,
+      "corrected_acc": 37.5,
+      "delta": 0.0,
+      "gl_trades": 29,
+      "gl_liop_acc": 27.59,
+      "gl_corrected_acc": 27.59,
+      "gl_delta": 0.0
+    },
+    "KNYC": {
+      "total": 179,
+      "liop_acc": 73.74,
+      "corrected_acc": 73.74,
+      "delta": 0.0,
+      "gl_trades": 60,
+      "gl_liop_acc": 55.0,
+      "gl_corrected_acc": 55.0,
+      "gl_delta": 0.0
+    },
+    "KOKC": {
+      "total": 151,
+      "liop_acc": 43.05,
+      "corrected_acc": 43.05,
+      "delta": 0.0,
+      "gl_trades": 29,
+      "gl_liop_acc": 24.14,
+      "gl_corrected_acc": 24.14,
+      "gl_delta": 0.0
+    },
+    "KPHL": {
+      "total": 74,
+      "liop_acc": 40.54,
+      "corrected_acc": 40.54,
+      "delta": 0.0,
+      "gl_trades": 32,
+      "gl_liop_acc": 28.12,
+      "gl_corrected_acc": 28.12,
+      "gl_delta": 0.0
+    },
+    "KPHX": {
+      "total": 129,
+      "liop_acc": 89.15,
+      "corrected_acc": 89.15,
+      "delta": 0.0,
+      "gl_trades": 0,
+      "gl_liop_acc": 0,
+      "gl_corrected_acc": 0,
+      "gl_delta": 0
+    },
+    "KSAT": {
+      "total": 61,
+      "liop_acc": 45.9,
+      "corrected_acc": 45.9,
+      "delta": 0.0,
+      "gl_trades": 0,
+      "gl_liop_acc": 0,
+      "gl_corrected_acc": 0,
+      "gl_delta": 0
+    },
+    "KSEA": {
+      "total": 96,
+      "liop_acc": 64.58,
+      "corrected_acc": 64.58,
+      "delta": 0.0,
+      "gl_trades": 0,
+      "gl_liop_acc": 0,
+      "gl_corrected_acc": 0,
+      "gl_delta": 0
+    },
+    "KSFO": {
+      "total": 156,
+      "liop_acc": 66.67,
+      "corrected_acc": 66.67,
+      "delta": 0.0,
+      "gl_trades": 0,
+      "gl_liop_acc": 0,
+      "gl_corrected_acc": 0,
+      "gl_delta": 0
+    }
+  },
+  "parameters": {
+    "cloud_threshold": 0.2,
+    "wind_threshold_kt": 8.0,
+    "base_confidence": 0.4
+  },
+  "diagnosis": {
+    "coverage": "810/2997 (27.03%)",
+    "assessment": "Goldilocks events affect ~0.6% of station-days. Signal is too rare to materially impact overall accuracy. Primary value is as intraday override module, not daily signal. Gray Room R7 A2 kill decision remains correct for daily fusion."
+  }
+}

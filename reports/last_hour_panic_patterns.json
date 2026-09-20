@@ -1,0 +1,2738 @@
+{
+  "metadata": {
+    "script": "scripts/last_hour_panic_monitor.py",
+    "task": "EB.2",
+    "description": "Monitor bid-ask spreads for market maker withdrawal patterns near settlement",
+    "snapshot_time": "2026-09-05T04:01:10.303610+00:00",
+    "mode": "NEW_SNAPSHOT",
+    "note": "For historical tracking, run this script periodically. Each run captures a snapshot."
+  },
+  "snapshot": {
+    "n_contracts_sampled": 336,
+    "n_total_spreads": 336,
+    "n_wide_spreads": 214,
+    "wide_pct": 0.637,
+    "contracts": {
+      "KXHIGHTATL-26SEP05-T93": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTATL-26SEP05-T100": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHTATL-26SEP05-B99.5": {
+        "bid": 0.22,
+        "ask": 0.24,
+        "mid": 0.22999999999999998,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.087,
+        "is_wide": false
+      },
+      "KXHIGHTATL-26SEP05-B97.5": {
+        "bid": 0.54,
+        "ask": 0.58,
+        "mid": 0.56,
+        "spread": 0.039999999999999925,
+        "spread_to_mid": 0.071,
+        "is_wide": false
+      },
+      "KXHIGHTATL-26SEP05-B95.5": {
+        "bid": 0.18,
+        "ask": 0.19,
+        "mid": 0.185,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.054,
+        "is_wide": false
+      },
+      "KXHIGHTATL-26SEP05-B93.5": {
+        "bid": 0.03,
+        "ask": 0.04,
+        "mid": 0.035,
+        "spread": 0.010000000000000002,
+        "spread_to_mid": 0.286,
+        "is_wide": false
+      },
+      "KXHIGHTATL-26SEP04-T99": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTATL-26SEP04-T92": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTATL-26SEP04-B98.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTATL-26SEP04-B96.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTATL-26SEP04-B94.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTATL-26SEP04-B92.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP05-T76": {
+        "bid": 0.24,
+        "ask": 0.29,
+        "mid": 0.265,
+        "spread": 0.04999999999999999,
+        "spread_to_mid": 0.189,
+        "is_wide": false
+      },
+      "KXLOWTATL-26SEP05-T69": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP05-B75.5": {
+        "bid": 0.54,
+        "ask": 0.6,
+        "mid": 0.5700000000000001,
+        "spread": 0.05999999999999994,
+        "spread_to_mid": 0.105,
+        "is_wide": false
+      },
+      "KXLOWTATL-26SEP05-B73.5": {
+        "bid": 0.06,
+        "ask": 0.15,
+        "mid": 0.105,
+        "spread": 0.09,
+        "spread_to_mid": 0.857,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP05-B71.5": {
+        "bid": 0.01,
+        "ask": 0.06,
+        "mid": 0.034999999999999996,
+        "spread": 0.049999999999999996,
+        "spread_to_mid": 1.429,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP05-B69.5": {
+        "bid": 0.01,
+        "ask": 0.03,
+        "mid": 0.02,
+        "spread": 0.019999999999999997,
+        "spread_to_mid": 1.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP04-T76": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP04-T69": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP04-B75.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXLOWTATL-26SEP04-B73.5": {
+        "bid": 0.0,
+        "ask": 0.05,
+        "mid": 0.025,
+        "spread": 0.05,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP04-B71.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTATL-26SEP04-B69.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP05-T94": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP05-T101": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP05-B98.5": {
+        "bid": 0.59,
+        "ask": 0.6,
+        "mid": 0.595,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.017,
+        "is_wide": false
+      },
+      "KXHIGHAUS-26SEP05-B96.5": {
+        "bid": 0.27,
+        "ask": 0.29,
+        "mid": 0.28,
+        "spread": 0.019999999999999962,
+        "spread_to_mid": 0.071,
+        "is_wide": false
+      },
+      "KXHIGHAUS-26SEP05-B94.5": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHAUS-26SEP05-B100.5": {
+        "bid": 0.11,
+        "ask": 0.12,
+        "mid": 0.11499999999999999,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.087,
+        "is_wide": false
+      },
+      "KXHIGHAUS-26SEP04-T93": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP04-T100": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP04-B99.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP04-B97.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHAUS-26SEP04-B95.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHAUS-26SEP04-B93.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTBOS-26SEP05-T77": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTBOS-26SEP05-T70": {
+        "bid": 0.07,
+        "ask": 0.08,
+        "mid": 0.07500000000000001,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.133,
+        "is_wide": false
+      },
+      "KXHIGHTBOS-26SEP05-B76.5": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTBOS-26SEP05-B74.5": {
+        "bid": 0.11,
+        "ask": 0.12,
+        "mid": 0.11499999999999999,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.087,
+        "is_wide": false
+      },
+      "KXHIGHTBOS-26SEP05-B72.5": {
+        "bid": 0.29,
+        "ask": 0.32,
+        "mid": 0.305,
+        "spread": 0.030000000000000027,
+        "spread_to_mid": 0.098,
+        "is_wide": false
+      },
+      "KXHIGHTBOS-26SEP05-B70.5": {
+        "bid": 0.44,
+        "ask": 0.46,
+        "mid": 0.45,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.044,
+        "is_wide": false
+      },
+      "KXHIGHTBOS-26SEP04-T87": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTBOS-26SEP04-T80": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTBOS-26SEP04-B86.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTBOS-26SEP04-B84.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTBOS-26SEP04-B82.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTBOS-26SEP04-B80.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP05-T67": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP05-T60": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP05-B66.5": {
+        "bid": 0.02,
+        "ask": 0.06,
+        "mid": 0.04,
+        "spread": 0.039999999999999994,
+        "spread_to_mid": 1.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP05-B64.5": {
+        "bid": 0.29,
+        "ask": 0.32,
+        "mid": 0.305,
+        "spread": 0.030000000000000027,
+        "spread_to_mid": 0.098,
+        "is_wide": false
+      },
+      "KXLOWTBOS-26SEP05-B62.5": {
+        "bid": 0.44,
+        "ask": 0.49,
+        "mid": 0.46499999999999997,
+        "spread": 0.04999999999999999,
+        "spread_to_mid": 0.108,
+        "is_wide": false
+      },
+      "KXLOWTBOS-26SEP05-B60.5": {
+        "bid": 0.11,
+        "ask": 0.16,
+        "mid": 0.135,
+        "spread": 0.05,
+        "spread_to_mid": 0.37,
+        "is_wide": false
+      },
+      "KXLOWTBOS-26SEP04-T70": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP04-T63": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP04-B69.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP04-B67.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTBOS-26SEP04-B65.5": {
+        "bid": 0.98,
+        "ask": 1.0,
+        "mid": 0.99,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.02,
+        "is_wide": false
+      },
+      "KXLOWTBOS-26SEP04-B63.5": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP05-T89": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP05-T82": {
+        "bid": 0.13,
+        "ask": 0.16,
+        "mid": 0.14500000000000002,
+        "spread": 0.03,
+        "spread_to_mid": 0.207,
+        "is_wide": false
+      },
+      "KXHIGHTDC-26SEP05-B88.5": {
+        "bid": 0.02,
+        "ask": 0.04,
+        "mid": 0.03,
+        "spread": 0.02,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP05-B86.5": {
+        "bid": 0.2,
+        "ask": 0.22,
+        "mid": 0.21000000000000002,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.095,
+        "is_wide": false
+      },
+      "KXHIGHTDC-26SEP05-B84.5": {
+        "bid": 0.31,
+        "ask": 0.34,
+        "mid": 0.325,
+        "spread": 0.030000000000000027,
+        "spread_to_mid": 0.092,
+        "is_wide": false
+      },
+      "KXHIGHTDC-26SEP05-B82.5": {
+        "bid": 0.3,
+        "ask": 0.31,
+        "mid": 0.305,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.033,
+        "is_wide": false
+      },
+      "KXHIGHTDC-26SEP04-T98": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP04-T91": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTDC-26SEP04-B97.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP04-B95.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP04-B93.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDC-26SEP04-B91.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP05-T74": {
+        "bid": 0.03,
+        "ask": 0.12,
+        "mid": 0.075,
+        "spread": 0.09,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP05-T67": {
+        "bid": 0.01,
+        "ask": 0.03,
+        "mid": 0.02,
+        "spread": 0.019999999999999997,
+        "spread_to_mid": 1.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP05-B73.5": {
+        "bid": 0.23,
+        "ask": 0.3,
+        "mid": 0.265,
+        "spread": 0.06999999999999998,
+        "spread_to_mid": 0.264,
+        "is_wide": false
+      },
+      "KXLOWTDC-26SEP05-B71.5": {
+        "bid": 0.48,
+        "ask": 0.54,
+        "mid": 0.51,
+        "spread": 0.06000000000000005,
+        "spread_to_mid": 0.118,
+        "is_wide": false
+      },
+      "KXLOWTDC-26SEP05-B69.5": {
+        "bid": 0.05,
+        "ask": 0.11,
+        "mid": 0.08,
+        "spread": 0.06,
+        "spread_to_mid": 0.75,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP05-B67.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP04-T78": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP04-T71": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP04-B77.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP04-B75.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP04-B73.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDC-26SEP04-B71.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHDEN-26SEP05-T94": {
+        "bid": 0.03,
+        "ask": 0.05,
+        "mid": 0.04,
+        "spread": 0.020000000000000004,
+        "spread_to_mid": 0.5,
+        "is_wide": true
+      },
+      "KXHIGHDEN-26SEP05-T87": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHDEN-26SEP05-B93.5": {
+        "bid": 0.34,
+        "ask": 0.35,
+        "mid": 0.345,
+        "spread": 0.009999999999999953,
+        "spread_to_mid": 0.029,
+        "is_wide": false
+      },
+      "KXHIGHDEN-26SEP05-B91.5": {
+        "bid": 0.46,
+        "ask": 0.47,
+        "mid": 0.46499999999999997,
+        "spread": 0.009999999999999953,
+        "spread_to_mid": 0.022,
+        "is_wide": false
+      },
+      "KXHIGHDEN-26SEP05-B89.5": {
+        "bid": 0.15,
+        "ask": 0.16,
+        "mid": 0.155,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.065,
+        "is_wide": false
+      },
+      "KXHIGHDEN-26SEP05-B87.5": {
+        "bid": 0.03,
+        "ask": 0.04,
+        "mid": 0.035,
+        "spread": 0.010000000000000002,
+        "spread_to_mid": 0.286,
+        "is_wide": false
+      },
+      "KXHIGHDEN-26SEP04-T95": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHDEN-26SEP04-T88": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHDEN-26SEP04-B94.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHDEN-26SEP04-B92.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHDEN-26SEP04-B90.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHDEN-26SEP04-B88.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDAL-26SEP05-T96": {
+        "bid": 0.03,
+        "ask": 0.04,
+        "mid": 0.035,
+        "spread": 0.010000000000000002,
+        "spread_to_mid": 0.286,
+        "is_wide": false
+      },
+      "KXHIGHTDAL-26SEP05-T103": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDAL-26SEP05-B98.5": {
+        "bid": 0.36,
+        "ask": 0.37,
+        "mid": 0.365,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.027,
+        "is_wide": false
+      },
+      "KXHIGHTDAL-26SEP05-B96.5": {
+        "bid": 0.1,
+        "ask": 0.15,
+        "mid": 0.125,
+        "spread": 0.04999999999999999,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTDAL-26SEP05-B102.5": {
+        "bid": 0.06,
+        "ask": 0.07,
+        "mid": 0.065,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.154,
+        "is_wide": false
+      },
+      "KXHIGHTDAL-26SEP05-B100.5": {
+        "bid": 0.45,
+        "ask": 0.46,
+        "mid": 0.455,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.022,
+        "is_wide": false
+      },
+      "KXHIGHTDAL-26SEP04-T93": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDAL-26SEP04-T100": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDAL-26SEP04-B99.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTDAL-26SEP04-B97.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDAL-26SEP04-B95.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTDAL-26SEP04-B93.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP05-T78": {
+        "bid": 0.31,
+        "ask": 0.32,
+        "mid": 0.315,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.032,
+        "is_wide": false
+      },
+      "KXLOWTDAL-26SEP05-T71": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP05-B77.5": {
+        "bid": 0.55,
+        "ask": 0.57,
+        "mid": 0.56,
+        "spread": 0.019999999999999907,
+        "spread_to_mid": 0.036,
+        "is_wide": false
+      },
+      "KXLOWTDAL-26SEP05-B75.5": {
+        "bid": 0.13,
+        "ask": 0.16,
+        "mid": 0.14500000000000002,
+        "spread": 0.03,
+        "spread_to_mid": 0.207,
+        "is_wide": false
+      },
+      "KXLOWTDAL-26SEP05-B73.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP05-B71.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP04-T77": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP04-T70": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP04-B76.5": {
+        "bid": 0.98,
+        "ask": 1.0,
+        "mid": 0.99,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.02,
+        "is_wide": false
+      },
+      "KXLOWTDAL-26SEP04-B74.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP04-B72.5": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTDAL-26SEP04-B70.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTHOU-26SEP05-T93": {
+        "bid": 0.31,
+        "ask": 0.32,
+        "mid": 0.315,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.032,
+        "is_wide": false
+      },
+      "KXHIGHTHOU-26SEP05-T86": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHTHOU-26SEP05-B92.5": {
+        "bid": 0.33,
+        "ask": 0.34,
+        "mid": 0.335,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.03,
+        "is_wide": false
+      },
+      "KXHIGHTHOU-26SEP05-B90.5": {
+        "bid": 0.27,
+        "ask": 0.29,
+        "mid": 0.28,
+        "spread": 0.019999999999999962,
+        "spread_to_mid": 0.071,
+        "is_wide": false
+      },
+      "KXHIGHTHOU-26SEP05-B88.5": {
+        "bid": 0.1,
+        "ask": 0.11,
+        "mid": 0.10500000000000001,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.095,
+        "is_wide": false
+      },
+      "KXHIGHTHOU-26SEP05-B86.5": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTHOU-26SEP04-T96": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTHOU-26SEP04-T89": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTHOU-26SEP04-B95.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTHOU-26SEP04-B93.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTHOU-26SEP04-B91.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTHOU-26SEP04-B89.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP05-T78": {
+        "bid": 0.28,
+        "ask": 0.36,
+        "mid": 0.32,
+        "spread": 0.07999999999999996,
+        "spread_to_mid": 0.25,
+        "is_wide": false
+      },
+      "KXLOWTHOU-26SEP05-T71": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP05-B77.5": {
+        "bid": 0.61,
+        "ask": 0.62,
+        "mid": 0.615,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.016,
+        "is_wide": false
+      },
+      "KXLOWTHOU-26SEP05-B75.5": {
+        "bid": 0.02,
+        "ask": 0.09,
+        "mid": 0.055,
+        "spread": 0.06999999999999999,
+        "spread_to_mid": 1.273,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP05-B73.5": {
+        "bid": 0.02,
+        "ask": 0.04,
+        "mid": 0.03,
+        "spread": 0.02,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP05-B71.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP04-T78": {
+        "bid": 0.81,
+        "ask": 0.85,
+        "mid": 0.8300000000000001,
+        "spread": 0.039999999999999925,
+        "spread_to_mid": 0.048,
+        "is_wide": false
+      },
+      "KXLOWTHOU-26SEP04-T71": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP04-B77.5": {
+        "bid": 0.11,
+        "ask": 0.19,
+        "mid": 0.15,
+        "spread": 0.08,
+        "spread_to_mid": 0.533,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP04-B75.5": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP04-B73.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTHOU-26SEP04-B71.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTLV-26SEP05-T93": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTLV-26SEP05-T100": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTLV-26SEP05-B99.5": {
+        "bid": 0.13,
+        "ask": 0.15,
+        "mid": 0.14,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.143,
+        "is_wide": false
+      },
+      "KXHIGHTLV-26SEP05-B97.5": {
+        "bid": 0.63,
+        "ask": 0.64,
+        "mid": 0.635,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.016,
+        "is_wide": false
+      },
+      "KXHIGHTLV-26SEP05-B95.5": {
+        "bid": 0.2,
+        "ask": 0.21,
+        "mid": 0.20500000000000002,
+        "spread": 0.009999999999999981,
+        "spread_to_mid": 0.049,
+        "is_wide": false
+      },
+      "KXHIGHTLV-26SEP05-B93.5": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTLV-26SEP04-T93": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTLV-26SEP04-T100": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTLV-26SEP04-B99.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTLV-26SEP04-B97.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTLV-26SEP04-B95.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTLV-26SEP04-B93.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP05-T72": {
+        "bid": 0.89,
+        "ask": 0.95,
+        "mid": 0.9199999999999999,
+        "spread": 0.05999999999999994,
+        "spread_to_mid": 0.065,
+        "is_wide": false
+      },
+      "KXLOWTLV-26SEP05-T65": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP05-B71.5": {
+        "bid": 0.05,
+        "ask": 0.12,
+        "mid": 0.08499999999999999,
+        "spread": 0.06999999999999999,
+        "spread_to_mid": 0.824,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP05-B69.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP05-B67.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP05-B65.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP04-T71": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXLOWTLV-26SEP04-T64": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP04-B70.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP04-B68.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP04-B66.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTLV-26SEP04-B64.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP05-T80": {
+        "bid": 0.42,
+        "ask": 0.44,
+        "mid": 0.43,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.047,
+        "is_wide": false
+      },
+      "KXHIGHLAX-26SEP05-T73": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP05-B79.5": {
+        "bid": 0.44,
+        "ask": 0.46,
+        "mid": 0.45,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.044,
+        "is_wide": false
+      },
+      "KXHIGHLAX-26SEP05-B77.5": {
+        "bid": 0.11,
+        "ask": 0.12,
+        "mid": 0.11499999999999999,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.087,
+        "is_wide": false
+      },
+      "KXHIGHLAX-26SEP05-B75.5": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP05-B73.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP04-T78": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP04-T71": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP04-B77.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHLAX-26SEP04-B75.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP04-B73.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHLAX-26SEP04-B71.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP05-T90": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP05-T83": {
+        "bid": 0.63,
+        "ask": 0.64,
+        "mid": 0.635,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.016,
+        "is_wide": false
+      },
+      "KXHIGHCHI-26SEP05-B89.5": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP05-B87.5": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP05-B85.5": {
+        "bid": 0.13,
+        "ask": 0.15,
+        "mid": 0.14,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.143,
+        "is_wide": false
+      },
+      "KXHIGHCHI-26SEP05-B83.5": {
+        "bid": 0.22,
+        "ask": 0.23,
+        "mid": 0.225,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.044,
+        "is_wide": false
+      },
+      "KXHIGHCHI-26SEP04-T96": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP04-T89": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP04-B95.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP04-B93.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHCHI-26SEP04-B91.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHCHI-26SEP04-B89.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP05-T93": {
+        "bid": 0.06,
+        "ask": 0.07,
+        "mid": 0.065,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.154,
+        "is_wide": false
+      },
+      "KXHIGHMIA-26SEP05-T86": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP05-B92.5": {
+        "bid": 0.3,
+        "ask": 0.31,
+        "mid": 0.305,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.033,
+        "is_wide": false
+      },
+      "KXHIGHMIA-26SEP05-B90.5": {
+        "bid": 0.48,
+        "ask": 0.5,
+        "mid": 0.49,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.041,
+        "is_wide": false
+      },
+      "KXHIGHMIA-26SEP05-B88.5": {
+        "bid": 0.16,
+        "ask": 0.18,
+        "mid": 0.16999999999999998,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.118,
+        "is_wide": false
+      },
+      "KXHIGHMIA-26SEP05-B86.5": {
+        "bid": 0.01,
+        "ask": 0.03,
+        "mid": 0.02,
+        "spread": 0.019999999999999997,
+        "spread_to_mid": 1.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP04-T94": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP04-T87": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP04-B93.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP04-B91.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHMIA-26SEP04-B89.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHMIA-26SEP04-B87.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP05-T95": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP05-T88": {
+        "bid": 0.77,
+        "ask": 0.78,
+        "mid": 0.775,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.013,
+        "is_wide": false
+      },
+      "KXHIGHTMIN-26SEP05-B94.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP05-B92.5": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP05-B90.5": {
+        "bid": 0.02,
+        "ask": 0.05,
+        "mid": 0.035,
+        "spread": 0.030000000000000002,
+        "spread_to_mid": 0.857,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP05-B88.5": {
+        "bid": 0.13,
+        "ask": 0.14,
+        "mid": 0.135,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.074,
+        "is_wide": false
+      },
+      "KXHIGHTMIN-26SEP04-T95": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP04-T88": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTMIN-26SEP04-B94.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP04-B92.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP04-B90.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTMIN-26SEP04-B88.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP05-T69": {
+        "bid": 0.02,
+        "ask": 0.07,
+        "mid": 0.045000000000000005,
+        "spread": 0.05,
+        "spread_to_mid": 1.111,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP05-T62": {
+        "bid": 0.01,
+        "ask": 0.03,
+        "mid": 0.02,
+        "spread": 0.019999999999999997,
+        "spread_to_mid": 1.0,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP05-B68.5": {
+        "bid": 0.19,
+        "ask": 0.23,
+        "mid": 0.21000000000000002,
+        "spread": 0.04000000000000001,
+        "spread_to_mid": 0.19,
+        "is_wide": false
+      },
+      "KXLOWTMIN-26SEP05-B66.5": {
+        "bid": 0.52,
+        "ask": 0.58,
+        "mid": 0.55,
+        "spread": 0.05999999999999994,
+        "spread_to_mid": 0.109,
+        "is_wide": false
+      },
+      "KXLOWTMIN-26SEP05-B64.5": {
+        "bid": 0.1,
+        "ask": 0.11,
+        "mid": 0.10500000000000001,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.095,
+        "is_wide": false
+      },
+      "KXLOWTMIN-26SEP05-B62.5": {
+        "bid": 0.02,
+        "ask": 0.05,
+        "mid": 0.035,
+        "spread": 0.030000000000000002,
+        "spread_to_mid": 0.857,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP04-T72": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP04-T65": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP04-B71.5": {
+        "bid": 0.37,
+        "ask": 0.71,
+        "mid": 0.54,
+        "spread": 0.33999999999999997,
+        "spread_to_mid": 0.63,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP04-B69.5": {
+        "bid": 0.33,
+        "ask": 0.63,
+        "mid": 0.48,
+        "spread": 0.3,
+        "spread_to_mid": 0.625,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP04-B67.5": {
+        "bid": 0.0,
+        "ask": 0.09,
+        "mid": 0.045,
+        "spread": 0.09,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTMIN-26SEP04-B65.5": {
+        "bid": 0.0,
+        "ask": 0.07,
+        "mid": 0.035,
+        "spread": 0.07,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP05-T93": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP05-T86": {
+        "bid": 0.01,
+        "ask": 0.03,
+        "mid": 0.02,
+        "spread": 0.019999999999999997,
+        "spread_to_mid": 1.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP05-B92.5": {
+        "bid": 0.09,
+        "ask": 0.1,
+        "mid": 0.095,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.105,
+        "is_wide": false
+      },
+      "KXHIGHTNOLA-26SEP05-B90.5": {
+        "bid": 0.44,
+        "ask": 0.47,
+        "mid": 0.45499999999999996,
+        "spread": 0.02999999999999997,
+        "spread_to_mid": 0.066,
+        "is_wide": false
+      },
+      "KXHIGHTNOLA-26SEP05-B88.5": {
+        "bid": 0.3,
+        "ask": 0.31,
+        "mid": 0.305,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.033,
+        "is_wide": false
+      },
+      "KXHIGHTNOLA-26SEP05-B86.5": {
+        "bid": 0.1,
+        "ask": 0.11,
+        "mid": 0.10500000000000001,
+        "spread": 0.009999999999999995,
+        "spread_to_mid": 0.095,
+        "is_wide": false
+      },
+      "KXHIGHTNOLA-26SEP04-T94": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP04-T87": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP04-B93.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP04-B91.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP04-B89.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTNOLA-26SEP04-B87.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXLOWTNOLA-26SEP05-T77": {
+        "bid": 0.13,
+        "ask": 0.18,
+        "mid": 0.155,
+        "spread": 0.04999999999999999,
+        "spread_to_mid": 0.323,
+        "is_wide": false
+      },
+      "KXLOWTNOLA-26SEP05-T70": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP05-B76.5": {
+        "bid": 0.38,
+        "ask": 0.41,
+        "mid": 0.395,
+        "spread": 0.02999999999999997,
+        "spread_to_mid": 0.076,
+        "is_wide": false
+      },
+      "KXLOWTNOLA-26SEP05-B74.5": {
+        "bid": 0.33,
+        "ask": 0.41,
+        "mid": 0.37,
+        "spread": 0.07999999999999996,
+        "spread_to_mid": 0.216,
+        "is_wide": false
+      },
+      "KXLOWTNOLA-26SEP05-B72.5": {
+        "bid": 0.01,
+        "ask": 0.08,
+        "mid": 0.045,
+        "spread": 0.07,
+        "spread_to_mid": 1.556,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP05-B70.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP04-T78": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP04-T71": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP04-B77.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP04-B75.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNOLA-26SEP04-B73.5": {
+        "bid": 0.98,
+        "ask": 1.0,
+        "mid": 0.99,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.02,
+        "is_wide": false
+      },
+      "KXLOWTNOLA-26SEP04-B71.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP05-T69": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP05-T62": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP05-B68.5": {
+        "bid": 0.53,
+        "ask": 0.55,
+        "mid": 0.54,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.037,
+        "is_wide": false
+      },
+      "KXLOWTNYC-26SEP05-B66.5": {
+        "bid": 0.36,
+        "ask": 0.44,
+        "mid": 0.4,
+        "spread": 0.08000000000000002,
+        "spread_to_mid": 0.2,
+        "is_wide": false
+      },
+      "KXLOWTNYC-26SEP05-B64.5": {
+        "bid": 0.02,
+        "ask": 0.05,
+        "mid": 0.035,
+        "spread": 0.030000000000000002,
+        "spread_to_mid": 0.857,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP05-B62.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP04-T73": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP04-T66": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP04-B72.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP04-B70.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXLOWTNYC-26SEP04-B68.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTNYC-26SEP04-B66.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTPHX-26SEP05-T98": {
+        "bid": 0.01,
+        "ask": 0.02,
+        "mid": 0.015,
+        "spread": 0.01,
+        "spread_to_mid": 0.667,
+        "is_wide": true
+      },
+      "KXHIGHTPHX-26SEP05-T105": {
+        "bid": 0.06,
+        "ask": 0.07,
+        "mid": 0.065,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.154,
+        "is_wide": false
+      },
+      "KXHIGHTPHX-26SEP05-B98.5": {
+        "bid": 0.03,
+        "ask": 0.04,
+        "mid": 0.035,
+        "spread": 0.010000000000000002,
+        "spread_to_mid": 0.286,
+        "is_wide": false
+      },
+      "KXHIGHTPHX-26SEP05-B104.5": {
+        "bid": 0.21,
+        "ask": 0.22,
+        "mid": 0.215,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.047,
+        "is_wide": false
+      },
+      "KXHIGHTPHX-26SEP05-B102.5": {
+        "bid": 0.51,
+        "ask": 0.52,
+        "mid": 0.515,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.019,
+        "is_wide": false
+      },
+      "KXHIGHTPHX-26SEP05-B100.5": {
+        "bid": 0.16,
+        "ask": 0.17,
+        "mid": 0.165,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.061,
+        "is_wide": false
+      },
+      "KXHIGHTPHX-26SEP04-T107": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTPHX-26SEP04-T100": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTPHX-26SEP04-B106.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTPHX-26SEP04-B104.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTPHX-26SEP04-B102.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTPHX-26SEP04-B100.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP05-T83": {
+        "bid": 0.81,
+        "ask": 0.85,
+        "mid": 0.8300000000000001,
+        "spread": 0.039999999999999925,
+        "spread_to_mid": 0.048,
+        "is_wide": false
+      },
+      "KXLOWTPHX-26SEP05-T76": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP05-B82.5": {
+        "bid": 0.08,
+        "ask": 0.15,
+        "mid": 0.11499999999999999,
+        "spread": 0.06999999999999999,
+        "spread_to_mid": 0.609,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP05-B80.5": {
+        "bid": 0.05,
+        "ask": 0.08,
+        "mid": 0.065,
+        "spread": 0.03,
+        "spread_to_mid": 0.462,
+        "is_wide": false
+      },
+      "KXLOWTPHX-26SEP05-B78.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP05-B76.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP04-T83": {
+        "bid": 0.93,
+        "ask": 0.98,
+        "mid": 0.9550000000000001,
+        "spread": 0.04999999999999993,
+        "spread_to_mid": 0.052,
+        "is_wide": false
+      },
+      "KXLOWTPHX-26SEP04-T76": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP04-B82.5": {
+        "bid": 0.01,
+        "ask": 0.08,
+        "mid": 0.045,
+        "spread": 0.07,
+        "spread_to_mid": 1.556,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP04-B80.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP04-B78.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTPHX-26SEP04-B76.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP05-T75": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP05-T68": {
+        "bid": 0.15,
+        "ask": 0.16,
+        "mid": 0.155,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.065,
+        "is_wide": false
+      },
+      "KXHIGHTSEA-26SEP05-B74.5": {
+        "bid": 0.04,
+        "ask": 0.07,
+        "mid": 0.05500000000000001,
+        "spread": 0.030000000000000006,
+        "spread_to_mid": 0.545,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP05-B72.5": {
+        "bid": 0.13,
+        "ask": 0.15,
+        "mid": 0.14,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.143,
+        "is_wide": false
+      },
+      "KXHIGHTSEA-26SEP05-B70.5": {
+        "bid": 0.41,
+        "ask": 0.43,
+        "mid": 0.42,
+        "spread": 0.020000000000000018,
+        "spread_to_mid": 0.048,
+        "is_wide": false
+      },
+      "KXHIGHTSEA-26SEP05-B68.5": {
+        "bid": 0.23,
+        "ask": 0.25,
+        "mid": 0.24,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.083,
+        "is_wide": false
+      },
+      "KXHIGHTSEA-26SEP04-T73": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP04-T66": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP04-B72.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP04-B70.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTSEA-26SEP04-B68.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSEA-26SEP04-B66.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP05-T53": {
+        "bid": 0.13,
+        "ask": 0.15,
+        "mid": 0.14,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.143,
+        "is_wide": false
+      },
+      "KXLOWTSEA-26SEP05-T46": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP05-B52.5": {
+        "bid": 0.5,
+        "ask": 0.55,
+        "mid": 0.525,
+        "spread": 0.050000000000000044,
+        "spread_to_mid": 0.095,
+        "is_wide": false
+      },
+      "KXLOWTSEA-26SEP05-B50.5": {
+        "bid": 0.3,
+        "ask": 0.36,
+        "mid": 0.32999999999999996,
+        "spread": 0.06,
+        "spread_to_mid": 0.182,
+        "is_wide": false
+      },
+      "KXLOWTSEA-26SEP05-B48.5": {
+        "bid": 0.01,
+        "ask": 0.05,
+        "mid": 0.030000000000000002,
+        "spread": 0.04,
+        "spread_to_mid": 1.333,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP05-B46.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP04-T52": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXLOWTSEA-26SEP04-T45": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP04-B51.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP04-B49.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP04-B47.5": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSEA-26SEP04-B45.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSFO-26SEP05-T74": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP05-T67": {
+        "bid": 0.02,
+        "ask": 0.03,
+        "mid": 0.025,
+        "spread": 0.009999999999999998,
+        "spread_to_mid": 0.4,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP05-B73.5": {
+        "bid": 0.19,
+        "ask": 0.21,
+        "mid": 0.2,
+        "spread": 0.01999999999999999,
+        "spread_to_mid": 0.1,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP05-B71.5": {
+        "bid": 0.43,
+        "ask": 0.44,
+        "mid": 0.435,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.023,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP05-B69.5": {
+        "bid": 0.26,
+        "ask": 0.29,
+        "mid": 0.275,
+        "spread": 0.02999999999999997,
+        "spread_to_mid": 0.109,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP05-B67.5": {
+        "bid": 0.07,
+        "ask": 0.1,
+        "mid": 0.085,
+        "spread": 0.03,
+        "spread_to_mid": 0.353,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP04-T73": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSFO-26SEP04-T66": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSFO-26SEP04-B72.5": {
+        "bid": 0.99,
+        "ask": 1.0,
+        "mid": 0.995,
+        "spread": 0.010000000000000009,
+        "spread_to_mid": 0.01,
+        "is_wide": false
+      },
+      "KXHIGHTSFO-26SEP04-B70.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSFO-26SEP04-B68.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXHIGHTSFO-26SEP04-B66.5": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP05-T58": {
+        "bid": 0.02,
+        "ask": 0.05,
+        "mid": 0.035,
+        "spread": 0.030000000000000002,
+        "spread_to_mid": 0.857,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP05-T51": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP05-B57.5": {
+        "bid": 0.85,
+        "ask": 0.88,
+        "mid": 0.865,
+        "spread": 0.030000000000000027,
+        "spread_to_mid": 0.035,
+        "is_wide": false
+      },
+      "KXLOWTSFO-26SEP05-B55.5": {
+        "bid": 0.01,
+        "ask": 0.14,
+        "mid": 0.07500000000000001,
+        "spread": 0.13,
+        "spread_to_mid": 1.733,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP05-B53.5": {
+        "bid": 0.01,
+        "ask": 0.06,
+        "mid": 0.034999999999999996,
+        "spread": 0.049999999999999996,
+        "spread_to_mid": 1.429,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP05-B51.5": {
+        "bid": 0.01,
+        "ask": 0.04,
+        "mid": 0.025,
+        "spread": 0.03,
+        "spread_to_mid": 1.2,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP04-T59": {
+        "bid": 0.0,
+        "ask": 0.01,
+        "mid": 0.005,
+        "spread": 0.01,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP04-T52": {
+        "bid": 0.0,
+        "ask": 0.02,
+        "mid": 0.01,
+        "spread": 0.02,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP04-B58.5": {
+        "bid": 0.86,
+        "ask": 0.93,
+        "mid": 0.895,
+        "spread": 0.07000000000000006,
+        "spread_to_mid": 0.078,
+        "is_wide": false
+      },
+      "KXLOWTSFO-26SEP04-B56.5": {
+        "bid": 0.11,
+        "ask": 0.14,
+        "mid": 0.125,
+        "spread": 0.030000000000000013,
+        "spread_to_mid": 0.24,
+        "is_wide": false
+      },
+      "KXLOWTSFO-26SEP04-B54.5": {
+        "bid": 0.0,
+        "ask": 0.04,
+        "mid": 0.02,
+        "spread": 0.04,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      },
+      "KXLOWTSFO-26SEP04-B52.5": {
+        "bid": 0.0,
+        "ask": 0.03,
+        "mid": 0.015,
+        "spread": 0.03,
+        "spread_to_mid": 2.0,
+        "is_wide": true
+      }
+    }
+  },
+  "aggregate": {
+    "n_contracts": 336,
+    "mean_spread_to_mid": 1.16,
+    "max_spread_to_mid": 2.0,
+    "n_wide_contracts": 214,
+    "wide_contracts": [
+      "KXHIGHTATL-26SEP05-T93",
+      "KXHIGHTATL-26SEP05-T100",
+      "KXHIGHTATL-26SEP04-T99",
+      "KXHIGHTATL-26SEP04-T92",
+      "KXHIGHTATL-26SEP04-B98.5",
+      "KXHIGHTATL-26SEP04-B96.5",
+      "KXHIGHTATL-26SEP04-B92.5",
+      "KXLOWTATL-26SEP05-T69",
+      "KXLOWTATL-26SEP05-B73.5",
+      "KXLOWTATL-26SEP05-B71.5",
+      "KXLOWTATL-26SEP05-B69.5",
+      "KXLOWTATL-26SEP04-T76",
+      "KXLOWTATL-26SEP04-T69",
+      "KXLOWTATL-26SEP04-B73.5",
+      "KXLOWTATL-26SEP04-B71.5",
+      "KXLOWTATL-26SEP04-B69.5",
+      "KXHIGHAUS-26SEP05-T94",
+      "KXHIGHAUS-26SEP05-T101",
+      "KXHIGHAUS-26SEP04-T93",
+      "KXHIGHAUS-26SEP04-T100"
+    ]
+  },
+  "panic_pattern_summary": {
+    "current_spread_environment": "WIDE",
+    "recommendation": "Run this script every 1-2 minutes during the last hour before settlement to detect intra-hour spread widening. The current snapshot captures a single point in time \u2014 without time-series data, we can't detect 5-min widening events."
+  }
+}

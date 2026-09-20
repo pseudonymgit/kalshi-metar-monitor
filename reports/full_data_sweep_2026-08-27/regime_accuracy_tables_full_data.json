@@ -1,0 +1,251 @@
+{
+  "season_accuracy": {
+    "seasonal_regime": {
+      "winter": 0.4565,
+      "spring": 0.4619,
+      "summer": 0.4301,
+      "fall": 0.4436
+    },
+    "gaussian": {
+      "winter": 0.6419,
+      "spring": 0.6843,
+      "summer": 0.6694,
+      "fall": 0.5815
+    },
+    "metar_trend": {
+      "winter": 0.448,
+      "spring": 0.4298,
+      "summer": 0.4536,
+      "fall": 0.455
+    },
+    "cooling_failure": {
+      "winter": 0.7029,
+      "spring": 0.69,
+      "summer": 0.7067,
+      "fall": 0.7981
+    },
+    "warm_momentum": {
+      "winter": 0.34,
+      "spring": 0.3385,
+      "summer": 0.3402,
+      "fall": 0.2922
+    },
+    "forecast_disagreement": {
+      "winter": 0.625,
+      "spring": 0.6577,
+      "summer": 0.6585,
+      "fall": 0.6407
+    },
+    "honest_trend": {
+      "winter": 0.4285,
+      "spring": 0.4078,
+      "summer": 0.4209,
+      "fall": 0.436
+    },
+    "pressure_delta": {
+      "winter": 0.4445,
+      "spring": 0.4703,
+      "summer": 0.4548,
+      "fall": 0.4464
+    },
+    "corrected_pressure_delta": {
+      "winter": 0.4445,
+      "spring": 0.4703,
+      "summer": 0.4548,
+      "fall": 0.4464
+    },
+    "calendar_climatology": {
+      "winter": 0.682,
+      "spring": 0.7204,
+      "summer": 0.7122,
+      "fall": 0.6138
+    },
+    "pressure_tendency": {
+      "winter": 0.5689,
+      "spring": 0.557,
+      "summer": 0.5615,
+      "fall": 0.5692
+    },
+    "gaussian_v2": {
+      "winter": 0.611,
+      "spring": 0.6515,
+      "summer": 0.6391,
+      "fall": 0.5836
+    },
+    "spike_reversion": {
+      "winter": 0.5924,
+      "spring": 0.6154,
+      "summer": 0.6097,
+      "fall": 0.6188
+    },
+    "ecmwf_bias_corrected": {
+      "winter": 0.4469,
+      "spring": 0.4298,
+      "summer": 0.4536,
+      "fall": 0.455
+    },
+    "radiational_cooling": {
+      "winter": 0.5091,
+      "spring": 0.5821,
+      "summer": 0.6015,
+      "fall": 0.6194
+    }
+  },
+  "pressure_accuracy": {
+    "seasonal_regime": {
+      "rising": 0.4187,
+      "falling": 0.4884,
+      "stable": 0.4372
+    },
+    "gaussian": {
+      "rising": 0.6332,
+      "falling": 0.6491,
+      "stable": 0.6447
+    },
+    "metar_trend": {
+      "rising": 0.4189,
+      "falling": 0.4455,
+      "stable": 0.4591
+    },
+    "cooling_failure": {
+      "rising": 0.5922,
+      "falling": 0.8054,
+      "stable": 0.7084
+    },
+    "warm_momentum": {
+      "rising": 0.4158,
+      "falling": 0.2837,
+      "stable": 0.3348
+    },
+    "forecast_disagreement": {
+      "rising": 0.6423,
+      "falling": 0.6427,
+      "stable": 0.6477
+    },
+    "honest_trend": {
+      "rising": 0.4144,
+      "falling": 0.4225,
+      "stable": 0.4266
+    },
+    "pressure_delta": {
+      "rising": 0.4783,
+      "falling": 0.4667,
+      "stable": 0.4305
+    },
+    "corrected_pressure_delta": {
+      "rising": 0.4783,
+      "falling": 0.4667,
+      "stable": 0.4305
+    },
+    "calendar_climatology": {
+      "rising": 0.6728,
+      "falling": 0.6686,
+      "stable": 0.6796
+    },
+    "pressure_tendency": {
+      "rising": 0.5443,
+      "falling": 0.5647,
+      "stable": 0.5768
+    },
+    "gaussian_v2": {
+      "rising": 0.6136,
+      "falling": 0.6278,
+      "stable": 0.6246
+    },
+    "spike_reversion": {
+      "rising": 0.5196,
+      "falling": 0.6672,
+      "stable": 0.603
+    },
+    "ecmwf_bias_corrected": {
+      "rising": 0.4183,
+      "falling": 0.4451,
+      "stable": 0.4591
+    },
+    "radiational_cooling": {
+      "rising": 0.4502,
+      "falling": 0.5951,
+      "stable": 0.578
+    }
+  },
+  "temp_trajectory_accuracy": {
+    "seasonal_regime": {
+      "warming": 0.4554,
+      "cooling": 0.4471,
+      "stable": 0.4381
+    },
+    "gaussian": {
+      "warming": 0.656,
+      "cooling": 0.6359,
+      "stable": 0.6384
+    },
+    "metar_trend": {
+      "warming": 0.4258,
+      "cooling": 0.4155,
+      "stable": 0.4809
+    },
+    "cooling_failure": {
+      "warming": 0.7552,
+      "cooling": 0.6171,
+      "stable": 0.7224
+    },
+    "warm_momentum": {
+      "warming": 0.3197,
+      "cooling": 0.3805,
+      "stable": 0.3421
+    },
+    "forecast_disagreement": {
+      "warming": 0.6481,
+      "cooling": 0.6507,
+      "stable": 0.6349
+    },
+    "honest_trend": {
+      "warming": 0.4051,
+      "cooling": 0.4146,
+      "stable": 0.4415
+    },
+    "pressure_delta": {
+      "warming": 0.4691,
+      "cooling": 0.4561,
+      "stable": 0.4396
+    },
+    "corrected_pressure_delta": {
+      "warming": 0.4691,
+      "cooling": 0.4561,
+      "stable": 0.4396
+    },
+    "calendar_climatology": {
+      "warming": 0.6842,
+      "cooling": 0.6733,
+      "stable": 0.6689
+    },
+    "pressure_tendency": {
+      "warming": 0.5615,
+      "cooling": 0.5665,
+      "stable": 0.5644
+    },
+    "gaussian_v2": {
+      "warming": 0.6321,
+      "cooling": 0.619,
+      "stable": 0.6184
+    },
+    "spike_reversion": {
+      "warming": 0.6185,
+      "cooling": 0.5894,
+      "stable": 0.5933
+    },
+    "ecmwf_bias_corrected": {
+      "warming": 0.4259,
+      "cooling": 0.4151,
+      "stable": 0.4804
+    },
+    "radiational_cooling": {
+      "warming": 0.549,
+      "cooling": 0.5356,
+      "stable": 0.6103
+    }
+  },
+  "generated_at": "2026-08-27 03:37 UTC",
+  "elapsed_seconds": 9.7,
+  "data_range": "2021-01-01 to present"
+}

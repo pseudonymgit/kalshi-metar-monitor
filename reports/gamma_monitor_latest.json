@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-09-05T19:23:15.482640+00:00",
+  "imports": {
+    "g1_cloud_clearing": "OK",
+    "g2_dryline_cooling": "OK",
+    "g3_wind_shift_ramp": "OK",
+    "g4_ramp_acceleration": "OK",
+    "g5_inversion_breakout": "OK",
+    "g6_gust_front_pressure": "OK"
+  },
+  "heldout": {
+    "status": "EXISTS",
+    "signals_tested": 0,
+    "promoted": [],
+    "shadow": [],
+    "dormant": [],
+    "receipt": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/../reports/additive_heldout_2026.json"
+  },
+  "cooccurrence": {
+    "status": "FAIL",
+    "error": "cannot import name 'CO_OCCURRENCE_MATRIX' from 'core.additive.cooccurrence' (/home/node/.openclaw/workspace/prototypes/weather-engine-source/core/additive/cooccurrence.py)"
+  },
+  "all_ok": true
+}

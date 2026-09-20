@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "script": "scripts/delta_era5_ceiling.py",
+    "task": "0.1",
+    "description": "ERA5 day-over-day delta upper bound \u2014 theoretical ceiling for NWP-based directional systems",
+    "era5_date_range": "2025-01-01 to 2026-04-23",
+    "kalshi_overlap_start": "2025-01-01",
+    "kalshi_overlap_end": "2026-04-23"
+  },
+  "summary": {
+    "era5_directional_accuracy": 0.815,
+    "theoretical_ceiling_pct": "18.5%",
+    "interpretation": "ERA5 gets day-over-day direction right 81.5% of the time. Any NWP-based system is theoretically capped at 18.5% directional accuracy because even perfect reanalysis (ERA5) misses 18.5% of actual direction changes. The remaining error is in Kalshi noise or microclimate effects.",
+    "total_pair_days": 3130,
+    "n_stations": 17
+  },
+  "per_station": {
+    "KATL": {
+      "accuracy": 0.913,
+      "n_pairs": 69
+    },
+    "KAUS": {
+      "accuracy": 0.8261,
+      "n_pairs": 345
+    },
+    "KBOS": {
+      "accuracy": 0.9342,
+      "n_pairs": 76
+    },
+    "KDCA": {
+      "accuracy": 0.6585,
+      "n_pairs": 82
+    },
+    "KDEN": {
+      "accuracy": 0.8943,
+      "n_pairs": 369
+    },
+    "KDFW": {
+      "accuracy": 0.5968,
+      "n_pairs": 62
+    },
+    "KHOU": {
+      "accuracy": 0.9661,
+      "n_pairs": 59
+    },
+    "KLAS": {
+      "accuracy": 0.8667,
+      "n_pairs": 90
+    },
+    "KLAX": {
+      "accuracy": 0.7078,
+      "n_pairs": 332
+    },
+    "KMDW": {
+      "accuracy": 0.9041,
+      "n_pairs": 365
+    },
+    "KMIA": {
+      "accuracy": 0.731,
+      "n_pairs": 290
+    },
+    "KNYC": {
+      "accuracy": 0.7885,
+      "n_pairs": 435
+    },
+    "KOKC": {
+      "accuracy": 0.9231,
+      "n_pairs": 65
+    },
+    "KPHL": {
+      "accuracy": 0.8394,
+      "n_pairs": 330
+    },
+    "KPHX": {
+      "accuracy": 0.6667,
+      "n_pairs": 63
+    },
+    "KSEA": {
+      "accuracy": 0.8,
+      "n_pairs": 5
+    },
+    "KSFO": {
+      "accuracy": 0.7849,
+      "n_pairs": 93
+    }
+  }
+}

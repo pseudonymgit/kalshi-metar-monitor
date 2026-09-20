@@ -1,0 +1,178 @@
+{
+  "generated_utc": "2026-09-18T18:53:18Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price), core/settlement_outcome.strike_crossing_direction",
+  "label_source": "settlement_truth (date-tiered: GHCN authoritative through 2026-09-12; kalshi_finalized 09-13..16; weatherapi recency bridge)",
+  "n_correct_axis_labels": 56,
+  "stations": 17,
+  "strike_backfill_status": "P0-B NOT LANDED \u2014 56 strike rows (Sep 7/8) only; full history pending",
+  "nwp_analog_enabled": true,
+  "signals": {
+    "pressure_delta (ref)": {
+      "original": {
+        "accuracy": 0.263158,
+        "mcc": 0.148522,
+        "n": 19,
+        "tp": 3,
+        "fp": 14,
+        "tn": 2,
+        "fn": 0
+      },
+      "inverted": {
+        "accuracy": 0.736842,
+        "mcc": -0.148522,
+        "n": 19,
+        "tp": 0,
+        "fp": 2,
+        "tn": 14,
+        "fn": 3
+      },
+      "verdict": "UNDERPOWERED (n<20 \u2014 cannot resolve inversion vs noise; re-run after P0-B)",
+      "n_fired": 19
+    },
+    "corrected_pressure_delta": {
+      "original": {
+        "accuracy": 0.736842,
+        "mcc": -0.148522,
+        "n": 19,
+        "tp": 0,
+        "fp": 2,
+        "tn": 14,
+        "fn": 3
+      },
+      "inverted": {
+        "accuracy": 0.263158,
+        "mcc": 0.148522,
+        "n": 19,
+        "tp": 3,
+        "fp": 14,
+        "tn": 2,
+        "fn": 0
+      },
+      "verdict": "UNDERPOWERED (n<20 \u2014 cannot resolve inversion vs noise; re-run after P0-B)",
+      "n_fired": 19
+    },
+    "spike_reversion": {
+      "original": {
+        "accuracy": 0.823529,
+        "mcc": 0.0,
+        "n": 17,
+        "tp": 0,
+        "fp": 0,
+        "tn": 14,
+        "fn": 3
+      },
+      "inverted": {
+        "accuracy": 0.176471,
+        "mcc": 0.0,
+        "n": 17,
+        "tp": 3,
+        "fp": 14,
+        "tn": 0,
+        "fn": 0
+      },
+      "verdict": "UNDERPOWERED (n<20 \u2014 cannot resolve inversion vs noise; re-run after P0-B)",
+      "n_fired": 17
+    },
+    "persistence": {
+      "original": {
+        "accuracy": 0.517857,
+        "mcc": -0.048839,
+        "n": 56,
+        "tp": 5,
+        "fp": 19,
+        "tn": 24,
+        "fn": 8
+      },
+      "inverted": {
+        "accuracy": 0.482143,
+        "mcc": 0.048839,
+        "n": 56,
+        "tp": 8,
+        "fp": 24,
+        "tn": 19,
+        "fn": 5
+      },
+      "verdict": "NOISE (coin-flip; wrongness not persistent)",
+      "n_fired": 56
+    },
+    "simple_trend": {
+      "original": {
+        "accuracy": 0.517857,
+        "mcc": -0.048839,
+        "n": 56,
+        "tp": 5,
+        "fp": 19,
+        "tn": 24,
+        "fn": 8
+      },
+      "inverted": {
+        "accuracy": 0.482143,
+        "mcc": 0.048839,
+        "n": 56,
+        "tp": 8,
+        "fp": 24,
+        "tn": 19,
+        "fn": 5
+      },
+      "verdict": "NOISE (coin-flip; wrongness not persistent)",
+      "n_fired": 56
+    },
+    "wind_direction_shift": {
+      "original": {
+        "accuracy": 0.5,
+        "mcc": 0.0,
+        "n": 2,
+        "tp": 0,
+        "fp": 0,
+        "tn": 1,
+        "fn": 1
+      },
+      "inverted": {
+        "accuracy": 0.5,
+        "mcc": 0.0,
+        "n": 2,
+        "tp": 1,
+        "fp": 1,
+        "tn": 0,
+        "fn": 0
+      },
+      "verdict": "UNDERPOWERED (n<20 \u2014 cannot resolve inversion vs noise; re-run after P0-B)",
+      "n_fired": 2
+    },
+    "nwp_analog": {
+      "original": {
+        "accuracy": 0.696429,
+        "mcc": -0.053722,
+        "n": 56,
+        "tp": 1,
+        "fp": 5,
+        "tn": 38,
+        "fn": 12
+      },
+      "inverted": {
+        "accuracy": 0.303571,
+        "mcc": 0.053722,
+        "n": 56,
+        "tp": 12,
+        "fp": 38,
+        "tn": 5,
+        "fn": 1
+      },
+      "verdict": "INCONCLUSIVE (weak/mixed; does not clear thresholds)",
+      "n_fired": 56
+    },
+    "late_day_momentum": {
+      "unavailable": true,
+      "note": "intraday 17-22 UTC signal; no daily evaluate(idx,days) surface in tree; needs transition_events label surface (absent)."
+    },
+    "goldilocks_microstructure": {
+      "unavailable": true,
+      "note": "real-time microstructure spike-reversion; needs transition_events label surface (absent in this container)."
+    }
+  },
+  "read_only": true,
+  "no_mutation": true,
+  "no_commit": true
+}

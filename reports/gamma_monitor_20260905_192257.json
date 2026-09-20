@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-09-05T19:22:57.632083+00:00",
+  "imports": {
+    "g1_cloud_clearing": "FAIL: No module named 'core'",
+    "g2_dryline_cooling": "FAIL: No module named 'core'",
+    "g3_wind_shift_ramp": "FAIL: No module named 'core'",
+    "g4_ramp_acceleration": "FAIL: No module named 'core'",
+    "g5_inversion_breakout": "FAIL: No module named 'core'",
+    "g6_gust_front_pressure": "FAIL: No module named 'core'"
+  },
+  "heldout": {
+    "status": "EXISTS",
+    "signals_tested": 0,
+    "promoted": [],
+    "shadow": [],
+    "dormant": [],
+    "receipt": "/home/node/.openclaw/workspace/prototypes/weather-engine-source/scripts/../reports/additive_heldout_2026.json"
+  },
+  "cooccurrence": {
+    "status": "FAIL",
+    "error": "No module named 'core'"
+  },
+  "all_ok": false
+}

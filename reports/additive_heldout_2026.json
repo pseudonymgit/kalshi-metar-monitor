@@ -1,0 +1,275 @@
+{
+  "config": {
+    "start": "2026-07-25",
+    "end": "2026-08-31",
+    "base_model": "era5\u2192ecmwf\u2192gfs\u2192icon",
+    "sample_every": 1,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBNA",
+      "KBOS",
+      "KCLT",
+      "KDAL",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KDTW",
+      "KHOU",
+      "KJFK",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KORD",
+      "KPDX",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO",
+      "KSLC",
+      "KTPA",
+      "PHNL",
+      "TEST"
+    ],
+    "feature_cutoff_local": "11:30"
+  },
+  "n_pairs": 740,
+  "n_scored": 740,
+  "analysis": {
+    "n_scored": 740,
+    "overall_mae_base": 2.809,
+    "overall_hit_base": 0.2541,
+    "signals": {
+      "ramp_acceleration": {
+        "n_fired": 192,
+        "coverage": 0.2595,
+        "mae_base_fired": 2.719,
+        "mae_with_fired": 2.7,
+        "mae_improvement": 0.018,
+        "hit_lift": 0.0677,
+        "n_up": 192,
+        "n_down": 0,
+        "mean_offset": 1.72,
+        "mean_base_err_on_fired": 0.35
+      },
+      "am_wind_shift": {
+        "n_fired": 194,
+        "coverage": 0.2622,
+        "mae_base_fired": 3.153,
+        "mae_with_fired": 3.109,
+        "mae_improvement": 0.045,
+        "hit_lift": 0.0722,
+        "n_up": 189,
+        "n_down": 5,
+        "mean_offset": 0.78,
+        "mean_base_err_on_fired": 0.01
+      },
+      "inversion_breakout": {
+        "n_fired": 6,
+        "coverage": 0.0081,
+        "mae_base_fired": 1.553,
+        "mae_with_fired": 1.603,
+        "mae_improvement": -0.05,
+        "hit_lift": -0.1667,
+        "n_up": 6,
+        "n_down": 0,
+        "mean_offset": 2.07,
+        "mean_base_err_on_fired": 1.55
+      },
+      "dryline_cooling": {
+        "n_fired": 8,
+        "coverage": 0.0108,
+        "mae_base_fired": 1.93,
+        "mae_with_fired": 4.074,
+        "mae_improvement": -2.144,
+        "hit_lift": 0.0,
+        "n_up": 0,
+        "n_down": 8,
+        "mean_offset": -3.48,
+        "mean_base_err_on_fired": 0.43
+      },
+      "gust_front_pressure": {
+        "n_fired": 2,
+        "coverage": 0.0027,
+        "mae_base_fired": 0.5,
+        "mae_with_fired": 3.82,
+        "mae_improvement": -3.32,
+        "hit_lift": -1.0,
+        "n_up": 2,
+        "n_down": 0,
+        "mean_offset": 2.0,
+        "mean_base_err_on_fired": -0.02
+      }
+    }
+  },
+  "cooccurrence": {
+    "n_days": 740,
+    "n_fire_days": 350,
+    "per_signal_fires": {
+      "cloud_clearing": 0,
+      "ramp_acceleration": 192,
+      "am_wind_shift": 194,
+      "inversion_breakout": 6,
+      "dryline_cooling": 8,
+      "gust_front_pressure": 2
+    },
+    "per_signal_coverage": {
+      "cloud_clearing": 0.0,
+      "ramp_acceleration": 0.2595,
+      "am_wind_shift": 0.2622,
+      "inversion_breakout": 0.0081,
+      "dryline_cooling": 0.0108,
+      "gust_front_pressure": 0.0027
+    },
+    "pairs": [],
+    "stack_distribution": {
+      "0": 390,
+      "1": 298,
+      "2": 52,
+      "3+": 0
+    },
+    "mean_abs_offset_when_fired": {
+      "cloud_clearing": 0.0,
+      "ramp_acceleration": 1.72,
+      "am_wind_shift": 0.85,
+      "inversion_breakout": 2.07,
+      "dryline_cooling": 3.48,
+      "gust_front_pressure": 2.0
+    }
+  },
+  "monitor": {
+    "generated_utc": "2026-09-04T20:52:06.351226+00:00",
+    "signals": [
+      {
+        "name": "cloud_clearing",
+        "n_evaluated": 740,
+        "n_fired": 0,
+        "fire_rate": 0.0,
+        "spec_target": 0.1,
+        "mean_abs_offset": 0.0,
+        "n_up": 0,
+        "n_down": 0,
+        "hit_lift": null,
+        "bias_improvement_f": null,
+        "drift_60d": null
+      },
+      {
+        "name": "dryline_cooling",
+        "n_evaluated": 740,
+        "n_fired": 8,
+        "fire_rate": 0.0108,
+        "spec_target": 0.065,
+        "mean_abs_offset": 3.48,
+        "n_up": 0,
+        "n_down": 8,
+        "hit_lift": null,
+        "bias_improvement_f": null,
+        "drift_60d": 0.1225
+      },
+      {
+        "name": "am_wind_shift",
+        "n_evaluated": 740,
+        "n_fired": 194,
+        "fire_rate": 0.2622,
+        "spec_target": 0.125,
+        "mean_abs_offset": 0.85,
+        "n_up": 189,
+        "n_down": 5,
+        "hit_lift": 0.0722,
+        "bias_improvement_f": 1.2,
+        "drift_60d": 2.9712
+      },
+      {
+        "name": "ramp_acceleration",
+        "n_evaluated": 740,
+        "n_fired": 192,
+        "fire_rate": 0.2595,
+        "spec_target": 1.0,
+        "mean_abs_offset": 1.72,
+        "n_up": 192,
+        "n_down": 0,
+        "hit_lift": 0.0677,
+        "bias_improvement_f": 1.944,
+        "drift_60d": 2.9405
+      },
+      {
+        "name": "inversion_breakout",
+        "n_evaluated": 740,
+        "n_fired": 6,
+        "fire_rate": 0.0081,
+        "spec_target": 0.065,
+        "mean_abs_offset": 2.07,
+        "n_up": 6,
+        "n_down": 0,
+        "hit_lift": null,
+        "bias_improvement_f": null,
+        "drift_60d": 0.0919
+      },
+      {
+        "name": "gust_front_pressure",
+        "n_evaluated": 740,
+        "n_fired": 2,
+        "fire_rate": 0.0027,
+        "spec_target": 0.1,
+        "mean_abs_offset": 2.0,
+        "n_up": 2,
+        "n_down": 0,
+        "hit_lift": null,
+        "bias_improvement_f": null,
+        "drift_60d": 0.0306
+      }
+    ],
+    "summary": {
+      "n_evaluated_days": 740,
+      "n_signals_live": 5,
+      "fired_day_share": 0.473
+    }
+  },
+  "sign_tests": {
+    "am_wind_shift": {
+      "improved": 124,
+      "worsened": 70,
+      "n": 194,
+      "p_two_sided": 0.0001,
+      "holm_adjusted_p": 0.0002,
+      "rejected_at_0.05": true,
+      "per_month": {
+        "2026-07": {
+          "improved": 17,
+          "worsened": 11,
+          "rate": 0.607
+        },
+        "2026-08": {
+          "improved": 107,
+          "worsened": 59,
+          "rate": 0.645
+        }
+      },
+      "per_station_min_rate_ge5fires": 0.33,
+      "stations_ge5fires_positive": "12 of 13"
+    },
+    "ramp_acceleration": {
+      "improved": 106,
+      "worsened": 85,
+      "n": 191,
+      "p_two_sided": 0.1477,
+      "holm_adjusted_p": 0.1477,
+      "rejected_at_0.05": false,
+      "note": "directionally positive (dMAE +0.018, lift +6.8%) but not significant; promote to shadow monitoring, not live sizing"
+    }
+  },
+  "disposition": {
+    "am_wind_shift": "PROMOTED - held-out significant after Holm-Bonferroni",
+    "ramp_acceleration": "SHADOW - positive but underpowered; watch on monitor",
+    "cloud_clearing": "DORMANT - no separable TRAIN fires",
+    "dryline_cooling": "DORMANT - TRAIN+HELDOUT negative at current thresholds",
+    "inversion_breakout": "DORMANT - negative held-out, insufficient fires",
+    "gust_front_pressure": "DORMANT - n too small to judge"
+  }
+}

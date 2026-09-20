@@ -1,0 +1,208 @@
+{
+  "metadata": {
+    "script": "scripts/late_day_creep_backtest.py",
+    "description": "Late-day creep backtest \u2014 when temp is near bucket boundary at h-3, does market misprice crossing?",
+    "n_pairs_near_boundary": 9543,
+    "n_stations": 20
+  },
+  "key_finding": {
+    "within_1f_of_boundary": 8725,
+    "actual_crossing_rate": 0.4274,
+    "avg_market_probability": 0.5515,
+    "edge": -0.1241,
+    "has_edge": true,
+    "interpretation": "When the temperature is within 1\u00b0F of a bucket boundary at h-3 (8725 days), the actual crossing rate is 42.7% vs the market-implied probability of 55.1%. Edge: -12.4%. This is a **tradable edge** at h-3 (market overprices crossing)."
+  },
+  "by_delta_from_boundary": {
+    "0_0.5": {
+      "n_pairs": 4535,
+      "n_crossed": 2048,
+      "actual_crossing_rate": 0.4516,
+      "avg_market_prob": 0.5512,
+      "edge": -0.0997,
+      "edge_interpretation": "Market prices crossing at 55.1% but actual rate is 45.2%. Edge: -10.0%"
+    },
+    "0.5_1": {
+      "n_pairs": 4190,
+      "n_crossed": 1681,
+      "actual_crossing_rate": 0.4012,
+      "avg_market_prob": 0.5517,
+      "edge": -0.1505,
+      "edge_interpretation": "Market prices crossing at 55.2% but actual rate is 40.1%. Edge: -15.1%"
+    },
+    "3_5": {
+      "n_pairs": 124,
+      "n_crossed": 48,
+      "actual_crossing_rate": 0.3871,
+      "avg_market_prob": 0.8774,
+      "edge": -0.4903,
+      "edge_interpretation": "Market prices crossing at 87.7% but actual rate is 38.7%. Edge: -49.0%"
+    },
+    "2_3": {
+      "n_pairs": 121,
+      "n_crossed": 89,
+      "actual_crossing_rate": 0.7355,
+      "avg_market_prob": 0.8777,
+      "edge": -0.1421,
+      "edge_interpretation": "Market prices crossing at 87.8% but actual rate is 73.6%. Edge: -14.2%"
+    },
+    "5_plus": {
+      "n_pairs": 565,
+      "n_crossed": 121,
+      "actual_crossing_rate": 0.2142,
+      "avg_market_prob": 0.799,
+      "edge": -0.5848,
+      "edge_interpretation": "Market prices crossing at 79.9% but actual rate is 21.4%. Edge: -58.5%"
+    },
+    "1_2": {
+      "n_pairs": 8,
+      "n_crossed": 8,
+      "actual_crossing_rate": 1.0,
+      "avg_market_prob": 0.8823,
+      "edge": 0.1177,
+      "edge_interpretation": "Market prices crossing at 88.2% but actual rate is 100.0%. Edge: +11.8%"
+    }
+  },
+  "by_station_type": {
+    "continental": {
+      "n_pairs": 4777,
+      "actual_crossing_rate": 0.4254,
+      "avg_market_prob": 0.564,
+      "edge": -0.1386
+    },
+    "coastal": {
+      "n_pairs": 4766,
+      "actual_crossing_rate": 0.4119,
+      "avg_market_prob": 0.5856,
+      "edge": -0.1737
+    }
+  },
+  "by_season": {
+    "winter": {
+      "n_pairs": 1865,
+      "actual_crossing_rate": 0.3528,
+      "avg_market_prob": 0.8581,
+      "edge": -0.5053
+    },
+    "spring": {
+      "n_pairs": 2836,
+      "actual_crossing_rate": 0.4097,
+      "avg_market_prob": 0.6655,
+      "edge": -0.2557
+    },
+    "summer": {
+      "n_pairs": 3166,
+      "actual_crossing_rate": 0.4564,
+      "avg_market_prob": 0.3293,
+      "edge": 0.1271
+    },
+    "fall": {
+      "n_pairs": 1676,
+      "actual_crossing_rate": 0.4356,
+      "avg_market_prob": 0.5698,
+      "edge": -0.1342
+    }
+  },
+  "per_station": {
+    "KATL": {
+      "n_pairs": 201,
+      "n_crossed": 95,
+      "crossing_rate": 0.4726
+    },
+    "KAUS": {
+      "n_pairs": 1077,
+      "n_crossed": 520,
+      "crossing_rate": 0.4828
+    },
+    "KBOS": {
+      "n_pairs": 200,
+      "n_crossed": 97,
+      "crossing_rate": 0.485
+    },
+    "KDCA": {
+      "n_pairs": 215,
+      "n_crossed": 102,
+      "crossing_rate": 0.4744
+    },
+    "KDEN": {
+      "n_pairs": 563,
+      "n_crossed": 244,
+      "crossing_rate": 0.4334
+    },
+    "KDFW": {
+      "n_pairs": 193,
+      "n_crossed": 72,
+      "crossing_rate": 0.3731
+    },
+    "KHOU": {
+      "n_pairs": 194,
+      "n_crossed": 86,
+      "crossing_rate": 0.4433
+    },
+    "KLAS": {
+      "n_pairs": 216,
+      "n_crossed": 96,
+      "crossing_rate": 0.4444
+    },
+    "KLAX": {
+      "n_pairs": 531,
+      "n_crossed": 259,
+      "crossing_rate": 0.4878
+    },
+    "KMDW": {
+      "n_pairs": 1723,
+      "n_crossed": 630,
+      "crossing_rate": 0.3656
+    },
+    "KMIA": {
+      "n_pairs": 1066,
+      "n_crossed": 412,
+      "crossing_rate": 0.3865
+    },
+    "KMSP": {
+      "n_pairs": 105,
+      "n_crossed": 52,
+      "crossing_rate": 0.4952
+    },
+    "KMSY": {
+      "n_pairs": 100,
+      "n_crossed": 53,
+      "crossing_rate": 0.53
+    },
+    "KNYC": {
+      "n_pairs": 1820,
+      "n_crossed": 683,
+      "crossing_rate": 0.3753
+    },
+    "KOKC": {
+      "n_pairs": 189,
+      "n_crossed": 87,
+      "crossing_rate": 0.4603
+    },
+    "KPHL": {
+      "n_pairs": 504,
+      "n_crossed": 205,
+      "crossing_rate": 0.4067
+    },
+    "KPHX": {
+      "n_pairs": 195,
+      "n_crossed": 93,
+      "crossing_rate": 0.4769
+    },
+    "KSAT": {
+      "n_pairs": 100,
+      "n_crossed": 41,
+      "crossing_rate": 0.41
+    },
+    "KSEA": {
+      "n_pairs": 129,
+      "n_crossed": 62,
+      "crossing_rate": 0.4806
+    },
+    "KSFO": {
+      "n_pairs": 222,
+      "n_crossed": 106,
+      "crossing_rate": 0.4775
+    }
+  }
+}

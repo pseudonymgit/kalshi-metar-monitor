@@ -1,0 +1,118 @@
+{
+  "generated_utc": "2026-09-18T10:18:38Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "clean_label_filter": {
+    "market_type": "HIGH",
+    "epoch_status": "closed",
+    "settlement_bucket_range": [
+      -22,
+      119
+    ],
+    "prior_settlement_bucket_range": [
+      -22,
+      119
+    ],
+    "note": "range filter on both buckets excludes unresolved + linkage rows"
+  },
+  "total_clean_epochs": 51801,
+  "stations": 30,
+  "nwp_analog_enabled": true,
+  "signals": {
+    "corrected_pressure_delta": {
+      "original": {
+        "accuracy": 0.381374,
+        "mcc": -0.237804,
+        "total": 30516,
+        "tp": 6141,
+        "fp": 9432,
+        "tn": 5497,
+        "fn": 9446
+      },
+      "inverted": {
+        "accuracy": 0.618626,
+        "mcc": 0.237804,
+        "total": 30516,
+        "tp": 9446,
+        "fp": 5497,
+        "tn": 9432,
+        "fn": 6141
+      },
+      "verdict": "STABLE WRONG-WAY (inversion candidate \u2014 flip yields a real edge)"
+    },
+    "spike_reversion": {
+      "original": {
+        "accuracy": 0.476659,
+        "mcc": 0.0,
+        "total": 11996,
+        "tp": 0,
+        "fp": 0,
+        "tn": 5718,
+        "fn": 6278
+      },
+      "inverted": {
+        "accuracy": 0.523341,
+        "mcc": 0.0,
+        "total": 11996,
+        "tp": 6278,
+        "fp": 5718,
+        "tn": 0,
+        "fn": 0
+      },
+      "verdict": "NOISE (coin-flip \u2014 wrongness is not persistent)"
+    },
+    "nwp_analog": {
+      "original": {
+        "accuracy": 0.528595,
+        "mcc": 0.066279,
+        "total": 10299,
+        "tp": 2351,
+        "fp": 1839,
+        "tn": 3093,
+        "fn": 3016
+      },
+      "inverted": {
+        "accuracy": 0.471405,
+        "mcc": -0.066279,
+        "total": 10299,
+        "tp": 3016,
+        "fp": 3093,
+        "tn": 1839,
+        "fn": 2351
+      },
+      "verdict": "NOISE (coin-flip \u2014 wrongness is not persistent)"
+    },
+    "pressure_delta (reference)": {
+      "original": {
+        "accuracy": 0.618626,
+        "mcc": 0.237804,
+        "total": 30516,
+        "tp": 9446,
+        "fp": 5497,
+        "tn": 9432,
+        "fn": 6141
+      },
+      "inverted": {
+        "accuracy": 0.381374,
+        "mcc": -0.237804,
+        "total": 30516,
+        "tp": 6141,
+        "fp": 9432,
+        "tn": 5497,
+        "fn": 9446
+      },
+      "verdict": "STABLE RIGHT-WAY (already correct; no inversion needed)"
+    }
+  },
+  "thresholds": {
+    "noise_band": [
+      0.47,
+      0.53
+    ],
+    "stable_wrong_way": "inverted acc > 53% AND inv MCC > 0 AND orig acc < 50%",
+    "stable_right_way": "orig acc > 53% AND orig MCC > 0"
+  },
+  "read_only": true,
+  "no_mutation": true,
+  "no_commit": true
+}

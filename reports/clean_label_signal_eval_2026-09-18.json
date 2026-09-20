@@ -1,0 +1,68 @@
+{
+  "generated_utc": "2026-09-18T03:30:13Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "clean_label_filter": {
+    "market_type": "HIGH",
+    "epoch_status": "closed",
+    "settlement_bucket_range": [
+      -22,
+      119
+    ],
+    "prior_settlement_bucket_range": [
+      -22,
+      119
+    ],
+    "excluded_unresolved": 28,
+    "excluded_linkage": 18,
+    "note": "range filter on both buckets excludes unresolved + linkage rows"
+  },
+  "total_clean_epochs": 52299,
+  "stations": 30,
+  "nwp_analog_enabled": true,
+  "signals": [
+    {
+      "label": "pressure_delta (reference)",
+      "accuracy": 0.618464,
+      "mcc": 0.237493,
+      "total": 30676,
+      "tp": 9475,
+      "fp": 5524,
+      "tn": 9497,
+      "fn": 6180,
+      "fired_stations": 30
+    },
+    {
+      "label": "corrected_pressure_delta",
+      "accuracy": 0.381536,
+      "mcc": -0.237493,
+      "total": 30676,
+      "tp": 6180,
+      "fp": 9497,
+      "tn": 5524,
+      "fn": 9475,
+      "fired_stations": 30
+    },
+    {
+      "label": "nwp_analog",
+      "accuracy": 0.527662,
+      "mcc": 0.062738,
+      "total": 10791,
+      "tp": 2469,
+      "fp": 1975,
+      "tn": 3225,
+      "fn": 3122,
+      "fired_stations": 20
+    }
+  ],
+  "goldilocks_microstructure": {
+    "label": "goldilocks_microstructure_spike_reversion",
+    "evaluable_against_daily_settlement_labels": false,
+    "accuracy": null,
+    "mcc": null,
+    "reason": "The separated real-time microstructure spike-reversion edge (microstructure_spike_reversion, emitted via core/data_processor.py -> _compute_microstructure_spike_confidence) is an INTRAday alert on the transition_events label surface, not a daily directional signal with an evaluate(idx, days) interface. Its intraday label surface (transition_events in /var/data/alerts.db) is NOT present in this container, so it cannot be scored against the daily settlement_epochs HIGH buckets without fabricating a label. The daily-level SpikeReversionSignal (formerly goldilocks) remains KEEP-KILLED per KILLED-SIGNAL-REVIEW-2026-09-18.md \u00a73 and is intentionally NOT scored here as a revival candidate."
+  },
+  "deterministic": true,
+  "single_pass": true,
+  "no_mutation": true
+}

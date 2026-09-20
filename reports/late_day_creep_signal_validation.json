@@ -1,0 +1,270 @@
+{
+  "metadata": {
+    "script": "core/signals/late_day_creep.py",
+    "task": "EB.3",
+    "description": "Wire late-day creep backtest findings into signal pipeline \u2014 h-3 boundary crossing signal",
+    "seasonal_edges": {
+      "winter": -0.5053,
+      "spring": -0.2557,
+      "summer": 0.1271,
+      "fall": -0.1342
+    }
+  },
+  "validation": {
+    "total_firings": 8729,
+    "overall_accuracy": 0.5348,
+    "n_correct": 4668,
+    "by_season": {
+      "winter": {
+        "accuracy": 0.5869,
+        "n": 1232
+      },
+      "spring": {
+        "accuracy": 0.5954,
+        "n": 2746
+      },
+      "summer": {
+        "accuracy": 0.4466,
+        "n": 3119
+      },
+      "fall": {
+        "accuracy": 0.5619,
+        "n": 1632
+      }
+    },
+    "by_signal_type": {
+      "SELL_CROSSING": {
+        "accuracy": 0.5838,
+        "n": 5610
+      },
+      "BUY_CROSSING": {
+        "accuracy": 0.4466,
+        "n": 3119
+      }
+    },
+    "pass_threshold": false,
+    "threshold": "> 55% directional accuracy required for ADVANCE"
+  },
+  "sample_firings": [
+    {
+      "station": "KATL",
+      "date": "2026-02-04",
+      "h3_temp": 41.7,
+      "actual_temp": 57.0,
+      "boundary": 42.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.7,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-05",
+      "h3_temp": 39.4,
+      "actual_temp": 45.0,
+      "boundary": 40.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.5,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-06",
+      "h3_temp": 50.4,
+      "actual_temp": 65.0,
+      "boundary": 50.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.7,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-07",
+      "h3_temp": 40.1,
+      "actual_temp": 55.0,
+      "boundary": 40.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.7,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-08",
+      "h3_temp": 50.7,
+      "actual_temp": 61.0,
+      "boundary": 50.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.5,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-09",
+      "h3_temp": 55.2,
+      "actual_temp": 68.0,
+      "boundary": 56.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.5,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-10",
+      "h3_temp": 60.1,
+      "actual_temp": 70.0,
+      "boundary": 60.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.7,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-11",
+      "h3_temp": 54.5,
+      "actual_temp": 65.0,
+      "boundary": 54.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.7,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-12",
+      "h3_temp": 54.9,
+      "actual_temp": 65.0,
+      "boundary": 54.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.5,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-13",
+      "h3_temp": 55.9,
+      "actual_temp": 63.0,
+      "boundary": 56.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.7,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-14",
+      "h3_temp": 55.9,
+      "actual_temp": 62.0,
+      "boundary": 56.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.7,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-15",
+      "h3_temp": 53.8,
+      "actual_temp": 60.0,
+      "boundary": 54.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.7,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-16",
+      "h3_temp": 64.4,
+      "actual_temp": 69.0,
+      "boundary": 64.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.7,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-17",
+      "h3_temp": 54.7,
+      "actual_temp": 69.0,
+      "boundary": 54.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.5,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-18",
+      "h3_temp": 59.0,
+      "actual_temp": 69.0,
+      "boundary": 58.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.5,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-19",
+      "h3_temp": 69.6,
+      "actual_temp": 79.0,
+      "boundary": 70.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.7,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-20",
+      "h3_temp": 69.1,
+      "actual_temp": 80.0,
+      "boundary": 70.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.5,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-21",
+      "h3_temp": 60.4,
+      "actual_temp": 66.0,
+      "boundary": 60.0,
+      "signal": "SELL_CROSSING",
+      "direction": "UP",
+      "confidence": 0.7,
+      "correct": true
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-22",
+      "h3_temp": 45.9,
+      "actual_temp": 58.0,
+      "boundary": 46.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.7,
+      "correct": false
+    },
+    {
+      "station": "KATL",
+      "date": "2026-02-24",
+      "h3_temp": 47.3,
+      "actual_temp": 54.0,
+      "boundary": 48.0,
+      "signal": "SELL_CROSSING",
+      "direction": "DOWN",
+      "confidence": 0.5,
+      "correct": false
+    }
+  ]
+}

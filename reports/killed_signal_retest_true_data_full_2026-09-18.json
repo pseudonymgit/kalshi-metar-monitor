@@ -1,0 +1,180 @@
+{
+  "generated_utc": "2026-09-18T18:55:39Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "axis": "strike-crossing (T-contract greater/less) \u2014 settlement_temp vs strike, core/settlement_outcome.contract_is_itm",
+  "label_universe": "kalshi_market_snapshots.db market tickers (T-contracts) x settlement_truth date-tiered temps",
+  "n_labels": 1537,
+  "label_distribution": {
+    "up": 1264,
+    "down": 273
+  },
+  "temp_source_distribution": {
+    "ghcn": 1298,
+    "kalshi_finalized": 79,
+    "weatherapi": 160
+  },
+  "stations": 20,
+  "strike_backfill_status": "P0-B NOT LANDED \u2014 full 2021->present strike history still pending; this uses the 2026-08-06..09-19 market-ticker strikes already captured",
+  "nwp_analog_enabled": true,
+  "signals": {
+    "pressure_delta (ref)": {
+      "original": {
+        "accuracy": 0.577947,
+        "mcc": 0.022513,
+        "n": 526,
+        "tp": 266,
+        "fp": 53,
+        "tn": 38,
+        "fn": 169
+      },
+      "inverted": {
+        "accuracy": 0.422053,
+        "mcc": -0.022513,
+        "n": 526,
+        "tp": 169,
+        "fp": 38,
+        "tn": 53,
+        "fn": 266
+      },
+      "verdict": "INCONCLUSIVE"
+    },
+    "corrected_pressure_delta": {
+      "original": {
+        "accuracy": 0.422053,
+        "mcc": -0.022513,
+        "n": 526,
+        "tp": 169,
+        "fp": 38,
+        "tn": 53,
+        "fn": 266
+      },
+      "inverted": {
+        "accuracy": 0.577947,
+        "mcc": 0.022513,
+        "n": 526,
+        "tp": 266,
+        "fp": 53,
+        "tn": 38,
+        "fn": 169
+      },
+      "verdict": "STABLE WRONG-WAY (inversion edge)"
+    },
+    "spike_reversion": {
+      "original": {
+        "accuracy": 0.186937,
+        "mcc": 0.0,
+        "n": 444,
+        "tp": 0,
+        "fp": 0,
+        "tn": 83,
+        "fn": 361
+      },
+      "inverted": {
+        "accuracy": 0.813063,
+        "mcc": 0.0,
+        "n": 444,
+        "tp": 361,
+        "fp": 83,
+        "tn": 0,
+        "fn": 0
+      },
+      "verdict": "STABLE WRONG-WAY (inversion edge)"
+    },
+    "persistence": {
+      "original": {
+        "accuracy": 0.454481,
+        "mcc": -0.014206,
+        "n": 1417,
+        "tp": 502,
+        "fp": 117,
+        "tn": 142,
+        "fn": 656
+      },
+      "inverted": {
+        "accuracy": 0.545519,
+        "mcc": 0.014206,
+        "n": 1417,
+        "tp": 656,
+        "fp": 142,
+        "tn": 117,
+        "fn": 502
+      },
+      "verdict": "STABLE WRONG-WAY (inversion edge)"
+    },
+    "simple_trend": {
+      "original": {
+        "accuracy": 0.454481,
+        "mcc": -0.014206,
+        "n": 1417,
+        "tp": 502,
+        "fp": 117,
+        "tn": 142,
+        "fn": 656
+      },
+      "inverted": {
+        "accuracy": 0.545519,
+        "mcc": 0.014206,
+        "n": 1417,
+        "tp": 656,
+        "fp": 142,
+        "tn": 117,
+        "fn": 502
+      },
+      "verdict": "STABLE WRONG-WAY (inversion edge)"
+    },
+    "wind_direction_shift": {
+      "original": {
+        "accuracy": 0.48,
+        "mcc": -0.288547,
+        "n": 50,
+        "tp": 23,
+        "fp": 12,
+        "tn": 1,
+        "fn": 14
+      },
+      "inverted": {
+        "accuracy": 0.52,
+        "mcc": 0.288547,
+        "n": 50,
+        "tp": 14,
+        "fp": 1,
+        "tn": 12,
+        "fn": 23
+      },
+      "verdict": "UNDERPOWERED (n<100)"
+    },
+    "nwp_analog": {
+      "original": {
+        "accuracy": 0.294079,
+        "mcc": -0.063676,
+        "n": 1537,
+        "tp": 252,
+        "fp": 73,
+        "tn": 200,
+        "fn": 1012
+      },
+      "inverted": {
+        "accuracy": 0.705921,
+        "mcc": 0.063676,
+        "n": 1537,
+        "tp": 1012,
+        "fp": 200,
+        "tn": 73,
+        "fn": 252
+      },
+      "verdict": "STABLE WRONG-WAY (inversion edge)"
+    },
+    "late_day_momentum": {
+      "unavailable": true,
+      "note": "intraday 17-22 UTC; no daily evaluate surface; needs transition_events label surface (absent)"
+    },
+    "goldilocks_microstructure": {
+      "unavailable": true,
+      "note": "real-time microstructure; needs transition_events label surface (absent)"
+    }
+  },
+  "read_only": true,
+  "no_mutation": true,
+  "no_commit": true
+}

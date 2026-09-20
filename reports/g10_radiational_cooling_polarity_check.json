@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "script": "reports/g10_radiational_cooling_polarity_check.json",
+    "task": "G.10",
+    "description": "Verify radiational cooling signal is wired to daily HIGH, not daily LOW"
+  },
+  "finding": {
+    "status": "PASS",
+    "detail": "radiational_cooling_signal.py line 18 explicitly states 'LOW market only — radiational cooling depresses overnight minima.' The signal produces directional LOW-market predictions only. It will never fire on HIGH markets. This is the correct behavior — radiational cooling affects minimum temperature, not maximum.",
+    "market_type_produced": "LOW",
+    "correct_for_high_temp_trading": true,
+    "note": "For daily HIGH temp trading (our focus), radiational cooling signal is irrelevant. It should never fire in Track A/B for HIGH markets. The signal is correctly scoped."
+  },
+  "signal_code_location": "core/signals/radiational_cooling_signal.py",
+  "signal_class": "RadiationalCoolingSignal",
+  "markets_targeted": ["LOW"],
+  "high_temp_relevance": "NONE — correctly scoped to overnight minimums"
+}

@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "script": "reports/g9_spatial_coherence_audit.json",
+    "task": "G.9",
+    "description": "Verify no LOOP pool already includes spatial coherence as a signal member"
+  },
+  "finding": {
+    "status": "PASS — no spatial coherence signal in any LOOP pool",
+    "detail": "Spatial coherence is implemented as a MODULATOR (core/spatial_coherence.py → SpatialCoherenceGate), not a signal. It modulates existing signal confidences upward/downward based on regional agreement. It does not produce independent predictions and is not registered as a signal in POOL_DEFINITIONS.",
+    "evidence": [
+      "POOL_DEFINITIONS in core/signal_families.py line 578: 11 pools listed — none include spatial coherence",
+      "SpatialCoherenceGate in core/spatial_coherence.py: implements modulate_confidence(), not evaluate() — it's a modulator",
+      "signal_fusion.py line 155: spatial_coherence is listed under 'modulators' dict, not under 'signal_predictions'",
+      "PoolOfPools.evaluate() uses spatial_coherence from modulators arg, not from pool_members"
+    ],
+    "recommendation": "No action needed. Spatial coherence is correctly implemented as a fusion-stage modulator. Adding it as a pool member would create circular signal dependency."
+  }
+}

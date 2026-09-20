@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "script": "scripts/track_a_calibrated_baseline.py",
+    "task": "B.4",
+    "description": "Track A re-run with calibrated NWP \u2014 strike accuracy and probability calibration baseline for Track B"
+  },
+  "summary": {
+    "directional_note": "Bias correction is shift-invariant \u2014 directional accuracy is identical for raw and calibrated NWP. The 53.5% GEFS figure from Phase 0 stands as the directional baseline. Calibration improves STRIKE accuracy and probability sharpness, not direction.",
+    "per_model_directional": {
+      "ecmwf": {
+        "directional_accuracy": 0.7129,
+        "n_directional_pairs": 1818,
+        "n_stations": 20,
+        "interpretation": "Directional accuracy: 71.3% (n=1818). Bias correction is shift-invariant \u2014 direction doesn't change. The real value of calibration is in strike-level probability calibration, which requires the full signal pipeline to measure."
+      },
+      "era5": {
+        "directional_accuracy": 0.8036,
+        "n_directional_pairs": 3177,
+        "n_stations": 17,
+        "interpretation": "Directional accuracy: 80.4% (n=3177). Bias correction is shift-invariant \u2014 direction doesn't change. The real value of calibration is in strike-level probability calibration, which requires the full signal pipeline to measure."
+      },
+      "gem": {
+        "directional_accuracy": 0.7112,
+        "n_directional_pairs": 1745,
+        "n_stations": 20,
+        "interpretation": "Directional accuracy: 71.1% (n=1745). Bias correction is shift-invariant \u2014 direction doesn't change. The real value of calibration is in strike-level probability calibration, which requires the full signal pipeline to measure."
+      },
+      "gfs": {
+        "directional_accuracy": 0.7285,
+        "n_directional_pairs": 1985,
+        "n_stations": 20,
+        "interpretation": "Directional accuracy: 72.8% (n=1985). Bias correction is shift-invariant \u2014 direction doesn't change. The real value of calibration is in strike-level probability calibration, which requires the full signal pipeline to measure."
+      },
+      "icon": {
+        "directional_accuracy": 0.6954,
+        "n_directional_pairs": 1707,
+        "n_stations": 20,
+        "interpretation": "Directional accuracy: 69.5% (n=1707). Bias correction is shift-invariant \u2014 direction doesn't change. The real value of calibration is in strike-level probability calibration, which requires the full signal pipeline to measure."
+      }
+    },
+    "probability_calibration": {
+      "ecmwf": {
+        "within_50ci_fraction": 0.1468,
+        "expected_for_perfect": 0.5,
+        "delta_from_perfect": -0.3532,
+        "n_samples": 2139,
+        "interpretation": "14.7% of actual temps fell within the calibrated 50% CI. Overconfident. GEFS spread_ratio=0.155 \u2192 calibrated \u03c3 = raw_std/0.155 = 6.45\u00d7 \u2192 distribution is VERY wide, so 14.7% should be near 50%."
+      },
+      "era5": {
+        "within_50ci_fraction": 0.5465,
+        "expected_for_perfect": 0.5,
+        "delta_from_perfect": 0.0465,
+        "n_samples": 3581,
+        "interpretation": "54.6% of actual temps fell within the calibrated 50% CI. Well calibrated. GEFS spread_ratio=0.155 \u2192 calibrated \u03c3 = raw_std/0.155 = 6.45\u00d7 \u2192 distribution is VERY wide, so 54.6% should be near 50%."
+      },
+      "gem": {
+        "within_50ci_fraction": 0.134,
+        "expected_for_perfect": 0.5,
+        "delta_from_perfect": -0.366,
+        "n_samples": 2059,
+        "interpretation": "13.4% of actual temps fell within the calibrated 50% CI. Overconfident. GEFS spread_ratio=0.155 \u2192 calibrated \u03c3 = raw_std/0.155 = 6.45\u00d7 \u2192 distribution is VERY wide, so 13.4% should be near 50%."
+      },
+      "gfs": {
+        "within_50ci_fraction": 0.1464,
+        "expected_for_perfect": 0.5,
+        "delta_from_perfect": -0.3536,
+        "n_samples": 2329,
+        "interpretation": "14.6% of actual temps fell within the calibrated 50% CI. Overconfident. GEFS spread_ratio=0.155 \u2192 calibrated \u03c3 = raw_std/0.155 = 6.45\u00d7 \u2192 distribution is VERY wide, so 14.6% should be near 50%."
+      },
+      "icon": {
+        "within_50ci_fraction": 0.1441,
+        "expected_for_perfect": 0.5,
+        "delta_from_perfect": -0.3559,
+        "n_samples": 2019,
+        "interpretation": "14.4% of actual temps fell within the calibrated 50% CI. Overconfident. GEFS spread_ratio=0.155 \u2192 calibrated \u03c3 = raw_std/0.155 = 6.45\u00d7 \u2192 distribution is VERY wide, so 14.4% should be near 50%."
+      }
+    },
+    "track_b_expected": "Track B (per-model pools) is expected to improve strike-level accuracy by 3-8pp by using model-specific calibrated spreads. Directional accuracy may not improve since it's dominated by day-over-day temp persistence, not absolute calibration."
+  }
+}

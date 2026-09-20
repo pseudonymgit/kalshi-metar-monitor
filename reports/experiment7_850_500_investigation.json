@@ -1,0 +1,50 @@
+{
+  "experiment": "850mb_500mb_investigation",
+  "signals": {
+    "850mb_temp_advection": {
+      "signal": "850mb_temp_advection",
+      "times_fired": 92,
+      "standalone_accuracy": 56.52,
+      "average_confidence": 0.48,
+      "up_votes": 70,
+      "down_votes": 22,
+      "up_pct": 76.1,
+      "agrees_with_liop": 30,
+      "disagrees_with_liop": 62,
+      "agree_pct": 32.6,
+      "liop_wrong_signal_right": 40,
+      "liop_right_signal_wrong": 22,
+      "net_marginal_value": 18
+    },
+    "500mb_height_pattern": {
+      "signal": "500mb_height_pattern",
+      "times_fired": 2003,
+      "standalone_accuracy": 51.77,
+      "average_confidence": 0.357,
+      "up_votes": 1251,
+      "down_votes": 752,
+      "up_pct": 62.5,
+      "agrees_with_liop": 848,
+      "disagrees_with_liop": 1155,
+      "agree_pct": 42.3,
+      "liop_wrong_signal_right": 516,
+      "liop_right_signal_wrong": 639,
+      "net_marginal_value": -123
+    }
+  },
+  "combined_overlap": {
+    "both_fired": 54,
+    "both_correct": 14,
+    "both_wrong": 0,
+    "both_agree": 29,
+    "both_disagree": 25,
+    "only_850_correct": 13,
+    "only_500_correct": 12,
+    "neither_correct": 15
+  },
+  "diagnosis": {
+    "850mb_temp_advection": "MODERATE COVERAGE (92 times) \u2014 may not fire enough to build trust",
+    "500mb_height_pattern": "MARGINAL ACCURACY 51.77% \u2014 barely above random; NEGATIVE CONTRIBUTION (net=-123) \u2014 signal disagrees with LIOP and is MORE often wrong than LIOP",
+    "recommendation": "850mb_temp_advection: KILL \u2014 too rare to be useful; 500mb_height_pattern: KILL \u2014 negative marginal value to fusion"
+  }
+}

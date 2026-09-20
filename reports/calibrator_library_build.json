@@ -1,0 +1,41 @@
+{
+  "experiment": "build_all_calibrators_v2",
+  "timestamp": "2026-09-03T20:48:51.845967+00:00",
+  "cells_fitted": 203,
+  "cells_sparse": 17695,
+  "total_cells": 203,
+  "dimensions_found": [
+    "climate_group",
+    "confidence_tier",
+    "direction",
+    "forecast_horizon",
+    "fusion_mode",
+    "market_type",
+    "season",
+    "settlement_source",
+    "signal_family",
+    "signal_name",
+    "signal_quality",
+    "station",
+    "synoptic_regime"
+  ],
+  "duration_seconds": 25.9383327960968,
+  "per_signal_accuracy": {
+    "calendar_climatology": 55.0,
+    "cooling_failure": 44.75,
+    "corrected_pressure_delta": 38.14,
+    "cross_model_divergence": 79.4,
+    "forecast_disagreement": 53.83,
+    "gaussian": 55.32,
+    "gaussian_v2": 53.13,
+    "ghcn_calibration": 90.56,
+    "honest_trend": 50.1,
+    "metar_trend": 56.26,
+    "pressure_delta": 43.34,
+    "pressure_tendency": 59.43,
+    "radiational_cooling": 40.59,
+    "seasonal_regime": 50.35,
+    "spike_reversion": 38.67,
+    "warm_momentum": 52.92
+  }
+}

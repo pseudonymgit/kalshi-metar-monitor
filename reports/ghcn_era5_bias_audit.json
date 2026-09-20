@@ -1,0 +1,456 @@
+{
+  "metadata": {
+    "script": "scripts/z4_ghcn_era5_bias_audit.py",
+    "task": "Z.4",
+    "description": "GHCN-to-ERA5 bias audit \u2014 per-station adjustment factors",
+    "ghcn_source": "ghcn_settlements.db \u2192 ghcn_settlements (high_f in \u00b0F)",
+    "era5_source": "nwp_forecasts.db \u2192 nwp_forecasts (temperature_2m_max in \u00b0C)",
+    "stations_total": 20
+  },
+  "summary": {
+    "n_stations_with_ghcn_data": 2,
+    "stations_with_ghcn_data": [
+      "KLAX",
+      "KNYC"
+    ],
+    "stations_without_ghcn_data": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "n_total_stations": 20,
+    "overall_pooled_stats": {
+      "n_observations": 956,
+      "mean_bias_f": 0.37,
+      "bias_std_f": 2.98,
+      "mae_f": 2.24,
+      "rmse_f": 3.0
+    },
+    "interpretation": "KNYC bias: 0.07\u00b0F, KLAX bias: 0.66\u00b0F. Only 2 of 20 stations (KNYC, KLAX) have GHCN data. 18 stations have no GHCN records \u2014 ERA5 cannot be locally adjusted for them. For stations with GHCN, the bias and monthly breakdowns provide additive correction factors to convert ERA5 reanalysis \u2192 GHCN-equivalent TMAX."
+  },
+  "per_station": {
+    "KATL": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KATL. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KAUS": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KAUS. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KBOS": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KBOS. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KDCA": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KDCA. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KDEN": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KDEN. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KDFW": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KDFW. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KHOU": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KHOU. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KLAS": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KLAS. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KLAX": {
+      "status": "ok",
+      "n_overlap_dates": 478,
+      "date_range": [
+        "2025-01-01",
+        "2026-04-23"
+      ],
+      "ghcn_total_rows": 29952,
+      "era5_total_rows": 478,
+      "ghcn_mean_tmax_f": 70.5,
+      "ghcn_std_tmax_f": 6.55,
+      "era5_mean_tmax_f": 69.84,
+      "era5_std_tmax_f": 6.58,
+      "ghcn_minus_era5_mean_bias_f": 0.66,
+      "ghcn_minus_era5_std_f": 2.62,
+      "mae_f": 2.05,
+      "rmse_f": 2.7,
+      "adjustment_formula": "GHCN_TMAX_adj = ERA5_TMAX(\u00b0C\u2192\u00b0F) + +0.66\u00b0F (or +0.37\u00b0C additive to ERA5 \u00b0C)",
+      "monthly": {
+        "01": {
+          "month_name": "January",
+          "n_dates": 62,
+          "ghcn_mean_tmax_f": 68.55,
+          "era5_mean_tmax_f": 66.23,
+          "bias_f": 2.32,
+          "bias_std_f": 2.58,
+          "mae_f": 2.77,
+          "adjustment_additive_f": 2.32
+        },
+        "02": {
+          "month_name": "February",
+          "n_dates": 56,
+          "ghcn_mean_tmax_f": 68.03,
+          "era5_mean_tmax_f": 66.66,
+          "bias_f": 1.38,
+          "bias_std_f": 2.99,
+          "mae_f": 2.7,
+          "adjustment_additive_f": 1.38
+        },
+        "03": {
+          "month_name": "March",
+          "n_dates": 62,
+          "ghcn_mean_tmax_f": 68.78,
+          "era5_mean_tmax_f": 68.98,
+          "bias_f": -0.2,
+          "bias_std_f": 2.75,
+          "mae_f": 1.92,
+          "adjustment_additive_f": -0.2
+        },
+        "04": {
+          "month_name": "April",
+          "n_dates": 53,
+          "ghcn_mean_tmax_f": 68.5,
+          "era5_mean_tmax_f": 67.51,
+          "bias_f": 0.99,
+          "bias_std_f": 1.91,
+          "mae_f": 1.76,
+          "adjustment_additive_f": 0.99
+        },
+        "05": {
+          "month_name": "May",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 69.5,
+          "era5_mean_tmax_f": 69.96,
+          "bias_f": -0.45,
+          "bias_std_f": 1.78,
+          "mae_f": 1.32,
+          "adjustment_additive_f": -0.45
+        },
+        "06": {
+          "month_name": "June",
+          "n_dates": 30,
+          "ghcn_mean_tmax_f": 71.81,
+          "era5_mean_tmax_f": 71.29,
+          "bias_f": 0.52,
+          "bias_std_f": 1.82,
+          "mae_f": 1.41,
+          "adjustment_additive_f": 0.52
+        },
+        "07": {
+          "month_name": "July",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 72.89,
+          "era5_mean_tmax_f": 73.17,
+          "bias_f": -0.28,
+          "bias_std_f": 1.62,
+          "mae_f": 1.31,
+          "adjustment_additive_f": -0.28
+        },
+        "08": {
+          "month_name": "August",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 77.69,
+          "era5_mean_tmax_f": 78.51,
+          "bias_f": -0.82,
+          "bias_std_f": 2.33,
+          "mae_f": 1.85,
+          "adjustment_additive_f": -0.82
+        },
+        "09": {
+          "month_name": "September",
+          "n_dates": 30,
+          "ghcn_mean_tmax_f": 76.83,
+          "era5_mean_tmax_f": 77.1,
+          "bias_f": -0.27,
+          "bias_std_f": 1.89,
+          "mae_f": 1.62,
+          "adjustment_additive_f": -0.27
+        },
+        "10": {
+          "month_name": "October",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 73.99,
+          "era5_mean_tmax_f": 73.46,
+          "bias_f": 0.53,
+          "bias_std_f": 1.86,
+          "mae_f": 1.53,
+          "adjustment_additive_f": 0.53
+        },
+        "11": {
+          "month_name": "November",
+          "n_dates": 30,
+          "ghcn_mean_tmax_f": 68.37,
+          "era5_mean_tmax_f": 67.95,
+          "bias_f": 0.42,
+          "bias_std_f": 3.3,
+          "mae_f": 2.57,
+          "adjustment_additive_f": 0.42
+        },
+        "12": {
+          "month_name": "December",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 68.33,
+          "era5_mean_tmax_f": 66.17,
+          "bias_f": 2.15,
+          "bias_std_f": 3.0,
+          "mae_f": 2.97,
+          "adjustment_additive_f": 2.15
+        }
+      }
+    },
+    "KMDW": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KMDW. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KMIA": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KMIA. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KMSP": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KMSP. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KMSY": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KMSY. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KNYC": {
+      "status": "ok",
+      "n_overlap_dates": 478,
+      "date_range": [
+        "2025-01-01",
+        "2026-04-23"
+      ],
+      "ghcn_total_rows": 57579,
+      "era5_total_rows": 478,
+      "ghcn_mean_tmax_f": 59.15,
+      "ghcn_std_tmax_f": 19.14,
+      "era5_mean_tmax_f": 59.08,
+      "era5_std_tmax_f": 20.59,
+      "ghcn_minus_era5_mean_bias_f": 0.07,
+      "ghcn_minus_era5_std_f": 3.28,
+      "mae_f": 2.42,
+      "rmse_f": 3.28,
+      "adjustment_formula": "GHCN_TMAX_adj = ERA5_TMAX(\u00b0C\u2192\u00b0F) + +0.07\u00b0F (or +0.04\u00b0C additive to ERA5 \u00b0C)",
+      "monthly": {
+        "01": {
+          "month_name": "January",
+          "n_dates": 62,
+          "ghcn_mean_tmax_f": 36.35,
+          "era5_mean_tmax_f": 34.61,
+          "bias_f": 1.74,
+          "bias_std_f": 2.7,
+          "mae_f": 2.4,
+          "adjustment_additive_f": 1.74
+        },
+        "02": {
+          "month_name": "February",
+          "n_dates": 56,
+          "ghcn_mean_tmax_f": 39.24,
+          "era5_mean_tmax_f": 36.89,
+          "bias_f": 2.36,
+          "bias_std_f": 3.95,
+          "mae_f": 3.5,
+          "adjustment_additive_f": 2.36
+        },
+        "03": {
+          "month_name": "March",
+          "n_dates": 62,
+          "ghcn_mean_tmax_f": 55.38,
+          "era5_mean_tmax_f": 54.63,
+          "bias_f": 0.75,
+          "bias_std_f": 3.08,
+          "mae_f": 2.46,
+          "adjustment_additive_f": 0.75
+        },
+        "04": {
+          "month_name": "April",
+          "n_dates": 53,
+          "ghcn_mean_tmax_f": 64.39,
+          "era5_mean_tmax_f": 64.88,
+          "bias_f": -0.49,
+          "bias_std_f": 3.13,
+          "mae_f": 2.22,
+          "adjustment_additive_f": -0.49
+        },
+        "05": {
+          "month_name": "May",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 69.49,
+          "era5_mean_tmax_f": 70.29,
+          "bias_f": -0.8,
+          "bias_std_f": 2.74,
+          "mae_f": 2.24,
+          "adjustment_additive_f": -0.8
+        },
+        "06": {
+          "month_name": "June",
+          "n_dates": 30,
+          "ghcn_mean_tmax_f": 80.37,
+          "era5_mean_tmax_f": 84.33,
+          "bias_f": -3.95,
+          "bias_std_f": 2.95,
+          "mae_f": 4.11,
+          "adjustment_additive_f": -3.95
+        },
+        "07": {
+          "month_name": "July",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 86.77,
+          "era5_mean_tmax_f": 89.41,
+          "bias_f": -2.63,
+          "bias_std_f": 2.31,
+          "mae_f": 2.84,
+          "adjustment_additive_f": -2.63
+        },
+        "08": {
+          "month_name": "August",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 81.99,
+          "era5_mean_tmax_f": 83.4,
+          "bias_f": -1.41,
+          "bias_std_f": 1.84,
+          "mae_f": 2.01,
+          "adjustment_additive_f": -1.41
+        },
+        "09": {
+          "month_name": "September",
+          "n_dates": 30,
+          "ghcn_mean_tmax_f": 77.81,
+          "era5_mean_tmax_f": 78.12,
+          "bias_f": -0.32,
+          "bias_std_f": 2.19,
+          "mae_f": 1.77,
+          "adjustment_additive_f": -0.32
+        },
+        "10": {
+          "month_name": "October",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 65.04,
+          "era5_mean_tmax_f": 65.34,
+          "bias_f": -0.3,
+          "bias_std_f": 1.14,
+          "mae_f": 0.85,
+          "adjustment_additive_f": -0.3
+        },
+        "11": {
+          "month_name": "November",
+          "n_dates": 30,
+          "ghcn_mean_tmax_f": 53.02,
+          "era5_mean_tmax_f": 52.61,
+          "bias_f": 0.41,
+          "bias_std_f": 2.31,
+          "mae_f": 1.45,
+          "adjustment_additive_f": 0.41
+        },
+        "12": {
+          "month_name": "December",
+          "n_dates": 31,
+          "ghcn_mean_tmax_f": 39.98,
+          "era5_mean_tmax_f": 38.42,
+          "bias_f": 1.56,
+          "bias_std_f": 3.0,
+          "mae_f": 2.49,
+          "adjustment_additive_f": 1.56
+        }
+      }
+    },
+    "KOKC": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KOKC. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KPHL": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KPHL. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KPHX": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KPHX. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KSAT": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KSAT. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KSEA": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KSEA. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    },
+    "KSFO": {
+      "status": "no_ghcn_data",
+      "ghcn_total_rows": 0,
+      "era5_total_rows": 478,
+      "overlap_dates": 0,
+      "interpretation": "No GHCN data found for KSFO. Adjustment factors cannot be computed. If ERA5 is needed as a GHCN proxy, apply bulk regional adjustment from KNYC/KLAX or await GHCN backfill."
+    }
+  }
+}

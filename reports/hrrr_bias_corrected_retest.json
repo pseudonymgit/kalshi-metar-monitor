@@ -1,0 +1,879 @@
+{
+  "report": "D.5 HRRR Bias-Corrected Retest",
+  "generated_at": "2026-09-04T19:24:39.063537+00:00",
+  "elapsed_seconds": 18.8,
+  "config": {
+    "stations_count": 20,
+    "past_days": 92,
+    "forecast_days": 3,
+    "api_source": "Open-Meteo best_match (HRRR for US)",
+    "bias_reference": "ERA5 reanalysis from nwp_calibration.json",
+    "rate_limit_delay_s": 0.6,
+    "max_past_days": 92
+  },
+  "overall": {
+    "stations_success": 20,
+    "stations_failed": 0,
+    "hrrr_raw": {
+      "n_pairs": 974,
+      "correct": 816,
+      "accuracy": 0.8378
+    },
+    "hrrr_era5_corrected": {
+      "n_pairs": 974,
+      "correct": 816,
+      "accuracy": 0.8378
+    }
+  },
+  "stations": [
+    {
+      "station": "KATL",
+      "lat": 33.6407,
+      "lon": -84.4277,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -1.657,
+      "n_pairs_raw": 50,
+      "hrrr_raw_accuracy": 0.86,
+      "hrrr_corrected_accuracy": 0.86,
+      "gfs_accuracy": 0.7642,
+      "delta_hrrr_raw_vs_gfs": 0.0958,
+      "delta_hrrr_corrected_vs_gfs": 0.0958
+    },
+    {
+      "station": "KAUS",
+      "lat": 30.1945,
+      "lon": -97.6699,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.978,
+      "n_pairs_raw": 46,
+      "hrrr_raw_accuracy": 0.913,
+      "hrrr_corrected_accuracy": 0.913,
+      "gfs_accuracy": 0.7312,
+      "delta_hrrr_raw_vs_gfs": 0.1818,
+      "delta_hrrr_corrected_vs_gfs": 0.1818
+    },
+    {
+      "station": "KBOS",
+      "lat": 42.3645,
+      "lon": -71.0052,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.965,
+      "n_pairs_raw": 52,
+      "hrrr_raw_accuracy": 0.8654,
+      "hrrr_corrected_accuracy": 0.8654,
+      "gfs_accuracy": 0.7798,
+      "delta_hrrr_raw_vs_gfs": 0.0856,
+      "delta_hrrr_corrected_vs_gfs": 0.0856
+    },
+    {
+      "station": "KDCA",
+      "lat": 38.8521,
+      "lon": -77.0377,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.394,
+      "n_pairs_raw": 52,
+      "hrrr_raw_accuracy": 0.8462,
+      "hrrr_corrected_accuracy": 0.8462,
+      "gfs_accuracy": 0.7064,
+      "delta_hrrr_raw_vs_gfs": 0.1398,
+      "delta_hrrr_corrected_vs_gfs": 0.1398
+    },
+    {
+      "station": "KDEN",
+      "lat": 39.8493,
+      "lon": -104.6738,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.815,
+      "n_pairs_raw": 53,
+      "hrrr_raw_accuracy": 0.8868,
+      "hrrr_corrected_accuracy": 0.8868,
+      "gfs_accuracy": 0.7963,
+      "delta_hrrr_raw_vs_gfs": 0.0905,
+      "delta_hrrr_corrected_vs_gfs": 0.0905
+    },
+    {
+      "station": "KDFW",
+      "lat": 32.8968,
+      "lon": -97.038,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.751,
+      "n_pairs_raw": 38,
+      "hrrr_raw_accuracy": 0.8421,
+      "hrrr_corrected_accuracy": 0.8421,
+      "gfs_accuracy": 0.6154,
+      "delta_hrrr_raw_vs_gfs": 0.2267,
+      "delta_hrrr_corrected_vs_gfs": 0.2267
+    },
+    {
+      "station": "KHOU",
+      "lat": 29.6455,
+      "lon": -95.2789,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.19,
+      "n_pairs_raw": 45,
+      "hrrr_raw_accuracy": 0.8667,
+      "hrrr_corrected_accuracy": 0.8667,
+      "gfs_accuracy": 0.6923,
+      "delta_hrrr_raw_vs_gfs": 0.1744,
+      "delta_hrrr_corrected_vs_gfs": 0.1744
+    },
+    {
+      "station": "KLAS",
+      "lat": 36.0801,
+      "lon": -115.1522,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.307,
+      "n_pairs_raw": 50,
+      "hrrr_raw_accuracy": 0.82,
+      "hrrr_corrected_accuracy": 0.82,
+      "gfs_accuracy": 0.7,
+      "delta_hrrr_raw_vs_gfs": 0.12,
+      "delta_hrrr_corrected_vs_gfs": 0.12
+    },
+    {
+      "station": "KLAX",
+      "lat": 33.9416,
+      "lon": -118.4085,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.553,
+      "n_pairs_raw": 48,
+      "hrrr_raw_accuracy": 0.8542,
+      "hrrr_corrected_accuracy": 0.8542,
+      "gfs_accuracy": 0.6702,
+      "delta_hrrr_raw_vs_gfs": 0.184,
+      "delta_hrrr_corrected_vs_gfs": 0.184
+    },
+    {
+      "station": "KMDW",
+      "lat": 41.7866,
+      "lon": -87.7524,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -1.007,
+      "n_pairs_raw": 54,
+      "hrrr_raw_accuracy": 0.8333,
+      "hrrr_corrected_accuracy": 0.8333,
+      "gfs_accuracy": 0.7358,
+      "delta_hrrr_raw_vs_gfs": 0.0975,
+      "delta_hrrr_corrected_vs_gfs": 0.0975
+    },
+    {
+      "station": "KMIA",
+      "lat": 25.7959,
+      "lon": -80.287,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.451,
+      "n_pairs_raw": 43,
+      "hrrr_raw_accuracy": 0.814,
+      "hrrr_corrected_accuracy": 0.814,
+      "gfs_accuracy": 0.6867,
+      "delta_hrrr_raw_vs_gfs": 0.1273,
+      "delta_hrrr_corrected_vs_gfs": 0.1273
+    },
+    {
+      "station": "KMSP",
+      "lat": 44.8854,
+      "lon": -93.2175,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.0,
+      "n_pairs_raw": 50,
+      "hrrr_raw_accuracy": 0.96,
+      "hrrr_corrected_accuracy": 0.96,
+      "gfs_accuracy": 0.7788,
+      "delta_hrrr_raw_vs_gfs": 0.1812,
+      "delta_hrrr_corrected_vs_gfs": 0.1812
+    },
+    {
+      "station": "KMSY",
+      "lat": 29.9934,
+      "lon": -90.2582,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.0,
+      "n_pairs_raw": 43,
+      "hrrr_raw_accuracy": 0.7442,
+      "hrrr_corrected_accuracy": 0.7442,
+      "gfs_accuracy": 0.7444,
+      "delta_hrrr_raw_vs_gfs": -0.0002,
+      "delta_hrrr_corrected_vs_gfs": -0.0002
+    },
+    {
+      "station": "KNYC",
+      "lat": 40.7128,
+      "lon": -74.006,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.098,
+      "n_pairs_raw": 53,
+      "hrrr_raw_accuracy": 0.7736,
+      "hrrr_corrected_accuracy": 0.7736,
+      "gfs_accuracy": 0.6306,
+      "delta_hrrr_raw_vs_gfs": 0.143,
+      "delta_hrrr_corrected_vs_gfs": 0.143
+    },
+    {
+      "station": "KOKC",
+      "lat": 35.393,
+      "lon": -97.6007,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.521,
+      "n_pairs_raw": 47,
+      "hrrr_raw_accuracy": 0.8936,
+      "hrrr_corrected_accuracy": 0.8936,
+      "gfs_accuracy": 0.7157,
+      "delta_hrrr_raw_vs_gfs": 0.1779,
+      "delta_hrrr_corrected_vs_gfs": 0.1779
+    },
+    {
+      "station": "KPHL",
+      "lat": 39.8722,
+      "lon": -75.2409,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.057,
+      "n_pairs_raw": 51,
+      "hrrr_raw_accuracy": 0.8039,
+      "hrrr_corrected_accuracy": 0.8039,
+      "gfs_accuracy": 0.7143,
+      "delta_hrrr_raw_vs_gfs": 0.0896,
+      "delta_hrrr_corrected_vs_gfs": 0.0896
+    },
+    {
+      "station": "KPHX",
+      "lat": 33.4341,
+      "lon": -112.0117,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": -0.653,
+      "n_pairs_raw": 52,
+      "hrrr_raw_accuracy": 0.7885,
+      "hrrr_corrected_accuracy": 0.7885,
+      "gfs_accuracy": 0.6476,
+      "delta_hrrr_raw_vs_gfs": 0.1409,
+      "delta_hrrr_corrected_vs_gfs": 0.1409
+    },
+    {
+      "station": "KSAT",
+      "lat": 29.5337,
+      "lon": -98.4698,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.0,
+      "n_pairs_raw": 42,
+      "hrrr_raw_accuracy": 0.881,
+      "hrrr_corrected_accuracy": 0.881,
+      "gfs_accuracy": 0.7931,
+      "delta_hrrr_raw_vs_gfs": 0.0879,
+      "delta_hrrr_corrected_vs_gfs": 0.0879
+    },
+    {
+      "station": "KSEA",
+      "lat": 47.449,
+      "lon": -122.3113,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.646,
+      "n_pairs_raw": 52,
+      "hrrr_raw_accuracy": 0.7308,
+      "hrrr_corrected_accuracy": 0.7308,
+      "gfs_accuracy": 0.578,
+      "delta_hrrr_raw_vs_gfs": 0.1528,
+      "delta_hrrr_corrected_vs_gfs": 0.1528
+    },
+    {
+      "station": "KSFO",
+      "lat": 37.619,
+      "lon": -122.3748,
+      "status": "success",
+      "hourly_records": 1442,
+      "daily_max_dates": 61,
+      "date_range": {
+        "start": "2026-07-08",
+        "end": "2026-09-06"
+      },
+      "era5_bias_applied": 0.228,
+      "n_pairs_raw": 53,
+      "hrrr_raw_accuracy": 0.7925,
+      "hrrr_corrected_accuracy": 0.7925,
+      "gfs_accuracy": 0.7087,
+      "delta_hrrr_raw_vs_gfs": 0.0838,
+      "delta_hrrr_corrected_vs_gfs": 0.0838
+    }
+  ],
+  "gfs_baseline": {
+    "overall": {
+      "n_pairs": 2006,
+      "correct": 1423,
+      "accuracy": 0.7094
+    },
+    "stations": {
+      "KATL": {
+        "n_pairs": 106,
+        "correct": 81,
+        "accuracy": 0.7642,
+        "by_season": {
+          "fall": {
+            "n": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 20,
+            "correct": 17,
+            "accuracy": 0.85
+          },
+          "summer": {
+            "n": 85,
+            "correct": 64,
+            "accuracy": 0.7529
+          }
+        }
+      },
+      "KAUS": {
+        "n_pairs": 93,
+        "correct": 68,
+        "accuracy": 0.7312,
+        "by_season": {
+          "spring": {
+            "n": 17,
+            "correct": 14,
+            "accuracy": 0.8235
+          },
+          "summer": {
+            "n": 76,
+            "correct": 54,
+            "accuracy": 0.7105
+          }
+        }
+      },
+      "KBOS": {
+        "n_pairs": 109,
+        "correct": 85,
+        "accuracy": 0.7798,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 20,
+            "correct": 19,
+            "accuracy": 0.95
+          },
+          "summer": {
+            "n": 87,
+            "correct": 66,
+            "accuracy": 0.7586
+          }
+        }
+      },
+      "KDCA": {
+        "n_pairs": 109,
+        "correct": 77,
+        "accuracy": 0.7064,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 22,
+            "correct": 16,
+            "accuracy": 0.7273
+          },
+          "summer": {
+            "n": 85,
+            "correct": 61,
+            "accuracy": 0.7176
+          }
+        }
+      },
+      "KDEN": {
+        "n_pairs": 108,
+        "correct": 86,
+        "accuracy": 0.7963,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5
+          },
+          "spring": {
+            "n": 21,
+            "correct": 20,
+            "accuracy": 0.9524
+          },
+          "summer": {
+            "n": 85,
+            "correct": 65,
+            "accuracy": 0.7647
+          }
+        }
+      },
+      "KDFW": {
+        "n_pairs": 91,
+        "correct": 56,
+        "accuracy": 0.6154,
+        "by_season": {
+          "fall": {
+            "n": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 19,
+            "correct": 8,
+            "accuracy": 0.4211
+          },
+          "summer": {
+            "n": 71,
+            "correct": 48,
+            "accuracy": 0.6761
+          }
+        }
+      },
+      "KHOU": {
+        "n_pairs": 91,
+        "correct": 63,
+        "accuracy": 0.6923,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0
+          },
+          "spring": {
+            "n": 17,
+            "correct": 14,
+            "accuracy": 0.8235
+          },
+          "summer": {
+            "n": 72,
+            "correct": 47,
+            "accuracy": 0.6528
+          }
+        }
+      },
+      "KLAS": {
+        "n_pairs": 100,
+        "correct": 70,
+        "accuracy": 0.7,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 18,
+            "correct": 14,
+            "accuracy": 0.7778
+          },
+          "summer": {
+            "n": 80,
+            "correct": 56,
+            "accuracy": 0.7
+          }
+        }
+      },
+      "KLAX": {
+        "n_pairs": 94,
+        "correct": 63,
+        "accuracy": 0.6702,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0
+          },
+          "spring": {
+            "n": 18,
+            "correct": 12,
+            "accuracy": 0.6667
+          },
+          "summer": {
+            "n": 74,
+            "correct": 49,
+            "accuracy": 0.6622
+          }
+        }
+      },
+      "KMDW": {
+        "n_pairs": 106,
+        "correct": 78,
+        "accuracy": 0.7358,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 19,
+            "correct": 18,
+            "accuracy": 0.9474
+          },
+          "summer": {
+            "n": 85,
+            "correct": 60,
+            "accuracy": 0.7059
+          }
+        }
+      },
+      "KMIA": {
+        "n_pairs": 83,
+        "correct": 57,
+        "accuracy": 0.6867,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 14,
+            "correct": 11,
+            "accuracy": 0.7857
+          },
+          "summer": {
+            "n": 67,
+            "correct": 46,
+            "accuracy": 0.6866
+          }
+        }
+      },
+      "KMSP": {
+        "n_pairs": 104,
+        "correct": 81,
+        "accuracy": 0.7788,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5
+          },
+          "spring": {
+            "n": 18,
+            "correct": 17,
+            "accuracy": 0.9444
+          },
+          "summer": {
+            "n": 84,
+            "correct": 63,
+            "accuracy": 0.75
+          }
+        }
+      },
+      "KMSY": {
+        "n_pairs": 90,
+        "correct": 67,
+        "accuracy": 0.7444,
+        "by_season": {
+          "fall": {
+            "n": 1,
+            "correct": 1,
+            "accuracy": 1.0
+          },
+          "spring": {
+            "n": 17,
+            "correct": 16,
+            "accuracy": 0.9412
+          },
+          "summer": {
+            "n": 72,
+            "correct": 50,
+            "accuracy": 0.6944
+          }
+        }
+      },
+      "KNYC": {
+        "n_pairs": 111,
+        "correct": 70,
+        "accuracy": 0.6306,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 21,
+            "correct": 12,
+            "accuracy": 0.5714
+          },
+          "summer": {
+            "n": 88,
+            "correct": 58,
+            "accuracy": 0.6591
+          }
+        }
+      },
+      "KOKC": {
+        "n_pairs": 102,
+        "correct": 73,
+        "accuracy": 0.7157,
+        "by_season": {
+          "fall": {
+            "n": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 21,
+            "correct": 17,
+            "accuracy": 0.8095
+          },
+          "summer": {
+            "n": 80,
+            "correct": 56,
+            "accuracy": 0.7
+          }
+        }
+      },
+      "KPHL": {
+        "n_pairs": 105,
+        "correct": 75,
+        "accuracy": 0.7143,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5
+          },
+          "spring": {
+            "n": 19,
+            "correct": 17,
+            "accuracy": 0.8947
+          },
+          "summer": {
+            "n": 84,
+            "correct": 57,
+            "accuracy": 0.6786
+          }
+        }
+      },
+      "KPHX": {
+        "n_pairs": 105,
+        "correct": 68,
+        "accuracy": 0.6476,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0
+          },
+          "spring": {
+            "n": 21,
+            "correct": 19,
+            "accuracy": 0.9048
+          },
+          "summer": {
+            "n": 82,
+            "correct": 47,
+            "accuracy": 0.5732
+          }
+        }
+      },
+      "KSAT": {
+        "n_pairs": 87,
+        "correct": 69,
+        "accuracy": 0.7931,
+        "by_season": {
+          "fall": {
+            "n": 1,
+            "correct": 1,
+            "accuracy": 1.0
+          },
+          "spring": {
+            "n": 18,
+            "correct": 17,
+            "accuracy": 0.9444
+          },
+          "summer": {
+            "n": 68,
+            "correct": 51,
+            "accuracy": 0.75
+          }
+        }
+      },
+      "KSEA": {
+        "n_pairs": 109,
+        "correct": 63,
+        "accuracy": 0.578,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "spring": {
+            "n": 22,
+            "correct": 14,
+            "accuracy": 0.6364
+          },
+          "summer": {
+            "n": 85,
+            "correct": 49,
+            "accuracy": 0.5765
+          }
+        }
+      },
+      "KSFO": {
+        "n_pairs": 103,
+        "correct": 73,
+        "accuracy": 0.7087,
+        "by_season": {
+          "fall": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0
+          },
+          "spring": {
+            "n": 17,
+            "correct": 13,
+            "accuracy": 0.7647
+          },
+          "summer": {
+            "n": 84,
+            "correct": 58,
+            "accuracy": 0.6905
+          }
+        }
+      }
+    }
+  },
+  "era5_calibration_stations": [
+    "KATL",
+    "KAUS",
+    "KBOS",
+    "KDCA",
+    "KDEN",
+    "KDFW",
+    "KHOU",
+    "KLAS",
+    "KLAX",
+    "KMDW",
+    "KMIA",
+    "KNYC",
+    "KOKC",
+    "KPHL",
+    "KPHX",
+    "KSEA",
+    "KSFO"
+  ],
+  "conclusions": {
+    "hrrr_is_superior_to_gfs_raw": true,
+    "hrrr_improvement_pp_raw": 12.8,
+    "hrrr_corrected_improvement_pp": 12.8,
+    "era5_bias_correction_impact_pp": 0.0
+  }
+}

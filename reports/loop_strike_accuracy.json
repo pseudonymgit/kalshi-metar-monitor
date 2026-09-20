@@ -1,0 +1,525 @@
+{
+  "generated": "2026-09-07T05:47:04.103927+00:00",
+  "item": 5,
+  "title": "LOOP->Strike Historical Mapping",
+  "description": "Per-station, per-window strike accuracy for LOOP fusion system",
+  "data_sources": {
+    "backtest_db": "data/bmode_p1_backtest.db (bmode_trades)",
+    "temperature_column": "gefs_mean_f \u2014 GEFS ensemble mean temperature (F)",
+    "settlement_source": "data/kalshi_settlements.db",
+    "strike_map": "data/strike_map.json",
+    "window_classification": {
+      "h-12_same_day": "0-12 hours before settlement",
+      "h-24_1_day": "13-36 hours before settlement",
+      "h-48_2_day": "37-60 hours before settlement",
+      "h-72_3_day": "61-84 hours before settlement",
+      "h-96plus": "85+ hours before settlement"
+    }
+  },
+  "data_quality": {
+    "total_backtest_trades_loaded": 13420,
+    "matched_to_settlement": 10353,
+    "stations_analyzed": 20,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "data_limitation_note": null,
+    "has_adequate_observations": true
+  },
+  "summary": {
+    "overall_strike_accuracy": 0.1104,
+    "overall_directional_accuracy": 0.7058,
+    "total_observations": 10353,
+    "overall_bucket_distance_mae": 3.8876,
+    "knyc_crosscheck": {
+      "directional_accuracy": 0.9183,
+      "strike_accuracy": 0.272,
+      "expected_mvp_directional": 0.9,
+      "expected_mvp_strike": null,
+      "note": "KNYC MVP cited ~90% directional accuracy at h-6 window. The bmode backtest uses ~24h daily data (GEFS mean temperature), which is coarser than the hourly-resolution LOOP output that achieves the MVP figure. Directional accuracy in the ~24h window is within expected range for NWP-only prediction without LOOP's signal fusion."
+    }
+  },
+  "all_windows_topline": {
+    "h-24_1_day": {
+      "mean_strike_accuracy": 0.111,
+      "mean_directional_accuracy": 0.7029,
+      "mean_bucket_distance_mae": 3.9035,
+      "total_observations": 10176
+    },
+    "h-48_2_day": {
+      "mean_strike_accuracy": 0.0909,
+      "mean_directional_accuracy": 0.6364,
+      "mean_bucket_distance_mae": 2.5,
+      "total_observations": 44
+    },
+    "h-72_3_day": {
+      "mean_strike_accuracy": 0.0,
+      "mean_directional_accuracy": 1.0,
+      "mean_bucket_distance_mae": 4.0,
+      "total_observations": 4
+    },
+    "h-96plus": {
+      "mean_strike_accuracy": 0.0593,
+      "mean_directional_accuracy": 0.9407,
+      "mean_bucket_distance_mae": 3.1949,
+      "total_observations": 118
+    },
+    "unknown": {
+      "mean_strike_accuracy": 0.1818,
+      "mean_directional_accuracy": 1.0,
+      "mean_bucket_distance_mae": 2.0909,
+      "total_observations": 11
+    }
+  },
+  "per_station_per_window": {
+    "KATL": {
+      "h-24_1_day": {
+        "n_obs": 402,
+        "strike_accuracy": 0.0348,
+        "directional_accuracy": 0.6493,
+        "bucket_distance_mae": 4.0896
+      }
+    },
+    "KAUS": {
+      "h-24_1_day": {
+        "n_obs": 1111,
+        "strike_accuracy": 0.0324,
+        "directional_accuracy": 0.6976,
+        "bucket_distance_mae": 4.3555
+      },
+      "h-48_2_day": {
+        "n_obs": 2,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.0
+      },
+      "h-96plus": {
+        "n_obs": 27,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 3.0
+      },
+      "unknown": {
+        "n_obs": 2,
+        "strike_accuracy": 1.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 0.0
+      }
+    },
+    "KBOS": {
+      "h-24_1_day": {
+        "n_obs": 408,
+        "strike_accuracy": 0.2647,
+        "directional_accuracy": 0.9412,
+        "bucket_distance_mae": 2.3848
+      }
+    },
+    "KDCA": {
+      "h-24_1_day": {
+        "n_obs": 445,
+        "strike_accuracy": 0.1685,
+        "directional_accuracy": 0.9551,
+        "bucket_distance_mae": 2.973
+      },
+      "h-48_2_day": {
+        "n_obs": 9,
+        "strike_accuracy": 0.2222,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 1.5556
+      },
+      "h-72_3_day": {
+        "n_obs": 2,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.0
+      },
+      "h-96plus": {
+        "n_obs": 7,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 1.0
+      }
+    },
+    "KDEN": {
+      "h-24_1_day": {
+        "n_obs": 1130,
+        "strike_accuracy": 0.0814,
+        "directional_accuracy": 0.7257,
+        "bucket_distance_mae": 5.3027
+      },
+      "h-48_2_day": {
+        "n_obs": 4,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 6.5
+      },
+      "h-72_3_day": {
+        "n_obs": 2,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 6.0
+      },
+      "h-96plus": {
+        "n_obs": 15,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.4667
+      },
+      "unknown": {
+        "n_obs": 7,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 3.0
+      }
+    },
+    "KDFW": {
+      "h-24_1_day": {
+        "n_obs": 319,
+        "strike_accuracy": 0.094,
+        "directional_accuracy": 0.5141,
+        "bucket_distance_mae": 4.2257
+      }
+    },
+    "KHOU": {
+      "h-24_1_day": {
+        "n_obs": 323,
+        "strike_accuracy": 0.0279,
+        "directional_accuracy": 0.2755,
+        "bucket_distance_mae": 4.7028
+      }
+    },
+    "KLAS": {
+      "h-24_1_day": {
+        "n_obs": 653,
+        "strike_accuracy": 0.0995,
+        "directional_accuracy": 0.7902,
+        "bucket_distance_mae": 3.441
+      }
+    },
+    "KLAX": {
+      "h-24_1_day": {
+        "n_obs": 1046,
+        "strike_accuracy": 0.0516,
+        "directional_accuracy": 0.6568,
+        "bucket_distance_mae": 2.4866
+      },
+      "h-48_2_day": {
+        "n_obs": 14,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.0,
+        "bucket_distance_mae": 1.5
+      },
+      "h-96plus": {
+        "n_obs": 30,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.0667
+      },
+      "unknown": {
+        "n_obs": 2,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 1.0
+      }
+    },
+    "KMDW": {
+      "h-24_1_day": {
+        "n_obs": 1150,
+        "strike_accuracy": 0.187,
+        "directional_accuracy": 0.8417,
+        "bucket_distance_mae": 3.4748
+      },
+      "h-48_2_day": {
+        "n_obs": 11,
+        "strike_accuracy": 0.1818,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 2.2727
+      },
+      "h-96plus": {
+        "n_obs": 32,
+        "strike_accuracy": 0.2188,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 3.9688
+      }
+    },
+    "KMIA": {
+      "h-24_1_day": {
+        "n_obs": 265,
+        "strike_accuracy": 0.0264,
+        "directional_accuracy": 0.7736,
+        "bucket_distance_mae": 2.6491
+      },
+      "h-48_2_day": {
+        "n_obs": 2,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.0,
+        "bucket_distance_mae": 4.0
+      }
+    },
+    "KMSP": {
+      "h-24_1_day": {
+        "n_obs": 164,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.5854,
+        "bucket_distance_mae": 6.189
+      }
+    },
+    "KMSY": {
+      "h-24_1_day": {
+        "n_obs": 135,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.1852,
+        "bucket_distance_mae": 3.9259
+      }
+    },
+    "KNYC": {
+      "h-24_1_day": {
+        "n_obs": 783,
+        "strike_accuracy": 0.272,
+        "directional_accuracy": 0.9183,
+        "bucket_distance_mae": 2.4023
+      }
+    },
+    "KOKC": {
+      "h-24_1_day": {
+        "n_obs": 556,
+        "strike_accuracy": 0.0234,
+        "directional_accuracy": 0.491,
+        "bucket_distance_mae": 5.8507
+      }
+    },
+    "KPHL": {
+      "h-24_1_day": {
+        "n_obs": 330,
+        "strike_accuracy": 0.1242,
+        "directional_accuracy": 0.8303,
+        "bucket_distance_mae": 4.4848
+      },
+      "h-48_2_day": {
+        "n_obs": 2,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 1.0,
+        "bucket_distance_mae": 6.0
+      }
+    },
+    "KPHX": {
+      "h-24_1_day": {
+        "n_obs": 261,
+        "strike_accuracy": 0.387,
+        "directional_accuracy": 0.7854,
+        "bucket_distance_mae": 3.6092
+      }
+    },
+    "KSAT": {
+      "h-24_1_day": {
+        "n_obs": 105,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.1524,
+        "bucket_distance_mae": 6.3429
+      },
+      "h-96plus": {
+        "n_obs": 7,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.0,
+        "bucket_distance_mae": 9.0
+      }
+    },
+    "KSEA": {
+      "h-24_1_day": {
+        "n_obs": 162,
+        "strike_accuracy": 0.0,
+        "directional_accuracy": 0.1667,
+        "bucket_distance_mae": 8.4444
+      }
+    },
+    "KSFO": {
+      "h-24_1_day": {
+        "n_obs": 428,
+        "strike_accuracy": 0.1332,
+        "directional_accuracy": 0.5234,
+        "bucket_distance_mae": 3.278
+      }
+    }
+  },
+  "per_station_summary": {
+    "KATL": {
+      "total_obs": 402,
+      "overall_strike_accuracy": 0.0323,
+      "overall_directional_accuracy": 0.6493,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0348,
+      "best_window_obs": 402
+    },
+    "KAUS": {
+      "total_obs": 1142,
+      "overall_strike_accuracy": 0.0324,
+      "overall_directional_accuracy": 0.7058,
+      "best_window": "unknown",
+      "best_window_strike_accuracy": 1.0,
+      "best_window_obs": 2
+    },
+    "KBOS": {
+      "total_obs": 408,
+      "overall_strike_accuracy": 0.2623,
+      "overall_directional_accuracy": 0.9412,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.2647,
+      "best_window_obs": 408
+    },
+    "KDCA": {
+      "total_obs": 463,
+      "overall_strike_accuracy": 0.162,
+      "overall_directional_accuracy": 0.9568,
+      "best_window": "h-48_2_day",
+      "best_window_strike_accuracy": 0.2222,
+      "best_window_obs": 9
+    },
+    "KDEN": {
+      "total_obs": 1158,
+      "overall_strike_accuracy": 0.0786,
+      "overall_directional_accuracy": 0.7323,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0814,
+      "best_window_obs": 1130
+    },
+    "KDFW": {
+      "total_obs": 319,
+      "overall_strike_accuracy": 0.0909,
+      "overall_directional_accuracy": 0.511,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.094,
+      "best_window_obs": 319
+    },
+    "KHOU": {
+      "total_obs": 323,
+      "overall_strike_accuracy": 0.0279,
+      "overall_directional_accuracy": 0.2724,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0279,
+      "best_window_obs": 323
+    },
+    "KLAS": {
+      "total_obs": 653,
+      "overall_strike_accuracy": 0.098,
+      "overall_directional_accuracy": 0.7902,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0995,
+      "best_window_obs": 653
+    },
+    "KLAX": {
+      "total_obs": 1092,
+      "overall_strike_accuracy": 0.0485,
+      "overall_directional_accuracy": 0.6584,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0516,
+      "best_window_obs": 1046
+    },
+    "KMDW": {
+      "total_obs": 1193,
+      "overall_strike_accuracy": 0.1869,
+      "overall_directional_accuracy": 0.8466,
+      "best_window": "h-96plus",
+      "best_window_strike_accuracy": 0.2188,
+      "best_window_obs": 32
+    },
+    "KMIA": {
+      "total_obs": 267,
+      "overall_strike_accuracy": 0.0225,
+      "overall_directional_accuracy": 0.7678,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0264,
+      "best_window_obs": 265
+    },
+    "KMSP": {
+      "total_obs": 164,
+      "overall_strike_accuracy": 0.0,
+      "overall_directional_accuracy": 0.5854,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0,
+      "best_window_obs": 164
+    },
+    "KMSY": {
+      "total_obs": 135,
+      "overall_strike_accuracy": 0.0,
+      "overall_directional_accuracy": 0.1852,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0,
+      "best_window_obs": 135
+    },
+    "KNYC": {
+      "total_obs": 783,
+      "overall_strike_accuracy": 0.2708,
+      "overall_directional_accuracy": 0.9183,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.272,
+      "best_window_obs": 783
+    },
+    "KOKC": {
+      "total_obs": 556,
+      "overall_strike_accuracy": 0.0234,
+      "overall_directional_accuracy": 0.4892,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0234,
+      "best_window_obs": 556
+    },
+    "KPHL": {
+      "total_obs": 332,
+      "overall_strike_accuracy": 0.1205,
+      "overall_directional_accuracy": 0.8283,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.1242,
+      "best_window_obs": 330
+    },
+    "KPHX": {
+      "total_obs": 261,
+      "overall_strike_accuracy": 0.387,
+      "overall_directional_accuracy": 0.7816,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.387,
+      "best_window_obs": 261
+    },
+    "KSAT": {
+      "total_obs": 112,
+      "overall_strike_accuracy": 0.0,
+      "overall_directional_accuracy": 0.1429,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0,
+      "best_window_obs": 105
+    },
+    "KSEA": {
+      "total_obs": 162,
+      "overall_strike_accuracy": 0.0,
+      "overall_directional_accuracy": 0.1667,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.0,
+      "best_window_obs": 162
+    },
+    "KSFO": {
+      "total_obs": 428,
+      "overall_strike_accuracy": 0.1332,
+      "overall_directional_accuracy": 0.5234,
+      "best_window": "h-24_1_day",
+      "best_window_strike_accuracy": 0.1332,
+      "best_window_obs": 428
+    }
+  }
+}

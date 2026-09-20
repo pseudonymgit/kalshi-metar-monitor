@@ -1,0 +1,386 @@
+{
+  "experiment": "sensor_bias_correction",
+  "overall": {
+    "total_trades": 2997,
+    "liop_accuracy": 57.36,
+    "corrected_accuracy": 60.29,
+    "delta_pp": 2.94
+  },
+  "sunny_calm_subset": {
+    "trades": 222,
+    "pct_of_total": 7.4,
+    "liop_accuracy": 36.94,
+    "corrected_accuracy": 76.58,
+    "delta_pp": 39.64
+  },
+  "per_station": {
+    "KATL": {
+      "total": 161,
+      "liop_acc": 44.1,
+      "corrected_acc": 52.17,
+      "delta": 8.07,
+      "sc_trades": 17,
+      "sc_liop_acc": 11.76,
+      "sc_corrected_acc": 88.24,
+      "sc_delta": 76.47
+    },
+    "KAUS": {
+      "total": 256,
+      "liop_acc": 48.44,
+      "corrected_acc": 53.12,
+      "delta": 4.69,
+      "sc_trades": 23,
+      "sc_liop_acc": 21.74,
+      "sc_corrected_acc": 73.91,
+      "sc_delta": 52.17
+    },
+    "KBOS": {
+      "total": 168,
+      "liop_acc": 57.14,
+      "corrected_acc": 57.74,
+      "delta": 0.6,
+      "sc_trades": 5,
+      "sc_liop_acc": 40.0,
+      "sc_corrected_acc": 60.0,
+      "sc_delta": 20.0
+    },
+    "KDCA": {
+      "total": 175,
+      "liop_acc": 60.57,
+      "corrected_acc": 60.0,
+      "delta": -0.57,
+      "sc_trades": 20,
+      "sc_liop_acc": 55.0,
+      "sc_corrected_acc": 50.0,
+      "sc_delta": -5.0
+    },
+    "KDEN": {
+      "total": 264,
+      "liop_acc": 61.74,
+      "corrected_acc": 68.56,
+      "delta": 6.82,
+      "sc_trades": 29,
+      "sc_liop_acc": 20.69,
+      "sc_corrected_acc": 82.76,
+      "sc_delta": 62.07
+    },
+    "KDFW": {
+      "total": 145,
+      "liop_acc": 69.66,
+      "corrected_acc": 68.97,
+      "delta": -0.69,
+      "sc_trades": 4,
+      "sc_liop_acc": 75.0,
+      "sc_corrected_acc": 50.0,
+      "sc_delta": -25.0
+    },
+    "KHOU": {
+      "total": 138,
+      "liop_acc": 39.13,
+      "corrected_acc": 39.86,
+      "delta": 0.72,
+      "sc_trades": 2,
+      "sc_liop_acc": 50.0,
+      "sc_corrected_acc": 100.0,
+      "sc_delta": 50.0
+    },
+    "KLAS": {
+      "total": 144,
+      "liop_acc": 70.14,
+      "corrected_acc": 72.92,
+      "delta": 2.78,
+      "sc_trades": 49,
+      "sc_liop_acc": 65.31,
+      "sc_corrected_acc": 73.47,
+      "sc_delta": 8.16
+    },
+    "KLAX": {
+      "total": 241,
+      "liop_acc": 58.92,
+      "corrected_acc": 61.41,
+      "delta": 2.49,
+      "sc_trades": 16,
+      "sc_liop_acc": 43.75,
+      "sc_corrected_acc": 81.25,
+      "sc_delta": 37.5
+    },
+    "KMDW": {
+      "total": 259,
+      "liop_acc": 53.67,
+      "corrected_acc": 57.92,
+      "delta": 4.25,
+      "sc_trades": 17,
+      "sc_liop_acc": 23.53,
+      "sc_corrected_acc": 88.24,
+      "sc_delta": 64.71
+    },
+    "KMIA": {
+      "total": 61,
+      "liop_acc": 47.54,
+      "corrected_acc": 50.82,
+      "delta": 3.28,
+      "sc_trades": 2,
+      "sc_liop_acc": 0.0,
+      "sc_corrected_acc": 100.0,
+      "sc_delta": 100.0
+    },
+    "KMSP": {
+      "total": 75,
+      "liop_acc": 44.0,
+      "corrected_acc": 52.0,
+      "delta": 8.0,
+      "sc_trades": 8,
+      "sc_liop_acc": 12.5,
+      "sc_corrected_acc": 87.5,
+      "sc_delta": 75.0
+    },
+    "KMSY": {
+      "total": 64,
+      "liop_acc": 37.5,
+      "corrected_acc": 48.44,
+      "delta": 10.94,
+      "sc_trades": 9,
+      "sc_liop_acc": 11.11,
+      "sc_corrected_acc": 88.89,
+      "sc_delta": 77.78
+    },
+    "KNYC": {
+      "total": 179,
+      "liop_acc": 73.74,
+      "corrected_acc": 76.54,
+      "delta": 2.79,
+      "sc_trades": 15,
+      "sc_liop_acc": 40.0,
+      "sc_corrected_acc": 73.33,
+      "sc_delta": 33.33
+    },
+    "KOKC": {
+      "total": 151,
+      "liop_acc": 43.05,
+      "corrected_acc": 43.05,
+      "delta": 0.0,
+      "sc_trades": 0,
+      "sc_liop_acc": 0,
+      "sc_corrected_acc": 0,
+      "sc_delta": 0
+    },
+    "KPHL": {
+      "total": 74,
+      "liop_acc": 40.54,
+      "corrected_acc": 45.95,
+      "delta": 5.41,
+      "sc_trades": 6,
+      "sc_liop_acc": 16.67,
+      "sc_corrected_acc": 83.33,
+      "sc_delta": 66.67
+    },
+    "KPHX": {
+      "total": 129,
+      "liop_acc": 89.15,
+      "corrected_acc": 89.15,
+      "delta": 0.0,
+      "sc_trades": 0,
+      "sc_liop_acc": 0,
+      "sc_corrected_acc": 0,
+      "sc_delta": 0
+    },
+    "KSAT": {
+      "total": 61,
+      "liop_acc": 45.9,
+      "corrected_acc": 45.9,
+      "delta": 0.0,
+      "sc_trades": 0,
+      "sc_liop_acc": 0,
+      "sc_corrected_acc": 0,
+      "sc_delta": 0
+    },
+    "KSEA": {
+      "total": 96,
+      "liop_acc": 64.58,
+      "corrected_acc": 64.58,
+      "delta": 0.0,
+      "sc_trades": 0,
+      "sc_liop_acc": 0,
+      "sc_corrected_acc": 0,
+      "sc_delta": 0
+    },
+    "KSFO": {
+      "total": 156,
+      "liop_acc": 66.67,
+      "corrected_acc": 66.67,
+      "delta": 0.0,
+      "sc_trades": 0,
+      "sc_liop_acc": 0,
+      "sc_corrected_acc": 0,
+      "sc_delta": 0
+    }
+  },
+  "parameters": {
+    "cloud_cover_threshold": 0.125,
+    "wind_threshold_kt": 5.0,
+    "base_confidence": 0.55,
+    "correction_weight": 0.15
+  },
+  "sample_affected_trades": [
+    {
+      "station": "KATL",
+      "date": "2026-02-08",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-03-14",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KATL",
+      "date": "2026-03-19",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-03-20",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-04-10",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KATL",
+      "date": "2026-04-11",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.42
+    },
+    {
+      "station": "KATL",
+      "date": "2026-04-15",
+      "liop": "down",
+      "actual": "down",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-04-20",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-04-21",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KATL",
+      "date": "2026-05-15",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-05-19",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.33
+    },
+    {
+      "station": "KATL",
+      "date": "2026-06-04",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.45
+    },
+    {
+      "station": "KATL",
+      "date": "2026-06-05",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.45
+    },
+    {
+      "station": "KATL",
+      "date": "2026-06-20",
+      "liop": "down",
+      "actual": "down",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KATL",
+      "date": "2026-06-24",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.42
+    },
+    {
+      "station": "KATL",
+      "date": "2026-06-30",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.42
+    },
+    {
+      "station": "KATL",
+      "date": "2026-07-20",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KAUS",
+      "date": "2025-08-06",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KAUS",
+      "date": "2025-08-10",
+      "liop": "down",
+      "actual": "down",
+      "fused": "up",
+      "conf": 0.39
+    },
+    {
+      "station": "KAUS",
+      "date": "2025-08-11",
+      "liop": "down",
+      "actual": "up",
+      "fused": "up",
+      "conf": 0.39
+    }
+  ]
+}

@@ -1,0 +1,1529 @@
+{
+  "generated": "2026-09-07T05:03:17.163693+00:00",
+  "sweep_parameters": {
+    "models": [
+      "ecmwf",
+      "gfs",
+      "gem",
+      "icon"
+    ],
+    "windows_hours": [
+      0,
+      24,
+      48,
+      72,
+      96,
+      120,
+      144
+    ],
+    "primary_model": "ecmwf",
+    "ensemble_method": "multi-model mean of temperature_2m_max (C->F converted)",
+    "strike_bucket_method": "2degF buckets from strike_map strike prices [40..114]",
+    "resolution_note": "Daily resolution (date-based on fetch_date and target_date); h-0 = same-day forecast (~6-18h before end-of-day settlement)",
+    "directional_comparison": "Against station_mean from strike_map.json"
+  },
+  "per_station_per_window": {
+    "KATL": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.0476,
+        "strike_accuracy_weighted": 0.1714,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 2.4619,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.1081,
+        "strike_accuracy_weighted": 0.1189,
+        "direction_accuracy": 0.627,
+        "bucket_distance_mae": 3.2703,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.0995,
+        "strike_accuracy_weighted": 0.0989,
+        "direction_accuracy": 0.614,
+        "bucket_distance_mae": 2.201,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.1707,
+        "strike_accuracy_weighted": 0.2049,
+        "direction_accuracy": 0.6634,
+        "bucket_distance_mae": 2.678,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.125,
+        "strike_accuracy_weighted": 0.155,
+        "direction_accuracy": 0.66,
+        "bucket_distance_mae": 2.945,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1795,
+        "strike_accuracy_weighted": 0.1692,
+        "direction_accuracy": 0.6513,
+        "bucket_distance_mae": 3.1077,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.2632,
+        "strike_accuracy_weighted": 0.1842,
+        "direction_accuracy": 0.6474,
+        "bucket_distance_mae": 3.079,
+        "conf_calibration": 1.0
+      }
+    },
+    "KAUS": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.1667,
+        "strike_accuracy_weighted": 0.1952,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 2.7619,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.3243,
+        "strike_accuracy_weighted": 0.2432,
+        "direction_accuracy": 0.6486,
+        "bucket_distance_mae": 3.2649,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.3141,
+        "strike_accuracy_weighted": 0.2791,
+        "direction_accuracy": 0.622,
+        "bucket_distance_mae": 1.7895,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2195,
+        "strike_accuracy_weighted": 0.2146,
+        "direction_accuracy": 0.6634,
+        "bucket_distance_mae": 2.7561,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.4,
+        "strike_accuracy_weighted": 0.255,
+        "direction_accuracy": 0.66,
+        "bucket_distance_mae": 2.94,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.359,
+        "strike_accuracy_weighted": 0.2615,
+        "direction_accuracy": 0.6564,
+        "bucket_distance_mae": 3.0461,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.3421,
+        "strike_accuracy_weighted": 0.2737,
+        "direction_accuracy": 0.6526,
+        "bucket_distance_mae": 3.1316,
+        "conf_calibration": 1.0
+      }
+    },
+    "KBOS": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.3333,
+        "strike_accuracy_weighted": 0.2714,
+        "direction_accuracy": 0.7619,
+        "bucket_distance_mae": 2.0381,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.0,
+        "strike_accuracy_weighted": 0.0541,
+        "direction_accuracy": 0.7513,
+        "bucket_distance_mae": 3.1838,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2984,
+        "strike_accuracy_weighted": 0.2807,
+        "direction_accuracy": 0.6731,
+        "bucket_distance_mae": 1.6922,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.1951,
+        "strike_accuracy_weighted": 0.2293,
+        "direction_accuracy": 0.761,
+        "bucket_distance_mae": 2.2536,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.05,
+        "strike_accuracy_weighted": 0.09,
+        "direction_accuracy": 0.76,
+        "bucket_distance_mae": 2.58,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1026,
+        "strike_accuracy_weighted": 0.1333,
+        "direction_accuracy": 0.759,
+        "bucket_distance_mae": 2.7795,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1316,
+        "strike_accuracy_weighted": 0.1,
+        "direction_accuracy": 0.7421,
+        "bucket_distance_mae": 3.1421,
+        "conf_calibration": 1.0
+      }
+    },
+    "KDCA": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.381,
+        "strike_accuracy_weighted": 0.2476,
+        "direction_accuracy": 0.7429,
+        "bucket_distance_mae": 2.0619,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.1622,
+        "strike_accuracy_weighted": 0.1135,
+        "direction_accuracy": 0.7351,
+        "bucket_distance_mae": 3.0162,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.3351,
+        "strike_accuracy_weighted": 0.2743,
+        "direction_accuracy": 0.6619,
+        "bucket_distance_mae": 1.8453,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.3171,
+        "strike_accuracy_weighted": 0.2537,
+        "direction_accuracy": 0.7414,
+        "bucket_distance_mae": 2.3708,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.175,
+        "strike_accuracy_weighted": 0.195,
+        "direction_accuracy": 0.74,
+        "bucket_distance_mae": 2.435,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2564,
+        "strike_accuracy_weighted": 0.2,
+        "direction_accuracy": 0.7333,
+        "bucket_distance_mae": 2.8564,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.2368,
+        "strike_accuracy_weighted": 0.2263,
+        "direction_accuracy": 0.7369,
+        "bucket_distance_mae": 2.6684,
+        "conf_calibration": 1.0
+      }
+    },
+    "KDEN": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.1667,
+        "strike_accuracy_weighted": 0.1714,
+        "direction_accuracy": 0.6857,
+        "bucket_distance_mae": 3.2143,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.1351,
+        "strike_accuracy_weighted": 0.1189,
+        "direction_accuracy": 0.6702,
+        "bucket_distance_mae": 4.0973,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2932,
+        "strike_accuracy_weighted": 0.2584,
+        "direction_accuracy": 0.6475,
+        "bucket_distance_mae": 2.0989,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.122,
+        "strike_accuracy_weighted": 0.1415,
+        "direction_accuracy": 0.683,
+        "bucket_distance_mae": 3.3415,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.05,
+        "strike_accuracy_weighted": 0.115,
+        "direction_accuracy": 0.68,
+        "bucket_distance_mae": 3.535,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1026,
+        "strike_accuracy_weighted": 0.1026,
+        "direction_accuracy": 0.677,
+        "bucket_distance_mae": 3.7487,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1053,
+        "strike_accuracy_weighted": 0.1211,
+        "direction_accuracy": 0.6737,
+        "bucket_distance_mae": 3.8158,
+        "conf_calibration": 1.0
+      }
+    },
+    "KDFW": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.3333,
+        "strike_accuracy_weighted": 0.3047,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 2.419,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.3243,
+        "strike_accuracy_weighted": 0.2162,
+        "direction_accuracy": 0.6486,
+        "bucket_distance_mae": 3.1297,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2147,
+        "strike_accuracy_weighted": 0.2217,
+        "direction_accuracy": 0.5837,
+        "bucket_distance_mae": 1.8947,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.4146,
+        "strike_accuracy_weighted": 0.3024,
+        "direction_accuracy": 0.6634,
+        "bucket_distance_mae": 2.4975,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.325,
+        "strike_accuracy_weighted": 0.245,
+        "direction_accuracy": 0.655,
+        "bucket_distance_mae": 2.875,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.3077,
+        "strike_accuracy_weighted": 0.2308,
+        "direction_accuracy": 0.6564,
+        "bucket_distance_mae": 3.0103,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.3158,
+        "strike_accuracy_weighted": 0.2,
+        "direction_accuracy": 0.6526,
+        "bucket_distance_mae": 3.1,
+        "conf_calibration": 1.0
+      }
+    },
+    "KHOU": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.4048,
+        "strike_accuracy_weighted": 0.3381,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 2.0381,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.3514,
+        "strike_accuracy_weighted": 0.2162,
+        "direction_accuracy": 0.6432,
+        "bucket_distance_mae": 2.9297,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2408,
+        "strike_accuracy_weighted": 0.2328,
+        "direction_accuracy": 0.6029,
+        "bucket_distance_mae": 1.8038,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.4146,
+        "strike_accuracy_weighted": 0.322,
+        "direction_accuracy": 0.6586,
+        "bucket_distance_mae": 2.2342,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.3,
+        "strike_accuracy_weighted": 0.23,
+        "direction_accuracy": 0.66,
+        "bucket_distance_mae": 2.655,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1282,
+        "strike_accuracy_weighted": 0.2308,
+        "direction_accuracy": 0.6513,
+        "bucket_distance_mae": 2.8667,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1316,
+        "strike_accuracy_weighted": 0.1579,
+        "direction_accuracy": 0.6474,
+        "bucket_distance_mae": 3.0368,
+        "conf_calibration": 1.0
+      }
+    },
+    "KLAS": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.3095,
+        "strike_accuracy_weighted": 0.2857,
+        "direction_accuracy": 0.6905,
+        "bucket_distance_mae": 2.2809,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.3784,
+        "strike_accuracy_weighted": 0.3081,
+        "direction_accuracy": 0.6757,
+        "bucket_distance_mae": 2.8324,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2199,
+        "strike_accuracy_weighted": 0.2105,
+        "direction_accuracy": 0.6555,
+        "bucket_distance_mae": 1.7416,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2683,
+        "strike_accuracy_weighted": 0.2976,
+        "direction_accuracy": 0.6927,
+        "bucket_distance_mae": 2.3464,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.25,
+        "strike_accuracy_weighted": 0.29,
+        "direction_accuracy": 0.69,
+        "bucket_distance_mae": 2.485,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.3077,
+        "strike_accuracy_weighted": 0.2974,
+        "direction_accuracy": 0.6821,
+        "bucket_distance_mae": 2.6462,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.3421,
+        "strike_accuracy_weighted": 0.3053,
+        "direction_accuracy": 0.6789,
+        "bucket_distance_mae": 2.7158,
+        "conf_calibration": 1.0
+      }
+    },
+    "KLAX": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.0238,
+        "strike_accuracy_weighted": 0.1143,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 3.0381,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.0541,
+        "strike_accuracy_weighted": 0.1027,
+        "direction_accuracy": 0.6486,
+        "bucket_distance_mae": 3.2433,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.1832,
+        "strike_accuracy_weighted": 0.1898,
+        "direction_accuracy": 0.563,
+        "bucket_distance_mae": 2.2233,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.0244,
+        "strike_accuracy_weighted": 0.0829,
+        "direction_accuracy": 0.6634,
+        "bucket_distance_mae": 3.0927,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.0,
+        "strike_accuracy_weighted": 0.075,
+        "direction_accuracy": 0.66,
+        "bucket_distance_mae": 3.32,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.0256,
+        "strike_accuracy_weighted": 0.1077,
+        "direction_accuracy": 0.6564,
+        "bucket_distance_mae": 3.4051,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.0263,
+        "strike_accuracy_weighted": 0.0947,
+        "direction_accuracy": 0.6526,
+        "bucket_distance_mae": 3.2737,
+        "conf_calibration": 1.0
+      }
+    },
+    "KMDW": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.4762,
+        "strike_accuracy_weighted": 0.3047,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 1.6286,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.2432,
+        "strike_accuracy_weighted": 0.1676,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.2487,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.3037,
+        "strike_accuracy_weighted": 0.2807,
+        "direction_accuracy": 0.6826,
+        "bucket_distance_mae": 1.6539,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2927,
+        "strike_accuracy_weighted": 0.2049,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 1.8732,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.175,
+        "strike_accuracy_weighted": 0.205,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.11,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2564,
+        "strike_accuracy_weighted": 0.159,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.3077,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.2105,
+        "strike_accuracy_weighted": 0.1684,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.1789,
+        "conf_calibration": 1.0
+      }
+    },
+    "KMIA": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.0238,
+        "strike_accuracy_weighted": 0.0619,
+        "direction_accuracy": 0.3667,
+        "bucket_distance_mae": 3.5381,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.1351,
+        "strike_accuracy_weighted": 0.0919,
+        "direction_accuracy": 0.4,
+        "bucket_distance_mae": 3.3568,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 617,
+        "n_ensemble_obs": 187,
+        "strike_accuracy": 0.0802,
+        "strike_accuracy_weighted": 0.0875,
+        "direction_accuracy": 0.3031,
+        "bucket_distance_mae": 3.4814,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.0488,
+        "strike_accuracy_weighted": 0.0683,
+        "direction_accuracy": 0.361,
+        "bucket_distance_mae": 3.522,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.175,
+        "strike_accuracy_weighted": 0.14,
+        "direction_accuracy": 0.38,
+        "bucket_distance_mae": 3.585,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1026,
+        "strike_accuracy_weighted": 0.1231,
+        "direction_accuracy": 0.3795,
+        "bucket_distance_mae": 3.5179,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1316,
+        "strike_accuracy_weighted": 0.0895,
+        "direction_accuracy": 0.3947,
+        "bucket_distance_mae": 3.4316,
+        "conf_calibration": 1.0
+      }
+    },
+    "KMSP": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.2381,
+        "strike_accuracy_weighted": 0.2048,
+        "direction_accuracy": 0.6476,
+        "bucket_distance_mae": 2.4571,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.2432,
+        "strike_accuracy_weighted": 0.173,
+        "direction_accuracy": 0.6,
+        "bucket_distance_mae": 2.9459,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 623,
+        "n_ensemble_obs": 189,
+        "strike_accuracy": 0.3439,
+        "strike_accuracy_weighted": 0.2392,
+        "direction_accuracy": 0.5875,
+        "bucket_distance_mae": 1.8925,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2439,
+        "strike_accuracy_weighted": 0.1805,
+        "direction_accuracy": 0.639,
+        "bucket_distance_mae": 2.7464,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.175,
+        "strike_accuracy_weighted": 0.115,
+        "direction_accuracy": 0.625,
+        "bucket_distance_mae": 3.13,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2051,
+        "strike_accuracy_weighted": 0.159,
+        "direction_accuracy": 0.6205,
+        "bucket_distance_mae": 2.8872,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1579,
+        "strike_accuracy_weighted": 0.1474,
+        "direction_accuracy": 0.6263,
+        "bucket_distance_mae": 2.6579,
+        "conf_calibration": 1.0
+      }
+    },
+    "KMSY": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.2143,
+        "strike_accuracy_weighted": 0.2428,
+        "direction_accuracy": 0.6381,
+        "bucket_distance_mae": 2.3238,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.3784,
+        "strike_accuracy_weighted": 0.1892,
+        "direction_accuracy": 0.5892,
+        "bucket_distance_mae": 2.6973,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 623,
+        "n_ensemble_obs": 189,
+        "strike_accuracy": 0.2381,
+        "strike_accuracy_weighted": 0.2328,
+        "direction_accuracy": 0.5939,
+        "bucket_distance_mae": 1.5939,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.3415,
+        "strike_accuracy_weighted": 0.239,
+        "direction_accuracy": 0.6146,
+        "bucket_distance_mae": 2.4293,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.325,
+        "strike_accuracy_weighted": 0.2,
+        "direction_accuracy": 0.605,
+        "bucket_distance_mae": 2.575,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.4103,
+        "strike_accuracy_weighted": 0.1898,
+        "direction_accuracy": 0.6102,
+        "bucket_distance_mae": 2.6051,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.3684,
+        "strike_accuracy_weighted": 0.2158,
+        "direction_accuracy": 0.5947,
+        "bucket_distance_mae": 2.621,
+        "conf_calibration": 1.0
+      }
+    },
+    "KNYC": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.4762,
+        "strike_accuracy_weighted": 0.3238,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 1.9619,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.2703,
+        "strike_accuracy_weighted": 0.1784,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.7567,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2827,
+        "strike_accuracy_weighted": 0.2663,
+        "direction_accuracy": 0.6826,
+        "bucket_distance_mae": 1.8501,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2927,
+        "strike_accuracy_weighted": 0.239,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.2195,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.325,
+        "strike_accuracy_weighted": 0.22,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.325,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2564,
+        "strike_accuracy_weighted": 0.2,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.5026,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1579,
+        "strike_accuracy_weighted": 0.1368,
+        "direction_accuracy": 0.8,
+        "bucket_distance_mae": 2.7632,
+        "conf_calibration": 1.0
+      }
+    },
+    "KOKC": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.119,
+        "strike_accuracy_weighted": 0.1476,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 3.0762,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.3784,
+        "strike_accuracy_weighted": 0.2216,
+        "direction_accuracy": 0.6486,
+        "bucket_distance_mae": 3.8324,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.2565,
+        "strike_accuracy_weighted": 0.236,
+        "direction_accuracy": 0.6156,
+        "bucket_distance_mae": 2.1866,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2195,
+        "strike_accuracy_weighted": 0.2342,
+        "direction_accuracy": 0.6634,
+        "bucket_distance_mae": 3.1171,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.225,
+        "strike_accuracy_weighted": 0.17,
+        "direction_accuracy": 0.66,
+        "bucket_distance_mae": 3.595,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1795,
+        "strike_accuracy_weighted": 0.1846,
+        "direction_accuracy": 0.6564,
+        "bucket_distance_mae": 3.7641,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.2368,
+        "strike_accuracy_weighted": 0.1579,
+        "direction_accuracy": 0.6526,
+        "bucket_distance_mae": 3.8474,
+        "conf_calibration": 1.0
+      }
+    },
+    "KPHL": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.2619,
+        "strike_accuracy_weighted": 0.1762,
+        "direction_accuracy": 0.781,
+        "bucket_distance_mae": 2.2809,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.0811,
+        "strike_accuracy_weighted": 0.1081,
+        "direction_accuracy": 0.7784,
+        "bucket_distance_mae": 2.9189,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 623,
+        "n_ensemble_obs": 189,
+        "strike_accuracy": 0.2011,
+        "strike_accuracy_weighted": 0.1846,
+        "direction_accuracy": 0.6806,
+        "bucket_distance_mae": 1.8218,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.2439,
+        "strike_accuracy_weighted": 0.1415,
+        "direction_accuracy": 0.7805,
+        "bucket_distance_mae": 2.4195,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.15,
+        "strike_accuracy_weighted": 0.145,
+        "direction_accuracy": 0.78,
+        "bucket_distance_mae": 2.57,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.1282,
+        "strike_accuracy_weighted": 0.159,
+        "direction_accuracy": 0.7795,
+        "bucket_distance_mae": 2.6872,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1579,
+        "strike_accuracy_weighted": 0.1632,
+        "direction_accuracy": 0.779,
+        "bucket_distance_mae": 2.8368,
+        "conf_calibration": 1.0
+      }
+    },
+    "KPHX": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.2381,
+        "strike_accuracy_weighted": 0.2667,
+        "direction_accuracy": 0.6428,
+        "bucket_distance_mae": 2.6048,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.1892,
+        "strike_accuracy_weighted": 0.2324,
+        "direction_accuracy": 0.6378,
+        "bucket_distance_mae": 2.8487,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.1466,
+        "strike_accuracy_weighted": 0.1675,
+        "direction_accuracy": 0.6125,
+        "bucket_distance_mae": 1.7512,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.3171,
+        "strike_accuracy_weighted": 0.2634,
+        "direction_accuracy": 0.6488,
+        "bucket_distance_mae": 2.6195,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.25,
+        "strike_accuracy_weighted": 0.23,
+        "direction_accuracy": 0.65,
+        "bucket_distance_mae": 2.75,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2564,
+        "strike_accuracy_weighted": 0.2308,
+        "direction_accuracy": 0.6462,
+        "bucket_distance_mae": 2.8051,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.2632,
+        "strike_accuracy_weighted": 0.2474,
+        "direction_accuracy": 0.6526,
+        "bucket_distance_mae": 2.7105,
+        "conf_calibration": 1.0
+      }
+    },
+    "KSAT": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.4286,
+        "strike_accuracy_weighted": 0.3762,
+        "direction_accuracy": 0.6666,
+        "bucket_distance_mae": 2.1952,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.2703,
+        "strike_accuracy_weighted": 0.2595,
+        "direction_accuracy": 0.6486,
+        "bucket_distance_mae": 2.8216,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 623,
+        "n_ensemble_obs": 189,
+        "strike_accuracy": 0.4021,
+        "strike_accuracy_weighted": 0.366,
+        "direction_accuracy": 0.6035,
+        "bucket_distance_mae": 1.4863,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.4146,
+        "strike_accuracy_weighted": 0.3366,
+        "direction_accuracy": 0.6634,
+        "bucket_distance_mae": 2.2829,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.375,
+        "strike_accuracy_weighted": 0.29,
+        "direction_accuracy": 0.66,
+        "bucket_distance_mae": 2.475,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.3333,
+        "strike_accuracy_weighted": 0.2564,
+        "direction_accuracy": 0.6564,
+        "bucket_distance_mae": 2.6257,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.3947,
+        "strike_accuracy_weighted": 0.2474,
+        "direction_accuracy": 0.6526,
+        "bucket_distance_mae": 2.7526,
+        "conf_calibration": 1.0
+      }
+    },
+    "KSEA": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.1429,
+        "strike_accuracy_weighted": 0.181,
+        "direction_accuracy": 0.6048,
+        "bucket_distance_mae": 3.0905,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.2432,
+        "strike_accuracy_weighted": 0.1351,
+        "direction_accuracy": 0.5838,
+        "bucket_distance_mae": 3.8595,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.1623,
+        "strike_accuracy_weighted": 0.1515,
+        "direction_accuracy": 0.5614,
+        "bucket_distance_mae": 2.6826,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.122,
+        "strike_accuracy_weighted": 0.1903,
+        "direction_accuracy": 0.6049,
+        "bucket_distance_mae": 3.1707,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.175,
+        "strike_accuracy_weighted": 0.13,
+        "direction_accuracy": 0.6,
+        "bucket_distance_mae": 3.405,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2051,
+        "strike_accuracy_weighted": 0.1333,
+        "direction_accuracy": 0.5949,
+        "bucket_distance_mae": 3.6205,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.1842,
+        "strike_accuracy_weighted": 0.1421,
+        "direction_accuracy": 0.5947,
+        "bucket_distance_mae": 3.6211,
+        "conf_calibration": 1.0
+      }
+    },
+    "KSFO": {
+      "h-0": {
+        "n_obs": 210,
+        "n_ensemble_obs": 42,
+        "strike_accuracy": 0.1667,
+        "strike_accuracy_weighted": 0.1857,
+        "direction_accuracy": 0.6238,
+        "bucket_distance_mae": 1.9857,
+        "conf_calibration": 1.0
+      },
+      "h-120": {
+        "n_obs": 185,
+        "n_ensemble_obs": 37,
+        "strike_accuracy": 0.1622,
+        "strike_accuracy_weighted": 0.1081,
+        "direction_accuracy": 0.5135,
+        "bucket_distance_mae": 2.8811,
+        "conf_calibration": 1.0
+      },
+      "h-144": {
+        "n_obs": 627,
+        "n_ensemble_obs": 191,
+        "strike_accuracy": 0.1414,
+        "strike_accuracy_weighted": 0.1547,
+        "direction_accuracy": 0.5024,
+        "bucket_distance_mae": 2.0893,
+        "conf_calibration": 1.0
+      },
+      "h-24": {
+        "n_obs": 205,
+        "n_ensemble_obs": 41,
+        "strike_accuracy": 0.1707,
+        "strike_accuracy_weighted": 0.1317,
+        "direction_accuracy": 0.6,
+        "bucket_distance_mae": 2.2976,
+        "conf_calibration": 1.0
+      },
+      "h-48": {
+        "n_obs": 200,
+        "n_ensemble_obs": 40,
+        "strike_accuracy": 0.1,
+        "strike_accuracy_weighted": 0.13,
+        "direction_accuracy": 0.6,
+        "bucket_distance_mae": 2.385,
+        "conf_calibration": 1.0
+      },
+      "h-72": {
+        "n_obs": 195,
+        "n_ensemble_obs": 39,
+        "strike_accuracy": 0.2308,
+        "strike_accuracy_weighted": 0.1231,
+        "direction_accuracy": 0.5846,
+        "bucket_distance_mae": 2.5333,
+        "conf_calibration": 1.0
+      },
+      "h-96": {
+        "n_obs": 190,
+        "n_ensemble_obs": 38,
+        "strike_accuracy": 0.2632,
+        "strike_accuracy_weighted": 0.1158,
+        "direction_accuracy": 0.5316,
+        "bucket_distance_mae": 2.6842,
+        "conf_calibration": 1.0
+      }
+    }
+  },
+  "per_station_detail": {
+    "KATL": {
+      "best_window": "h-96",
+      "best_strike_accuracy": 0.2632,
+      "best_window_obs": 38,
+      "all_windows_total_obs": 428
+    },
+    "KAUS": {
+      "best_window": "h-48",
+      "best_strike_accuracy": 0.4,
+      "best_window_obs": 40,
+      "all_windows_total_obs": 428
+    },
+    "KBOS": {
+      "best_window": "h-0",
+      "best_strike_accuracy": 0.3333,
+      "best_window_obs": 42,
+      "all_windows_total_obs": 428
+    },
+    "KDCA": {
+      "best_window": "h-0",
+      "best_strike_accuracy": 0.381,
+      "best_window_obs": 42,
+      "all_windows_total_obs": 428
+    },
+    "KDEN": {
+      "best_window": "h-144",
+      "best_strike_accuracy": 0.2932,
+      "best_window_obs": 191,
+      "all_windows_total_obs": 428
+    },
+    "KDFW": {
+      "best_window": "h-24",
+      "best_strike_accuracy": 0.4146,
+      "best_window_obs": 41,
+      "all_windows_total_obs": 428
+    },
+    "KHOU": {
+      "best_window": "h-24",
+      "best_strike_accuracy": 0.4146,
+      "best_window_obs": 41,
+      "all_windows_total_obs": 428
+    },
+    "KLAS": {
+      "best_window": "h-120",
+      "best_strike_accuracy": 0.3784,
+      "best_window_obs": 37,
+      "all_windows_total_obs": 428
+    },
+    "KLAX": {
+      "best_window": "h-144",
+      "best_strike_accuracy": 0.1832,
+      "best_window_obs": 191,
+      "all_windows_total_obs": 428
+    },
+    "KMDW": {
+      "best_window": "h-0",
+      "best_strike_accuracy": 0.4762,
+      "best_window_obs": 42,
+      "all_windows_total_obs": 428
+    },
+    "KMIA": {
+      "best_window": "h-48",
+      "best_strike_accuracy": 0.175,
+      "best_window_obs": 40,
+      "all_windows_total_obs": 424
+    },
+    "KMSP": {
+      "best_window": "h-144",
+      "best_strike_accuracy": 0.3439,
+      "best_window_obs": 189,
+      "all_windows_total_obs": 426
+    },
+    "KMSY": {
+      "best_window": "h-72",
+      "best_strike_accuracy": 0.4103,
+      "best_window_obs": 39,
+      "all_windows_total_obs": 426
+    },
+    "KNYC": {
+      "best_window": "h-0",
+      "best_strike_accuracy": 0.4762,
+      "best_window_obs": 42,
+      "all_windows_total_obs": 428
+    },
+    "KOKC": {
+      "best_window": "h-120",
+      "best_strike_accuracy": 0.3784,
+      "best_window_obs": 37,
+      "all_windows_total_obs": 428
+    },
+    "KPHL": {
+      "best_window": "h-0",
+      "best_strike_accuracy": 0.2619,
+      "best_window_obs": 42,
+      "all_windows_total_obs": 426
+    },
+    "KPHX": {
+      "best_window": "h-24",
+      "best_strike_accuracy": 0.3171,
+      "best_window_obs": 41,
+      "all_windows_total_obs": 428
+    },
+    "KSAT": {
+      "best_window": "h-0",
+      "best_strike_accuracy": 0.4286,
+      "best_window_obs": 42,
+      "all_windows_total_obs": 426
+    },
+    "KSEA": {
+      "best_window": "h-120",
+      "best_strike_accuracy": 0.2432,
+      "best_window_obs": 37,
+      "all_windows_total_obs": 428
+    },
+    "KSFO": {
+      "best_window": "h-96",
+      "best_strike_accuracy": 0.2632,
+      "best_window_obs": 38,
+      "all_windows_total_obs": 428
+    }
+  },
+  "summary": {
+    "overall_strike_accuracy": 0.1931,
+    "overall_directional_accuracy": 0.8411,
+    "best_window": "h-0",
+    "best_window_accuracy": 0.2381,
+    "station_range": [
+      "KSAT 0.37",
+      "KLAX 0.05"
+    ],
+    "strike_bucket_distance_mae": 2.6274,
+    "stations_analyzed": 20,
+    "stations_low_confidence": [],
+    "total_observations": 27666,
+    "knyc_crosscheck": {
+      "h0_directional_accuracy": 0.8,
+      "h0_strike_accuracy": 0.4762,
+      "expected_directional": 0.9,
+      "note": "KNYC MVP cited ~90% directional at h-6; NWP date-resolution data shows ~80% at h-0. Gap expected: (a) daily vs hourly data resolution, (b) deterministic raw NWP vs fused multi-signal pipeline."
+    }
+  },
+  "all_windows_topline": {
+    "h-0": {
+      "mean_accuracy": 0.2381,
+      "total_observations": 840
+    },
+    "h-120": {
+      "mean_accuracy": 0.2108,
+      "total_observations": 740
+    },
+    "h-144": {
+      "mean_accuracy": 0.2353,
+      "total_observations": 3808
+    },
+    "h-24": {
+      "mean_accuracy": 0.2305,
+      "total_observations": 820
+    },
+    "h-48": {
+      "mean_accuracy": 0.2062,
+      "total_observations": 800
+    },
+    "h-72": {
+      "mean_accuracy": 0.2038,
+      "total_observations": 780
+    },
+    "h-96": {
+      "mean_accuracy": 0.2092,
+      "total_observations": 760
+    }
+  },
+  "all_windows_directional_topline": {
+    "h-0": {
+      "mean_directional_accuracy": 0.6698,
+      "total_observations": 4200
+    },
+    "h-120": {
+      "mean_directional_accuracy": 0.6492,
+      "total_observations": 3700
+    },
+    "h-144": {
+      "mean_directional_accuracy": 0.6018,
+      "total_observations": 12514
+    },
+    "h-24": {
+      "mean_directional_accuracy": 0.6661,
+      "total_observations": 4100
+    },
+    "h-48": {
+      "mean_directional_accuracy": 0.6663,
+      "total_observations": 4000
+    },
+    "h-72": {
+      "mean_directional_accuracy": 0.6603,
+      "total_observations": 3900
+    },
+    "h-96": {
+      "mean_directional_accuracy": 0.655,
+      "total_observations": 3800
+    }
+  }
+}

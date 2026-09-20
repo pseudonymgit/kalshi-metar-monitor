@@ -1,0 +1,50 @@
+{
+  "experiment": "liop_calibration_retrain_v3",
+  "method": "Fused-direct LIOP calibration",
+  "metadata": {
+    "fusion_mode": "LIOP",
+    "n_trades_total": 2997,
+    "n_train": 1468,
+    "n_holdout": 1529
+  },
+  "calibration_stats": {
+    "l1_cells_fitted": 17,
+    "l1_cells_total": 40,
+    "l1_resolution_pct": 42.5,
+    "fallback_cells": 0,
+    "season_cells": 13,
+    "cells_on_fallback_pct": 32
+  },
+  "holdout_validation": {
+    "calibrated_accuracy": 52.13,
+    "calibrated_ece": 0.0826,
+    "calibrated_brier": 0.2436,
+    "raw_accuracy": 52.13,
+    "raw_ece": 0.2712,
+    "raw_brier": 0.3228,
+    "ece_reduction_pct": 69.5,
+    "brier_improvement_pct": 24.5
+  },
+  "per_station_ece": {
+    "KATL": 0.0033,
+    "KAUS": 0.0855,
+    "KBOS": 0.0383,
+    "KDCA": 0.1078,
+    "KDEN": 0.0364,
+    "KDFW": 0.1692,
+    "KHOU": 0.0575,
+    "KLAS": 0.1605,
+    "KLAX": 0.0632,
+    "KMDW": 0.0686,
+    "KMIA": 0.0302,
+    "KMSP": 0.1456,
+    "KMSY": 0.0705,
+    "KNYC": 0.1194,
+    "KOKC": 0.1212,
+    "KPHL": 0.1878,
+    "KPHX": 0.2892,
+    "KSAT": 0.1645,
+    "KSEA": 0.0894,
+    "KSFO": 0.0684
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "script": "core/signals/additive_cooccurrence_matrix.py",
+    "task": "G.7",
+    "description": "Pairwise co-occurrence matrix for additive signals \u2014 detect double-counting",
+    "n_signals": 6,
+    "n_pairs": 15,
+    "status": "PROVISIONAL \u2014 uses physical overlap estimates. Run with signal_results for empirical values."
+  },
+  "matrix": {
+    "cloud_cover_escape_x_diurnal_ramp_acceleration": {
+      "physical_overlap": 0.5,
+      "jaccard_similarity": 0.0
+    },
+    "cloud_cover_escape_x_inversion_breakout": {
+      "physical_overlap": 0.3,
+      "jaccard_similarity": 0.0
+    },
+    "dewpoint_evaporative_cooling_x_am_wind_shift_ramp": {
+      "physical_overlap": 0.4,
+      "jaccard_similarity": 0.0
+    },
+    "inversion_breakout_x_am_wind_shift_ramp": {
+      "physical_overlap": 0.3,
+      "jaccard_similarity": 0.0
+    },
+    "pressure_tendency_gust_front_x_am_wind_shift_ramp": {
+      "physical_overlap": 0.6,
+      "jaccard_similarity": 0.0
+    },
+    "pressure_tendency_gust_front_x_dewpoint_evaporative_cooling": {
+      "physical_overlap": 0.3,
+      "jaccard_similarity": 0.0
+    },
+    "diurnal_ramp_acceleration_x_am_wind_shift_ramp": {
+      "physical_overlap": 0.2,
+      "jaccard_similarity": 0.0
+    }
+  },
+  "high_correlation_pairs": [
+    "cloud_cover_escape_x_diurnal_ramp_acceleration",
+    "pressure_tendency_gust_front_x_am_wind_shift_ramp"
+  ],
+  "recommendation": "Pairs with physical_overlap >= 0.5 (2 pairs) require monitoring during initial deployment. If jaccard_similarity exceeds 0.5 in live data, consider merging or dropping the less predictive signal.",
+  "critical_pair": "pressure_tendency_gust_front \u2194 am_wind_shift_ramp (physical_overlap=0.6): Both detect wind shifts from frontal passages. If co-occurrence > 0.5, drop am_wind_shift_ramp in favor of pressure_tendency_gust_front which has more predictive specificity."
+}

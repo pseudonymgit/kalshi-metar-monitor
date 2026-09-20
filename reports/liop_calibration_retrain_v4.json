@@ -1,0 +1,70 @@
+{
+  "experiment": "liop_calibration_retrain_v4",
+  "method": "LIOP fused-direct + Season + Regime dimensions",
+  "metadata": {
+    "n_train": 1468,
+    "n_holdout": 1529,
+    "date_range": "2025-08-03 to 2026-08-02"
+  },
+  "calibration_stats": {
+    "l1_cells": 17,
+    "l1_total": 40,
+    "fallback_cells": 0,
+    "season_cells": 13,
+    "regime_cells": 10,
+    "l1_resolution_pct": 42.5
+  },
+  "holdout_validation": {
+    "pipeline": {
+      "ece": 0.061,
+      "brier": 0.2411,
+      "accuracy": 52.13
+    },
+    "raw": {
+      "ece": 0.2712,
+      "brier": 0.3228
+    },
+    "dynamic_selector": {
+      "ece": 0.2938,
+      "brier": 0.3359
+    },
+    "ece_reduction_pct": 77.5,
+    "dynamic_vs_pipeline_ece": -381.5
+  },
+  "per_station_ece": {
+    "KATL": 0.0067,
+    "KAUS": 0.0682,
+    "KBOS": 0.0456,
+    "KDCA": 0.0897,
+    "KDEN": 0.0274,
+    "KDFW": 0.0819,
+    "KHOU": 0.0429,
+    "KLAS": 0.1434,
+    "KLAX": 0.0366,
+    "KMDW": 0.0711,
+    "KMIA": 0.0448,
+    "KMSP": 0.1255,
+    "KMSY": 0.0597,
+    "KNYC": 0.1289,
+    "KOKC": 0.1084,
+    "KPHL": 0.1801,
+    "KPHX": 0.2963,
+    "KSAT": 0.1556,
+    "KSEA": 0.1471,
+    "KSFO": 0.0869
+  },
+  "regime_distribution": {
+    "trough": 120,
+    "frontal": 638,
+    "quiescent": 476,
+    "ridge": 78,
+    "advection": 156
+  },
+  "dynamic_selector": {
+    "total_cells": 40,
+    "l1_cells": 17,
+    "fallback_cells": 0,
+    "season_cells": 13,
+    "regime_cells": 10
+  }
+}

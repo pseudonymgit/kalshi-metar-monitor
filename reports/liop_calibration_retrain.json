@@ -1,0 +1,95 @@
+{
+  "experiment": "liop_calibration_retrain_v2",
+  "cells": {
+    "l1": 33,
+    "fallback": 0
+  },
+  "comparison": {
+    "uwc": 36,
+    "liop": 20,
+    "shared": 18,
+    "changed": 18
+  },
+  "per_signal_accuracy": {
+    "calendar_climatology": {
+      "fired": 700,
+      "correct": 385,
+      "accuracy": 55.0
+    },
+    "cooling_failure": {
+      "fired": 362,
+      "correct": 162,
+      "accuracy": 44.75
+    },
+    "corrected_pressure_delta": {
+      "fired": 1636,
+      "correct": 624,
+      "accuracy": 38.14
+    },
+    "cross_model_divergence": {
+      "fired": 937,
+      "correct": 744,
+      "accuracy": 79.4
+    },
+    "forecast_disagreement": {
+      "fired": 1579,
+      "correct": 850,
+      "accuracy": 53.83
+    },
+    "gaussian": {
+      "fired": 1251,
+      "correct": 692,
+      "accuracy": 55.32
+    },
+    "gaussian_v2": {
+      "fired": 2012,
+      "correct": 1069,
+      "accuracy": 53.13
+    },
+    "ghcn_calibration": {
+      "fired": 2934,
+      "correct": 2657,
+      "accuracy": 90.56
+    },
+    "honest_trend": {
+      "fired": 2886,
+      "correct": 1446,
+      "accuracy": 50.1
+    },
+    "metar_trend": {
+      "fired": 2945,
+      "correct": 1657,
+      "accuracy": 56.26
+    },
+    "pressure_delta": {
+      "fired": 1636,
+      "correct": 709,
+      "accuracy": 43.34
+    },
+    "pressure_tendency": {
+      "fired": 1659,
+      "correct": 986,
+      "accuracy": 59.43
+    },
+    "radiational_cooling": {
+      "fired": 340,
+      "correct": 138,
+      "accuracy": 40.59
+    },
+    "seasonal_regime": {
+      "fired": 2443,
+      "correct": 1230,
+      "accuracy": 50.35
+    },
+    "spike_reversion": {
+      "fired": 1174,
+      "correct": 454,
+      "accuracy": 38.67
+    },
+    "warm_momentum": {
+      "fired": 667,
+      "correct": 353,
+      "accuracy": 52.92
+    }
+  }
+}

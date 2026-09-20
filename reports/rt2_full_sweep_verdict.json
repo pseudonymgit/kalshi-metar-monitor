@@ -1,0 +1,62 @@
+{
+  "generated_utc": "2026-09-19T03:20:00Z",
+  "suite": "R/T-2 full-history signal re-sweep",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) — settlement_epochs.strike_price joined settlement_truth.settlement_temp_f",
+  "truth_source": "settlement_epochs.strike_price (full 14,265-row Kalshi /historical/markets backfill)",
+  "n_labels": 14130,
+  "label_distribution": {"up": 4845, "down": 9285},
+  "base_rate_up": 0.342887,
+  "base_rate_down": 0.657113,
+  "base_rate_by_market_type": {"HIGH": 0.100308, "LOW": 0.946433},
+  "stations": 20,
+  "excluded": {"between": 54, "untrusted": 80},
+  "temp_source_distribution": {"ghcn": 13969, "kalshi_finalized": 79, "weatherapi": 162},
+  "null_baselines": {
+    "always_down_sharpe_annualized": 5.25,
+    "always_down_accuracy": 0.6571,
+    "market_type_conditional_majority_accuracy": 0.9135,
+    "note": "always-predict-down null already yields Sharpe ~5.25 from skew alone; any signal with Sharpe below this and MCC~0 has no real edge"
+  },
+  "verdict": {
+    "genuine_edge": ["nwp_dtdt_fusion", "frontal_passage_intraday"],
+    "marginal_weak": ["cross_model_divergence", "nwp_analog", "nwp_analog_ensemble", "pressure_tendency", "metar_trend"],
+    "base_rate_artifact": ["spike_reversion", "radiational_cooling", "metar_dtdt", "cooling_failure", "fogr_reversion", "warm_momentum"],
+    "dead_negative": ["calendar_climatology", "gaussian", "regime", "goldilocks", "gaussian_v2", "forecast_disagreement", "corrected_pressure_delta", "pressure_delta", "wind_direction_shift"],
+    "no_output": ["ai_composite", "cloud_cover_index", "dewpoint_depression", "dual_polarity", "eighty_two_member_ensemble", "eighty_two_member_ensemble_ece", "eighty_two_member_ensemble_pooled", "feels_like_delta", "frontal_detector", "frontal_passage_detector", "frontal_passage_nowcast", "metar_nowcast", "settlement_arbitrage", "spread_based_entry", "trajectory_state_vector", "volume_momentum"],
+    "skipped_slow": ["esdr", "intraday_metar_confirmation", "nwp_direct", "temperature_advection"],
+    "import_failed": ["seasonal_regime"]
+  },
+  "signals": {
+    "nwp_dtdt_fusion": {"accuracy": 0.5898, "mcc": 0.1053, "sharpe": 2.9, "ece": 0.2052, "n": 9827, "up_precision": 0.4732, "down_precision": 0.6394, "up_call_edge_vs_base": 0.1302, "verdict": "genuine_edge"},
+    "frontal_passage_intraday": {"accuracy": 0.6607, "mcc": 0.1094, "sharpe": 5.39, "ece": 0.1447, "n": 2809, "up_precision": 0.4317, "down_precision": 0.7056, "up_call_edge_vs_base": 0.0888, "verdict": "genuine_edge"},
+    "nwp_analog": {"accuracy": 0.5259, "mcc": 0.0347, "sharpe": 0.82, "ece": 0.1154, "n": 10861, "up_precision": 0.4000, "down_precision": 0.6337, "up_call_edge_vs_base": 0.0569, "verdict": "marginal"},
+    "nwp_analog_ensemble": {"accuracy": 0.5259, "mcc": 0.0347, "sharpe": 0.82, "ece": 0.1154, "n": 10861, "up_precision": 0.4000, "down_precision": 0.6337, "up_call_edge_vs_base": 0.0569, "verdict": "marginal"},
+    "cross_model_divergence": {"accuracy": 0.5132, "mcc": 0.0246, "sharpe": 0.42, "ece": 0.3612, "n": 3611, "up_precision": 0.5190, "down_precision": 0.5063, "up_call_edge_vs_base": 0.1756, "verdict": "marginal_note_up_side_strong_down_side_weak"},
+    "pressure_tendency": {"accuracy": 0.5733, "mcc": 0.0332, "sharpe": 2.35, "ece": 0.1393, "n": 893, "up_precision": 0.3552, "down_precision": 0.6782, "up_call_edge_vs_base": 0.0123, "verdict": "marginal_small_n"},
+    "metar_trend": {"accuracy": 0.5161, "mcc": 0.0271, "sharpe": 0.51, "ece": 0.1675, "n": 14020, "up_precision": 0.3550, "down_precision": 0.6708, "up_call_edge_vs_base": 0.0119, "verdict": "marginal"},
+    "wind_direction_shift": {"accuracy": 0.4990, "mcc": 0.0322, "sharpe": -0.03, "ece": 0.3235, "n": 1563, "up_precision": 0.2930, "down_precision": 0.7360, "up_call_edge_vs_base": -0.0498, "verdict": "dead_negative"},
+    "pressure_delta": {"accuracy": 0.5061, "mcc": 0.0091, "sharpe": 0.19, "ece": 0.2776, "n": 7594, "verdict": "dead_negative"},
+    "corrected_pressure_delta": {"accuracy": 0.4941, "mcc": -0.0088, "sharpe": -0.19, "ece": 0.3530, "n": 7602, "verdict": "dead_negative"},
+    "forecast_disagreement": {"accuracy": 0.4893, "mcc": -0.0016, "sharpe": -0.34, "ece": 0.3601, "n": 4680, "verdict": "dead_negative"},
+    "goldilocks": {"accuracy": 0.4928, "mcc": -0.0282, "sharpe": -0.23, "ece": 0.1478, "n": 7344, "verdict": "dead_negative"},
+    "gaussian_v2": {"accuracy": 0.5071, "mcc": -0.0460, "sharpe": 0.23, "ece": 0.3892, "n": 9438, "verdict": "dead_negative"},
+    "gaussian": {"accuracy": 0.4995, "mcc": -0.1508, "sharpe": -0.02, "ece": 0.5005, "n": 5568, "verdict": "dead_negative"},
+    "regime": {"accuracy": 0.5784, "mcc": -0.1353, "sharpe": 2.52, "ece": 0.3485, "n": 204, "verdict": "dead_negative_small_n"},
+    "calendar_climatology": {"accuracy": 0.4737, "mcc": -0.1973, "sharpe": -0.84, "ece": 0.1458, "n": 3078, "verdict": "dead_negative"},
+    "spike_reversion": {"accuracy": 0.6201, "mcc": 0.0, "sharpe": 3.93, "ece": 0.1783, "n": 3848, "note": "always-predicts-down; Sharpe 3.93 < null 5.25", "verdict": "base_rate_artifact"},
+    "radiational_cooling": {"accuracy": 0.7708, "mcc": 0.0, "sharpe": 10.23, "ece": 0.4785, "n": 144, "note": "always-predicts-down; n=144 HIGH-dominated; MCC=0", "verdict": "base_rate_artifact"},
+    "metar_dtdt": {"accuracy": 0.6022, "mcc": 0.0082, "sharpe": 3.32, "ece": 0.2123, "n": 8221, "note": "89% down-calls; Sharpe 3.32 < null 5.25; MCC~0", "verdict": "base_rate_artifact"},
+    "cooling_failure": {"accuracy": 0.3537, "mcc": 0.0, "sharpe": -4.86, "ece": 0.0463, "n": 670, "verdict": "base_rate_artifact"},
+    "fogr_reversion": {"accuracy": 0.3380, "mcc": 0.0, "sharpe": -5.44, "ece": 0.0877, "n": 7154, "verdict": "base_rate_artifact"},
+    "warm_momentum": {"accuracy": 0.3532, "mcc": 0.0, "sharpe": -4.88, "ece": 0.1468, "n": 6759, "verdict": "base_rate_artifact"}
+  },
+  "lane_gate_fusion_calibration_availability": {
+    "lanes": {"forecasting_ensemble": "available", "sure_thing": "available", "goldilocks": "available", "trajectory": "available", "nowcasting": "available", "radiational_cooling": "available"},
+    "gates": {"agreement": "available", "settlement_execution": "available", "production": "available", "station_skill": "available", "liquidity": "available", "trajectory_confirmation": "available", "spatial_coherence": "available", "adaptive_thresholds": "available", "crossfeed": "available"},
+    "fusion_modes": {"none": "available", "uwc": "available", "majority": "available", "weighted": "available"},
+    "calibration_modes": {"platt": "available", "bma": "available", "emos": "available", "both": "available"}
+  },
+  "elapsed_seconds": 1311.68
+}

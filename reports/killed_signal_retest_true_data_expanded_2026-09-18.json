@@ -1,0 +1,175 @@
+{
+  "generated_utc": "2026-09-18T18:54:08Z",
+  "repo": "prototypes/weather-engine-source",
+  "branch": "temp-sprint-branch",
+  "axis": "strike-crossing per-contract (kalshi_market_snapshots strike ladder x settlement_truth date-tiered temp)",
+  "n_contract_labels": 336,
+  "label_distribution": {
+    "down": 175,
+    "up": 161
+  },
+  "station_date_type_keys": 68,
+  "strike_source": "kalshi_market_snapshots.db (1008 contracts, 2026-09-07/08, 17 stations)",
+  "strike_backfill_status": "P0-B NOT LANDED \u2014 only Sep 7/8 window available; full history pending",
+  "nwp_analog_enabled": true,
+  "signals": {
+    "pressure_delta (ref)": {
+      "original": {
+        "accuracy": 0.526316,
+        "mcc": 0.108332,
+        "n": 114,
+        "tp": 52,
+        "fp": 50,
+        "tn": 8,
+        "fn": 4
+      },
+      "inverted": {
+        "accuracy": 0.473684,
+        "mcc": -0.108332,
+        "n": 114,
+        "tp": 4,
+        "fp": 8,
+        "tn": 50,
+        "fn": 52
+      },
+      "verdict": "NOISE (coin-flip)"
+    },
+    "corrected_pressure_delta": {
+      "original": {
+        "accuracy": 0.473684,
+        "mcc": -0.108332,
+        "n": 114,
+        "tp": 4,
+        "fp": 8,
+        "tn": 50,
+        "fn": 52
+      },
+      "inverted": {
+        "accuracy": 0.526316,
+        "mcc": 0.108332,
+        "n": 114,
+        "tp": 52,
+        "fp": 50,
+        "tn": 8,
+        "fn": 4
+      },
+      "verdict": "NOISE (coin-flip)"
+    },
+    "spike_reversion": {
+      "original": {
+        "accuracy": 0.568627,
+        "mcc": 0.0,
+        "n": 102,
+        "tp": 0,
+        "fp": 0,
+        "tn": 58,
+        "fn": 44
+      },
+      "inverted": {
+        "accuracy": 0.431373,
+        "mcc": 0.0,
+        "n": 102,
+        "tp": 44,
+        "fp": 58,
+        "tn": 0,
+        "fn": 0
+      },
+      "verdict": "NOISE (coin-flip)"
+    },
+    "persistence": {
+      "original": {
+        "accuracy": 0.491071,
+        "mcc": -0.024077,
+        "n": 336,
+        "tp": 67,
+        "fp": 77,
+        "tn": 98,
+        "fn": 94
+      },
+      "inverted": {
+        "accuracy": 0.508929,
+        "mcc": 0.024077,
+        "n": 336,
+        "tp": 94,
+        "fp": 98,
+        "tn": 77,
+        "fn": 67
+      },
+      "verdict": "NOISE (coin-flip)"
+    },
+    "simple_trend": {
+      "original": {
+        "accuracy": 0.491071,
+        "mcc": -0.024077,
+        "n": 336,
+        "tp": 67,
+        "fp": 77,
+        "tn": 98,
+        "fn": 94
+      },
+      "inverted": {
+        "accuracy": 0.508929,
+        "mcc": 0.024077,
+        "n": 336,
+        "tp": 94,
+        "fp": 98,
+        "tn": 77,
+        "fn": 67
+      },
+      "verdict": "NOISE (coin-flip)"
+    },
+    "wind_direction_shift": {
+      "original": {
+        "accuracy": 0.416667,
+        "mcc": 0.0,
+        "n": 12,
+        "tp": 0,
+        "fp": 0,
+        "tn": 5,
+        "fn": 7
+      },
+      "inverted": {
+        "accuracy": 0.583333,
+        "mcc": 0.0,
+        "n": 12,
+        "tp": 7,
+        "fp": 5,
+        "tn": 0,
+        "fn": 0
+      },
+      "verdict": "UNDERPOWERED"
+    },
+    "nwp_analog": {
+      "original": {
+        "accuracy": 0.497024,
+        "mcc": -0.062601,
+        "n": 336,
+        "tp": 14,
+        "fp": 22,
+        "tn": 153,
+        "fn": 147
+      },
+      "inverted": {
+        "accuracy": 0.502976,
+        "mcc": 0.062601,
+        "n": 336,
+        "tp": 147,
+        "fp": 153,
+        "tn": 22,
+        "fn": 14
+      },
+      "verdict": "NOISE (coin-flip)"
+    },
+    "late_day_momentum": {
+      "unavailable": true,
+      "note": "intraday; needs transition_events surface (absent)"
+    },
+    "goldilocks_microstructure": {
+      "unavailable": true,
+      "note": "intraday; needs transition_events surface (absent)"
+    }
+  },
+  "read_only": true,
+  "no_mutation": true,
+  "no_commit": true
+}

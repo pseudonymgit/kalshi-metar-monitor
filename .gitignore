@@ -17,7 +17,19 @@ data/
 graphify-out/
 docs/weather-engine/backtests/
 
+# Scaffolding / backup / scrap — not deliverables
+graphify-out-*/
+graphify-snapshot-*/
+graphify-snapshots/
+graphify-snapshots-*/
+.graphify-snapshots/
+snapshots/
+*.py_failed
+
 # Secrets — never commit
 *.pem
 *.key
 kalshi_private_key.pem
+
+# Local test fixtures (transient evidence manifests)
+tests/fixtures/

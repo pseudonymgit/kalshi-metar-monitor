@@ -1,0 +1,26 @@
+{
+  "experiment": "p13_calibration_ab",
+  "method": "Temporal walk-forward Platt scaling",
+  "results": {
+    "raw_liop": {
+      "accuracy": 57.36,
+      "ece": 0.2233,
+      "brier_score": 0.2949,
+      "mean_confidence": 0.7967,
+      "n_trades": 2997
+    },
+    "platt_scaled": {
+      "accuracy": 57.36,
+      "ece": 0.0949,
+      "brier_score": 0.2555,
+      "mean_confidence": 0.6683,
+      "n_trades": 2997
+    }
+  },
+  "delias": {
+    "accuracy_delta_pp": 0.0,
+    "ece_reduction": 57.5,
+    "brier_improvement": 13.4
+  },
+  "conclusion": "Platt scaling reduces ECE but has minimal effect on directional accuracy. The primary value is improved position sizing (Kelly fraction), not direction prediction. Recommend enabling Platt calibration for live trading."
+}

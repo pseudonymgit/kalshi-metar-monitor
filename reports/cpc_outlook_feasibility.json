@@ -1,0 +1,219 @@
+{
+  "script": "z2_cpc_outlook.py",
+  "timestamp": "2026-09-04T19:52:11.047190Z",
+  "outcome": "SUCCESS",
+  "details": {
+    "format": "new_composite",
+    "records_fetched": 23,
+    "stations_mapped": 20,
+    "rows_stored": 20,
+    "fcst_date": "2026-09-04",
+    "valid_start": "2026-09-12",
+    "valid_end": "2026-09-18"
+  },
+  "station_data_sample": [
+    {
+      "station": "KATL",
+      "fcst_date": "2026-09-04",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-18",
+      "probability_above": 60.0,
+      "probability_below": null
+    },
+    {
+      "station": "KAUS",
+      "fcst_date": "2026-09-04",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KBOS",
+      "fcst_date": "2026-09-04",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-18",
+      "probability_above": 32.0,
+      "probability_below": 32.0
+    },
+    {
+      "station": "KDCA",
+      "fcst_date": "2026-09-04",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-18",
+      "probability_above": 40.0,
+      "probability_below": null
+    },
+    {
+      "station": "KDEN",
+      "fcst_date": "2026-09-04",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-18",
+      "probability_above": 50.0,
+      "probability_below": null
+    }
+  ],
+  "db_row_count": 40,
+  "db_sample": [
+    {
+      "station": "KATL",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 60.0,
+      "probability_below": null
+    },
+    {
+      "station": "KAUS",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KBOS",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 32.0,
+      "probability_below": 32.0
+    },
+    {
+      "station": "KDCA",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 40.0,
+      "probability_below": null
+    },
+    {
+      "station": "KDEN",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 50.0,
+      "probability_below": null
+    },
+    {
+      "station": "KDFW",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KHOU",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KLAS",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 32.0,
+      "probability_below": 32.0
+    },
+    {
+      "station": "KLAX",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 32.0,
+      "probability_below": 32.0
+    },
+    {
+      "station": "KMDW",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 50.0,
+      "probability_below": null
+    },
+    {
+      "station": "KMIA",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KMSP",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 50.0,
+      "probability_below": null
+    },
+    {
+      "station": "KMSY",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KNYC",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 33.0,
+      "probability_below": null
+    },
+    {
+      "station": "KOKC",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KPHL",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 40.0,
+      "probability_below": null
+    },
+    {
+      "station": "KPHX",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 33.0,
+      "probability_below": null
+    },
+    {
+      "station": "KSAT",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 70.0,
+      "probability_below": null
+    },
+    {
+      "station": "KSEA",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": null,
+      "probability_below": 33.0
+    },
+    {
+      "station": "KSFO",
+      "issue_date": "2026-09-04",
+      "target_date_start": "2026-09-12",
+      "target_date_end": "2026-09-18",
+      "probability_above": 32.0,
+      "probability_below": 32.0
+    }
+  ]
+}
