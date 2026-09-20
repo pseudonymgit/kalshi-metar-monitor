@@ -29,7 +29,7 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 
 from core.db_utils import query_db, with_db
-from core.observational_asof_gate import settlement_window_open
+from core.observational_asof_gate import settlement_window_open, prior_day
 
 # -- Paths --------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -227,25 +227,31 @@ class EpochBuilder:
         with with_db(self.metar_db, row_factory=True, commit=False) as conn:
             cur = conn.cursor()
 
-            # ── R/R-1a as-of gate ──────────────────────────────────────────
-            # The epoch feature vector is built from the settlement day's own
-            # observations (max/min/avg temp + intraday METAR rows).  For a
-            # same-day strike-crossing prediction this is lookahead: those rows
-            # already contain the day's extremum that determines the outcome.
-            # Gate at read time — only observations strictly before the
-            # settlement window opens (settlement day 00:00 UTC) are admitted.
+            # ── R/R-1a as-of gate (RE-DO — correct prior-day semantics) ──────
+            # The epoch feature vector for a same-day strike-crossing prediction
+            # must be built from CONTEMPORANEOUS observations only: the PRIOR day
+            # and earlier.  The settlement day's own rows (daily_stats extremum +
+            # intraday METAR) are the outcome's measurement stream and are lookahead.
+            # The prior (rejected) version kept `daily_stats.date_utc = date` (the
+            # settlement day's already-aggregated extremum — lookahead) while gating
+            # only the intraday METAR read with `timestamp_utc < dateT00:00:00` on a
+            # `date_utc = date` scope (empty by construction).
+            #
+            # Correct fix: read the PRIOR day's daily_stats + intraday METAR rows.
+            # Gate at read time; do not delete data.
+            pday = prior_day(date)
             window_open = settlement_window_open(date)
 
             cur.execute("SELECT * FROM daily_stats WHERE station=? AND date_utc=?",
-                         (station, date))
+                         (station, pday))
             day_row = cur.fetchone()
             if day_row is None:
-                raise EpochBuildError(f"No daily stats for {station} on {date}")
+                raise EpochBuildError(f"No prior-day daily stats for {station} on {pday} (settlement {date})")
 
             obs_count = day_row["observation_count"] or 0
             if obs_count < 6:
                 raise EpochBuildError(
-                    f"Insufficient observations ({obs_count}) for {station} on {date}")
+                    f"Insufficient prior-day observations ({obs_count}) for {station} on {pday}")
 
             cur.execute("""
                 SELECT mo.temp_f, mo.dewpoint_f, mo.wind_speed_kt,
@@ -260,7 +266,7 @@ class EpochBuilder:
                 WHERE mo.station=? AND mo.date_utc=?
                   AND mo.timestamp_utc < ?
                 ORDER BY mo.timestamp_utc
-            """, (station, date, window_open))
+            """, (station, pday, window_open))
             rows = cur.fetchall()
 
         if len(rows) < 6:

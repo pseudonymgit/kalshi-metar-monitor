@@ -1,0 +1,57 @@
+{
+  "generated_utc": "2026-09-20T14:34:19Z",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) \u2014 core/settlement_outcome.strike_crossing_direction",
+  "truth_source": "settlement_truth.strike_price (14,305 rows; real strikes, NOT day-over-day)",
+  "asof_gate_corrected": "core/observational_asof_gate.py \u2014 date_utc < settlement_date (PRIOR day), timestamp_utc < settlement_window_open (settlement-day 00:00 UTC)",
+  "defect_fixed": "prior gate bolted timestamp_utc < settlement-day-start onto date_utc = settlement_date (zero-by-contradiction); corrected to date_utc < settlement_date",
+  "row_count_evidence": {
+    "station": "KATL",
+    "settlement_date": "2026-09-19",
+    "prior_day": "2026-09-18",
+    "broken_query_rows": 0,
+    "corrected_all_prior_rows": 50185,
+    "corrected_prior_day_rows": 23,
+    "corrected_prior_3h_rows": 3
+  },
+  "corrected_gate": {
+    "frontal_passage_intraday": {
+      "accuracy": 0.478388,
+      "mcc": 0.018683,
+      "n": 13303,
+      "tp": 2696,
+      "fp": 5177,
+      "tn": 3668,
+      "fn": 1762,
+      "base_rate_accuracy": 0.909795,
+      "base_rate_delta": -0.431406,
+      "ece": 0.419164,
+      "sharpe": -0.686791,
+      "n_returns": 13303,
+      "up_ratio_predicted": 0.5918,
+      "status": "NO_EDGE"
+    },
+    "nwp_dtdt_fusion": {
+      "accuracy": 0.596381,
+      "mcc": 0.114409,
+      "n": 9836,
+      "tp": 1384,
+      "fp": 1536,
+      "tn": 4482,
+      "fn": 2434,
+      "base_rate_accuracy": 0.922224,
+      "base_rate_delta": -0.325844,
+      "ece": 0.441829,
+      "sharpe": 3.118475,
+      "n_returns": 9836,
+      "up_ratio_predicted": 0.2969,
+      "status": "NO_EDGE"
+    }
+  },
+  "label_exclusions": {
+    "between_excluded": 54,
+    "untrusted_excluded": 80,
+    "no_temp": 0,
+    "unknown_market_type": 0
+  },
+  "elapsed_seconds": 338.39
+}

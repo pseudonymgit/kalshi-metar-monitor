@@ -28,7 +28,7 @@ import logging
 
 from .base_signal import BaseSignal, validate_signal
 from core.sqlite_utils import get_sqlite_connection
-from core.observational_asof_gate import is_asof_safe, settlement_window_open
+from core.observational_asof_gate import is_asof_safe, settlement_window_open, prior_day
 
 logger = logging.getLogger(__name__)
 
@@ -118,29 +118,34 @@ class FrontalPassageIntradaySignal(BaseSignal):
             conn = get_sqlite_connection(self.db_path)
             cur = conn.cursor()
 
-            # Constrain to time window within the day
-            window_start = f"{date}T00:00:00"
-            window_end = f"{date}T{hours:02d}:59:59"
-
-            # ── R/R-1a as-of gate ──────────────────────────────────────────
+            # ── R/R-1a as-of gate (RE-DO — correct prior-day semantics) ────
             # A same-day strike-crossing prediction must NOT read observations
-            # at-or-after the settlement window opens (settlement day 00:00 UTC),
-            # because those observations already contain the day's extremum that
-            # determines the outcome.  Gate at read time; do not delete data.
-            window_open = settlement_window_open(date)
+            # from the settlement day itself — that day's observations already
+            # contain the extremum that determines the outcome.  The only
+            # genuinely-contemporaneous observations are the PRIOR day's (and
+            # earlier).  The prior (rejected) version scoped `date_utc = date`
+            # AND `timestamp_utc < dateT00:00:00`, which is empty by
+            # construction (settlement-day rows all have timestamp >= day start).
+            # Correct fix: read the prior day, taking the `hours` most recent
+            # hours immediately preceding settlement-day 00:00 UTC.
+            pday = prior_day(date)
+            window_open = settlement_window_open(date)  # settlement-day 00:00 UTC
+            # Lower bound = `hours` hours before the settlement window opens.
+            # For the 3-hour (and 24-hour fallback) frontal detector, this spans
+            # the prior day's tail (21:00–23:59 UTC for hours=3).
+            window_start = f"{pday}T{max(0, 24 - hours):02d}:00:00"
 
             cur.execute("""
                 SELECT timestamp_utc, pressure_mb, wind_direction_deg, temp_f
                 FROM metar_observations
                 WHERE station = ?
-                  AND date_utc = ?
+                  AND date_utc < ?
                   AND timestamp_utc >= ?
-                  AND timestamp_utc <= ?
                   AND timestamp_utc < ?
                   AND temp_f IS NOT NULL
                   AND pressure_mb IS NOT NULL
                 ORDER BY timestamp_utc ASC
-            """, (station, date, window_start, window_end, window_open))
+            """, (station, date, window_start, window_open))
 
             obs = []
             for row in cur.fetchall():
