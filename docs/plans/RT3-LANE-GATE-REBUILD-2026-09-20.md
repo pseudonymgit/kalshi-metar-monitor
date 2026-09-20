@@ -216,7 +216,9 @@ here. If a fresh walk-forward is required, that is a separate pass (R/T-4+).
   `reports/rt3_lane_gate_rebuild_20260920-045447.json`
 - This doc: `docs/plans/RT3-LANE-GATE-REBUILD-2026-09-20.md`
 
-**Commit:** `be8124bdb06f887bd38054d817e64426f6873db0`.
+**Commit:** `cea3d8573924baa0b7fa07b722d54e3b4bf8babd` (substantive commit: driver + JSON + this receipt).
+(Final hash-fill follow-up commit: `25696f3027cc5e5bb1f7e8633dbc6201bd25f1c8` — only
+updates this hash line; the substantive content is in `cea3d8573`.)
 
 **Boundary note:** no committed source was modified. No signal wiring touched. No
 kill-list mutation (SOFT-KILL = disposition recorded here, code untouched). The
