@@ -89,26 +89,35 @@ class NwpDtdtFusionSignal(BaseSignal):
         station: str,
         date: str,
         conn: sqlite3.Connection = None,
-        market_type: str = 'HIGH'
+        market_type: str = 'HIGH',
+        strike_price: Optional[float] = None
     ) -> Tuple[Optional[str], float]:
         """
         Evaluate NWP + METAR dT/dt fusion signal.
 
-        Gets GFS direction from NwpDirectSignal and METAR trend from
+        Gets the NWP strike-crossing direction from NwpDirectSignal (R/R-1b
+        re-spec'd to the strike-crossing axis) and METAR trend from
         MetarDtdtSignal, then fuses them using Bayesian log-odds.
+
+        NOTE (R/R-1b): the NWP leg is now strike-crossing (correct axis).  The
+        METAR dT/dt leg is an intraday trend-continuation signal — it modulates
+        confidence only; it does NOT set the primary direction.  The fusion's
+        DIRECTION is the NWP strike-crossing vote, which is on the correct axis.
 
         Args:
             station: Station code
             date: ISO date string
             conn: Optional SQLite connection to metar DB
             market_type: 'HIGH' or 'LOW'
+            strike_price: strike to cross (°F).  REQUIRED for the NWP leg.
 
         Returns:
             (direction, fused_confidence) or (None, 0.0)
         """
-        # Get GFS direction from NWP signal
+        # Get strike-crossing direction from the (re-spec'd) NWP signal
         nwp_direction, nwp_confidence = self._nwp_signal.evaluate_for_station(
-            station, date, conn=conn, market_type=market_type
+            station, date, conn=conn, market_type=market_type,
+            strike_price=strike_price
         )
 
         # Get METAR dT/dt direction

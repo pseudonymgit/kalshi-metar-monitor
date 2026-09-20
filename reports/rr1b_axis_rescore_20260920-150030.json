@@ -1,0 +1,61 @@
+{
+  "generated_utc": "2026-09-20T14:54:48Z",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) \u2014 core/settlement_outcome.strike_crossing_direction",
+  "truth_source": "settlement_truth.strike_price (real strikes, NOT day-over-day)",
+  "respec": "nwp_direct_signal re-spec'd day-over-day -> strike-crossing (HIGH: temp_2m_max vs strike; LOW: temp_2m_min vs strike; \u00b0C->\u00b0F; contemporaneous gate)",
+  "strike_passed": "strike_price passed to nwp_direct + nwp_dtdt_fusion (correct axis); metar_dtdt scored without strike (trend signal, axis-mismatch documented separately)",
+  "label_exclusions": {
+    "between_excluded": 54,
+    "untrusted_excluded": 80,
+    "no_temp": 0,
+    "unknown_market_type": 0
+  },
+  "scores": {
+    "nwp_direct": {
+      "accuracy": 0.951727,
+      "mcc": 0.903908,
+      "n": 5241,
+      "tp": 2605,
+      "fp": 174,
+      "tn": 2383,
+      "fn": 79,
+      "base_rate_accuracy": 0.96432,
+      "base_rate_delta": -0.012593,
+      "sharpe": 33.455442,
+      "n_returns": 5241,
+      "up_ratio_predicted": 0.5302,
+      "status": "NO_EDGE"
+    },
+    "nwp_dtdt_fusion": {
+      "accuracy": 0.82973,
+      "mcc": 0.638745,
+      "n": 9990,
+      "tp": 2687,
+      "fp": 473,
+      "tn": 5602,
+      "fn": 1228,
+      "base_rate_accuracy": 0.923223,
+      "base_rate_delta": -0.093493,
+      "sharpe": 13.925816,
+      "n_returns": 9990,
+      "up_ratio_predicted": 0.3163,
+      "status": "NO_EDGE"
+    },
+    "metar_dtdt": {
+      "accuracy": 0.60955,
+      "mcc": 0.021376,
+      "n": 8398,
+      "tp": 379,
+      "fp": 580,
+      "tn": 4740,
+      "fn": 2699,
+      "base_rate_accuracy": 0.916171,
+      "base_rate_delta": -0.306621,
+      "sharpe": 3.564715,
+      "n_returns": 8398,
+      "up_ratio_predicted": 0.1142,
+      "status": "NO_EDGE"
+    }
+  },
+  "elapsed_seconds": 344.17
+}
