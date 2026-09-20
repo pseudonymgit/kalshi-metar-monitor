@@ -192,7 +192,7 @@ Deterministic/script-only in the scoring loop; no AI calls inside the loop.
 - Re-score JSON: `reports/rr1b_axis_rescore_20260920-150030.json`
 - This doc: `docs/plans/RR1B-NWP-AXIS-RESPEC-2026-09-20.md`
 
-**Commit:** `<pending — see git commit below>`
+**Commit:** `ba7400e3b9da0b06fa9cc66471e13db244869377`
 
 ---
 
