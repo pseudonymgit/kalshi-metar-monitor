@@ -202,7 +202,7 @@ Deterministic/script-only in the scoring loop; no AI calls inside the loop.
 - Re-score JSON: `reports/rr1c_strict_asof_rescore_20260920-151235.json`
 - This doc: `docs/plans/RR1C-NWP-STRICT-ASOF-2026-09-20.md`
 
-**Commit:** `<recorded-below>`
+**Commit:** `a5fae98bb9d31b1fbca508babc958ddc49874eb6`
 
 ---
 
