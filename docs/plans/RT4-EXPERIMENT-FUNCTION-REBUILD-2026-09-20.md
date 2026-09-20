@@ -204,8 +204,8 @@ base-rate artifact, not skill.
 - branch: `temp-sprint-branch`
 - files added: `scripts/rt4_noside_entry_verification.py` (independent QC),
   `docs/plans/RT4-EXPERIMENT-FUNCTION-REBUILD-2026-09-20.md` (this receipt)
-- commit hash: `1728f7aa93c3b830f196cd13114d44e79f045a9a` (single work commit —
-  QC script + this receipt)
+- commit hash: `ed66eb31dcb2697899f503a2010182952218e967` (single work commit — QC
+  script + this receipt; self-referential, final state recorded here)
 
 ## Safety / boundaries honored
 
