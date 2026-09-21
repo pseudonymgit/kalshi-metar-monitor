@@ -5,7 +5,7 @@
 corrected 7-signal set + corrected ground-truth axis, then wire the data-driven default
 behind a reversible feature flag.
 
-**Commit:** `e3e91050b`
+**Commit:** `409ec58ab`
 **Branch:** `temp-sprint-branch` (NOT merged — merge is Dan's)
 
 ---
@@ -123,8 +123,8 @@ and must NOT be wired as default.
 
 ## 8. Receipt
 
-- `commit=e3e91050b`
-- `clean=e3e91050b` (working tree clean of R/T-8F files; see note on sibling file below)
+- `commit=409ec58ab`
+- `clean=409ec58ab` (working tree clean of R/T-8F files; see note on sibling file below)
 - No data mutation, no DB writes, no merge.
 
 ### Note on sibling untracked file
