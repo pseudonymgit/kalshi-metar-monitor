@@ -17,7 +17,7 @@ behind a reversible feature flag.
   → `spatial_coherence` → `ensemble_diversity` → `position_sizing`) as the default path.
 - **Path B is behind a feature flag:** `FUSION_MODE` in `core/paper_trading_engine.py`
   (env `PAPER_FUSION_MODE`, values `agreement_gate` | `liop` | `uwc`; default
-  `agreement_gate`). When set to `liop`/`uwc`, `generate_signals()` routes through
+  `liop`). When set to `liop`/`uwc`, `generate_signals()` routes through
   `_fuse_path_b()` and emits one fused `(station, market_type, direction, reason, conf)`
   per location instead of the gate stack. Falls back to Path A on any import/fusion
   failure — the live path is never left without a prediction source.
