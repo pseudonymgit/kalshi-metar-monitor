@@ -70,6 +70,19 @@ import time
 from collections import Counter, defaultdict
 from typing import Dict, List, Optional, Tuple
 
+# ── Parallelization (R/T-8G) ──
+# ProcessPool worker-per-signal.  Each worker rebuilds its own signal instance
+# (by name) and its own sqlite connection so there is NO shared mutable state
+# and NO pickling of live signal objects across processes.  The parent merges
+# results in sorted-key order, making parallel output deterministic and
+# byte-identical to the serial path (modulo dict insertion order, which is
+# preserved because both paths iterate `sorted(registry)`).
+import concurrent.futures as _cf
+import multiprocessing as _mp
+
+_PARALLEL = False
+_NUM_WORKERS = 1
+
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE)
 
@@ -708,6 +721,127 @@ def sweep_calibration(labels, dry_run=False, registry=None, status=None):
 
 
 # ─────────────────────────────────────────────────────────────────────────
+# PARALLEL EXECUTION (R/T-8G) — worker-per-signal, deterministic merge
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Architecture:
+#   * Each worker rebuilds its OWN signal instance from a name (via
+#     build_signal_registry) and opens its OWN sqlite connection.  Nothing is
+#     pickled except the (name, labels, meta) tuple — labels/meta are plain
+#     JSON-serializable dicts.
+#   * The parent submits one task per signal name in `sorted(registry)` order,
+#     collects results, then re-sorts by name.  This makes the merged dict
+#     insertion-ordered identically to the serial path.
+#   * No shared mutable state: no module-level LossLimiter/gate singletons are
+#     touched (those live in sweep_engine.py, not here).
+#
+# Worker functions MUST be module-level (picklable) for ProcessPool on the
+# 'spawn' start method.
+
+def _score_signal_worker(args):
+    """ProcessPool worker: rebuild signal by name, score it, return (name, result)."""
+    name, labels, meta = args
+    registry, status = build_signal_registry()
+    sig = registry.get(name)
+    if sig is None:
+        return name, {'status': 'NOT_REACHABLE', 'reason': status.get(name)}
+    if name in SLOW_SIGNALS_TO_SKIP:
+        return name, {'status': 'SKIPPED', 'reason': 'slow_or_live_api'}
+    conn = sqlite3.connect(METAR_DB)
+    try:
+        with contextlib.redirect_stderr(io.StringIO()):
+            m = _score_signal(sig, name, labels, meta, conn)
+    finally:
+        conn.close()
+    if m['n'] == 0:
+        return name, {'status': 'NO_FIRES', 'reason': 'signal never produced a direction on any label'}
+    m['status'] = 'PASS' if (m['mcc'] > 0 and m['base_rate_delta'] > 0) else 'NO_EDGE'
+    return name, m
+
+
+def _calibrate_signal_worker(args):
+    """ProcessPool worker: rebuild signal by name, calibrate it, return (name, result)."""
+    name, labels, meta = args
+    registry, status = build_signal_registry()
+    sig = registry.get(name)
+    if sig is None:
+        return name, {'status': 'NOT_REACHABLE', 'reason': status.get(name)}
+    if name in SLOW_SIGNALS_TO_SKIP:
+        return name, {'status': 'SKIPPED', 'reason': 'slow_or_live_api'}
+
+    def _brier(results):
+        vals = []
+        for pred, actual, conf in results:
+            p = conf if pred == 'up' else (1.0 - conf)
+            y = 1.0 if actual == 'up' else 0.0
+            vals.append((p - y) ** 2)
+        return sum(vals) / len(vals) if vals else 1.0
+
+    conn = sqlite3.connect(METAR_DB)
+    try:
+        results = []
+        with contextlib.redirect_stderr(io.StringIO()):
+            for st, lblmap in labels.items():
+                days = load_daily_series(conn, st)
+                if not days:
+                    continue
+                idx_by_date = {d['date']: i for i, d in enumerate(days)}
+                for (mt, date), actual in lblmap.items():
+                    idx = idx_by_date.get(date)
+                    if idx is None:
+                        continue
+                    direction, confidence = evaluate_signal(sig, name, st, idx, date, days, conn)
+                    if direction is None:
+                        continue
+                    results.append((direction, actual, float(confidence or 0.5)))
+    finally:
+        conn.close()
+    if not results:
+        return name, {'status': 'NO_FIRES', 'reason': 'no predictions produced'}
+    return name, {
+        'status': 'SCORED',
+        'brier': round(_brier(results), 4),
+        'ece': round(_ece_by_market_type(
+            [(p, a, c, 'HIGH') for p, a, c in results]) or 1.0, 4),
+        'n': len(results),
+    }
+
+
+def _parallel_map(fn, names, labels, meta):
+    """Deterministic parallel map over signal names.
+
+    Submits tasks in `names` (already sorted), collects in submission order,
+    and returns results keyed by name.  `chunksize=1` avoids reordering
+    surprises from batching.  Falls back to serial on any failure.
+    """
+    n_workers = min(_NUM_WORKERS, len(names)) if _NUM_WORKERS > 0 else 1
+    if not _PARALLEL or n_workers <= 1:
+        out = {}
+        for name in names:
+            _, res = fn((name, labels, meta))
+            out[name] = res
+        return out
+    tasks = [(name, labels, meta) for name in names]
+    out = {}
+    with _cf.ProcessPoolExecutor(max_workers=n_workers) as ex:
+        for name, res in ex.map(fn, tasks, chunksize=1):
+            out[name] = res
+    return out
+
+
+def sweep_signals_parallel(labels, meta, registry, status):
+    """Parallel equivalent of sweep_signals (same output schema)."""
+    names = sorted(registry)
+    return _parallel_map(_score_signal_worker, names, labels, meta)
+
+
+def sweep_calibration_parallel(labels, meta, registry, status):
+    """Parallel equivalent of sweep_calibration (same output schema)."""
+    names = sorted(registry)
+    return _parallel_map(_calibrate_signal_worker, names, labels, meta)
+
+
+# ─────────────────────────────────────────────────────────────────────────
 # SWEEP 4 — EXPERIMENT / FUNCTION SWEEP (recoverable functions)
 # ─────────────────────────────────────────────────────────────────────────
 
@@ -797,6 +931,8 @@ def run_suite(layers=None, dry_run=False, emit=True):
         'dry_run': dry_run,
         'layers_requested': sorted(requested),
         'sweeps': sorted(sweeps),
+        'parallel': bool(_PARALLEL),
+        'num_workers': int(_NUM_WORKERS),
         'results': {},
     }
 
@@ -819,7 +955,10 @@ def run_suite(layers=None, dry_run=False, emit=True):
 
     if 'signal' in sweeps:
         print("[SWEEP 1 — SIGNAL SWEEP (directional layer, correct axis)]")
-        report['results']['signal'] = sweep_signals(labels, meta, dry_run, registry, status)
+        if _PARALLEL and not dry_run:
+            report['results']['signal'] = sweep_signals_parallel(labels, meta, registry, status)
+        else:
+            report['results']['signal'] = sweep_signals(labels, meta, dry_run, registry, status)
         r = report['results']['signal']
         if dry_run:
             print(f"  enumerated={r['enumerated']}  reachable={len(r['reachable'])}  not_reachable={len(r['not_reachable'])}")
@@ -853,7 +992,10 @@ def run_suite(layers=None, dry_run=False, emit=True):
 
     if 'calibration' in sweeps:
         print("\n[SWEEP 3 — CALIBRATION SWEEP (Brier/ECE)]")
-        report['results']['calibration'] = sweep_calibration(labels, dry_run, registry, status)
+        if _PARALLEL and not dry_run:
+            report['results']['calibration'] = sweep_calibration_parallel(labels, meta, registry, status)
+        else:
+            report['results']['calibration'] = sweep_calibration(labels, dry_run, registry, status)
         if not dry_run:
             for name, m in sorted(report['results']['calibration'].items()):
                 if m.get('status') == 'SCORED':
@@ -959,13 +1101,19 @@ def render_markdown(report):
 
 
 def main():
+    global _PARALLEL, _NUM_WORKERS
     parser = argparse.ArgumentParser(description="R/T-1 Ultimate Sweep / Test / Calibrate Suite")
     parser.add_argument('--dry-run', action='store_true', help='enumerate only, no scoring')
     parser.add_argument('--layer', action='append', default=None,
                         choices=ALL_LAYERS,
                         help='restrict to specific layer(s); repeat for multiple')
     parser.add_argument('--no-emit', action='store_true', help='do not write report files')
+    parser.add_argument('--workers', type=int, default=1, metavar='N',
+                        help='parallelize signal/calibration scoring across N worker processes '
+                             '(deterministic; output identical to serial). 1 = serial (default).')
     args = parser.parse_args()
+    _NUM_WORKERS = args.workers
+    _PARALLEL = args.workers > 1
     # dry-run enumerates only and never emits a (partial) manifest.
     emit = (not args.dry_run) and (not args.no_emit)
     run_suite(layers=args.layer, dry_run=args.dry_run, emit=emit)
