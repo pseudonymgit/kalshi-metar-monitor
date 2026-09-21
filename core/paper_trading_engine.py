@@ -41,6 +41,7 @@ from .agreement_gate import AgreementGate, SimpleAgreementChecker
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .adaptive_thresholds import filter_signals_by_adaptive_threshold, get_adaptive_threshold
 from typing import Dict, List, Optional, Tuple, Any
+from collections import defaultdict
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from enum import Enum
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
@@ -296,6 +297,29 @@ except ImportError:
 ENSEMBLE_DIVERSITY_ENABLED = True
 DIVERSITY_BASE_WEIGHT = 0.75  # Minimum weight when diversity = 0
 DIVERSITY_MAX_WEIGHT = 1.0    # Max weight when diversity = 1
+
+# ══════════════════════════════════════════════════════════════════
+# R/T-8F: Fusion path feature flag (reversible A/B switch)
+#
+#   "agreement_gate"  -> Path A (baseline): the existing adaptive-threshold +
+#                        agreement-gate + diversity stack. Emits a set of
+#                        per-signal (station, market_type, direction, conf)
+#                        tuples that pass consensus.
+#   "liop"            -> Path B: flat 4-layer Log-Odds Linear Opinion Pool
+#                        (SignalFusionEngine.fuse_signals) — one fused
+#                        (direction, prob) per (station, market_type).
+#   "uwc"             -> Path B (alt): Uncertainty-Weighted Cascade
+#                        (UncertaintyWeightedCascade.fuse).
+#
+# Default = "liop" (Path B), decided on DATA by the R/T-8F A/B (see
+# docs/plans/RT8F-FUSION-WIRING-AB-2026-09-21.md): LIOP strictly beat the
+# agreement-gate on MCC, ECE, and Brier. Reversible via
+# PAPER_FUSION_MODE=agreement_gate (Path A) or =uwc.
+# ══════════════════════════════════════════════════════════════════
+FUSION_MODE = os.getenv("PAPER_FUSION_MODE", "liop").strip().lower()
+if FUSION_MODE not in ("agreement_gate", "liop", "uwc"):
+    _LOGGER.warning("Invalid PAPER_FUSION_MODE=%r; falling back to 'agreement_gate'", FUSION_MODE)
+    FUSION_MODE = "agreement_gate"
 
 # Instance environment variable (PROD/DEV/SBOX)
 INSTANCE = os.getenv("PAPER_TRADING_INSTANCE", "DEV").upper()
@@ -980,6 +1004,76 @@ class PaperTrader:
         conn.commit()
         conn.close()
 
+    # ══════════════════════════════════════════════════════════════════
+    # R/T-8F: Path B fusion helpers (LIOP / UWC) — reversible feature flag
+    # ══════════════════════════════════════════════════════════════════
+    def _fuse_path_b(self, signals, fusion_mode="liop"):
+        """
+        Path B: fuse per-(station, market_type) signal votes into a single
+        directional prediction via the LIOP/UWC fusion engines (now importable
+        after R/T-8a fixed the import + name-mapping bugs).
+
+        Input  `signals`: list of (station, market_type, direction, reason)
+                          where direction is MarketSide.UP/DOWN.
+        Output: list of (station, market_type, direction, reason, confidence)
+                — one fused prediction per (station, market_type).
+
+        Falls back to the existing gate stack (returns None) on any failure so
+        the live path is never left without a prediction source.
+        """
+        try:
+            from core.signal_fusion import SignalFusionEngine, UncertaintyWeightedCascade
+            from core.signal_fusion import FusionModeConfig
+        except Exception as e:
+            _LOGGER.warning("Path B fusion import failed (%s); falling back to Path A", e)
+            return None
+
+        # Group raw votes per (station, market_type).
+        groups = defaultdict(list)
+        for station, market_type, direction, reason in signals:
+            d = "up" if direction in (MarketSide.UP, "UP", "up") else "down"
+            groups[(station, market_type)].append((reason, d))
+
+        fused = []
+        for (station, market_type), votes in groups.items():
+            # Build signal_predictions dict for UWC / signal list for LIOP.
+            # Use a deterministic baseline confidence (0.5) — the fusion
+            # engines calibrate internally; raw confidences are not carried
+            # in the gate-stack tuple format.
+            sig_preds = {name: (d, 0.5) for name, d in votes}
+            sig_list = [(name, d, 0.5) for name, d in votes]
+
+            direction = None
+            confidence = 0.5
+            if fusion_mode == "uwc":
+                uwc = UncertaintyWeightedCascade(
+                    FusionModeConfig(mode='uwc', n_agreement_gate=1))
+                res = uwc.fuse(signal_predictions=sig_preds)
+                direction = res.get("direction")
+                if direction is None:
+                    bc = res.get("bayesian_conf", 0.5)
+                    direction = "up" if bc >= 0.5 else "down"
+                confidence = res.get("confidence", 0.5)
+            else:
+                # LIOP (default Path B)
+                engine = SignalFusionEngine(
+                    signal_names=[name for name, _ in votes],
+                    city_codes=[station],
+                )
+                direction, prob, confidence = engine.fuse_signals(sig_list, station)
+
+            if direction is None:
+                continue
+            ms = MarketSide.UP if direction == "up" else MarketSide.DOWN
+            reason = f"fusion_{fusion_mode}"
+            fused.append((station, market_type, ms, reason, confidence))
+
+        _LOGGER.info(
+            "Path B (%s) fusion produced %d predictions from %d raw votes",
+            fusion_mode, len(fused), len(signals),
+        )
+        return fused
+
     def generate_signals(self, date):
         """
         DETERMINISTIC: Generate daily trade signals based on fixed algorithms.
@@ -1186,6 +1280,18 @@ class PaperTrader:
                     _LOGGER.debug(f"Skipped unskilled station trade: {station} for {market_type} market")
             signals = filtered_signals
             _LOGGER.info(f"Applied skill gate filter: {len(signals)} skilled out of {before_count} total signals")
+
+        # ══════════════════════════════════════════════════════════════
+        # R/T-8F: Path B (LIOP/UWC fusion) — reversible feature-flag branch.
+        # When FUSION_MODE != "agreement_gate", skip the gate stack and emit a
+        # single fused prediction per (station, market_type). Path A remains
+        # fully intact below and is the default.
+        # ══════════════════════════════════════════════════════════════
+        if FUSION_MODE in ("liop", "uwc"):
+            fused = self._fuse_path_b(signals, fusion_mode=FUSION_MODE)
+            if fused is not None:
+                return fused
+            # else: fall through to Path A (import/fusion failure handled in helper)
 
         # A3: Separate spike reversion signals if separate lane is enabled
         spike_reversion_signals = []

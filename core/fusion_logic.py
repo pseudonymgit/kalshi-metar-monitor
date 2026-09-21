@@ -618,6 +618,8 @@ class SignalFusionEngine:
         # If no calibrated signals, return defaults
         if not calibrated_signals:
             return None, 0.0, 0.0
+
+        n_signals = len(calibrated_signals)
             
         # Layer 1 & 2: Compute weights and perform Log-Odds Linear Opinion Pooling
         # Use MI-based weights if available, fall back to equal weights
@@ -680,7 +682,6 @@ class SignalFusionEngine:
             max_vote_share = max(up_count, down_count) / n_signals
             diversity = 1.0 - abs(2.0 * max_vote_share - 1.0)
             diversity_modifier = 0.75 + 0.25 * diversity
-            _logger = logging.getLogger(__name__)
             _logger.debug(
                 f"EnsembleDiversity: up={up_count}, down={down_count}, "
                 f"max_vote_share={max_vote_share:.3f}, "
