@@ -49,6 +49,7 @@ from core.signal_families import (
 
 # Re-export existing fusion classes from fusion_logic for backward compatibility
 from core.fusion_logic import (
+    SignalFusionEngine,
     SignalFusionEngine as LegacyFusionEngine,
     TimeDecaySignalManager,
     mutual_information_from_boolean_pairs,
@@ -174,8 +175,19 @@ class PoolOfPools:
             member_names = self.pool_members.get(pool_name, [])
             predictions = []
             for sig_name in member_names:
+                # R/T-8a name-mapping fix: taxonomy uses `_signal` suffixes
+                # (`gaussian_signal`), the execution registry uses short names
+                # (`gaussian`). Normalize both forms so pool membership actually
+                # matches live signal_predictions keys (no silent zero).
+                matched_name = None
                 if sig_name in signal_predictions:
-                    predictions.append(signal_predictions[sig_name])
+                    matched_name = sig_name
+                elif sig_name.endswith('_signal'):
+                    short = sig_name[:-len('_signal')]
+                    if short in signal_predictions:
+                        matched_name = short
+                if matched_name is not None:
+                    predictions.append(signal_predictions[matched_name])
             if predictions:
                 pool_data[pool_name] = predictions
 

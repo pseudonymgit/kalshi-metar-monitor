@@ -36,12 +36,23 @@ from core.signal_fusion import SignalFusionEngine, TimeDecaySignalManager
 from core.market_cost_model import MARKET_COST_MODEL
 
 # Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
+# R/T-8a (2026-09-21): reconciled to the live SignalRegistry.
+# Removed 3 dead names that were silently skipped (registry returned None →
+# `if sig is None: continue`):
+#   - spike_reversion     (removed from registry, Fix 5, 49.85% negative EV)
+#   - goldilocks          (removed from registry, same signal)
+#   - wind_direction_shift (removed from registry, 49.72% below coin flip)
+# The live SignalRegistry (core/signals/__init__.py) has 12 keys; these 7 are
+# the forecasting-ensemble subset that actually fire and are settlement-validated.
+# The other 5 live signals (cloud_cover_index, feels_like_delta, metar_trend,
+# cross_model_divergence, radiational_cooling) are non-ensemble lanes/P0 signals
+# not part of the directional high/low ensemble.
 BACKTEST_SIGNALS = [
     # Core signals (verified firing, non-zero variance per correlation matrix 2026-07-25)
-    'gaussian', 'gaussian_v2', 'spike_reversion', 'goldilocks',
-    'pressure_delta', 'calendar_climatology', 'wind_direction_shift',
+    'gaussian', 'gaussian_v2',
+    'pressure_delta', 'calendar_climatology',
     'forecast_disagreement', 'corrected_pressure_delta',
-    # Spike-reversion + Sure Thing lanes (separate from forecasting ensemble)
+    # Sure Thing lane (separate from forecasting ensemble)
     'frontal_passage_intraday',
 ]
 
@@ -299,6 +310,13 @@ def run_backtest(
                 for sig_name in signal_names:
                     sig = registry.get_signal(sig_name)
                     if sig is None:
+                        # R/T-8a tripwire: a requested signal absent from the live
+                        # registry is a silent drop. Log it loudly instead of skipping.
+                        logger.warning(
+                            "run_backtest: signal '%s' not in live SignalRegistry "
+                            "(silent drop). Reconcile signal_names with the registry.",
+                            sig_name,
+                        )
                         continue
                     direction, confidence = sig.evaluate(idx, days)
                     if direction is not None and confidence >= min_conf:
