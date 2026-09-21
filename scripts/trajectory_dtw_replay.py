@@ -26,7 +26,11 @@ FEATURES: Mapping[str, tuple[str, ...]] = {
     "temp_humidity": ("temp_max_f", "rh_pct"),
     "temp_humidity_pressure": ("temp_max_f", "rh_pct", "pressure_mb"),
 }
-FEATURE_WEIGHTS = {name: tuple(1.0 / len(cols) for _ in cols) for name, cols in FEATURES.items()}
+FEATURE_WEIGHTS = {
+    "temp_only": (1.0,),
+    "temp_humidity": (0.7, 0.3),  # Temperature 70%, humidity 30%
+    "temp_humidity_pressure": (0.6, 0.2, 0.2),  # Temperature 60%, humidity 20%, pressure 20%
+}
 BUCKETS = tuple(range(-50, 131))
 SEQUENCE_LENGTH = 5
 DTW_RADIUS = 1
@@ -185,7 +189,7 @@ def _local_cost(a: Sequence[float], b: Sequence[float], weights: Sequence[float]
     return math.sqrt(sum(w * (x - y) ** 2 for x, y, w in zip(a, b, weights)))
 
 
-def dtw_distance(query: Sequence[Sequence[float]], candidate: Sequence[Sequence[float]], radius: int = DTW_RADIUS) -> tuple[float, list[tuple[int, int]]]:
+def dtw_distance(query: Sequence[Sequence[float]], candidate: Sequence[Sequence[float]], weights: Sequence[float], radius: int = DTW_RADIUS) -> tuple[float, list[tuple[int, int]]]:
     """Exact banded DTW, normalized by selected path length.
 
     Predecessor ties are resolved diagonal, up, left. The returned path uses
@@ -194,7 +198,7 @@ def dtw_distance(query: Sequence[Sequence[float]], candidate: Sequence[Sequence[
     n, m = len(query), len(candidate)
     if not n or not m or radius < abs(n - m):
         return math.inf, []
-    weights = tuple(1.0 / len(query[0]) for _ in query[0])
+    # Use provided weights instead of recalculating equal weights
     inf = float("inf")
     costs = [[inf] * (m + 1) for _ in range(n + 1)]
     lengths = [[0] * (m + 1) for _ in range(n + 1)]
@@ -293,7 +297,7 @@ def replay_fixture(db_path: Path = DEFAULT_DB) -> dict[str, Any]:
                 matches = []
                 for settlement, candidate_days, candidate_seq in candidate_payloads:
                     scaled_candidate = _scaled(candidate_seq, stats, feature_set)
-                    distance, path = dtw_distance(scaled_query, scaled_candidate, DTW_RADIUS)
+                    distance, path = dtw_distance(scaled_query, scaled_candidate, FEATURE_WEIGHTS[feature_set], DTW_RADIUS)
                     if not math.isfinite(distance):
                         raise ReplayQCError(f"non-finite DTW distance for {_candidate_id(settlement)}")
                     matches.append({"candidate_id": _candidate_id(settlement), "station": settlement.station, "target_date": settlement.target_date, "bucket": settlement.bucket, "distance": distance, "path_length": len(path), "path": path})
