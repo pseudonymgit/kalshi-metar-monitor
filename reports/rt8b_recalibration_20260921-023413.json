@@ -1,0 +1,608 @@
+{
+  "generated_utc": "2026-09-21T02:34:13Z",
+  "task": "R/T-8b exhaustive multi-target recalibration",
+  "axis": "strike-crossing (settlement_temp_f vs strike_price) \u2014 core/settlement_outcome.strike_crossing_direction",
+  "provenance": {
+    "labels": "settlement_truth.strike_price (14,305 rows via /historical backfill)",
+    "signals": "BACKTEST_SIGNALS (7 honest live signals, R/T-8a corrected)",
+    "fusion": "SignalFusionEngine (LIOP/LLOP, core/fusion_logic.py) \u2014 the connected fusion whose import R/T-8a fixed",
+    "note": "R/T-8F (on-branch) A/B: LIOP MCC -0.0119 (non-degenerate, default); UWC degenerate (always-up). Calibration target = LIOP."
+  },
+  "totals": {
+    "labeled_events": 14020,
+    "fused_fired": 12151,
+    "fused_null_rate": 0.13331
+  },
+  "global": {
+    "tp": 1920,
+    "fp": 3805,
+    "tn": 4170,
+    "fn": 2256,
+    "n": 12151,
+    "accuracy": 0.501193,
+    "mcc": -0.016504,
+    "base_rate_accuracy": 0.656325,
+    "base_rate_delta": -0.155132
+  },
+  "per_station": {
+    "KATL": {
+      "tp": 81,
+      "fp": 82,
+      "tn": 105,
+      "fn": 72,
+      "n": 340,
+      "accuracy": 0.547059,
+      "mcc": 0.09053,
+      "base_rate_accuracy": 0.55,
+      "base_rate_delta": -0.002941
+    },
+    "KAUS": {
+      "tp": 153,
+      "fp": 452,
+      "tn": 519,
+      "fn": 139,
+      "n": 1263,
+      "accuracy": 0.532067,
+      "mcc": 0.049348,
+      "base_rate_accuracy": 0.768804,
+      "base_rate_delta": -0.236737
+    },
+    "KBOS": {
+      "tp": 71,
+      "fp": 79,
+      "tn": 114,
+      "fn": 86,
+      "n": 350,
+      "accuracy": 0.528571,
+      "mcc": 0.043118,
+      "base_rate_accuracy": 0.551429,
+      "base_rate_delta": -0.022858
+    },
+    "KDCA": {
+      "tp": 81,
+      "fp": 100,
+      "tn": 100,
+      "fn": 82,
+      "n": 363,
+      "accuracy": 0.498623,
+      "mcc": -0.003052,
+      "base_rate_accuracy": 0.550964,
+      "base_rate_delta": -0.052341
+    },
+    "KDEN": {
+      "tp": 106,
+      "fp": 288,
+      "tn": 328,
+      "fn": 140,
+      "n": 862,
+      "accuracy": 0.50348,
+      "mcc": -0.033214,
+      "base_rate_accuracy": 0.714617,
+      "base_rate_delta": -0.211137
+    },
+    "KDFW": {
+      "tp": 79,
+      "fp": 83,
+      "tn": 108,
+      "fn": 67,
+      "n": 337,
+      "accuracy": 0.554896,
+      "mcc": 0.105665,
+      "base_rate_accuracy": 0.566766,
+      "base_rate_delta": -0.01187
+    },
+    "KHOU": {
+      "tp": 76,
+      "fp": 95,
+      "tn": 121,
+      "fn": 76,
+      "n": 368,
+      "accuracy": 0.535326,
+      "mcc": 0.059417,
+      "base_rate_accuracy": 0.586957,
+      "base_rate_delta": -0.051631
+    },
+    "KLAS": {
+      "tp": 71,
+      "fp": 88,
+      "tn": 130,
+      "fn": 77,
+      "n": 366,
+      "accuracy": 0.54918,
+      "mcc": 0.075306,
+      "base_rate_accuracy": 0.595628,
+      "base_rate_delta": -0.046448
+    },
+    "KLAX": {
+      "tp": 106,
+      "fp": 204,
+      "tn": 198,
+      "fn": 145,
+      "n": 653,
+      "accuracy": 0.465544,
+      "mcc": -0.08295,
+      "base_rate_accuracy": 0.61562,
+      "base_rate_delta": -0.150076
+    },
+    "KMDW": {
+      "tp": 210,
+      "fp": 519,
+      "tn": 481,
+      "fn": 249,
+      "n": 1459,
+      "accuracy": 0.473612,
+      "mcc": -0.057101,
+      "base_rate_accuracy": 0.685401,
+      "base_rate_delta": -0.211789
+    },
+    "KMIA": {
+      "tp": 137,
+      "fp": 403,
+      "tn": 424,
+      "fn": 188,
+      "n": 1152,
+      "accuracy": 0.486979,
+      "mcc": -0.059309,
+      "base_rate_accuracy": 0.717882,
+      "base_rate_delta": -0.230903
+    },
+    "KMSP": {
+      "tp": 75,
+      "fp": 78,
+      "tn": 122,
+      "fn": 89,
+      "n": 364,
+      "accuracy": 0.541209,
+      "mcc": 0.067854,
+      "base_rate_accuracy": 0.549451,
+      "base_rate_delta": -0.008242
+    },
+    "KMSY": {
+      "tp": 55,
+      "fp": 77,
+      "tn": 126,
+      "fn": 82,
+      "n": 340,
+      "accuracy": 0.532353,
+      "mcc": 0.022292,
+      "base_rate_accuracy": 0.597059,
+      "base_rate_delta": -0.064706
+    },
+    "KNYC": {
+      "tp": 148,
+      "fp": 579,
+      "tn": 511,
+      "fn": 200,
+      "n": 1438,
+      "accuracy": 0.458275,
+      "mcc": -0.090723,
+      "base_rate_accuracy": 0.757997,
+      "base_rate_delta": -0.299722
+    },
+    "KOKC": {
+      "tp": 68,
+      "fp": 70,
+      "tn": 117,
+      "fn": 81,
+      "n": 336,
+      "accuracy": 0.550595,
+      "mcc": 0.08285,
+      "base_rate_accuracy": 0.556548,
+      "base_rate_delta": -0.005953
+    },
+    "KPHL": {
+      "tp": 151,
+      "fp": 304,
+      "tn": 225,
+      "fn": 164,
+      "n": 844,
+      "accuracy": 0.445498,
+      "mcc": -0.092473,
+      "base_rate_accuracy": 0.626777,
+      "base_rate_delta": -0.181279
+    },
+    "KPHX": {
+      "tp": 74,
+      "fp": 86,
+      "tn": 111,
+      "fn": 66,
+      "n": 337,
+      "accuracy": 0.548961,
+      "mcc": 0.090813,
+      "base_rate_accuracy": 0.58457,
+      "base_rate_delta": -0.035609
+    },
+    "KSAT": {
+      "tp": 67,
+      "fp": 64,
+      "tn": 109,
+      "fn": 79,
+      "n": 319,
+      "accuracy": 0.551724,
+      "mcc": 0.090093,
+      "base_rate_accuracy": 0.54232,
+      "base_rate_delta": 0.009404
+    },
+    "KSEA": {
+      "tp": 63,
+      "fp": 88,
+      "tn": 109,
+      "fn": 70,
+      "n": 330,
+      "accuracy": 0.521212,
+      "mcc": 0.026567,
+      "base_rate_accuracy": 0.59697,
+      "base_rate_delta": -0.075758
+    },
+    "KSFO": {
+      "tp": 48,
+      "fp": 66,
+      "tn": 112,
+      "fn": 104,
+      "n": 330,
+      "accuracy": 0.484848,
+      "mcc": -0.057649,
+      "base_rate_accuracy": 0.539394,
+      "base_rate_delta": -0.054546
+    }
+  },
+  "per_regime": {
+    "HIGH": {
+      "tp": 379,
+      "fp": 3742,
+      "tn": 4040,
+      "fn": 500,
+      "n": 8661,
+      "accuracy": 0.510218,
+      "mcc": -0.03004,
+      "base_rate_accuracy": 0.898511,
+      "base_rate_delta": -0.388293
+    },
+    "LOW": {
+      "tp": 1541,
+      "fp": 63,
+      "tn": 130,
+      "fn": 1756,
+      "n": 3490,
+      "accuracy": 0.478797,
+      "mcc": 0.064653,
+      "base_rate_accuracy": 0.944699,
+      "base_rate_delta": -0.465902
+    }
+  },
+  "per_season": {
+    "DJF": {
+      "tp": 366,
+      "fp": 872,
+      "tn": 816,
+      "fn": 347,
+      "n": 2401,
+      "accuracy": 0.492295,
+      "mcc": -0.002984,
+      "base_rate_accuracy": 0.70304,
+      "base_rate_delta": -0.210745
+    },
+    "MAM": {
+      "tp": 527,
+      "fp": 862,
+      "tn": 1634,
+      "fn": 897,
+      "n": 3920,
+      "accuracy": 0.551276,
+      "mcc": 0.024868,
+      "base_rate_accuracy": 0.636735,
+      "base_rate_delta": -0.085459
+    },
+    "JJA": {
+      "tp": 735,
+      "fp": 1061,
+      "tn": 1413,
+      "fn": 896,
+      "n": 4105,
+      "accuracy": 0.523264,
+      "mcc": 0.021488,
+      "base_rate_accuracy": 0.60268,
+      "base_rate_delta": -0.079416
+    },
+    "SON": {
+      "tp": 292,
+      "fp": 1010,
+      "tn": 307,
+      "fn": 116,
+      "n": 1725,
+      "accuracy": 0.347246,
+      "mcc": -0.050581,
+      "base_rate_accuracy": 0.763478,
+      "base_rate_delta": -0.416232
+    }
+  },
+  "up_vs_down": {
+    "up": {
+      "n": 5725,
+      "precision": 0.335371,
+      "actual_up_rate": 0.335371,
+      "actual_down_rate": 0.664629
+    },
+    "down": {
+      "n": 6426,
+      "precision": 0.648926,
+      "actual_up_rate": 0.351074,
+      "actual_down_rate": 0.648926
+    }
+  },
+  "calibration_pairs": {
+    "station": {
+      "KATL": {
+        "up": {
+          "n": 163,
+          "precision": 0.496933
+        },
+        "down": {
+          "n": 177,
+          "precision": 0.59322
+        }
+      },
+      "KAUS": {
+        "up": {
+          "n": 605,
+          "precision": 0.252893
+        },
+        "down": {
+          "n": 658,
+          "precision": 0.788754
+        }
+      },
+      "KBOS": {
+        "up": {
+          "n": 150,
+          "precision": 0.473333
+        },
+        "down": {
+          "n": 200,
+          "precision": 0.57
+        }
+      },
+      "KDCA": {
+        "up": {
+          "n": 181,
+          "precision": 0.447514
+        },
+        "down": {
+          "n": 182,
+          "precision": 0.549451
+        }
+      },
+      "KDEN": {
+        "up": {
+          "n": 394,
+          "precision": 0.269036
+        },
+        "down": {
+          "n": 468,
+          "precision": 0.700855
+        }
+      },
+      "KDFW": {
+        "up": {
+          "n": 162,
+          "precision": 0.487654
+        },
+        "down": {
+          "n": 175,
+          "precision": 0.617143
+        }
+      },
+      "KHOU": {
+        "up": {
+          "n": 171,
+          "precision": 0.444444
+        },
+        "down": {
+          "n": 197,
+          "precision": 0.614213
+        }
+      },
+      "KLAS": {
+        "up": {
+          "n": 159,
+          "precision": 0.446541
+        },
+        "down": {
+          "n": 207,
+          "precision": 0.628019
+        }
+      },
+      "KLAX": {
+        "up": {
+          "n": 310,
+          "precision": 0.341935
+        },
+        "down": {
+          "n": 343,
+          "precision": 0.577259
+        }
+      },
+      "KMDW": {
+        "up": {
+          "n": 729,
+          "precision": 0.288066
+        },
+        "down": {
+          "n": 730,
+          "precision": 0.658904
+        }
+      },
+      "KMIA": {
+        "up": {
+          "n": 540,
+          "precision": 0.253704
+        },
+        "down": {
+          "n": 612,
+          "precision": 0.69281
+        }
+      },
+      "KMSP": {
+        "up": {
+          "n": 153,
+          "precision": 0.490196
+        },
+        "down": {
+          "n": 211,
+          "precision": 0.578199
+        }
+      },
+      "KMSY": {
+        "up": {
+          "n": 132,
+          "precision": 0.416667
+        },
+        "down": {
+          "n": 208,
+          "precision": 0.605769
+        }
+      },
+      "KNYC": {
+        "up": {
+          "n": 727,
+          "precision": 0.203576
+        },
+        "down": {
+          "n": 711,
+          "precision": 0.718706
+        }
+      },
+      "KOKC": {
+        "up": {
+          "n": 138,
+          "precision": 0.492754
+        },
+        "down": {
+          "n": 198,
+          "precision": 0.590909
+        }
+      },
+      "KPHL": {
+        "up": {
+          "n": 455,
+          "precision": 0.331868
+        },
+        "down": {
+          "n": 389,
+          "precision": 0.578406
+        }
+      },
+      "KPHX": {
+        "up": {
+          "n": 160,
+          "precision": 0.4625
+        },
+        "down": {
+          "n": 177,
+          "precision": 0.627119
+        }
+      },
+      "KSAT": {
+        "up": {
+          "n": 131,
+          "precision": 0.51145
+        },
+        "down": {
+          "n": 188,
+          "precision": 0.579787
+        }
+      },
+      "KSEA": {
+        "up": {
+          "n": 151,
+          "precision": 0.417219
+        },
+        "down": {
+          "n": 179,
+          "precision": 0.608939
+        }
+      },
+      "KSFO": {
+        "up": {
+          "n": 114,
+          "precision": 0.421053
+        },
+        "down": {
+          "n": 216,
+          "precision": 0.518519
+        }
+      }
+    },
+    "regime": {
+      "HIGH": {
+        "up": {
+          "n": 4121,
+          "precision": 0.091968
+        },
+        "down": {
+          "n": 4540,
+          "precision": 0.889868
+        }
+      },
+      "LOW": {
+        "up": {
+          "n": 1604,
+          "precision": 0.960723
+        },
+        "down": {
+          "n": 1886,
+          "precision": 0.068929
+        }
+      }
+    },
+    "season": {
+      "DJF": {
+        "up": {
+          "n": 1238,
+          "precision": 0.295638
+        },
+        "down": {
+          "n": 1163,
+          "precision": 0.701634
+        }
+      },
+      "MAM": {
+        "up": {
+          "n": 1389,
+          "precision": 0.37941
+        },
+        "down": {
+          "n": 2531,
+          "precision": 0.645595
+        }
+      },
+      "JJA": {
+        "up": {
+          "n": 1796,
+          "precision": 0.409243
+        },
+        "down": {
+          "n": 2309,
+          "precision": 0.611953
+        }
+      },
+      "SON": {
+        "up": {
+          "n": 1302,
+          "precision": 0.22427
+        },
+        "down": {
+          "n": 423,
+          "precision": 0.725768
+        }
+      }
+    }
+  },
+  "excluded": {
+    "between_excluded": 54,
+    "untrusted_excluded": 80,
+    "no_temp": 0,
+    "unknown_market_type": 0
+  },
+  "elapsed_seconds": 282.29
+}
