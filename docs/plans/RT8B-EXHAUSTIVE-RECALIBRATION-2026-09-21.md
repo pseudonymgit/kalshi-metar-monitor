@@ -216,7 +216,7 @@ This is a *calibration-surface* finding, not a fix — flagged for a follow-up
 - **Report JSON:** `reports/rt8b_recalibration_20260921-023413.json`
 - **Report MD:** `reports/rt8b_recalibration_20260921-023413.md`
 - **Script:** `scripts/rt8b_exhaustive_recalibration.py`
-- **Commit:** (recorded after commit, below)
+- **Commit:** `e2dc789f5`
 - **No merge to main** — merge is Dan's.
 
 ## Next (gated)
