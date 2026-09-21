@@ -348,6 +348,28 @@ def build_signal_registry():
     _reg("eighty_two_member_ensemble_pooled", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
          gefs_db=gefs_db, tigge_db=tigge_db, weighting_mode='member_pooling')
 
+    # ─────────────────────────────────────────────────────────────────────
+    # FULL SIGNAL RECONCILIATION (2026-09-21) — wire previously-missing REAL signals.
+    # These signals have real evaluate()/evaluate_for_station() logic but were not
+    # registered in build_signal_registry(), so the suite silently dropped them.
+    # ─────────────────────────────────────────────────────────────────────
+    # Standard evaluate(idx, days) signals (direction computed from the daily METAR series).
+    _reg("persistence", "persistence_signal", "PersistenceSignal")
+    _reg("simple_trend", "simple_trend_signal", "SimpleTrendSignal")
+    _reg("honest_trend", "honest_trend_signal", "HonestTrendSignal")
+    _reg("rdae_mos", "rdae_mos_signal", "RDAEMOSSignal")
+    _reg("ghcn_calibration", "ghcn_calibration_signal", "GHCNCalibrationSignal")
+    _reg("sensor_bias_correction", "sensor_bias_correction_signal", "SensorBiasCorrectionSignal")
+
+    # evaluate_for_station-only signals (evaluate() returns (None,0.0); scored via
+    # SIGNALS_WITH_OWN_DB which passes conn=None so they self-connect to their archive).
+    _reg("asos_microstructure", "asos_microstructure_signal", "AsosMicrostructureSignal")
+    _reg("500mb_height_pattern", "upper_atmosphere_signal", "FiveHundredMbHeightPatternSignal")
+    _reg("850mb_temp_advection", "upper_atmosphere_signal", "EightHundredFiftyMbAdvectionSignal")
+
+    # Live-API source signal (stays in SLOW_SIGNALS_TO_SKIP, but now enumerated).
+    _reg("ecmwf_bias_corrected", "ecmwf_bias_corrected_signal", "ECMWFBiasCorrectedSignal")
+
     return registry, status
 
 
@@ -371,6 +393,8 @@ STANDARD_EVALUATE_SIGNALS = {
     'calendar_climatology', 'wind_direction_shift', 'forecast_disagreement',
     'frontal_detector', 'spread_based_entry', 'volume_momentum', 'settlement_arbitrage',
     'seasonal_regime',
+    # Reconciliation-wired standard signals (2026-09-21):
+    'simple_trend', 'honest_trend', 'rdae_mos', 'ghcn_calibration', 'sensor_bias_correction',
 }
 
 # Signals that read from their OWN database (not the METAR conn passed by the
@@ -378,6 +402,8 @@ STANDARD_EVALUATE_SIGNALS = {
 # to their own archive (e.g. weatherapi_archive.db) rather than reuse it.
 SIGNALS_WITH_OWN_DB = {
     'cloud_cover_index', 'feels_like_delta',
+    # Reconciliation-wired own-DB signals (2026-09-21): self-connect to their archive.
+    'asos_microstructure', '500mb_height_pattern', '850mb_temp_advection',
 }
 
 
