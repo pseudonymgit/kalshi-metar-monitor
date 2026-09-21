@@ -1,5 +1,7 @@
 # R/T-1 Ultimate Suite — Canonical Sweep/Test/Calibrate Harness
 
+> **SUPERSEDED 2026-09-21** — see `TEST-SUITE-REFERENCE-2026-09-21.md`. This doc references the old entry point `scripts/ultimate_suite.py` (now `ultimate_sweep.py`), the old 1,537-label truth set (now 14,305), and predates parallelization (`--workers`, R/T-8g) and the connected-fusion work (R/T-8a/8f).
+
 **Date:** 2026-09-18
 **Owner:** Gilfoyle (subagent, R/T-1)
 **Repo:** `prototypes/weather-engine-source` (branch `temp-sprint-branch`, dirty tree preserved)
