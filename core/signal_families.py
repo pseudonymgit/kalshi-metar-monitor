@@ -244,6 +244,68 @@ SIGNAL_REGISTRY: Dict[str, SignalEntry] = {
         status="GATED",
         freshness_hours=6.0,
     ),
+    "trajectory_state_vector_signal": SignalEntry(
+        module_name="trajectory_state_vector_signal",
+        family="D", pool=None,
+        description="PARK — Upstream air trajectory state vector stub",
+        status="PARK",
+        freshness_hours=6.0,
+    ),
+    "weatherapi_base_signal": SignalEntry(
+        module_name="weatherapi_base_signal",
+        family="D", pool=None,
+        description="WeatherAPI archive base: climatological z-score (CCI/FeelsLike infra)",
+        freshness_hours=6.0,
+    ),
+    # Gamma signals (G1-G6) — Ensemble augmentation
+    "gamma_g1_uncertainty_signal": SignalEntry(
+        module_name="gamma_g1_uncertainty_signal",
+        family="D", pool=None,
+        description="Ensemble uncertainty modulator (Gamma G1)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.25,
+        freshness_hours=6.0,
+    ),
+    "gamma_g2_regime_signal": SignalEntry(
+        module_name="gamma_g2_regime_signal",
+        family="D", pool=None,
+        description="Dynamic regime classifier (Gamma G2)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.30,
+        freshness_hours=6.0,
+    ),
+    "gamma_g3_analog_signal": SignalEntry(
+        module_name="gamma_g3_analog_signal",
+        family="D", pool=None,
+        description="Historical analog matcher (Gamma G3)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.35,
+        freshness_hours=6.0,
+    ),
+    "gamma_g4_pressure_adv_signal": SignalEntry(
+        module_name="gamma_g4_pressure_adv_signal",
+        family="D", pool=None,
+        description="Pressure-based advection indicator (Gamma G4)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.28,
+        freshness_hours=6.0,
+    ),
+    "gamma_g5_dewpoint_signal": SignalEntry(
+        module_name="gamma_g5_dewpoint_signal",
+        family="D", pool=None,
+        description="Dewpoint depression indicator (Gamma G5)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.32,
+        freshness_hours=6.0,
+    ),
+    "gamma_g6_cloud_cover_signal": SignalEntry(
+        module_name="gamma_g6_cloud_cover_signal",
+        family="D", pool=None,
+        description="Cloud cover radiational effect (Gamma G6)",
+        timescale="daily",
+        baseline_correlation_to_gefs=0.30,
+        freshness_hours=6.0,
+    ),
 
     # ── Family E: Dead / Killed / Orphaned (10 signals) ───────────
     "persistence_signal": SignalEntry(
