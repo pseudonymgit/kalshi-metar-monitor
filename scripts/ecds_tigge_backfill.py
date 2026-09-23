@@ -24,7 +24,7 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 _ECDS_URL = "https://ecds.ecmwf.int/api"
-_ECDS_KEY = "e543bdb6-c396-48b4-bc1c-bebe08db954e"
+_ECDS_KEY = "cf271ac1-862b-4c01-a6e9-9a6d84721707"
 DB_PATH = os.path.join(ROOT, "data", "tigge_archive.db")
 GRIB_DIR = os.path.join(ROOT, "data", "tigge_grib")
 CKPT = os.path.join(ROOT, "data", "ecds_backfill_checkpoint.json")

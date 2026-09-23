@@ -63,6 +63,16 @@ from .metar_trend_signal import MetarTrendSignal
 from .cross_model_divergence_signal import CrossModelDivergenceSignal
 from .subhourly_trajectory_signal import SubhourlyTrajectorySignal
 
+# ── Gamma Signals (G1-G6) for 82-member ensemble enhancement ──
+from .gamma_signals import (
+    G1_UncertaintySignal,
+    G2_RegimeSignal, 
+    G3_AnalogSignal,
+    G4_PressureAdvectionSignal,
+    G5_DewpointSignal,
+    G6_CloudCoverSignal
+)
+
 
 class SignalRegistry:
     """
@@ -103,6 +113,14 @@ class SignalRegistry:
 
             # ── Physics-Corrected Pressure Delta (revived 2026-09-18) ──
             'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
+
+            # ── Gamma Signals (G1-G6) for 82-member ensemble enhancement ──
+            'gamma_g1_uncertainty': G1_UncertaintySignal(db_path),
+            'gamma_g2_regime': G2_RegimeSignal(db_path),
+            'gamma_g3_analog': G3_AnalogSignal(db_path),
+            'gamma_g4_pressure_adv': G4_PressureAdvectionSignal(db_path),
+            'gamma_g5_dewpoint': G5_DewpointSignal(db_path),
+            'gamma_g6_cloud_cover': G6_CloudCoverSignal(db_path),
 
             # SpikeReversionSignal removed — Fix 5: 49.85% accuracy (negative EV)
             # GoldilocksSignal removed — same signal, same negative EV
