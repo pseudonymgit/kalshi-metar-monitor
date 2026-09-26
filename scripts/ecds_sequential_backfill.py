@@ -391,11 +391,16 @@ def main():
             conn.close()
             return
         resume_from = date.fromisoformat(cp["last_date"]) + timedelta(days=1)
-        cur = conn.execute("SELECT MAX(target_date) FROM tigge_archive")
-        max_d = cur.fetchone()[0]
-        end = date.fromisoformat(max_d) if max_d else date.today()
+        # End bound is TODAY, not MAX(target_date) in the archive. Using the
+        # archive max made this self-limiting: once the checkpoint caught up to
+        # the newest stored date, resume_from > end every run and the job
+        # printed "All dates up to checkpoint are filled." forever, so the
+        # collection could never advance past 2026-09-19. date.today() lets the
+        # backfill keep moving forward. Idempotent: get_dates_to_backfill skips
+        # dates already present, so re-runs are safe.
+        end = date.today()
         if resume_from > end:
-            print("All dates up to checkpoint are filled.")
+            print("All dates up to today are filled.")
             conn.close()
             return
         dates = get_dates_to_backfill(conn, resume_from.isoformat(), end.isoformat())

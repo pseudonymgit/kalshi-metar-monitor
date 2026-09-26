@@ -175,8 +175,23 @@ class EnsembleAgreementGate:
             direction = 'down'
             agreement = down_count
         else:
+            # No 3-of-4 supermajority. If the split is exactly 2-2 (an even
+            # split with all four models directional), resolve deterministically
+            # via the magnitude-weighted lean rather than dropping to FLAT.
             direction = None
             agreement = directional_total if directional_total > 0 else None
+            if up_count == 2 and down_count == 2:
+                from core.nwp_tiebreak import resolve_tie
+                deltas = {m: model_directions[m]['delta'] for m in MODELS}
+                tie_dir, tie_conf, tie_reason = resolve_tie(deltas)
+                if tie_dir is not None:
+                    direction = tie_dir
+                    agreement = 'tiebreak'
+                    model_directions['_tiebreak'] = {
+                        'direction': tie_dir,
+                        'confidence': tie_conf,
+                        'reason': tie_reason,
+                    }
 
         # Consensus temp: mean of models agreeing with the gate direction
         consensus_temp = None

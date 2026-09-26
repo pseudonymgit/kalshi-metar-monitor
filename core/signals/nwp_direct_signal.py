@@ -83,14 +83,17 @@ class NwpDirectSignal(BaseSignal):
         # Collect votes from all available models
         votes = []  # list of model directions
         magnitudes = []
+        deltas = {}  # model -> (tomorrow - today); used by the tie-breaker
 
         for model in self._model_order:
             today_temp = self._get_temp(station, date, model, field)
             tomorrow_temp = self._get_temp(station, tomorrow_date, model, field)
 
             if today_temp is not None and tomorrow_temp is not None:
-                mag = abs(tomorrow_temp - today_temp)
+                delta = tomorrow_temp - today_temp
+                mag = abs(delta)
                 magnitudes.append(mag)
+                deltas[model.lower()] = delta
                 if tomorrow_temp > today_temp:
                     votes.append('up')
                 elif tomorrow_temp < today_temp:
@@ -106,7 +109,17 @@ class NwpDirectSignal(BaseSignal):
         total = up + down
 
         if up == down:
-            return None, 0.0
+            # Even split: resolve deterministically via magnitude-weighted lean
+            # instead of dropping to NEUTRAL. Confidence is capped low because
+            # a tie is the weakest-agreement case.
+            from core.nwp_tiebreak import resolve_tie
+            tie_dir, tie_conf, tie_reason = resolve_tie(deltas)
+            if tie_dir is None:
+                return None, 0.0
+            logger.debug(
+                "nwp_direct tie %s %s %s -> %s (%.2f) [%s]",
+                station, date, market_type, tie_dir, tie_conf, tie_reason)
+            return tie_dir, tie_conf
 
         direction = 'up' if up > down else 'down'
 

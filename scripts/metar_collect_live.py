@@ -129,6 +129,7 @@ def parse_metar(raw_text):
                 dew_c = _parse_temp_c(parts[1])
                 if temp_c is not None:
                     temp_f = temp_c * 9/5 + 32
+        if temp_f is not None and (temp_f < -90 or temp_f > 150): temp_f = None
                 if dew_c is not None:
                     dewpoint_f = dew_c * 9/5 + 32
                 if temp_c is not None or dew_c is not None:
@@ -368,6 +369,10 @@ def update_daily_stats(db_path, station, date_str):
             if {'date_local', 'observation_count', 'ingestion_timestamp_utc'}.issubset(daily_cols):
                 # Existing backfill schema.
                 c.execute(f"""
+            # Guard: reject corrupt temperatures that would silently poison signals
+            for v in (max_temp_f, avg_temp_f):
+                if v is not None and (v < -60 or v > 140):
+                    v = None
                     INSERT OR REPLACE INTO daily_stats
                     (station, date_local, date_utc, max_temp_f, min_temp_f, avg_temp_f,
                      observation_count, first_observation_utc, last_observation_utc,
