@@ -32,9 +32,18 @@ from typing import Dict, List, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 # ─── Paths ──────────────────────────────────────────────────────────────────
-REPO_ROOT = Path(__file__).resolve().parents[2]
-CROSSFEED_DB = (
-    REPO_ROOT / "polymarket-whalewatch" / "data" / "whalewatch_crossfeed.db"
+# Crossfeed DB path: configurable via CROSSFEED_DB env var.
+# Default resolves through the workspace root so it works from either
+# weather-engine-source or polymarket-whalewatch repo roots.
+_CROSSFEED_DB_DEFAULT = (
+    Path(__file__).resolve().parents[3]
+    / "prototypes"
+    / "polymarket-whalewatch"
+    / "data"
+    / "whalewatch_crossfeed.db"
+)
+CROSSFEED_DB = Path(
+    os.environ.get("CROSSFEED_DB", str(_CROSSFEED_DB_DEFAULT))
 )
 
 # Modulation parameters: probability bump in percentage points by conviction level

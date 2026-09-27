@@ -36,42 +36,76 @@ _BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _DB_PATH = os.path.join(_BASE, "data", "metar_backfill.db")
 _CACHE_PATH = os.path.join(_BASE, "data", "station_mapping.json")
 
-# Static mapping as ultimate fallback — verified against Kalshi settlement data
-# 15 viable stations (20 verified - 4 negative-EV unmapped - 1 duplicate KDAL)
-_RESEARCH_STATION_CODES = [
-    'KATL', 'KBOS', 'KDFW', 'KDEN', 'KJFK', 
-    'KLAX', 'KMIA', 'KORD', 'KSEA', 'KSFO', 
-    'KBNA', 'KHOU', 'KDCA', 'KPDX', 'KSLC', 
-    'PHNL', 'KTPA', 'KDTW', 'KCLT', 'KMSP'
+# ─── CANONICAL 20-STATION SET (single source of truth) ──────────────────
+# Reconciled 2026-09-26 against BOTH Kalshi live series endpoints
+# (data/kalshi_official_mapping.json, 20 series) AND the METAR daily_stats /
+# NWP / settlement_epochs ground truth. These are exactly the 20 Kalshi
+# weather-market cities. All PROCESSING must filter to this set.
+#
+# KDAL is removed (Kalshi settles Dallas on KDFW / series KXHIGHTDAL).
+# TEST is synthetic and is never a station.
+#
+# The canonical list is pinned in data/station_mapping.json ("station_count": 20
+# + "stations"). The fallback below mirrors it verbatim and is used only if that
+# file is unreadable.
+_FALLBACK_CANONICAL_STATIONS = [
+    'KATL', 'KAUS', 'KBOS', 'KDCA', 'KDEN', 'KDFW', 'KHOU', 'KLAS',
+    'KLAX', 'KMDW', 'KMIA', 'KMSP', 'KMSY', 'KNYC', 'KOKC', 'KPHL',
+    'KPHX', 'KSAT', 'KSEA', 'KSFO',
 ]
 
 
+def _load_canonical_stations():
+    """Load the canonical 20 from data/station_mapping.json, else fallback."""
+    try:
+        with open(_CACHE_PATH) as f:
+            data = json.load(f)
+        st = data.get('stations') if isinstance(data, dict) else None
+        if isinstance(st, dict) and st:
+            return sorted(st.keys())
+    except Exception:
+        pass
+    return list(_FALLBACK_CANONICAL_STATIONS)
+
+
+CANONICAL_STATIONS = _load_canonical_stations()
+
+# Backward-compat alias (old name; its header previously mislabeled it "15").
+_RESEARCH_STATION_CODES = CANONICAL_STATIONS
+
+
+# Station metadata (city/state/tz) for the canonical 20, verified against
+# data/station_mapping.json. Used only as a fallback if the cache is missing.
 STATIC_MAPPING = {
     'KATL': {'city': 'Atlanta', 'state': 'GA', 'tz': 'America/New_York'},
+    'KAUS': {'city': 'Austin', 'state': 'TX', 'tz': 'America/Chicago'},
     'KBOS': {'city': 'Boston', 'state': 'MA', 'tz': 'America/New_York'},
-    'KDFW': {'city': 'Dallas-Fort Worth', 'state': 'TX', 'tz': 'America/Chicago'},
+    'KDCA': {'city': 'Washington DC', 'state': 'DC', 'tz': 'America/New_York'},
     'KDEN': {'city': 'Denver', 'state': 'CO', 'tz': 'America/Denver'},
-    'KJFK': {'city': 'New York', 'state': 'NY', 'tz': 'America/New_York'},
+    'KDFW': {'city': 'Dallas', 'state': 'TX', 'tz': 'America/Chicago'},
+    'KHOU': {'city': 'Houston', 'state': 'TX', 'tz': 'America/Chicago'},
+    'KLAS': {'city': 'Las Vegas', 'state': 'NV', 'tz': 'America/Los_Angeles'},
     'KLAX': {'city': 'Los Angeles', 'state': 'CA', 'tz': 'America/Los_Angeles'},
+    'KMDW': {'city': 'Chicago', 'state': 'IL', 'tz': 'America/Chicago'},
     'KMIA': {'city': 'Miami', 'state': 'FL', 'tz': 'America/New_York'},
-    'KORD': {'city': 'Chicago', 'state': 'IL', 'tz': 'America/Chicago'},
+    'KMSP': {'city': 'Minneapolis', 'state': 'MN', 'tz': 'America/Chicago'},
+    'KMSY': {'city': 'New Orleans', 'state': 'LA', 'tz': 'America/Chicago'},
+    'KNYC': {'city': 'New York', 'state': 'NY', 'tz': 'America/New_York'},
+    'KOKC': {'city': 'Oklahoma City', 'state': 'OK', 'tz': 'America/Chicago'},
+    'KPHL': {'city': 'Philadelphia', 'state': 'PA', 'tz': 'America/New_York'},
+    'KPHX': {'city': 'Phoenix', 'state': 'AZ', 'tz': 'America/Phoenix'},
+    'KSAT': {'city': 'San Antonio', 'state': 'TX', 'tz': 'America/Chicago'},
     'KSEA': {'city': 'Seattle', 'state': 'WA', 'tz': 'America/Los_Angeles'},
     'KSFO': {'city': 'San Francisco', 'state': 'CA', 'tz': 'America/Los_Angeles'},
-    'KBNA': {'city': 'Nashville', 'state': 'TN', 'tz': 'America/Chicago'},
-    'KHOU': {'city': 'Houston', 'state': 'TX', 'tz': 'America/Chicago'},
-    'KDCA': {'city': 'Washington DC', 'state': 'VA', 'tz': 'America/New_York'},
-    'KPDX': {'city': 'Portland', 'state': 'OR', 'tz': 'America/Los_Angeles'},
-    'KSLC': {'city': 'Salt Lake City', 'state': 'UT', 'tz': 'America/Denver'},
-    'PHNL': {'city': 'Honolulu', 'state': 'HI', 'tz': 'Pacific/Honolulu'},
-    'KTPA': {'city': 'Tampa', 'state': 'FL', 'tz': 'America/New_York'},
-    'KDTW': {'city': 'Detroit', 'state': 'MI', 'tz': 'America/Detroit'},
-    'KCLT': {'city': 'Charlotte', 'state': 'NC', 'tz': 'America/New_York'},
-    'KMSP': {'city': 'Minneapolis', 'state': 'MN', 'tz': 'America/Chicago'}
 }
 
 
-# Stations removed from registry (duplicates only)
-_REMOVED_STATIONS = {"KDAL"}
+# Stations that must NEVER appear in processing output.
+#   KDAL — duplicate of KDFW (Dallas settles on KDFW)
+#   TEST — synthetic, never a real station
+_FORBIDDEN_STATIONS = {"KDAL", "TEST"}
+# Backward-compat alias.
+_REMOVED_STATIONS = _FORBIDDEN_STATIONS
 
 
 def _try_kalshi_discovery():
@@ -115,70 +149,69 @@ def _try_settlement_epochs():
 @lru_cache(maxsize=1)
 def get_all_stations():
     """
-    Returns the authoritative list of viable station codes.
-    
-    Stations in _REMOVED_STATIONS are filtered out regardless of source.
-    These are negative-EV markets (no price fetcher mapping → 0.50 fallback)
-    or duplicates (e.g., KDAL duplicates KDFW).
-    
-    Fallback chain:
-    1. Kalshi discovery (will fail — DNS in container)
-    2. Cache file (data/station_mapping.json)
-    3. Settlement epochs table in metar_backfill.db
-    4. Static hardcoded list (verified against Kalshi)
+    Returns the CANONICAL 20 station codes — the single processing universe.
+
+    This is authoritative and deliberately does NOT read settlement_epochs:
+    that table historically carried off-list rows (KDAL, TEST, and 9
+    non-Kalshi extras), which is exactly the drift this registry now prevents.
+    Forbidden stations (_FORBIDDEN_STATIONS) are always excluded.
+
+    Collection scripts may still gather extra stations for future expansion;
+    they must filter through this function (or is_canonical_station) before
+    emitting any processing output.
     """
-    # 1. Try Kalshi discovery
-    stations = _try_kalshi_discovery()
-    if stations:
-        return sorted(set(stations) - _REMOVED_STATIONS)
-    
-    # 2. Try cache file
-    stations = _try_cache_file()
-    if stations:
-        return sorted(set(stations) - _REMOVED_STATIONS)
-    
-    # 3. Try settlement epochs table
-    stations = _try_settlement_epochs()
-    if stations:
-        return sorted(set(stations) - _REMOVED_STATIONS)
-    
-    # 4. Static fallback using research station codes
-    return sorted(_RESEARCH_STATION_CODES)
+    return sorted(set(CANONICAL_STATIONS) - _FORBIDDEN_STATIONS)
 
 
-@lru_cache(maxsize=1)
+def is_canonical_station(station) -> bool:
+    """True only for the 20 canonical stations (KDAL/TEST excluded)."""
+    return str(station).upper() in set(CANONICAL_STATIONS) - _FORBIDDEN_STATIONS
+
+
+def assert_canonical_stations(stations, *, stage: str = "processing") -> list:
+    """Fail loudly if any station is non-canonical.
+
+    Call this at the end of every processing stage before emitting rows. It is
+    the guard that turns silent 30-station drift into a hard, named failure.
+    Returns the input list unchanged when clean.
+    """
+    bad = sorted({s for s in stations if not is_canonical_station(s)})
+    if bad:
+        raise ValueError(
+            f"NON-CANONICAL STATION(S) AT '{stage}': {bad}. "
+            f"Processing must emit only the canonical {len(CANONICAL_STATIONS)} "
+            f"stations (KDAL/TEST forbidden)."
+        )
+    return list(stations)
+
+
 def get_station_mapping():
     """
-    Returns dict of station -> {city_name, state, lat, lon}.
-    
-    Stations in _REMOVED_STATIONS are filtered out.
-    
-    Uses the same fallback chain as get_all_stations().
+    Returns dict of station -> {city_name, state, lat, lon} for the canonical 20.
+
+    Rows for forbidden stations (_FORBIDDEN_STATIONS: KDAL, TEST) are dropped.
     """
     result = {}
-    
+
     # Try cache file first for full mapping (includes lat/lon)
     try:
         with open(_CACHE_PATH, 'r') as f:
             data = json.load(f)
             if isinstance(data, dict):
-                if 'stations' in data:
-                    for code, info in data['stations'].items():
-                        if code not in _REMOVED_STATIONS:
-                            result[code] = info
-                else:
-                    for code, info in data.items():
-                        if code not in _REMOVED_STATIONS:
+                src = data.get('stations', data)
+                if isinstance(src, dict):
+                    for code, info in src.items():
+                        if is_canonical_station(code):
                             result[code] = info
                 if result:
                     return result
     except Exception:
         pass
-    
+
     # Fall back to static mapping
     for code, info in STATIC_MAPPING.items():
         result[code] = info
-    
+
     return result
 
 

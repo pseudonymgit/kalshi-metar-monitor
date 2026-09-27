@@ -490,3 +490,27 @@ def record_outcome(signal_name: str, station: str,
 def filter_signals(signals: List[dict]) -> List[dict]:
     """Legacy: filter signals by adaptive threshold."""
     return get_registry().filter_signals(signals)
+
+
+def filter_signals_by_adaptive_threshold(
+    signals: List[dict], trade_journal: Optional[Any] = None
+) -> List[dict]:
+    """Legacy compatibility shim used by signal_pipeline / paper_trading_engine.
+
+    Delegates to the current AdaptiveThresholdRegistry.filter_signals API rather
+    than resurrecting the retired v1 step-function logic. The ``trade_journal``
+    argument is accepted (and ignored) so existing 2-arg call sites keep working;
+    per-(signal, station) thresholds now come from the registry's Bayesian
+    controllers, whose outcome state is recorded via ``record_outcome``.
+
+    Contract preserved: dict-in / dict-out, passing signals get an
+    ``adaptive_threshold`` key added.
+    """
+    if not signals:
+        return []
+    result = get_registry().filter_signals(signals)
+    logger.info(
+        "Adaptive threshold filtering: %d signals in, %d signals out",
+        len(signals), len(result),
+    )
+    return result

@@ -40,7 +40,10 @@ def _get_daily_metars(self, target_date):
         ORDER BY station
     """, (target_date,))
 
-    stations = [row[0] for row in c.fetchall()]
+    # Canonical 20-station filter (2026-09-26): settlement_epochs carries
+    # off-list rows (KDAL, TEST, non-Kalshi extras) — never emit them.
+    _canonical = set(_get_all_stations())
+    stations = [row[0] for row in c.fetchall() if row[0] in _canonical]
     conn.close()
 
     return stations
@@ -281,12 +284,9 @@ def generate_signals(self, date):
 
     if not available_stations:
         print(f"INFO: No settlement data available for {date}, checking for live trading signals instead...")
-        available_stations = [s[0] for s in
-            [('KATL', 'Atlanta'), ('KBOS', 'Boston'), ('KLAX', 'Los Angeles'),
-             ('KJFK', 'New York'), ('KORD', 'Chicago'), ('KMIA', 'Miami'),
-             ('KSEA', 'Seattle'), ('KSFO', 'San Francisco'), ('KHOU', 'Houston'),
-             ('KPHX', 'Phoenix'), ('KDEN', 'Denver'), ('KATL', 'Atlanta')]]
-        available_stations = list(set(available_stations[:6]))  # Use first 6
+        # Canonical fallback — never use non-canonical codes (KJFK/KORD are not
+        # Kalshi weather stations; KNYC/KMDW are their canonical equivalents).
+        available_stations = list(_get_all_stations())[:6]
 
     # Open METAR DB connection for hourly late-day momentum signal
     metar_conn = sqlite3.connect(self.metar_db, timeout=10)
@@ -449,7 +449,9 @@ def generate_signals(self, date):
         
         # Group signals by station and market type, then apply agreement check
         grouped_signals = {}
-        for station, market_type, direction, reason in other_signals:
+        # ``other_signals`` may carry a 5th (confidence) element from the
+        # adaptive-threshold stage; only the first four are contractual here.
+        for station, market_type, direction, reason, *_ in other_signals:
             key = (station, market_type)
             if key not in grouped_signals:
                 grouped_signals[key] = []

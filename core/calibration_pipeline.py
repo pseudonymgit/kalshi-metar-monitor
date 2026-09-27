@@ -57,7 +57,78 @@ class CalibrationPipeline:
         
         # Initialize database-based history tracking to support signal history pruning (Task 4.9)
         self.db_path = os.getenv("SIGNAL_CALIBRATION_DB", "/var/data/signal_calibration.db")
+        self.persistence_available = False
+        self.persistence_writes = 0
+        self.persistence_failures = 0
+        self.last_persistence_success = None
+        self.last_persistence_error = None
         self._init_history_db()
+
+    def _init_history_db(self):
+        """Create the optional calibration-history table.
+
+        Calibration history is auxiliary persistence: in-memory history remains
+        authoritative for the current process, while this table provides a
+        durable audit trail when its parent directory is writable.  Database
+        failures are intentionally non-fatal so calibration remains usable in
+        read-only/test environments.
+        """
+        try:
+            parent = os.path.dirname(self.db_path)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS calibration_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        signal TEXT NOT NULL,
+                        city TEXT NOT NULL,
+                        direction TEXT,
+                        raw_conf REAL NOT NULL,
+                        was_correct INTEGER NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+                conn.commit()
+                self.persistence_available = True
+        except Exception:
+            self.persistence_available = False
+            _logger.debug("Calibration history DB unavailable", exc_info=True)
+
+    def persist_evaluation_to_db(self, signal, city, raw_conf, was_correct, direction=None):
+        """Persist one calibration observation when auxiliary storage is available."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute(
+                    """
+                    INSERT INTO calibration_history
+                        (signal, city, direction, raw_conf, was_correct)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (signal, city, direction, float(raw_conf), int(bool(was_correct))),
+                )
+                conn.commit()
+                self.persistence_writes += 1
+                self.last_persistence_success = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()
+                self.last_persistence_error = None
+        except Exception:
+            self.persistence_failures += 1
+            self.persistence_available = False
+            self.last_persistence_error = "calibration history write failed"
+            _logger.debug("Calibration history write unavailable", exc_info=True)
+
+    def persistence_health(self):
+        """Return observable persistence health for runtime receipts."""
+        return {
+            "db_path": self.db_path,
+            "available": bool(getattr(self, "persistence_available", False)),
+            "writes": self.persistence_writes,
+            "failures": self.persistence_failures,
+            "last_success": self.last_persistence_success,
+            "last_error": self.last_persistence_error,
+        }
 
     def set_window_start(self, window_start):
         """

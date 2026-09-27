@@ -423,7 +423,13 @@ class PaperTrader:
         if HAS_SPREAD_BASED_ENTRY:
             self.signal_names.append("spread_based_entry")
         # Define common weather stations for initial available locations
-        self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KJFK', 'KORD', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']  # Common trade locations
+        # Canonical 20-station filter (2026-09-26): pull from the registry
+        # instead of a hardcoded list that contained non-canonical codes
+        # (KJFK/KORD are dupes of KNYC/KMDW).
+        try:
+            self.available_stations = list(_get_all_stations())
+        except Exception:
+            self.available_stations = ['KATL', 'KBOS', 'KLAX', 'KNYC', 'KMDW', 'KMIA', 'KSEA', 'KSFO', 'KHOU', 'KPHX', 'KDEN']
 
         # Initialize calibration pipeline with common stations
         if HAS_CALIBRATION_PIPELINE:
@@ -1002,8 +1008,8 @@ class PaperTrader:
 
         # Open METAR DB connection for hourly late-day momentum signal
         metar_conn = sqlite3.connect(self.metar_db, timeout=10)
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
+        metar_conn.execute("PRAGMA journal_mode=WAL;")
+        metar_conn.execute("PRAGMA busy_timeout=5000;")
 
         for station in available_stations:
             # NOTE: reversion signal (Signal 1) REMOVED from ensemble per Phase 1 fix.
@@ -1272,7 +1278,9 @@ class PaperTrader:
             
             # Group signals by station and market type, then apply agreement check
             grouped_signals = {}
-            for station, market_type, direction, reason in other_signals:
+            # ``other_signals`` may carry a 5th (confidence) element from the
+            # adaptive-threshold stage; only the first four are contractual here.
+            for station, market_type, direction, reason, *_ in other_signals:
                 key = (station, market_type)
                 if key not in grouped_signals:
                     grouped_signals[key] = []
