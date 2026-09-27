@@ -66,15 +66,38 @@ LEVER_BOUNDS = {
 LHS_N_SAMPLES = 5000
 CHECKPOINT_INTERVAL = 500
 
+# Ensemble source consumed by this frozen grid. B2.3 pins `gefs_only`
+# (index 0 of LEVER_BOUNDS["ensemble_source"]). The B2 real-price sweep reads
+# ONLY the GEFS archive (see sweep/data.py:load_gefs_archive); ECMWF/TIGGE is
+# never consumed. The ECMWF-dependent hard gates are therefore enforced only
+# when the sweep actually consumes ECMWF — otherwise a GEFS-only sweep could be
+# aborted by an unrelated ECMWF/TIGGE shortfall (the hard gate would guard a
+# data source the run never reads).
+#
+# Re-promote the ECMWF gates to hard blocks whenever this is not `gefs_only`
+# (i.e. set this together with LEVER_BOUNDS["ensemble_source"]).
+SWEEP_ENSEMBLE_SOURCE = "gefs_only"
+SWEEP_USES_ECMWF = SWEEP_ENSEMBLE_SOURCE != "gefs_only"
 
-# Gate names that are hard blocks (sweep aborts if they fail)
-HARD_GATE_NAMES = [
+# Non-ECMWF hard gates (always enforced)
+_NON_ECMWF_HARD_GATES = [
     "GEFS completeness (≥30/31 members per date/station/step)",
-    "ECMWF completeness (≥49/51 members per date/station/step)",
-    "Station alignment: GEFS and ECMWF sample same stations",
     "Price sanity: entry_price between $0.01 and $0.99",
     "Fee sanity: fee_per_trade / notional ≤ 0.15",
 ]
+
+# ECMWF-dependent hard gates (only meaningful when the sweep reads ECMWF)
+_ECMWF_HARD_GATES = [
+    "ECMWF completeness (≥49/51 members per date/station/step)",
+    "Station alignment: GEFS and ECMWF sample same stations",
+]
+
+# Gate names that are hard blocks (sweep aborts if they fail)
+HARD_GATE_NAMES = (
+    _ECMWF_HARD_GATES + _NON_ECMWF_HARD_GATES
+    if SWEEP_USES_ECMWF
+    else list(_NON_ECMWF_HARD_GATES)
+)
 
 def run_integrity_gate(skip: bool = False) -> bool:
     """
