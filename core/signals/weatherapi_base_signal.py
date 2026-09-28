@@ -70,12 +70,32 @@ class WeatherAPIBaseSignal(BaseSignal):
         return f"<{type(self).__name__} name={self.name} db_path={self.db_path!r}>"
 
     def _resolve_db_path(self) -> Optional[str]:
-        """Resolve the archivedb path, preferring an explicit db_path."""
-        if self.db_path:
-            return self.db_path
+        """Resolve the WeatherAPI archive DB path.
+
+        WeatherAPI-sourced signals (cloud cover, feels-like, ...) read the
+        `hourly` table, which lives in `weatherapi_archive.db` — NOT in the
+        METAR DB. The signal registry instantiates these signals with the
+        METAR `db_path`, so an explicit `db_path` must be honoured only when it
+        actually contains the `hourly` table; otherwise fall back to the
+        archive DB. (Fix 2026-09-27: inherited METAR path caused
+        "no such table: hourly" and zero trades for these signals.)
+        """
+        candidate = self.db_path
+        if candidate and os.path.exists(candidate):
+            try:
+                c = sqlite3.connect(candidate)
+                has_hourly = c.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='hourly'"
+                ).fetchone()
+                c.close()
+                if has_hourly:
+                    return candidate
+            except sqlite3.Error:
+                pass
         repo_root = os.path.dirname(os.path.dirname(os.path.dirname(
             os.path.abspath(__file__))))
-        return os.path.join(repo_root, "data", self.DB_FILENAME)
+        default = os.path.join(repo_root, "data", self.DB_FILENAME)
+        return default
 
     def _load_hourly(
         self, station: str, conn: sqlite3.Connection

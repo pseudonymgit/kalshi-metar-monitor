@@ -92,66 +92,56 @@ class GateResult:
 
 def check_gefs_completeness() -> GateResult:
     """
-    Gate 1: Check that GEFS has ≥30/31 members for each (date, station, step=24).
+    Gate 1 (GS-A3): blob-invariant integrity for each (date, station, step=24).
+
+    The previous gate only checked `n_members >= 30`, which was BLIND to the real
+    corruption (n_members itself was inflated, so it passed while blobs were
+    polluted). This gate now asserts, per row:
+      - len(member_values) == n_members
+      - ensemble_min <= ensemble_mean <= ensemble_max
+      - spread > 0 (not a collapsed/identical-member ensemble)
     """
-    gate = GateResult("GEFS completeness (≥30/31 members per date/station/step)")
-    
+    gate = GateResult("GEFS blob integrity (len(blob)==n_members AND min<=mean<=max AND spread>0)")
+
     db_path = os.path.join(DATA_DIR, "gefs_archive.db")
     if not os.path.exists(db_path):
         gate.fail(f"GEFS database not found at {db_path}")
         gate.details = {"db_path": db_path, "exists": False}
         return gate
-    
+
     try:
         conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         cur = conn.cursor()
-        
-        # Count records by member count
+
+        cur.execute("SELECT COUNT(*) FROM gefs_archive WHERE step = ?", (TARGET_STEP,))
+        total = cur.fetchone()[0]
+
         cur.execute("""
-            SELECT n_members, COUNT(*) as cnt
-            FROM gefs_archive
-            WHERE step = ?
-            GROUP BY n_members
-            ORDER BY n_members
+            SELECT COUNT(*) FROM gefs_archive
+            WHERE step = ? AND (
+                length(member_values) != n_members
+                OR ensemble_mean < ensemble_min - 0.01
+                OR ensemble_mean > ensemble_max + 0.01
+                OR ensemble_max - ensemble_min <= 0
+            )
         """, (TARGET_STEP,))
-        member_dist = dict(cur.fetchall())
-        
-        total = sum(member_dist.values())
-        below_threshold = sum(v for k, v in member_dist.items() if k < GEFS_MIN_MEMBERS)
-        full_members = sum(v for k, v in member_dist.items() if k >= GEFS_EXPECTED_MEMBERS)
-        
+        violations = cur.fetchone()[0]
+
         gate.total_checked = total
-        gate.failed_count = below_threshold
+        gate.failed_count = violations
         gate.details = {
             "db_path": db_path,
             "target_step": TARGET_STEP,
             "total_records": total,
-            "member_distribution": member_dist,
-            "expected_members": GEFS_EXPECTED_MEMBERS,
-            "min_required": GEFS_MIN_MEMBERS,
-            "records_below_threshold": below_threshold,
-            "records_with_full_members": full_members,
-            "completeness_pct": round(full_members / total * 100, 1) if total > 0 else 0,
+            "invariant_violations": violations,
+            "checks": "len(blob)==n_members AND min<=mean<=max AND spread>0",
         }
-        
+
         if total == 0:
             gate.fail("No GEFS records found for step=24")
-        elif below_threshold > 0:
-            gate.fail(f"{below_threshold}/{total} records have <{GEFS_MIN_MEMBERS} members")
-        
-        # Show which stations have issues
-        if below_threshold > 0:
-            cur.execute("""
-                SELECT station, n_members, COUNT(*) as cnt
-                FROM gefs_archive
-                WHERE step = ? AND n_members < ?
-                GROUP BY station, n_members
-                ORDER BY cnt DESC
-                LIMIT 20
-            """, (TARGET_STEP, GEFS_MIN_MEMBERS))
-            low_member_records = [{"station": r[0], "n_members": r[1], "count": r[2]} for r in cur.fetchall()]
-            gate.details["low_member_examples"] = low_member_records
-        
+        elif violations > 0:
+            gate.fail(f"{violations}/{total} records violate blob invariants")
+
         conn.close()
     except Exception as e:
         gate.fail(f"Error querying GEFS database: {e}")

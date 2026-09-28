@@ -289,9 +289,11 @@ class HourlySignalEvaluator:
             conn = sqlite3.connect(self.metar_db, timeout=30)
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
+            # NOTE (WS-N 2026-09-27): metar_observations lacks clouds_cover_pct;
+            # selecting it raised "no such column". Use real columns only.
             cur.execute("""
                 SELECT timestamp_utc, temp_f, wind_direction_deg, pressure_mb,
-                       clouds_cover_pct, dewpoint_f, wind_speed_kt
+                       dewpoint_f, wind_speed_kt
                 FROM metar_observations
                 WHERE station = ? AND date_utc = ?
                   AND temp_f IS NOT NULL

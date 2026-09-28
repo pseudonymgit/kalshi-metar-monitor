@@ -33,21 +33,40 @@ def get_missing_dates(gefs_conn):
     return missing
 
 def get_nwp_data(target_date):
-    """Get GEFS ensemble data from nwp_forecasts.db for a target_date."""
+    """Get GEFS ensemble data from nwp_forecasts.db for a target_date.
+
+    FIX (WS-R 2026-09-28): nwp_forecasts keeps one row PER FETCH CYCLE
+    (UNIQUE includes fetch_date), so a naive SELECT returns several forecasts
+    for the same member — different vintages for the same target date. Feeding
+    all of them into one 'ensemble' concatenated multiple cycles, inflating
+    n_members (31 -> up to 155) and corrupting mean/min/max (a value older than
+    the mean landed in the list, so mean fell outside [min,max]).
+
+    We now take, per (station, variable), ONLY the row with the LATEST
+    fetch_date — i.e. one coherent forecast ensemble.
+    """
     nwp = sqlite3.connect(NWP_DB)
     cur = nwp.execute("""
-        SELECT station, value FROM nwp_forecasts
-        WHERE model='gefs_ens' AND target_date = ?
-        ORDER BY station, variable
-    """, (target_date,))
+        SELECT nf.station, nf.value
+        FROM nwp_forecasts nf
+        JOIN (
+            SELECT station, variable, MAX(fetch_date) AS max_fd
+            FROM nwp_forecasts
+            WHERE model='gefs_ens' AND target_date = ?
+            GROUP BY station, variable
+        ) latest
+          ON nf.station = latest.station
+         AND nf.variable = latest.variable
+         AND nf.fetch_date = latest.max_fd
+        WHERE nf.model='gefs_ens' AND nf.target_date = ?
+        ORDER BY nf.station, nf.variable
+    """, (target_date, target_date))
     rows = cur.fetchall()
     nwp.close()
     
     stations = {}
     for stn, val in rows:
-        if stn not in stations:
-            stations[stn] = []
-        stations[stn].append(val)
+        stations.setdefault(stn, []).append(val)
     return stations
 
 def encode_blob(member_temps_c, mean_c):

@@ -23,8 +23,11 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-_ECDS_URL = "https://ecds.ecmwf.int/api"
-_ECDS_KEY = "cf271ac1-862b-4c01-a6e9-9a6d84721707"
+_ECDS_URL = os.environ.get("ECDS_URL", "https://ecds.ecmwf.int/api")
+# GS-C5 (2026-09-28): previously a hardcoded ECDS key literal sat here. Removed.
+# Read from environment / .env only — never commit credentials. Dan rotates the
+# key out-of-band; this file must be secret-free.
+_ECDS_KEY = os.environ.get("ECDS_KEY", "")
 DB_PATH = os.path.join(ROOT, "data", "tigge_archive.db")
 GRIB_DIR = os.path.join(ROOT, "data", "tigge_grib")
 CKPT = os.path.join(ROOT, "data", "ecds_backfill_checkpoint.json")

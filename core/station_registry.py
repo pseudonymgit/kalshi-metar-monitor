@@ -363,6 +363,68 @@ TIER_MICROSTRUCTURE_DISCOUNTS = {
 CONFIG_MICROSTRUCTURE_OVERRIDE: dict = {}
 
 
+# ─── KALSHI SERIES MAP (derived, drift-proof) ──────────────────────────
+# Collection scripts no longer hardcode series tickers. get_station_series()
+# derives HIGH series from the canonical registry + data/kalshi_series_map.json
+# (primary), cross-checked against data/kalshi_official_mapping.json (live).
+# A registry/map disagreement raises loudly instead of silently dropping a
+# station — this is the guard against the 2026-09-26 drift recurring.
+_SERIES_MAP_PATH = os.path.join(_BASE, "data", "kalshi_series_map.json")
+_OFFICIAL_MAPPING_PATH = os.path.join(_BASE, "data", "kalshi_official_mapping.json")
+
+
+def get_station_series() -> dict:
+    """Derive {station: [HIGH series tickers]} for the canonical 20.
+
+    HIGH series first (the z8 collector polls the first ticker that returns
+    markets); legacy aliases follow as fallbacks. Sources of truth:
+      1. data/kalshi_series_map.json        — per-canonical-ICAO aliases (primary)
+      2. data/kalshi_official_mapping.json  — 20 live series (cross-check)
+
+    Raises ValueError if the registry and the series map disagree (a canonical
+    station with no series, or a series-map station not in the registry).
+    """
+    stations = get_all_stations()
+    with open(_SERIES_MAP_PATH) as f:
+        series_map = json.load(f)
+    sm_stations = (series_map.get("stations") or {}) if isinstance(series_map, dict) else {}
+    with open(_OFFICIAL_MAPPING_PATH) as f:
+        official = json.load(f)
+    official_series = {
+        str(r.get("series")) for r in official
+        if isinstance(r, dict) and r.get("series")
+    }
+
+    missing = [s for s in stations if s not in sm_stations]
+    extra = [s for s in sm_stations if s not in stations]
+    if missing or extra:
+        raise ValueError(
+            "KALSHI SERIES DRIFT: registry/map disagree. "
+            f"canonical station(s) missing a series: {sorted(missing)}; "
+            f"series-map station(s) not in registry: {sorted(extra)}. "
+            "Fix data/kalshi_series_map.json (or the registry) before collecting."
+        )
+
+    result: dict = {}
+    for station in stations:
+        entry = sm_stations[station]
+        if not entry.get("aliases"):
+            raise ValueError(
+                f"KALSHI SERIES DRIFT: canonical station {station} has no HIGH 'aliases'."
+            )
+        ordered = [str(t) for t in entry["aliases"]]
+        for t in entry.get("legacy_aliases", []):
+            if str(t) not in ordered:
+                ordered.append(str(t))
+        if not any(t in official_series for t in ordered):
+            raise ValueError(
+                f"KALSHI SERIES DRIFT: station {station} resolves to no live series "
+                f"in kalshi_official_mapping.json (tried {ordered})."
+            )
+        result[station] = ordered
+    return result
+
+
 def get_liquidity_tier(station: str) -> int:
     """Get the liquidity tier (1, 2, or 3) for a station.
 

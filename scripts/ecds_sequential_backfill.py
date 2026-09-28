@@ -205,7 +205,13 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
     Download and process a batch of dates in a single CDSAPI call.
     Returns True if all dates in batch succeeded.
     """
-    import cdsapi
+    try:
+        import cdsapi
+    except ImportError as e:
+        # Fail closed: a missing dependency must NOT look like success.
+        print(f"ERROR: cdsapi unavailable ({e}) — cannot acquire TIGGE data",
+              file=sys.stderr)
+        return False
     
     if not date_batch:
         return True
@@ -265,7 +271,13 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
     
     # Parse the multi-date GRIB once — GRIB messages have dataDate field
     # to distinguish which date each forecast is for
-    import eccodes
+    try:
+        import eccodes
+    except ImportError as e:
+        # Fail closed: a missing parser must NOT look like success.
+        print(f"ERROR: eccodes unavailable ({e}) — cannot parse TIGGE data",
+              file=sys.stderr)
+        return False
     
     # Structure: {date: {station: {step: [temps]}}}
     batch_data: Dict[str, Dict[str, Dict[int, List[float]]]] = {}
@@ -435,6 +447,9 @@ def main():
     
     t_start = time.time()
     failed_batches = 0
+    db_dates_before = conn.execute(
+        "SELECT COUNT(DISTINCT target_date) FROM tigge_archive"
+    ).fetchone()[0]
     
     for bi, batch in enumerate(batches):
         elapsed = time.time() - t_start
@@ -474,6 +489,21 @@ def main():
     print(f"  Rate: {len(dates)/(elapsed/3600):.1f} dates/hour")
     print(f"{'='*60}")
     conn.close()
+
+    # Loud failure: exit non-zero so an orchestrating cron cannot report
+    # green while writing nothing. Previously this script always exited 0,
+    # which let ecmwf-tigge-daily-update report ok while the archive stalled
+    # (e.g. ECMWF MARS AccessError "Restricted access to TIGGE data").
+    # Gate on dates actually written (not raw batch failures) so a batch that
+    # recovers via the per-date fallback still exits 0.
+    if db_dates <= db_dates_before:
+        print(
+            f"ERROR: no new dates written — archive still at {db_dates} dates "
+            f"after {len(dates)} requested date(s) ({failed_batches} batch "
+            f"failure(s)). Exiting non-zero.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
 
 if __name__ == "__main__":

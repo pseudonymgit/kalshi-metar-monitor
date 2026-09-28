@@ -57,13 +57,10 @@ class GammaEnsembleEvaluator:
     def load_station_data(self, station: str, date_range: Tuple[str, str]) -> List[dict]:
         """
         Load historical station data for evaluation.
-        
-        Args:
-            station: Station identifier (e.g., 'KJFK')
-            date_range: Tuple of (start_date, end_date)
-            
-        Returns:
-            List of daily data dictionaries
+
+        Adds `cloud_cover` (daily-mean percent) from weatherapi_archive.db when
+        available, so G6 can evaluate from real cloud data rather than the
+        visibility proxy. (WS-G2 2026-09-27)
         """
         start_dt, end_dt = date_range
         
@@ -89,6 +86,8 @@ class GammaEnsembleEvaluator:
         cursor = self.conn.cursor()
         cursor.execute(query, (station, start_dt, end_dt))
         rows = cursor.fetchall()
+
+        cloud_by_date = self._load_cloud_cover(station, start_dt, end_dt)
         
         # Convert to list of dictionaries
         days = []
@@ -105,9 +104,30 @@ class GammaEnsembleEvaluator:
                 'visibility': row[8],
                 'station': station
             }
+            if row[0] in cloud_by_date:
+                day_dict['cloud_cover'] = cloud_by_date[row[0]]
             days.append(day_dict)
         
         return days
+
+    def _load_cloud_cover(self, station, start_dt, end_dt):
+        """date -> mean cloud cover (%) from weatherapi_archive.db (best-effort)."""
+        import os as _os
+        db = _os.path.join(_os.path.dirname(_os.path.dirname(
+            _os.path.abspath(__file__))), 'data', 'weatherapi_archive.db')
+        if not _os.path.exists(db):
+            return {}
+        try:
+            c = sqlite3.connect(db)
+            rows = c.execute(
+                "SELECT date, AVG(cloud) FROM hourly WHERE station=? "
+                "AND date BETWEEN ? AND ? GROUP BY date",
+                (station, start_dt, end_dt),
+            ).fetchall()
+            c.close()
+            return {d: v for d, v in rows if v is not None}
+        except sqlite3.Error:
+            return {}
     
     def load_settlement_data(self, station: str, date_range: Tuple[str, str]) -> Dict[str, str]:
         """

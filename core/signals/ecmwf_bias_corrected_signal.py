@@ -322,22 +322,27 @@ class ECMWFBiasCorrectedSignal(BaseSignal):
         Returns:
             (direction, confidence) where direction is 'up' or 'down',
             or (None, 0.0) if insufficient data.
+
+        LEAKAGE CONTRACT (GS-B1/B7 2026-09-28): predicts the target day (idx) from
+        the LAST COMPLETED day only (idx-1 vs idx-2). Previously it read
+        days[idx]['high'] — the target day's observed high — a look-ahead leak.
         """
-        if idx < 1 or idx >= len(days):
+        if idx < 2 or idx >= len(days):
             return None, 0.0
 
-        today = days[idx].get('high')
-        yesterday = days[idx - 1].get('high')
+        cur = idx - 1  # last completed day
+        today = days[cur].get('high')
+        yesterday = days[cur - 1].get('high')
 
         if today is None or yesterday is None:
             return None, 0.0
 
-        # Direction based on most recent temperature change
+        # Direction based on most recent completed temperature change
         direction = 'up' if today > yesterday else 'down'
 
-        # Confidence based on trend consistency over last 3 days
+        # Confidence based on trend consistency over last 3 completed days
         consistent = 0
-        for i in range(max(1, idx - 2), idx + 1):
+        for i in range(max(1, cur - 2), cur + 1):
             prev = days[i - 1].get('high')
             curr = days[i].get('high')
             if prev is not None and curr is not None:

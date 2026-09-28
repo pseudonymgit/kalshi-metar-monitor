@@ -45,12 +45,17 @@ METAR_DB = DATA_DIR / "metar_backfill.db"
 NWP_DB = DATA_DIR / "nwp_forecasts.db"
 OUTPUT_FILE = DATA_DIR / "daily_loop_output.json"
 
-# The 20 active stations (matches intraday_bridge.ALL_STATIONS and the spec).
-ALL_STATIONS = [
-    "KATL", "KAUS", "KBOS", "KDCA", "KDEN", "KDFW", "KHOU", "KLAS",
-    "KLAX", "KMDW", "KMIA", "KMSP", "KMSY", "KNYC", "KOKC", "KPHL",
-    "KPHX", "KSAT", "KSEA", "KSFO",
-]
+# Canonical 20-station filter — single source of truth (2026-09-26).
+# Was a hand-maintained literal that could drift; now imports the registry.
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from core.station_registry import (
+    get_all_stations as _get_canonical_stations,
+    assert_canonical_stations as _assert_canonical,
+)
+
+# The 20 active stations (matches the Kalshi series set + spec).
+ALL_STATIONS = _get_canonical_stations()
 
 # Signal fusion constants (documented, deterministic).
 SIGNAL_CONFIDENCE_WEIGHT = {
@@ -353,6 +358,12 @@ def build_output(run_date: str) -> Dict[str, Any]:
 
         mean_confidence = round(sum(confidences) / len(confidences), 3) if confidences else 0.5
         overall_accuracy = round(0.5 + (mean_confidence - 0.5) * 0.5, 2)
+
+        # Guard: fail loudly if any non-canonical station reached the output.
+        _assert_canonical(
+            [v["station"] for v in stations_data.values()],
+            stage="daily_loop_producer",
+        )
 
         output = {
             "timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00"),

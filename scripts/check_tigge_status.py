@@ -8,7 +8,7 @@ from datetime import datetime, date, timedelta
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 _ECDS_URL = "https://ecds.ecmwf.int/api"
-_ECDS_KEY = "cf271ac1-862b-4c01-a6e9-9a6d84721707"
+_ECDS_KEY = os.environ.get("ECDS_KEY", "")  # GS-C5: secret-free; read from env
 DB_PATH = os.path.join(ROOT, "data", "tigge_archive.db")
 
 def log(msg):

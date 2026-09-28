@@ -127,10 +127,13 @@ class HourlyPipeline:
             cur = conn.cursor()
 
             # Query obs for this station and date
+            # NOTE (WS-N 2026-09-27): metar_observations has no clouds_cover_pct
+            # or ceil_humidity columns — querying them raised "no such column"
+            # and silently yielded 0 calibrated stations. Select only real columns.
             cur.execute("""
                 SELECT timestamp_utc, temp_f, dewpoint_f, wind_speed_kt,
-                       wind_direction_deg, pressure_mb, clouds_cover_pct,
-                       ceil_humidity, visibility_mi
+                       wind_direction_deg, pressure_mb,
+                       visibility_mi
                 FROM metar_observations
                 WHERE station = ? AND date_utc = ?
                   AND temp_f IS NOT NULL

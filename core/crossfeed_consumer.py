@@ -83,7 +83,9 @@ class CrossfeedConsumer:
             return None
         if self._conn is None:
             try:
-                self._conn = sqlite3.connect(f"file:{self._db_path}?mode=ro", uri=True)
+                # PWW sprint fix: removed ?mode=ro — the consumer must be able to
+                # write consumed=1 to the crossfeed DB after reading a signal.
+                self._conn = sqlite3.connect(str(self._db_path))
             except sqlite3.OperationalError:
                 logger.warning("PWW crossfeed DB not readable")
                 return None

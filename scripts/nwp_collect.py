@@ -15,6 +15,7 @@ endpoint: /v1/gfs, /v1/ecmwf, /v1/dwd-icon, /v1/gem.
 """
 
 import sqlite3
+import sys
 import urllib.request
 import urllib.error
 import json
@@ -348,6 +349,17 @@ def main():
     conn.close()
     print(f"\nDone at {datetime.now(timezone.utc).isoformat()}")
 
+    # GS-C1 (2026-09-28): zero-rows exit contract. A cron must not report green
+    # while writing nothing. Exit non-zero if the whole run stored no new values.
+    if total_stored == 0:
+        print(
+            f"ERROR: NWP collection stored 0 values across {len(MODELS)} model(s) "
+            f"({len(total_errors)} errors). Exiting non-zero.",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

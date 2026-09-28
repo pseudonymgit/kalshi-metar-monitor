@@ -28,8 +28,18 @@ if [ ! -f "$DAEMON_SCRIPT" ]; then
 fi
 
 mkdir -p logs
-nohup python3 "$DAEMON_SCRIPT" --interval-min 5 > logs/intraday_daemon.log 2>&1 &
+# Use the project venv: bare `python3` lacks numpy/scipy, which the intraday
+# pipeline imports (core/intraday/fusion.py) — that was the silent restart
+# failure. .venv-gefs has numpy+scipy; .venv's interpreter is broken.
+PYTHON_BIN="${WORK_DIR}/.venv-gefs/bin/python"
+if [ ! -x "$PYTHON_BIN" ]; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] venv python not found: $PYTHON_BIN" >> "$LOG_FILE"
+    exit 1
+fi
+nohup "$PYTHON_BIN" "$DAEMON_SCRIPT" --interval-min 5 > logs/intraday_daemon.log 2>&1 &
 NEW_PID=$!
+# Do NOT write PID_FILE here: the daemon writes its own PID on startup. Having
+# the watchdog pre-write $! caused the daemon's _check_pid() to see its own
+# (alive) PID and exit "already running". (WS-N fix 2026-09-27)
 echo "$(date '+%Y-%m-%d %H:%M:%S') [RESTART] Daemon restarted: PID=$NEW_PID" >> "$LOG_FILE"
-echo "$NEW_PID" > "$PID_FILE"
 exit 0

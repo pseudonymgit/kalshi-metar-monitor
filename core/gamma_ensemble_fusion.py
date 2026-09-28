@@ -52,7 +52,8 @@ class GammaEnsembleFusion:
                  ensemble_weight: float = 0.7,
                  gamma_weight: float = 0.3,
                  uncertainty_modulation: bool = True,
-                 agreement_threshold: float = 0.5):
+                 agreement_threshold: float = 0.5,
+                 use_signals: List[str] = None):
         """
         Initialize the fusion engine.
         
@@ -82,6 +83,9 @@ class GammaEnsembleFusion:
             'g5_dewpoint': self.gamma_signals[4],    # G5_DewpointSignal
             'g6_cloud_cover': self.gamma_signals[5]  # G6_CloudCoverSignal
         }
+        # GS-B4 (2026-09-28): only G1+G3 carry real edge (G2/G4/G5/G6 parked —
+        # honest holdout <=0.51). Gate the fusion to the keepers by default.
+        self.use_signals = use_signals or ['g1_uncertainty', 'g3_analog']
     
     def fuse(self, idx: int, days: List[dict]) -> FusionResult:
         """
@@ -105,10 +109,13 @@ class GammaEnsembleFusion:
             try:
                 gamma_dir, gamma_conf = signal.evaluate(idx, days)
                 gamma_results[name] = (gamma_dir, gamma_conf)
-                
-                # Only include signals that produced valid results
-                if gamma_dir is not None and gamma_conf > 0:
-                    active_gamma_signals.append((gamma_dir, gamma_conf))
+
+                # GS-B4/B6: only include allowlisted signals, and exclude any that
+                # are not meaningfully confident (conf<=0.5 carries no signed edge).
+                if name not in self.use_signals:
+                    continue
+                if gamma_dir is not None and gamma_conf > 0.5:
+                    active_gamma_signals.append((name, gamma_dir, gamma_conf))
             except Exception as e:
                 logger.warning(f"Gamma signal {name} failed: {e}")
                 gamma_results[name] = (None, 0.0)
@@ -150,49 +157,47 @@ class GammaEnsembleFusion:
             adjusted_confidence=adjusted_confidence
         )
     
-    def _aggregate_gamma_signals(self, active_signals: List[Tuple[str, float]]) -> Tuple[Optional[str], float]:
+    def _aggregate_gamma_signals(self, active_signals: List[tuple]) -> Tuple[Optional[str], float]:
         """
         Aggregate active gamma signals into a single prediction.
-        
+
+        GS-B6 (2026-09-28): SIGNED aggregation. Each signal votes with weight
+        max(0, 2*conf - 1) — a conf of 0.5 is zero weight, conf of 1.0 is full
+        weight. Signals at conf<=0.5 were already excluded upstream. This avoids
+        the old bug where a 0.51-conf signal counted as strongly as a 0.95 one.
+
         Args:
-            active_signals: List of (direction, confidence) tuples from active gamma signals
-            
+            active_signals: list of (name, direction, confidence) tuples
+
         Returns:
             (direction, confidence) aggregated result
         """
         if not active_signals:
             return None, 0.0
-        
-        # Separate up and down votes with their weights
-        up_votes = []
-        down_votes = []
-        
-        for direction, confidence in active_signals:
+
+        up_weight = 0.0
+        down_weight = 0.0
+        total_weight = 0.0
+        for entry in active_signals:
+            name, direction, confidence = entry
+            w = max(0.0, 2.0 * confidence - 1.0)  # signed weight; 0.5 -> 0
+            if w <= 0:
+                continue
+            total_weight += w
             if direction == 'up':
-                up_votes.append(confidence)
+                up_weight += w
             elif direction == 'down':
-                down_votes.append(confidence)
-            # Neutral signals don't vote in direction, but affect confidence
-        
-        total_up = sum(up_votes)
-        total_down = sum(down_votes)
-        total_confidence = total_up + total_down
-        
-        if total_confidence == 0:
+                down_weight += w
+
+        if total_weight == 0:
             return None, 0.0
-        
-        # Determine direction based on total weighted votes
-        if total_up > total_down:
-            final_direction = 'up'
-            final_confidence = total_up / len(active_signals)  # Average confidence of agreeing signals
-        elif total_down > total_up:
-            final_direction = 'down'
-            final_confidence = total_down / len(active_signals)  # Average confidence of agreeing signals
-        else:
-            # Tie - neutral direction with low confidence
-            return 'neutral', 0.3
-        
-        return final_direction, min(1.0, final_confidence)
+
+        if up_weight > down_weight:
+            return 'up', min(1.0, up_weight / total_weight)
+        if down_weight > up_weight:
+            return 'down', min(1.0, down_weight / total_weight)
+        # Tie — no directional edge
+        return 'neutral', 0.3
     
     def _calculate_agreement(self, 
                            ensemble_dir: Optional[str], 

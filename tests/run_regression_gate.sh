@@ -9,9 +9,19 @@ set -e
 echo "Starting Weather Engine Regression Gate..."
 
 # Track test results
-ALL_TESTS=("IMPORT" "SIGNAL_GEN" "RISK" "SKILL_GATE" "REGISTRY" "NWP" "CALIBRATION")
+ALL_TESTS=("IMPORT" "SIGNAL_GEN" "RISK" "SKILL_GATE" "REGISTRY" "NWP" "CALIBRATION" "TARGET_INVARIANCE")
 PASSED_TESTS=()
 FAILED_TESTS=()
+
+# Test 0 (GS-B3): Target-invariance gate — BLOCKING. No signal may read the
+# target day's observed values (the settlement answer). Any leak fails the gate.
+if python3 tests/test_target_invariance.py >/dev/null 2>&1; then
+    PASSED_TESTS+=("TARGET_INVARIANCE")
+else
+    echo "TARGET_INVARIANCE: FAIL (a signal reads the target day — look-ahead leak)"
+    python3 tests/test_target_invariance.py 2>&1 | grep -E "LEAK|-" | head
+    FAILED_TESTS+=("TARGET_INVARIANCE")
+fi
 
 # Test 1: Import check
 if python3 -c "from core.paper_trading_engine import PaperTrader; t = PaperTrader(); print('IMPORT: PASS')" 2>/dev/null; then

@@ -422,7 +422,13 @@ class RadiationalCoolingSignal(BaseSignal):
         if idx < self.min_lookback or idx >= len(days):
             return None, 0.0
 
-        day = days[idx]
+        # LEAKAGE CONTRACT (GS-B1 2026-09-28): read only the last COMPLETED day
+        # (idx-1). Previously this read days[idx] — the target day — whose observed
+        # temp/low/dewpoint ARE the settlement quantity.
+        cur = idx - 1
+        if cur < 0:
+            return None, 0.0
+        day = days[cur]
 
         # Extract daily fields (aggregate, not nighttime-specific)
         temp = day.get('temp')           # Avg temp (F)
