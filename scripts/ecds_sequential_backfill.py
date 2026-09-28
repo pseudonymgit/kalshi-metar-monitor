@@ -51,6 +51,11 @@ GRIB_DIR = str(REPO_ROOT / "data" / "tigge_grib")
 # wasted download on empty steps.
 TIGGE_STEPS = [0, 6, 12, 18, 24]
 BATCH_DAYS_DEFAULT = 5  # Default: 5 dates per CDSAPI call
+
+# TIGGE publishes with a ~1-2 day embargo on the newest dates. Requesting an
+# unpublished date returns AccessError 'Restricted access' and burns retries.
+# Cap the resume end-bound behind today by this many days. Verified 2026-09-28.
+TIGGE_EMBARGO_DAYS = 2
 DELAY_S = 5  # Small delay to respect ECDS queue
 
 CHECKPOINT_FILE = str(REPO_ROOT / "data" / "ecds_checkpoint.json")
@@ -403,14 +408,18 @@ def main():
             conn.close()
             return
         resume_from = date.fromisoformat(cp["last_date"]) + timedelta(days=1)
-        # End bound is TODAY, not MAX(target_date) in the archive. Using the
-        # archive max made this self-limiting: once the checkpoint caught up to
-        # the newest stored date, resume_from > end every run and the job
-        # printed "All dates up to checkpoint are filled." forever, so the
-        # collection could never advance past 2026-09-19. date.today() lets the
-        # backfill keep moving forward. Idempotent: get_dates_to_backfill skips
-        # dates already present, so re-runs are safe.
-        end = date.today()
+        # End bound is TODAY - TIGGE_EMBARGO_DAYS, not MAX(target_date) in the
+        # archive. Using the archive max made this self-limiting: once the
+        # checkpoint caught up to the newest stored date, resume_from > end
+        # every run and the job printed "All dates up to checkpoint are
+        # filled." forever. Using bare date.today() fixed that but then always
+        # reached for the newest day, which TIGGE has not yet published
+        # (verified 2026-09-28: 09-20 and 09-26 download fine, 09-27 returns
+        # AccessError 'Restricted access' — a publication embargo on the newest
+        # ~1-2 days, NOT an entitlement block). Capping at today-2 lets the
+        # backfill reach the newest PUBLISHED day and stop. Idempotent:
+        # get_dates_to_backfill skips dates already present, so re-runs are safe.
+        end = date.today() - timedelta(days=TIGGE_EMBARGO_DAYS)
         if resume_from > end:
             print("All dates up to today are filled.")
             conn.close()
