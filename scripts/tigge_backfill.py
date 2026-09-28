@@ -42,7 +42,7 @@ from typing import Dict, List, Tuple, Optional, Any
 
 # ECDS API URL (TIGGE migrated here in 2026-05)
 _ECDS_URL = "https://ecds.ecmwf.int/api"
-_ECDS_KEY = "e543bdb6-c396-48b4-bc1c-bebe08db954e"
+_ECDS_KEY = os.environ.get("ECDS_KEY", "")
 
 # ── Paths ──
 REPO_ROOT = Path(__file__).resolve().parents[1]

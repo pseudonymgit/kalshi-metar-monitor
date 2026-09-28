@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 _ECDS_URL = "https://ecds.ecmwf.int/api"
-_ECDS_KEY = "e543bdb6-c396-48b4-bc1c-bebe08db954e"
+_ECDS_KEY = os.environ.get("ECDS_KEY", "")
 
 STATIONS: List[Tuple[str, float, float]] = [
     ("KATL", 33.6407, -84.4277), ("KAUS", 30.1945, -97.6699),
