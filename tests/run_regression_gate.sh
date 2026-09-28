@@ -12,6 +12,7 @@ echo "Starting Weather Engine Regression Gate..."
 ALL_TESTS=("IMPORT" "SIGNAL_GEN" "RISK" "SKILL_GATE" "REGISTRY" "NWP" "CALIBRATION" "TARGET_INVARIANCE")
 PASSED_TESTS=()
 FAILED_TESTS=()
+SKIPPED_TESTS=()  # R/T (2026-09-28): skips reported separately, never as passes
 
 # Test 0 (GS-B3): Target-invariance gate — BLOCKING. No signal may read the
 # target day's observed values (the settlement answer). Any leak fails the gate.
@@ -85,41 +86,29 @@ fi
 # Test 5: Signal registry test
 if "$PYTHON" -c "
 import sqlite3
-try:
-    # First, verify the database exists and has required tables
-    conn = sqlite3.connect('data/metar_backfill.db')
-    cursor = conn.cursor()
-    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table';\")
-    tables = [row[0] for row in cursor.fetchall()]
-    if 'metar_observations' not in tables:
-        raise Exception('Missing metar_observations table')
-    conn.close()
-    
-    # Now test signal registry initialization separately
-    # We'll check for expected signals
-    from core.signals.wind_direction_shift import WindDirectionShiftSignal
-    from core.signals.nwp_analog_signal import NwpAnalogSignal
-    # NOTE: GoldilocksSignal might currently have issues but others should work
-    
-    # Try to initialize basic functionality (the problematic signal separately)
-    wind_sig_instance = WindDirectionShiftSignal('data/metar_backfill.db')
-    nwp_sig_instance = NwpAnalogSignal('data/metar_backfill.db', 'data/metar_backfill.db')
-    
-    print('REGISTRY: Basic signal components accessible')
-    print('REGISTRY: PASS')
-except Exception as e:
-    print(f'Registry Test Error: {e}')
-    # Check for specific dead signals in signal files themselves
-    import os
-    signal_files = []
-    signals_dir = 'core/signals'
-    if os.path.isdir(signals_dir):
-        for file_name in os.listdir(signals_dir):
-            if file_name.endswith('.py') and not file_name.startswith('__'):
-                if 'pressure_regime' in file_name or 'dtr_trend' in file_name:
-                    raise Exception(f'Dead signal file still exists: {file_name}')
-    print('REGISTRY: Checked for dead signal files, none found')
-    print('REGISTRY: PASS')
+# R/T FIX (2026-09-28): the old block printed 'REGISTRY: PASS' on its EXCEPT
+# branch -> any import/DB error was reported as a PASS (a false green). A registry
+# failure must FAIL the gate. Also assert registry size >= 17 (silent-shrink guard).
+import sqlite3
+conn = sqlite3.connect('data/metar_backfill.db')
+cur = conn.cursor()
+cur.execute(\"SELECT name FROM sqlite_master WHERE type='table';\")
+tables = [r[0] for r in cur.fetchall()]
+conn.close()
+if 'metar_observations' not in tables:
+    raise SystemExit('REGISTRY: FAIL - missing metar_observations table')
+from core.signals.wind_direction_shift import WindDirectionShiftSignal
+from core.signals.nwp_analog_signal import NwpAnalogSignal
+wind_sig_instance = WindDirectionShiftSignal('data/metar_backfill.db')
+nwp_sig_instance = NwpAnalogSignal('data/metar_backfill.db', 'data/metar_backfill.db')
+import sys as _sys
+if 'core' not in _sys.path:
+    _sys.path.insert(0, 'core')
+from signals import SignalRegistry
+_reg = SignalRegistry('data/metar_backfill.db')
+_n = len(_reg.get_all_signals())
+assert _n >= 17, f'registry shrank to {_n} (<17) - silent coverage loss'
+print(f'REGISTRY: PASS ({_n} signals)')
 " 2>/dev/null; then
     PASSED_TESTS+=("REGISTRY")
 else
@@ -152,9 +141,11 @@ except Exception as e:
     print('ERROR')
 " 2>/dev/null)
 
+    # R/T FIX (2026-09-28): missing NWP data is a SKIP, not a PASS. Previously it
+    # was added to PASSED_TESTS -> the gate could report 8/8 with NWP never run.
     if [ "$NWP_AVAILABLE" = "MISSING" ] || [ "$NWP_AVAILABLE" = "ERROR" ]; then
-        echo "NWP: SKIP (data not available)"
-        PASSED_TESTS+=("NWP")
+        echo "NWP: SKIP (data not available) - NOT counted as pass"
+        SKIPPED_TESTS+=("NWP")
     else
         echo "NWP: FAIL"
         FAILED_TESTS+=("NWP")
@@ -176,57 +167,21 @@ fi
 # Print Results Summary
 TOTAL_TESTS=${#ALL_TESTS[@]}
 PASSED_COUNT=${#PASSED_TESTS[@]}
+SKIPPED_COUNT=${#SKIPPED_TESTS[@]}
 
 echo ""
-echo "REGRESSION GATE RESULTS: $PASSED_COUNT/$TOTAL_TESTS tests passed"
+echo "REGRESSION GATE RESULTS: $PASSED_COUNT/$TOTAL_TESTS passed, $SKIPPED_COUNT skipped"
+if [ $SKIPPED_COUNT -gt 0 ]; then
+    echo "Skipped (NOT passes): ${SKIPPED_TESTS[*]}"
+fi
 
+# R/T FIX (2026-09-28): PASS requires EVERY test to pass; skips do not count.
 if [ $PASSED_COUNT -eq $TOTAL_TESTS ]; then
     echo "REGRESSION GATE: PASS - All systems nominal"
-    
-    # Ensure NWP was counted properly in the success case
-    if [[ ! " ${PASSED_TESTS[@]} " =~ " NWP " ]]; then
-        # If NWP wasn't explicitly passed, check if it was skipped due to missing data
-        NWP_STATUS="N/A"
-        for ft in "${FAILED_TESTS[@]}"; do
-            if [ "$ft" = "NWP" ]; then
-                NWP_STATUS="FAIL"
-                break
-            fi
-        done
-        if [ "$NWP_STATUS" = "N/A" ]; then
-            echo "Note: NWP test was skipped (data not available)"
-        fi
-    fi
-    
     exit 0
 else
     echo "REGRESSION GATE: FAIL - Critical components failing"
-    echo "Failed tests: ${FAILED_TESTS[*]}"
-    
-    # Special case: if only NWP failed and it's due to missing data, we might consider it a partial pass 
-    if [ ${#FAILED_TESTS[@]} -eq 1 ] && [ "${FAILED_TESTS[0]}" = "NWP" ]; then
-        echo "Only NWP test failed; checking if this is due to data availability..."
-        NWP_AVAILABLE=$("$PYTHON" -c "
-        try:
-            import sqlite3
-            conn = sqlite3.connect('data/nwp_forecasts.db')
-            cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM forecasts LIMIT 1')
-            has_data = cursor.fetchone()[0] > 0
-            print('AVAIL' if has_data else 'MISSING')
-            conn.close()
-        except Exception as e:
-            print('ERROR')
-        " 2>/dev/null)
-        
-        if [ "$NWP_AVAILABLE" = "MISSING" ] || [ "$NWP_AVAILABLE" = "ERROR" ]; then
-            echo "NWP test failed due to missing data, continuing with other passes..."
-            if [ $((${#PASSED_TESTS[@]} - 1)) -eq $((${TOTAL_TESTS} - 1)) ]; then
-                echo "All critical tests passed! Only NWP skipped due to missing data."
-                exit 0
-            fi
-        fi
-    fi
-    
+    [ ${#FAILED_TESTS[@]} -gt 0 ] && echo "Failed tests: ${FAILED_TESTS[*]}"
+    [ $SKIPPED_COUNT -gt 0 ] && echo "Skipped tests (not passes): ${SKIPPED_TESTS[*]}"
     exit 1
 fi
