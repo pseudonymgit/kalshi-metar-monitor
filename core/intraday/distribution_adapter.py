@@ -31,8 +31,9 @@ class DistributionState:
     station: str
     date: str
     mu: float          # calibrated predictive mean (F)
-    sigma: float       # calibrated predictive std (F)
+    sigma: float       # CURRENT predictive std (F)
     high_so_far: Optional[float] = None  # observed max so far today (F)
+    base_sigma: Optional[float] = None   # unshrunk daily sigma (set once at seed)
 
     def p_ge(self, x: float) -> float:
         # WAVE-A/2 (2026-09-28): enforce the monotonicity boundary EXACTLY.
@@ -49,13 +50,16 @@ def from_ws_p(dist: dict, station: str, ens_mean: float, ens_std: float,
     """Seed a DistributionState from the WS-P artifact.
 
     WAVE-A/4 (2026-09-28): `date` is now passed through (was hardcoded "").
+    E2E/F15: records `base_sigma` so the intraday shrink is applied to the daily
+    sigma ONCE per call, not compounded across calls.
     """
     fit = dist["fit"]
     bias = fit["per_station_bias_F"].get(station, 0.0)
     offset = fit["global_offset_F"]
     mb = fit.get("month_bias_F", {}).get(str(month), 0.0)
     sigma = max(0.8, fit["spread_a0_F"] + fit["spread_a1"] * ens_std)
-    return DistributionState(station, date, ens_mean + bias + offset + mb, sigma)
+    return DistributionState(station, date, ens_mean + bias + offset + mb, sigma,
+                             high_so_far=None, base_sigma=sigma)
 
 
 def update_from_intraday(state: DistributionState, high_so_far: float,
@@ -64,16 +68,25 @@ def update_from_intraday(state: DistributionState, high_so_far: float,
     Constrain the daily-max distribution by the observed high-so-far.
 
     WAVE-A/2: records high_so_far so p_ge() can enforce P(high>=X)=1 for
-    X<=high_so_far exactly (truncation, not just a mean shift). The mean is also
-    floored at the observed max; sigma shrinks as the day progresses.
+    X<=high_so_far exactly (truncation, not just a mean shift).
+
+    E2E/F15 (2026-09-28) — CRITICAL FIX: the shrink is now applied to `base_sigma`
+    (the unshrunk daily sigma recorded at seed), NOT to the running sigma. The old
+    form did `sigma = state.sigma * sqrt(remaining)`, which COMPOUNDED on every
+    call: a real hourly replay (≈20 calls) drove sigma 8.42 -> 0.37, turning the
+    distribution into a spike and making p_ge() a step function (a false p=1.0 on
+    strikes ABOVE the observed high). Recomputing from base_sigma each call makes
+    the update idempotent w.r.t. call count for a given (high_so_far, fraction).
     """
     df = max(0.0, min(1.0, day_fraction_elapsed))
     remaining = max(0.05, 1.0 - df)
     # Preserve the running observed max across successive calls.
     hsf = max(high_so_far, state.high_so_far) if state.high_so_far is not None else high_so_far
+    base = state.base_sigma if state.base_sigma is not None else state.sigma
     mu = max(state.mu, hsf)
-    sigma = state.sigma * math.sqrt(remaining)
-    return DistributionState(state.station, state.date, mu, sigma, high_so_far=hsf)
+    sigma = base * math.sqrt(remaining)
+    return DistributionState(state.station, state.date, mu, sigma,
+                             high_so_far=hsf, base_sigma=base)
 
 
 def select(state: DistributionState, strikes: List[Dict], min_edge: float = 0.0) -> Optional[Dict]:

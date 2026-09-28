@@ -14,6 +14,7 @@ to run the EV + market-skill measurement now.
 Deterministic. No AI/ML.
 """
 import json
+import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -30,7 +31,8 @@ SNAPSHOTS = REPO / "data" / "kalshi_market_snapshots.db"
 
 def load_strike_ladder(snapshot_db: Path, station: str, date_yy: str,
                        market_type: str = "HIGH",
-                       contract_semantic: str = "threshold") -> List[Dict]:
+                       contract_semantic: str = "threshold",
+                       before: Optional[str] = None) -> List[Dict]:
     """
     Load the strike ladder for one station-day from the most recent snapshot.
 
@@ -53,13 +55,20 @@ def load_strike_ladder(snapshot_db: Path, station: str, date_yy: str,
     conn = sqlite3.connect(f"file:{snapshot_db}?mode=ro", uri=True)
     try:
         like = f"%-{date_yy}-%"
-        rows = conn.execute(
-            """SELECT market_ticker, strike_temp, market_type, mid_price, yes_bid, yes_ask, snapshot_time
-               FROM market_snapshots
-               WHERE station=? AND market_ticker LIKE ? AND market_ticker LIKE ?
-                 AND mid_price IS NOT NULL
-               ORDER BY snapshot_time DESC""",
-            (station, like, f"{prefix}%")).fetchall()
+        sql = ("SELECT market_ticker, strike_temp, market_type, mid_price, yes_bid, yes_ask, snapshot_time "
+               "FROM market_snapshots "
+               "WHERE station=? AND market_ticker LIKE ? AND market_ticker LIKE ? "
+               "AND mid_price IS NOT NULL")
+        params: list = [station, like, f"{prefix}%"]
+        # E2E/F16 (2026-09-28): snapshots taken AFTER settlement write a 0.5
+        # placeholder mid_price into the same ticker rows, and 'latest-per-strike'
+        # therefore returned a non-tradeable price. `before` bounds the snapshot
+        # time to a pre-settlement instant so EV is computed on real quotes.
+        if before:
+            sql += " AND snapshot_time < ?"
+            params.append(before)
+        sql += " ORDER BY snapshot_time DESC"
+        rows = conn.execute(sql, params).fetchall()
     finally:
         conn.close()
 
@@ -74,10 +83,22 @@ def load_strike_ladder(snapshot_db: Path, station: str, date_yy: str,
             return tail.startswith("B")
         return True
 
+    def _strike_from_ticker(ticker: str) -> Optional[float]:
+        # E2E/F12 (2026-09-28): strike_temp is NULL for ~99.9% of snapshot rows
+        # (only 1008 of 1.88M are populated), so the price path silently returned
+        # nothing. The strike is embedded in the ticker suffix: -T65 / -B65.5.
+        tail = ticker.rsplit("-", 1)[-1]
+        m = re.match(r"^[TB]([0-9]+\.?[0-9]*)$", tail)
+        return float(m.group(1)) if m else None
+
     # keep the latest snapshot per strike
     seen = {}
     for ticker, strike, mtype, mid, yb, ya, ts in rows:
-        if strike is None or not _semantic_ok(ticker):
+        if not _semantic_ok(ticker):
+            continue
+        if strike is None:
+            strike = _strike_from_ticker(ticker)
+        if strike is None:
             continue
         if strike not in seen:
             yes = mid if mid is not None else (ya if ya is not None else None)

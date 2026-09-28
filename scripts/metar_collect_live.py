@@ -116,6 +116,14 @@ def parse_metar(raw_text):
     ceiling_ft = None
 
     for token in tokens[1:]:  # Skip station id
+        # ITEM-2 FIX (2026-09-28): temp_c/dew_c are only assigned inside the
+        # temperature-token block below, but referenced unconditionally after it.
+        # On any token that is NOT a temp token (wind, pressure, timestamp), the
+        # next `if dew_c is not None:` raised UnboundLocalError and killed the
+        # collector on the FIRST station — the true cause of the 2026-09-25 METAR
+        # stall (the earlier 'compile fix' only fixed syntax, not this runtime bug).
+        temp_c = None
+        dew_c = None
         if token == 'METAR' or token == 'AUTO':
             continue
         if token.endswith('Z') and re.match(r'^\d{6}Z$', token):
