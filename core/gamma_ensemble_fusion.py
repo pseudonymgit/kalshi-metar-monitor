@@ -254,7 +254,16 @@ class GammaEnsembleFusion:
             return gamma_dir, gamma_conf
         if gamma_dir is None:
             return ensemble_dir, ensemble_conf
-        
+
+        # WAVE-B/8 (2026-09-28): 'neutral' is the ABSENCE of a directional call,
+        # not a competing direction. Previously a neutral gamma (or ensemble) could
+        # win the low-agreement weighting and discard the other side's real call.
+        # Defer to whichever side has an actual direction.
+        if ensemble_dir == 'neutral' and gamma_dir != 'neutral':
+            return gamma_dir, gamma_conf
+        if gamma_dir == 'neutral' and ensemble_dir != 'neutral':
+            return ensemble_dir, ensemble_conf
+
         # If both are neutral, stay neutral
         if ensemble_dir == 'neutral' and gamma_dir == 'neutral':
             return 'neutral', (ensemble_conf + gamma_conf) / 2

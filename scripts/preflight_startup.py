@@ -14,7 +14,15 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED_MODULES = ["numpy", "scipy", "requests"]
+# WAVE-C/12 (2026-09-28): expanded so every WE entrypoint's deps are covered.
+# Previously only numpy/scipy/requests were checked, so an entrypoint needing
+# cdsapi/eccodes/xarray/cfgrib/pandas could pass preflight and then crash at run.
+REQUIRED_MODULES = [
+    "numpy", "scipy", "requests", "pandas",
+    "xarray", "cfgrib", "cdsapi", "cryptography",
+]
+# eccodes is the GRIB C-library binding; fail soft if absent (some hosts lack it).
+OPTIONAL_MODULES = ["eccodes"]
 REQUIRED_DBS = ["metar_backfill.db", "gefs_archive.db", "nwp_forecasts.db", "kalshi_settlements.db"]
 
 
@@ -31,6 +39,11 @@ def main():
             importlib.import_module(m)
         except ImportError as e:
             failures.append(f"missing module: {m} ({e})")
+    for m in OPTIONAL_MODULES:
+        try:
+            importlib.import_module(m)
+        except ImportError:
+            pass  # optional; absence is not fatal
 
     # 3. DB presence + readability + non-empty core tables
     checks = {

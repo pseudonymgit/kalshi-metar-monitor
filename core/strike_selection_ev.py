@@ -10,7 +10,7 @@ select the strike maximizing expected value, accounting for the fee model.
 
 EV logic (per strike X, YES side):
   p            = P(high >= X)                       (calibrated)
-  fee(c,p)     = ceil(0.07 * c * p * (1-p))         (Kalshi real fee, per side)
+  fee(c)       = ceil(0.07 * c)                     (Kalshi fee depends on price only, per side)
   EV_yes(X)    = p*(1 - cost_yes - fee) - (1-p)*(cost_yes + fee)
   EV_no(X)     = (1-p)*(1 - cost_no  - fee) - p*(cost_no  + fee)
   Choose max EV across strikes and sides; only fire if EV > min_edge.
@@ -41,9 +41,18 @@ def p_high_ge(mu: float, sigma: float, x: float) -> float:
     return 1.0 - norm_cdf((x - mu) / sigma)
 
 
-def kalshi_fee(price: float, p: float) -> float:
-    """Kalshi fee in dollars per contract (price in dollars 0-1)."""
-    return math.ceil(0.07 * price * p * (1 - p) * 100) / 100.0
+def kalshi_fee(price: float, p: float = None) -> float:
+    """Kalshi fee in dollars per contract (price in dollars 0-1).
+
+    WAVE-A/1 (2026-09-28): fee depends on the CONTRACT PRICE only, not on the
+    model probability. The prior `0.07 * price * p * (1 - p)` wrongly scaled the
+    fee by p*(1-p) (which peaks at 0.25), understating the true fee up to 4x.
+    Correct Kalshi general fee: ceil(0.07 * price)
+    """
+    p = 0.5 if p is None else p  # retained for call-site compatibility; unused
+    if price <= 0:
+        return 0.0
+    return math.ceil(0.07 * price * 100) / 100.0
 
 
 def ev_yes(mu: float, sigma: float, x: float, cost_yes: float) -> float:

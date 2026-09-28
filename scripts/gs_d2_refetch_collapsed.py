@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """
-GS-D2 — Re-fetch collapsed gefs_archive rows using the CORRECT forecast step (f024).
+GS-D2 / W1-A — Re-fetch collapsed gefs_archive rows using the CORRECT forecast step (f024).
 
-Defect: fast_gefs_backfill.py downloaded f006 (overnight max) with a whole-°C
-offset convention, producing collapsed/incorrect blobs. This script re-downloads
-the day-1 DAILY MAX (f024) per member and rewrites the blob in the canonical
-0.1°C offset convention, recomputing mean/min/max.
+Defect (GS-D2): fast_gefs_backfill.py downloaded f006 (overnight max) with a whole-°C
+offset convention, producing collapsed/incorrect blobs. This re-downloads the day-1
+DAILY MAX (f024) per member and rewrites blobs in the canonical 0.1°C offset convention.
+
+DESIGN (W1-A fix): GRIB files are per (init_date, member) and cover ALL stations. So we
+download each (date, member) GRIB ONCE and extract every station we need from it — NOT
+once per station-day (that was a 3x redundancy bug).
 
 Bounded + checkpointed. Dry-run by default. Only touches blob_ok=0 rows.
 
 Usage:
-  .venv-gefs/bin/python scripts/gs_d2_refetch_collapsed.py --dry-run
-  .venv-gefs/bin/python scripts/gs_d2_refetch_collapsed.py --apply --limit 20
-  .venv-gefs/bin/python scripts/gs_d2_refetch_collapsed.py --apply   # full
+  .venv-gefs/bin/python scripts/gs_d2_refetch_collapsed.py                 # dry-run
+  .venv-gefs/bin/python scripts/gs_d2_refetch_collapsed.py --apply --limit 5
+  .venv-gefs/bin/python scripts/gs_d2_refetch_collapsed.py --apply         # full
 """
 import argparse
 import json
@@ -22,8 +25,9 @@ import struct
 import sys
 import tempfile
 import urllib.request
-from datetime import date, timedelta
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -42,12 +46,12 @@ STATIONS = {
     "KSEA": (47.45, -122.31), "KSFO": (37.62, -122.38),
 }
 MEMBERS = ["gec00"] + [f"gep{d:02d}" for d in range(1, 31)]
-WORKERS = 8
-# NOTE: f024 = day-1 daily max. Do NOT use f006 (the original defect).
-FORECAST_STEP = 24
+WORKERS = 16
+FORECAST_STEP = 24  # f024 = day-1 daily max. NEVER f006 (the original defect).
 
 
-def extract_station_tmax(path, lat, lon):
+def extract_all_stations(path, stations):
+    """Open one GRIB, return {station: tmax_C} for every requested station."""
     import xarray as xr
     ds = xr.open_dataset(path, engine="cfgrib", filter_by_keys={"shortName": "tmax"})
     try:
@@ -56,91 +60,124 @@ def extract_station_tmax(path, lat, lon):
         if np.any(lons > 180):
             lons = np.where(lons > 180, lons - 360, lons)
         arr = ds.tmax.values
-        li = int(np.argmin(np.abs(lats - lat)))
-        lo = int(np.argmin(np.abs(lons - lon)))
-        v = float(arr[li, lo])
-        return None if (np.isnan(v) or np.isinf(v)) else v - 273.15
+        out = {}
+        for code in stations:
+            lat, lon = STATIONS[code]
+            li = int(np.argmin(np.abs(lats - lat)))
+            lo = int(np.argmin(np.abs(lons - lon)))
+            v = float(arr[li, lo])
+            if not (np.isnan(v) or np.isinf(v)):
+                out[code] = v - 273.15
+        return out
     finally:
         ds.close()
 
 
-def refetch_station(target_date, station):
-    """Return list of 31 member TMAX (C) using f024, or None."""
-    init = date.fromisoformat(target_date) - timedelta(days=1)
-    lat, lon = STATIONS[station]
-    temps = []
-    for member in MEMBERS:
-        url = f"{S3}/gefs.{init:%Y%m%d}/00/atmos/pgrb2sp25/{member}.t00z.pgrb2s.0p25.f{FORECAST_STEP:03d}"
-        tmp = tempfile.NamedTemporaryFile(suffix=".grib2", delete=False)
-        tmp.close()
-        try:
-            urllib.request.urlretrieve(url, tmp.name)
-            v = extract_station_tmax(tmp.name, lat, lon)
-            if v is not None:
-                temps.append(v)
-        except Exception:
-            pass
-        finally:
+def fetch_member(init_compact, member, stations):
+    """Download ONE (init, member) GRIB, return {station: tmax_C} or None."""
+    url = f"{S3}/gefs.{init_compact}/00/atmos/pgrb2sp25/{member}.t00z.pgrb2s.0p25.f{FORECAST_STEP:03d}"
+    tmp = tempfile.NamedTemporaryFile(suffix=".grib2", delete=False)
+    tmp.close()
+    try:
+        urllib.request.urlretrieve(url, tmp.name)
+        return extract_all_stations(tmp.name, stations)
+    except Exception:
+        return None
+    finally:
+        for p in (tmp.name, tmp.name + ".idx"):
             try:
-                os.unlink(tmp.name)
-                os.unlink(tmp.name + ".idx")
+                os.unlink(p)
             except OSError:
                 pass
-    return temps if len(temps) >= 3 else None
+
+
+def process_date(target_date, stations):
+    """Download all 31 members for one target date ONCE; return {station: [temps]}."""
+    init = date.fromisoformat(target_date) - timedelta(days=1)
+    init_c = f"{init:%Y%m%d}"
+    member_temps = defaultdict(dict)  # station -> member -> temp
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        futs = {ex.submit(fetch_member, init_c, m, stations): m for m in MEMBERS}
+        for f in as_completed(futs):
+            res = f.result()
+            if res:
+                for st, t in res.items():
+                    member_temps[st][futs[f]] = t
+    return {st: list(md.values()) for st, md in member_temps.items()}
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
-    ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--limit", type=int, default=0, help="limit number of DATES")
     args = ap.parse_args()
 
     conn = sqlite3.connect(ARCHIVE)
-    rows = conn.execute(
-        "SELECT DISTINCT target_date, station FROM gefs_archive "
-        "WHERE step=24 AND blob_ok=0 ORDER BY target_date").fetchall()
+    # date -> set of stations needing repair
+    need = defaultdict(set)
+    for d, s in conn.execute("SELECT target_date, station FROM gefs_archive WHERE step=24 AND blob_ok=0"):
+        need[d].add(s)
+    dates = sorted(need)
     if args.limit:
-        rows = rows[:args.limit]
-    print(f"collapsed (blob_ok=0) station-days to refetch: {len(rows)}")
+        dates = dates[:args.limit]
+    total_sd = sum(len(need[d]) for d in dates)
+    print(f"dates to process: {len(dates)} | station-days: {total_sd}")
 
     done = set()
     if os.path.exists(CKPT):
-        done = set(tuple(x) for x in json.load(open(CKPT)).get("done", []))
-    pending = [r for r in rows if r not in done]
-    print(f"pending: {len(pending)} (already done: {len(done)})")
+        done = set(json.load(open(CKPT)).get("done_dates", []))
+    pending = [d for d in dates if d not in done]
+    print(f"pending dates: {len(pending)} (done: {len(done)})")
     if not args.apply:
         print("DRY-RUN: no downloads.")
         return 0
 
-    fixed = failed = 0
-    results = {}
-    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        futs = {ex.submit(refetch_station, d, s): (d, s) for d, s in pending}
-        for i, f in enumerate(as_completed(futs)):
-            d, s = futs[f]
-            temps = f.result()
-            if not temps:
-                failed += 1
+    fixed_sd = failed_dates = partial_dates = 0
+    stuck = set()
+    for i, d in enumerate(pending):
+        stations = sorted(need[d])
+        per_st = process_date(d, stations)
+        ok_this = 0
+        for st, temps in per_st.items():
+            if len(temps) < 3:
                 continue
             mean = sum(temps) / len(temps)
             offs = [max(-128, min(127, int(round((t - mean) * 10)))) for t in temps]
-            offsets = struct.pack(f"{len(offs)}b", *offs)  # signed int8 (negatives OK)
-            results[(d, s)] = (offsets, round(mean, 2), round(min(temps), 2), round(max(temps), 2))
-            fixed += 1
-            if (i + 1) % 50 == 0:
-                print(f"  [{i+1}/{len(pending)}] fixed={fixed} failed={failed}")
+            blob = struct.pack(f"{len(offs)}b", *offs)
+            conn.execute(
+                "UPDATE gefs_archive SET member_values=?, n_members=?, ensemble_mean=?, "
+                "ensemble_min=?, ensemble_max=?, blob_ok=1, source='grib_backfill_f024' "
+                "WHERE target_date=? AND station=? AND step=24",
+                (blob, len(offs), round(mean, 2), round(min(temps), 2), round(max(temps), 2), d, st))
+            ok_this += 1
+        conn.commit()
+        fixed_sd += ok_this
+        # WAVE-C/11 (2026-09-28): a date is only DONE if every target row was
+        # repaired. Previously every date was marked done even when 0 rows were
+        # fixed, so the checkpoint lied and unrepaired rows were never retried.
+        if ok_this >= len(stations):
+            done.add(d)
+        elif ok_this == 0:
+            failed_dates += 1
+            stuck.add(d)
+        else:
+            partial_dates += 1
+            stuck.add(d)
+        # Recompute blob_ok HONESTLY from the DB for the rows still failing:
+        remaining = conn.execute(
+            "SELECT COUNT(*) FROM gefs_archive WHERE target_date=? AND step=24 AND blob_ok=0",
+            (d,)).fetchone()[0]
+        json.dump({"done_dates": sorted(done),
+                   "still_degenerate_dates": sorted(stuck),
+                   "blob_ok_remaining_for_date": remaining}, open(CKPT, "w"))
+        if (i + 1) % 25 == 0 or (i + 1) == len(pending):
+            print(f"  [{i+1}/{len(pending)}] {d}: fixed {ok_this}/{len(stations)} | total {fixed_sd}")
 
-    for (d, s), (offsets, mean, mn, mx) in results.items():
-        conn.execute(
-            "UPDATE gefs_archive SET member_values=?, n_members=?, ensemble_mean=?, "
-            "ensemble_min=?, ensemble_max=?, blob_ok=1, source='grib_backfill_f024' "
-            "WHERE target_date=? AND station=? AND step=24",
-            (offsets, len(offsets), mean, mn, mx, d, s))
-        done.add((d, s))
-    conn.commit()
-    json.dump({"done": [list(x) for x in done]}, open(CKPT, "w"))
-    print(f"\nrefetched+fixed: {fixed} | failed: {failed}")
-    return 0 if fixed > 0 or not pending else 1
+    total_stuck = conn.execute(
+        "SELECT COUNT(*) FROM gefs_archive WHERE step=24 AND blob_ok=0").fetchone()[0]
+    print(f"\nfixed station-days: {fixed_sd} | dates no-data: {failed_dates} | "
+          f"partial: {partial_dates} | blob_ok=0 remaining (honest): {total_stuck}")
+    return 0 if fixed_sd > 0 or not pending else 1
 
 
 if __name__ == "__main__":

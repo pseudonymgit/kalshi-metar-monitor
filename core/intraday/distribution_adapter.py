@@ -32,20 +32,30 @@ class DistributionState:
     date: str
     mu: float          # calibrated predictive mean (F)
     sigma: float       # calibrated predictive std (F)
+    high_so_far: Optional[float] = None  # observed max so far today (F)
 
     def p_ge(self, x: float) -> float:
+        # WAVE-A/2 (2026-09-28): enforce the monotonicity boundary EXACTLY.
+        # The daily max is >= high_so_far by construction, so P(high>=X)=1 for
+        # every X <= high_so_far. A shifted Gaussian still leaves mass below
+        # high_so_far (impossible events) -> we truncate explicitly.
+        if self.high_so_far is not None and x <= self.high_so_far:
+            return 1.0
         return p_high_ge(self.mu, self.sigma, x)
 
 
 def from_ws_p(dist: dict, station: str, ens_mean: float, ens_std: float,
-              month: int) -> DistributionState:
-    """Seed a DistributionState from the WS-P artifact."""
+              month: int, date: str = "") -> DistributionState:
+    """Seed a DistributionState from the WS-P artifact.
+
+    WAVE-A/4 (2026-09-28): `date` is now passed through (was hardcoded "").
+    """
     fit = dist["fit"]
     bias = fit["per_station_bias_F"].get(station, 0.0)
     offset = fit["global_offset_F"]
     mb = fit.get("month_bias_F", {}).get(str(month), 0.0)
     sigma = max(0.8, fit["spread_a0_F"] + fit["spread_a1"] * ens_std)
-    return DistributionState(station, "", ens_mean + bias + offset + mb, sigma)
+    return DistributionState(station, date, ens_mean + bias + offset + mb, sigma)
 
 
 def update_from_intraday(state: DistributionState, high_so_far: float,
@@ -53,16 +63,17 @@ def update_from_intraday(state: DistributionState, high_so_far: float,
     """
     Constrain the daily-max distribution by the observed high-so-far.
 
-    The daily max is AT LEAST high_so_far (monotone). We shift the mean up to the
-    observed max if the prior mean was below it, and shrink sigma as the day
-    progresses (remaining uncertainty about the peak falls).
+    WAVE-A/2: records high_so_far so p_ge() can enforce P(high>=X)=1 for
+    X<=high_so_far exactly (truncation, not just a mean shift). The mean is also
+    floored at the observed max; sigma shrinks as the day progresses.
     """
     df = max(0.0, min(1.0, day_fraction_elapsed))
-    # Remaining fraction of the day still able to set a new max.
     remaining = max(0.05, 1.0 - df)
-    mu = max(state.mu, high_so_far)
+    # Preserve the running observed max across successive calls.
+    hsf = max(high_so_far, state.high_so_far) if state.high_so_far is not None else high_so_far
+    mu = max(state.mu, hsf)
     sigma = state.sigma * math.sqrt(remaining)
-    return DistributionState(state.station, state.date, mu, sigma)
+    return DistributionState(state.station, state.date, mu, sigma, high_so_far=hsf)
 
 
 def select(state: DistributionState, strikes: List[Dict], min_edge: float = 0.0) -> Optional[Dict]:

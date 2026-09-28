@@ -104,8 +104,12 @@ class SignalRegistry:
             # ── Radiational Cooling (LOW only) ──
             'radiational_cooling': RadiationalCoolingSignal(db_path),
 
-            # ── Physics-Corrected Pressure Delta (revived 2026-09-18) ──
-            'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
+            # ── Physics-Corrected Pressure Delta ──
+            # WAVE-B/7 (2026-09-28): RE-REMOVED from registry. Settlement validation
+            # 2026-07-25 gave MCC=-0.2167 (actively harmful) and the header comment
+            # already listed it as removed — but it was still registered here, so it
+            # silently re-entered the ensemble. Kept out until a re-test clears it.
+            # 'corrected_pressure_delta': CorrectedPressureDeltaSignal(db_path),
 
             # ── Gamma Signals (G1-G6) for 82-member ensemble enhancement ──
             'gamma_g1_uncertainty': G1_UncertaintySignal(db_path),

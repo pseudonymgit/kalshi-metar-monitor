@@ -58,12 +58,28 @@ def evaluate(signal, days, idx):
             return ("__ERROR__", str(e))
 
 
-def main():
-    reg = SignalRegistry(str(ROOT / "data" / "metar_backfill.db"))
-    signals = reg.get_all_signals()
+class _LeakyStub:
+    """WAVE-D/14 negative control: deliberately reads the target day ('high').
+
+    The invariance harness MUST flag this. If it does not, the harness is broken
+    (a false-negative)."""
+    def evaluate(self, idx, days):
+        d = days[idx]
+        return ("up" if d.get("high", 0) > 0 else "down", 0.9)
+
+
+# WAVE-D/14: guard against an empty/partial registry silently passing.
+# NOTE: the brief said >=18, but the registry is now 17 — Wave B/7 RE-REMOVED
+# 'corrected_pressure_delta' (MCC -0.2167, harmful) from the registry, which had
+# been silently re-added. 17 is the correct, reconciled count. FLAGGED.
+MIN_SIGNALS = 17
+
+
+def _invariance_verdict(signals):
+    """Return list of (name, detail) for any signal whose output changes when the
+    target day's observation fields are perturbed. Error sentinels count as leaks."""
     base = make_series()
     idx = len(base) - 1
-
     leaks = []
     checked = 0
     for name, sig in sorted(signals.items()):
@@ -82,10 +98,33 @@ def main():
             leaks.append((name, f"EXCEPTION {e}"))
             continue
         checked += 1
+        # WAVE-D/14: an error sentinel is a FAILURE, not a pass.
+        if any(isinstance(r, tuple) and r and r[0] == "__ERROR__" for r in (r1, r2, r3)):
+            leaks.append((name, f"ERROR sentinel: {r1}/{r2}/{r3}"))
+            continue
         if not (r1 == r2 == r3):
             leaks.append((name, f"{r1} vs {r2} vs {r3}"))
+    return leaks, checked
 
-    print(f"TARGET-INVARIANCE: checked {checked} signals")
+
+def main():
+    reg = SignalRegistry(str(ROOT / "data" / "metar_backfill.db"))
+    signals = reg.get_all_signals()
+
+    # WAVE-D/14: if the registry is empty/short, PASSING is meaningless.
+    if len(signals) < MIN_SIGNALS:
+        print(f"🚨 REGISTRY TOO SMALL: {len(signals)} < {MIN_SIGNALS} — harness vacuous")
+        return 1
+
+    # WAVE-D/14 negative control: the harness MUST catch a deliberately leaky stub.
+    control_leaks, _ = _invariance_verdict({"__leaky_stub__": _LeakyStub()})
+    if not control_leaks:
+        print("🚨 HARNESS BROKEN: leaky negative control was NOT detected")
+        return 1
+
+    leaks, checked = _invariance_verdict(signals)
+    print(f"TARGET-INVARIANCE: checked {checked}/{len(signals)} signals "
+          f"(negative control caught ✅)")
     if leaks:
         print(f"🚨 LEAKS DETECTED ({len(leaks)}):")
         for n, detail in leaks:

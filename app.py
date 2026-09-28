@@ -3882,15 +3882,10 @@ def integrity_replay_parity():
 
 
 # ─── Health Check Endpoint ─────────────────────────────────────────────────
-
-@app.route("/healthz", methods=["GET"])
-def healthz():
-    """Simple health check endpoint for Render and monitoring."""
-    return jsonify({
-        "status": "ok",
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "uptime_seconds": int(monotonic() - START_TIME),
-    }), 200
+# NOTE (WAVE-D/13-15 2026-09-28): a duplicate `healthz` route/function was defined
+# here, which raised 'View function mapping is overwriting an existing endpoint'
+# at import and broke all 38 observability tests at collection. The canonical
+# healthz lives earlier in this file (with app/version fields). Duplicate removed.
 
 
 # Start collector daemon service on Render startup

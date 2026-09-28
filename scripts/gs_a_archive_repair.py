@@ -63,9 +63,10 @@ def main():
         # the anchor (it is 99% self-consistent with the blob), then recompute
         # min/max/n_members strictly FROM the blob.
         cur = conn.execute(
-            "SELECT ensemble_mean FROM gefs_archive WHERE target_date=? AND station=? AND step=?",
+            "SELECT ensemble_mean, n_members FROM gefs_archive WHERE target_date=? AND station=? AND step=?",
             (dt, st, step)).fetchone()
         mean_c = cur[0]
+        stored_n = cur[1]
         if mean_c is None:
             continue
         temps = mean_c + offs * 0.1  # degrees C
@@ -74,7 +75,11 @@ def main():
         is_degenerate = spread_f < 0.5
         if is_degenerate:
             degenerate += 1
-        blob_ok = (not is_degenerate) and (len(blob) == n_members) and (mn <= mean_c <= mx)
+        # WAVE-C/10 (2026-09-28): the old check compared len(blob) to n_members, but
+        # n_members = len(offs) = len(blob) — always True (tautology). Compare to the
+        # STORED n_members so a blob that disagrees with its recorded member count is
+        # actually caught.
+        blob_ok = (not is_degenerate) and (stored_n == n_members) and (mn <= mean_c <= mx)
         if args.apply:
             conn.execute(
                 "UPDATE gefs_archive SET ensemble_min=?, ensemble_max=?, n_members=?, "

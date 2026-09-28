@@ -17,12 +17,18 @@ from typing import List, Optional
 def brier(preds: List[float], outcomes: List[int]) -> Optional[float]:
     if not preds:
         return None
+    # WAVE-A/3 (2026-09-28): guard against silent zip-truncation.
+    if len(preds) != len(outcomes):
+        raise ValueError(f"brier: len(preds)={len(preds)} != len(outcomes)={len(outcomes)}")
     return sum((p - o) ** 2 for p, o in zip(preds, outcomes)) / len(preds)
 
 
 def ece(preds: List[float], outcomes: List[int], bins: int = 10) -> Optional[float]:
     if not preds:
         return None
+    # WAVE-A/3 (2026-09-28): guard against silent zip-truncation.
+    if len(preds) != len(outcomes):
+        raise ValueError(f"ece: len(preds)={len(preds)} != len(outcomes)={len(outcomes)}")
     n = len(preds)
     total = 0.0
     for i in range(bins):

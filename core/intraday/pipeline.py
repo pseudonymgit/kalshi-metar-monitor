@@ -183,7 +183,7 @@ class HourlyPipeline:
 
         result = {
             "temperature_f": sum(temps) / len(temps) if temps else None,
-            "dewpoint_f": sum(dews) / len(devs) if dews else None,
+            "dewpoint_f": sum(dews) / len(dews) if dews else None,
             "wind_speed_kt": sum(winds) / len(winds) if winds else None,
             "wind_direction_deg": sum(wind_dirs) / len(wind_dirs) if wind_dirs else None,
             "pressure_mb": sum(pressures) / len(pressures) if pressures else None,

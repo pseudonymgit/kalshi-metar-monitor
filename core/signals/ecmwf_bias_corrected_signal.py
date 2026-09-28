@@ -382,21 +382,46 @@ class ECMWFBiasCorrectedSignal(BaseSignal):
         if extremes['max_f'] is None or extremes['min_f'] is None:
             return None, 0.0
 
-        # Direction: forecast mid-temp above 70°F neutral baseline → 'up', else 'down'
+        # WAVE-B/6 (2026-09-28): baseline is now the per-station, per-MONTH
+        # climatological norm from ERA5 — NOT a hardcoded 70F. A 70F baseline is
+        # wrong for KPHX in July and KSEA in January alike.
+        baseline_f = self._monthly_norm_f(station, date)
         mid_temp = (extremes['max_f'] + extremes['min_f']) / 2.0
-        direction = 'up' if mid_temp > 70.0 else 'down'
+        direction = 'up' if mid_temp > baseline_f else 'down'
 
         # Confidence from bias correction quality + forecast strength
         confidence = extremes['confidence']
 
-        # Amplify confidence if forecast is clearly above/below baseline
-        deviation = abs(mid_temp - 70.0)
+        # Amplify confidence if forecast is clearly above/below the local norm
+        deviation = abs(mid_temp - baseline_f)
         if deviation > 10.0:
             confidence = min(0.85, confidence + 0.1)
         elif deviation < 3.0:
             confidence = max(0.3, confidence - 0.1)  # Near neutral → lower confidence
 
         return direction, round(confidence, 3)
+
+    def _monthly_norm_f(self, station: str, date: str) -> float:
+        """Per-station, per-month climatological daily-max norm (F) from ERA5.
+
+        Falls back to 70F only if ERA5 has no data for the station/month.
+        """
+        import sqlite3 as _sq
+        era5 = os.path.join(DATA_DIR, "era5_archive.db")
+        try:
+            month = date[5:7]
+            conn = _sq.connect(f"file:{era5}?mode=ro", uri=True)
+            row = conn.execute(
+                "SELECT AVG(daily_max_t2m) FROM era5_archive "
+                "WHERE station=? AND substr(target_date,6,2)=? AND daily_max_t2m IS NOT NULL",
+                (station, month),
+            ).fetchone()
+            conn.close()
+            if row and row[0] is not None:
+                return row[0] * 9.0 / 5.0 + 32.0
+        except Exception:
+            pass
+        return 70.0
 
     def record_settlement(self, station: str, settlement_date: str,
                           settlement_hour: int, actual_temp_f: float):

@@ -65,6 +65,10 @@ class GateResult:
     def __init__(self, name: str):
         self.name = name
         self.passed = True
+        # WAVE-C/9 (2026-09-28): a gate that had NO data to check is SKIPPED, not
+        # passed. Previously an unverified gate returned passed=True, which made
+        # `all_pass` meaningless (price/fee gates "passed" with zero inputs).
+        self.skipped = False
         self.issues: List[str] = []
         self.details: dict = {}
         self.failed_count = 0
@@ -74,11 +78,18 @@ class GateResult:
         self.passed = False
         self.issues.append(issue)
         self.failed_count += 1
+
+    def skip(self, reason: str):
+        """Mark the gate SKIPPED — no data available to verify. Not a pass."""
+        self.skipped = True
+        self.passed = False  # a skipped gate is NOT a pass
+        self.issues.append(f"SKIPPED: {reason}")
     
     def to_dict(self) -> dict:
         return {
             "name": self.name,
             "pass": self.passed,
+            "skipped": self.skipped,
             "issues": self.issues,
             "failed_count": self.failed_count,
             "total_checked": self.total_checked,
@@ -518,6 +529,8 @@ def check_price_sanity(results: Optional[List[dict]] = None) -> GateResult:
             # Temperature range implies price = probability of exceeding threshold
             # No direct price check without trade data
             gate.details["price_check_note"] = "Run with trade results to validate actual entry prices"
+            # WAVE-C/9: a temperature-range proxy is NOT a price check -> SKIPPED.
+            gate.skip("no trade prices provided (checked settlement temp range as proxy only)")
         except Exception as e:
             gate.fail(f"Error checking price sanity: {e}")
     
@@ -537,8 +550,10 @@ def check_fee_sanity(results: Optional[List[dict]] = None) -> GateResult:
     gate = GateResult(f"Fee sanity: fee_per_trade / notional ≤ {MAX_FEE_RATIO}")
     
     if not results:
+        # WAVE-C/9: no data to verify -> SKIPPED, not passed.
         gate.details = {"note": "No trade results provided. Pass trade data to validate fee sanity."}
         gate.total_checked = 0
+        gate.skip("no trade results provided")
         return gate
     
     violations = []
