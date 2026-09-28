@@ -357,7 +357,12 @@ def build_output(run_date: str) -> Dict[str, Any]:
             confidences.append(confidence)
 
         mean_confidence = round(sum(confidences) / len(confidences), 3) if confidences else 0.5
-        overall_accuracy = round(0.5 + (mean_confidence - 0.5) * 0.5, 2)
+        # P2-E (2026-09-28): this is NOT a measured accuracy — it is a monotone
+        # remap of mean confidence (0.5 + (conf-0.5)*0.5). Calling it "accuracy"
+        # invited readers to treat an unvalidated confidence average as a hit rate.
+        # Rename to what it is; keep the old key as a deprecated alias for any
+        # downstream consumer that hasn't migrated.
+        confidence_derived_edge_estimate = round(0.5 + (mean_confidence - 0.5) * 0.5, 2)
 
         # Guard: fail loudly if any non-canonical station reached the output.
         _assert_canonical(
@@ -372,7 +377,8 @@ def build_output(run_date: str) -> Dict[str, Any]:
             "stations": len(stations_data),
             "stations_data": stations_data,
             "consensus": {
-                "overall_accuracy_estimate": overall_accuracy,
+                "confidence_derived_edge_estimate": confidence_derived_edge_estimate,
+                "overall_accuracy_estimate": confidence_derived_edge_estimate,  # DEPRECATED alias (P2-E) — confidence-derived, NOT measured accuracy
                 "mean_confidence": mean_confidence,
                 "stations_with_signals": stations_with_signals,
             },

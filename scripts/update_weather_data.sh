@@ -26,20 +26,27 @@ echo ""
 
 cd "$REPO_DIR"
 
+# P2-A (2026-09-28): route every step through we_cron_preflight.sh so a broken
+# env/dep fails LOUDLY instead of `|| echo WARNING` silently continuing. The
+# `|| echo WARNING` pattern produced "green" cron runs that did no work.
+PY="$REPO_DIR/.venv-gefs/bin/python"
+[ -x "$PY" ] || PY="python3"
+FAILED=0
+
 # ─── Step 1: Collect METAR data ─────────────────────────────────────────────
 echo "--- Step 1: METAR collection ---"
-python3 scripts/metar_collect_live.py 2>&1 || echo "WARNING: METAR collection failed, continuing..."
+bash scripts/we_cron_preflight.sh "$PY" scripts/metar_collect_live.py || { echo "ERROR: METAR collection failed"; FAILED=1; }
 echo ""
 
 # ─── Step 2: Collect NWP data ───────────────────────────────────────────────
 echo "--- Step 2: NWP forecast collection ---"
-python3 scripts/nwp_collect.py 2>&1 || echo "WARNING: NWP collection failed, continuing..."
+bash scripts/we_cron_preflight.sh "$PY" scripts/nwp_collect.py || { echo "ERROR: NWP collection failed"; FAILED=1; }
 echo ""
 
 # ─── Step 3: Collect forecast disagreement data ─────────────────────────────
 echo "--- Step 3: Forecast disagreement collection ---"
 if [ -f scripts/forecast_disagreement_collector.py ]; then
-    python3 scripts/forecast_disagreement_collector.py 2>&1 || echo "WARNING: Forecast disagreement collection failed, continuing..."
+    bash scripts/we_cron_preflight.sh "$PY" scripts/forecast_disagreement_collector.py || { echo "ERROR: Forecast disagreement collection failed"; FAILED=1; }
 else
     echo "Skipping (not found)"
 fi
@@ -73,4 +80,9 @@ fi
 echo ""
 
 echo "=== Complete: $TIMESTAMP ==="
+if [ "$FAILED" -ne 0 ]; then
+    echo "RESULT: FAILED — one or more collection steps errored (see above)"
+    exit 1
+fi
+echo "RESULT: OK"
 echo ""

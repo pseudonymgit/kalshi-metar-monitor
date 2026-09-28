@@ -19,6 +19,12 @@ import sys
 import time
 from typing import Any
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from core.station_registry import get_all_stations, get_station_series
+
 logging.basicConfig(
     level=logging.INFO,
     format="[Z.8] %(asctime)s %(message)s",
@@ -26,36 +32,35 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger("z8")
 
-# station -> list of possible HIGH series tickers to try
-STATION_SERIES: dict[str, list[str]] = {
-    "KATL": ["KXHIGHATL", "KXHIGHTATL"],
-    "KAUS": ["KXHIGHAUS"],
-    "KBOS": ["KXHIGHTBOS", "KXHIGHBOS"],
-    "KDCA": ["KXHIGHDCA", "KXHIGHTDC"],
-    "KDEN": ["KXHIGHDEN"],
-    "KDFW": ["KXHIGHTDAL", "KXHIGHDFW"],
-    "KHOU": ["KXHIGHTHOU", "KXHIGHHOU"],
-    "KLAS": ["KXHIGHTLV", "KXHIGHLAS"],
-    "KLAX": ["KXHIGHLAX"],
-    "KMDW": ["KXHIGHMDW"],
-    "KMIA": ["KXHIGHMIA"],
-    "KMSP": ["KXHIGHTMIN", "KXHIGHMSP"],
-    "KMSY": ["KXHIGHTNOLA", "KXHIGHMSY"],
-    "KNYC": ["KXHIGHNY0", "KXHIGHNY"],
-    "KOKC": ["KXHIGHOKC", "KXHIGHTOKC"],
-    "KPHX": ["KXHIGHTPHX", "KXHIGHPHX"],
-    "KSEA": ["KXHIGHTSEA", "KXHIGHSEA"],
-    "KSFO": ["KXHIGHTSFO", "KXHIGHSFO"],
-}
+# station -> list of possible HIGH series tickers to try, derived at import time
+# from the canonical registry + data/kalshi_series_map.json (cross-checked
+# against data/kalshi_official_mapping.json). HIGH series first; legacy aliases
+# ordered after as fallbacks. Drift (registry/map disagreement) raises loudly.
+STATION_SERIES: dict[str, list[str]] = get_station_series()
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXPECTED_STATIONS = get_all_stations()
+if sorted(STATION_SERIES) != EXPECTED_STATIONS:
+    raise RuntimeError(
+        "Z8 SERIES DRIFT: derived STATION_SERIES != canonical registry. "
+        f"derived={sorted(STATION_SERIES)} canonical={EXPECTED_STATIONS}"
+    )
+
 DB_PATH = os.path.join(PROJECT_ROOT, "data", "kalshi_market_snapshots.db")
 
 _LAST_REQUEST = 0.0
 
 
 def _kalshi_get(path: str) -> dict[str, Any]:
-    import requests
+    try:
+        import requests
+    except ImportError as e:
+        # Fail LOUD: a missing HTTP dep must never look like "no active markets".
+        raise RuntimeError(
+            "z8: the `requests` module is required but not importable in this "
+            f"interpreter ({sys.executable}). Install it (e.g. "
+            "`python3 -m pip install --user --break-system-packages requests`). "
+            "Refusing to run and report a false-green empty snapshot."
+        ) from e
     global _LAST_REQUEST
     elapsed = time.time() - _LAST_REQUEST
     if elapsed < 1.5:
@@ -161,6 +166,14 @@ def main() -> int:
         conn.commit()
         LOGGER.info("DONE stations_ok=%d fail=%d total_markets=%d elapsed=%.1fs",
                     ok, fail, total, time.time() - t0)
+        # Fail LOUD on a total wipe-out: zero stations with zero markets means the
+        # collector did not actually collect (e.g. a missing dep swallowed per
+        # ticker). Report non-zero so the cron cannot go false-green.
+        if ok == 0:
+            LOGGER.error(
+                "Z8 ZERO STATIONS COLLECTED — refusing to report success "
+                "(ok=0, fail=%d). Check dependency/API health.", fail)
+            return 1
         return 0
     finally:
         conn.close()

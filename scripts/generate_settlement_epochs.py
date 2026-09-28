@@ -25,9 +25,35 @@ if script_dir not in sys.path:
 if workspace_dir not in sys.path:
     sys.path.insert(0, workspace_dir)
 
+# Canonical 20-station filter — single source of truth.
+# Root-cause fix (2026-09-26): this script used to pull stations dynamically
+# from daily_stats with NO filter, which emitted 30 stations (incl. KDAL/TEST
+# and 9 non-Kalshi extras). Processing must emit only the canonical 20.
+try:
+    from core.station_registry import (
+        get_all_stations as _get_canonical_stations,
+        assert_canonical_stations as _assert_canonical,
+    )
+except Exception:  # pragma: no cover - path fallback when run as a bare script
+    from station_registry import (
+        get_all_stations as _get_canonical_stations,
+        assert_canonical_stations as _assert_canonical,
+    )
+
 
 def get_temp_bucket(temp_f: float, market_type: str) -> int:
-    """Convert temperature in Fahrenheit to a bucket integer."""
+    """Convert temperature in Fahrenheit to a bucket integer.
+
+    Guards against physically impossible inputs: a corrupt `daily_stats`
+    temp (the METAR parser bug produced values like 64893.2) would otherwise
+    pass straight through as a garbage bucket (64893). Any temp outside the
+    sane band [-60, 140] F raises ValueError so the caller skips the epoch
+    rather than writing a poisoned settlement bucket.
+    """
+    if temp_f is None:
+        raise ValueError("temp_f is None")
+    if temp_f < -60.0 or temp_f > 140.0:
+        raise ValueError(f"temp_f out of sane band: {temp_f}")
     # Round to nearest whole degree, then bucket (0-5, 6-10, 11-15, etc.)
     rounded = int(round(temp_f))
     if market_type == "HIGH":
@@ -76,20 +102,29 @@ def generate_epochs_for_station(
         obs_count = row[7]
         ingestion_ts = row[8]
         
-        # Determine bucket based on market type
-        if market_type == "HIGH":
-            current_bucket = get_temp_bucket(max_temp_f, "HIGH")
-        else:
-            current_bucket = get_temp_bucket(min_temp_f, "LOW")
+        # Determine bucket based on market type. Guard: a corrupt daily_stats
+        # temp (out of the sane band) must NOT become a settlement bucket —
+        # skip the epoch instead of writing garbage (the 292-row defect).
+        try:
+            if market_type == "HIGH":
+                current_bucket = get_temp_bucket(max_temp_f, "HIGH")
+            else:
+                current_bucket = get_temp_bucket(min_temp_f, "LOW")
+        except ValueError as exc:
+            print(f"  SKIP {station} {date_local} {market_type}: {exc}")
+            continue
         
         # Get prior bucket (previous day's max for HIGH, min for LOW)
         prior_bucket = None
         if i > 0:
             prior_row = daily_rows[i - 1]
-            if market_type == "HIGH":
-                prior_bucket = get_temp_bucket(prior_row[4], "HIGH")
-            else:
-                prior_bucket = get_temp_bucket(prior_row[5], "LOW")
+            try:
+                if market_type == "HIGH":
+                    prior_bucket = get_temp_bucket(prior_row[4], "HIGH")
+                else:
+                    prior_bucket = get_temp_bucket(prior_row[5], "LOW")
+            except ValueError:
+                prior_bucket = None  # prior day unusable -> no direction
         
         # Determine reversion: 1 if current > prior, 0 otherwise
         reversion_occurred = 1 if (prior_bucket is not None and current_bucket > prior_bucket) else 0
@@ -258,12 +293,21 @@ def generate_settlement_epochs(
         cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT station FROM daily_stats ORDER BY station")
         all_stations = [row[0] for row in cursor.fetchall()]
-        
+
         if not all_stations:
             print("ERROR: No daily_stats found in database!")
             return {}
-        
-        print(f"Found {len(all_stations)} stations: {', '.join(all_stations)}")
+
+        total_found = len(all_stations)
+        canonical = set(_get_canonical_stations())
+        dropped = sorted(s for s in all_stations if s not in canonical)
+        all_stations = [s for s in all_stations if s in canonical]
+
+        print(f"Found {total_found} stations in daily_stats; "
+              f"filtered to {len(all_stations)} canonical stations")
+        if dropped:
+            print(f"  Excluded non-canonical: {', '.join(dropped)}")
+        print(f"Canonical set: {', '.join(all_stations)}")
         print()
         
         # Filter if specified
@@ -300,7 +344,14 @@ def generate_settlement_epochs(
         
         for key, count in sorted(station_counts.items()):
             print(f"  {key}: {count}")
-        
+
+        # Guard: fail loudly if THIS RUN emitted a non-canonical station.
+        # (Checked against emitted set, not the whole table — legacy off-list
+        # rows from the pre-fix 30-station run still exist and are flagged for
+        # a separate, Dan-gated purge.)
+        emitted = sorted({k.rsplit("_", 1)[0] for k in station_counts})
+        _assert_canonical(emitted, stage="generate_settlement_epochs")
+
         print()
         
         # Verify insertion

@@ -43,6 +43,8 @@ if REPO_ROOT not in sys.path:
 # Using v1/ecmwf endpoint for explicit ECMWF IFS data
 OPEN_METEO_BASE = "https://api.open-meteo.com/v1/ecmwf"
 RATE_LIMIT_DELAY = 0.5  # 500ms between requests (well within 10k/day limit)
+# P2-C: on-disk forecast cache — keeps network I/O + sleep out of the signal path.
+_ECMWF_CACHE_DIR = os.path.join(DATA_DIR, "ecmwf_cache")
 
 # Bias correction
 BIAS_DB_PATH = os.path.join(DATA_DIR, "ecmwf_bias.db")
@@ -126,15 +128,51 @@ class ECMWFBiasCorrectedSignal(BaseSignal):
             logger.error(f"Open-Meteo ECMWF fetch failed: {e}")
             return None
 
+    def _fetch_with_retry(self, lat: float, lon: float, max_retries: int = 3) -> Optional[Dict]:
+        """Bounded-retry fetch. The rate-limit sleep lives here (cold path), not in
+        the per-call signal path. Exponential backoff: 0.5s, 1s, 2s."""
+        for attempt in range(max_retries):
+            if attempt > 0:
+                time.sleep(RATE_LIMIT_DELAY * (2 ** attempt))
+            data = self._fetch_from_open_meteo(lat, lon)
+            if data is not None:
+                return data
+            logger.warning(f"ECMWF fetch attempt {attempt+1}/{max_retries} failed for ({lat},{lon})")
+        return None
+
+    def _cache_path(self, lat: float, lon: float) -> str:
+        import hashlib as _hl
+        h = _hl.sha1(f"{lat:.3f},{lon:.3f}".encode()).hexdigest()[:12]
+        day = datetime.now(timezone.utc).strftime("%Y%m%d")
+        return os.path.join(_ECMWF_CACHE_DIR, f"ecmwf_{h}_{day}.json")
+
     def get_forecast(self, station: str, lat: float, lon: float) -> Optional[Dict]:
         """
         Fetch 3-day ECMWF IFS forecast for a station.
 
-        Returns dict with hourly temperature forecasts.
+        P2-C (2026-09-28): network I/O + rate-limit sleep moved OUT of the hot
+        signal path into a per-(lat,lon,day) on-disk cache. On a cache hit there
+        is NO network call and NO sleep; a prefetch job (or first call of the day)
+        warms the cache with a bounded retry. This removes the 0.5s serial stall
+        and the failure mode where a flaky network drags every signal evaluation.
         """
-        time.sleep(RATE_LIMIT_DELAY)  # Rate limit safety
-
-        raw = self._fetch_from_open_meteo(lat, lon)
+        cache = self._cache_path(lat, lon)
+        raw = None
+        if os.path.exists(cache):
+            try:
+                with open(cache) as fh:
+                    raw = json.load(fh)
+            except Exception:
+                raw = None
+        if raw is None:
+            raw = self._fetch_with_retry(lat, lon)
+            if raw is not None:
+                try:
+                    os.makedirs(_ECMWF_CACHE_DIR, exist_ok=True)
+                    with open(cache, "w") as fh:
+                        json.dump(raw, fh)
+                except Exception:
+                    pass
         if raw is None:
             return None
 

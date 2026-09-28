@@ -9,7 +9,7 @@ User=gaddams
 WorkingDirectory=/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source
 Environment=PYTHONUNBUFFERED=1
 ExecStartPre=/bin/bash -c 'source /home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/scripts/load_webhooks.sh'
-ExecStart=/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/.venv/bin/python /home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/app.py --env sbox
+ExecStart=/home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/.venv-gefs/bin/python /home/gaddams/.openclaw-next/workspace/prototypes/weather-engine-source/app.py --env sbox
 Restart=always
 RestartSec=10
 StandardOutput=journal

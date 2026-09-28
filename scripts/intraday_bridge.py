@@ -42,6 +42,14 @@ DATA_DIR = REPO_ROOT / "data"
 INTRADAY_DIR = DATA_DIR / "intraday"
 LOGS_DIR = REPO_ROOT / "logs"
 
+# Canonical 20-station filter — single source of truth (2026-09-26).
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from core.station_registry import (
+    get_all_stations as _get_canonical_stations,
+    assert_canonical_stations as _assert_canonical,
+)
+
 # ─── Paths ────────────────────────────────────────────────────────────────
 DAILY_LOOP_OUTPUT = DATA_DIR / "daily_loop_output.json"
 ANCHOR_H24_FILE = INTRADAY_DIR / "anchor_h24.json"
@@ -49,11 +57,7 @@ ANCHOR_H24_FILE = INTRADAY_DIR / "anchor_h24.json"
 # ─── Constants ────────────────────────────────────────────────────────────
 MAX_DAILY_AGE_HOURS = 36
 
-ALL_STATIONS = [
-    "KATL", "KAUS", "KBOS", "KDCA", "KDEN", "KDFW", "KHOU", "KLAS",
-    "KLAX", "KMDW", "KMIA", "KMSP", "KMSY", "KNYC", "KOKC", "KPHL",
-    "KPHX", "KSAT", "KSEA", "KSFO",
-]
+ALL_STATIONS = _get_canonical_stations()
 
 logger = logging.getLogger("intraday_bridge")
 
@@ -193,6 +197,11 @@ def _build_anchor(daily_data: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     # Per-station directional data lives in `stations_data` (current schema) or
     # `consensus.stations` (legacy schema).
     per_station = daily_data.get("stations_data") or consensus.get("stations", {})
+
+    # Canonical 20-station filter (2026-09-26): drop any off-list station and
+    # fail loudly if the upstream producer leaked a non-canonical one.
+    _assert_canonical(list(per_station.keys()), stage="intraday_bridge")
+    per_station = {k: v for k, v in per_station.items() if k in set(ALL_STATIONS)}
 
     # Aggregate a single directional anchor from per-station data when the
     # consensus block does not carry direction/confidence/mu/sigma directly.

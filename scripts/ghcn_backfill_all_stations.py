@@ -110,8 +110,14 @@ def _fetch_file(url: str, dest: Path, force: bool = False, timeout: int = 120) -
     raise RuntimeError(f"Fetch failed after retries: {url} -> {dest} ({last_err})")
 
 
-def download_all(stations: list[str], rate_limit: float = 0.5) -> tuple[int, int]:
-    """Download per-station .dly files. Returns (successes, attempts)."""
+def download_all(stations: list[str], rate_limit: float = 0.5, force: bool = False) -> tuple[int, int]:
+    """Download per-station .dly files. Returns (successes, attempts).
+
+    force=True re-downloads every file even if a local copy exists. NOAA
+    publishes the same all/<id>.dly file with new rows appended through the
+    current day, so a stale cache must be refreshed — a bare existence check
+    would otherwise freeze the DB at whatever date the cache was first written.
+    """
     ok = 0
     attempted = 0
     for i, icao in enumerate(stations):
@@ -123,7 +129,7 @@ def download_all(stations: list[str], rate_limit: float = 0.5) -> tuple[int, int
         dest = RAW_DIR / f"{ghcn_id}.dly"
         attempted += 1
         try:
-            if _fetch_file(url, dest):
+            if _fetch_file(url, dest, force=force):
                 ok += 1
             else:
                 ok += 1  # cached counts as available
@@ -330,7 +336,7 @@ def main() -> int:
 
     if not args.no_fetch:
         _LOGGER.info("Downloading .dly files from %s ...", BASE_URL)
-        ok, attempted = download_all(stations, rate_limit=args.rate_limit)
+        ok, attempted = download_all(stations, rate_limit=args.rate_limit, force=args.force)
         _LOGGER.info("Downloaded/available %d/%d files", ok, attempted)
     else:
         _LOGGER.info("Skipping download (--no-fetch)")

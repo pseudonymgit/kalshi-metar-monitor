@@ -125,85 +125,10 @@ def store_ensemble(conn, station, date_str, step, temps):
     """, (date_str, station, step, mean, mn, mx, values_blob, n_members))
 
 
-def parse_tigge_grib_all_stations(grib_file: str) -> Dict[str, Dict[int, List[float]]]:
-    """
-    Parse GRIB in ONE PASS for ALL 20 stations.
-    
-    Returns: {station_code: {step_hour: [temp_c_1, temp_c_2, ...]}}
-    
-    Key optimization: pre-compute nearest grid point indices on first message,
-    then extract at those indices for all subsequent messages.
-    """
-    import eccodes
-    
-    # Result structure: station → step → list of member temperatures
-    result: Dict[str, Dict[int, List[float]]] = {s: {} for s in STATION_NAMES}
-    station_indices = None  # {station_code: flat_index}
-    grib_msg_count = 0
-    station_pulls = 0
-    
-    if not os.path.exists(grib_file):
-        return result
-    
-    with open(grib_file, 'rb') as f:
-        while True:
-            try:
-                gid = eccodes.codes_grib_new_from_file(f)
-            except Exception:
-                break
-            if gid is None:
-                break
-            
-            grib_msg_count += 1
-            
-            try:
-                # Get step — skip if not in our target list
-                step = eccodes.codes_get_long(gid, 'step')
-                if step not in TIGGE_STEPS:
-                    eccodes.codes_release(gid)
-                    continue
-                
-                # Initialize step containers on first encounter
-                if station_indices is None:
-                    # First message: extract grid and compute nearest-point indices
-                    lats = eccodes.codes_get_array(gid, 'latitudes')
-                    lons = eccodes.codes_get_array(gid, 'longitudes')
-                    station_indices = {}
-                    for station in STATION_NAMES:
-                        st_lat, st_lon = STATION_MAP[station]
-                        best_dist = float('inf')
-                        best_idx = 0
-                        for i in range(len(lats)):
-                            dlat = lats[i] - st_lat
-                            dlon = lons[i] - st_lon
-                            dist = dlat * dlat + dlon * dlon
-                            if dist < best_dist:
-                                best_dist = dist
-                                best_idx = i
-                        station_indices[station] = best_idx
-                
-                # Initialize step for all stations
-                for s in STATION_NAMES:
-                    if step not in result[s]:
-                        result[s][step] = []
-                
-                # Extract temperature at all station grid points
-                values = eccodes.codes_get_values(gid)
-                for station in STATION_NAMES:
-                    temp_k = float(values.flat[station_indices[station]])
-                    temp_c = round(temp_k - 273.15, 2)
-                    result[station][step].append(temp_c)
-                    station_pulls += 1
-                    
-            except Exception as e:
-                pass
-            
-            eccodes.codes_release(gid)
-    
-    print(f"    GRIB parsed: {grib_msg_count} msgs, {station_pulls} station-pulls, "
-          f"{sum(len(result[s][step]) for s in STATION_NAMES for step in result[s])} total values")
-    return result
-
+# P2-F (2026-09-28): removed dead function `parse_tigge_grib_all_stations`.
+# It was never called (the live path parses inline in `process_batch`) and it
+# carried a silent `except Exception: pass` that could swallow every GRIB parse
+# error. Dead code + silent failure — quarantined.
 
 def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
     """

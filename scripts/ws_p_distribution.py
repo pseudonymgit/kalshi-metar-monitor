@@ -290,7 +290,12 @@ def main():
 
     summary = {
         "task": "WS-P/WS-Q ensemble->P(high>=X), GEFS-only",
-        "tigge_constraint": "TIGGE/ECMWF 50-member ensemble UNAVAILABLE (entitlement-restricted; archive frozen 2026-09-25). Distribution built GEFS-only; TIGGE remains a documented upgrade path.",
+        # P4-D (2026-09-28): corrected. TIGGE access is GRANTED and the archive is
+        # LIVE (max 2026-09-26, 186.5k rows); the earlier "UNAVAILABLE/frozen" claim
+        # was stale. TIGGE publishes with a ~2-day embargo on the newest days, which
+        # is a publication delay, not an entitlement block. The distribution is still
+        # built GEFS-only BY CHOICE here; TIGGE is the documented upgrade path.
+        "tigge_constraint": "TIGGE access GRANTED, archive LIVE (through 2026-09-26); newest ~2 days embargoed (publication delay). This distribution is GEFS-only; TIGGE 50-member is a documented upgrade path.",
         "split": {"holdout_start": args.split, "train_n": len(train_keys), "holdout_n": len(hold_keys)},
         "fit": {"spread_a0_F": round(float(a0), 3), "spread_a1": round(float(a1), 3),
                 "global_offset_F": round(float(offset), 3),
