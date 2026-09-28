@@ -15,11 +15,12 @@ FAILED_TESTS=()
 
 # Test 0 (GS-B3): Target-invariance gate — BLOCKING. No signal may read the
 # target day's observed values (the settlement answer). Any leak fails the gate.
-if python3 tests/test_target_invariance.py >/dev/null 2>&1; then
+PYTHON="${PYTHON:-.venv-gefs/bin/python}"
+if "$PYTHON" tests/test_target_invariance.py >/dev/null 2>&1; then
     PASSED_TESTS+=("TARGET_INVARIANCE")
 else
     echo "TARGET_INVARIANCE: FAIL (a signal reads the target day — look-ahead leak)"
-    python3 tests/test_target_invariance.py 2>&1 | grep -E "LEAK|-" | head
+    "$PYTHON" tests/test_target_invariance.py 2>&1 | grep -E "LEAK|-" | head
     FAILED_TESTS+=("TARGET_INVARIANCE")
 fi
 
