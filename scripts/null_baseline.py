@@ -41,10 +41,14 @@ def main():
     g.close()
 
     c = sqlite3.connect(f"file:{snap}?mode=ro", uri=True)
+    # REVIEW FIX (F11): restrict to THRESHOLD ('-T') tickers only. Mixing '-T'
+    # (threshold) and '-B' (bucket) tickers puts two different propositions on
+    # one grid; the base rate would be meaningless. Matches D1 (threshold default).
     rows = c.execute(
         """SELECT station, market_ticker, strike_temp, mid_price
            FROM market_snapshots
-           WHERE market_type IN ('HIGH','binary') AND strike_temp IS NOT NULL AND market_ticker LIKE 'KXHIGH%'"""
+           WHERE market_type IN ('HIGH','binary') AND strike_temp IS NOT NULL
+             AND market_ticker LIKE 'KXHIGH%' AND market_ticker LIKE '%-T%'"""
     ).fetchall()
     c.close()
 

@@ -55,30 +55,34 @@ def kalshi_fee(price: float, p: float = None) -> float:
     return math.ceil(0.07 * price * 100) / 100.0
 
 
-def ev_yes(mu: float, sigma: float, x: float, cost_yes: float) -> float:
-    p = p_high_ge(mu, sigma, x)
+def ev_yes(mu: float, sigma: float, x: float, cost_yes: float, p_fn=None) -> float:
+    p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
     fee = kalshi_fee(cost_yes, p) if cost_yes > 0 else 0.0
     return p * (1 - cost_yes - fee) - (1 - p) * (cost_yes + fee)
 
 
-def ev_no(mu: float, sigma: float, x: float, cost_no: float) -> float:
-    p = p_high_ge(mu, sigma, x)
+def ev_no(mu: float, sigma: float, x: float, cost_no: float, p_fn=None) -> float:
+    p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
     fee = kalshi_fee(cost_no, p) if cost_no > 0 else 0.0
     return (1 - p) * (1 - cost_no - fee) - p * (cost_no + fee)
 
 
-def select_strike(mu: float, sigma: float, strikes: List[Dict]) -> Optional[Dict]:
+def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float = 0.0,
+                  p_fn=None) -> Optional[Dict]:
     """
     strikes: list of {strike: float, yes_price: float, no_price: float}
              (prices in dollars, 0-1).
+    p_fn: optional callable x -> P(high >= x). REQUIRED when the caller holds a
+          constrained/truncated distribution (e.g. intraday high_so_far); passing
+          only (mu, sigma) would bypass that constraint and misprice locked wins.
     Returns the best {strike, side, ev, p} or None.
     """
     best = None
     for s in strikes:
         x = s["strike"]
-        p = p_high_ge(mu, sigma, x)
-        e_yes = ev_yes(mu, sigma, x, s.get("yes_price", 0.5))
-        e_no = ev_no(mu, sigma, x, s.get("no_price", 0.5))
+        p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
+        e_yes = ev_yes(mu, sigma, x, s.get("yes_price", 0.5), p_fn=p_fn)
+        e_no = ev_no(mu, sigma, x, s.get("no_price", 0.5), p_fn=p_fn)
         for side, ev in (("yes", e_yes), ("no", e_no)):
             if best is None or ev > best["ev"]:
                 best = {"strike": x, "side": side, "ev": round(ev, 4), "p": round(p, 4)}

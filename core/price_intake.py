@@ -29,7 +29,8 @@ SNAPSHOTS = REPO / "data" / "kalshi_market_snapshots.db"
 
 
 def load_strike_ladder(snapshot_db: Path, station: str, date_yy: str,
-                       market_type: str = "HIGH") -> List[Dict]:
+                       market_type: str = "HIGH",
+                       contract_semantic: str = "threshold") -> List[Dict]:
     """
     Load the strike ladder for one station-day from the most recent snapshot.
 
@@ -37,7 +38,16 @@ def load_strike_ladder(snapshot_db: Path, station: str, date_yy: str,
     market_type: HIGH or LOW. A HIGH ladder must NOT mix in LOW/binary strikes —
     the ticker embeds the type (KXHIGH* vs KXLOW*) and the DB `market_type` column
     is unreliable (many rows say 'binary'), so we filter on the TICKER prefix.
-    Returns [{strike, yes_price, no_price, mid}] (prices in dollars 0-1).
+
+    contract_semantic (D1, 2026-09-28): Kalshi's KXHIGH grid carries TWO ticker
+    forms on one grid —
+      * `-T<strike>`  THRESHOLD: "will the high be >= strike?"  -> P(high >= X)
+      * `-B<strike>`  BUCKET:    "will the high land in a band?" -> different object
+    Default is **threshold** (Dan's D1 call): it maps directly to the P(high>=X)
+    our distribution produces. Buckets are parked as a deferred option.
+    "threshold" filters to `-T` tickers only; "bucket" to `-B`; "all" mixes both
+    (NOT recommended for EV — they are different propositions).
+    Returns [{strike, yes_price, no_price, ticker, snapshot_time}].
     """
     prefix = "KXHIGH" if market_type.upper() == "HIGH" else "KXLOW"
     conn = sqlite3.connect(f"file:{snapshot_db}?mode=ro", uri=True)
@@ -52,10 +62,22 @@ def load_strike_ladder(snapshot_db: Path, station: str, date_yy: str,
             (station, like, f"{prefix}%")).fetchall()
     finally:
         conn.close()
+
+    def _semantic_ok(ticker: str) -> bool:
+        if contract_semantic == "all":
+            return True
+        # ticker like KXHIGHTATL-26SEP08-T91 or -B88.5
+        tail = ticker.rsplit("-", 1)[-1]
+        if contract_semantic == "threshold":
+            return tail.startswith("T")
+        if contract_semantic == "bucket":
+            return tail.startswith("B")
+        return True
+
     # keep the latest snapshot per strike
     seen = {}
     for ticker, strike, mtype, mid, yb, ya, ts in rows:
-        if strike is None:
+        if strike is None or not _semantic_ok(ticker):
             continue
         if strike not in seen:
             yes = mid if mid is not None else (ya if ya is not None else None)

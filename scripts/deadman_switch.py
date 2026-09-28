@@ -48,15 +48,37 @@ def main():
         else:
             print(f"DEADMAN: OK {label} — {age:.1f}h old")
 
-    # daemon liveness: cycle table advanced recently?
+    # REVIEW FIX (F8): daemon liveness — the previous block queried the cycle
+    # table, discarded the result, and never used it (dead code that looked like a
+    # check). It now actually gates: if the newest daemon cycle is older than the
+    # threshold, the dead-man switch fires.
     sc = REPO / "data" / "signal_cache.db"
     if sc.exists():
         try:
             c = sqlite3.connect(f"file:{sc}?mode=ro", uri=True)
-            row = c.execute("SELECT MAX(rowid) FROM intraday_daemon_cycles").fetchone()
+            cols = [r[1] for r in c.execute("PRAGMA table_info(intraday_daemon_cycles)")]
+            tcol = next((x for x in ("cycle_time", "timestamp", "created_at", "ts") if x in cols), None)
+            if tcol:
+                last = c.execute(f"SELECT MAX({tcol}) FROM intraday_daemon_cycles").fetchone()[0]
+            else:
+                last = None
             c.close()
-        except Exception:
-            pass
+            if last:
+                import datetime as _dt
+                try:
+                    ts = _dt.datetime.fromisoformat(str(last).replace("Z", "+00:00"))
+                    if ts.tzinfo is None:
+                        ts = ts.replace(tzinfo=_dt.timezone.utc)
+                    age_h = (_dt.datetime.now(_dt.timezone.utc) - ts).total_seconds() / 3600.0
+                    if age_h > 12:
+                        stale.append(("intraday_daemon_cycles", round(age_h, 1), 12))
+                        print(f"DEADMAN: STALE intraday_daemon_cycles — last {age_h:.1f}h ago (max 12h)")
+                    else:
+                        print(f"DEADMAN: OK intraday_daemon_cycles — last {age_h:.1f}h ago")
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"DEADMAN: WARN — could not read daemon cycles: {e}")
 
     if stale or missing:
         print(f"\nDEADMAN: FAIL — {len(stale)} stale, {len(missing)} missing")

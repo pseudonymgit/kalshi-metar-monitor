@@ -137,29 +137,51 @@ def gate_g0(archive: str) -> Gate:
 # ── G1: target invariance (distribution predictor) ──────────────────────────
 def gate_g1() -> Gate:
     g = Gate("G1 target invariance")
-    try:
-        conn = sqlite3.connect(f"file:{REPO/'data'/'metar_backfill.db'}?mode=ro", uri=True)
-        conn.close()
-    except Exception:
-        pass
-    # The distribution is a pure function of (ens_mean, ens_std, station, month).
-    # If the builder never reads target-day truth, perturbing it cannot change output.
     from core.intraday.distribution_adapter import from_ws_p, update_from_intraday
     try:
         dist = json.load(open(REPO / "data" / "ws_p_distribution.json"))
     except Exception as e:
         g.skip(f"no ws_p artifact: {e}")
         return g
+
+    # (1) determinism: identical inputs -> identical outputs
     a = from_ws_p(dist, "KNYC", 75.0, 2.5, 7, date="2026-07-15")
     b = from_ws_p(dist, "KNYC", 75.0, 2.5, 7, date="2026-07-15")
-    # perturb target-truth analogue: the observed high-so-far feeds BUT should shift
-    # mu only via the documented truncation rule, never via an un-modeled truth read.
     a2 = update_from_intraday(a, 78.0, 0.6)
     b2 = update_from_intraday(b, 78.0, 0.6)
-    ok = (a.mu, a.sigma, a2.mu, a2.sigma) == (b.mu, b.sigma, b2.mu, b2.sigma)
-    g.details = {"deterministic": ok}
-    if not ok:
-        g.fail("distribution not deterministic / target-dependent")
+    det = (a.mu, a.sigma, a2.mu, a2.sigma) == (b.mu, b.sigma, b2.mu, b2.sigma)
+
+    # (2) REVIEW FIX (2026-09-28): the original G1 compared f(x) to f(x) with the
+    # SAME inputs — a tautology that can never fail. Add a LEAKY NEGATIVE CONTROL:
+    # a predictor that reads the target-day truth ('observed_high') MUST be flagged.
+    # If the harness can't catch the leaky stub, G1 is vacuous.
+    target_truth = {"observed_high": 91.0}
+
+    def clean_predictor(ens_mean):
+        return from_ws_p(dist, "KNYC", ens_mean, 2.5, 7).mu
+
+    def leaky_predictor(ens_mean):
+        # deliberately reads the answer (target-day observed high)
+        return from_ws_p(dist, "KNYC", ens_mean, 2.5, 7).mu + target_truth["observed_high"]
+
+    def _invariant(fn):
+        v1 = fn(75.0)
+        target_truth["observed_high"] = 91.0
+        v2 = fn(75.0)
+        target_truth["observed_high"] = -500.0  # perturb the answer
+        v3 = fn(75.0)
+        return v1 == v2 == v3
+
+    control_caught = not _invariant(leaky_predictor)
+    clean_invariant = _invariant(clean_predictor)
+    g.details = {"deterministic": det, "clean_invariant": clean_invariant,
+                 "negative_control_caught": control_caught}
+    if not det:
+        g.fail("distribution not deterministic")
+    if not control_caught:
+        g.fail("harness BROKEN: leaky negative control not detected (G1 vacuous)")
+    if not clean_invariant:
+        g.fail("distribution reads target-day truth (leak)")
     return g
 
 
@@ -283,10 +305,30 @@ def _sha(path: Path) -> str:
     return h.hexdigest()[:16]
 
 
-def gate_g9(inputs: List[Path]) -> Gate:
-    g = Gate("G9 reproducibility (hashes recorded)")
-    hashes = {p.name: _sha(p) for p in inputs if p.exists()}
-    g.details = {"input_hashes": hashes, "seed_policy": "deterministic; no RNG"}
+def _db_fingerprint(path: Path) -> str:
+    """Cheap provenance fingerprint for a large MUTABLE DB.
+
+    REVIEW FIX (F5/2026-09-28): hashing the full 900MB+ gefs_archive.db every gate
+    run is slow AND semantically weak — the DB changes daily, so the hash is not a
+    stable identity, it just records 'the state right now'. A row-count + max-date
+    fingerprint is cheap, stable enough for provenance, and actually interpretable.
+    """
+    try:
+        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        n = conn.execute("SELECT COUNT(*) FROM gefs_archive").fetchone()[0]
+        mx = conn.execute("SELECT MAX(target_date) FROM gefs_archive").fetchone()[0]
+        conn.close()
+        return f"rows={n};max_date={mx}"
+    except Exception as e:
+        return f"unreadable:{e}"
+
+
+def gate_g9(small_inputs: List[Path], large_dbs: List[Path]) -> Gate:
+    g = Gate("G9 reproducibility (hashes/fingerprints recorded)")
+    hashes = {p.name: _sha(p) for p in small_inputs if p.exists()}
+    fps = {p.name: _db_fingerprint(p) for p in large_dbs if p.exists()}
+    g.details = {"input_hashes": hashes, "db_fingerprints": fps,
+                 "seed_policy": "deterministic; no RNG"}
     if not hashes:
         g.skip("no inputs to hash")
     return g
@@ -311,8 +353,9 @@ def main():
     # Only compute scores if G0/G1/G7 passed (gate-ordering rule).
     pre_ok = all(x.passed or x.skipped is False and x.passed for x in gates[:2]) and gates[0].passed and gates[1].passed
     if pre_ok:
-        gates += [gate_g2(rows), gate_g3(rows), gate_g5(), gate_g9([
-            REPO / "data" / "ws_p_distribution.json", REPO / "data" / "gefs_archive.db"])]
+        gates += [gate_g2(rows), gate_g3(rows), gate_g5(), gate_g9(
+            [REPO / "data" / "ws_p_distribution.json"],
+            [REPO / "data" / "gefs_archive.db"])]
     else:
         for nm in ("G2 CRPS skill", "G3 PIT uniformity", "G5 coherence", "G9 reproducibility"):
             gg = Gate(nm); gg.skip("blocked by G0/G1 failure (gate ordering)"); gates.append(gg)

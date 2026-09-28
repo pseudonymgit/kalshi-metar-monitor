@@ -77,8 +77,16 @@ def update_from_intraday(state: DistributionState, high_so_far: float,
 
 
 def select(state: DistributionState, strikes: List[Dict], min_edge: float = 0.0) -> Optional[Dict]:
-    """Pick the best-EV strike against live prices."""
-    return select_strike(state.mu, state.sigma, strikes)
+    """Pick the best-EV strike against live prices.
+
+    REVIEW FIX (2026-09-28): pass `p_fn=state.p_ge` so the EV layer uses the
+    CONSTRAINED distribution (which returns P(high>=X)=1 for X<=high_so_far).
+    Previously this delegated as select_strike(mu, sigma, ...), which recomputed a
+    plain Gaussian and BYPASSED the high_so_far truncation — mispricing any strike
+    at or below the already-observed max (a locked win priced as uncertain).
+    """
+    return select_strike(state.mu, state.sigma, strikes, min_edge=min_edge,
+                         p_fn=state.p_ge)
 
 
 if __name__ == "__main__":
