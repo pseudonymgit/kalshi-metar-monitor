@@ -141,15 +141,27 @@ def run_integrity_gate(skip: bool = False) -> bool:
         gates = gate_output.get("gates", [])
         
         # Separate hard vs soft gates
+        # B2-SWEEP FIX (2026-09-28): a SKIPPED gate could not be evaluated (its
+        # preconditions were absent — e.g. price/fee sanity need trade results,
+        # which a Phase-1 signal-only sweep does not produce). Blocking the sweep
+        # on a gate it structurally cannot satisfy is the E2 'gate scoping' defect:
+        # a gate must not block on data the run never consumes. Treat skipped as
+        # non-blocking (surfaced loudly as a warning), only real non-pass fails.
         hard_failures = []
         soft_failures = []
+        skipped_gates = []
         for g in gates:
+            if g.get("skipped"):
+                skipped_gates.append(g["name"])
+                continue
             if not g.get("pass"):
                 if g["name"] in HARD_GATE_NAMES:
                     hard_failures.append(g["name"])
                 else:
                     soft_failures.append(g["name"])
-        
+
+        if skipped_gates:
+            print(f"[config] SKIPPED gates (no data to evaluate — not blocking): {skipped_gates}")
         if hard_failures:
             print(f"[config] HARD FAILED gates: {hard_failures}")
             print("[config] Sweep ABORTED due to critical data integrity issues.")
@@ -158,7 +170,7 @@ def run_integrity_gate(skip: bool = False) -> bool:
             print("[config] Proceeding with sweep despite soft failures.")
         if not hard_failures and not soft_failures:
             print("[config] All integrity gates PASS. Proceeding with sweep.")
-        
+
         return len(hard_failures) == 0
     except Exception as e:
         print(f"[config] Could not parse integrity gate results: {e}")

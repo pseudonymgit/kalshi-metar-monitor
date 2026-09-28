@@ -38,8 +38,23 @@ from scripts.sweep_engine import (
     get_settlement_gate, _get_loss_limiter, _record_trade_outcome,
     get_agreement_gate, get_adaptive_registry, get_spatial_coherence,
     get_station_skill_gate_enabled, get_calibration_mode, get_platt_pipeline,
-    get_bias_corrections, MIN_TRADES_REPORT
+    get_bias_corrections, MIN_TRADES_REPORT, REPO_ROOT,
+    _TRAJECTORY_GATE_ENABLED, _TRAJECTORY_GATE,
+    _TRAJECTORY_LANE_ENABLED, _TRAJECTORY_LANE,
+    _STATION_SKILL_GATE_ENABLED, _STATION_SKILL_GATE, _STATION_SKILL_GATE_BSS_THRESHOLD,
+    _SETTLEMENT_GATE_ENABLED, _SETTLEMENT_GATE,
+    _AGREEMENT_GATE_ENABLED, _AGREEMENT_GATE, _AGREEMENT_N, _AGREEMENT_M,
+    _SPATIAL_COHERENCE_ENABLED, _SPATIAL_COHERENCE_GATE, _SPATIAL_COHERENCE_TRACKER,
+    _ADAPTIVE_THRESHOLDS_ENABLED, _ADAPTIVE_REGISTRY,
 )
+# B2-SWEEP FIX (2026-09-28): mutable run-state flags are read live via _eng.
+import scripts.sweep_engine as _eng
+from core.trajectory_confirmation_gate import evaluate_gate_for_station_date
+from core.trajectory_lane import (
+    evaluate_lane_for_station_date, apply_trajectory_lane_to_probability,
+)
+import logging as _logging
+logger = _logging.getLogger(__name__)
 
 def evaluate_signal_on_station(signal_name, signal_obj, station, config, settlements):
     if signal_obj is None:
@@ -90,10 +105,10 @@ def evaluate_signal_on_station(signal_name, signal_obj, station, config, settlem
         # Apply Trajectory Confirmation Gate (if enabled)
         mod_conf = cal_conf
         traj_verdict = "NEUTRAL"
-        if _TRAJECTORY_GATE_ENABLED and _TRAJECTORY_GATE is not None:
+        if _eng._TRAJECTORY_GATE_ENABLED and _eng._TRAJECTORY_GATE is not None:
             try:
                 traj_verdict, mod_conf = evaluate_gate_for_station_date(
-                    station, date_str, pd, cal_conf, _TRAJECTORY_GATE)[:2]
+                    station, date_str, pd, cal_conf, _eng._TRAJECTORY_GATE)[:2]
             except Exception:
                 mod_conf = cal_conf
                 traj_verdict = "NEUTRAL"
@@ -104,10 +119,10 @@ def evaluate_signal_on_station(signal_name, signal_obj, station, config, settlem
         lane_weight = 0.0
         lane_quality = 0.0
         lane_divergence = False
-        if _TRAJECTORY_LANE_ENABLED and _TRAJECTORY_LANE is not None:
+        if _eng._TRAJECTORY_LANE_ENABLED and _eng._TRAJECTORY_LANE is not None:
             try:
                 lane_result = evaluate_lane_for_station_date(
-                    station, date_str, cal_conf, pd, _TRAJECTORY_LANE
+                    station, date_str, cal_conf, pd, _eng._TRAJECTORY_LANE
                 )
                 lane_dir, lane_prob, lane_weight, lane_quality, lane_divergence = lane_result
                 mod_conf = apply_trajectory_lane_to_probability(
@@ -118,12 +133,12 @@ def evaluate_signal_on_station(signal_name, signal_obj, station, config, settlem
                 pass
 
         # Apply Station Skill Gate (if enabled)
-        if _STATION_SKILL_GATE_ENABLED and _STATION_SKILL_GATE is not None:
+        if _eng._STATION_SKILL_GATE_ENABLED and _eng._STATION_SKILL_GATE is not None:
             market_type = DataCache.get_market_type(station, date_str)
-            bss_matrix = _STATION_SKILL_GATE.get_bss_matrix()
+            bss_matrix = _eng._STATION_SKILL_GATE.get_bss_matrix()
             bss_val = bss_matrix.get(station, {}).get(market_type, -999.0)
-            if bss_val <= _STATION_SKILL_GATE_BSS_THRESHOLD:
-                logger.debug(f"Station Skill Gate: BLOCKED {station} {market_type} (BSS={bss_val:.4f} <= {_STATION_SKILL_GATE_BSS_THRESHOLD})")
+            if bss_val <= _eng._STATION_SKILL_GATE_BSS_THRESHOLD:
+                logger.debug(f"Station Skill Gate: BLOCKED {station} {market_type} (BSS={bss_val:.4f} <= {_eng._STATION_SKILL_GATE_BSS_THRESHOLD})")
                 continue
         trade = simulate_trade(pd, mod_conf, actual_dir, config, station, date_str, signal_name, loss_limiter=_get_loss_limiter(signal_name, station))
         if trade:
@@ -139,12 +154,12 @@ def evaluate_signal_on_station(signal_name, signal_obj, station, config, settlem
             trade["trajectory_lane_quality"] = lane_quality
             trade["trajectory_lane_divergence"] = lane_divergence
             trades.append(trade)
-            __record_trade_outcome(signal_name, station, trade)
+            _record_trade_outcome(signal_name, station, trade)
 
         # Record outcome for adaptive threshold learning
-        if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None:
+        if _eng._ADAPTIVE_THRESHOLDS_ENABLED and _eng._ADAPTIVE_REGISTRY is not None:
             was_correct = pd == actual_dir
-            _ADAPTIVE_REGISTRY.record_outcome(signal_name, station, cal_conf, was_correct)
+            _eng._ADAPTIVE_REGISTRY.record_outcome(signal_name, station, cal_conf, was_correct)
 
     return trades
 def split_discovery_holdout(settlements, holdout_frac=0.7):
@@ -224,10 +239,10 @@ def _eval_wrapper(signal_obj, signal_name, settlements_subset, config):
             # Apply Trajectory Confirmation Gate (if enabled)
             mod_conf = cal_conf
             traj_verdict = "NEUTRAL"
-            if _TRAJECTORY_GATE_ENABLED and _TRAJECTORY_GATE is not None:
+            if _eng._TRAJECTORY_GATE_ENABLED and _eng._TRAJECTORY_GATE is not None:
                 try:
                     traj_verdict, mod_conf = evaluate_gate_for_station_date(
-                        station, date_str, pd, cal_conf, _TRAJECTORY_GATE)[:2]
+                        station, date_str, pd, cal_conf, _eng._TRAJECTORY_GATE)[:2]
                 except Exception:
                     mod_conf = cal_conf
                     traj_verdict = "NEUTRAL"
@@ -238,10 +253,10 @@ def _eval_wrapper(signal_obj, signal_name, settlements_subset, config):
             lane_weight = 0.0
             lane_quality = 0.0
             lane_divergence = False
-            if _TRAJECTORY_LANE_ENABLED and _TRAJECTORY_LANE is not None:
+            if _eng._TRAJECTORY_LANE_ENABLED and _eng._TRAJECTORY_LANE is not None:
                 try:
                     lane_result = evaluate_lane_for_station_date(
-                        station, date_str, cal_conf, pd, _TRAJECTORY_LANE
+                        station, date_str, cal_conf, pd, _eng._TRAJECTORY_LANE
                     )
                     lane_dir, lane_prob, lane_weight, lane_quality, lane_divergence = lane_result
                     mod_conf = apply_trajectory_lane_to_probability(
@@ -252,12 +267,12 @@ def _eval_wrapper(signal_obj, signal_name, settlements_subset, config):
                     pass
 
             # Apply Station Skill Gate (if enabled)
-            if _STATION_SKILL_GATE_ENABLED and _STATION_SKILL_GATE is not None:
+            if _eng._STATION_SKILL_GATE_ENABLED and _eng._STATION_SKILL_GATE is not None:
                 market_type = DataCache.get_market_type(station, date_str)
-                bss_matrix = _STATION_SKILL_GATE.get_bss_matrix()
+                bss_matrix = _eng._STATION_SKILL_GATE.get_bss_matrix()
                 bss_val = bss_matrix.get(station, {}).get(market_type, -999.0)
-                if bss_val <= _STATION_SKILL_GATE_BSS_THRESHOLD:
-                    logger.debug(f"Station Skill Gate: BLOCKED {station} {market_type} (BSS={bss_val:.4f} <= {_STATION_SKILL_GATE_BSS_THRESHOLD})")
+                if bss_val <= _eng._STATION_SKILL_GATE_BSS_THRESHOLD:
+                    logger.debug(f"Station Skill Gate: BLOCKED {station} {market_type} (BSS={bss_val:.4f} <= {_eng._STATION_SKILL_GATE_BSS_THRESHOLD})")
                     continue
             trade = simulate_trade(pd, mod_conf, actual_dir, config, station, date_str, signal_name, loss_limiter=_get_loss_limiter(signal_name, station))
             if trade:
@@ -273,12 +288,12 @@ def _eval_wrapper(signal_obj, signal_name, settlements_subset, config):
                 trade["trajectory_lane_quality"] = lane_quality
                 trade["trajectory_lane_divergence"] = lane_divergence
                 all_trades.append(trade)
-                __record_trade_outcome(signal_name, station, trade)
+                _record_trade_outcome(signal_name, station, trade)
 
             # Record outcome for adaptive threshold learning
-            if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None:
+            if _eng._ADAPTIVE_THRESHOLDS_ENABLED and _eng._ADAPTIVE_REGISTRY is not None:
                 was_correct = pd == actual_dir
-                _ADAPTIVE_REGISTRY.record_outcome(signal_name, station, cal_conf, was_correct)
+                _eng._ADAPTIVE_REGISTRY.record_outcome(signal_name, station, cal_conf, was_correct)
 
     return all_trades
 def run_three_stage_validation(signal_obj, signal_name, config, settlements_all):
@@ -311,7 +326,7 @@ def evaluate_signal_all_stations(signal_name, signal_obj, config, settlements):
                       if compute_metrics(t, 3)["n_trades"] > 0}
 
     # Apply spatial coherence modulation (if enabled)
-    if _SPATIAL_COHERENCE_ENABLED:
+    if _eng._SPATIAL_COHERENCE_ENABLED:
         all_trades = apply_spatial_coherence_to_trades(all_trades)
         # Recompute per-station and per-market metrics with adjusted trades
         per_station_adj = defaultdict(list)
@@ -325,7 +340,7 @@ def evaluate_signal_all_stations(signal_name, signal_obj, config, settlements):
                           if compute_metrics(t, 3)["n_trades"] > 0}
 
     # Apply Agreement Gate filtering (if enabled)
-    if _AGREEMENT_GATE_ENABLED:
+    if _eng._AGREEMENT_GATE_ENABLED:
         all_trades = apply_agreement_gate_to_trades(all_trades, signal_name)
         # Recompute per-station and per-market metrics with filtered trades
         per_station_adj = defaultdict(list)
@@ -355,10 +370,10 @@ def apply_agreement_gate_to_trades(all_trades, signal_name):
     Returns:
         Filtered list of trades where direction consensus was met.
     """
-    if not all_trades or not _AGREEMENT_GATE_ENABLED:
+    if not all_trades or not _eng._AGREEMENT_GATE_ENABLED:
         return all_trades
 
-    gate = _AGREEMENT_GATE
+    gate = _eng._AGREEMENT_GATE
     if gate is None:
         return all_trades
 
@@ -369,7 +384,7 @@ def apply_agreement_gate_to_trades(all_trades, signal_name):
         market_type = t.get('market_type', 'HIGH')
         signals.append((t['station'], market_type, direction, signal_name))
 
-    if len(signals) < _AGREEMENT_M:
+    if len(signals) < _eng._AGREEMENT_M:
         # Not enough signals to form proper consensus — leave intact
         return all_trades
 
@@ -401,10 +416,10 @@ def apply_spatial_coherence_to_trades(all_trades):
     """
     if not all_trades:
         return all_trades
-    if not _SPATIAL_COHERENCE_ENABLED:
+    if not _eng._SPATIAL_COHERENCE_ENABLED:
         return all_trades
 
-    gate = _SPATIAL_COHERENCE_GATE
+    gate = _eng._SPATIAL_COHERENCE_GATE
     if gate is None:
         return all_trades
 

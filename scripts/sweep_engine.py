@@ -263,6 +263,21 @@ def get_calibration_mode() -> str:
 
 FT_NONE, FT_TAKER, FT_TAKER_SLIPPAGE, FT_MAKER = range(4)
 STATIONS = list(_DEF_STATIONS)
+
+# B2-SWEEP FIX (2026-09-28): canonical home for the two run-mode flags the
+# module-split scattered. big_sweep sets them here; sweep_fusion/metrics read them.
+_FUSION_MODE: str = 'none'
+_VARIANCE_SIZING_ENABLED: bool = False
+
+
+def set_fusion_mode(mode: str):
+    global _FUSION_MODE
+    _FUSION_MODE = mode
+
+
+def set_variance_sizing(enabled: bool):
+    global _VARIANCE_SIZING_ENABLED
+    _VARIANCE_SIZING_ENABLED = enabled
 _get_thread_ident = threading.get_ident
 def _safe_import_signal(rel_module, class_name):
     """Import a signal using the proper package path."""

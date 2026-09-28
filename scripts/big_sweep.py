@@ -125,6 +125,7 @@ from scripts.sweep_engine import (
     _TRAJECTORY_GATE_ENABLED, _TRAJECTORY_GATE,
     _SETTLEMENT_GATE_ENABLED, _SETTLEMENT_GATE,
     _TRAJECTORY_LANE_ENABLED, _TRAJECTORY_LANE,
+    STATIONS,  # B2-SWEEP FIX (2026-09-28): re-export so `global STATIONS` resolves
 )
 from scripts.sweep_metrics import (
     calibrate_confidence, simulate_trade,

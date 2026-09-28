@@ -29,10 +29,10 @@ from core.signal_fusion import UncertaintyWeightedCascade
 from core.adaptive_thresholds import AdaptiveThresholdRegistry
 
 def get_variance_sizing_enabled() -> bool:
-    return _VARIANCE_SIZING_ENABLED
+    return _eng._VARIANCE_SIZING_ENABLED
 
 def get_fusion_mode() -> str:
-    return _FUSION_MODE
+    return _eng._FUSION_MODE
 # ═══════════════════════════════════════════════════════════════════
 # 9. FUSION EVALUATION
 # ═══════════════════════════════════════════════════════════════════
@@ -131,7 +131,7 @@ def _evaluate_fusion_station(
         if len(signal_predictions) < 2:
             continue
 
-        if _VARIANCE_SIZING_ENABLED:
+        if _eng._VARIANCE_SIZING_ENABLED:
             # Variance-weighted blending
             sig_variances: Dict[str, float] = {}
             for sig_name in signal_predictions:
@@ -198,7 +198,7 @@ def _evaluate_fusion_station(
 
         # Use variance-weighted config override when variance sizing is active
         effective_config = config
-        if _VARIANCE_SIZING_ENABLED:
+        if _eng._VARIANCE_SIZING_ENABLED:
             try:
                 effective_config = config_override
             except NameError:
@@ -212,9 +212,9 @@ def _evaluate_fusion_station(
             trades.append(trade)
 
         # Record outcome for adaptive threshold learning
-        if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None:
+        if _eng._ADAPTIVE_THRESHOLDS_ENABLED and _eng._ADAPTIVE_REGISTRY is not None:
             was_correct = direction == actual_dir
-            _ADAPTIVE_REGISTRY.record_outcome('fusion', station, cal_conf, was_correct)
+            _eng._ADAPTIVE_REGISTRY.record_outcome('fusion', station, cal_conf, was_correct)
 
     return trades
 def _run_fusion_validation(

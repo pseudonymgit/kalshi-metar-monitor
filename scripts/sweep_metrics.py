@@ -22,8 +22,17 @@ from core.bma_emos import bma_calibrate, emos_calibrate
 from core.db_utils import query_db, with_db
 from core.continuous_kelly import fee_aware_kelly, KellyState
 from core.production_gate import LossLimiter
+from core.variance_weighted_sizing import variance_adjusted_kelly
 from scripts.sweep.config import SLIPPAGE_BUDGET
-from scripts.sweep_engine import MIN_TRADES_REPORT
+# B2-SWEEP FIX (2026-09-28): the module-split left these helpers referenced but
+# not imported -> NameError on the first signal. Import the real definitions.
+from scripts.sweep_engine import (
+    MIN_TRADES_REPORT, MIN_TRADES_CALIBRATE, KALSHI_REAL_FEE_RATE,
+    FT_NONE, FT_TAKER, FT_TAKER_SLIPPAGE, FT_MAKER,
+    get_platt_pipeline, DataCache,
+    _record_trade_outcome as _record_trade_outcome,
+)
+import scripts.sweep_engine as _eng
 from scripts.sweep.tiers import get_tier, get_tier_info
 
 def kalshi_fee(contracts: int, price: float) -> float:
@@ -99,16 +108,16 @@ def simulate_trade(pred_direction, confidence, actual_direction, config, station
     confidence = max(0.501, min(0.999, confidence))
     # Use adaptive threshold when enabled, falling back to static config
     conf_floor = config.get("confidence_floor", 0.5)
-    if _ADAPTIVE_THRESHOLDS_ENABLED and _ADAPTIVE_REGISTRY is not None and signal_name:
-        conf_floor = _ADAPTIVE_REGISTRY.get_threshold(signal_name, station)
+    if _eng._ADAPTIVE_THRESHOLDS_ENABLED and _eng._ADAPTIVE_REGISTRY is not None and signal_name:
+        conf_floor = _eng._ADAPTIVE_REGISTRY.get_threshold(signal_name, station)
     if confidence < conf_floor:
         return None
 
     # Settlement Execution Gate check — skip trade if gate blocks it
-    if _SETTLEMENT_GATE_ENABLED and _SETTLEMENT_GATE is not None:
+    if _eng._SETTLEMENT_GATE_ENABLED and _eng._SETTLEMENT_GATE is not None:
         market_type = DataCache.get_market_type(station, date_str)
         epoch_id = f"{date_str}_{market_type}"
-        gate_result = _SETTLEMENT_GATE.evaluate(
+        gate_result = _eng._SETTLEMENT_GATE.evaluate(
             station=station,
             trading_date=date_str,
             epoch_id=epoch_id,
