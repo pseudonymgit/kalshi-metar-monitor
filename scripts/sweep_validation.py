@@ -525,13 +525,59 @@ def run_best_config_for_signal(signal_name, signal_obj, configs, settlements):
     acc_window = []
     sharpe_window = []
 
+    # R/T (2026-09-29): per-signal wall-clock budget + per-config timeout.
+    # ROOT CAUSE of the "hung" B2: the ensemble signals cost ~6.5s/CONFIG
+    # (85k signal evals per config: bias-correct + Platt-calibrate per
+    # station-day). At the batch-7 convergence point (3,500 configs) that is
+    # ~6.3h PER ensemble signal x 3 variants ~= 19h, with NO timeout — so it
+    # looked hung while burning CPU. Budget the signal and hard-cap each config.
+    import os as _os
+    import signal as _signal
+    import time as _time
+    _signal_budget_s = float(_os.environ.get("SWEEP_SIGNAL_BUDGET_SECONDS", "1800"))
+    _config_timeout_s = float(_os.environ.get("SWEEP_CONFIG_TIMEOUT_SECONDS", "30"))
+    _t_signal_start = _time.monotonic()
+
+    def _cfg_timeout(_signum, _frame):
+        raise TimeoutError("per-config timeout")
+
+    _old_handler = None
+    if _config_timeout_s > 0 and hasattr(_signal, "SIGALRM"):
+        _old_handler = _signal.signal(_signal.SIGALRM, _cfg_timeout)
+
+    def _eval_one(cfg):
+        if _config_timeout_s > 0 and hasattr(_signal, "SIGALRM"):
+            _signal.setitimer(_signal.ITIMER_REAL, _config_timeout_s)
+        try:
+            return evaluate_signal_all_stations(signal_name, signal_obj, cfg, settlements)
+        finally:
+            if _config_timeout_s > 0 and hasattr(_signal, "SIGALRM"):
+                _signal.setitimer(_signal.ITIMER_REAL, 0)
+
+    _budget_hit = False
     for i, cfg in enumerate(configs):
-        result = evaluate_signal_all_stations(signal_name, signal_obj, cfg, settlements)
+        try:
+            result = _eval_one(cfg)
+        except TimeoutError:
+            logger.warning("per-config timeout %.1fs on %s config %d — skipping",
+                           _config_timeout_s, signal_name, i)
+            continue
+        except Exception as _e:
+            logger.warning("config %d failed on %s: %s", i, signal_name, _e)
+            continue
         agg = result.get("aggregate", {})
         pnl = agg.get("total_pnl", -1e9)
         if pnl > best_pnl and agg.get("n_trades", 0) >= MIN_TRADES_REPORT:
             best_pnl = pnl
             best_metrics = result
+
+        # R/T (2026-09-29): signal wall-clock budget.
+        if _signal_budget_s > 0 and (_time.monotonic() - _t_signal_start) > _signal_budget_s:
+            _budget_hit = True
+            print(f"    SIGNAL BUDGET hit after {i + 1} configs "
+                  f"({(_time.monotonic() - _t_signal_start):.0f}s > {_signal_budget_s:.0f}s) "
+                  f"— stopping {signal_name}, returning best so far")
+            break
 
         # Early stopping check every batch_size configs
         if (i + 1) % batch_size == 0:
