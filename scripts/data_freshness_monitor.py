@@ -67,16 +67,22 @@ SOURCES = [
     dict(key="gefs_archive", db="gefs_archive.db", table="gefs_archive",
          date_col="target_date", cadence_h=24, slack=1, per_station="station",
          note="WE-GEFS-daily-backfill / populate_gefs_archive.py"),
+    # TIGGE publishes with a ~2-day embargo and the daily script caps its
+    # request at today-2, so the normal frontier is t-2..t-3. A 48h threshold
+    # alerts on healthy data every cycle; 24h cadence + slack 3 = 96h.
     dict(key="tigge_archive", db="tigge_archive.db", table="tigge_archive",
-         date_col="target_date", cadence_h=24, slack=1, per_station="station",
-         note="ecmwf-tigge-daily-update (07:00 UTC)"),
+         date_col="target_date", cadence_h=24, slack=3, per_station="station",
+         note="ecmwf-tigge-daily-update (07:00 UTC); ~2d publication embargo"),
     dict(key="iem_asos_1min", db="iem_asos_1min.db", table="observations",
          date_col="valid", cadence_h=1, slack=2,
          note="z5-asos-1min-cron (hourly :40) / WE-IEM-ASOS-daily-backfill"),
+    # target_date is the *market* date; Kalshi finalizes it next morning
+    # (~05:00Z, i.e. ~1d after the weather day), so a 48h threshold alerts on
+    # healthy data. Cadence 24h + slack 2 = 72h matches the real settlement lag.
     dict(key="kalshi_settlements", db="kalshi_settlements.db",
          table="kalshi_settlements", date_col="target_date",
-         cadence_h=24, slack=1,
-         note="kalshi-settlement-upkeep (08:00 UTC)"),
+         cadence_h=24, slack=2,
+         note="kalshi-settlement-upkeep (08:00 UTC); finalizes ~t+1"),
     dict(key="forecast_disagreement", db="forecast_disagreement_live.db",
          table="daily_forecast_snapshots", date_col="collection_date",
          cadence_h=24, slack=1,
@@ -88,9 +94,12 @@ SOURCES = [
     # flagged as 5 days stale with no alert. Added here (the registry the hourly
     # WE-data-freshness-monitor cron actually runs). Daily producer; t+1 lag is
     # normal, so cadence 24h + slack 1 = 48h alert threshold.
+    # GHCN-Daily publishes with a ~2-3 day lag (verified 2026-09-30: NOAA's
+    # freshest .dly ends 09-27 even though the file Last-Modified is 09-29).
+    # Cadence 24h + slack 3 = 96h threshold so the normal lag does not alert.
     dict(key="ghcn_settlements", db="ghcn_settlements.db", table="ghcn_settlements",
-         date_col="date", cadence_h=24, slack=1, per_station="station",
-         note="WE-GHCN-daily-backfill (06:30 UTC)"),
+         date_col="date", cadence_h=24, slack=3, per_station="station",
+         note="WE-GHCN-daily-backfill (06:30 UTC); ~2-3d publication lag"),
     # Kalshi market snapshots (live order book; not the settlement table).
     dict(key="kalshi_market_snapshots", db="kalshi_market_snapshots.db",
          table="market_snapshots", date_col="snapshot_time", cadence_h=1, slack=2,

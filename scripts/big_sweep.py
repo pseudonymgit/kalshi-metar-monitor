@@ -370,11 +370,14 @@ def main():
     # Budget classes (see docs/plans/SWEEP-REFACTOR-DESIGN-2026-09-29.md):
     #   cheap    (pure functions of METAR/calendar)          -> 3500
     #   moderate (do DB lookups, calibration)                -> 2000
-    #   heavy    (ensemble: 82 members x bias/Platt per row) -> 1200
+    #   heavy    (ensemble: 82 members x bias/Platt per row) -> proof-gated
+    # Ensemble budgets are set per the 2026-09-29 config-budget proof (Dan
+    # approved 2026-09-30): equal-weight found its knee at 2000 (2000->3500
+    # adds only +0.4pp; 500 loses 4.1pp, CUT REJECTED); pooled plateaus by
+    # 1000 (best config already found at 500).
     PER_SIGNAL_BUDGETS = {
-        "eighty_two_member_ensemble": 1200,
-        "eighty_two_member_ensemble_pooled": 1200,
-        "eighty_two_member_ensemble_ece": 1200,
+        "eighty_two_member_ensemble": 2000,
+        "eighty_two_member_ensemble_pooled": 1000,
         "nwp_analog": 1200,
         "nwp_direct": 1200,
         "nwp_dtdt_fusion": 1200,
