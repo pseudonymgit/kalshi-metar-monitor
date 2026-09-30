@@ -47,18 +47,21 @@ from dataclasses import dataclass, field
 import urllib.request
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT / "core"))
+# Import core modules via the package form (core.X). The bare form (core/ on
+# sys.path) breaks on paper_trading_engine.py, which uses relative imports
+# (`.sqlite_utils`) and therefore requires a real parent package. 2026-09-30 fix.
+sys.path.insert(0, str(REPO_ROOT))
 
-from position_sizing import (
+from core.position_sizing import (
     compute_position_size,
     extract_confidence_from_signal_context,
     get_config_for_instance,
     ConfidenceTier,
 )
-from late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_signal
-from paper_trading_engine import PaperTrader, MarketSide, TradeType
-from kalshi_price_fetcher import build_market_url as _build_market_url
-from instance_config import (
+from core.late_day_momentum_hourly import late_day_momentum_hourly as _ldm_hourly_signal
+from core.paper_trading_engine import PaperTrader, MarketSide, TradeType
+from core.kalshi_price_fetcher import build_market_url as _build_market_url
+from core.instance_config import (
     INSTANCE_CONFIGS as _INSTANCE_CONFIGS,
     InstanceConfig,
     InstanceLock,
@@ -67,7 +70,7 @@ from instance_config import (
     log_alert,
     setup_instance_logger,
 )
-from alert_builder import (
+from core.alert_builder import (
     build_paper_trade_alert,
     compute_opportunity_grade,
     classify_lane,
