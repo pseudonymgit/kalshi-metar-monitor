@@ -148,7 +148,14 @@ from scripts.sweep_fusion import (
 def main():
     parser = argparse.ArgumentParser(description="Big Sweep — Phase 1: Signal-Only Parameter Sweep")
     parser.add_argument("--phase", type=int, default=1, choices=[1, 2],
-                        help="Phase: 1=signal-only sweep, 2=meta-sweep [default: 1]")
+                        help="Phase: 1=signal-only sweep (DEFAULT, unified single pass), "
+                             "2=legacy meta-sweep stub [default: 1]")
+    parser.add_argument("--signal-budget", type=int, default=None,
+                        help="Uniform per-signal config budget override. If unset, uses "
+                             "per-signal-class budgets (PER_SIGNAL_BUDGETS). R/T 2026-09-29.")
+    parser.add_argument("--no-budget", action="store_true",
+                        help="Ignore per-signal budgets; run every signal over all --n-configs "
+                             "(only for the config-budget proof).")
     parser.add_argument("--stations", nargs="*", default=None)
     parser.add_argument("--n-configs", type=int, default=20000)
     parser.add_argument("--n-meta-configs", type=int, default=2000,
@@ -353,7 +360,47 @@ def main():
     configs = generate_sweep_configs(args.n_configs)
     print(f"  Generated {len(configs)} configs")
 
-    print("\n[Phase 4] Per-signal evaluation...")
+    # R/T (2026-09-29): item 3 — COLLAPSED Phase 1 + Phase 2 into ONE pass.
+    # Phase 1's single-station prefilter saved ~nothing (ensemble signals dominate
+    # runtime) and its results were thrown away; Phase 2 was a degenerate stub that
+    # faked trades from STATIONS[:5] at fixed 0.5 confidence. Now: run ALL signals
+    # on ALL stations ONCE, with PER-SIGNAL config budgets. A signal that can't beat
+    # coin-flip will simply show that in the results — no pre-filter needed.
+    #
+    # Budget classes (see docs/plans/SWEEP-REFACTOR-DESIGN-2026-09-29.md):
+    #   cheap    (pure functions of METAR/calendar)          -> 3500
+    #   moderate (do DB lookups, calibration)                -> 2000
+    #   heavy    (ensemble: 82 members x bias/Platt per row) -> 1200
+    PER_SIGNAL_BUDGETS = {
+        "eighty_two_member_ensemble": 1200,
+        "eighty_two_member_ensemble_pooled": 1200,
+        "eighty_two_member_ensemble_ece": 1200,
+        "nwp_analog": 1200,
+        "nwp_direct": 1200,
+        "nwp_dtdt_fusion": 1200,
+        "regime": 2000,
+        "frontal_passage_intraday": 2000,
+        "frontal_passage_nowcast": 2000,
+        "frontal_detector": 2000,
+        "frontal_passage_detector": 2000,
+        "temperature_advection": 2000,
+        "metar_nowcast": 2000,
+        "forecast_disagreement": 2000,
+        "cross_model_divergence": 2000,
+        "esdr": 2000,
+        "goldilocks": 2000,
+        "spike_reversion": 2000,
+    }
+    DEFAULT_BUDGET = 3500
+
+    def _budget_for(sname: str) -> int:
+        if args.no_budget:
+            return len(configs)
+        if args.signal_budget:
+            return min(args.signal_budget, len(configs))
+        return min(PER_SIGNAL_BUDGETS.get(sname, DEFAULT_BUDGET), len(configs))
+
+    print("\n[Phase 4] Per-signal evaluation (unified phase, per-signal budgets)...")
     signal_results = {}
 
     for si, sname in enumerate(signal_names):
@@ -361,8 +408,10 @@ def main():
         if sobj is None:
             print(f"  [{si+1}/{len(signal_names)}] {sname}: SKIP")
             continue
-        print(f"\n[{si+1}/{len(signal_names)}] {sname}:")
-        result = run_best_config_for_signal(sname, sobj, configs, settlements)
+        budget = _budget_for(sname)
+        cfg_slice = configs[:budget]
+        print(f"\n[{si+1}/{len(signal_names)}] {sname}: (budget={budget})")
+        result = run_best_config_for_signal(sname, sobj, cfg_slice, settlements)
         signal_results[sname] = result
         agg = result.get("aggregate", {})
         print(f"  -> Trades: {agg.get('n_trades', 0)} | "

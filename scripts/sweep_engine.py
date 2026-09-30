@@ -376,13 +376,13 @@ def build_signal_registry():
     _reg("eighty_two_member_ensemble", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
          gefs_db=os.path.join(str(REPO_ROOT), "data", "gefs_archive.db"),
          tigge_db=os.path.join(str(REPO_ROOT), "data", "tigge_archive.db"))
-    
-    # ECE‑inverse weighting
-    _reg("eighty_two_member_ensemble_ece", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
-         gefs_db=os.path.join(str(REPO_ROOT), "data", "gefs_archive.db"),
-         tigge_db=os.path.join(str(REPO_ROOT), "data", "tigge_archive.db"),
-         weighting_mode='ece_inverse')
-    
+
+    # R/T (2026-09-29): DROPPED the `_ece` variant — `data/calibration/ece_weights.json`
+    # was missing, so weighting_mode='ece_inverse' silently fell back to equal
+    # weighting and produced BYTE-IDENTICAL output to the equal-weight ensemble
+    # (signal 37 == signal 36 in the B2 sweep). Dead weight — removed per Dan.
+    # Re-add ONLY once ece_weights.json is actually built and the two differ.
+
     # Member‑pooling weighting
     _reg("eighty_two_member_ensemble_pooled", "eighty_two_member_ensemble_signal", "EightyTwoMemberEnsembleSignal",
          gefs_db=os.path.join(str(REPO_ROOT), "data", "gefs_archive.db"),

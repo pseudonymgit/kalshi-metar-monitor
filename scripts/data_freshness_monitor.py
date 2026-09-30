@@ -84,6 +84,17 @@ SOURCES = [
     dict(key="era5_archive", db="era5_archive.db", table="era5_archive",
          date_col="target_date", cadence_h=168, slack=1, per_station="station",
          note="era5 archive backfill (weekly cadence)"),
+    # R/T (2026-09-29): GHCN was NOT monitored at all — the exact source Dan
+    # flagged as 5 days stale with no alert. Added here (the registry the hourly
+    # WE-data-freshness-monitor cron actually runs). Daily producer; t+1 lag is
+    # normal, so cadence 24h + slack 1 = 48h alert threshold.
+    dict(key="ghcn_settlements", db="ghcn_settlements.db", table="ghcn_settlements",
+         date_col="date", cadence_h=24, slack=1, per_station="station",
+         note="WE-GHCN-daily-backfill (06:30 UTC)"),
+    # Kalshi market snapshots (live order book; not the settlement table).
+    dict(key="kalshi_market_snapshots", db="kalshi_market_snapshots.db",
+         table="market_snapshots", date_col="snapshot_time", cadence_h=1, slack=2,
+         note="kalshi live market snapshots"),
 ]
 
 
