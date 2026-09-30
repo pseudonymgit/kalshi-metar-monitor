@@ -369,7 +369,9 @@ def build_signal_registry():
     _reg_func("dewpoint_depression", "dewpoint_depression_modulator", "modulate_confidence")
     _reg("regime", "regime_signal", "RegimeSignal")
     _reg("frontal_passage_nowcast", "frontal_passage_nowcast_signal", "FrontalPassageNowcastSignal", metar_db_path=METAR_DB)
-    _reg("temperature_advection", "temperature_advection_signal", "TemperatureAdvectionSignal", db_path=METAR_DB)
+    # temperature_advection reads NWP (nwp_forecasts.advection_850hPa), not METAR —
+    # registering it with METAR_DB made every lookup hit the wrong DB and fail.
+    _reg("temperature_advection", "temperature_advection_signal", "TemperatureAdvectionSignal", db_path=nwp_db)
 
     # ── A1: Combined 82-member meta-signal ──
     # Equal weighting (default)

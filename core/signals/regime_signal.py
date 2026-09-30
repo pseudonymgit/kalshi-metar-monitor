@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
-SIGNAL: Regime (DTR-scaled) [DISABLED=True]
+SIGNAL: Regime (DTR-scaled)
 
-[DISABLED=True] Removed from BACKTEST_SIGNALS and registry in Cycle 3.
-Signal has interface mismatch bug (evaluate_for_station signature) that
-prevents it from ever firing. Keeping code file for reference.
+STATUS (reconciled 2026-09-30): ACTIVE in the sweep registry
+(`scripts/sweep_engine.py::build_signal_registry` registers `regime`), where it
+produced 15 trades at 73.3% accuracy on the 2026-09-30 full sweep. The old
+`[DISABLED=True]` banner was STALE: the `evaluate_for_station(station, date, conn)`
+signature mismatch it referenced is fixed, and the signal fires. It remains
+DELIBERATELY excluded from the *active ensemble* registry
+(`core/signals/__init__.py`) — that pruning was a separate correlation-based
+decision, not a "cannot fire" verdict. Do not treat this file's history as a
+disable signal.
 
 Detects stable temperature regimes (low volatility, low slope) and trades
 reversion to the 30-day mean when temperature deviates significantly.

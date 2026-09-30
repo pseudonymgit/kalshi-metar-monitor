@@ -37,10 +37,10 @@ CHECKS = [
     # ── METAR (30-min cron) ──
     ("METAR", "data/metar_backfill.db", "metar_observations", "timestamp_utc", 3, "content"),
     # ── GHCN daily backfill (cron 06:30 UTC) ──
-    # R/T (2026-09-29): NOAA GHCN-Daily publishes with a ~2-day lag, so the
-    # newest date is legitimately today-2. A 36h threshold fired on a healthy
-    # source. 72h allows the publication lag + one missed daily cycle.
-    ("GHCN", "data/ghcn_settlements.db", "ghcn_settlements", "date", 72, "content_date"),
+    # NOAA GHCN-Daily publishes with a ~2-3 day lag (verified 2026-09-30: freshest
+    # .dly ends today-3 even though the file Last-Modified is yesterday). 72h fired
+    # on healthy data at 86.9h; 96h allows the lag + one missed daily cycle.
+    ("GHCN", "data/ghcn_settlements.db", "ghcn_settlements", "date", 96, "content_date"),
     # ── GEFS archive (daily) ──
     ("GEFS", "data/gefs_archive.db", "gefs_archive", "target_date", 30, "content_date"),
     # ── TIGGE archive (daily) ──
@@ -60,8 +60,11 @@ CHECKS = [
     ("IEM-ASOS", "data/iem_asos_1min.db", "observations", "valid", 4, "content"),
     # ── NWP forecasts (6h cron) ──
     ("NWP", "data/nwp_forecasts.db", "nwp_forecasts", "fetch_timestamp", 12, "content"),
-    # ── ERA5 reanalysis (daily) ──
-    ("ERA5", "data/era5_archive.db", "era5_archive", "target_date", 50, "content_date"),
+    # ── ERA5 reanalysis (WEEKLY cron: Mon 08:00 UTC) ──
+    # ERA5 backfill runs weekly, so the newest target_date is legitimately days
+    # old mid-week; a 50h threshold fired on every healthy week. 192h (8 days)
+    # allows one missed weekly cycle before alerting.
+    ("ERA5", "data/era5_archive.db", "era5_archive", "target_date", 192, "content_date"),
     # ── WeatherAPI archive (daily) ──
     ("WeatherAPI", "data/weatherapi_archive.db", "daily", "date", 30, "content_date"),
 ]

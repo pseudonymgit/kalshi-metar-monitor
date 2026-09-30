@@ -76,7 +76,7 @@ def extract_tmax_from_grib(filepath, station_lat, station_lon):
         lon_idx = int(np.argmin(np.abs(lons - station_lon)))
         tmax_k = float(ds.tmax.values[lat_idx, lon_idx])
         ds.close()
-        return round(tmax_k - 273.15, 1)
+        return round((tmax_k - 273.15) * 9/5 + 32, 1)
     finally:
         # Delete temp file + any cfgrib index files
         for suffix in ["", ".idx", ".nx2", ".nx3"]:

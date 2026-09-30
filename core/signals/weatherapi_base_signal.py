@@ -201,7 +201,20 @@ class WeatherAPIBaseSignal(BaseSignal):
         if not db_path or not os.path.exists(db_path):
             return None, 0.0
 
-        own_conn = conn is None
+        # A caller (e.g. the sweep harness) may pass a METAR connection, but this
+        # signal's data lives in weatherapi_archive.db. Reusing a foreign conn that
+        # lacks the `hourly` table silently fails with "no such table: hourly".
+        # Only honour a passed conn if it actually carries the `hourly` table;
+        # otherwise open our own archive DB. (Fix 2026-09-30.)
+        usable = conn is not None
+        if usable:
+            try:
+                usable = conn.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='hourly'"
+                ).fetchone() is not None
+            except Exception:
+                usable = False
+        own_conn = not usable
         if own_conn:
             conn = sqlite3.connect(db_path)
         try:
