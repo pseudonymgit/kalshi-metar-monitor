@@ -252,7 +252,17 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
                 if station_indices is None:
                     lats = eccodes.codes_get_array(gid, 'latitudes')
                     lons = eccodes.codes_get_array(gid, 'longitudes')
+                    # FIX (2026-09-30): TIGGE grids publish longitudes on a
+                    # 0..360 scale (0.5 deg grid => 0.0..359.5). Station
+                    # longitudes are -180..180. Comparing the two directly
+                    # collapses EVERY station west of the grid's first column
+                    # (grid lon < 0.5E, i.e. every US conus station) onto grid
+                    # index 0 — which is exactly why KATL/KPHX, KAUS/KMSY,
+                    # KDEN/KPHL and KHOU/KSAT collided. Wrap the GRID
+                    # longitudes back to -180..180 so both sides share a frame.
+                    lons = [l - 360.0 if l > 180.0 else l for l in lons]
                     station_indices = {}
+                    station_offsets = {}
                     for station in STATION_NAMES:
                         st_lat, st_lon = STATION_MAP[station]
                         best_dist = float('inf')
@@ -265,6 +275,25 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
                                 best_dist = dist
                                 best_idx = i
                         station_indices[station] = best_idx
+                        station_offsets[station] = (float(lats[best_idx]),
+                                                    float(lons[best_idx]),
+                                                    best_dist ** 0.5)
+                    # GUARD: no two stations may share a gridpoint. This is the
+                    # invariant whose violation silently corrupted the archive.
+                    _seen_idx = {}
+                    for _st, _gi in station_indices.items():
+                        if _gi in _seen_idx:
+                            raise ValueError(
+                                f"station-gridpoint collision: {_st} and "
+                                f"{_seen_idx[_gi]} both map to grid index {_gi}")
+                        _seen_idx[_gi] = _st
+                    _max_off = max(o[2] for o in station_offsets.values())
+                    if _max_off > 3.0:
+                        raise ValueError(
+                            f"nearest-gridpoint offset {_max_off:.1f} deg too "
+                            f"large — grid/mapping bug")
+                    print(f"    Mapped {len(station_indices)} stations, "
+                          f"max grid offset {_max_off:.2f} deg, no collisions")
                 
                 values = eccodes.codes_get_values(gid)
                 for station in STATION_NAMES:

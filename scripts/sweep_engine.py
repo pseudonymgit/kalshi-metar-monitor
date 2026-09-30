@@ -349,7 +349,7 @@ def build_signal_registry():
     # _reg("persistence", "persistence_signal", "PersistenceSignal")
     # _reg("simple_trend", "simple_trend_signal", "SimpleTrendSignal")
     _reg("wind_direction_shift", "wind_direction_shift", "WindDirectionShiftSignal")
-    _reg("corrected_pressure_delta", "dual_polarity_signal", "DualPolaritySignal", wrapped_signal=None)
+    _reg("corrected_pressure_delta", "dual_polarity_signal", "CorrectedPressureDeltaSignal")
     _reg("spike_reversion", "spike_reversion_signal", "SpikeReversionSignal")
     _reg("goldilocks", "goldilocks_signal", "GoldilocksSignal")
     _reg("pressure_tendency", "pressure_tendency_signal", "PressureTendencySignal")
@@ -360,9 +360,14 @@ def build_signal_registry():
     _reg("fogr_reversion", "fogr_reversion_signal", "FogrReversionSignal")
     _reg("esdr", "esdr_signal", "EsdrSignal", nwp_db_path=nwp_db)
     _reg("frontal_detector", "frontal_detector_signal", "FrontalDetectorSignal")
-    _reg("ai_composite", "ai_composite_signal", "AiCompositeSignal")
+    # ai_composite reads NWP (nwp_forecasts), not METAR — registering it with
+    # METAR_DB made every lookup hit the wrong DB and fail (same class of bug as
+    # temperature_advection). Fixed 2026-09-30 zero-trade triage.
+    _reg("ai_composite", "ai_composite_signal", "AiCompositeSignal", db_path=nwp_db)
     _reg_func("frontal_passage_detector", "frontal_passage_detector", "evaluate")
-    _reg("nwp_direct", "nwp_direct_signal", "NwpDirectSignal")
+    # nwp_direct reads NWP (nwp_forecasts), not METAR — same METAR-path bug.
+    # Fixed 2026-09-30 zero-trade triage.
+    _reg("nwp_direct", "nwp_direct_signal", "NwpDirectSignal", db_path=nwp_db)
     _reg("nwp_dtdt_fusion", "nwp_dtdt_fusion_signal", "NwpDtdtFusionSignal", nwp_db_path=nwp_db)
     _reg("metar_nowcast", "metar_nowcast_signal", "MetarNowcastSignal")
     _reg("spread_based_entry", "spread_based_entry_signal", "SpreadBasedEntryDetector")

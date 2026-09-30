@@ -115,8 +115,12 @@ def load_intraday_hsf(freq: str, cut_hour_utc: int = 18) -> Dict[Tuple[str, str]
         )
     elif freq == "15m":
         c = _conn("iem_asos_1min.db")
+        # FIX 2026-09-30: `observations.tmpf` is ALREADY Fahrenheit (IEM ASOS
+        # convention; global range -49..122). The prior query applied
+        # `tmpf * 9/5 + 32`, double-converting 66F -> ~151F and corrupting every
+        # CRPS weighted by w_hsf. Use tmpf directly.
         rows = c.execute(
-            "SELECT station, substr(valid,1,10) AS d, MAX(tmpf * 9.0/5.0 + 32.0) "
+            "SELECT station, substr(valid,1,10) AS d, MAX(tmpf) "
             "FROM observations "
             "WHERE tmpf IS NOT NULL AND CAST(substr(valid,12,2) AS INT) <= ? "
             "GROUP BY station, d",

@@ -110,13 +110,27 @@ def parse_grib_for_stations(grib_path):
     eccodes.codes_release(first)
     f.close()
     
-    # For each station, find nearest grid point
+    # For each station, find nearest grid point.
+    # FIX (2026-09-30): same 0..360-vs-(-180..180) frame bug as
+    # ecds_sequential_backfill.py. The old per-station `adj_lon` still left
+    # every western station (lon < 0) closer to the grid's first column than
+    # to its true column, collapsing KATL/KPHX, KAUS/KMSY, KDEN/KPHL and
+    # KHOU/KSAT. Wrap the GRID longitudes into -180..180 instead, so the
+    # distance is computed in a single consistent frame.
+    lons_2d = np.where(lons_2d > 180.0, lons_2d - 360.0, lons_2d)
     station_indices = {}
     for name, s_lat, s_lon in STATIONS:
-        adj_lon = s_lon + 360 if lons_2d.max() > 180 and s_lon < 0 else s_lon
-        dist = np.sqrt((lats_2d - s_lat)**2 + (lons_2d - adj_lon)**2)
+        dist = np.sqrt((lats_2d - s_lat)**2 + (lons_2d - s_lon)**2)
         li, loi = np.unravel_index(np.argmin(dist), lats_2d.shape)
         station_indices[name] = (li, loi)
+    # GUARD: no two stations may share a gridpoint.
+    _seen_idx = {}
+    for _nm, _idx in station_indices.items():
+        if _idx in _seen_idx:
+            raise ValueError(
+                f"station-gridpoint collision: {_nm} and {_seen_idx[_idx]} "
+                f"both map to grid index {_idx}")
+        _seen_idx[_idx] = _nm
     
     # Parse all messages: 51 members × 9 steps × (params) per date
     # Only extract 2 metre temperature (param=167)

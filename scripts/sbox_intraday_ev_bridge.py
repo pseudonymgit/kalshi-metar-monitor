@@ -1,32 +1,37 @@
 #!/usr/bin/env python3
 """
-SBOX Intraday EV Bridge (2026-09-30)
-====================================
-Wires Dan's Item-1 chain into the SBOX paper ledger, end to end:
+SBOX Multi-Forecaster Intraday EV Bridge (2026-09-30)
+=====================================================
+Extends the Item-1 bridge (scripts/sbox_intraday_ev_bridge.py) to run THREE
+independent forecasters and score trading AND analytics together.
 
-    WS-P calibrated distribution
-        -> intraday truncation (high-so-far from METAR observations TODAY)
-        -> strike selection (EV vs REAL Kalshi ladder prices, net of fee)
+Pipeline:
+
+    WS-P calibrated GEFS/emOS distribution        (p_gefs,  intraday-truncated)
+  + GHCN analog empirical CDF                     (p_analog, independent)
+  + trajectory historical-analog outcome CDF      (p_trajectory, independent)
+        -> fusion (core/intraday/multi_forecaster_fusion.py)
+        -> strike selection (core/strike_selection_ev.py, EV net of fee)
         -> EntryTimingEngine entry decision
         -> paper trade recorded in data/paper_trading_sbox.db
+           (p_gefs, p_analog, p_trajectory, p_fused stored per trade)
+  AND a pure weather-analytics evaluation (CRPS vs settlement, resolution)
+      reported TOGETHER with the trade results.
 
 Deterministic, no AI/ML. SBOX only — refuses to touch DEV/PROD.
 
-Correctness notes (all three were bugs in the first draft, fixed 2026-09-30):
-  1. The weather DAY is the station-LOCAL calendar day, not the UTC date.
-     GEFS target_date, METAR obs, the Kalshi ticker suffix and settlement all key
-     off the local day. Using the UTC date misaligns every one of them.
-  2. HIGH-SO-FAR must come from intraday METAR observations, not the
-     `daily_stats` rollup (which is the FINAL day max, i.e. a locked win).
-  3. The GEFS ensemble comes from `nwp_forecasts.db` (CLEAN), NOT
-     `gefs_archive.db` (documented corrupt for distribution use), and is Celsius
-     -> F.
+Fusion rule (see docs/plans/SBOX-MULTI-FORECASTER-BRIDGE-2026-09-30.md):
+  core  = 0.55*p_gefs + 0.45*p_analog          when |gap| <= 0.10  (agree, x1.0)
+        = 0.50/0.50                             when 0.10 < gap <= 0.20 (split, x1.25)
+        = shrink(0.50/0.50, x0.5)               when gap > 0.20        (disagree, x1.50)
+  p_fused = 0.5 + traj_mult*(core - 0.5), traj_mult in {0.75 discount, 0.95 soft, 1.05 confirm}
+  min-edge is scaled by the agreement edge multiplier for the picked strike.
 
 CLI:
-  python3 scripts/sbox_intraday_ev_bridge.py              # record (respects window)
-  python3 scripts/sbox_intraday_ev_bridge.py --dry-run    # evaluate only
-  python3 scripts/sbox_intraday_ev_bridge.py --report      # distribution/edge dump
-  python3 scripts/sbox_intraday_ev_bridge.py --ignore-window --min-edge 0
+  python3 scripts/sbox_intraday_ev_bridge.py --dry-run --ignore-window   # evaluate
+  python3 scripts/sbox_intraday_ev_bridge.py                             # record (window)
+  python3 scripts/sbox_intraday_ev_bridge.py --combined-report           # trade+analytics
+  python3 scripts/sbox_intraday_ev_bridge.py --report                    # per-strike dump
 """
 import argparse
 import json
@@ -42,8 +47,14 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "core"))
 
-from core.intraday.distribution_adapter import from_ws_p, update_from_intraday, select  # noqa: E402
+from core.intraday.distribution_adapter import from_ws_p, update_from_intraday  # noqa: E402
 from core.intraday.entry_engine import EntryTimingEngine  # noqa: E402
+from core.intraday.analog_cdf import _load_series  # noqa: E402
+from core.strike_selection_ev import select_strike, p_high_ge as gauss_p_high_ge  # noqa: E402
+from core.intraday.multi_forecaster_fusion import (  # noqa: E402
+    TrajectoryForecaster, build_live_epoch, build_analog_cdf_today,
+    fuse_strike, ensure_schema, FUSION_RULE_ID,
+)
 from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name,
 )
@@ -54,6 +65,7 @@ WS_P = DATA / "ws_p_distribution.json"
 NWP = DATA / "nwp_forecasts.db"   # CLEAN GEFS source
 METAR = DATA / "metar_backfill.db"
 SNAPS = DATA / "kalshi_market_snapshots.db"
+SETTLEMENTS = DATA / "kalshi_settlements.db"
 INSTANCE = "SBOX"
 
 STATIONS = ["KATL", "KAUS", "KBOS", "KDCA", "KDEN", "KDFW", "KHOU", "KLAS",
@@ -89,10 +101,7 @@ def _dt_yy(d: str) -> str:
 
 
 def gefs_ens(station: str, target_date: str):
-    """(ens_mean_f, ens_std_f) for the daily-max GEFS ensemble, or None.
-
-    nwp_forecasts.db is the clean source; values are Celsius -> F.
-    """
+    """(ens_mean_f, ens_std_f) for the daily-max GEFS ensemble, or None."""
     c = _ro(NWP)
     try:
         rows = c.execute(
@@ -133,14 +142,7 @@ def high_so_far(station: str, day_start: datetime, day_end: datetime,
 
 def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
                   min_volume: float = 50.0) -> List[Dict]:
-    """Threshold (-T) strikes with LIQUID mid prices for one station-day.
-
-    Filters to KXHIGH*-T tickers (the P(high>=X) proposition). Bounds snapshot
-    time to `before_iso` so a post-settlement 0.5 placeholder can't be used as a
-    live quote (E2E/F16). Also drops rail/illiquid quotes: the `-T` grid on these
-    stations is often barely quoted (mid ~0.005, vol ~0), and trading those would
-    produce fantasy fills and meaningless P&L.
-    """
+    """Threshold (-T) strikes with LIQUID mid prices for one station-day."""
     c = _ro(SNAPS)
     try:
         sql = ("SELECT market_ticker, mid_price, yes_ask, volume_24h FROM market_snapshots "
@@ -170,48 +172,129 @@ def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
             continue
         px = float(px)
         if px <= 0.02 or px >= 0.98:
-            continue  # rail / placeholder quote
+            continue
         if (vol or 0) < min_volume:
-            continue  # illiquid
+            continue
         seen[strike] = {"strike": strike, "yes_price": px,
                         "no_price": round(1 - px, 4), "ticker": tk,
                         "volume_24h": vol}
     return sorted(seen.values(), key=lambda d: d["strike"])
 
 
+def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs):
+    """Insert-or-replace the companion per-trade forecaster row (idempotent)."""
+    now = datetime.now(timezone.utc).isoformat()
+    conn.execute(
+        """INSERT INTO trade_forecaster_probs
+           (trade_uuid, station, trade_date_utc, strike, side, ticker,
+            p_gefs, p_analog, p_trajectory, p_fused, n_analog, n_traj,
+            agreement, edge_mult, traj_verdict, traj_mult, fusion_rule, created_at_utc)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+           ON CONFLICT(trade_uuid) DO UPDATE SET
+             p_gefs=excluded.p_gefs, p_analog=excluded.p_analog,
+             p_trajectory=excluded.p_trajectory, p_fused=excluded.p_fused,
+             n_analog=excluded.n_analog, n_traj=excluded.n_traj,
+             agreement=excluded.agreement, edge_mult=excluded.edge_mult,
+             traj_verdict=excluded.traj_verdict, traj_mult=excluded.traj_mult,
+             fusion_rule=excluded.fusion_rule, created_at_utc=excluded.created_at_utc""",
+        (tuuid, station, day_str, strike, side, ticker,
+         probs.get("p_gefs"), probs.get("p_analog"),
+         probs.get("p_trajectory"), probs.get("p_fused"),
+         probs.get("n_analog"), probs.get("n_traj"),
+         probs.get("agreement"), probs.get("edge_mult"),
+         probs.get("traj_verdict"), probs.get("traj_mult"),
+         FUSION_RULE_ID, now))
+
+
 def record_trade(conn, station, market_type, side, our_prob, market_price,
-                 confidence, strike, ticker, size_usd, functionality, day_str):
-    """Insert one SBOX trade row. Idempotent per (station, day, functionality)."""
-    dupe = conn.execute(
-        "SELECT 1 FROM trades WHERE station=? AND trade_date_utc=? AND functionality=?",
+                 confidence, strike, ticker, size_usd, functionality, day_str,
+                 probs: Optional[Dict] = None):
+    """Record ONE SBOX trade per (station, day, functionality), idempotently.
+
+    Extension (2026-09-30): the row also carries p_gefs/p_analog/p_trajectory/
+    p_fused (additive columns) plus a companion row in trade_forecaster_probs.
+
+    Idempotency / no-double-count rule: if a row already exists for
+    (station, trade_date_utc, functionality) — e.g. an earlier single-forecaster
+    bridge run already booked today's position — this pass does NOT insert a
+    second trade. It ENRICHES the existing row in place with the multi-forecaster
+    probabilities and refreshes the companion row (status="enriched"). The
+    canonical `trades` columns and existing semantics are untouched.
+    """
+    probs = probs or {}
+    existing = conn.execute(
+        "SELECT trade_uuid FROM trades WHERE station=? AND trade_date_utc=? "
+        "AND functionality=?",
         (station, day_str, functionality)).fetchone()
-    if dupe:
-        return {"status": "skipped", "reason": "already_recorded_today", "station": station}
+    if existing:
+        tuuid = existing[0]
+        conn.execute(
+            "UPDATE trades SET p_gefs=?, p_analog=?, p_trajectory=?, p_fused=? "
+            "WHERE trade_uuid=?",
+            (probs.get("p_gefs"), probs.get("p_analog"),
+             probs.get("p_trajectory"), probs.get("p_fused"), tuuid))
+        _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
+        conn.commit()
+        return {"status": "enriched", "station": station,
+                "picked_strike": strike,
+                "p_gefs": probs.get("p_gefs"), "p_analog": probs.get("p_analog"),
+                "p_trajectory": probs.get("p_trajectory"), "p_fused": probs.get("p_fused"),
+                "agreement": probs.get("agreement"), "traj_verdict": probs.get("traj_verdict")}
     now = datetime.now(timezone.utc).isoformat()
     price = float(market_price)
     qty = max(1, int(round(size_usd / max(price, 0.01))))
     cost = abs(qty * price)
     direction = "UP" if side == "BUY" else "DOWN"
+    tuuid = str(uuid.uuid4())
     conn.execute(
         """INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,
            signal_direction, forecast_prob, market_price, trade_type, quantity,
            position_size_usd, trade_price, trade_cost, trade_version, functionality,
            status, notes, implied_prob, analytical_prob, calibration_error,
-           confidence_indicator, created_at_utc)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-        (str(uuid.uuid4()), day_str, station, market_type, direction, our_prob, price,
+           confidence_indicator, created_at_utc,
+           p_gefs, p_analog, p_trajectory, p_fused)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (tuuid, day_str, station, market_type, direction, our_prob, price,
          "buy_yes" if side == "BUY" else "sell_yes", qty, size_usd, price, cost,
-         f"v3.0_{INSTANCE.lower()}", functionality, "open",
-         f"EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
-         price, our_prob, abs(our_prob - price), confidence, now))
+         f"v3.1_{INSTANCE.lower()}", functionality, "open",
+         f"multi-forecaster EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
+         price, our_prob, abs(our_prob - price), confidence, now,
+         probs.get("p_gefs"), probs.get("p_analog"),
+         probs.get("p_trajectory"), probs.get("p_fused")))
+    _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
     conn.commit()
     return {"status": "executed", "station": station, "signal_direction": direction,
             "strike": strike, "ticker": ticker, "our_prob": round(our_prob, 4),
-            "market_price": price, "position_size_usd": round(size_usd, 2), "edge": round(our_prob - price, 4)}
+            "market_price": price, "position_size_usd": round(size_usd, 2),
+            "edge": round(our_prob - price, 4),
+            "p_gefs": probs.get("p_gefs"), "p_analog": probs.get("p_analog"),
+            "p_trajectory": probs.get("p_trajectory"), "p_fused": probs.get("p_fused"),
+            "agreement": probs.get("agreement"), "traj_verdict": probs.get("traj_verdict")}
 
 
-def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03, report=False):
+def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float]):
+    """Return (p_fn, meta_fn): per-strike x -> p_fused and the fusion meta dict."""
+    cache: Dict[float, Dict] = {}
+
+    def _calc(x: float) -> Dict:
+        if x in cache:
+            return cache[x]
+        row = fuse_strike(state.p_ge, cdf.p_high_ge,
+                          lambda xx: traj.p_high_ge(xx, hsf), x)
+        cache[x] = row
+        return row
+
+    def p_fn(x: float) -> float:
+        return _calc(x)["p_fused"]
+
+    return p_fn, _calc
+
+
+def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
+        report=False, max_stations=None):
     stations = stations or STATIONS
+    if max_stations:
+        stations = stations[:max_stations]
     now_utc = datetime.now(timezone.utc)
     now_iso = now_utc.isoformat()
 
@@ -224,6 +307,11 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03, report
     conn = None if dry_run else sqlite3.connect(SBOX_DB)
     if conn:
         conn.execute("PRAGMA journal_mode=WAL;")
+        ensure_schema(conn)  # additive: p_* columns + companion table
+
+    # ONE matcher/climatology for the whole pass (the climatology build is the
+    # expensive part; constructing per-station rebuilt it every time).
+    shared_traj = TrajectoryForecaster()
 
     results, skipped, diag = [], [], []
     for st in stations:
@@ -256,35 +344,78 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03, report
             skipped.append((st, "no_strike_ladder"))
             continue
 
-        picked = select(state, ladder, min_edge=min_edge)
-        if not picked or picked.get("side") is None or picked.get("ev", 0) <= 0:
-            skipped.append((st, "no_positive_ev_strike"))
+        # -- Item 5: independent analog CDF forecaster (extend series to today) --
+        try:
+            cdf = build_analog_cdf_today(st, day_str, high_so_far=hsf)
+        except Exception as e:
+            skipped.append((st, f"analog_cdf_error:{type(e).__name__}"))
             continue
 
+        # -- Item 4: trajectory analog gate -> p_trajectory + directional verdict --
+        try:
+            q_epoch = build_live_epoch(st, day_start, day_end, now_utc)
+            if q_epoch is None:
+                traj = None
+            else:
+                traj = shared_traj.fit(q_epoch)
+        except Exception as e:
+            traj = None
+            diag.append({"station": st, "traj_error": f"{type(e).__name__}:{e}"})
+        if traj is None:
+            skipped.append((st, "no_trajectory_query_epoch"))
+            continue
+
+        # -- fuse per strike; select on the FUSED probability --
+        p_fn, meta_fn = build_fused_p_fn(state, cdf, traj, hsf)
+        picked = select_strike(state.mu, state.sigma, ladder, min_edge=0.0, p_fn=p_fn)
+        if not picked or picked.get("ev", 0) <= 0:
+            skipped.append((st, "no_positive_ev_strike"))
+            continue
         strike = picked["strike"]
+        meta = meta_fn(strike)
+        # Item 5: wider required edge when forecasters disagree.
+        if picked["ev"] <= min_edge * meta["edge_mult"]:
+            skipped.append((st, f"edge_below_scaled_min:{meta['agreement']}"))
+            continue
+
         row = next((s for s in ladder if abs(s["strike"] - strike) < 1e-9), None)
         if row is None:
             skipped.append((st, "no_real_price_for_picked_strike"))
             continue
-        our_prob = state.p_ge(strike)
-        if picked["side"] == "no":
-            our_prob = 1.0 - our_prob
-            mkt = row["no_price"]
-        else:
-            mkt = row["yes_price"]
+
+        p_gefs = state.p_ge(strike)
+        both = dict(meta)
+        both.update({"p_gefs": meta["p_gefs"], "p_analog": meta["p_analog"],
+                     "p_trajectory": meta["p_trajectory"],
+                     "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs})
+        fused_at_strike = meta["p_fused"]
+        our_prob = fused_at_strike if picked["side"] == "yes" else 1.0 - fused_at_strike
+        mkt = row["yes_price"] if picked["side"] == "yes" else row["no_price"]
         ticker = row["ticker"]
 
-        diag.append({"station": st, "day": day_str, "ens": [round(ens[0], 2), round(ens[1], 2)],
-                     "hsf": hsf, "frac": round(frac, 3), "mu": round(state.mu, 2),
-                     "sigma": round(state.sigma, 2), "strike": strike, "side": picked["side"],
-                     "our_prob": round(our_prob, 4), "mkt": mkt, "ev": picked["ev"],
+        # directional gate verdict on the trade side (Item 4 evidence).
+        # Our proposition is P(high>=strike): YES side = we expect the high to
+        # reach/exceed the strike -> trajectory direction "up"; NO -> "down".
+        gate_dir = "up" if picked["side"] == "yes" else "down"
+        verdict = traj.gate_verdict(gate_dir, abs(our_prob - 0.5) * 2.0)
+
+        diag.append({"station": st, "day": day_str,
+                     "ens": [round(ens[0], 2), round(ens[1], 2)], "hsf": hsf,
+                     "frac": round(frac, 3), "mu": round(state.mu, 2),
+                     "sigma": round(state.sigma, 2), "strike": strike,
+                     "side": picked["side"], "ev": picked["ev"],
+                     "our_prob": round(our_prob, 4), "mkt": mkt,
+                     "p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
+                     "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
+                     "agreement": both["agreement"], "traj_verdict": both["traj_verdict"],
+                     "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
+                     "gate": verdict["verdict"], "p_warm": verdict.get("p_warm"),
                      "n_strikes": len(ladder)})
         if report:
             continue
 
         sig = engine.evaluate_hour(
-            hour=now_utc.hour,
-            hour_before_settlement=6,
+            hour=now_utc.hour, hour_before_settlement=6,
             our_probability=our_prob, market_price=mkt,
             confidence=abs(our_prob - 0.5) * 2.0,
         )
@@ -292,16 +423,23 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03, report
             skipped.append((st, "entry_engine_pass"))
             continue
 
+        prob_payload = {"p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
+                        "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
+                        "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
+                        "agreement": both["agreement"], "edge_mult": both["edge_mult"],
+                        "traj_verdict": both["traj_verdict"], "traj_mult": both["traj_mult"]}
+
         if dry_run:
             results.append({"status": "would_execute", "station": st,
                             "side": sig.signal_type.name, "strike": strike,
                             "our_prob": round(our_prob, 4), "market_price": mkt,
-                            "size": round(float(sig.position_size), 2)})
+                            "size": round(float(sig.position_size), 2),
+                            **prob_payload})
         else:
             results.append(record_trade(
                 conn, st, "HIGH", sig.signal_type.name, our_prob, mkt,
                 abs(our_prob - 0.5) * 2.0, strike, ticker,
-                sig.position_size, "intraday_ev_strike", day_str))
+                sig.position_size, "intraday_ev_strike", day_str, probs=prob_payload))
 
     if conn:
         conn.close()
@@ -312,16 +450,173 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03, report
     return out
 
 
+# =============================================================================
+# Item 8 — combined trade + analytics report
+# =============================================================================
+def _crps_gauss(mu: float, sigma: float, y: float) -> float:
+    """Closed-form CRPS of N(mu,sigma) vs scalar y."""
+    if sigma <= 0:
+        return abs(mu - y)
+    z = (y - mu) / sigma
+    from math import erf, exp, pi, sqrt
+    phi = exp(-0.5 * z * z) / sqrt(2 * pi)
+    Phi = 0.5 * (1 + erf(z / sqrt(2)))
+    return sigma * (z * (2 * Phi - 1) + 2 * phi - 1 / sqrt(pi))
+
+
+def pure_analytics_report(stations=None, n_days=20, dist=None) -> Dict:
+    """Pure weather analytics: CRPS vs settlement + resolution for both
+    distributional forecasters over the most recent settled station-days."""
+    from core.intraday.multi_forecaster_fusion import build_analog_cdf_today
+    stations = stations or STATIONS
+    dist = dist or json.load(open(WS_P))
+
+    # settlement truth: {station: {date: temp_f}}
+    c = _ro(SETTLEMENTS)
+    try:
+        rows = c.execute(
+            "SELECT station, target_date, kalshi_temp FROM kalshi_settlements "
+            "WHERE kalshi_temp IS NOT NULL").fetchall()
+    finally:
+        c.close()
+    truth: Dict[str, Dict[str, float]] = {}
+    for st, d, t in rows:
+        truth.setdefault(st, {})[d] = float(t)
+
+    per_station = {}
+    crps_analog, crps_gefs, n = [], [], 0
+    for st in stations:
+        tmap = truth.get(st, {})
+        if not tmap:
+            continue
+        dates = sorted(tmap)[-n_days:]
+        a_list, g_list = [], []
+        for d in dates:
+            y = tmap[d]
+            try:
+                cdf = build_analog_cdf_today(st, d)
+                ca = cdf.crps(y)
+            except Exception:
+                ca = None
+            # GEFS curve: seed from WS-P + ensemble for that date if available
+            cg = None
+            ens = gefs_ens(st, d)
+            if ens:
+                fit = dist["fit"]
+                bias = fit["per_station_bias_F"].get(st, 0.0)
+                off = fit["global_offset_F"]
+                mb = fit.get("month_bias_F", {}).get(str(int(d[5:7])), 0.0)
+                sigma = max(0.8, fit["spread_a0_F"] + fit["spread_a1"] * ens[1])
+                cg = _crps_gauss(ens[0] + bias + off + mb, sigma, y)
+            if ca is not None and ca == ca:
+                crps_analog.append(ca)
+                a_list.append(ca)
+            if cg is not None and cg == cg:
+                crps_gefs.append(cg)
+                g_list.append(cg)
+            if ca is not None or cg is not None:
+                n += 1
+        per_station[st] = {
+            "n": len(dates),
+            "crps_analog": round(sum(a_list) / len(a_list), 4) if a_list else None,
+            "crps_gefs": round(sum(g_list) / len(g_list), 4) if g_list else None,
+        }
+    return {
+        "windows": n,
+        "crps_analog_mean": round(sum(crps_analog) / len(crps_analog), 4) if crps_analog else None,
+        "crps_gefs_mean": round(sum(crps_gefs) / len(crps_gefs), 4) if crps_gefs else None,
+        "per_station": per_station,
+    }
+
+
+def trade_results_report() -> Dict:
+    """Trade results from SBOX rows carrying p_* columns."""
+    c = _ro(SBOX_DB)
+    try:
+        cols = {d[1] for d in c.execute("PRAGMA table_info(trades)")}
+        has = all(k in cols for k in ("p_gefs", "p_analog", "p_trajectory", "p_fused"))
+        if not has:
+            return {"error": "p_* columns absent (run a recording pass first)"}
+        rows = c.execute(
+            "SELECT station, trade_date_utc, signal_direction, "
+            "forecast_prob, market_price, "
+            "p_gefs, p_analog, p_trajectory, p_fused, "
+            "status, settled_value, realized_pnl "
+            "FROM trades WHERE p_fused IS NOT NULL").fetchall()
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        c.close()
+    n = len(rows)
+    if n == 0:
+        return {"n": 0, "note": "no trades carry p_* yet"}
+    # settled when realized_pnl is populated
+    acc = [r for r in rows if r[11] is not None]
+    settled = len(acc)
+    wins = sum(1 for r in acc if (r[11] or 0) > 0)
+    pnl = sum((r[11] or 0) for r in acc)
+    # ECE over settled trades: p_yes = p_fused for UP, 1-p_fused for DOWN;
+    # outcome y = 1 if settled_value win (use realized_pnl>0 as win proxy).
+    ece = None
+    if settled:
+        bins = [[] for _ in range(10)]
+        for r in acc:
+            direction, p_fused, rp = r[2], r[8], r[11]
+            if p_fused is None:
+                continue
+            p_yes = p_fused if direction == "UP" else 1.0 - p_fused
+            b = min(9, int(p_yes * 10))
+            bins[b].append((p_yes, 1.0 if (rp or 0) > 0 else 0.0))
+        tot = sum(len(b) for b in bins)
+        if tot:
+            ece = 0.0
+            for b in bins:
+                if not b:
+                    continue
+                mp = sum(x[0] for x in b) / len(b)
+                my = sum(x[1] for x in b) / len(b)
+                ece += (len(b) / tot) * abs(mp - my)
+    # mean agreement mix
+    agrees = {}
+    for r in rows:
+        key = ("agree" if abs((r[5] or 0) - (r[6] or 0)) <= 0.10 else
+               "split" if abs((r[5] or 0) - (r[6] or 0)) <= 0.20 else "disagree")
+        agrees[key] = agrees.get(key, 0) + 1
+    return {
+        "n_trades_with_probs": n,
+        "n_settled": settled,
+        "settled_win_rate": round(wins / settled, 4) if settled else None,
+        "realized_pnl": round(pnl, 2),
+        "ece": round(ece, 4) if ece is not None else None,
+        "agreement_mix": agrees,
+        "mean_p_gefs": round(sum(r[5] for r in rows if r[5] is not None) / n, 4),
+        "mean_p_analog": round(sum(r[6] for r in rows if r[6] is not None) / n, 4),
+        "mean_p_trajectory": round(sum(r[7] for r in rows if r[7] is not None) / n, 4),
+        "mean_p_fused": round(sum(r[8] for r in rows if r[8] is not None) / n, 4),
+    }
+
+
+def combined_report(stations=None) -> Dict:
+    return {"trade_results": trade_results_report(),
+            "pure_weather_analytics": pure_analytics_report(stations=stations)}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--ignore-window", action="store_true")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--combined-report", action="store_true")
     ap.add_argument("--stations", nargs="*", default=None)
     ap.add_argument("--min-edge", type=float, default=0.03)
+    ap.add_argument("--max-stations", type=int, default=None)
     a = ap.parse_args()
+    if a.combined_report:
+        print(json.dumps(combined_report(a.stations), indent=2, default=str))
+        return 0
     out = run(dry_run=a.dry_run, ignore_window=a.ignore_window,
-              stations=a.stations, min_edge=a.min_edge, report=a.report)
+              stations=a.stations, min_edge=a.min_edge, report=a.report,
+              max_stations=a.max_stations)
     print(json.dumps(out, indent=2, default=str))
     return 0
 
