@@ -14,6 +14,11 @@ from pathlib import Path
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .market_cost_model import MARKET_COST_MODEL
 from .trade_execution import TradeType
+# R/T (2026-10-01): settlement builds a TradeResult for the risk manager but the
+# symbol was never imported here, so process_settlements_for_date raised
+# `name 'TradeResult' is not defined` and every settlement silently fell through
+# to the legacy buggy path.
+from .risk_controls import TradeResult
 
 # Import calibration pipeline flag (from paper_trading_engine module-level constant)
 HAVE_CALIBRATION_PIPELINE = False
@@ -140,16 +145,18 @@ def process_settlements_for_date(self, settlement_date):
 
         # Update the trade with settlement data
         realized_pnl = profit
+        # R/T (2026-10-01): the original UPDATE referenced settlement_confirmed
+        # and settlement_outcome columns that do not exist on `trades`, so the
+        # whole statement raised and the exception was swallowed by the engine,
+        # which then fell through to a buggy legacy settlement path. Write only
+        # the columns that exist.
         c.execute("""
             UPDATE trades
             SET settled_value = ?, settlement_date_utc = ?,
                 realized_pnl = ?, settlement_return_amount = ?,
-                status = 'closed',
-                settlement_confirmed = 1,
-                settlement_outcome = ?
+                status = 'closed'
             WHERE trade_uuid = ?
-        """, (settlement_value, settlement_date, profit, return_amount,
-              settlement_outcome, trade_uuid))
+        """, (settlement_value, settlement_date, profit, return_amount, trade_uuid))
 
         # Update corresponding position (reduce by quantity)
         trade_qty = qty
@@ -885,5 +892,32 @@ def _get_strike_price(station: str, market_type: str, date: str, paper_db: str, 
     except Exception as e:
         _LOGGER.debug("strike_price_cache_failed station=%s error=%s", station, e)
 
-    # 3. Not available
+    # 3. Parse from the trade's own ticker/notes.
+    # R/T (2026-10-01): historical strikes are not served by the live Kalshi API
+    # and market_cache may be empty, but every paper trade records its strike in
+    # the `notes` column (e.g. "... KXHIGHTBOS-26SEP29-T69 @ 69.0F; inst=SBOX").
+    # Without this fallback, historical settlement always skips at `strike is
+    # None` and trades never close. Parse the "@ <N>F" or "-T<N>" token.
+    try:
+        import re
+        conn = get_sqlite_connection(paper_db)
+        try:
+            row = conn.execute(
+                "SELECT notes FROM trades WHERE station = ? AND market_type = ? "
+                "AND trade_date_utc = ? LIMIT 1",
+                (station, market_type, date),
+            ).fetchone()
+        finally:
+            conn.close()
+        if row and row[0]:
+            note = row[0]
+            m = re.search(r"@\s*(-?\d+(?:\.\d+)?)\s*F", note)
+            if not m:
+                m = re.search(r"-T(-?\d+(?:\.\d+)?)", note)
+            if m:
+                return int(round(float(m.group(1))))
+    except Exception as e:
+        _LOGGER.debug("strike_price_notes_failed station=%s error=%s", station, e)
+
+    # 4. Not available
     return None

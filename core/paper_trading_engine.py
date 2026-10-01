@@ -2432,6 +2432,14 @@ class PaperTrader:
                     "pnl_tracking.process_settlements_for_date completed for %s",
                     settlement_date
                 )
+                # R/T (2026-10-01): the delegated module is the single source of
+                # truth for settlement. Return here so the legacy body below
+                # NEVER runs — it settled every trade as a win via
+                # `1.0 if settlement_value > 50.0 else 0.0` (settlement_value is
+                # the actual temp in F, so every US high "won"). That produced a
+                # phantom 34-0 / +$29k result. Fall through only if delegation
+                # is unavailable or raised.
+                return
             except Exception as e:
                 _LOGGER.warning(
                     "pnl_tracking.process_settlements_for_date failed for %s: %s",
