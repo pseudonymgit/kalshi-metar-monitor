@@ -63,8 +63,13 @@ os.makedirs(GRIB_DIR, exist_ok=True)
 
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    # R/T (2026-10-02): WAL + busy_timeout so multiple shard processes can
+    # re-ingest disjoint date ranges into the same archive without "database is
+    # locked" failures. Writes are idempotent (INSERT OR REPLACE on the PK).
+    conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=30000")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS tigge_archive (
             target_date TEXT NOT NULL, station TEXT NOT NULL,
