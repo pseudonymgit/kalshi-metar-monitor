@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SBOX_DB = os.path.join(REPO, "data", "paper_trading_sbox.db")
 
-TRADER = PaperTrader(paper_db=SBOX_DB)
+# D4 (2026-10-02): Dan's real bankroll is $200, not the $10k default.
+TRADER = PaperTrader(paper_db=SBOX_DB, initial_balance=200.0, fee_rate=0.0205)
 
 today = datetime.now(timezone.utc).date()
 # Settle recent trading dates
@@ -33,6 +34,21 @@ for days_ago in range(1, 12):
         TRADER.process_settlements_for_date(date_str)
     except Exception as e:
         logger.warning("%s: %s", date_str, e)
+
+# D4 (2026-10-02): refresh daily_balances so the bankroll updates automatically
+# on each settlement cycle (previously only process_settlements ran, never the
+# reconciler, so daily_balances went stale).
+#
+# Scope note: reconcile ONLY the current UTC day, chaining from the last
+# closing balance. We deliberately do NOT back-reconcile history — the legacy
+# v3.0_sbox 9/29-9/30 trades carry pre-ladder sizing and P&L that is not valid
+# on Dan's $200 book; re-deriving those days would re-inflate the bankroll.
+# Legacy trade records are LEFT INTACT for Dan's decision (flagged, not deleted).
+_today_str = today.isoformat()
+try:
+    TRADER.daily_reconciliation(_today_str)
+except Exception as e:
+    logger.warning("reconcile %s: %s", _today_str, e)
 
 if __name__ == "__main__":
     pass

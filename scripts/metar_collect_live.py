@@ -376,12 +376,14 @@ def update_daily_stats(db_path, station, date_str):
             temp_range = max_t - min_t if max_t is not None and min_t is not None else None
             now = datetime.now(timezone.utc).isoformat()
             if {'date_local', 'observation_count', 'ingestion_timestamp_utc'}.issubset(daily_cols):
+                # Guard (B4, 2026-10-02): reject corrupt temperatures before they
+                # poison daily_stats / signals. Values are read back to callers.
+                if max_t is not None and (max_t < -60 or max_t > 140):
+                    max_t = None
+                if avg_t is not None and (avg_t < -60 or avg_t > 140):
+                    avg_t = None
                 # Existing backfill schema.
                 c.execute(f"""
-            # Guard: reject corrupt temperatures that would silently poison signals
-            for v in (max_temp_f, avg_temp_f):
-                if v is not None and (v < -60 or v > 140):
-                    v = None
                     INSERT OR REPLACE INTO daily_stats
                     (station, date_local, date_utc, max_temp_f, min_temp_f, avg_temp_f,
                      observation_count, first_observation_utc, last_observation_utc,

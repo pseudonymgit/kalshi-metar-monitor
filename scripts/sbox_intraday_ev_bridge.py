@@ -442,7 +442,14 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
 
         # R/T (2026-10-01): Dan's sizing ladder replaces the old EntryTimingEngine
         # position_size, which was a fixed $100. Use our_prob-based ladder instead.
-        size_usd = _position_size_usd(abs(our_prob - 0.5) * 2.0)
+        confidence = abs(our_prob - 0.5) * 2.0
+        size_usd = _position_size_usd(confidence)
+        # Second half of A5 (2026-10-02): a $0 ladder tier means NO trade. Without
+        # this guard a $0 size still records a phantom row (qty floored to 1).
+        # The ladder is the only sizing path; below the lowest tier we pass.
+        if size_usd <= 0:
+            skipped.append((st, "below_min_confidence_tier"))
+            continue
 
         prob_payload = {"p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
                         "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],

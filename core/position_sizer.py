@@ -157,7 +157,7 @@ class PositionSizer:
 
     def __init__(
         self,
-        bankroll: float = 10000.0,
+        bankroll: float = 200.0,
         cost_fraction: Optional[float] = None,
         fee_rate: Optional[float] = None,
         fraction_kelly: float = 0.5,

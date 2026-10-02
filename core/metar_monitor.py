@@ -896,6 +896,11 @@ def _parse_tgftp_text(text: str) -> Optional[Dict[str, Any]]:
         if c is None:
             continue
         temp_f = _c_to_f(c)
+        # Write-time sanity clamp: reject RMK-group mis-parses (e.g. 64882F)
+        # that silently poison signals. B1, 2026-10-02.
+        if temp_f is not None and (temp_f < -90 or temp_f > 150):
+            temp_f = None
+            continue
         break
     if temp_f is None:
         return None
