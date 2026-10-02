@@ -79,18 +79,25 @@ def init_db():
     return conn
 
 
-def get_dates_to_backfill(conn, start: str, end: str) -> List[str]:
-    """Return all dates in [start, end] that are NOT in the archive."""
+def get_dates_to_backfill(conn, start: str, end: str, force: bool = False) -> List[str]:
+    """Return all dates in [start, end] that are NOT in the archive.
+
+    R/T (2026-10-02): with force=True, ignore the archive and return EVERY date
+    in [start, end]. Used to RE-INGEST stale rows written by the pre-fix
+    longitude mapping (which collapsed station pairs and dropped KATL). Re-ingest
+    is idempotent via INSERT OR REPLACE, so this is safe to re-run.
+    """
     start_dt = date.fromisoformat(start)
     end_dt = date.fromisoformat(end)
     done = set()
-    cur = conn.execute("SELECT DISTINCT target_date FROM tigge_archive WHERE source='tigge_ecmwf'")
-    for row in cur.fetchall():
-        done.add(row[0])
+    if not force:
+        cur = conn.execute("SELECT DISTINCT target_date FROM tigge_archive WHERE source='tigge_ecmwf'")
+        for row in cur.fetchall():
+            done.add(row[0])
     result = []
     d = start_dt
     while d <= end_dt:
-        if d.isoformat() not in done:
+        if force or d.isoformat() not in done:
             result.append(d.isoformat())
         d += timedelta(days=1)
     return result
@@ -334,6 +341,9 @@ def main():
     parser.add_argument("--resume", action="store_true", help="Resume from checkpoint")
     parser.add_argument("--batch-days", type=int, default=BATCH_DAYS_DEFAULT,
                         help=f"Dates per CDSAPI call (default: {BATCH_DAYS_DEFAULT})")
+    parser.add_argument("--force", action="store_true",
+                        help="Re-ingest every date in range even if present "
+                             "(repairs stale/incorrectly-mapped rows).")
     args = parser.parse_args()
     
     # Load .env at runtime
@@ -381,7 +391,7 @@ def main():
         dates = get_dates_to_backfill(conn, resume_from.isoformat(), end.isoformat())
         print(f"Resuming from {cp['last_date']} → {end.isoformat()}")
     elif args.start and args.end:
-        dates = get_dates_to_backfill(conn, args.start, args.end)
+        dates = get_dates_to_backfill(conn, args.start, args.end, force=args.force)
     else:
         print("Need --start/--end or --resume")
         conn.close()
@@ -412,6 +422,9 @@ def main():
     failed_batches = 0
     db_dates_before = conn.execute(
         "SELECT COUNT(DISTINCT target_date) FROM tigge_archive"
+    ).fetchone()[0]
+    db_rows_before = conn.execute(
+        "SELECT COUNT(*) FROM tigge_archive"
     ).fetchone()[0]
     
     for bi, batch in enumerate(batches):
@@ -459,11 +472,19 @@ def main():
     # (e.g. ECMWF MARS AccessError "Restricted access to TIGGE data").
     # Gate on dates actually written (not raw batch failures) so a batch that
     # recovers via the per-date fallback still exits 0.
-    if db_dates <= db_dates_before:
+    # R/T (2026-10-02): in --force re-ingest mode the DISTINCT-date count does
+    # not change (we overwrite existing dates), so gate on ROWS written instead.
+    # Otherwise a successful repair run would falsely exit non-zero.
+    # (db_rows/db_dates were captured above, before conn.close().)
+    if args.force:
+        stalled = db_rows <= db_rows_before
+    else:
+        stalled = db_dates <= db_dates_before
+    if stalled:
         print(
-            f"ERROR: no new dates written — archive still at {db_dates} dates "
-            f"after {len(dates)} requested date(s) ({failed_batches} batch "
-            f"failure(s)). Exiting non-zero.",
+            f"ERROR: no new data written — archive at {db_dates} dates / "
+            f"{db_rows} rows after {len(dates)} requested date(s) "
+            f"({failed_batches} batch failure(s)). Exiting non-zero.",
             file=sys.stderr,
         )
         sys.exit(1)
