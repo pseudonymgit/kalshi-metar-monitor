@@ -629,6 +629,38 @@ def combined_report(stations=None) -> Dict:
             "pure_weather_analytics": pure_analytics_report(stations=stations)}
 
 
+# =============================================================================
+# E1/E3 (2026-10-02) — SBOX trade-fail / zero-trade notification path
+# =============================================================================
+def _notify_bridge_result(out: Dict) -> Optional[Dict]:
+    """Ping the SBOX Discord webhook when the bridge runs but places 0 trades.
+
+    Reuses the existing alert_dispatcher (DISCORD_WEBHOOK_SBOX). No-ops safely
+    when no webhook is configured, so it never breaks a cron run. Returns the
+    dispatch result (or None when nothing was sent).
+    """
+    if out.get("error"):
+        reason = f"bridge error: {out['error']}"
+    elif out.get("n_executed", 0) == 0:
+        reason = (f"bridge ran but placed 0 trades "
+                  f"({out.get('n_skipped', 0)} skipped)")
+    else:
+        return None
+    try:
+        from core.alert_dispatcher import dispatch_alert  # noqa: E402
+        content = (f"**[SBOX] Weather Engine bridge ATTENTION** — {reason}\n"
+                   f"date_utc={out.get('date_utc')}")
+        result = dispatch_alert(
+            alert_data={"content": content},
+            discord_payload={"content": content},
+            instance="SBOX",
+        )
+        return result
+    except Exception as e:  # never let alerting break the bridge
+        print(f"[warn] bridge notify failed: {type(e).__name__}: {e}", file=sys.stderr)
+        return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
@@ -645,6 +677,10 @@ def main():
     out = run(dry_run=a.dry_run, ignore_window=a.ignore_window,
               stations=a.stations, min_edge=a.min_edge, report=a.report,
               max_stations=a.max_stations)
+    if not a.dry_run:
+        note = _notify_bridge_result(out)
+        if note is not None:
+            out["notify"] = note
     print(json.dumps(out, indent=2, default=str))
     return 0
 
