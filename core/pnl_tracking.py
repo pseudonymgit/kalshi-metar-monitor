@@ -29,7 +29,7 @@ except ImportError:
 
 # Default calibration report path
 CALIBRATION_REPORT_PATH = str(Path(__file__).resolve().parent.parent / "reports" / "paper_trading_calibration.json")
-__all__ = ['process_settlements_for_date', 'daily_reconciliation', 'calculate_calibration_metrics_for_date', 'get_current_balance', 'get_version_performance', 'generate_calibration_report', 'compute_sharpe', 'update_risk_metrics_on_trade', '_get_strike_price']
+__all__ = ['process_settlements_for_date', 'daily_reconciliation', 'calculate_calibration_metrics_for_date', 'get_current_balance', 'get_version_performance', 'generate_calibration_report', 'compute_sharpe', 'update_risk_metrics_on_trade', '_get_strike_price', 'compute_settlement_accuracy', '_migrate_settlement_columns']
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -245,8 +245,12 @@ def daily_reconciliation(self, reconcile_date=None):
     # Get opening balance from previous day
     prev_balance = self.get_current_balance(reconcile_date)
 
-    # B-Mode R8 Cycle 4.1: Migrate settlement columns if not present
-    self._migrate_settlement_columns(reconcile_date)
+    # B-Mode R8 Cycle 4.1: Migrate settlement columns if not present.
+    # R/T (2026-10-02): previously `self._migrate_settlement_columns(...)`, but
+    # this helper is a module-level function (defined below) that is never bound
+    # to PaperTrader, so every reconcile raised AttributeError. Call the module
+    # function directly, passing self (matching this module's delegation style).
+    _migrate_settlement_columns(self, reconcile_date)
 
     # Count trades and other details for this date
     conn = get_sqlite_connection(self.paper_db)
