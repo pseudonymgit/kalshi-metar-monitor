@@ -62,6 +62,47 @@ CHECKPOINT_FILE = str(REPO_ROOT / "data" / "ecds_checkpoint.json")
 os.makedirs(GRIB_DIR, exist_ok=True)
 
 
+def _cleanup_grib(path: str) -> None:
+    """Remove a downloaded GRIB, ignoring races/missing files.
+
+    R/T (2026-10-02): every batch — success OR failure — must drop its raw
+    payload so shards never accumulate ECDS data. Called on the success path
+    and on every early-return/exception path.
+    """
+    try:
+        if path and os.path.exists(path):
+            os.remove(path)
+    except OSError:
+        pass
+
+
+def _sweep_stale_gribs(max_age_hours: float = 6.0) -> None:
+    """Remove GRIB files older than max_age_hours at startup.
+
+    R/T (2026-10-02): a shard killed mid-batch (or a crash on an early-return
+    path) leaves its in-flight GRIB orphaned. No single batch runs anywhere near
+    6h, so any GRIB older than that is abandoned — drop it so killed processes
+    can't accumulate raw ECDS payloads across runs.
+    """
+    cutoff = time.time() - max_age_hours * 3600
+    removed = 0
+    try:
+        for name in os.listdir(GRIB_DIR):
+            if not name.endswith(".grib"):
+                continue
+            p = os.path.join(GRIB_DIR, name)
+            try:
+                if os.path.getmtime(p) < cutoff:
+                    os.remove(p)
+                    removed += 1
+            except OSError:
+                pass
+    except FileNotFoundError:
+        pass
+    if removed:
+        print(f"  Swept {removed} stale GRIB file(s) older than {max_age_hours:.0f}h")
+
+
 def init_db():
     # R/T (2026-10-02): WAL + busy_timeout so multiple shard processes can
     # re-ingest disjoint date ranges into the same archive without "database is
@@ -206,6 +247,7 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
                     time.sleep(backoff)
                 else:
                     print(f"    Giving up after {max_retries} attempts.")
+                    _cleanup_grib(grib_file)
                     return False
     else:
         size = os.path.getsize(grib_file)
@@ -219,6 +261,7 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
         # Fail closed: a missing parser must NOT look like success.
         print(f"ERROR: eccodes unavailable ({e}) — cannot parse TIGGE data",
               file=sys.stderr)
+        _cleanup_grib(grib_file)
         return False
     
     # Structure: {date: {station: {step: [temps]}}}
@@ -330,10 +373,10 @@ def process_batch(date_batch: List[str], conn: sqlite3.Connection) -> bool:
     conn.commit()
     print(f"    DB: {inserts} inserts across {n_dates} dates ({total_msgs} GRIB msgs parsed)")
     
-    # Clean up GRIB file
-    if os.path.exists(grib_file):
-        os.remove(grib_file)
-        print(f"    GRIB cleaned up")
+    # Clean up GRIB file — dump the raw payload immediately after ingest so
+    # nothing accumulates. (R/T 2026-10-02: also covered on failure paths.)
+    _cleanup_grib(grib_file)
+    print(f"    GRIB cleaned up")
     
     return True
 
@@ -368,6 +411,7 @@ def main():
         sys.exit(1)
     
     conn = init_db()
+    _sweep_stale_gribs()  # drop abandoned GRIBs from killed/previous runs
     batch_size = max(1, args.batch_days)
     
     if args.resume:
