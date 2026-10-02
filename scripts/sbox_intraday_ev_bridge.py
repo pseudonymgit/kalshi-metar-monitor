@@ -58,6 +58,7 @@ from core.intraday.multi_forecaster_fusion import (  # noqa: E402
 from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name,
 )
+from core.market_cost_model import MARKET_COST_MODEL  # noqa: E402
 
 DATA = REPO / "data"
 SBOX_DB = DATA / "paper_trading_sbox.db"
@@ -204,6 +205,22 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
          probs.get("agreement"), probs.get("edge_mult"),
          probs.get("traj_verdict"), probs.get("traj_mult"),
          FUSION_RULE_ID, now))
+
+
+def _position_size_usd(confidence: float) -> float:
+    """Dan's sizing ladder (2026-10-01):
+    - very high confidence (>0.85): $50 max
+    - high confidence (>0.7): $25 max
+    - medium confidence (>0.5): $10 max
+    - below 0.5: $0 (no trade)
+    """
+    if confidence > 0.85:
+        return 50.0
+    elif confidence > 0.7:
+        return 25.0
+    elif confidence > 0.5:
+        return 10.0
+    return 0.0
 
 
 def record_trade(conn, station, market_type, side, our_prob, market_price,
@@ -423,6 +440,10 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             skipped.append((st, "entry_engine_pass"))
             continue
 
+        # R/T (2026-10-01): Dan's sizing ladder replaces the old EntryTimingEngine
+        # position_size, which was a fixed $100. Use our_prob-based ladder instead.
+        size_usd = _position_size_usd(abs(our_prob - 0.5) * 2.0)
+
         prob_payload = {"p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
                         "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
                         "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
@@ -433,13 +454,13 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             results.append({"status": "would_execute", "station": st,
                             "side": sig.signal_type.name, "strike": strike,
                             "our_prob": round(our_prob, 4), "market_price": mkt,
-                            "size": round(float(sig.position_size), 2),
+                            "size": size_usd,
                             **prob_payload})
         else:
             results.append(record_trade(
                 conn, st, "HIGH", sig.signal_type.name, our_prob, mkt,
                 abs(our_prob - 0.5) * 2.0, strike, ticker,
-                sig.position_size, "intraday_ev_strike", day_str, probs=prob_payload))
+                size_usd, "intraday_ev_strike", day_str, probs=prob_payload))
 
     if conn:
         conn.close()
