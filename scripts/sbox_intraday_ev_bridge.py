@@ -58,6 +58,9 @@ except Exception:
 
 from core.intraday.distribution_adapter import from_ws_p, update_from_intraday  # noqa: E402
 from core.intraday.entry_engine import EntryTimingEngine  # noqa: E402
+from core.intraday.timing_overlay_gate import (  # noqa: E402
+    evaluate_with_overlay, live_overlay_signal, overlay_enabled,
+)
 from core.intraday.analog_cdf import _load_series  # noqa: E402
 from core.strike_selection_ev import select_strike, p_high_ge as gauss_p_high_ge  # noqa: E402
 from core.intraday.multi_forecaster_fusion import (  # noqa: E402
@@ -440,14 +443,31 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         if report:
             continue
 
-        sig = engine.evaluate_hour(
-            hour=now_utc.hour, hour_before_settlement=6,
+        # 15m timing overlay (opt-in, default OFF via WE_15M_TIMING_OVERLAY=1).
+        # When a live trigger agrees with the engine direction, its confidence is
+        # folded 50/50 into the engine's confidence argument; silent/disagreeing
+        # overlays leave the engine decision unchanged (plan §5).
+        engine_conf = abs(our_prob - 0.5) * 2.0
+        overlay_sig = None
+        if overlay_enabled():
+            try:
+                overlay_sig = live_overlay_signal(st, day_str, strike)
+            except Exception as e:
+                diag.append({"station": st,
+                             "overlay_error": f"{type(e).__name__}:{e}"})
+        sig = evaluate_with_overlay(
+            engine, hour=now_utc.hour, hour_before_settlement=6,
             our_probability=our_prob, market_price=mkt,
-            confidence=abs(our_prob - 0.5) * 2.0,
+            confidence=engine_conf, overlay_signal=overlay_sig,
+            enabled=True,
         )
         if sig is None or sig.signal_type.name == "PASS":
             skipped.append((st, "entry_engine_pass"))
             continue
+        if overlay_sig is not None:
+            diag.append({"station": st, "overlay_trigger": overlay_sig.trigger,
+                         "overlay_dir": overlay_sig.direction,
+                         "overlay_conf": round(overlay_sig.confidence, 4)})
 
         # R/T (2026-10-01): Dan's sizing ladder replaces the old EntryTimingEngine
         # position_size, which was a fixed $100. Use our_prob-based ladder instead.
