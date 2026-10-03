@@ -1,7 +1,11 @@
 #!/bin/bash
 # Daemon Auto-Restart Watchdog
-# Checks if intraday daemon is running. If not, restarts it.
-# Run every 5 minutes via cron.
+# Default:     checks if the intraday daemon is running; restarts it if not.
+#              Run every 5 minutes via cron.
+# --check-only: liveness check with NO restart authority. Exit 0 if alive,
+#              exit 1 if dead. Used for the D2 demotion path where a host-level
+#              supervisor owns restart (see
+#              docs/plans/DUAL-SUPERVISOR-CONSOLIDATION-2026-10-03.md §3.3).
 
 PID_FILE="/tmp/intraday-daemon.pid"
 DAEMON_SCRIPT="scripts/intraday_daemon.py"
@@ -15,6 +19,48 @@ LOG_FILE="${WORK_DIR}/logs/daemon_watchdog.log"
 MAX_RESTARTS=6
 WINDOW=3600
 RATE_FILE="/tmp/intraday-daemon.restarts"
+
+CHECK_ONLY=0
+for arg in "$@"; do
+    case "$arg" in
+        --check-only) CHECK_ONLY=1 ;;
+        *)
+            echo "[watchdog] unknown argument: $arg" >&2
+            exit 2
+            ;;
+    esac
+done
+
+# Print the PID from the PID file (empty/fail if absent).
+daemon_pid() {
+    [ -f "$PID_FILE" ] || return 1
+    local pid
+    pid=$(cat "$PID_FILE" 2>/dev/null)
+    [ -n "$pid" ] || return 1
+    printf '%s' "$pid"
+}
+
+# Alive iff the PID file names a live process.
+daemon_alive() {
+    local pid
+    pid=$(daemon_pid) || return 1
+    kill -0 "$pid" 2>/dev/null
+}
+
+# ── --check-only: pure liveness/observability, NO restart authority ──────────
+# Emits a clear DEAD line to stdout so the cron announce / failureAlert surfaces
+# it. This is what the container WE-daemon-watchdog cron becomes after demotion.
+if [ "$CHECK_ONLY" -eq 1 ]; then
+    if daemon_alive; then
+        PID=$(daemon_pid)
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [OK] Daemon running (pid=$PID)" >> "$LOG_FILE"
+        echo "[watchdog] OK: daemon alive (pid=$PID)"
+        exit 0
+    fi
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEAD] daemon not running (check-only; no restart authority)" >> "$LOG_FILE"
+    echo "[watchdog] DEAD: daemon not running — host supervisor must restart it (check-only job has no restart authority)."
+    exit 1
+fi
 
 alert_stuck() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [STUCK] $1 — restart rate limited ($MAX_RESTARTS/${WINDOW}s). MANUAL INTERVENTION NEEDED." >> "$LOG_FILE"
