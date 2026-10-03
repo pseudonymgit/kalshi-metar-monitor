@@ -15,7 +15,7 @@ __all__ = [
     "require", "asos_hourly_db",
 ]
 
-_REPO_ROOT = Path(__file__).resolve().parents[3]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = _REPO_ROOT
 DATA_DIR = _REPO_ROOT / "data"
 
