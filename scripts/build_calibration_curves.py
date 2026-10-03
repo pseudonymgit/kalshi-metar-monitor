@@ -385,6 +385,40 @@ def build_low_calibration():
     }, dir_counts, station_n
 
 
+# ── Nonzero guard (M6 regression, 2026-10-03) ────────────────────────────────
+
+def zero_sample_stations(calibration, stations=None):
+    """Return stations whose curves are all-empty (n==0 in every cell).
+
+    This is the M5/KBOS-KSAT failure shape: a curves artifact that parses and
+    loads fine but carries zero samples for every station, so the runner logs
+    "Calibration complete: 0 stations calibrated" while looking green. A
+    station is "zero" when HIGH/up, HIGH/down, LOW/up and LOW/down all have
+    global.n == 0.
+
+    Returns a sorted list of station keys that are zero-sample (empty when the
+    artifact is healthy).
+    """
+    if stations is None:
+        stations = [k for k in calibration.keys() if k != "_global"]
+    zero = []
+    for s in stations:
+        mk = calibration.get(s)
+        if not isinstance(mk, dict):
+            zero.append(s)
+            continue
+        nonzero = False
+        for mt, dirs in mk.items():
+            if not isinstance(dirs, dict):
+                continue
+            for dr, cell in dirs.items():
+                if isinstance(cell, dict) and (cell.get("global", {}) or {}).get("n", 0):
+                    nonzero = True
+        if not nonzero:
+            zero.append(s)
+    return sorted(zero)
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -430,6 +464,17 @@ def main():
         "HIGH": {"up": high_result["up"]["global"], "down": high_result["down"]["global"]},
         "LOW": {"up": low_result["up"]["global"], "down": low_result["down"]["global"]},
     }
+
+    # M6 fail-closed guard: never mint an all-zero curves artifact. If every
+    # station is zero-sample the artifact is indistinguishable from a wipe and
+    # would silently disable calibration, so abort instead of writing it.
+    zero_stations = zero_sample_stations(calibration, STATIONS)
+    if len(zero_stations) == len(STATIONS):
+        raise SystemExit(
+            "REFUSING to write calibration_curves.json: all "
+            f"{len(STATIONS)} stations are zero-sample (M5/KBOS-KSAT shape). "
+            "Check GEFS/NWP/settlement inputs before re-running."
+        )
 
     with open(OUTPUT, "w") as f:
         json.dump(calibration, f, indent=2)
