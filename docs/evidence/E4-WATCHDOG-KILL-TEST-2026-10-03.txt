@@ -1,0 +1,26 @@
+E4 — WE intraday daemon watchdog kill test (deterministic)
+Executed: 2026-10-03 06:16:06 UTC (Ray Donovan)
+Design: .meta/continuity/weather-engine/gilfoyle-sprint-2026-10-02.md (E4)
+
+PRE:  old_pid=153054, alive (kill -0 ok)
+KILL: kill -TERM 153054
+      - died within 5s: YES (died 2026-10-03 06:16:06, <1s)
+      - clean shutdown log ("Received SIGTERM — shutting down cleanly"): YES
+WAIT: new PID appeared in /tmp/intraday-daemon.pid at 2026-10-03 06:20:00
+      restart_waited = 234s (watchdog tick cadence */5; next tick after 06:16 kill = 06:20)
+NEW:  new_pid=831493 (NEW != OLD: yes, alive)
+      watchdog log gained: "2026-10-03 06:20:00 [RESTART] Daemon restarted: PID=831493"
+CYCLE: "Fusion complete" observed in logs/intraday_daemon.log — YES
+Determinism guards honored:
+  - PID read from /tmp/intraday-daemon.pid (never pgrep by name)
+  - /tmp/intraday-daemon.restarts cleared before the test (rate-limiter cannot mask)
+
+RESULT: PASS  old=153054 new=831493 restart_waited=234s
+
+OBSERVATION (non-blocking, flag for architecture): at 06:16:57 (51s post-kill, NOT a
+watchdog tick) a daemon start self-exited with
+  "Daemon already running (pid 830885, per /tmp/intraday-daemon.pid) — exiting".
+An unknown process launched the daemon within the same minute this test cleared the
+restart record. The PID file was left holding the dead 830885, so the 06:20 watchdog
+correctly treated it as stale and restarted. Suggest identifying the 06:16:57 launcher
+(possibly another wrapper around the same daemon) to rule out a competing supervisor.
