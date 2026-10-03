@@ -137,8 +137,9 @@ def parse_metar(raw_text):
                 dew_c = _parse_temp_c(parts[1])
                 if temp_c is not None:
                     temp_f = temp_c * 9/5 + 32
-        if temp_f is not None and (temp_f < -90 or temp_f > 150):
-            temp_f = None
+                    # Runs PER parsed temp (inside the token loop), not once post-loop.
+                    if temp_f is not None and (temp_f < -90 or temp_f > 150):
+                        temp_f = None
         if dew_c is not None:
             dewpoint_f = dew_c * 9/5 + 32
         if temp_c is not None or dew_c is not None:
