@@ -47,6 +47,15 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "core"))
 
+# Load repo-root .env before anything reads webhook/API keys. Cron runs via
+# `sh -lc` with no shell init that sources .env, so without this the SBOX
+# trade-failure notify path resolves no webhook and silently no-ops.
+try:  # never let env loading break the bridge
+    from core.env_file import load_env_file as _load_env_file
+    _load_env_file()
+except Exception:
+    pass
+
 from core.intraday.distribution_adapter import from_ws_p, update_from_intraday  # noqa: E402
 from core.intraday.entry_engine import EntryTimingEngine  # noqa: E402
 from core.intraday.analog_cdf import _load_series  # noqa: E402

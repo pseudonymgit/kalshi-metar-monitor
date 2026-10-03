@@ -24,6 +24,22 @@ WEBHOOK_ENV_VARS = {
     "SBOX": "DISCORD_WEBHOOK_SBOX",
 }
 
+# Accepted aliases per instance — e.g. the repo ``.env`` sets ``WEBHOOK_SBOX``
+# while the canonical name is ``DISCORD_WEBHOOK_SBOX``. Both resolve the same URL.
+WEBHOOK_ENV_ALIASES = {
+    "PROD": ("DISCORD_WEBHOOK_PROD", "WEBHOOK_PROD"),
+    "DEV": ("DISCORD_WEBHOOK_DEV", "WEBHOOK_DEV"),
+    "SBOX": ("DISCORD_WEBHOOK_SBOX", "WEBHOOK_SBOX"),
+}
+
+# Load repo-root .env once at import, so a cron-launched process (which has no
+# shell init to source .env) still sees WEBHOOK_SBOX / DISCORD_WEBHOOK_SBOX.
+try:  # never let env loading break alerting
+    from core.env_file import load_env_file as _load_env_file
+    _load_env_file()
+except Exception:  # pragma: no cover - defensive
+    pass
+
 # Default user-agent for Discord webhook requests
 DEFAULT_USER_AGENT = "WeatherEngine/2.0"
 
@@ -47,6 +63,15 @@ def _get_webhook_url(instance: Optional[str] = None) -> Optional[str]:
         return None
     
     url = os.getenv(env_var)
+    if not url:
+        # Fall back to the accepted aliases (e.g. WEBHOOK_SBOX for the SBOX
+        # instance) so a repo .env authored with the short name still delivers.
+        for alias in WEBHOOK_ENV_ALIASES.get(instance, ()):
+            cand = os.getenv(alias)
+            if cand:
+                url = cand
+                logger.info(f"Webhook URL resolved from alias {alias} for {instance}")
+                break
     if not url:
         logger.warning(f"Webhook URL not set: {env_var} (required for {instance})")
         return None
