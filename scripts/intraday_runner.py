@@ -266,6 +266,7 @@ def run_intraday_cycle(
         from core.additive import SIGNAL_NAMES, ENABLED_BY_DEFAULT
         n_enabled = len(ENABLED_BY_DEFAULT)
         n_total = len(SIGNAL_NAMES)
+        results_by_day = {}  # M1: accumulate per-(station,date) evaluations for persistence
         logger.info(f"Additive gamma: {n_enabled}/{n_total} signals enabled (ENABLED_BY_DEFAULT={'empty' if n_enabled==0 else list(ENABLED_BY_DEFAULT)})")
         
         for st in stations:
@@ -275,6 +276,7 @@ def run_intraday_cycle(
             try:
                 ctx = AdditiveContext(st, date_str)
                 results = additive_evaluate_all(ctx)
+                results_by_day[(st, date_str)] = results
                 # Apply enabled additive signals (all disabled by default)
                 stack = apply_additive_offsets(results, enabled=list(ENABLED_BY_DEFAULT))
                 ctx.close()
@@ -294,6 +296,20 @@ def run_intraday_cycle(
                     )
             except Exception as add_err:
                 logger.debug(f"Additive gamma skipped for {st}: {add_err}")
+        # M1: persist evaluated (station,date,signal) results to signal_cache.db.
+        if results_by_day:
+            try:
+                from core.additive.persistence import persist_results_to_db
+                n_rows = persist_results_to_db(
+                    results_by_day,
+                    db_path=REPO_ROOT / "data" / "signal_cache.db",
+                )
+                logger.info(
+                    f"G.8 persistence: {n_rows} result rows written for "
+                    f"{len(results_by_day)} station-days"
+                )
+            except Exception as persist_err:
+                logger.warning(f"G.8 persistence skipped: {persist_err}")
     except Exception as e:
         logger.warning(f"Additive gamma stack error: {e}")
     

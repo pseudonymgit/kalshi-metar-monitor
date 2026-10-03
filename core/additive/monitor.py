@@ -12,6 +12,7 @@ Outputs:
   - render_text(report) -> human-readable dashboard
   - build_report(results_by_day, errors_by_day) -> dict
   - persist(report, path) -> JSON snapshot for cron checks
+  - persist_results(conn, results_by_day, provenance=...) -> SQLite rows (M1)
 
 Drift alarm thresholds (die, not wink):
   - fire rate < 25% of spec target for 30d -> signal underperforming
@@ -32,9 +33,17 @@ __all__ = [
     "SignalMonitor",
     "build_report",
     "persist",
+    "persist_results",
     "render_text",
     "run_daily_dashboard",
 ]
+
+# M1: re-export the SQLite writer so callers can reach it via monitor.* without
+# importing the persistence module directly.
+def persist_results(conn, results_by_day, provenance=None, updated_at=None):
+    """Persist evaluated additive results; see core.additive.persistence."""
+    from .persistence import persist_results as _persist
+    return _persist(conn, results_by_day, provenance=provenance, updated_at=updated_at)
 
 logger = __import__("logging").getLogger(__name__)
 
@@ -244,14 +253,23 @@ def render_text(report: dict) -> str:
     return "\n".join(lines)
 
 
-def run_daily_dashboard(db_path: str) -> dict:
+def run_daily_dashboard(
+    db_path: str,
+    results_by_day: Optional[Dict[tuple, List[AdditiveSignalResult]]] = None,
+    provenance: Optional[str] = None,
+) -> dict:
     """
     G.8 dashboard entry point — build report from additive signal data
-    and persist a JSON snapshot.
+    and persist a JSON snapshot (and, when results are supplied, the
+    per-(station,date,signal) SQLite rows via the M1 writer).
 
     Args:
         db_path: Path to the data directory where the dashboard snapshot
                  will be written.
+        results_by_day: optional {(station, date): [AdditiveSignalResult]}
+                 evaluations to persist to signal_cache.db. Default None keeps
+                 the legacy cron behaviour (snapshot only).
+        provenance: optional provenance override for persisted rows.
 
     Returns:
         Report dict (may be empty on failure). Always returns a dict.
@@ -261,8 +279,31 @@ def run_daily_dashboard(db_path: str) -> dict:
         from datetime import datetime as _dt
 
         now = _dt.now(timezone.utc)
-        # Build empty report (no results-by-day available in live cron mode)
-        report = build_report({}, {})
+        # Build report from supplied results (legacy: empty in cron mode)
+        report = build_report(results_by_day or {}, {})
+
+        # M1: persist evaluated results as they are produced. Best-effort —
+        # a persistence failure must never take down the dashboard.
+        if results_by_day:
+            try:
+                from .persistence import (
+                    TABLE_NAME,
+                    persist_results_to_db,
+                )
+                n_written = persist_results_to_db(
+                    results_by_day,
+                    db_path=_os.path.join(db_path, "signal_cache.db"),
+                    provenance=provenance,
+                )
+                report["persistence"] = {
+                    "table": TABLE_NAME,
+                    "rows_written": n_written,
+                }
+                logger.info(
+                    "G.8 persisted %d result rows to %s", n_written, TABLE_NAME
+                )
+            except Exception as persist_err:
+                logger.warning("G.8 persistence skipped: %s", persist_err)
 
         dashboard_dir = _os.path.join(db_path, "intraday", "dashboard")
         snapshot_path = _os.path.join(dashboard_dir, "G8_last_snapshot.json")
