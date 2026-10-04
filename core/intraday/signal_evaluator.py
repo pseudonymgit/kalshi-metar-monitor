@@ -191,7 +191,10 @@ _register_signal("intraday_cloud_cover", "heuristic", _detect_cloud_cover)
 
 # ─── Module-level helper ──────────────────────────────────────
 
-def load_hourly_signal_hours(station: str, date_str: str, metar_db: str) -> Tuple[List[int], List[Dict]]:
+def load_hourly_signal_hours(
+    station: str, date_str: str, metar_db: str,
+    asos_db: str = "", nwp_db: str = "",
+) -> Tuple[List[int], List[Dict]]:
     """
     Load hourly-aggregated METAR data for a station+date.
 
@@ -199,6 +202,8 @@ def load_hourly_signal_hours(station: str, date_str: str, metar_db: str) -> Tupl
         station: ICAO station code
         date_str: ISO date string "YYYY-MM-DD"
         metar_db: Path to METAR SQLite database
+        asos_db: Optional path to IEM ASOS 1-min SQLite database
+        nwp_db: Optional path to Open-Meteo NWP forecast SQLite database
 
     Returns:
         (hours_with_data, metadata_list) where metadata_list is the
@@ -208,8 +213,8 @@ def load_hourly_signal_hours(station: str, date_str: str, metar_db: str) -> Tupl
 
     pipeline = HourlyPipeline(
         metar_db=metar_db,
-        asos_db="",
-        nwp_db="",
+        asos_db=asos_db,
+        nwp_db=nwp_db,
     )
     vectors = pipeline.build_for_station_date(station, date_str)
     hours = [v.hour_utc for v in vectors]
@@ -252,10 +257,15 @@ class HourlySignalEvaluator:
         # results: {"intraday_pressure_tendency": ("up", 0.55), ...}
     """
 
-    def __init__(self, metar_db: str = ""):
+    def __init__(self, metar_db: str = "", asos_db: str = "", nwp_db: str = ""):
         self.metar_db = metar_db
+        self.asos_db = asos_db
+        self.nwp_db = nwp_db
         self._signal_registry = _INTRADAY_SIGNALS
-        logger.info(f"HourlySignalEvaluator initialized: metar_db={metar_db}")
+        logger.info(
+            f"HourlySignalEvaluator initialized: metar_db={metar_db}, "
+            f"asos_db={asos_db}, nwp_db={nwp_db}"
+        )
 
     # ─── Data Loading ─────────────────────────────────────────
 
@@ -276,8 +286,8 @@ class HourlySignalEvaluator:
 
         pipeline = HourlyPipeline(
             metar_db=self.metar_db,
-            asos_db="",
-            nwp_db="",
+            asos_db=self.asos_db,
+            nwp_db=self.nwp_db,
         )
 
         vectors = pipeline.build_for_station_date(station, date_str)

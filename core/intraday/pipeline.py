@@ -227,7 +227,12 @@ class HourlyPipeline:
         """
         Enrich hourly vectors with ASOS 1-minute data (sub-hour precision).
 
-        Falls back gracefully if ASOS DB is unavailable.
+        Real schema (data/iem_asos_1min.db): a single `observations` table
+        (NO per-station `t{station}` tables) with columns:
+            station, valid ('YYYY-MM-DD HH:MM'), tmpf, dwpf, sknt, drct,
+            alti, mslp, ...
+        Prefers mslp (mb); falls back to alti (inHg -> mb).
+        Fills ONLY null fields; METAR values are never overwritten.
         """
         if not self.asos_db:
             return vectors
@@ -235,29 +240,44 @@ class HourlyPipeline:
         try:
             conn = _get_connection(self.asos_db)
             cur = conn.cursor()
+            enriched = 0
 
             for v in vectors:
-                hour_label = f"{date_str} {v.hour_utc:02d}:%"
                 cur.execute("""
-                    SELECT AVG(tmpf) as avg_temp, AVG(skid) as avg_ws,
-                           AVG(drct) as avg_dir, AVG(pressure) as avg_pres
-                    FROM t{station}
-                    WHERE valid LIKE ?
-                """.replace("{station}", station.lower()), (hour_label,))
+                    SELECT AVG(tmpf) AS tmpf, AVG(dwpf) AS dwpf,
+                           AVG(sknt) AS sknt, AVG(drct) AS drct,
+                           AVG(mslp) AS mslp, AVG(alti) AS alti, COUNT(*) AS n
+                    FROM observations
+                    WHERE station = ? AND valid LIKE ?
+                """, (station, f"{date_str} {v.hour_utc:02d}:%"))
                 row = cur.fetchone()
-                if row and any(row):
-                    if v.temperature_f is None and row["avg_temp"] is not None:
-                        v.temperature_f = float(row["avg_temp"])
-                    if v.wind_speed_kt is None and row["avg_ws"] is not None:
-                        v.wind_speed_kt = float(row["avg_ws"])
-                    if v.wind_direction_deg is None and row["avg_dir"] is not None:
-                        v.wind_direction_deg = float(row["avg_dir"])
-                    if v.pressure_mb is None and row["avg_pres"] is not None:
-                        v.pressure_mb = float(row["avg_pres"])
+                if not row or not row["n"]:
+                    continue
+                row_used = False
+                if v.temperature_f is None and row["tmpf"] is not None:
+                    v.temperature_f = float(row["tmpf"]); row_used = True
+                if v.dewpoint_f is None and row["dwpf"] is not None:
+                    v.dewpoint_f = float(row["dwpf"]); row_used = True
+                if v.wind_speed_kt is None and row["sknt"] is not None:
+                    v.wind_speed_kt = float(row["sknt"]); row_used = True
+                if v.wind_direction_deg is None and row["drct"] is not None:
+                    v.wind_direction_deg = float(row["drct"]); row_used = True
+                if v.pressure_mb is None:
+                    if row["mslp"] is not None:
+                        v.pressure_mb = float(row["mslp"]); row_used = True
+                    elif row["alti"] is not None:
+                        v.pressure_mb = float(row["alti"]) * 33.8639; row_used = True
+                if row_used:
+                    enriched += 1
 
             conn.close()
+            if enriched:
+                logger.info(
+                    f"ASOS enrichment: {enriched}/{len(vectors)} vectors "
+                    f"filled for {station} {date_str}"
+                )
         except Exception as e:
-            logger.debug(f"ASOS enrichment failed for {station} {date_str}: {e}")
+            logger.warning(f"ASOS enrichment failed for {station} {date_str}: {e}")
 
         return vectors
 
@@ -269,7 +289,15 @@ class HourlyPipeline:
         """
         Enrich hourly vectors with NWP forecast data.
 
-        Falls back gracefully if NWP DB is unavailable.
+        Real schema (data/nwp_forecasts.db): `nwp_forecasts` is LONG format,
+            fetch_date, target_date, station, model, variable, value
+        There is NO `nwp_hourly_forecasts` table. Variables are daily
+        (`temperature_2m_max` °C, `dew_point_2m_daily_mean` °C,
+        `cloud_cover_daily_mean` % 0-100, `wind_*_daily_mean` km/h) or member
+        maxima (`temperature_2m_max_member*`). We derive one value per feature
+        for the whole day (daily data -> broadcast to every hourly vector) and
+        fill ONLY null fields. Uses the most recent fetch_date <= date_str and
+        the first model (priority gfs, ecmwf, icon, gem) that has a temperature.
         """
         if not self.nwp_db:
             return vectors
@@ -278,33 +306,87 @@ class HourlyPipeline:
             conn = _get_connection(self.nwp_db)
             cur = conn.cursor()
 
-            for v in vectors:
-                # Look up NWP forecast for this station + date + hour
-                hour_str = f"{v.hour_utc:02d}"
-                cur.execute("""
-                    SELECT temp_f, dewpoint_f, wind_speed_kt,
-                           wind_direction_deg, pressure_mb, cloud_cover_pct
-                    FROM nwp_hourly_forecasts
-                    WHERE station = ? AND date_utc = ? AND hour_utc = ?
-                """, (station, date_str, hour_str))
-                row = cur.fetchone()
-                if row and any(row):
-                    if v.temperature_f is None:
-                        v.temperature_f = row["temp_f"]
-                    if v.dewpoint_f is None:
-                        v.dewpoint_f = row["dewpoint_f"]
-                    if v.wind_speed_kt is None:
-                        v.wind_speed_kt = row["wind_speed_kt"]
-                    if v.wind_direction_deg is None:
-                        v.wind_direction_deg = row["wind_direction_deg"]
-                    if v.pressure_mb is None:
-                        v.pressure_mb = row["pressure_mb"]
-                    if v.cloud_cover_pct is None:
-                        v.cloud_cover_pct = row["cloud_cover_pct"]
+            # Latest fetch_date at or before the target date across models.
+            cur.execute("""
+                SELECT MAX(fetch_date) FROM nwp_forecasts
+                WHERE station = ? AND target_date = ? AND fetch_date <= ?
+            """, (station, date_str, date_str))
+            fd_row = cur.fetchone()
+            if not fd_row or fd_row[0] is None:
+                conn.close()
+                return vectors
+            fetch_date = fd_row[0]
 
+            cur.execute("""
+                SELECT model, variable, value FROM nwp_forecasts
+                WHERE station = ? AND target_date = ? AND fetch_date = ?
+            """, (station, date_str, fetch_date))
+            by_model: Dict[str, Dict[str, float]] = {}
+            for m, var, val in cur.fetchall():
+                by_model.setdefault(m, {})[var] = float(val)
             conn.close()
+
+            if not by_model:
+                return vectors
+
+            # Choose the best model: prefer one carrying a 2m temperature.
+            model_priority = ["gfs", "ecmwf", "icon", "gem"]
+            chosen = None
+            for m in model_priority:
+                if m in by_model and "temperature_2m_max" in by_model[m]:
+                    chosen = m
+                    break
+            if chosen is None:
+                chosen = next(
+                    (m for m in by_model if "temperature_2m_max" in by_model[m]),
+                    None,
+                )
+            if chosen is None:
+                return vectors
+
+            nwp = by_model[chosen]
+
+            def _c_to_f(c):
+                return c * 9.0 / 5.0 + 32.0
+
+            temp_f = _c_to_f(nwp["temperature_2m_max"]) if "temperature_2m_max" in nwp else None
+            dew_f = (
+                _c_to_f(nwp["dew_point_2m_daily_mean"])
+                if "dew_point_2m_daily_mean" in nwp else None
+            )
+            wind_kt = (
+                nwp["wind_speed_10m_daily_mean"] / 1.852
+                if "wind_speed_10m_daily_mean" in nwp else None
+            )
+            wind_dir = nwp.get("wind_direction_10m_daily_mean")
+            cloud = (
+                min(1.0, max(0.0, nwp["cloud_cover_daily_mean"] / 100.0))
+                if "cloud_cover_daily_mean" in nwp else None
+            )
+
+            enriched = 0
+            for v in vectors:
+                row_used = False
+                if v.temperature_f is None and temp_f is not None:
+                    v.temperature_f = temp_f; row_used = True
+                if v.dewpoint_f is None and dew_f is not None:
+                    v.dewpoint_f = dew_f; row_used = True
+                if v.wind_speed_kt is None and wind_kt is not None:
+                    v.wind_speed_kt = wind_kt; row_used = True
+                if v.wind_direction_deg is None and wind_dir is not None:
+                    v.wind_direction_deg = wind_dir; row_used = True
+                if v.cloud_cover_pct is None and cloud is not None:
+                    v.cloud_cover_pct = cloud; row_used = True
+                if row_used:
+                    enriched += 1
+
+            if enriched:
+                logger.info(
+                    f"NWP enrichment: {enriched}/{len(vectors)} vectors filled "
+                    f"for {station} {date_str} (model={chosen}, fetch={fetch_date})"
+                )
         except Exception as e:
-            logger.debug(f"NWP enrichment failed for {station} {date_str}: {e}")
+            logger.warning(f"NWP enrichment failed for {station} {date_str}: {e}")
 
         return vectors
 
