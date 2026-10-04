@@ -298,6 +298,108 @@ def _try_instantiate(cls, db_path=METAR_DB, **extra_kw):
         except (TypeError, Exception):
             continue
     return None
+# ────────────────────────────────────────────────────────────────────
+# Signal taxonomy (SIGNAL-TAXONOMY-SPEC-2026-10-03)
+#
+# Every registered signal belongs to exactly one class. "zero-trade" is
+# only ever a *failure* for a DIRECTIONAL PREDICTOR; a MODULATOR or
+# EXECUTION GATE can never "trade" by design, so counting one as broken
+# is a category error (see docs/plans/ZERO-TRADE-TRIAGE-2026-09-30.md).
+#
+#   predictor  — emits a signed direction (+1/-1) + confidence; a trade
+#                is a bet on its direction. 0 trades == FAILURE.
+#   modulator  — no direction; scales/attenuates another predictor's
+#                confidence. 0 trades == N/A (report "inactive").
+#   gate       — no direction; boolean/timing verdict that permits or
+#                blocks an already-directed trade. 0 trades == N/A.
+# ────────────────────────────────────────────────────────────────────
+SIGNAL_CLASSES: Dict[str, str] = {
+    # ── MODULATORS (no direction by construction) ──
+    "volume_momentum": "modulator",
+    "dewpoint_depression": "modulator",
+    "cloud_cover_index": "modulator",
+    "feels_like_delta": "modulator",
+    "cross_model_divergence": "modulator",
+    # ── EXECUTION GATES (permit/block/size; no direction) ──
+    "settlement_arbitrage": "gate",
+    "spread_based_entry": "gate",
+    "frontal_passage_nowcast": "gate",
+    "intraday_metar_confirmation": "gate",
+    "frontal_passage_detector": "gate",
+    # ── DIRECTIONAL PREDICTORS (everything else) ──
+    "radiational_cooling": "predictor",
+    "gaussian": "predictor",
+    "gaussian_v2": "predictor",
+    "pressure_delta": "predictor",
+    "forecast_disagreement": "predictor",
+    "calendar_climatology": "predictor",
+    "frontal_passage_intraday": "predictor",
+    "dual_polarity": "predictor",
+    "metar_trend": "predictor",
+    "nwp_analog": "predictor",
+    "wind_direction_shift": "predictor",
+    "corrected_pressure_delta": "predictor",
+    "spike_reversion": "predictor",
+    "goldilocks": "predictor",
+    "pressure_tendency": "predictor",
+    "metar_dtdt": "predictor",
+    "fogr_reversion": "predictor",
+    "esdr": "predictor",
+    "frontal_detector": "predictor",
+    "ai_composite": "predictor",
+    "nwp_direct": "predictor",
+    "nwp_dtdt_fusion": "predictor",
+    "metar_nowcast": "predictor",
+    "regime": "predictor",
+    "temperature_advection": "predictor",
+    "eighty_two_member_ensemble": "predictor",
+    "eighty_two_member_ensemble_pooled": "predictor",
+}
+
+VALID_SIGNAL_CLASSES = frozenset({"predictor", "modulator", "gate"})
+
+
+def signal_class_of(name: str) -> Optional[str]:
+    """Return the taxonomy class for a registry signal, or None if unknown."""
+    return SIGNAL_CLASSES.get(name)
+
+
+def count_zero_trade_by_class(signal_results: Dict[str, Any]) -> Dict[str, Any]:
+    """Split per-signal sweep results into taxonomy buckets.
+
+    `signal_results` maps signal name -> result dict (as produced by the
+    sweep; trade count lives at `result["aggregate"]["n_trades"]`).
+
+    "zero-trade" is only a failure for a DIRECTIONAL PREDICTOR. Modulators
+    and execution gates are never expected to trade, so they are reported
+    separately and MUST NOT appear in `predictors_zero_trade`.
+    """
+    buckets: Dict[str, Any] = {
+        "predictors_zero_trade": [],
+        "predictors_trading": [],
+        "modulators": [],
+        "gates": [],
+        "unclassified": [],
+    }
+    for name in sorted(signal_results):
+        cls = signal_class_of(name)
+        agg = (signal_results[name] or {}).get("aggregate") or {}
+        try:
+            n_trades = int(agg.get("n_trades", 0) or 0)
+        except (TypeError, ValueError):
+            n_trades = 0
+        if cls == "predictor":
+            key = "predictors_trading" if n_trades > 0 else "predictors_zero_trade"
+            buckets[key].append(name)
+        elif cls == "modulator":
+            buckets["modulators"].append(name)
+        elif cls == "gate":
+            buckets["gates"].append(name)
+        else:
+            buckets["unclassified"].append(name)
+    return buckets
+
+
 def build_signal_registry():
     sig_dir = os.path.join(str(REPO_ROOT), "core", "signals")
     nwp_db = os.path.join(str(REPO_ROOT), "data", "nwp_forecasts.db")

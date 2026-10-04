@@ -120,6 +120,7 @@ from scripts.sweep_engine import (
     _get_loss_limiter, _record_trade_outcome,
     _safe_import_signal, _try_instantiate,
     build_signal_registry, DataCache,
+    signal_class_of, count_zero_trade_by_class, VALID_SIGNAL_CLASSES,
     _latin_hypercube, generate_sweep_configs, generate_meta_configs,
     get_platt_pipeline, get_bias_corrections,
     _TRAJECTORY_GATE_ENABLED, _TRAJECTORY_GATE,
@@ -563,6 +564,36 @@ def main():
     with open(diff_json, "w") as f:
         json.dump(differentials, f, indent=2, default=str)
     print(f"  Wrote: {diff_json}")
+
+    # ── Signal taxonomy split (SIGNAL-TAXONOMY-SPEC-2026-10-03) ──
+    # "zero-trade" is only a failure for a DIRECTIONAL PREDICTOR. Modulators
+    # and execution gates never trade by design; counting them as broken is a
+    # category error. Report the predictor failure count as the actionable
+    # metric and list modulators/gates separately under a "wired?" status.
+    taxo = count_zero_trade_by_class(signal_results)
+    predictors_zero_trade = taxo["predictors_zero_trade"]
+    taxonomy_json = os.path.join(str(RESULTS_DIR), "sweep_taxonomy_split.json")
+    with open(taxonomy_json, "w") as f:
+        json.dump({
+            "predictors_zero_trade": predictors_zero_trade,
+            "predictors_zero_trade_count": len(predictors_zero_trade),
+            "predictors_trading": taxo["predictors_trading"],
+            "modulators": taxo["modulators"],
+            "gates": taxo["gates"],
+            "unclassified": taxo["unclassified"],
+            "signal_classes": {k: signal_class_of(k) for k in sorted(signal_results)},
+        }, f, indent=2)
+    print(f"  Wrote: {taxonomy_json}")
+
+    print(f"\n  Predictors with 0 trades: {len(predictors_zero_trade)}")
+    if predictors_zero_trade:
+        print(f"    (actionable defects) {', '.join(predictors_zero_trade)}")
+    print(f"  Modulators wired: {len(taxo['modulators'])} "
+          f"{'(never expected to trade) ' + ', '.join(taxo['modulators']) if taxo['modulators'] else ''}")
+    print(f"  Gates wired: {len(taxo['gates'])} "
+          f"{'(never expected to trade) ' + ', '.join(taxo['gates']) if taxo['gates'] else ''}")
+    if taxo["unclassified"]:
+        print(f"  \u26a0\ufe0f Unclassified (no taxonomy entry): {', '.join(taxo['unclassified'])}")
 
     print(f"\n  SIGNAL LEADERBOARD (by P&L):")
     leaders = sorted(
