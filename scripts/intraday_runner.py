@@ -204,6 +204,8 @@ def run_intraday_cycle(
         )
         evaluator = HourlySignalEvaluator(
             metar_db=str(METAR_DB),
+            asos_db=str(ASOS_DB),
+            nwp_db=str(NWP_DB),
         )
         date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
         # Use pool-name mapped output so fusion engine's pool definitions match
@@ -255,6 +257,62 @@ def run_intraday_cycle(
     except Exception as e:
         logger.error(f"Fusion failed: {e}", exc_info=True)
         return {"error": f"Fusion: {e}", "signals": 0}
+
+    # 4a. M1: persist CORE evaluator results.
+    #     The additive gamma block (4b) below only persists *additive* results;
+    #     the core intraday evaluator output is computed every cycle and was
+    #     previously discarded. Persist it here so downstream calibration
+    #     (M2/M6/M8) has durable evaluated (station, date, signal) rows.
+    #     Adapter: {signal_name: (direction, confidence)} -> AdditiveSignalResult.
+    core_persisted_rows = 0
+    core_persisted_fired = 0
+    try:
+        from core.additive.base import AdditiveSignalResult
+        from core.additive.persistence import persist_results_to_db
+
+        def _core_signal_to_rows(sigs):
+            out = []
+            for sig_name, pred in (sigs or {}).items():
+                direction, confidence = pred[0], pred[1]
+                fired = direction is not None and confidence > 0
+                out.append(AdditiveSignalResult(
+                    signal=str(sig_name),
+                    offset_f=0.0,
+                    confidence=float(confidence or 0.0),
+                    fired=bool(fired),
+                    reason=(f"core:{direction}" if direction is not None
+                            else "core:no_fire"),
+                    meta={"direction": direction, "source": "core_evaluator"},
+                ))
+            return out
+
+        # Persist the raw core evaluator signals (real signal names — the
+        # calibration key). The pool view collapses to a single "heuristic"
+        # name, so raw names are used for fidelity + row granularity.
+        core_results_by_day = {}
+        for st in stations:
+            rows = _core_signal_to_rows(signal_results.get(st, {}))
+            if rows:
+                core_results_by_day[(st, date_str)] = rows
+
+        if core_results_by_day:
+            core_persisted_rows = persist_results_to_db(
+                core_results_by_day,
+                db_path=REPO_ROOT / "data" / "signal_cache.db",
+            )
+            core_persisted_fired = sum(
+                1 for rows in core_results_by_day.values()
+                for r in rows if r.fired
+            )
+            logger.info(
+                f"M1 core persistence: {core_persisted_rows} rows written for "
+                f"{len(core_results_by_day)} station-days "
+                f"({core_persisted_fired} fired)"
+            )
+        else:
+            logger.info("M1 core persistence: no core results to persist")
+    except Exception as core_persist_err:
+        logger.warning(f"M1 core persistence skipped: {core_persist_err}")
     
     # 4b. Additive gamma — apply temperature offsets as probability modulators
     additive_applied = 0
