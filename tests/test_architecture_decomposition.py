@@ -302,7 +302,7 @@ class TestSignalRegistryImportPaths:
         """Verify SignalRegistry creates all 22 signals without error."""
         from core.signals import SignalRegistry
         registry = SignalRegistry(db_path="/tmp/test_registry_paths.db")
-        assert len(registry.signals) == 17
+        assert len(registry.signals) == 18
         for name, sig in registry.signals.items():
             assert hasattr(sig, 'evaluate'), f"{name} missing evaluate"
             assert hasattr(sig, 'name'), f"{name} missing name"
@@ -312,7 +312,7 @@ class TestSignalRegistryImportPaths:
         """Verify factory function works."""
         from core.signals import create_signal_registry
         registry = create_signal_registry(db_path="/tmp/test_factory.db")
-        assert len(registry.signals) == 17
+        assert len(registry.signals) == 18
 
 
 # ─── Core Package Import Paths ────────────────────────────────────────────────
@@ -385,7 +385,7 @@ class TestBehavioralRegression:
         """from core.signals import SignalRegistry should still work."""
         from core.signals import SignalRegistry
         registry = SignalRegistry(db_path="/tmp/test_regression.db")
-        assert len(registry.signals) == 17
+        assert len(registry.signals) == 18
 
     def test_agreement_gate_import_path_unchanged(self):
         """from core.agreement_gate import AgreementGate should still work."""

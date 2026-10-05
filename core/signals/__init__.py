@@ -85,13 +85,15 @@ class SignalRegistry:
 
     def __init__(self, db_path: str):
         self.db_path = db_path
-        # ── Sub-hourly trajectory nowcast (OOS-validated ef1e9d8c0) ──
-        # Registered for scoring only. NOT wired into the live/paper trading path
-        # (separate Dan-gated step). Scored via evaluate_nowcast(), not the daily
-        # evaluate(idx, days) interface.
-        self.subhourly_trajectory = SubhourlyTrajectorySignal(db_path)
-
         self.signals = {
+            # ── Sub-hourly trajectory nowcast (OOS-validated ef1e9d8c0) ──
+            # Registered for scoring only; scored via evaluate_nowcast() /
+            # iter_nowcast_events(), NOT the daily evaluate(idx, days) interface.
+            # NOT wired into the live/paper trading path (separate Dan-gated step).
+            # QC 789b30027: was attribute-only, so get_all_signals() omitted it and
+            # it was silently dropped (NO_FIRES). Key added 2026-10-05.
+            'subhourly_trajectory': SubhourlyTrajectorySignal(db_path),
+
             # ── Forecasting Ensemble (Lane 1) ──
             'gaussian': GaussianSignal(db_path),               # 66.53% settlement-validated
             'gaussian_v2': GaussianV2Signal(db_path),          # 63.95%
@@ -130,6 +132,9 @@ class SignalRegistry:
             # SpikeReversionSignal removed — Fix 5: 49.85% accuracy (negative EV)
             # GoldilocksSignal removed — same signal, same negative EV
         }
+
+        # Convenience attribute (mirrors the registry key; some callers use it).
+        self.subhourly_trajectory = self.signals['subhourly_trajectory']
 
         # REMOVED from registry (verified by settlement validation 2026-07-25):
         # wind_direction_shift         — 49.72% settlement accuracy (below coin flip)

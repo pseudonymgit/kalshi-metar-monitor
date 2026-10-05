@@ -520,8 +520,8 @@ class TestSignalFactoryEdgeCases:
         from core.signals import SignalRegistry, create_signal_registry
 
         registry = SignalRegistry(db_path=None)
-        # R/T (2026-09-29): reconciled to the live registry size (17).
-        assert len(registry.signals) == 17
+        # 2026-10-05: +subhourly_trajectory (QC 789b30027 registry-gap fix) → 18.
+        assert len(registry.signals) == 18
         for name, sig in registry.signals.items():
             assert hasattr(sig, 'evaluate')
 
@@ -539,8 +539,9 @@ class TestSignalFactoryEdgeCases:
 
         registry = SignalRegistry(db_path="/tmp/test_get_all.db")
         signals = registry.get_all_signals()
-        # R/T (2026-09-29): reconciled to the live registry size (17).
-        assert len(signals) == 17
+        # 2026-10-05: +subhourly_trajectory (QC 789b30027 registry-gap fix) → 18.
+        assert len(signals) == 18
+        assert "subhourly_trajectory" in signals
 
     def test_add_signal_valid(self):
         """Adding a valid signal should work."""
@@ -556,7 +557,7 @@ class TestSignalFactoryEdgeCases:
         registry = SignalRegistry(db_path="/tmp/test_add.db")
         registry.add_signal("test_signal", TestSignal())
         assert registry.get_signal("test_signal") is not None
-        assert len(registry.signals) == 18  # 17 base + 1 added
+        assert len(registry.signals) == 19  # 18 base + 1 added
 
     def test_add_signal_invalid_type(self):
         """Adding a non-BaseSignal object should raise TypeError."""
