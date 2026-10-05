@@ -557,4 +557,17 @@ def collect_daily():
 
 
 if __name__ == "__main__":
-    collect_daily()
+    succeeded, failed, signals_triggered = collect_daily()
+    # ── Fail-closed exit semantics (R6 phantom-success prevention) ─────────
+    # A "successful" collection must have actually collected. If zero stations
+    # succeeded (total failure), exit 2. If any station failed (partial), exit 1
+    # so the scheduler surfaces it — never silently report success with 0 writes.
+    if succeeded == 0:
+        print(f"[forecast-disagreement] FATAL: 0/{len(STATIONS)} stations "
+              f"succeeded — exiting 2")
+        sys.exit(2)
+    if failed > 0:
+        print(f"[forecast-disagreement] WARN: {failed}/{len(STATIONS)} stations "
+              f"failed — exiting 1")
+        sys.exit(1)
+    sys.exit(0)
