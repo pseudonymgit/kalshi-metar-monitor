@@ -413,6 +413,38 @@ def run_intraday_cycle(
     except Exception as _traj_err:
         logger.warning(f"Sub-hourly trajectory scoring skipped: {_traj_err}")
 
+    # 4b-3. Gamma G1-G6 — SCORING ONLY (E4, 2026-10-05).
+    #     G1-G6 implement the daily evaluate(idx, days) interface and are
+    #     registered in core/signals/__init__.py, but the intraday evaluator
+    #     runs a DIFFERENT registry (_INTRADAY_SIGNALS), so gamma never reached
+    #     additive_signal_results. ENABLED_BY_DEFAULT (core/additive) is a
+    #     different family and does not gate these. Evaluate them here and
+    #     persist under their own names. Never touches fused_results / entry /
+    #     SBOX (Dan-gated).
+    try:
+        from core.signals.gamma_signals import get_gamma_signals
+        from core.signals.gamma_scoring import score_all_stations
+        from core.additive.persistence import persist_results_to_db
+
+        _gamma = get_gamma_signals(db_path=str(METAR_DB))
+        _gamma_by_day = score_all_stations(_gamma, str(METAR_DB), stations)
+        if _gamma_by_day:
+            _gamma_rows = persist_results_to_db(
+                _gamma_by_day,
+                db_path=REPO_ROOT / "data" / "signal_cache.db",
+            )
+            _gamma_fired = sum(
+                1 for rows in _gamma_by_day.values() for r in rows if r.fired
+            )
+            logger.info(
+                f"Gamma G1-G6 scoring: {_gamma_rows} rows for "
+                f"{len(_gamma_by_day)} station-days ({_gamma_fired} fired)"
+            )
+        else:
+            logger.info("Gamma G1-G6 scoring: no station-days scored")
+    except Exception as _gamma_err:
+        logger.warning(f"Gamma G1-G6 scoring skipped: {_gamma_err}")
+
     # 4c. PWW crossfeed modulation — whale detection probability bump
     # PWW crossfeed — wire 2026-09-06, fail-graceful
     try:
