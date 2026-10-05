@@ -292,14 +292,20 @@ class AdditiveContext:
             logger.debug("METAR DB not available for %s", self.station)
 
     def _load_cloud(self):
-        """Load cloud cover data from weatherapi_archive.hourly."""
+        """Load cloud cover data from weatherapi_archive.hourly.
+
+        Table-name drift fix (2026-10-05): this queried `weatherapi_archive_hourly`
+        but the real table in WEATHERAPI_DB is `hourly`. The mismatch was wrapped
+        in a bare `except: pass`, so cloud-cover silently returned zero rows. The
+        corrected name plus a logged warning means a future schema drift fails loud.
+        """
         try:
             conn = sqlite3.connect(f"file:{WEATHERAPI_DB}?mode=ro", uri=True)
             cur = conn.cursor()
             cur.execute(
                 """
                 SELECT hour, cloud
-                FROM weatherapi_archive_hourly
+                FROM hourly
                 WHERE station = ? AND date = ? AND hour < 11
                 ORDER BY hour ASC
                 """,
@@ -311,8 +317,11 @@ class AdditiveContext:
                     dc = self._dc_for_local_day(self.date_str)
                     dc.cloud_hourly[int(hour)] = float(cloud)
             conn.close()
-        except (sqlite3.OperationalError, FileNotFoundError):
-            pass
+        except (sqlite3.OperationalError, FileNotFoundError) as exc:
+            logger.warning(
+                "cloud-cover load failed for %s %s (WEATHERAPI_DB=%s): %s",
+                self.station, self.date_str, WEATHERAPI_DB, exc,
+            )
 
     def _load_daily(self):
         """Load daily summary data (high/lows) for trailing days."""
@@ -410,7 +419,7 @@ class AdditiveContext:
             cur.execute(
                 f"""
                 SELECT hour, {field}
-                FROM weatherapi_archive_hourly
+                FROM hourly
                 WHERE station = ? AND date = ? AND hour IN ({placeholders})
                 ORDER BY hour ASC
                 """,
@@ -420,8 +429,11 @@ class AdditiveContext:
                 if row[1] is not None:
                     result[int(row[0])] = float(row[1])
             conn.close()
-        except (sqlite3.OperationalError, FileNotFoundError):
-            pass
+        except (sqlite3.OperationalError, FileNotFoundError) as exc:
+            logger.warning(
+                "weatherapi field '%s' load failed for %s %s (WEATHERAPI_DB=%s): %s",
+                field, self.station, self.date_str, WEATHERAPI_DB, exc,
+            )
         return result
 
     # ─── Public accessors for signals ─────────────────────────────────────
