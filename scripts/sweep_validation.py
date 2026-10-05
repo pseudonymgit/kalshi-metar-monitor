@@ -373,12 +373,21 @@ def evaluate_signal_all_stations(signal_name, signal_obj, config, settlements):
 # SCORING-ONLY: it emits NO daily trades and is NEVER fed into fusion, PnL,
 # SBOX, or paper trading (Dan-gated, same as the gamma signals).
 
-def _subhourly_scoring_rows(signal_obj):
+def _subhourly_scoring_rows(signal_obj, cell_only=True):
     """Daily-axis scoring rows from one pass of the signal's nowcast feed.
 
-    Each row is a station-day that produced a non-abstaining prediction:
-    direction = the day-dominant nowcast label (cross / no-cross, ties → cross),
-    correct   = solid prediction held (strike-crossing axis: cross⇒settle>strike).
+    E6 (2026-10-05): the anticipation CELL only. The signal's only validated
+    edge is the anticipatory cell (gap in [1,3) AND slope >= 0.05 -> predict
+    "cross"). The complementary "no-cross" label is a BASE-RATE artifact ~91%
+    of the time simply because most station-days do not cross the strike; scoring
+    it produced a 91% headline that measured the base rate, not the signal.
+
+    With cell_only=True (the default) only station-days that emitted at least one
+    cell ("cross") prediction are scored, each as direction="cross".
+    correct = the day's high DID cross (strike-crossing axis: cross => settle>strike).
+
+    Pass cell_only=False for the legacy day-dominant labelling (kept for
+    diagnostics/back-comparison only; carries base-rate noise).
     """
     events = list(signal_obj.iter_nowcast_events())
     by_day = defaultdict(list)
@@ -398,14 +407,22 @@ def _subhourly_scoring_rows(signal_obj):
             continue
         n_cross = sum(1 for e in fired if e["prediction"] == "cross")
         n_nocross = sum(1 for e in fired if e["prediction"] == "no-cross")
-        direction = "cross" if n_cross >= n_nocross else "no-cross"
-        conf = max((e.get("confidence") or 0.0) for e in fired)
+        if cell_only:
+            if n_cross == 0:
+                continue  # no cell prediction this day -> not a scored cell row
+            direction = "cross"
+            conf = max((e.get("confidence") or 0.0) for e in fired
+                       if e["prediction"] == "cross")
+        else:
+            direction = "cross" if n_cross >= n_nocross else "no-cross"
+            conf = max((e.get("confidence") or 0.0) for e in fired)
         correct = ((direction == "cross") == (outcome == 1))
         rows.append({
             "station": station, "date": date_str, "direction": direction,
             "confidence": float(conf), "correct": bool(correct),
             "outcome": int(outcome),
             "n_cross": n_cross, "n_nocross": n_nocross,
+            "cell_only": cell_only,
             "is_daily_predictor": False,
         })
     return rows
@@ -439,8 +456,16 @@ def score_subhourly_trajectory(signal_name, signal_obj):
     sweep writes/persists it identically, plus sub-hourly diagnostics and an
     explicit `scoring_only` flag. No trades are generated.
     """
-    rows = _subhourly_scoring_rows(signal_obj)
+    # E6 (2026-10-05): score the anticipation CELL only. The signal's only
+    # validated edge is the cell (gap in [1,3) AND slope>=0.05 -> cross); the
+    # complementary no-cross label is a base-rate artifact (~91% of minutes),
+    # not signal skill. The headline number is now the cell-only accuracy.
+    rows = _subhourly_scoring_rows(signal_obj, cell_only=True)
     aggregate = _subhourly_row_metrics(rows)
+
+    # Legacy day-dominant labelling, retained only for back-comparison.
+    legacy_rows = _subhourly_scoring_rows(signal_obj, cell_only=False)
+    legacy_agg = _subhourly_row_metrics(legacy_rows)
 
     per_station = defaultdict(list)
     for r in rows:
@@ -448,13 +473,10 @@ def score_subhourly_trajectory(signal_name, signal_obj):
     station_metrics = {s: _subhourly_row_metrics(t) for s, t in per_station.items()
                        if _subhourly_row_metrics(t)["n_trades"] > 0}
 
-    # Validated anticipatory-cell diagnostics (cross direction only).
+    # Validated anticipatory-cell diagnostics (cross direction only = all rows now).
     cross_rows = [r for r in rows if r["direction"] == "cross"]
-    nocross_rows = [r for r in rows if r["direction"] == "no-cross"]
     n_cross = len(cross_rows)
     cross_acc = (sum(1 for r in cross_rows if r["correct"]) / n_cross) if n_cross else 0.0
-    n_nocross = len(nocross_rows)
-    nocross_acc = (sum(1 for r in nocross_rows if r["correct"]) / n_nocross) if n_nocross else 0.0
 
     # 3-stage validation on the strike-crossing axis (date-based discovery/holdout).
     all_dates = sorted({r["date"] for r in rows})
@@ -481,16 +503,20 @@ def score_subhourly_trajectory(signal_name, signal_obj):
         "scoring_only": True,
         "scoring_path": "evaluate_nowcast",
         "subhourly": {
+            # E6: cell-only is the headline. `legacy` is the old day-dominant
+            # label (base-rate contaminated) kept for comparison only.
             "n_station_days_scored": aggregate["n_trades"],
-            "n_cross_days": n_cross,
-            "cross_accuracy": cross_acc,
-            "n_nocross_days": n_nocross,
-            "nocross_accuracy": nocross_acc,
+            "n_cell_days": n_cross,
+            "cell_accuracy": cross_acc,
             "n_stations": len(station_metrics),
+            "legacy_day_dominant_n": legacy_agg["n_trades"],
+            "legacy_day_dominant_accuracy": legacy_agg["accuracy"],
         },
-        "notes": ("Sub-hourly trajectory nowcast scored via evaluate_nowcast on "
-                  "the strike-crossing axis; no daily trades; not wired to "
-                  "fusion/paper/SBOX (Dan-gated)."),
+        "notes": ("Sub-hourly trajectory nowcast scored via evaluate_nowcast; "
+                  "E6 (2026-10-05): headline is the anticipatory CELL ONLY "
+                  "(gap in [1,3) AND slope>=0.05 -> cross); the prior ~91% was "
+                  "the no-cross base rate, not skill. No daily trades; not "
+                  "wired to fusion/paper/SBOX (Dan-gated)."),
     }
 
 def apply_agreement_gate_to_trades(all_trades, signal_name):
