@@ -1,0 +1,21 @@
+{
+  "gate_version": "cost-schema-v1-fixture",
+  "generated": "2026-08-23",
+  "overall_pass": false,
+  "pass_count": 5,
+  "total_checks": 7,
+  "fail_count": 2,
+  "results": {
+    "c1_spread_accuracy": {"pass": true},
+    "c2_fee_accuracy": {"pass": true},
+    "c3_fill_probability": {"pass": false, "notes": "thin-market (KOKC, spread=10¢): fill prob model deviates 0.18pp from actual 0.5 fill ratio. Requires calibration factor for sub-15¢ spreads."},
+    "c4_slippage_conservative": {"pass": false, "notes": "75% below 80% threshold. partial_fill_thin scenario: conservative best-price estimate (0.0¢) underestimates actual slippage (3.0¢). Requires 1.5× depth factor for <10 total depth."},
+    "c5_cost_uncertainty": {"pass": true},
+    "c6_schema": {"pass": true},
+    "c7_reconciliation": {"pass": true, "notes": "All 3 trade PnLs reconcile. Fee formula verified against canonical Kalshi schedule (filled-contract basis)."}
+  },
+  "blockers": [
+    "C4: Thin-market slippage factor needed (1.5× for total depth < 10 contracts)",
+    "C3: Wide-spread fill probability needs better calibration (currently cuts to ~32% at 10¢ spread)"
+  ]
+}
