@@ -250,5 +250,145 @@ class PersistenceWriterTests(unittest.TestCase):
             conn.close()
 
 
+class FiredOnceLatchTests(unittest.TestCase):
+    """M4 fired-once latch.
+
+    The (station, date, signal) key has no hour dimension, so a later quiet
+    cycle must not downgrade an earlier productive one. The latch is opt-in.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self.tmp.close()
+        self.db_path = self.tmp.name
+
+    def tearDown(self):
+        for suffix in ("", "-wal", "-shm"):
+            p = self.db_path + suffix
+            if os.path.exists(p):
+                os.unlink(p)
+
+    def _conn(self):
+        return sqlite3.connect(self.db_path)
+
+    def test_latch_prevents_fired_downgrade(self):
+        conn = self._conn()
+        try:
+            key = ("KNYC", "2026-10-05")
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", offset=1.8, confidence=0.72,
+                             fired=True, reason="core:up")]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+
+            # Quiet later cycle for the SAME key must not clobber it.
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", offset=0.0, confidence=0.0,
+                             fired=False, reason="core:no_fire")]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+
+            row = persistence.load_results(conn)[0]
+            self.assertTrue(row["fired"])
+            self.assertEqual(row["confidence"], 0.72)
+            self.assertEqual(row["offset_f"], 1.8)
+            # Only reason/meta/updated_at are refreshed.
+            self.assertEqual(row["reason"], "core:no_fire")
+        finally:
+            conn.close()
+
+    def test_latch_allows_stronger_productive_update(self):
+        conn = self._conn()
+        try:
+            key = ("KLAX", "2026-10-05")
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", offset=0.5, confidence=0.10,
+                             fired=True, reason="weak")]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", offset=3.0, confidence=0.90,
+                             fired=True, reason="strong")]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+            row = persistence.load_results(conn)[0]
+            self.assertTrue(row["fired"])
+            self.assertEqual(row["confidence"], 0.90)
+            self.assertEqual(row["offset_f"], 3.0)
+        finally:
+            conn.close()
+
+    def test_latch_off_is_still_last_write_wins(self):
+        conn = self._conn()
+        try:
+            key = ("KBOS", "2026-10-05")
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", confidence=0.72, fired=True)]},
+            )
+            conn.commit()
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", confidence=0.0, fired=False)]},
+            )
+            conn.commit()
+            row = persistence.load_results(conn)[0]
+            self.assertFalse(row["fired"])
+            self.assertEqual(row["confidence"], 0.0)
+        finally:
+            conn.close()
+
+    def test_latch_does_not_block_new_quiet_key(self):
+        conn = self._conn()
+        try:
+            key = ("KMDW", "2026-10-05")
+            persistence.persist_results(
+                conn,
+                {key: [_res("regime_classifier", confidence=0.0, fired=False)]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+            row = persistence.load_results(conn)[0]
+            self.assertFalse(row["fired"])
+            self.assertEqual(row["confidence"], 0.0)
+        finally:
+            conn.close()
+
+    def test_latch_scoped_per_key(self):
+        """Latching one key must not affect a sibling quiet key."""
+        conn = self._conn()
+        try:
+            fired_key = ("KATL", "2026-10-05")
+            quiet_key = ("KATL", "2026-10-05")
+            persistence.persist_results(
+                conn,
+                {fired_key: [_res("regime_classifier", confidence=0.8,
+                                   fired=True)]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+            # A different signal on the same station/date stays quiet.
+            persistence.persist_results(
+                conn,
+                {quiet_key: [_res("cloud_clearing", confidence=0.0,
+                                  fired=False)]},
+                fired_once_latch=True,
+            )
+            conn.commit()
+            rows = {r["signal"]: r for r in persistence.load_results(conn)}
+            self.assertTrue(rows["regime_classifier"]["fired"])
+            self.assertFalse(rows["cloud_clearing"]["fired"])
+        finally:
+            conn.close()
+
+
 if __name__ == "__main__":
     unittest.main()

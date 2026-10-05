@@ -19,6 +19,11 @@ Guarantees
   - UPSERT on (station, date, signal): dedup + last-write-wins via
     INSERT ... ON CONFLICT(station, date, signal) DO UPDATE.
   - Re-running the same (station, date) leaves exactly one row per key.
+  - M4 fired-once latch (opt-in via fired_once_latch=True): because the key
+    has no hour dimension, a quiet later cycle must not overwrite a productive
+    earlier one. When enabled, an incoming fired=0 / confidence=0 row never
+    downgrades an existing fired=1 / confidence>0 row for the same key — only
+    reason/meta/updated_at are refreshed and the productive state is preserved.
   - provenance on every row (date-tiered per Dan's 2026-09-19 ruling).
   - Deterministic only — NO AI/ML. No look-ahead; this module never reads
     observations, it only persists already-computed evaluations.
@@ -107,11 +112,46 @@ def _meta_json(meta: Optional[dict]) -> str:
         return "{}"
 
 
+def _existing_states(
+    conn: sqlite3.Connection,
+    keys: List[tuple],
+) -> Dict[tuple, tuple]:
+    """Return {(station, date, signal): (offset_f, confidence, fired)} for keys
+    already present in the table. Missing keys are simply absent from the dict.
+
+    Used by the M4 fired-once latch: a quiet evaluation cycle must not downgrade
+    a productive one for the same (station, date, signal) key. The table has no
+    hour dimension, so without this check a later zero-write overwrites it.
+    """
+    if not keys:
+        return {}
+    placeholders = ",".join(["(?,?,?)"] * len(keys))
+    params = [v for key in keys for v in key]
+    try:
+        rows = conn.execute(
+            f"SELECT station, date, signal, offset_f, confidence, fired "
+            f"FROM {TABLE_NAME} "
+            f"WHERE (station, date, signal) IN (VALUES {placeholders})",
+            params,
+        ).fetchall()
+    except sqlite3.OperationalError:
+        # Older SQLite without row-value IN (VALUES ...) support — fall back.
+        rows = []
+        for (st, dt, sg) in keys:
+            rows.extend(conn.execute(
+                f"SELECT station, date, signal, offset_f, confidence, fired "
+                f"FROM {TABLE_NAME} WHERE station=? AND date=? AND signal=?",
+                (st, dt, sg),
+            ).fetchall())
+    return {(r[0], r[1], r[2]): (r[3], r[4], int(r[5] or 0)) for r in rows}
+
+
 def persist_results(
     conn: sqlite3.Connection,
     results_by_day: Dict[tuple, List[AdditiveSignalResult]],
     provenance: Optional[str] = None,
     updated_at: Optional[str] = None,
+    fired_once_latch: bool = False,
 ) -> int:
     """
     UPSERT one row per evaluated (station, date, signal).
@@ -124,6 +164,13 @@ def persist_results(
             the date-tiered doctrine. Non-matching keys fall back to the
             date tier of their own date.
         updated_at: ISO timestamp override; defaults to now (UTC).
+        fired_once_latch: M4 fired-once latch. When True, an incoming row may
+            NOT downgrade an existing row for the same (station, date, signal)
+            from fired=1 -> 0 or confidence>0 -> 0. On such a downgrade the
+            durable productive state (offset_f, confidence, fired) is preserved
+            and only reason/meta/updated_at (and provenance) are refreshed.
+            Defaults to False to preserve unconditional last-write-wins for
+            callers that need it; the intraday runner's M1 persist block opts in.
 
     Returns:
         Number of rows written (attempted UPSERTs; last-write-wins per key).
@@ -153,6 +200,34 @@ def persist_results(
     if not rows:
         return 0
 
+    # M4 fired-once latch: never let a quiet cycle downgrade a productive one.
+    if fired_once_latch:
+        existing = _existing_states(
+            conn, [(r[0], r[1], r[2]) for r in rows]
+        )
+        for i, r in enumerate(rows):
+            prev = existing.get((r[0], r[1], r[2]))
+            if prev is None:
+                continue
+            prev_offset, prev_conf, prev_fired = prev
+            cur_conf = float(r[4])
+            cur_fired = int(r[5])
+            downgrade = (prev_fired == 1 and cur_fired == 0) or (
+                prev_conf is not None
+                and float(prev_conf or 0.0) > 0.0
+                and cur_conf <= 0.0
+            )
+            if downgrade:
+                # Preserve the durable productive state; refresh only
+                # reason / meta / updated_at / provenance.
+                rows[i] = (
+                    r[0], r[1], r[2],
+                    prev_offset if prev_offset is not None else r[3],
+                    prev_conf if prev_conf is not None else r[4],
+                    prev_fired,
+                    r[6], r[7], r[8], r[9],
+                )
+
     conn.executemany(
         f"""
         INSERT INTO {TABLE_NAME}
@@ -177,11 +252,15 @@ def persist_results_to_db(
     results_by_day: Dict[tuple, List[AdditiveSignalResult]],
     db_path: Union[str, Path] = DEFAULT_DB_PATH,
     provenance: Optional[str] = None,
+    fired_once_latch: bool = False,
 ) -> int:
     """Convenience wrapper: open `db_path`, UPSERT, commit, close."""
     conn = sqlite3.connect(str(db_path), timeout=10)
     try:
-        n = persist_results(conn, results_by_day, provenance=provenance)
+        n = persist_results(
+            conn, results_by_day, provenance=provenance,
+            fired_once_latch=fired_once_latch,
+        )
         conn.commit()
         return n
     finally:

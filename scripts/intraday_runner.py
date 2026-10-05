@@ -296,9 +296,15 @@ def run_intraday_cycle(
                 core_results_by_day[(st, date_str)] = rows
 
         if core_results_by_day:
+            # M4 fired-once latch: the (station, date, signal) key has no hour
+            # dimension, so a quiet evening cycle would otherwise overwrite a
+            # productive morning cycle's fired/confidence with zeros. Latch on
+            # so an existing fired=1 / confidence>0 row can never be downgraded
+            # to fired=0 / confidence=0 within the same UTC date.
             core_persisted_rows = persist_results_to_db(
                 core_results_by_day,
                 db_path=REPO_ROOT / "data" / "signal_cache.db",
+                fired_once_latch=True,
             )
             core_persisted_fired = sum(
                 1 for rows in core_results_by_day.values()
