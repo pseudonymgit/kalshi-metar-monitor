@@ -21,3 +21,6 @@ logs/*.log
 *.db-wal
 .venv-gefs
 graphify-out
+
+# GEFS backfill working dir — disposable GRIB .idx cache (untracked 2026-10-05)
+data/gefs_work/
