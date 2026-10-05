@@ -376,7 +376,43 @@ def run_intraday_cycle(
                 logger.warning(f"G.8 persistence skipped: {persist_err}")
     except Exception as e:
         logger.warning(f"Additive gamma stack error: {e}")
-    
+
+    # 4b-2. Sub-hourly trajectory nowcast — SCORING ONLY.
+    #     The signal uses evaluate_nowcast()/iter_nowcast_events(), not the daily
+    #     evaluate() interface, so it cannot flow through the core/additive
+    #     evaluators above. This is the parallel scoring path: it runs the signal
+    #     for the trading date and persists its output into the SAME
+    #     additive_signal_results store (under the `subhourly_trajectory` key),
+    #     so the predictor is actually scored every cycle.
+    #     Dan-gated from live/paper: this block ONLY records scores. It never
+    #     touches fused_results / calibrated / entry decisions.
+    try:
+        from core.signals.subhourly_trajectory_signal import SubhourlyTrajectorySignal
+        from core.signals.subhourly_scoring import pick_date, score_day
+        from core.additive.persistence import persist_results_to_db
+
+        _traj = SubhourlyTrajectorySignal(str(METAR_DB))
+        _traj_date = pick_date(_traj, date_str)
+        _traj_by_day = score_day(_traj, _traj_date)
+        if _traj_by_day:
+            _traj_rows = persist_results_to_db(
+                {(st, _traj_date): rows for st, rows in _traj_by_day.items()},
+                db_path=REPO_ROOT / "data" / "signal_cache.db",
+            )
+            _traj_cross = sum(
+                1 for rows in _traj_by_day.values()
+                for r in rows if r.signal == "subhourly_trajectory_anticipatory" and r.fired
+            )
+            logger.info(
+                f"Sub-hourly trajectory scoring: {_traj_rows} rows for "
+                f"{len(_traj_by_day)} stations @ {_traj_date} "
+                f"({_traj_cross} anticipatory-cell fires)"
+            )
+        else:
+            logger.info(f"Sub-hourly trajectory scoring: no events for {_traj_date}")
+    except Exception as _traj_err:
+        logger.warning(f"Sub-hourly trajectory scoring skipped: {_traj_err}")
+
     # 4c. PWW crossfeed modulation — whale detection probability bump
     # PWW crossfeed — wire 2026-09-06, fail-graceful
     try:
