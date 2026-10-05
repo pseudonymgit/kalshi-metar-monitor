@@ -354,6 +354,9 @@ SIGNAL_CLASSES: Dict[str, str] = {
     "temperature_advection": "predictor",
     "eighty_two_member_ensemble": "predictor",
     "eighty_two_member_ensemble_pooled": "predictor",
+    # Sub-hourly trajectory nowcast — directional cross/no-cross predictor on the
+    # strike-crossing axis (scored via evaluate_nowcast, NOT the daily interface).
+    "subhourly_trajectory": "predictor",
 }
 
 VALID_SIGNAL_CLASSES = frozenset({"predictor", "modulator", "gate"})
@@ -427,6 +430,13 @@ def build_signal_registry():
 
     # Radiational Cooling (LOW only signal)
     _reg("radiational_cooling", "radiational_cooling_signal", "RadiationalCoolingSignal")
+
+    # ── Sub-hourly trajectory nowcast (OOS-validated ef1e9d8c0) — SCORING ONLY ──
+    # Uses the sub-hourly axis (evaluate_nowcast / iter_nowcast_events), NOT the
+    # daily evaluate(idx, days) interface. The sweep detects `evaluate_nowcast` and
+    # routes it to the dedicated scoring path (score_subhourly_trajectory), which
+    # never emits daily trades and never touches fusion/paper/SBOX. Dan-gated.
+    _reg("subhourly_trajectory", "subhourly_trajectory_signal", "SubhourlyTrajectorySignal")
 
     # Active (9)
     _reg("gaussian", "gaussian_signal", "GaussianSignal")

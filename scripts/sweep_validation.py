@@ -359,6 +359,140 @@ def evaluate_signal_all_stations(signal_name, signal_obj, config, settlements):
             "aggregate": aggregate, "per_station": station_metrics,
             "per_market": market_metrics, "validation": val,
             "n_stations_active": len(station_metrics), "total_trades": len(all_trades)}
+
+# ═══════════════════════════════════════════════════════════════
+# SUB-HOURLY NOWCAST SCORING PATH (scoring-only)
+# ═══════════════════════════════════════════════════════════════
+# The sub-hourly trajectory signal lives on a sub-hourly (minute-of-day) axis
+# and exposes `evaluate_nowcast(...)` / `iter_nowcast_events()`, NOT the daily
+# `evaluate(idx, days)` interface the rest of the sweep consumes. This is the
+# parallel scoring path: it mirrors the signal's OWN self-test feed
+# (scripts/test_subhourly_trajectory_signal.py → `iter_nowcast_events`) and
+# scores the emitted cross/no-cross prediction on the strike-crossing axis.
+#
+# SCORING-ONLY: it emits NO daily trades and is NEVER fed into fusion, PnL,
+# SBOX, or paper trading (Dan-gated, same as the gamma signals).
+
+def _subhourly_scoring_rows(signal_obj):
+    """Daily-axis scoring rows from one pass of the signal's nowcast feed.
+
+    Each row is a station-day that produced a non-abstaining prediction:
+    direction = the day-dominant nowcast label (cross / no-cross, ties → cross),
+    correct   = solid prediction held (strike-crossing axis: cross⇒settle>strike).
+    """
+    events = list(signal_obj.iter_nowcast_events())
+    by_day = defaultdict(list)
+    for e in events:
+        by_day[(e["station"], e["trading_date"])].append(e)
+    rows = []
+    for (station, date_str), evs in by_day.items():
+        outcome = None
+        for e in evs:
+            if e.get("outcome") is not None:
+                outcome = e["outcome"]
+                break
+        if outcome is None:
+            continue
+        fired = [e for e in evs if e.get("prediction") is not None]
+        if not fired:
+            continue
+        n_cross = sum(1 for e in fired if e["prediction"] == "cross")
+        n_nocross = sum(1 for e in fired if e["prediction"] == "no-cross")
+        direction = "cross" if n_cross >= n_nocross else "no-cross"
+        conf = max((e.get("confidence") or 0.0) for e in fired)
+        correct = ((direction == "cross") == (outcome == 1))
+        rows.append({
+            "station": station, "date": date_str, "direction": direction,
+            "confidence": float(conf), "correct": bool(correct),
+            "outcome": int(outcome),
+            "n_cross": n_cross, "n_nocross": n_nocross,
+            "is_daily_predictor": False,
+        })
+    return rows
+
+
+def _subhourly_row_metrics(rows):
+    n = len(rows)
+    if n == 0:
+        return {"n_trades": 0, "accuracy": 0.0, "total_pnl": 0.0, "sharpe": 0.0,
+                "profit_factor": 0.0, "max_drawdown": 0.0, "brier_score": 0.0,
+                "ece": 0.0, "total_fees": 0.0, "avg_confidence": 0.0, "n_dates": 0}
+    n_correct = sum(1 for r in rows if r["correct"])
+    confs = [r["confidence"] for r in rows]
+    brier = sum((r["confidence"] - (1.0 if r["correct"] else 0.0)) ** 2 for r in rows) / n
+    return {
+        "n_trades": n,
+        "accuracy": n_correct / n,
+        "total_pnl": 0.0, "sharpe": 0.0, "profit_factor": 0.0,
+        "max_drawdown": 0.0, "brier_score": float(brier),
+        "ece": 0.0,
+        "total_fees": 0.0, "total_cost": 0.0,
+        "avg_confidence": float(sum(confs) / n),
+        "n_dates": len({r["date"] for r in rows}),
+    }
+
+
+def score_subhourly_trajectory(signal_name, signal_obj):
+    """Scoring-only result for a signal that exposes `evaluate_nowcast()`.
+
+    Returns the same result-dict shape as `evaluate_signal_all_stations` so the
+    sweep writes/persists it identically, plus sub-hourly diagnostics and an
+    explicit `scoring_only` flag. No trades are generated.
+    """
+    rows = _subhourly_scoring_rows(signal_obj)
+    aggregate = _subhourly_row_metrics(rows)
+
+    per_station = defaultdict(list)
+    for r in rows:
+        per_station[r["station"]].append(r)
+    station_metrics = {s: _subhourly_row_metrics(t) for s, t in per_station.items()
+                       if _subhourly_row_metrics(t)["n_trades"] > 0}
+
+    # Validated anticipatory-cell diagnostics (cross direction only).
+    cross_rows = [r for r in rows if r["direction"] == "cross"]
+    nocross_rows = [r for r in rows if r["direction"] == "no-cross"]
+    n_cross = len(cross_rows)
+    cross_acc = (sum(1 for r in cross_rows if r["correct"]) / n_cross) if n_cross else 0.0
+    n_nocross = len(nocross_rows)
+    nocross_acc = (sum(1 for r in nocross_rows if r["correct"]) / n_nocross) if n_nocross else 0.0
+
+    # 3-stage validation on the strike-crossing axis (date-based discovery/holdout).
+    all_dates = sorted({r["date"] for r in rows})
+    si = max(1, int(len(all_dates) * 0.7)) if all_dates else 0
+    disc_dates, hold_dates = set(all_dates[:si]), set(all_dates[si:])
+    disc_rows = [r for r in rows if r["date"] in disc_dates]
+    time_rows = [r for r in rows if r["date"] in hold_dates]
+    validation = {
+        "discovery": _subhourly_row_metrics(disc_rows),
+        "time_holdout": _subhourly_row_metrics(time_rows),
+        "geo_holdout": {"n_trades": 0, "accuracy": 0.0},
+        "consolidated": aggregate,
+    }
+
+    return {
+        "signal_name": signal_name,
+        "config_id": -1,
+        "aggregate": aggregate,
+        "per_station": station_metrics,
+        "per_market": {},
+        "validation": validation,
+        "n_stations_active": len(station_metrics),
+        "total_trades": aggregate["n_trades"],
+        "scoring_only": True,
+        "scoring_path": "evaluate_nowcast",
+        "subhourly": {
+            "n_station_days_scored": aggregate["n_trades"],
+            "n_cross_days": n_cross,
+            "cross_accuracy": cross_acc,
+            "n_nocross_days": n_nocross,
+            "nocross_accuracy": nocross_acc,
+            "n_stations": len(station_metrics),
+        },
+        "notes": ("Sub-hourly trajectory nowcast scored via evaluate_nowcast on "
+                  "the strike-crossing axis; no daily trades; not wired to "
+                  "fusion/paper/SBOX (Dan-gated)."),
+    }
+
 def apply_agreement_gate_to_trades(all_trades, signal_name):
     """
     Apply N-of-M agreement filtering to collected trades for a single signal.

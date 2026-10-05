@@ -138,7 +138,7 @@ from scripts.sweep_validation import (
     split_geo_holdout, _eval_wrapper,
     run_three_stage_validation, evaluate_signal_all_stations,
     apply_agreement_gate_to_trades, apply_spatial_coherence_to_trades,
-    run_best_config_for_signal,
+    run_best_config_for_signal, score_subhourly_trajectory,
 )
 from scripts.sweep_fusion import (
     get_variance_sizing_enabled, get_fusion_mode,
@@ -411,6 +411,23 @@ def main():
         sobj = active.get(sname)
         if sobj is None:
             print(f"  [{si+1}/{len(signal_names)}] {sname}: SKIP")
+            continue
+        # Sub-hourly nowcast signals expose evaluate_nowcast(), not the daily
+        # evaluate(idx, days) interface. Route them to the dedicated
+        # scoring-only path (no config sweep, no trades, no fusion/paper).
+        if hasattr(sobj, "evaluate_nowcast"):
+            print(f"\n[{si+1}/{len(signal_names)}] {sname}: "
+                  f"(scoring-only: evaluate_nowcast path)")
+            result = score_subhourly_trajectory(sname, sobj)
+            signal_results[sname] = result
+            agg = result.get("aggregate", {})
+            sh = result.get("subhourly", {})
+            print(f"  -> Station-days scored: {agg.get('n_trades', 0)} | "
+                  f"Acc: {agg.get('accuracy', 0)*100:.2f}% | "
+                  f"cross-days: {sh.get('n_cross_days', 0)} "
+                  f"({sh.get('cross_accuracy', 0)*100:.1f}%) | "
+                  f"Brier: {agg.get('brier_score', 0):.4f} | "
+                  f"[scoring-only, no trades]")
             continue
         budget = _budget_for(sname)
         cfg_slice = configs[:budget]
