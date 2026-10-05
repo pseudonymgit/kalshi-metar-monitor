@@ -153,12 +153,31 @@ def high_so_far(station: str, day_start: datetime, day_end: datetime,
     return float(row[0]) if row and row[0] is not None else None
 
 
+PRICE_SNAPSHOT_SOURCE = "kalshi_market_snapshots.db:market_snapshots.mid_price"
+
+
 def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
                   min_volume: float = 50.0) -> List[Dict]:
-    """Threshold (-T) strikes with LIQUID mid prices for one station-day."""
+    """Threshold (-T) strikes with LIQUID mid prices for one station-day.
+
+    Provenance (E1 fix 2026-10-05): every entry carries the `snapshot_time` it
+    was priced from, and dedup-by-strike happens BEFORE the price/volume filters.
+    The query is ORDER BY snapshot_time DESC, so the FIRST row seen per strike is
+    the most recent snapshot at/before `before_iso`.
+
+    Prior bug: dedup ran AFTER filtering. When a strike's latest price was
+    filtered (px <= 0.02 / >= 0.98 / thin volume) the loop `continue`d WITHOUT
+    marking the strike seen, so it kept scanning older snapshots and silently
+    priced the strike from a stale row. Observed: KOKC trade 9b50b640 booked
+    market_price=0.025 from snapshot 2026-10-04T14:30 while the decision-time
+    snapshot (2026-10-05T13:30) was 0.005 — a 5x overstatement. Dedup-first
+    makes the latest snapshot authoritative: if it is filtered, the strike is
+    simply absent from the ladder (no trade at a stale price).
+    """
     c = _ro(SNAPS)
     try:
-        sql = ("SELECT market_ticker, mid_price, yes_ask, volume_24h FROM market_snapshots "
+        sql = ("SELECT market_ticker, mid_price, yes_ask, volume_24h, snapshot_time "
+               "FROM market_snapshots "
                "WHERE station=? AND market_ticker LIKE ? AND market_ticker LIKE 'KXHIGH%' "
                "AND mid_price IS NOT NULL")
         params = [station, f"%-{date_yy}-%"]
@@ -170,7 +189,8 @@ def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
     finally:
         c.close()
     seen = {}
-    for tk, mid, ask, vol in rows:
+    decided = set()  # strikes whose MOST-RECENT snapshot has been read
+    for tk, mid, ask, vol, snap in rows:
         tail = tk.rsplit("-", 1)[-1]
         if not tail.startswith("T"):
             continue
@@ -178,8 +198,12 @@ def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
             strike = float(tail[1:])
         except ValueError:
             continue
-        if strike in seen:
+        if strike in decided:
             continue
+        # First (newest) snapshot for this strike decides it — permanently.
+        # If that price is filtered below, the strike is absent from the ladder;
+        # we never fall back to an older snapshot's price.
+        decided.add(strike)
         px = mid if mid is not None else ask
         if px is None:
             continue
@@ -190,7 +214,7 @@ def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
             continue
         seen[strike] = {"strike": strike, "yes_price": px,
                         "no_price": round(1 - px, 4), "ticker": tk,
-                        "volume_24h": vol}
+                        "volume_24h": vol, "snapshot_time": snap}
     return sorted(seen.values(), key=lambda d: d["strike"])
 
 
@@ -235,9 +259,20 @@ def _position_size_usd(confidence: float) -> float:
     return 0.0
 
 
+def _ensure_price_source_column(conn) -> None:
+    """Additive provenance column (E1, 2026-10-05): trade_uuid -> snapshot row.
+
+    Idempotent; existing rows keep NULL until a reconciliation backfill runs.
+    """
+    cols = {d[1] for d in conn.execute("PRAGMA table_info(trades)")}
+    if "price_source" not in cols:
+        conn.execute("ALTER TABLE trades ADD COLUMN price_source TEXT")
+        conn.commit()
+
+
 def record_trade(conn, station, market_type, side, our_prob, market_price,
                  confidence, strike, ticker, size_usd, functionality, day_str,
-                 probs: Optional[Dict] = None):
+                 probs: Optional[Dict] = None, price_source: Optional[str] = None):
     """Record ONE SBOX trade per (station, day, functionality), idempotently.
 
     Extension (2026-09-30): the row also carries p_gefs/p_analog/p_trajectory/
@@ -262,6 +297,10 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
             "WHERE trade_uuid=?",
             (probs.get("p_gefs"), probs.get("p_analog"),
              probs.get("p_trajectory"), probs.get("p_fused"), tuuid))
+        if price_source:
+            conn.execute(
+                "UPDATE trades SET price_source=COALESCE(price_source, ?) "
+                "WHERE trade_uuid=?", (price_source, tuuid))
         _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
         conn.commit()
         return {"status": "enriched", "station": station,
@@ -281,15 +320,15 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
            position_size_usd, trade_price, trade_cost, trade_version, functionality,
            status, notes, implied_prob, analytical_prob, calibration_error,
            confidence_indicator, created_at_utc,
-           p_gefs, p_analog, p_trajectory, p_fused)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+           p_gefs, p_analog, p_trajectory, p_fused, price_source)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (tuuid, day_str, station, market_type, direction, our_prob, price,
          "buy_yes" if side == "BUY" else "sell_yes", qty, size_usd, price, cost,
          f"v3.1_{INSTANCE.lower()}", functionality, "open",
          f"multi-forecaster EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
          price, our_prob, abs(our_prob - price), confidence, now,
          probs.get("p_gefs"), probs.get("p_analog"),
-         probs.get("p_trajectory"), probs.get("p_fused")))
+         probs.get("p_trajectory"), probs.get("p_fused"), price_source))
     _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
     conn.commit()
     return {"status": "executed", "station": station, "signal_direction": direction,
@@ -337,6 +376,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
     if conn:
         conn.execute("PRAGMA journal_mode=WAL;")
         ensure_schema(conn)  # additive: p_* columns + companion table
+        _ensure_price_source_column(conn)  # E1: trade_uuid -> snapshot provenance
 
     # ONE matcher/climatology for the whole pass (the climatology build is the
     # expensive part; constructing per-station rebuilt it every time).
@@ -421,6 +461,9 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         our_prob = fused_at_strike if picked["side"] == "yes" else 1.0 - fused_at_strike
         mkt = row["yes_price"] if picked["side"] == "yes" else row["no_price"]
         ticker = row["ticker"]
+        # E1 provenance: trade_uuid -> ticker -> snapshot_time -> mid_price.
+        price_source = (f"{PRICE_SNAPSHOT_SOURCE}@{row.get('snapshot_time')}"
+                        f"|mid={row.get('yes_price')}")
 
         # directional gate verdict on the trade side (Item 4 evidence).
         # Our proposition is P(high>=strike): YES side = we expect the high to
@@ -496,7 +539,8 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             results.append(record_trade(
                 conn, st, "HIGH", sig.signal_type.name, our_prob, mkt,
                 abs(our_prob - 0.5) * 2.0, strike, ticker,
-                size_usd, "intraday_ev_strike", day_str, probs=prob_payload))
+                size_usd, "intraday_ev_strike", day_str, probs=prob_payload,
+                price_source=price_source))
 
     if conn:
         conn.close()
