@@ -478,6 +478,19 @@ def score_subhourly_trajectory(signal_name, signal_obj):
     n_cross = len(cross_rows)
     cross_acc = (sum(1 for r in cross_rows if r["correct"]) / n_cross) if n_cross else 0.0
 
+    # F4 (2026-10-06): climatology baseline for the cell score. The cell-only
+    # headline has no comparison point otherwise. Because the signal predicts
+    # "cross" on EVERY scored (cell) row, the honest baseline is the
+    # cell-conditioned climatology P(cross | cell) = mean(outcome) over the same
+    # cell rows. Lift over it (cell_edge_vs_climatology) measures whether the
+    # gate+prediction adds skill beyond the base rate of the days it fires on.
+    cell_climatology = (sum(1 for r in rows if r["outcome"] == 1) / len(rows)
+                        if rows else 0.0)
+    cell_edge_vs_climatology = cross_acc - cell_climatology
+    unconditional_cross_rate = (
+        sum(1 for r in legacy_rows if r["outcome"] == 1) / len(legacy_rows)
+        if legacy_rows else 0.0)
+
     # 3-stage validation on the strike-crossing axis (date-based discovery/holdout).
     all_dates = sorted({r["date"] for r in rows})
     si = max(1, int(len(all_dates) * 0.7)) if all_dates else 0
@@ -511,12 +524,21 @@ def score_subhourly_trajectory(signal_name, signal_obj):
             "n_stations": len(station_metrics),
             "legacy_day_dominant_n": legacy_agg["n_trades"],
             "legacy_day_dominant_accuracy": legacy_agg["accuracy"],
+            # F4: comparison points. `cell_climatology_accuracy` is P(cross |
+            # cell) over the same rows (the baseline the 77.78% must beat);
+            # `cell_edge_vs_climatology` is the lift; `unconditional_cross_rate`
+            # is P(cross) over ALL station-days (the always-cross base rate).
+            "cell_climatology_accuracy": round(cell_climatology, 4),
+            "cell_edge_vs_climatology": round(cell_edge_vs_climatology, 4),
+            "unconditional_cross_rate": round(unconditional_cross_rate, 4),
         },
         "notes": ("Sub-hourly trajectory nowcast scored via evaluate_nowcast; "
                   "E6 (2026-10-05): headline is the anticipatory CELL ONLY "
                   "(gap in [1,3) AND slope>=0.05 -> cross); the prior ~91% was "
-                  "the no-cross base rate, not skill. No daily trades; not "
-                  "wired to fusion/paper/SBOX (Dan-gated)."),
+                  "the no-cross base rate, not skill. F4 (2026-10-06): report "
+                  "the cell-conditioned climatology baseline alongside it — "
+                  "cell_edge_vs_climatology is the skill above P(cross|cell). "
+                  "No daily trades; not wired to fusion/paper/SBOX (Dan-gated)."),
     }
 
 def apply_agreement_gate_to_trades(all_trades, signal_name):
