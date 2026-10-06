@@ -32,6 +32,14 @@ REPO = Path(__file__).resolve().parents[1]
 TRADES_DB = REPO / "data" / "paper_trading_sbox.db"
 SNAPS_DB = REPO / "data" / "kalshi_market_snapshots.db"
 
+# E1 fix (commit 4a21c931, 2026-10-05T22:59:07Z) made the strike ladder
+# dedup-first: the newest snapshot is authoritative and the code never walks
+# back to a stale row. Trades CREATED at/after this instant are the post-fix
+# cohort and MUST verify clean. Trades created before it are frozen pre-fix
+# data — we report their residue loudly but do not let them gate the pipeline
+# (a gate that can never pass on immutable history is a broken gate).
+E1_FIX_UTC = "2026-10-05T22:59:07+00:00"
+
 _TICKER_RE = re.compile(r"(KXHI\w*?-\d\d[A-Z]{3}\d\d-[BT][\d.]+)")
 
 
@@ -90,31 +98,50 @@ def main():
     s = sqlite3.connect(f"file:{SNAPS_DB}?mode=ro", uri=True)
     s.row_factory = sqlite3.Row
 
+    tcols = {d[1] for d in t.execute("PRAGMA table_info(trades)")}
+    sel_src = "price_source" if "price_source" in tcols else "NULL AS price_source"
     rows = t.execute(
         "SELECT trade_uuid, station, trade_date_utc, created_at_utc, "
-        "market_price, trade_type, status, notes FROM trades ORDER BY created_at_utc").fetchall()
+        f"market_price, trade_type, status, notes, {sel_src} "
+        "FROM trades ORDER BY created_at_utc").fetchall()
 
     counts = {"MATCH": 0, "STALE_WALK": 0, "MISMATCH": 0, "NO_TICKER": 0,
               "NO_SNAPSHOT": 0}
+    post = {"n": 0, "MATCH": 0, "STALE_WALK": 0, "MISMATCH": 0,
+            "NO_TICKER": 0, "NO_SNAPSHOT": 0, "no_source": 0}
     bad = []
+    post_bad = []
 
     for r in rows:
+        is_post = r["created_at_utc"] >= E1_FIX_UTC
+        if is_post:
+            post["n"] += 1
+            if not r["price_source"]:
+                post["no_source"] += 1
         ticker = _ticker_from_notes(r["notes"])
         if not ticker:
             counts["NO_TICKER"] += 1
+            if is_post:
+                post["NO_TICKER"] += 1
             continue
         snap = _snap_at(s, ticker, r["created_at_utc"])
         booked = float(r["market_price"])
         if snap is None:
             counts["NO_SNAPSHOT"] += 1
-            bad.append((r["trade_uuid"], ticker, r["created_at_utc"], None,
-                        None, None, booked, "NO_SNAPSHOT"))
+            item = (r["trade_uuid"], ticker, r["created_at_utc"], None,
+                    None, None, booked, "NO_SNAPSHOT")
+            bad.append(item)
+            if is_post:
+                post["NO_SNAPSHOT"] += 1
+                post_bad.append(item)
             continue
         snap_time, bid, ask, mid = snap
         mid = float(mid) if mid is not None else None
         lo, hi = _expected_band(r["trade_type"], bid, ask, mid)
         if mid is not None and hi is not None and lo <= booked <= hi:
             counts["MATCH"] += 1
+            if is_post:
+                post["MATCH"] += 1
             continue
         # Not the decision-time price. Check if it's a stale older snapshot.
         verdict = "MISMATCH"
@@ -123,8 +150,12 @@ def main():
             verdict = "STALE_WALK"
             snap_time = f"{stale[0]}(walked)"
         counts[verdict] += 1
-        bad.append((r["trade_uuid"], ticker, r["created_at_utc"], snap_time,
-                    mid, f"[{lo},{hi}]", booked, verdict))
+        item = (r["trade_uuid"], ticker, r["created_at_utc"], snap_time,
+                mid, f"[{lo},{hi}]", booked, verdict)
+        bad.append(item)
+        if is_post:
+            post[verdict] += 1
+            post_bad.append(item)
 
     print("=" * 100)
     print("E1 PRICE PROVENANCE RECONCILIATION — paper_trading_sbox.db vs "
@@ -134,17 +165,32 @@ def main():
     for k, v in counts.items():
         print(f"  {k:12s}: {v}")
     print("-" * 100)
+    print(f"POST-FIX cohort (created_at_utc >= {E1_FIX_UTC}): n={post['n']}")
+    for k in ("MATCH", "STALE_WALK", "MISMATCH", "NO_TICKER", "NO_SNAPSHOT"):
+        print(f"  {k:12s}: {post[k]}")
+    print(f"  price_source NULL: {post['no_source']}")
+    print("-" * 100)
     print(f"{'verdict':10s} {'ticker':28s} {'created_at':26s} {'snap_time':26s} "
           f"{'mid':>6s} {'booked':>6s}")
     for tuuid, ticker, created, snap_time, mid, rng, booked, verdict in bad:
         print(f"{verdict:10s} {ticker:28s} {created:26s} {str(snap_time):26s} "
               f"{str(mid):>6s} {booked:>6.3f}  {rng or ''}")
     print("-" * 100)
-    n_bad = counts["STALE_WALK"] + counts["MISMATCH"]
-    if n_bad:
-        print(f"RESULT: {n_bad} trade(s) priced off a non-decision-time snapshot "
-              f"-> E1 bug PRESENT (pre-fix data).")
+    if post_bad:
+        print(f"RESULT: {len(post_bad)} POST-FIX trade(s) priced off a "
+              f"non-decision-time snapshot -> E1 regression PRESENT.")
         return 1
+    n_pre = counts["STALE_WALK"] + counts["MISMATCH"]
+    if post["no_source"]:
+        print(f"RESULT: {post['no_source']} POST-FIX trade(s) missing "
+              f"price_source -> E1 provenance INCOMPLETE.")
+        return 1
+    if n_pre:
+        print(f"RESULT: POST-FIX cohort clean (n={post['n']}) -> E1 FIX PROVEN.")
+        print(f"  NOTE: {n_pre} pre-fix historical row(s) still carry the old "
+              f"walk-back/inversion signature (frozen data, pre {E1_FIX_UTC}); "
+              f"not retroactively mutated. Non-blocking.")
+        return 0
     print("RESULT: all trades priced within their decision-time snapshots.")
     return 0
 

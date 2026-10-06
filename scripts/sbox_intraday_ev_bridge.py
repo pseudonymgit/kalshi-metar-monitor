@@ -272,7 +272,8 @@ def _ensure_price_source_column(conn) -> None:
 
 def record_trade(conn, station, market_type, side, our_prob, market_price,
                  confidence, strike, ticker, size_usd, functionality, day_str,
-                 probs: Optional[Dict] = None, price_source: Optional[str] = None):
+                 probs: Optional[Dict] = None, price_source: Optional[str] = None,
+                 selected_side: Optional[str] = None):
     """Record ONE SBOX trade per (station, day, functionality), idempotently.
 
     Extension (2026-09-30): the row also carries p_gefs/p_analog/p_trajectory/
@@ -312,7 +313,12 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
     price = float(market_price)
     qty = max(1, int(round(size_usd / max(price, 0.01))))
     cost = abs(qty * price)
-    direction = "UP" if side == "BUY" else "DOWN"
+    # F2 (2026-10-06): direction/trade_type describe the SELECTED leg the EV
+    # strike-picker returned (yes = long YES, no = long NO), NOT the
+    # EntryTimingEngine's BUY/SELL default. `side` (engine signal) still gates.
+    leg = selected_side if selected_side in ("yes", "no") else (
+        "yes" if side == "BUY" else "no")
+    direction = "UP" if leg == "yes" else "DOWN"
     tuuid = str(uuid.uuid4())
     conn.execute(
         """INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,
@@ -323,7 +329,7 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
            p_gefs, p_analog, p_trajectory, p_fused, price_source)
            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (tuuid, day_str, station, market_type, direction, our_prob, price,
-         "buy_yes" if side == "BUY" else "sell_yes", qty, size_usd, price, cost,
+         ("buy_yes" if leg == "yes" else "buy_no"), qty, size_usd, price, cost,
          f"v3.1_{INSTANCE.lower()}", functionality, "open",
          f"multi-forecaster EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
          price, our_prob, abs(our_prob - price), confidence, now,
@@ -540,7 +546,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                 conn, st, "HIGH", sig.signal_type.name, our_prob, mkt,
                 abs(our_prob - 0.5) * 2.0, strike, ticker,
                 size_usd, "intraday_ev_strike", day_str, probs=prob_payload,
-                price_source=price_source))
+                price_source=price_source, selected_side=picked["side"]))
 
     if conn:
         conn.close()
