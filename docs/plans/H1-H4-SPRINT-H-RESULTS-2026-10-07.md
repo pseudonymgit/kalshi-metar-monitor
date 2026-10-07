@@ -11,7 +11,8 @@
 | | Trades | Wins | Acc | P&L/contract | Sharpe | Brier (cal) |
 |---|---:|---:|---:|---:|---:|---:|
 | **Pre-Sprint-H** (14:00 comment; the quoted 09:00 canonical was 0.01751/1.17) | 95 | 55 | 0.5789 | +0.01751 | 1.17 | — |
-| **H4 final** (13:30Z, fee+calib+intraday) | **81** | **51** | **0.6296** | **+0.01753** | **1.28** | **0.126** |
+| **H4 v1** (13:30Z, fee + *day-over-day* calib + intraday) — **BLOCKED** | 81 | 51 | 0.6296 | +0.01753 | 1.28 | 0.126 |
+| **H4 v2** (13:30Z, fee + *strike-axis* calib + intraday) — **canonical** | **83** | **25** | **0.3012** | **+0.01295** | **0.93** | **0.100** |
 
 The task predicted the canonical-fee change alone would drop P&L to ~+0.01116 / Sharpe ~0.74. That
 recompute reproduces **exactly** — but only under one specific construct (fee changed in the P&L
@@ -56,32 +57,31 @@ Sharpe **1.17 → 0.74** — matches the task's prediction to 5 decimals.
 
 ## H2 — Calibration layer
 
-- Realized P&L used the RAW model probability. `calibration_curves.json` (M8, populated) is now
-  applied: per-station `HIGH/up` bins → pooled `_global` `HIGH/up` → raw fallback.
-- The sweep reports **calibrated p**, plus **Brier (calibrated)** and **Brier (raw)**, plus a
-  **10-bin reliability table** (outcome axis = `P(high≥strike)` = the YES event, matching the
-  curve's axis).
+- Realized P&L used the RAW model probability. The sweep now reports **calibrated p**, **Brier
+  (calibrated)** and **Brier (raw)**, plus a **10-bin reliability table** (outcome axis =
+  `P(high≥strike)` = the YES event).
 
-**Effect (13:30Z, fee+intraday on):** mean model−market edge **0.205 → 0.179**; Brier(cal)
-**0.154 → 0.126** (better). Calibration **shrinks the edge** — the expected/honest outcome.
+**First wiring (BLOCKED, superseded):** the initial H2 wired `calibration_curves.json` (the artifact
+name in the brief). Gilfoyle's gate review found that artifact is built on the **day-over-day
+warming axis** (`build_calibration_curves.py::compute_ensemble_fraction` → `predicted_warming =
+ensemble_mean > prev_temp`) — a different event than the sweep's strike-crossing `P(high≥T)`. The
+mapping silently fabricated the trade set (56/81 trades forced into the 0.0–0.1 bin with p≈0.009).
+**Verdict: NOT QUOTABLE.** (Review: `docs/plans/H4-REVIEW-2026-10-07.md`.)
 
-### ⚠️ Axis caveat (must be surfaced, not hidden)
+**Fix (implemented, required change #1):** H2 now consumes `data/strike_axis_calibration.json`,
+built by `scripts/build_strike_axis_calibration.py` on the **correct axis**, from the sweep's own
+(strict strike-crossing) ladder outcomes, and **out-of-sample** — trained only on station-days
+**before 2026-08-01**, so the Aug–Oct eval window is scored against prior history. The predictor is
+the same intraday-constrained `P(high≥T)` the sweep selects on (domain match); locked strikes
+(`T ≤ high_so_far`, a mathematical certainty) are excluded from the fit and passed through
+uncalibrated in the sweep.
 
-`calibration_curves.json` is built **per `scripts/build_calibration_curves.py`** on the
-**day-over-day warming direction**: `compute_ensemble_fraction` returns
-`predicted_warming = ensemble_mean > prev_temp`; the stored bins are `(confidence, predicted_warming
-== actual_warming)`. Its `up`/`down` split is the *warming direction*, and confidence is the
-ensemble **fraction**, not a strike probability. The B2 sweep's `P(high≥T)` is the
-**strike-crossing axis** (per Dan's 2026-09-19 ruling). Feeding the Gaussian strike probability
-into the day-over-day bins is an axis mismatch — visible in the reliability table, where the
-lowest-p bin still holds 0.998 "locked" values (e.g. KATL T89 at 13:30 with the observed high at
-78.8°F).
-
-A **strike-axis** calibration artifact exists (`data/ensemble_fraction_calibration.json`: "model_prob
-= count(members > threshold)/31 … calibrated_prob = P(actual_exceeds_threshold | model_prob in
-bin)") and is the correct curve for this layer. **Recommendation:** swap H2's source to it in a
-follow-up and re-measure; the current H2 is a faithful wiring of the artifact the brief named, with
-the mismatch flagged.
+**Why calibration *hurts* — honest finding:** the model's shadow Gaussian uses σ = ensemble
+spread/4 (≈1.6°F), far too narrow. The reliability table shows it is **inverted** at high p:
+model p≈0.9–1.0 actually settles yes ~10–15% of the time. The strike-axis curve captures this
+(calibrated ceiling ≈ 0.11) — which is why calibration moves the number a lot (it rejects the
+model's high-p "confident YES" picks). OOS Brier confirms the curve generalizes: **raw 0.159 →
+calibrated 0.100**, including on the held-out Aug–Oct window the curve never saw.
 
 ---
 
@@ -102,57 +102,59 @@ composition bug caught by A/B. It is now applied **before** calibration and driv
 
 ---
 
-## H4 — Canonical run @13:30Z (fee + calibration + intraday)
+## H4 — Canonical run @13:30Z (fee + strike-axis calibration + intraday)
 
 **Artifact:** `data/b2_real_price_results.json` (bare run; `entry_utc_used = 13:30:00`).
+**This is the H4 v2 number (post H2 axis fix).** H4 v1 (day-over-day calibration) is superseded.
 
 | Metric | Value |
 |---|---:|
-| Trades | **81** |
-| Wins | **51** |
-| Directional accuracy | **0.6296** |
-| Wilson 95% CI | **[0.5208, 0.7267]** |
-| Near-money (0.15–0.85) accuracy | **0.3846** (n=13) |
-| Mean model−market edge | 0.18389 |
-| Mean P&L/contract (canonical fee) | **+0.01753** |
-| Sharpe (annualized, daily units) | **1.28** |
-| Brier (calibrated / raw) | 0.126 / 0.162 |
-| Sides | yes 35 / no 46 |
-| Stations | 10 |
+| Trades | **83** |
+| Wins | **25** |
+| Directional accuracy | **0.3012** |
+| Wilson 95% CI | **[0.2131, 0.4069]** |
+| Near-money (0.15–0.85) accuracy | **0.6429** (n=14) |
+| Mean model−market edge | 0.1092 |
+| Mean P&L/contract (canonical fee) | **+0.01295** |
+| Sharpe (annualized, daily units) | **0.93** |
+| Brier (calibrated / raw) | 0.100 / 0.159 |
+| Sides | yes 55 / no 28 |
+| Stations | 11 |
 
-### Reliability table (calibrated p vs empirical P(high≥strike))
+### Reliability table — raw model p (the finding)
 
-| bin | n | mean p | empirical |
-|---|---:|---:|---:|
-| 0.0–0.1 | 56 | 0.009 | 0.054 |
-| 0.1–0.2 | 6 | 0.163 | 0.167 |
-| 0.2–0.3 | 2 | 0.242 | 0.000 |
-| 0.3–0.4 | 1 | 0.346 | 0.000 |
-| 0.4–0.5 | 3 | 0.477 | 0.000 |
-| 0.5–0.6 | 9 | 0.550 | 0.222 |
-| 0.6–0.7 | 2 | 0.653 | 0.000 |
-| 0.9–1.0 | 2 | 1.000 | 0.000 |
+In-window raw-p vs actual `P(high≥strike)` (outcome = result=='yes') shows the model is
+**miscalibrated, not merely overconfident**: high p does not mean likely yes.
+
+| raw p bin | n | yes rate |
+|---|---:|---:|
+| 0.0–0.1 | 53 | 0.057 |
+| 0.1–0.2 | 6 | 0.167 |
+| 0.2–0.3 | 5 | 0.000 |
+| 0.3–0.4 | 2 | 0.000 |
+| 0.5–0.6 | 6 | 0.167 |
+| 0.7–0.8 | 4 | 0.500 |
+| 0.8–0.9 | 2 | 0.000 |
+| 0.9–1.0 | 4 | 0.000 |
 
 ### Honest verdict — does it clear 0.58?
 
-- **Point accuracy 0.6296 clears 0.58.** But the **Wilson 95% CI is [0.521, 0.727]** — the lower
-  bound is **below 0.58**, so the result is **NOT statistically significant** at the Gray-Room gate
-  on n=81.
-- **Near-money subset is 0.385 (n=13)** — the accuracy lives in far-from-money "no" trades
-  (bin 0.0–0.1, n=56). That is the same structural caveat Gilfoyle flagged on the pre-H number, and
-  it did not improve.
-- P&L (+0.0175) and Sharpe (1.28) are positive but rest on a small, thin sample; the near-money
-  cell is negative.
-- **Bottom line: the corrected number is still not quotable as an edge.** Accuracy is nominally above
-  the gate, but the CI straddles it and the near-money slice is weak. Do not treat as durable.
+- **NO.** Corrected accuracy is **0.3012** — the strike-axis calibration shows the model's confident
+  directional picks are largely wrong. **It does not clear 0.58**, and it is significant the wrong
+  way (Wilson CI [0.213, 0.407], entirely below the gate).
+- **The near-money subset is 0.643 (n=14)** — the *opposite* pattern from H4 v1: the model is better
+  near the money than far from it. But n=14 is far too small to claim anything.
+- **+0.01295/contract, Sharpe 0.93** — positive but far below the gate, and below the pre-H figure.
+- **Bottom line: the corrected number is NOT quotable as an edge. It is not an edge.** The headline
+  direction of the whole B2 effort — "B2 is a strong signal" — was a wrong-axis artifact; the
+  honest, axed result is below coin-flip on the model's own picks.
 
 | Variant (13:30Z) | n | acc | P&L | Sharpe | edge | Brier(cal) |
 |---|---:|---:|---:|---:|---:|---:|
-| legacy fee + no calib + no intraday | 87 | 0.598 | 0.0321 | 2.39 | 0.203 | 0.152 |
-| + canonical fee (P&L only) | 86 | 0.593 | 0.0256 | 1.89 | 0.205 | 0.154 |
-| + intraday (no calib) | 82 | 0.646 | 0.0318 | 2.30 | 0.212 | 0.164 |
-| + calibration (no intraday) | 86 | 0.581 | 0.0172 | 1.26 | 0.179 | 0.121 |
-| **H4 final (all three)** | **81** | **0.630** | **0.0175** | **1.28** | **0.184** | **0.126** |
+| legacy fee + no calib + no intraday | 87 | 0.598 | 0.0321 | 2.39 | 0.203 | — |
+| no-calibration (canon fee + intraday) | 82 | 0.646 | 0.0318 | 2.30 | 0.212 | — |
+| **H4 v1** (day-over-day calib) — BLOCKED | 81 | 0.630 | 0.0175 | 1.28 | 0.184 | 0.126 |
+| **H4 v2** (strike-axis calib) — canonical | **83** | **0.301** | **0.0130** | **0.93** | **0.109** | **0.100** |
 
 ---
 
@@ -170,3 +172,5 @@ composition bug caught by A/B. It is now applied **before** calibration and driv
 | `scripts/verify_fee_formula.py` | canonical expectation |
 | `scripts/sweep/{kalshi_sweep_eval,gefs_grid_sweep,old_signal_validation}.py`, `scripts/sweep_metrics.py`, 12 harness files | delegate to canonical |
 | `tests/test_sprint_modules.py` | corrected the buggy `0.90→0.07` assertion |
+| `scripts/build_strike_axis_calibration.py` | new — strike-crossing-axis OOS reliability curve (H2 fix) |
+| `data/strike_axis_calibration.json` | new — the H2 curve (trained pre-2026-08-01) |

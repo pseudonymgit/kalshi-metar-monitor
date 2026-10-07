@@ -58,7 +58,7 @@ GEFS = REPO / "data" / "gefs_archive.db"
 LADDER = REPO / "data" / "kalshi_strike_ladder.db"
 SNAPS = REPO / "data" / "kalshi_market_snapshots.db"
 METAR = REPO / "data" / "metar_backfill.db"          # H3
-CALIB = REPO / "data" / "calibration_curves.json"    # H2
+CALIB = REPO / "data" / "strike_axis_calibration.json"  # H2 (strike-crossing axis!)
 OUT = REPO / "data" / "b2_real_price_results.json"
 
 DEFAULT_ENTRY_UTC = "13:30:00"  # H3: pinned (was 13:00:00)
@@ -218,43 +218,44 @@ _BIN_EDGES = [0.50 + i * 0.05 for i in range(11)]
 
 
 def load_calibration():
+    """Load the strike-crossing-axis reliability curve.
+
+    H2 blocker fix (Gilfoyle, 2026-10-07): the prior source
+    (calibration_curves.json) is built on the DAY-OVER-DAY warming axis — a
+    different event than the sweep's strike-crossing P(high>=T). That mapping
+    fabricated the trade set. This now consumes data/strike_axis_calibration.json,
+    produced by scripts/build_strike_axis_calibration.py from the sweep's OWN
+    (p_raw, strict strike-crossing outcome) pairs, trained OUT-OF-SAMPLE on
+    station-days before the eval window.
+    """
     global _CALIB_TABLE
     if _CALIB_TABLE is None:
         try:
             _CALIB_TABLE = json.load(open(CALIB))
+            if _CALIB_TABLE.get("axis") != "strike_crossing":
+                print("WARNING: calibration artifact is not on the strike-crossing "
+                      "axis; refusing to apply it")
+                _CALIB_TABLE = {}
         except Exception as e:  # noqa: BLE001
-            print(f"WARNING: calibration_curves.json unreadable ({e}); raw p only")
+            print(f"WARNING: strike_axis_calibration.json unreadable ({e}); raw p only")
             _CALIB_TABLE = {}
     return _CALIB_TABLE
 
 
-def _bin_label(p):
-    for i in range(len(_BIN_EDGES) - 1):
-        if _BIN_EDGES[i] <= p < _BIN_EDGES[i + 1]:
-            return f"{_BIN_EDGES[i]:.2f}-{_BIN_EDGES[i+1]:.2f}"
-    return None
-
-
 def calibrate_p(station, raw_p):
-    """Map a raw ensemble P(high>=strike) (>=0.5) to the empirical win rate.
+    """Map raw ensemble P(high>=strike) to the empirical strike-exceedance rate.
 
-    Direction is 'up' for every strike here (P(high>=X) >= 0.5 is the event the
-    up-curve was fit on). Per-station HIGH/up bins first, then pooled _global
-    HIGH/up, then raw. Isotonic/PAVA curves are not used — the frozen artifact
-    is the empirical bin table.
+    Bin lookup on the strike-axis curve (pooled across stations). Station is
+    accepted for API compatibility; the pooled curve is used because the
+    per-station training counts are thin at the extremes.
     """
     table = load_calibration()
-    if not table or raw_p < 0.5:
+    rates = table.get("calibrated_rate")
+    if not rates:
         return raw_p
-    label = _bin_label(raw_p)
-    if label is None:
-        return raw_p
-    for tbl in (table.get(station, {}).get("HIGH", {}).get("up", {}),
-                table.get("_global", {}).get("HIGH", {}).get("up", {})):
-        wr = (tbl.get("bins", {}).get(label, {}) or {}).get("win_rate")
-        if wr is not None:
-            return float(wr)
-    return raw_p
+    p = min(max(float(raw_p), 0.0), 1.0)
+    idx = min(len(rates) - 1, int(p * len(rates)))
+    return float(rates[idx])
 
 
 def asof_mid(prices, ticker, t_eval_iso):
@@ -390,8 +391,14 @@ def main():
             # fold high_so_far + remaining-day sigma BEFORE calibrating, so the
             # constraint actually drives selection (not just a reported field).
             p_intra = _p_ge_intraday(mu, sigma, hsf, df, sv) if USE_INTRADAY else p_raw
-            # H2: calibration layer -> the probability the EV layer trades on
-            p = calibrate_p(st, p_intra) if USE_CALIB else p_intra
+            # H2: calibration layer -> the probability the EV layer trades on.
+            # A LOCKED strike (T <= observed high-so-far) is a mathematical
+            # certainty (P=1); the calibration curve is fit on uncertain strikes
+            # only, so pass locked strikes through unchanged.
+            if p_intra >= 1.0 - 1e-9:
+                p = p_intra
+            else:
+                p = calibrate_p(st, p_intra) if USE_CALIB else p_intra
             # YES leg: buy at mid, pays 1 if result=='yes'
             ev_yes = (p * 1.0 - mid) - fee_frac(mid)
             # NO leg: buy at (1-mid), pays 1 if result=='no'
@@ -460,7 +467,8 @@ def main():
             "h1_fee": "canonical ceil(0.07*P*(1-P)*100)/100 per contract (core.fees)",
             "h1_legacy_fee_ablation": USE_LEGACY_FEE,
             "h1_fee_pnl_only_ablation": FEE_PNL_ONLY,
-            "h2_calibration": ("calibration_curves.json HIGH/up bins -> pooled _global -> raw"
+            "h2_calibration": ("strike_axis_calibration.json (strike-crossing axis, OOS "
+                               "pre-2026-08-01) bin lookup"
                                if USE_CALIB else "disabled"),
             "h3_entry_pinned": DEFAULT_ENTRY_UTC,
             "h3_intraday_constraint": ("P(high>=X)=1 for X<=high_so_far; remaining-day sigma"
