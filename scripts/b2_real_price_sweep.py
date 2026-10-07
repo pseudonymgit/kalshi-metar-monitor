@@ -148,14 +148,14 @@ def load_ladder():
 
 
 def load_prices():
-    """{ticker: [(snapshot_time, mid, ask, volume)]} — real quotes."""
+    """{ticker: [(snapshot_time, mid, ask, bid, volume)]} — real quotes."""
     c = ro(SNAPS)
     out = defaultdict(list)
-    q = """SELECT market_ticker, snapshot_time, mid_price, yes_ask, volume_24h
+    q = """SELECT market_ticker, snapshot_time, mid_price, yes_ask, yes_bid, volume_24h
            FROM market_snapshots
            WHERE mid_price IS NOT NULL AND snapshot_time BETWEEN ? AND ?"""
-    for tk, ts, mid, ask, vol in c.execute(q, (START + "T00:00:00", END + "T23:59:59.999")):
-        out[tk].append((ts, float(mid), ask, vol))
+    for tk, ts, mid, ask, bid, vol in c.execute(q, (START + "T00:00:00", END + "T23:59:59.999")):
+        out[tk].append((ts, float(mid), ask, bid, vol))
     c.close()
     return out
 
@@ -260,16 +260,15 @@ def calibrate_p(station, raw_p):
 
 def asof_mid(prices, ticker, t_eval_iso):
     """Latest quote at snapshot_time <= t_eval (no lookahead).
-    Returns (snapshot_time, px, volume) or None.
-    Mirrors sbox_intraday_ev_bridge.strike_ladder: prefer mid, else ask."""
+    Returns (snapshot_time, mid, yes_ask, yes_bid, volume) or None."""
     rows = prices.get(ticker)
     if not rows:
         return None
     best = None
-    for ts, mid, ask, vol in rows:
+    for ts, mid, ask, bid, vol in rows:
         if ts <= t_eval_iso and (best is None or ts > best[0]):
             px = mid if mid is not None else ask
-            best = (ts, px, vol)
+            best = (ts, px, ask, bid, vol)
     return best
 
 
@@ -371,7 +370,7 @@ def main():
             if not got:
                 skipped["no_price"] += 1
                 continue
-            ts, mid, vol = got
+            ts, mid, ask, bid, vol = got
             if mid is None:
                 continue
             mid = float(mid)
@@ -410,10 +409,22 @@ def main():
                 continue
             if best is None or ev > best["ev"]:
                 won = (res == leg)
+                # Executable (taker) entry: YES leg pays yes_ask; NO leg pays
+                # 1 - yes_bid. Mid is NOT executable (Gilfoyle v2 req #3); the
+                # half-spread is the whole edge on a deep-OTM bid/ask.
+                if leg == "yes":
+                    entry_exec = float(ask) if ask is not None else cost
+                else:
+                    entry_exec = (1.0 - float(bid)) if bid is not None else cost
+                if entry_exec <= 0 or entry_exec >= 1:
+                    entry_exec = cost
                 best = dict(station=st, date=d, strike=sv, ticker=tk,
                             side=leg, p_raw=round(p_raw, 4), p=round(p, 4),
                             p_intraday=round(p_intra, 4), mid=round(mid, 4),
-                            entry=round(cost, 4), ev=round(ev, 4), result=res,
+                            yes_ask=round(float(ask), 4) if ask is not None else None,
+                            yes_bid=round(float(bid), 4) if bid is not None else None,
+                            entry=round(cost, 4), entry_exec=round(entry_exec, 4),
+                            ev=round(ev, 4), result=res,
                             won=bool(won), snapshot_time=ts, volume_24h=vol,
                             sigma=round(sigma, 3), n_members=nm,
                             high_so_far=round(hsf, 2) if hsf is not None else None,
@@ -429,6 +440,7 @@ def main():
         # P&L per contract: win => (1 - entry), lose => (-entry); minus round-trip fee
         payout = 1.0 if best["won"] else 0.0
         best["pnl_per_contract"] = round(payout - best["entry"] - fee_pnl(best["entry"]) - fee_pnl(1.0 if best["won"] else 0.0), 5)
+        best["pnl_per_contract_exec"] = round(payout - best["entry_exec"] - fee_pnl(best["entry_exec"]) - fee_pnl(1.0 if best["won"] else 0.0), 5)
         trades.append(best)
 
     # ---- metrics ----
@@ -449,10 +461,60 @@ def main():
     brier_cal = sum((t["p"] - (1.0 if t["result"] == "yes" else 0.0)) ** 2 for t in trades) / n if n else None
     brier_raw = sum((t["p_raw"] - (1.0 if t["result"] == "yes" else 0.0)) ** 2 for t in trades) / n if n else None
 
-    near = [t for t in trades if 0.15 <= t["mid"] <= 0.85]
+    def _sharpe(vals):
+        if len(vals) < 2:
+            return 0.0
+        m = sum(vals) / len(vals)
+        var = sum((x - m) ** 2 for x in vals) / (len(vals) - 1)
+        sd = math.sqrt(var)
+        return (m / sd) * math.sqrt(252) if sd > 0 else 0.0
+
+    exec_pnls = [t["pnl_per_contract_exec"] for t in trades]
+    mean_pnl_exec = sum(exec_pnls) / n if n else 0.0
+    sharpe_exec = _sharpe(exec_pnls)
+
+    # Near-money on the TRADED-SIDE entry (Gilfoyle v2 req #5): the YES-side mid
+    # mislabels NO-legs. Use the actual cost paid for the side traded.
+    near = [t for t in trades if 0.15 <= t["entry"] <= 0.85]
     near_n = len(near)
     near_w = sum(1 for t in near if t["won"])
     near_acc = (near_w / near_n) if near_n else None
+
+    # ── honesty diagnostics (Gilfoyle v2 req #1/#2) ──
+    # base rate of the YES event over the traded set
+    base_yes = (sum(1 for t in trades if t["result"] == "yes") / n) if n else 0.0
+    # constant predictor at the base rate -> Brier
+    brier_const = (sum((base_yes - (1.0 if t["result"] == "yes" else 0.0)) ** 2
+                       for t in trades) / n) if n else None
+    # always-NO accuracy (the trivial baseline on this book)
+    always_no = (sum(1 for t in trades if t["result"] == "no") / n) if n else None
+    # discrimination: does calibrated p rank the YES event at all? (rank corr)
+    def _rank(vals):
+        order = sorted(range(len(vals)), key=lambda i: vals[i])
+        r = [0.0] * len(vals)
+        i = 0
+        while i < len(order):
+            j = i
+            while j + 1 < len(order) and vals[order[j + 1]] == vals[order[i]]:
+                j += 1
+            avg = (i + j) / 2.0 + 1.0
+            for k in range(i, j + 1):
+                r[order[k]] = avg
+            i = j + 1
+        return r
+    rank_corr = None
+    if n >= 3:
+        ps = [t["p"] for t in trades]
+        ys = [1.0 if t["result"] == "yes" else 0.0 for t in trades]
+        rp, ry = _rank(ps), _rank(ys)
+        mp, my = sum(rp) / n, sum(ry) / n
+        cov = sum((rp[i] - mp) * (ry[i] - my) for i in range(n))
+        vp = math.sqrt(sum((rp[i] - mp) ** 2 for i in range(n)))
+        vy = math.sqrt(sum((ry[i] - my) ** 2 for i in range(n)))
+        rank_corr = round(cov / (vp * vy), 4) if vp > 0 and vy > 0 else None
+    from collections import Counter as _C
+    p_counts = _C(round(t["p"], 4) for t in trades)
+    p_top_val, p_top_n = (p_counts.most_common(1)[0] if p_counts else (None, 0))
 
     by_station = defaultdict(lambda: [0, 0, 0.0])
     for t in trades:
@@ -484,13 +546,24 @@ def main():
         "accuracy": round(acc, 4),
         "accuracy_wilson_95ci": {"lo": ci[0], "hi": ci[1]},
         "near_money_0.15_0.85": {"n": near_n, "wins": near_w,
-                                 "accuracy": round(near_acc, 4) if near_acc is not None else None},
+                                 "accuracy": round(near_acc, 4) if near_acc is not None else None,
+                                 "basis": "traded-side entry"},
         "mean_pnl_per_contract": round(mean_pnl, 5),
+        "mean_pnl_per_contract_executable": round(mean_pnl_exec, 5),
+        "sharpe_executable": round(sharpe_exec, 4),
         "mean_model_minus_market_edge": round(mean_edge, 5),
         "mean_ev": round(mean_ev, 5),
         "sharpe_annualized": round(sharpe, 4),
         "brier_calibrated": round(brier_cal, 5) if brier_cal is not None else None,
         "brier_raw": round(brier_raw, 5) if brier_raw is not None else None,
+        "diagnostics": {
+            "base_rate_yes_event": round(base_yes, 4),
+            "brier_constant_predictor": round(brier_const, 5) if brier_const is not None else None,
+            "always_no_accuracy": round(always_no, 4) if always_no is not None else None,
+            "rank_corr_p_vs_yes_event": rank_corr,
+            "distinct_p_values": len(p_counts),
+            "modal_p": p_top_val, "modal_p_count": p_top_n,
+        },
         "reliability": reliability_table(trades),
         "skipped": dict(skipped),
         "by_station": {k: {"n": v[0], "wins": v[1],
@@ -504,7 +577,8 @@ def main():
     print(json.dumps({k: report[k] for k in
                       ["n_trades", "n_wins", "accuracy", "accuracy_wilson_95ci",
                        "near_money_0.15_0.85", "mean_pnl_per_contract",
-                       "mean_model_minus_market_edge", "mean_ev", "sharpe_annualized",
+                       "mean_pnl_per_contract_executable", "sharpe_annualized",
+                       "sharpe_executable", "mean_model_minus_market_edge", "mean_ev",
                        "brier_calibrated", "brier_raw", "skipped"]}, indent=2))
     print("reliability:", json.dumps(report["reliability"]))
     print("stations:", len(by_station), "→ wrote", a.out)

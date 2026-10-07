@@ -115,11 +115,29 @@ composition bug caught by A/B. It is now applied **before** calibration and driv
 | Wilson 95% CI | **[0.2131, 0.4069]** |
 | Near-money (0.15–0.85) accuracy | **0.6429** (n=14) |
 | Mean model−market edge | 0.1092 |
-| Mean P&L/contract (canonical fee) | **+0.01295** |
-| Sharpe (annualized, daily units) | **0.93** |
+| Mean P&L/contract (mid, **upper bound**) | **+0.01295** |
+| Mean P&L/contract (**executable taker**) | **+0.00542** |
+| Sharpe (mid / **executable**) | 0.93 / **0.39** |
 | Brier (calibrated / raw) | 0.100 / 0.159 |
+| Brier (constant @ base rate) | **0.0772** (better than calibrated) |
+| Always-NO baseline accuracy | **0.9157** |
 | Sides | yes 55 / no 28 |
 | Stations | 11 |
+
+### Diagnostics — is the calibrated p a signal? (v2 review req #1/#2)
+
+| Diagnostic | Value | Read |
+|---|---:|---|
+| Modal calibrated p | **0.0745 on 63/83 trades** | near-constant predictor |
+| Distinct p values | 4 | no ranking resolution |
+| rank corr(p, YES event) | +0.13 | negligible |
+| Constant-predictor Brier | 0.0772 | **beats** the calibrated 0.100 |
+| Always-NO accuracy | 0.9157 | **beats** the model's 0.301 |
+
+**The calibrated predictor has no discriminating power.** 63/83 trades carry an identical p,
+the constant predictor at the base rate has a *better* Brier, and always-NO beats the model on
+accuracy. The EV math reduces to `ev_no ≈ mid − 0.075 − fee` — fading the deep-OTM YES ask
+whenever the market prices it above ~0.08, essentially independent of the weather model.
 
 ### Reliability table — raw model p (the finding)
 
@@ -139,15 +157,20 @@ In-window raw-p vs actual `P(high≥strike)` (outcome = result=='yes') shows the
 
 ### Honest verdict — does it clear 0.58?
 
-- **NO.** Corrected accuracy is **0.3012** — the strike-axis calibration shows the model's confident
-  directional picks are largely wrong. **It does not clear 0.58**, and it is significant the wrong
-  way (Wilson CI [0.213, 0.407], entirely below the gate).
-- **The near-money subset is 0.643 (n=14)** — the *opposite* pattern from H4 v1: the model is better
-  near the money than far from it. But n=14 is far too small to claim anything.
-- **+0.01295/contract, Sharpe 0.93** — positive but far below the gate, and below the pre-H figure.
-- **Bottom line: the corrected number is NOT quotable as an edge. It is not an edge.** The headline
-  direction of the whole B2 effort — "B2 is a strong signal" — was a wrong-axis artifact; the
-  honest, axed result is below coin-flip on the model's own picks.
+- **NO.** Corrected accuracy is **0.3012** (Wilson CI [0.213, 0.407], entirely below 0.58,
+  significant the wrong way). It is also **below the always-NO baseline (0.916)**.
+- **Near-money (traded-side entry, 0.15–0.85) is 0.643 (n=14)** — but n=14 is not a claim, and
+  the pre-fix 0.643 was inflated by deep-NO far-legs mislabeled by the YES-side mid.
+- **+0.01295/contract (mid) is an optimistic upper bound.** At the executable taker ask it is
+  **+0.00542 / Sharpe 0.39** — the half-spread is the whole edge on a deep-OTM ask.
+- **Bottom line: NOT QUOTABLE. It is not an edge.** The headline direction of the whole B2 effort
+  — "B2 is a strong signal" — was a wrong-axis artifact; the honest, axed result is a near-constant
+  predictor fading a deep-OTM ask, below coin-flip on the model's own picks.
+
+**H3 ablation (v2 review req #4):** with calibration active, `--no-intraday` is a **no-op**
+(identical selection) because calibration collapses every non-locked p to the same near-constant
+rate — so H3 *appears* inert in H4 v2. Tested correctly, under `--no-calibration`: intraday moves
+the book (no-calib 82 trades/0.646 vs no-calib+no-intraday 86/0.593). H3 works; calibration masks it.
 
 | Variant (13:30Z) | n | acc | P&L | Sharpe | edge | Brier(cal) |
 |---|---:|---:|---:|---:|---:|---:|
