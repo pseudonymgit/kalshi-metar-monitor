@@ -62,10 +62,14 @@ def _expected_band(trade_type, bid, ask, mid):
 
     buy_yes  -> long YES: fair in [yes_bid, yes_ask]
     sell_yes -> short YES = long NO: fair in [1-yes_ask, 1-yes_bid]
+    buy_no   -> long NO: fair in [1-yes_ask, 1-yes_bid] (same NO band as
+                sell_yes). The F2 side-inversion fix (17a2fd703) now emits
+                buy_no for a NO-leg pick, so the verifier must band it as NO
+                or it would MISMATCH a correct post-fix trade.
     """
     if mid is None:
         return None, None
-    if trade_type == "sell_yes":
+    if trade_type in ("sell_yes", "buy_no"):
         lo = 1.0 - ask if ask is not None else 1.0 - mid
         hi = 1.0 - bid if bid is not None else 1.0 - mid
         return lo, hi
