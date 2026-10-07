@@ -10,7 +10,7 @@ select the strike maximizing expected value, accounting for the fee model.
 
 EV logic (per strike X, YES side):
   p            = P(high >= X)                       (calibrated)
-  fee(c)       = ceil(0.07 * c)                     (Kalshi fee depends on price only, per side)
+  fee(c)       = ceil(0.07 * c * (1-c) * 100)/100    (Kalshi fee, canonical per contract)
   EV_yes(X)    = p*(1 - cost_yes - fee) - (1-p)*(cost_yes + fee)
   EV_no(X)     = (1-p)*(1 - cost_no  - fee) - p*(cost_no  + fee)
   Choose max EV across strikes and sides; only fire if EV > min_edge.
@@ -23,8 +23,12 @@ B-Mode compliant. No AI/ML.
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from core.fees import fee_per_contract as _fee_per_contract  # noqa: E402  (canonical fee)
 
 min_edge = 0.0
 
@@ -42,17 +46,17 @@ def p_high_ge(mu: float, sigma: float, x: float) -> float:
 
 
 def kalshi_fee(price: float, p: float = None) -> float:
-    """Kalshi fee in dollars per contract (price in dollars 0-1).
+    """Kalshi fee in dollars for ONE contract (price in dollars 0-1).
 
-    WAVE-A/1 (2026-09-28): fee depends on the CONTRACT PRICE only, not on the
-    model probability. The prior `0.07 * price * p * (1 - p)` wrongly scaled the
-    fee by p*(1-p) (which peaks at 0.25), understating the true fee up to 4x.
-    Correct Kalshi general fee: ceil(0.07 * price)
+    H1 (Sprint H, 2026-10-07): the canonical Kalshi taker fee is
+        ceil(0.07 * P * (1-P) * 100) / 100
+    (7% of notional, rounded up to the whole cent). The prior WAVE-A/1 form
+    `ceil(0.07 * price)` dropped the p*(1-p) factor and mispriced away from
+    P=0.5 — e.g. P=0.90 was over-charged 7x ($0.07 vs the true $0.01). The fee
+    depends on the CONTRACT PRICE only, not on the model probability, so `p` is
+    retained for call-site compatibility but unused.
     """
-    p = 0.5 if p is None else p  # retained for call-site compatibility; unused
-    if price <= 0:
-        return 0.0
-    return math.ceil(0.07 * price * 100) / 100.0
+    return _fee_per_contract(price)
 
 
 def ev_yes(mu: float, sigma: float, x: float, cost_yes: float, p_fn=None) -> float:

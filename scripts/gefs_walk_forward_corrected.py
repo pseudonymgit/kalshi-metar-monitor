@@ -83,11 +83,11 @@ DEFAULT_TEMP_DIFF_MIN = 0.5
 
 # ─── Fee Model ──────────────────────────────────────────────────────────────
 
+from core.fees import kalshi_fee as _canonical_kalshi_fee
+
+
 def kalshi_fee(contracts: int, price: float) -> float:
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-    fee_per_contract = math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
-    return fee_per_contract * contracts
+    return _canonical_kalshi_fee(contracts, price)
 
 # ─── UHI Bias and Calibration (static) ─────────────────────────────────────
 

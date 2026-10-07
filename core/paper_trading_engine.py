@@ -40,6 +40,7 @@ from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .agreement_gate import AgreementGate, SimpleAgreementChecker
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .adaptive_thresholds import filter_signals_by_adaptive_threshold, get_adaptive_threshold
+from .fees import kalshi_fee as _canonical_kalshi_fee  # H1 canonical fee
 from typing import Dict, List, Optional, Tuple, Any
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from enum import Enum
@@ -1927,9 +1928,11 @@ class PaperTrader:
         effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
         quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
 
-        # Kalshi real fee model: ceil(0.07 × quantity × price × (1-price)) per side
-        # Round trip = 2 × per-side fee
-        per_side_fee = math.ceil(0.07 * quantity * effective_price * (1.0 - effective_price))
+        # Kalshi real fee model (H1 canonical, dollars):
+        #   ceil(0.07 × P × (1-P) × 100) / 100 per contract, × quantity per side
+        # Round trip = 2 × per-side fee. (Prior form returned CENTS via a per-order
+        # ceil, and was added to a dollar position_size — 100x understated.)
+        per_side_fee = _canonical_kalshi_fee(quantity, effective_price)
         round_trip_fee = per_side_fee * 2
         net_cost = position_size + round_trip_fee * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 

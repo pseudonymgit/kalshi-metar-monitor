@@ -28,7 +28,9 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from core.fees import kalshi_fee as _canonical_kalshi_fee  # noqa: E402  (H1 canonical)
 from sweep import config as sweep_config
 from sweep.data import load_kalshi_settlements, load_gefs_archive
 from sweep.config import FEE_TYPE_OPTIONS, SLIPPAGE_BUDGET
@@ -42,19 +44,12 @@ STATIONS = sweep_config.STATIONS
 
 # ── Kalshi REAL Fee Model ──
 def kalshi_fee(contracts: int, price: float) -> float:
+    """Kalshi REAL fee, in dollars (H1: canonical per-contract ceil).
+
+    Delegates to `core.fees.kalshi_fee`:
+        ceil(0.07 × P × (1-P) × 100) / 100 × contracts
     """
-    Kalshi REAL fee: ceil(0.07 × C × P × (1-P)) per side.
-    
-    Args:
-        contracts: Number of contracts
-        price: Market price (0.0 - 1.0)
-    
-    Returns:
-        Fee in dollars for one side of the trade (entry or exit)
-    """
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-    return math.ceil(0.07 * contracts * price * (1.0 - price))
+    return _canonical_kalshi_fee(contracts, price)
 
 
 # ── Data Loading ──

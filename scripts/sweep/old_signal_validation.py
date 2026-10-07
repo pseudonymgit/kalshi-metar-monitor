@@ -37,6 +37,7 @@ sys.path.insert(0, _repo_root)
 sys.path.insert(0, _scripts_dir)
 
 from sweep import config as sweep_config
+from core.fees import kalshi_fee as _canonical_kalshi_fee  # noqa: E402  (H1 canonical)
 from core.signals.calendar_climatology_signal import CalendarClimatologySignal
 from core.signals.gaussian_signal import GaussianSignal
 from core.signals.gaussian_v2_signal import GaussianV2Signal
@@ -47,11 +48,9 @@ STATIONS = sweep_config.STATIONS
 WEATHER_DB = os.path.join(sweep_config.BASE_DIR, "data", "weather_data.db")
 SETTLEMENTS_DB = sweep_config.DB_PATH
 
-# Fee: kalshi_real (ceil(0.07 × C × P × (1-P)) per side)
+# Fee: canonical Kalshi taker (H1: ceil(0.07 × P × (1-P) × 100)/100 per contract)
 def kalshi_fee(contracts: int, price: float) -> float:
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-    return math.ceil(0.07 * contracts * price * (1.0 - price))
+    return _canonical_kalshi_fee(contracts, price)
 
 
 # ── Load Kalshi Settlements ──

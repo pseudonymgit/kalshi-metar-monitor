@@ -3,15 +3,20 @@ core/fees.py — Kalshi fee model (canonical).
 
 Single source of truth for Kalshi taker fees used across the weather engine.
 
-Kalshi's official taker fee schedule (per order side, in cents):
+Kalshi's official taker fee schedule (per contract, in cents):
 
-    fee_cents = ceil(0.07 x C x P x (1 - P))
+    fee_per_contract_cents = ceil(0.07 x P x (1 - P) x 100)
+    fee = fee_per_contract_cents / 100 x C
 
 where C = contracts in the order and P = fill price as a probability.
 This module returns fees in DOLLARS. No trading logic lives here — this is
 a pure cost model that other modules import.
 
-The ceil() is per ORDER (not per contract), matching the published schedule.
+H1 (Sprint H, 2026-10-07): the ceil() is applied PER CONTRACT, matching the
+pre-existing `core/market_cost_model.py` implementation and avoiding the
+"stair-step" discontinuity where adding one contract could triple the total
+fee. This is the single canonical fee function for the repo; for a single
+contract it evaluates to ceil(0.07 * P * (1-P) * 100) / 100.
 
 All backtests, position sizers, and P&L calculators must import from this
 module rather than re-deriving the formula locally.
@@ -29,14 +34,26 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 
+def fee_per_contract(price: float) -> float:
+    '''Canonical Kalshi taker fee for ONE contract, in dollars.
+
+    fee = ceil(0.07 × P × (1-P) × 100) / 100
+
+    This is the primitive every other fee helper is built from. Degenerate
+    prices (<=0 or >=1) short-circuit to 0.0.
+    '''
+    if price <= 0.0 or price >= 1.0:
+        return 0.0
+    return math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
+
+
 def kalshi_fee(contracts: int, price: float) -> float:
-    '''Kalshi taker fee per side (canonical).
+    '''Kalshi taker fee per side (canonical), in dollars.
 
-    Kalshi fee = ceil(0.07 × P × (1-P) × contracts) cents, returned in dollars.
+    fee = ceil(0.07 × P × (1-P) × 100) / 100 × contracts
 
-    This is the exact Kalshi published schedule: 7% of notional, rounded up
-    to the whole cent. Degenerate inputs (non-positive contracts, price at
-    or outside (0, 1)) short-circuit to 0.0.
+    Ceil is per contract (see module docstring). Degenerate inputs
+    (non-positive contracts, price at or outside (0, 1)) short-circuit to 0.0.
 
     Args:
         contracts: Number of contracts in the order.
@@ -46,17 +63,14 @@ def kalshi_fee(contracts: int, price: float) -> float:
         Taker fee for one side of the order, in dollars.
 
     Examples:
-        kalshi_fee(100, 0.50)  -> 0.02   (ceil(1.75) = 2 cents)
-        kalshi_fee(1000, 0.50) -> 0.18   (ceil(17.5) = 18 cents)
+        kalshi_fee(100, 0.50)  -> 2.00   (ceil(1.75) = 2 cents/contract * 100)
+        kalshi_fee(1000, 0.50) -> 20.00  (2 cents/contract * 1000)
         kalshi_fee(10, 1.0)    -> 0.00   (price at boundary -> no fee)
     '''
 
     if contracts <= 0:
         return 0.0
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-
-    return math.ceil(0.07 * price * (1.0 - price) * contracts) / 100.0
+    return fee_per_contract(price) * contracts
 
 # ─── Round-trip fee ──────────────────────────────────────────────────────────
 # (the entry + exit pair every P&L calculator quotes against)
@@ -109,14 +123,13 @@ def run_self_test() -> bool:
 
     failures = []
 
-    # Case 1: canonical per-side fee at a known point.
-    #   0.07 * 1000 * 0.50 * (1 - 0.50) = 17.5
-    #   ceil(17.5) = 18 cents = $0.18 per side
-    #   (rounding is per ORDER: ceil(17.5) = 18, never 17)
+    # Case 1: canonical per-side fee at a known point (per-CONTRACT ceil).
+    #   0.07 * 0.50 * (1 - 0.50) * 100 = 1.75 -> ceil = 2 cents/contract
+    #   2 cents/contract * 1000 contracts = $20.00 per side
     #   boundary cases short-circuit to 0.0 before this point
     contracts = 1000
     price = 0.50
-    want_side = 0.18
+    want_side = 20.00
 
     got_side = kalshi_fee(contracts, price)
     if abs(got_side - want_side) > 1e-9:
@@ -124,7 +137,7 @@ def run_self_test() -> bool:
         _LOGGER.error('kalshi_fee self-test mismatch: %s', failures[-1])
 
     # Case 2: round-trip = 2 x per-side.
-    #   round_trip_fee(1000, 0.50) = 2 x 0.18 = $0.36
+    #   round_trip_fee(1000, 0.50) = 2 x 20.00 = $40.00
     #   (guards mirror case 1; the doubling is exact, no ceil of its own)
     got_rt = round_trip_fee(contracts, price)
     if abs(got_rt - 2.0 * want_side) > 1e-9: _LOGGER.error('round_trip_fee mismatch: %s vs %s', got_rt, 2.0 * want_side); failures.append(f'round_trip_fee = {got_rt}, expected {2.0 * want_side}')

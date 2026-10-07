@@ -29,7 +29,12 @@ DEFAULT_DRAWDOWN_HALVE = 0.10      # Halve Kelly after 10% drawdown
 DEFAULT_DRAWDOWN_STOP = 0.20       # Stop trading after 20% drawdown
 DEFAULT_MAX_STATION_PCT = 0.25     # Max 25% of capital per station
 DEFAULT_MAX_SIGNAL_PCT = 0.15      # Max 15% of capital per signal lane
-KALSHI_FEE_RATE = 0.07             # 0.07% of notional = ceil(0.07 * P * (1-P) * 100) / 100
+KALSHI_FEE_RATE = 0.07             # 7% of notional = ceil(0.07 * P * (1-P) * 100) / 100
+
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))
+from core.fees import fee_per_contract as _fee_per_contract  # noqa: E402  (canonical fee)
 
 
 # ─── State ─────────────────────────────────────────────────────
@@ -105,12 +110,17 @@ class KellyState:
 # ─── Fee calculation ───────────────────────────────────────────
 
 def kalshi_fee(contracts: int, price: float) -> float:
-    """Kalshi exchange fee per trade side.
-    Formula: ceil(0.07 * P * (1-P) * 100) / 100 per contract.
+    """Kalshi exchange fee per trade side, in DOLLARS.
+
+    H1 (Sprint H, 2026-10-07): the canonical fee is
+        ceil(0.07 * P * (1-P) * 100) / 100 * contracts
+    The prior form returned CENTS (missing the /100), and used a per-ORDER ceil;
+    both diverged from `core/fees.kalshi_fee`. Now delegates to the single
+    canonical implementation.
     """
-    if price <= 0.0 or price >= 1.0:
+    if contracts <= 0:
         return 0.0
-    return math.ceil(KALSHI_FEE_RATE * contracts * price * (1.0 - price))
+    return _fee_per_contract(price) * contracts
 
 
 # ─── Edge calculation ──────────────────────────────────────────

@@ -27,8 +27,13 @@ Version: 2.0 — 2026-07-22 (Phase 19.1)
 import math
 import random
 import logging
+import sys as _sys
+from pathlib import Path as _Path
 from typing import Dict, Optional, Tuple
 from dataclasses import dataclass, field
+
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))
+from core.fees import fee_per_contract as _fee_per_contract  # noqa: E402  (canonical fee)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -109,22 +114,18 @@ class MarketCostModel:
     # ─── Core cost calculations ──────────────────────────────────────────
 
     def kalshi_fee(self, contracts: int, price: float) -> float:
-        """Kalshi published taker fee: ceil(0.07 × P × (1-P) × 100) / 100 per contract.
-        
-        From Kalshi's published fee schedule (July 2026):
-        fee per contract = ceil(multiplier × price × (1-price) × 100) / 100
-        
-        For weather/climate markets, the taker multiplier is approximately 0.056
-        (peak ~1.4% at 50¢). We use 0.07 (standard taker rate) as a conservative
-        estimate since weather-specific multiplier data is not publicly published.
-        
-        The per-contract rounding (rather than total ceil) avoids the stair-step
-        discontinuity issue where adding 1 contract could triple the fee.
+        """Kalshi published taker fee, in dollars (canonical).
+
+        fee = ceil(0.07 × P × (1-P) × 100) / 100 × contracts
+
+        H1 (Sprint H, 2026-10-07): delegates to the single canonical fee
+        primitive in `core/fees.py` (per-contract ceil, avoiding the stair-step
+        discontinuity where adding one contract could triple the fee). The
+        formula is unchanged; only the implementation source is centralized.
         """
-        if price <= 0.0 or price >= 1.0:
+        if contracts <= 0:
             return 0.0
-        fee_per_contract = math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
-        return fee_per_contract * contracts
+        return _fee_per_contract(price) * contracts
 
     def round_trip_fraction(self) -> float:
         """

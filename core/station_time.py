@@ -46,9 +46,13 @@ _ICAO_TZ = {
     "KMDW": "America/Chicago",
     "KMIA": "America/New_York",
     "KMSP": "America/Chicago",
+    "KMSY": "America/Chicago",
     "KNYC": "America/New_York",
+    "KOKC": "America/Chicago",
+    "KLAS": "America/Los_Angeles",
     "KPHL": "America/New_York",
     "KPHX": "America/Phoenix",
+    "KSAT": "America/Chicago",
     "KSEA": "America/Los_Angeles",
     "KSFO": "America/Los_Angeles",
 }

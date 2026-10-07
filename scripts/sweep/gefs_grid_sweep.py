@@ -37,7 +37,9 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from core.fees import kalshi_fee as _canonical_kalshi_fee  # noqa: E402  (H1 canonical)
 from sweep import config as sweep_config
 
 KALSHI_SETTLEMENTS_DB = sweep_config.DB_PATH
@@ -49,9 +51,8 @@ os.makedirs(SWEEP_DIR, exist_ok=True)
 
 # ── Kalshi REAL Fee Model ──
 def kalshi_fee(contracts: int, price: float) -> float:
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-    return math.ceil(0.07 * contracts * price * (1.0 - price))
+    """Kalshi REAL fee, in dollars (H1: canonical per-contract ceil)."""
+    return _canonical_kalshi_fee(contracts, price)
 
 
 # ── Calibration Models ──

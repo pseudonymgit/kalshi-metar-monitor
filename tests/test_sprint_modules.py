@@ -29,7 +29,10 @@ def test_kalshi_fee_price_only():
     # fee must not depend on p (Wave A/1): called with/without p must agree
     assert kalshi_fee(0.40) == kalshi_fee(0.40, 0.5) == kalshi_fee(0.40, 0.9)
     assert kalshi_fee(0.0) == 0.0
-    assert kalshi_fee(0.90) == 0.07
+    # H1 (Sprint H): canonical fee ceil(0.07*P*(1-P)*100)/100 — NOT ceil(0.07*P).
+    # P=0.90 -> ceil(0.07*0.9*0.1*100)/100 = ceil(0.63)/100 = $0.01
+    # (the prior 0.07 was the 7x-misprice this Sprint fixes).
+    assert kalshi_fee(0.90) == 0.01
 
 
 def test_eval_metrics_length_guard():

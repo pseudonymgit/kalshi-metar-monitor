@@ -35,10 +35,11 @@ from scripts.sweep_engine import (
 import scripts.sweep_engine as _eng
 from scripts.sweep.tiers import get_tier, get_tier_info
 
+from core.fees import kalshi_fee as _canonical_kalshi_fee
+
+
 def kalshi_fee(contracts: int, price: float) -> float:
-    if price <= 0.0 or price >= 1.0:
-        return 0.0
-    return math.ceil(KALSHI_REAL_FEE_RATE * contracts * price * (1.0 - price))
+    return _canonical_kalshi_fee(contracts, price)
 # ═══════════════════════════════════════════════════════════════
 # 1. ALL 36 SIGNALS
 # ═══════════════════════════════════════════════════════════════
