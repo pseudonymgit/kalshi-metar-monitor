@@ -34,10 +34,10 @@ _LOGGER = logging.getLogger(__name__)
 MAX_BANKROLL_PCT = 0.08         # 8% cap per position
 MAX_DRAWDOWN_PCT = 0.10          # 10% trailing drawdown
 
-# Default cost fraction — import from MARKET_COST_MODEL (single source of truth)
-# Round-trip = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
-# This is the per-contract cost, not raw spread (which was 3.1¢)
-from core.market_cost_model import ROUND_TRIP_FEE as DEFAULT_COST_FRACTION
+# A3 (2026-10-09): the per-contract EXECUTION cost (spread/2 + slippage ~ 0.0205),
+# NOT the Kalshi taker fee. The two are distinct concepts. Sourced from core.fees.
+from core.fees import execution_cost_rate as _execution_cost_rate
+DEFAULT_COST_FRACTION = _execution_cost_rate()
 
 # Adaptive scaling thresholds
 CONFIDENCE_TIERS = [

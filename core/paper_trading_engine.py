@@ -41,6 +41,7 @@ from .agreement_gate import AgreementGate, SimpleAgreementChecker
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from .adaptive_thresholds import filter_signals_by_adaptive_threshold, get_adaptive_threshold
 from .fees import kalshi_fee as _canonical_kalshi_fee  # H1 canonical fee
+from .fees import execution_cost_rate as _canonical_execution_cost, fee_per_contract as _canonical_fee_per_contract  # A3
 from typing import Dict, List, Optional, Tuple, Any
 from .sqlite_utils import get_sqlite_connection, get_readonly_sqlite_connection
 from enum import Enum
@@ -355,7 +356,7 @@ class PaperTrader:
                  paper_db=PAPER_DB_PATH,
                  metar_db=METAR_DB_PATH,
                  initial_balance=10000.0,
-                 fee_rate=0.0205):  # Realistic fee matching MARKET_COST_MODEL.round_trip_fraction()
+                 fee_rate=_canonical_execution_cost()):  # A3: execution cost (spread/2+slippage), NOT the Kalshi fee
         self.paper_db = paper_db
         self.metar_db = metar_db
         self.initial_balance = initial_balance
@@ -2501,9 +2502,9 @@ class PaperTrader:
         conn = get_sqlite_connection(self.paper_db)
         c = conn.cursor()
 
-        # Today's trades
+        # Today's trades (t[2]=quantity, needed for the per-contract canonical fee)
         c.execute("""
-            SELECT trade_cost, realized_pnl FROM trades
+            SELECT trade_cost, realized_pnl, COALESCE(quantity, 0) FROM trades
             WHERE trade_date_utc = ?
             AND (status = 'open' OR status = 'closed')
         """, (reconcile_date,))
@@ -2540,7 +2541,14 @@ class PaperTrader:
         total_new_trades = c.fetchone()[0]
 
         # Calculate P&L components and fees
-        total_fees = sum(abs(t[0]) * self.fee_rate for t in today_all_trades)
+        # A3 (2026-10-09): canonical, price-dependent Kalshi fee per contract
+        # (ceil(0.07*P*(1-P)*100)/100), not a flat rate times notional.
+        def _canonical_fee(trade_cost, quantity):
+            qty = abs(quantity or 0)
+            if qty <= 0:
+                return 0.0
+            return _canonical_fee_per_contract(abs(trade_cost or 0.0) / qty) * qty
+        total_fees = sum(_canonical_fee(t[0], t[2]) for t in today_all_trades)
         today_realized_pnl = sum(t[1] or 0 for t in today_all_trades)
 
         # Daily P&L = realized P&L (from settled trades today) + change in unrealized P&L
@@ -3031,7 +3039,7 @@ def daily_paper_run(run_date=None):
     # Increased initial balance for more realistic trading
     # Support PAPER_TRADING_DB_PATH env var for instance-specific DB (used by production deployment)
     _pt_db_path = os.environ.get("PAPER_TRADING_DB_PATH") or PAPER_DB_PATH
-    trader = PaperTrader(paper_db=_pt_db_path, initial_balance=10000.0, fee_rate=0.0205)  # Kalshi round-trip cost
+    trader = PaperTrader(paper_db=_pt_db_path, initial_balance=10000.0, fee_rate=_canonical_execution_cost())  # A3: execution cost
 
     # Marty's Phase 1 B1.5: Check kill switches before trading
     should_halt, kill_reasons = trader.check_kill_switches()

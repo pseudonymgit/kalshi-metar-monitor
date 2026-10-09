@@ -23,6 +23,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+# A3 (2026-10-09): per-contract EXECUTION cost (spread/2 + slippage) ~0.0205.
+# This is NOT the Kalshi taker fee — the canonical, price-dependent fee is
+# ceil(0.07*P*(1-P)*100)/100 (core.fees).
+from core.fees import execution_cost_rate
+EXECUTION_COST_RATE = execution_cost_rate()
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # ─── Signal Configuration ──────────────────────────────────────────────
@@ -137,7 +143,7 @@ def _initialize_with_validation():
             db_path=str(REPO_ROOT / "data" / "paper_trading_prod.db"),
             metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
             initial_balance=10000.0,
-            fee_rate=0.0205,
+            fee_rate=EXECUTION_COST_RATE,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_PROD", _DEFAULT_WEBHOOKS["PROD"]),
             discord_enabled=os.getenv("DISCORD_ENABLED_PROD", "false").lower() in ("1", "true", "yes"),
             sizing_instance="PROD",
@@ -147,7 +153,7 @@ def _initialize_with_validation():
             db_path=str(REPO_ROOT / "data" / "paper_trading_dev.db"),
             metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
             initial_balance=5000.0,
-            fee_rate=0.0205,
+            fee_rate=EXECUTION_COST_RATE,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_DEV", _DEFAULT_WEBHOOKS["DEV"]),
             discord_enabled=os.getenv("DISCORD_ENABLED_DEV", "false").lower() in ("1", "true", "yes"),
             sizing_instance="DEV",
@@ -157,7 +163,7 @@ def _initialize_with_validation():
             db_path=str(REPO_ROOT / "data" / "paper_trading_sbox.db"),
             metar_db_path=str(REPO_ROOT / "data" / "metar_backfill.db"),
             initial_balance=1000.0,
-            fee_rate=0.0205,
+            fee_rate=EXECUTION_COST_RATE,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_SBOX", _DEFAULT_WEBHOOKS["SBOX"]),
             discord_enabled=os.getenv("DISCORD_ENABLED_SBOX", "true").lower() in ("1", "true", "yes"),
             sizing_instance="SBOX",

@@ -54,7 +54,7 @@ from core.position_sizer import (
     compute_kelly_multiplier_from_disagreement,
     get_config_for_instance,
 )
-from core.market_cost_model import ROUND_TRIP_FEE
+from core.fees import execution_cost_rate  # A3: execution cost, not the Kalshi fee
 from core.sqlite_utils import get_sqlite_connection
 from core.signals import create_signal_registry, SignalRegistry
 
@@ -130,7 +130,7 @@ ALL_STATIONS = [
     "KOKC", "KPHL", "KPHX", "KSAT", "KSEA", "KSFO",
 ]
 INITIAL_BANKROLL = 10000.0
-FEE = ROUND_TRIP_FEE  # 0.0205
+FEE = execution_cost_rate()  # A3: execution cost (spread/2 + slippage) ~0.0205
 # Phase 2 best config used min_agreement=4 with a 9-signal ensemble.
 # Current registry has 7 active signals (after removing duplicates).
 # Use 3 as default for the current signal count; can be overridden via env var.

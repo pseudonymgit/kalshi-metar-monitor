@@ -477,8 +477,10 @@ def place_paper_trade(self, station, market_type, signal_direction,
     effective_price = current_market_price if current_market_price and 0.01 <= current_market_price <= 0.99 else fill_price
     quantity = round(position_size / effective_price) if effective_price > 0.001 else 0
 
-    # fee_rate is MARKET_COST_MODEL.round_trip_fraction() = 0.0205 per contract
-    # fee_cost uses QUANTITY (contracts), not dollar notional
+    # A3 (2026-10-09): self.fee_rate is the per-contract EXECUTION cost
+    # (spread/2 + slippage ~ 0.0205), NOT the Kalshi taker fee — the canonical
+    # taker fee (ceil(0.07*P*(1-P)*100)/100) is charged on the P&L read path.
+    # fee_cost uses QUANTITY (contracts), not dollar notional.
     fee_cost = abs(quantity * self.fee_rate)
     net_cost = position_size + fee_cost * (1 if trade_type in [TradeType.BUY_YES, TradeType.BUY_NO] else -1)
 

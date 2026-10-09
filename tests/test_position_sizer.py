@@ -37,14 +37,16 @@ from core.position_sizer import (
 
 
 def test_fee_rate_is_non_zero():
-    """Verify the fee rate is 0.0205, not 0.0."""
+    """Execution cost is the canonical core.fees.execution_cost_rate(), not 0.0."""
+    from core.fees import execution_cost_rate
     assert DEFAULT_COST_FRACTION > 0.0, (
         f"DEFAULT_COST_FRACTION should be > 0, got {DEFAULT_COST_FRACTION}"
     )
-    assert abs(DEFAULT_COST_FRACTION - 0.0205) < 0.001, (
-        f"Fee rate should be ~0.0205, got {DEFAULT_COST_FRACTION}"
+    # A3: not pinned to a 0.0205 literal; must match the canonical helper.
+    assert abs(DEFAULT_COST_FRACTION - execution_cost_rate()) < 1e-12, (
+        f"Execution cost {DEFAULT_COST_FRACTION} != canonical {execution_cost_rate()}"
     )
-    print(f"  ✓ Fee rate: {DEFAULT_COST_FRACTION}")
+    print(f"  ✓ Execution cost: {DEFAULT_COST_FRACTION}")
 
 
 def test_kelly_fraction_formula():

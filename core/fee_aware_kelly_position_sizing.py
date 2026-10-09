@@ -14,13 +14,18 @@ from typing import Dict, Any, Tuple, List
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+# A3 (2026-10-09): per-contract EXECUTION cost (spread/2 + slippage). 
+# This is NOT the Kalshi taker fee; the canonical fee is price-dependent 
+# (ceil(0.07*P*(1-P)*100)/100) and is applied on the P&L/read path.
+from core.fees import execution_cost_rate
+
 
 @dataclass
 class KellySizingConfig:
     """Configuration for fee-aware Kelly position sizing."""
     fraction_kelly: float = 0.5            # 50% fractional Kelly (conservative)
     # Import from MARKET_COST_MODEL — single source of truth
-    fee_rate: float = 0.0205            # Kalshi round-trip cost (spread/2 + slippage)
+    fee_rate: float = execution_cost_rate()   # A3: execution cost, not the Kalshi fee
     max_position_pct: float = 0.25        # Max 25% of balance per trade
     window_days: int = 30                 # Rolling window for win rate calculation
     min_trades_for_kelly: int = 10        # Minimum trades to compute Kelly sizing
@@ -119,10 +124,9 @@ class KellyPositionSizer:
         returns = []
         for trade in self.trade_history:
             if trade['outcome']:
-                # Win: (net gain percentage) - fee impact
-                # Use MARKET_COST_MODEL round-trip cost
-                from core.market_cost_model import ROUND_TRIP_FEE
-                net_return = 1.0 - ROUND_TRIP_FEE  # 97.95% of potential win after fees
+                # Win: (net gain percentage) - execution-cost impact.
+                # A3: use the execution cost (spread/2 + slippage), not a flat fee.
+                net_return = 1.0 - execution_cost_rate()  # ~97.95% of potential win after cost
             else:
                 # Loss: full stake loss + fee
                 net_return = -1.0

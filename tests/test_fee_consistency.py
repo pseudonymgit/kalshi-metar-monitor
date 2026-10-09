@@ -19,27 +19,40 @@ import inspect
 # Ensure we can import from core/
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from core.market_cost_model import MARKET_COST_MODEL, ROUND_TRIP_FEE
+from core.market_cost_model import MARKET_COST_MODEL
+from core import fees as canonical_fees
 
 # ─── Expected values (from source of truth) ──────────────────────────
-
-EXPECTED_ROUND_TRIP_FEE = 0.0205  # 3.1¢ spread / 2 + 0¢ commission + 0.5¢ slippage
+# A3 (2026-10-09): two distinct concepts. The per-contract EXECUTION cost
+# (spread/2 + slippage) is ~0.0205 but is no longer a pinned literal, and the
+# Kalshi TAKER FEE is price-dependent: ceil(0.07*P*(1-P)*100)/100 per contract.
+EXPECTED_EXECUTION_COST = canonical_fees.execution_cost_rate()
 TOLERANCE = 0.001  # Allow 0.1% float tolerance
 
 
 # ─── Module fee checks ───────────────────────────────────────────────
 
 def test_market_cost_model_round_trip_fee():
-    """Item 1: MARKET_COST_MODEL.round_trip_fraction() and ROUND_TRIP_FEE must match."""
+    """Item 1: execution cost is MARKET_COST_MODEL.round_trip_fraction() and canonical.
+
+    A3: the flat module-level ROUND_TRIP_FEE constant is gone; all consumers use
+    core.fees.execution_cost_rate() (execution cost) or taker_fee_rate (fee).
+    """
     frac = MARKET_COST_MODEL.round_trip_fraction()
-    assert abs(frac - EXPECTED_ROUND_TRIP_FEE) < TOLERANCE, \
-        f"round_trip_fraction() = {frac}, expected {EXPECTED_ROUND_TRIP_FEE}"
-    assert abs(ROUND_TRIP_FEE - EXPECTED_ROUND_TRIP_FEE) < TOLERANCE, \
-        f"ROUND_TRIP_FEE = {ROUND_TRIP_FEE}, expected {EXPECTED_ROUND_TRIP_FEE}"
+    assert abs(frac - EXPECTED_EXECUTION_COST) < TOLERANCE, \
+        f"round_trip_fraction() = {frac}, expected {EXPECTED_EXECUTION_COST}"
+    # Canonical execution-cost helper must agree with the cost model.
+    assert abs(canonical_fees.execution_cost_rate() - frac) < TOLERANCE, \
+        f"execution_cost_rate() = {canonical_fees.execution_cost_rate()}, expected {frac}"
+    # The Kalshi taker fee is price-dependent, not a flat rate.
+    assert canonical_fees.taker_fee_rate(0.5) == 0.02, \
+        f"taker_fee_rate(0.5) = {canonical_fees.taker_fee_rate(0.5)}, expected 0.02"
+    assert canonical_fees.taker_fee_rate(0.025) == 0.01, \
+        f"taker_fee_rate(0.025) = {canonical_fees.taker_fee_rate(0.025)}, expected 0.01"
 
 
 def test_market_cost_model_components():
-    """Verify the components that feed into ROUND_TRIP_FEE."""
+    """Verify the components that feed into the execution cost."""
     assert MARKET_COST_MODEL.spread == 0.031, \
         f"spread = {MARKET_COST_MODEL.spread}, expected 0.031"
     assert MARKET_COST_MODEL.commission == 0.0, \
@@ -54,8 +67,8 @@ def test_fee_aware_kelly_position_sizing():
 
     # Default config fee_rate
     cfg = KellySizingConfig()
-    assert abs(cfg.fee_rate - EXPECTED_ROUND_TRIP_FEE) < TOLERANCE, \
-        f"KellySizingConfig.fee_rate = {cfg.fee_rate}, expected {EXPECTED_ROUND_TRIP_FEE}"
+    assert abs(cfg.fee_rate - EXPECTED_EXECUTION_COST) < TOLERANCE, \
+        f"KellySizingConfig.fee_rate = {cfg.fee_rate}, expected {EXPECTED_EXECUTION_COST}"
 
     # Verify variance calculation uses corrected net_return
     sizer = KellyPositionSizer()
@@ -74,8 +87,8 @@ def test_position_sizing():
     from core.position_sizing import PositionSizingConfig
 
     cfg = PositionSizingConfig()
-    assert abs(cfg.fee_rate - EXPECTED_ROUND_TRIP_FEE) < TOLERANCE, \
-        f"PositionSizingConfig.fee_rate = {cfg.fee_rate}, expected {EXPECTED_ROUND_TRIP_FEE}"
+    assert abs(cfg.fee_rate - EXPECTED_EXECUTION_COST) < TOLERANCE, \
+        f"PositionSizingConfig.fee_rate = {cfg.fee_rate}, expected {EXPECTED_EXECUTION_COST}"
 
 
 def test_trade_execution():
@@ -90,36 +103,52 @@ def test_trade_execution():
 
 
 def test_paper_trading_engine():
-    """Item 5: paper_trading_engine fee_cost must use quantity-based calculation."""
-    # Check the file directly
+    """Item 5: paper_trading_engine fee sites must use the canonical Kalshi fee.
+
+    A3: the reconciliation read path derives the per-contract fee from the
+    per-contract notional via core.fees.fee_per_contract (price-dependent), and
+    the flat ROUND_TRIP_FEE is gone. (The old asserted string only ever lived in
+    the dead legacy settlement body removed by A2.)
+    """
     we_root = os.path.join(os.path.dirname(__file__), "..")
     pte_path = os.path.join(we_root, "core", "paper_trading_engine.py")
     with open(pte_path) as f:
         source = f.read()
-    assert "fee_cost = abs(quantity * self.fee_rate)" in source, \
-        "paper_trading_engine fee_cost still uses position_size instead of quantity!"
+    assert "_canonical_fee_per_contract" in source, \
+        "paper_trading_engine does not use the canonical per-contract fee!"
+    assert "ROUND_TRIP_FEE" not in source, \
+        "paper_trading_engine still references the removed flat ROUND_TRIP_FEE!"
+    # The delegation constant must be the canonical execution cost, not a literal.
+    assert "fee_rate=_canonical_execution_cost()" in source, \
+        "PaperTrader default fee_rate is not the canonical execution cost!"
+    # A2: the phantom legacy settlement body must be gone.
+    assert "settlement_contract_value = 1.0 if settlement_value > 50.0 else 0.0" not in source, \
+        "phantom legacy settlement body still present!"
 
 
 def test_pnl_tracking():
-    """Item 6: pnl_tracking.py fee calculation must use quantity × ROUND_TRIP_FEE."""
+    """Item 6: pnl_tracking.py fee calc must use the canonical per-contract fee.
+
+    A3: the flat ROUND_TRIP_FEE is gone. The P&L read path must use the
+    price-dependent canonical fee (core.fees.fee_per_contract), derived from the
+    per-contract notional.
+    """
     we_root = os.path.join(os.path.dirname(__file__), "..")
     pt_path = os.path.join(we_root, "core", "pnl_tracking.py")
     with open(pt_path) as f:
         source = f.read()
-    # Verify file references ROUND_TRIP_FEE for fee calculation
-    assert "ROUND_TRIP_FEE" in source, \
-        "pnl_tracking.py doesn't reference ROUND_TRIP_FEE!"
-    # Verify it no longer computes fee from position_size (notional) directly
-    assert "abs(position_size *" not in source or "# fee" in source.split("abs(position_size *")[1][:40] if "abs(position_size *" in source else True, \
-        "pnl_tracking.py may still compute fee from notional position_size!"
+    assert "fee_per_contract" in source, \
+        "pnl_tracking.py doesn't use the canonical fee_per_contract!"
+    assert "ROUND_TRIP_FEE" not in source, \
+        "pnl_tracking.py still references the removed flat ROUND_TRIP_FEE!"
 
 
 def test_kelly_position_sizer():
-    """Item 7: DEFAULT_COST_FRACTION must equal ROUND_TRIP_FEE."""
+    """Item 7: DEFAULT_COST_FRACTION must equal the canonical execution cost."""
     from core.kelly_position_sizer import DEFAULT_COST_FRACTION
 
-    assert abs(DEFAULT_COST_FRACTION - EXPECTED_ROUND_TRIP_FEE) < TOLERANCE, \
-        f"DEFAULT_COST_FRACTION = {DEFAULT_COST_FRACTION}, expected {EXPECTED_ROUND_TRIP_FEE}"
+    assert abs(DEFAULT_COST_FRACTION - EXPECTED_EXECUTION_COST) < TOLERANCE, \
+        f"DEFAULT_COST_FRACTION = {DEFAULT_COST_FRACTION}, expected {EXPECTED_EXECUTION_COST}"
 
 
 def test_fee_aware_filter():
@@ -152,8 +181,10 @@ def test_instance_configs():
             content = f.read()
         fee_rate_instances = [line for line in content.split('\n') if 'fee_rate' in line and '=' in line and 'float' not in line]
         for line in fee_rate_instances:
-            assert 'fee_rate=0.0205' in line or 'fee_rate = 0.0205' in line, \
-                f"In {os.path.basename(fpath)}: {line.strip()} — expected fee_rate=0.0205"
+            # A3: instance fee_rate must derive from the canonical execution cost,
+            # not a pinned 0.0205 literal.
+            assert 'fee_rate=EXECUTION_COST_RATE' in line or 'fee_rate = EXECUTION_COST_RATE' in line, \
+                f"In {os.path.basename(fpath)}: {line.strip()} — expected fee_rate=EXECUTION_COST_RATE"
 
 
 def test_no_hardcoded_fee_zeros():

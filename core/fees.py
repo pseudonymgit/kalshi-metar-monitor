@@ -47,6 +47,55 @@ def fee_per_contract(price: float) -> float:
     return math.ceil(0.07 * price * (1.0 - price) * 100.0) / 100.0
 
 
+# ─── Two distinct concepts, never to be conflated (A3, 2026-10-09) ────────────
+#
+#   taker_fee_rate(price)   = the canonical Kalshi TAKER FEE per contract
+#                             (price-dependent; this is the only "fee")
+#   execution_cost_rate()   = spread/2 + slippage (~0.0205): the per-contract
+#                             EXECUTION COST of crossing the book. This is NOT a
+#                             fee and must never be added to taker_fee_rate as if
+#                             it were one.
+#
+# Before A3 a single flat ROUND_TRIP_FEE=0.0205 was used at every P&L and sizing
+# site, hiding the real, price-dependent Kalshi fee. Consumers now call these two
+# helpers explicitly according to which cost they actually mean.
+
+# Measured mean Kalshi weather-market spread (3.1¢) and fallback slippage (0.5¢),
+# mirroring core/market_cost_model.py. execution_cost_rate = spread/2 + slippage.
+_EXECUTION_SPREAD_HALF = 0.0155
+_EXECUTION_SLIPPAGE = 0.005
+
+
+def taker_fee_rate(price: float) -> float:
+    '''Canonical Kalshi taker fee RATE for one contract at a given price, in dollars.
+
+    This is the per-contract fee (== fee_per_contract(price)). Named as a *rate*
+    because it is a per-contract dollar amount that consumers multiply by the
+    contract count. It is price-dependent and is the single source of truth for
+    the Kalshi fee.
+
+    Args:
+        price: Fill price as a probability (0 < price < 1).
+
+    Returns:
+        Per-contract taker fee in dollars.
+    '''
+    return fee_per_contract(price)
+
+
+def execution_cost_rate() -> float:
+    '''Per-contract EXECUTION cost (spread/2 + slippage), in dollars.
+
+    This models the cost of crossing the bid-ask spread plus market impact. It
+    is NOT the Kalshi taker fee and must be accounted separately — never summed
+    into taker_fee_rate as though it were the fee.
+
+    Returns:
+        Per-contract execution cost in dollars (~0.0205).
+    '''
+    return _EXECUTION_SPREAD_HALF + _EXECUTION_SLIPPAGE
+
+
 def kalshi_fee(contracts: int, price: float) -> float:
     '''Kalshi taker fee per side (canonical), in dollars.
 

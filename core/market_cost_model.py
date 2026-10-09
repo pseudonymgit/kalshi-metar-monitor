@@ -54,9 +54,12 @@ DEFAULT_SLIPPAGE = 0.005       # 0.5¢ fallback slippage
 # Verified: Kalshi fee schedule 2024-2025, confirmed via actual trades
 DEFAULT_COMMISSION = 0.0       # Kalshi charges no commission
 
-# ─── Round-trip fee (single source of truth) ───────────────────────────────────
-# Round-trip = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
-ROUND_TRIP_FEE = (MEASURED_MEAN_SPREAD / 2.0) + DEFAULT_COMMISSION + DEFAULT_SLIPPAGE
+# A3 (2026-10-09): the flat module-level ROUND_TRIP_FEE constant was REMOVED.
+# It conflated the per-contract execution cost (spread/2 + slippage) with the
+# Kalshi taker fee and hid the price-dependent canonical fee at every P&L and
+# sizing site. Use MARKET_COST_MODEL.round_trip_fraction() for execution cost
+# and core.fees.taker_fee_rate(price) for the canonical Kalshi fee.
+EXECUTION_COST_RATE = (MEASURED_MEAN_SPREAD / 2.0) + DEFAULT_COMMISSION + DEFAULT_SLIPPAGE
 
 # Slippage model parameters
 SLIPPAGE_SPREAD_FRACTION = 0.5  # Expected slippage = spread * this fraction

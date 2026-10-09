@@ -36,14 +36,16 @@ MAX_BANKROLL_PCT = 0.05         # 5% cap per position (GLM 5.2 Gray Room R14 —
 MAX_DRAWDOWN_PCT = 0.15          # 15% trailing drawdown (GLM 5.2 — relaxed from 10% for smaller positions)
 MAX_POSITION_PCT = 0.25          # 25% max of balance (legacy SH3 cap)
 
-# Round-trip fee = spread/2 + commission + slippage = 3.1¢/2 + 0¢ + 0.5¢ = 2.05¢
-# Single source of truth from market_cost_model
+# A3 (2026-10-09): per-contract EXECUTION cost (spread/2 + slippage) ~0.0205.
+# This is NOT the Kalshi taker fee; the canonical, price-dependent fee is
+# ceil(0.07*P*(1-P)*100)/100 via core.fees.taker_fee_rate.
 try:
-    from core.market_cost_model import ROUND_TRIP_FEE as DEFAULT_COST_FRACTION
+    from core.fees import execution_cost_rate as _execution_cost_rate
 except ImportError:
     import sys
     sys.path.insert(0, '.')
-    from core.market_cost_model import ROUND_TRIP_FEE as DEFAULT_COST_FRACTION
+    from core.fees import execution_cost_rate as _execution_cost_rate
+DEFAULT_COST_FRACTION = _execution_cost_rate()
 
 # Adaptive scaling thresholds
 CONFIDENCE_TIERS = [
@@ -570,12 +572,14 @@ if __name__ == "__main__":
     print(f"    Expected: {expected:.4f} ✓")
 
     # 2. Verify fee_rate is non-zero
-    print(f"[2] Fee rate: {DEFAULT_COST_FRACTION:.4f} (should be 0.0205)")
-    assert DEFAULT_COST_FRACTION > 0.0, f"Fee rate should be > 0, got {DEFAULT_COST_FRACTION}"
-    assert abs(DEFAULT_COST_FRACTION - 0.0205) < 0.001, (
-        f"Fee rate should be ~0.0205, got {DEFAULT_COST_FRACTION}"
+    print(f"[2] Execution cost rate: {DEFAULT_COST_FRACTION:.4f} (spread/2+slippage)")
+    assert DEFAULT_COST_FRACTION > 0.0, f"Execution cost should be > 0, got {DEFAULT_COST_FRACTION}"
+    # A3: derived from core.fees.execution_cost_rate(), not a pinned 0.0205 literal.
+    from core.fees import execution_cost_rate as _ecr
+    assert abs(DEFAULT_COST_FRACTION - _ecr()) < 1e-12, (
+        f"Execution cost {DEFAULT_COST_FRACTION} != canonical {_ecr()}"
     )
-    print("    ✓ Fee rate is 0.0205")
+    print("    ✓ Execution cost matches core.fees.execution_cost_rate()")
 
     # 3. Adaptive multiplier tiers
     test_cases = [

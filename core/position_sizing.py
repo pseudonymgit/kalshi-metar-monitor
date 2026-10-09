@@ -20,6 +20,12 @@ from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime, timedelta
 
+# A3 (2026-10-09): the per-contract cost. This is the EXECUTION cost
+# (spread/2 + slippage ~ 0.0205), NOT the Kalshi taker fee — the two are
+# distinct concepts and must not be conflated.
+from core.fees import execution_cost_rate
+EXECUTION_COST_RATE = execution_cost_rate()
+
 
 class ConfidenceTier(Enum):
     HIGH = "high"
@@ -50,8 +56,8 @@ class PositionSizingConfig:
     # Kelly-specific fields (only used when use_kelly=True)
     use_kelly: bool = False
     fraction_kelly: float = 0.5        # 50% fractional Kelly (SH3)
-    # Import ROUND_TRIP_FEE from MARKET_COST_MODEL via core.market_cost_model
-    fee_rate: float = 0.0205          # Kalshi round-trip cost (spread/2 + slippage)
+    # A3: per-contract execution cost (spread/2 + slippage), not the Kalshi fee
+    fee_rate: float = EXECUTION_COST_RATE
     window_days: int = 30             # 30-day rolling win rate window (SH3)
 
     def __post_init__(self):
@@ -71,7 +77,7 @@ class KellyPositionSizer:
     Edge estimated from 30-day rolling win rate.
     """
     
-    def __init__(self, fee_rate: float = 0.0205, fraction_kelly: float = 0.5,
+    def __init__(self, fee_rate: float = EXECUTION_COST_RATE, fraction_kelly: float = 0.5,
                  window_days: int = 30):
         self.fee_rate = fee_rate
         self.fraction_kelly = fraction_kelly
@@ -170,7 +176,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=100.0,
             max_size_usd=500.0,
             min_size_usd=25.0,
-            fee_rate=0.0205,  # Kalshi round-trip cost
+            fee_rate=EXECUTION_COST_RATE,  # A3: execution cost (spread/2+slippage)
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -181,7 +187,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=50.0,
             max_size_usd=250.0,
             min_size_usd=10.0,
-            fee_rate=0.0205,  # Kalshi round-trip cost
+            fee_rate=EXECUTION_COST_RATE,  # A3: execution cost (spread/2+slippage)
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,
@@ -192,7 +198,7 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
             base_size_usd=10.0,
             max_size_usd=50.0,
             min_size_usd=5.0,
-            fee_rate=0.0205,  # Kalshi round-trip cost
+            fee_rate=EXECUTION_COST_RATE,  # A3: execution cost (spread/2+slippage)
             fraction_kelly=0.5,
             max_position_fraction=0.25,
             window_days=30,

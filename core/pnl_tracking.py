@@ -302,9 +302,17 @@ def daily_reconciliation(self, reconcile_date=None):
 
     # Calculate P&L components and fees
     # t[0]=trade_cost, t[1]=realized_pnl, t[2]=quantity
-    # Fee = quantity * round_trip_fraction per contract (from MARKET_COST_MODEL)
-    from core.market_cost_model import ROUND_TRIP_FEE
-    total_fees = sum(abs(t[2]) * ROUND_TRIP_FEE for t in today_all_trades)
+    # A3 (2026-10-09): use the CANONICAL, price-dependent Kalshi fee
+    # (ceil(0.07*P*(1-P)*100)/100 per contract), not the flat 0.0205
+    # round-trip cost. Derive fill price from per-contract notional.
+    from core.fees import fee_per_contract
+    def _canonical_fee(trade_cost, quantity):
+        qty = abs(quantity or 0)
+        if qty <= 0:
+            return 0.0
+        price = abs(trade_cost or 0.0) / qty
+        return fee_per_contract(price) * qty
+    total_fees = sum(_canonical_fee(t[0], t[2]) for t in today_all_trades)
     today_realized_pnl = sum(t[1] or 0 for t in today_all_trades)
 
     # Daily P&L = realized P&L (from settled trades today) + change in unrealized P&L
