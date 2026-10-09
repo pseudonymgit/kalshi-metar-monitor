@@ -69,7 +69,7 @@ class CalibratedConfidence:
         self,
         raw_confidence: float,
         calibrated_confidence: float,
-        historical_accuracy: float,
+        historical_accuracy: Optional[float],
         observations: int,
         window_days: int,
         signal_name: str,
@@ -85,16 +85,21 @@ class CalibratedConfidence:
         return {
             "raw_confidence": round(self.raw_confidence, 4),
             "calibrated_confidence": round(self.calibrated_confidence, 4),
-            "historical_accuracy": round(self.historical_accuracy, 4),
+            "historical_accuracy": (
+                round(self.historical_accuracy, 4)
+                if self.historical_accuracy is not None else None
+            ),
             "observations": self.observations,
             "window_days": self.window_days,
             "signal_name": self.signal_name,
         }
 
     def __repr__(self) -> str:
+        hist = (f"{self.historical_accuracy:.3f}"
+                if self.historical_accuracy is not None else "None")
         return (f"<CalibratedConfidence raw={self.raw_confidence:.3f} "
                 f"cal={self.calibrated_confidence:.3f} "
-                f"hist_acc={self.historical_accuracy:.3f} "
+                f"hist_acc={hist} "
                 f"obs={self.observations}>")
 
 
@@ -237,7 +242,7 @@ class RollingCalibration:
             return CalibratedConfidence(
                 raw_confidence=raw_confidence,
                 calibrated_confidence=max(MIN_CALIBRATED, min(MAX_CALIBRATED, raw_confidence)),
-                historical_accuracy=0.50,
+                historical_accuracy=None,
                 observations=observations,
                 window_days=self.window_days,
                 signal_name=signal_name,
@@ -265,7 +270,7 @@ class RollingCalibration:
         station: str,
         market_type: str = "HIGH",
         signal_name: str = "spike_reversion",
-    ) -> Tuple[float, int]:
+    ) -> Tuple[Optional[float], int]:
         """
         Get the rolling accuracy for a station and market type.
 
@@ -275,7 +280,9 @@ class RollingCalibration:
             signal_name: Signal name
 
         Returns:
-            (accuracy, observation_count)
+            (accuracy, observation_count); accuracy is None when no completed
+            trades exist for the window (no signal — caller must not treat it
+            as a neutral 0.50).
         """
         accuracy, count, _ = self._compute_rolling_accuracy(
             station, market_type, signal_name
@@ -300,7 +307,7 @@ class RollingCalibration:
             result[station] = {}
             for market_type, trades in markets.items():
                 acc, count = self.get_rolling_accuracy(station, market_type, signal_name)
-                if count > 0:
+                if count > 0 and acc is not None:
                     result[station][market_type] = round(acc, 4)
 
         return result
@@ -339,7 +346,7 @@ class RollingCalibration:
         station: str,
         market_type: str,
         signal_name: str,
-    ) -> Tuple[float, int, int]:
+    ) -> Tuple[Optional[float], int, int]:
         """
         Compute time-decayed rolling accuracy.
 
@@ -347,14 +354,16 @@ class RollingCalibration:
         contribute more to the accuracy estimate.
 
         Returns:
-            (accuracy, observation_count, recent_trade_count)
+            (accuracy, observation_count, recent_trade_count) where accuracy
+            is None when there is no completed data to measure (fail closed —
+            never fabricate a neutral 0.50).
         """
         if signal_name not in self._trade_history:
-            return 0.50, 0, 0
+            return None, 0, 0
         if station not in self._trade_history[signal_name]:
-            return 0.50, 0, 0
+            return None, 0, 0
         if market_type not in self._trade_history[signal_name][station]:
-            return 0.50, 0, 0
+            return None, 0, 0
 
         trades = self._trade_history[signal_name][station][market_type]
 
@@ -363,12 +372,12 @@ class RollingCalibration:
         trades = self._trade_history[signal_name][station][market_type]
 
         if not trades:
-            return 0.50, 0, 0
+            return None, 0, 0
 
         # Count completed trades (those with was_correct != None)
         completed = [(ts, correct, conf) for ts, correct, conf in trades if correct is not None]
         if not completed:
-            return 0.50, 0, len(trades)
+            return None, 0, len(trades)
 
         # Compute time-decayed accuracy using exponential weights
         now = time.time()
@@ -386,7 +395,7 @@ class RollingCalibration:
 
         total_weight = sum(weights)
         if total_weight == 0:
-            return 0.50, len(completed), len(trades)
+            return None, len(completed), len(trades)
 
         weighted_accuracy = sum(
             w * c for w, c in zip(weights, correct_flags)
@@ -489,19 +498,20 @@ def _self_test():
     r1 = cal.get_calibrated_confidence("KATL", "HIGH", raw_confidence=0.70)
     assert abs(r1.calibrated_confidence - 0.70) < 0.01, f"Expected ~0.70, got {r1.calibrated_confidence}"
     assert r1.observations == 0
+    assert r1.historical_accuracy is None, "No data must not fabricate a 0.50 accuracy"
     print(f"  Test 1 PASS: {r1}")
 
-    # Test 2: Record 10 correct trades
+    # Test 2: Record 20 correct trades (>= MIN_OBSERVATIONS so calibration engages)
     now = time.time()
-    for i in range(10):
+    for i in range(20):
         cal.record_trade(
             "KATL", "HIGH", "spike_reversion",
             confidence=0.70, was_correct=True,
             timestamp=now - (i * 3600),  # Each trade 1 hour apart
         )
     r2 = cal.get_calibrated_confidence("KATL", "HIGH", raw_confidence=0.70)
-    assert r2.observations == 10
-    assert r2.historical_accuracy > 0.90
+    assert r2.observations == 20
+    assert r2.historical_accuracy is not None and r2.historical_accuracy > 0.90
     # Calibrated should be between raw and historical
     assert r2.calibrated_confidence > r2.raw_confidence, f"Calibrated should be boosted"
     print(f"  Test 2 PASS: {r2}")
@@ -533,6 +543,7 @@ def _self_test():
     # Test 5: Empty station
     r5 = cal.get_calibrated_confidence("UNKNOWN", "HIGH", raw_confidence=0.50)
     assert r5.observations == 0
+    assert r5.historical_accuracy is None, "No data must not fabricate a 0.50 accuracy"
     assert abs(r5.calibrated_confidence - 0.50) < 0.01
     print(f"  Test 5 PASS: {r5}")
 
@@ -557,12 +568,17 @@ def _self_test():
             confidence=0.60, was_correct=True,
             timestamp=now - (1 * 86400) + (i * 3600),
         )
+    # 5 observations is below MIN_OBSERVATIONS, so query get_calibrated_confidence
+    # short-circuits to raw confidence with no fabricated accuracy — assert the
+    # fail-closed contract, then verify the time-decay bias directly.
     r6 = cal3.get_calibrated_confidence("KATL", "HIGH", raw_confidence=0.60)
-    # Historical accuracy should be biased toward recent (correct) trades
-    assert r6.historical_accuracy > 0.50, f"Expected >0.50 (recent bias), got {r6.historical_accuracy}"
-    # Old trades at 30d boundary should have been pruned
     assert r6.observations == 5, f"Expected 5 (old pruned), got {r6.observations}"
-    print(f"  Test 6 PASS: {r6}")
+    assert r6.historical_accuracy is None, f"Expected None below MIN_OBSERVATIONS, got {r6.historical_accuracy}"
+    # Historical accuracy should be biased toward recent (correct) trades
+    acc6, completed6, _ = cal3._compute_rolling_accuracy("KATL", "HIGH", "spike_reversion")
+    assert completed6 == 5, f"Expected 5 completed, got {completed6}"
+    assert acc6 is not None and acc6 > 0.50, f"Expected >0.50 (recent bias), got {acc6}"
+    print(f"  Test 6 PASS: {r6} \u2192 decayed acc={acc6:.3f}")
 
     # Test 7: Cache persistence
     cal4 = RollingCalibration(

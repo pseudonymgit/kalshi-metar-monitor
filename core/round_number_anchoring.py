@@ -19,7 +19,7 @@ from .signal_config import (
 )
 
 
-def get_climatological_probability(station: str, date: str, threshold: int, market_type: str) -> float:
+def get_climatological_probability(station: str, date: str, threshold: int, market_type: str) -> Optional[float]:
     """
     Calculate the climatological probability of reaching a temperature threshold
     based on historical METAR data for the same date/day of year.
@@ -31,7 +31,9 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
         market_type: 'HIGH' or 'LOW' market type
         
     Returns:
-        Probability (0.0 to 1.0) from historical data
+        Probability (0.0 to 1.0) from historical data, or None when no
+        historical data is available. None means "no signal" — the caller
+        must exclude the trade rather than fabricating a neutral 0.5.
     """
     try:
         # Connect to historical METAR database
@@ -77,8 +79,9 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
                 
             results = cursor.fetchall()
             if len(results) == 0:
-                # Return neutral probability if no historical data
-                return 0.5
+                # No historical data -> no signal. Return None so the caller
+                # excludes the trade instead of fabricating a neutral 0.5.
+                return None
             
             # Count favorable outcomes based on market type
             favor_count = 0
@@ -95,11 +98,12 @@ def get_climatological_probability(station: str, date: str, threshold: int, mark
             if total_count > 0:
                 return favor_count / total_count
             else:
-                return 0.5
+                # Rows existed but none carried usable temperatures -> no signal.
+                return None
             
     except Exception as e:
         print(f"Error calculating climatological probability: {str(e)}")
-        return 0.5  # Neutral if error
+        return None  # No signal on error — fail closed, never fabricate 0.5
 
 
 def get_kalshi_midpoint_price(series_ticker: str, market_type: str, threshold: int) -> Optional[float]:
@@ -202,6 +206,9 @@ def check_round_number_arbitrage(station: str, date: str) -> Tuple[str, float, f
         climat_prob = get_climatological_probability(station, date, thres, 'HIGH')
         market_prob = get_kalshi_midpoint_price(high_series_ticker, 'HIGH', thres)
 
+        if climat_prob is None:
+            # No climatology -> no edge can be computed. Exclude the trade.
+            continue
         if market_prob is not None:
             # Calculate edge: if climatological prob > market_prob, market undervaluing (go LONG)
             # if climatological prob < market_prob, market overvaluing (go SHORT)
@@ -226,6 +233,9 @@ def check_round_number_arbitrage(station: str, date: str) -> Tuple[str, float, f
         climat_prob = get_climatological_probability(station, date, thres, 'LOW')  
         market_prob = get_kalshi_midpoint_price(f"KXLOW{station_code}", 'LOW', thres)
 
+        if climat_prob is None:
+            # No climatology -> no edge can be computed. Exclude the trade.
+            continue
         if market_prob is not None:
             price_diff = climat_prob - market_prob
             edge = abs(price_diff)

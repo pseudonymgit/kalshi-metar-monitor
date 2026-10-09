@@ -292,20 +292,27 @@ class BMAEMOSPostProcessor:
         self._loaded = True
         logger.info("Using default BMA/EMOS parameters (equal weights, identity)")
 
-    def _get_bma_weights(self, station: str, season: str) -> Tuple[float, float]:
-        """Return (w_gefs, w_ecmwf) for station‑season, with empirical Bayes shrinkage applied."""
+    def _get_bma_weights(self, station: str, season: str) -> Tuple[Optional[float], Optional[float]]:
+        """Return (w_gefs, w_ecmwf) for station‑season, with empirical Bayes shrinkage applied.
+
+        Returns (None, None) when no fitted weights exist for the station/season
+        (fail closed — the caller must exclude the trade rather than fabricate a
+        neutral 0.5/0.5).
+        """
         if not self._loaded:
             self.load_cache()
         station_weights = self._bma_weights.get(station)
         if not station_weights:
-            return 0.5, 0.5
+            return None, None
         params = station_weights.get(season)
         if not params:
-            return 0.5, 0.5
+            return None, None
 
         # Empirical Bayes shrinkage toward pooled (0.5/0.5) estimate.
         # final_weight = shrinkage_alpha * pooled_weight + (1 - shrinkage_alpha) * station_weight
         alpha = params.shrinkage_alpha
+        if alpha is None:
+            return None, None
         w_gefs = alpha * 0.5 + (1.0 - alpha) * params.w_gefs
         w_ecmwf = alpha * 0.5 + (1.0 - alpha) * params.w_ecmwf
         return w_gefs, w_ecmwf
@@ -328,7 +335,7 @@ class BMAEMOSPostProcessor:
         ecmwf_fraction: Optional[float],
         station: str,
         date: str,
-    ) -> float:
+    ) -> Optional[float]:
         """
         Apply BMA weighting to per‑model ensemble fractions.
 
@@ -342,15 +349,16 @@ class BMAEMOSPostProcessor:
             date: Date string 'YYYY‑MM‑DD'
 
         Returns:
-            Weighted fraction clipped to [0, 1].  Falls back to equal weight
-            or single model when one source is missing.
+            Weighted fraction clipped to [0, 1]; a single model's fraction when
+            the other source is missing; or None when both are missing or no
+            fitted weights exist (fail closed — caller must exclude the trade).
         """
         gefs_available = gefs_fraction is not None
         ecmwf_available = ecmwf_fraction is not None
 
         if not gefs_available and not ecmwf_available:
             logger.error(f"Both models missing for {station} on {date}")
-            return 0.5
+            return None
         if not gefs_available:
             logger.warning(f"GEFS missing for {station} on {date} — using ECMWF‑only")
             return float(np.clip(ecmwf_fraction, 0.0, 1.0))
@@ -360,6 +368,9 @@ class BMAEMOSPostProcessor:
 
         season = get_season(date)
         w_gefs, w_ecmwf = self._get_bma_weights(station, season)
+        if w_gefs is None or w_ecmwf is None:
+            logger.error(f"No fitted BMA weights for {station}/{season} on {date}")
+            return None
         result = w_gefs * gefs_fraction + w_ecmwf * ecmwf_fraction
         return float(np.clip(result, 0.0, 1.0))
 
@@ -428,7 +439,7 @@ class BMAEMOSPostProcessor:
         threshold: float,
         station: str,
         date: str,
-    ) -> Tuple[float, float, float]:
+    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """
         Full calibration pipeline: BMA weighting + EMOS adjustment.
 
@@ -460,10 +471,10 @@ class BMAEMOSPostProcessor:
         gefs_fraction = _safe_fraction(gefs_members)
         ecmwf_fraction = _safe_fraction(ecmwf_members)
 
-        # If both models have no valid members, return neutral
+        # If both models have no valid members there is no signal to calibrate.
         if gefs_fraction is None and ecmwf_fraction is None:
-            logger.warning(f"All members NaN/empty for {station} on {date} — returning 0.5")
-            return 0.5, 0.0, 1.0
+            logger.warning(f"All members NaN/empty for {station} on {date} — no signal")
+            return None, None, None
 
         # Step 2: Apply BMA weighting (if mode includes BMA)
         if self.mode in ("bma", "both"):
@@ -471,7 +482,12 @@ class BMAEMOSPostProcessor:
         else:
             # Equal weight average (per‑model avg)
             vals = [v for v in (gefs_fraction, ecmwf_fraction) if v is not None]
-            bma_weighted = sum(vals) / len(vals) if vals else 0.5
+            bma_weighted = sum(vals) / len(vals) if vals else None
+
+        # No weighting could be formed -> fail closed, exclude the trade.
+        if bma_weighted is None:
+            logger.warning(f"No BMA weight for {station} on {date} — no signal")
+            return None, None, None
 
         # Step 3: Compute ensemble moments for EMOS
         mean, var = compute_ensemble_stats(gefs_members, ecmwf_members)
@@ -505,7 +521,7 @@ def _get_processor() -> BMAEMOSPostProcessor:
     return _bma_emos_singleton
 
 
-def bma_calibrate(station: str, raw_forecast: Tuple[Optional[float], Optional[float]]) -> float:
+def bma_calibrate(station: str, raw_forecast: Tuple[Optional[float], Optional[float]]) -> Optional[float]:
     """
     Apply BMA weighting to per‑model ensemble fractions.
 
@@ -514,7 +530,8 @@ def bma_calibrate(station: str, raw_forecast: Tuple[Optional[float], Optional[fl
         raw_forecast: tuple (gefs_fraction, ecmwf_fraction) where each can be None
 
     Returns:
-        Weighted fraction [0, 1].
+        Weighted fraction [0, 1], or None when no weighting can be formed
+        (fail closed — caller must exclude the trade).
     """
     gefs_frac, ecmwf_frac = raw_forecast
     from datetime import datetime
@@ -553,7 +570,7 @@ def calibrate_ensemble(
     ecmwf_forecast: Union[np.ndarray, list],
     threshold: float,
     date: str,
-) -> Tuple[float, float, float]:
+) -> Tuple[Optional[float], Optional[float], Optional[float]]:
     """
     Full calibration pipeline for a given station and forecasts.
 
@@ -620,16 +637,16 @@ def test_module() -> bool:
     )
     print(f"  Full calibration probability: {prob:.4f} ({ci_lower:.4f}, {ci_upper:.4f})")
 
-    # Test degenerate ensembles
+    # Test degenerate ensembles — fail CLOSED: no fabricated neutral 0.5.
     prob_d, ci_l_d, ci_u_d = proc.calibrate_ensemble([], [], threshold, station, date)
-    print(f"  Empty ensemble: {prob_d:.4f} ({ci_l_d:.4f}, {ci_u_d:.4f})")
-    assert not np.isnan(prob_d), "Empty ensemble returned NaN"
+    print(f"  Empty ensemble: {prob_d} ({ci_l_d}, {ci_u_d})")
+    assert prob_d is None, "Empty ensemble must return None (fail closed)"
 
     prob_n, ci_l_n, ci_u_n = proc.calibrate_ensemble(
         [np.nan, np.nan], [np.nan, np.nan], threshold, station, date
     )
-    print(f"  All‑NaN ensemble: {prob_n:.4f} ({ci_l_n:.4f}, {ci_u_n:.4f})")
-    assert not np.isnan(prob_n), "All‑NaN ensemble returned NaN"
+    print(f"  All‑NaN ensemble: {prob_n} ({ci_l_n}, {ci_u_n})")
+    assert prob_n is None, "All‑NaN ensemble must return None (fail closed)"
 
     print("\n  ✅ Self‑test complete")
     return True
