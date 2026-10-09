@@ -330,6 +330,15 @@ class MarketSide(Enum):
     DOWN = "DOWN"
 
 
+class SettlementProcessingError(RuntimeError):
+    """Raised when settlement cannot be processed safely.
+
+    A2 (2026-10-09): settlement must fail LOUDLY rather than fall through to a
+    legacy path that settled every trade as a win. Raised when the P&L tracking
+    module is unavailable or when the delegated settlement raises.
+    """
+
+
 class PaperTrader:
     """
     Paper trading engine implementing deterministic-only signals with version tracking.
@@ -2425,158 +2434,32 @@ class PaperTrader:
         Process settlements for a specific date. Updates trades with settlement results
         and calculates realized P/L.
 
-        Delegates to pnl_tracking module for primary logic when available.
+        A2 (2026-10-09): the delegated pnl_tracking module is the ONLY settlement
+        path. There is NO legacy fall-through. If delegation is unavailable or
+        raises, this FAILS LOUDLY with SettlementProcessingError. The previous
+        behaviour fell through to a legacy body that settled every trade as a win
+        via `1.0 if settlement_value > 50.0 else 0.0` (settlement_value is the
+        actual temp in °F, so every US high "won"), producing a phantom 34-0 /
+        +$29k result. Never mutate trades, never settle without a validated strike.
         """
-        # PnL Tracking: delegate to extracted module for settlement processing
-        if HAS_PNL_TRACKING and _pnl_tracking is not None:
-            try:
-                _pnl_tracking.process_settlements_for_date(self, settlement_date)
-                _LOGGER.info(
-                    "pnl_tracking.process_settlements_for_date completed for %s",
-                    settlement_date
-                )
-                # R/T (2026-10-01): the delegated module is the single source of
-                # truth for settlement. Return here so the legacy body below
-                # NEVER runs — it settled every trade as a win via
-                # `1.0 if settlement_value > 50.0 else 0.0` (settlement_value is
-                # the actual temp in F, so every US high "won"). That produced a
-                # phantom 34-0 / +$29k result. Fall through only if delegation
-                # is unavailable or raised.
-                return
-            except Exception as e:
-                _LOGGER.warning(
-                    "pnl_tracking.process_settlements_for_date failed for %s: %s",
-                    settlement_date, e
-                )
-
-        conn = get_sqlite_connection(self.paper_db)
-        c = conn.cursor()
-        c.execute("ATTACH DATABASE ? AS metar", (self.metar_db,))
-
-        # Get all open trades for which settlements are available
-        c.execute("""
-            SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
-                   t.quantity,
-                   p.settlement_bucket
-            FROM trades t
-            JOIN (SELECT station, market_type, local_trading_date, settlement_bucket
-                  FROM metar.settlement_epochs
-                  WHERE epoch_status = 'closed' AND local_trading_date = ?) p
-            ON t.station = p.station AND t.trade_date_utc = date(p.local_trading_date)
-               AND t.market_type = p.market_type
-            WHERE t.status = 'open'
-        """, (settlement_date,))
-
-        unsettled_trades = c.fetchall()
-
-        settled_count = 0
-        for trade_uuid, station, trade_type_str, filled_price, market_price, quantity, settlement_value in unsettled_trades:
-            # Convert trade type to enum
-            try:
-                trade_type = TradeType(trade_type_str)
-            except ValueError:
-                continue
-
-            # Calculate settlement return based on the trade type and settlement value.
-            # Long YES pays $1 when event occurs; long NO pays $1 when it does not.
-            # Short sides are represented as negative exposure with realized P&L mirrored.
-            settlement_contract_value = 1.0 if settlement_value > 50.0 else 0.0
-            qty = quantity or 0
-
-            if trade_type == TradeType.BUY_YES:
-                payout_per_contract = settlement_contract_value
-                cost_per_contract = filled_price
-                profit = (payout_per_contract - cost_per_contract) * qty
-                return_amount = payout_per_contract * qty
-            elif trade_type == TradeType.BUY_NO:
-                payout_per_contract = 1.0 - settlement_contract_value
-                cost_per_contract = 1.0 - filled_price
-                profit = (payout_per_contract - cost_per_contract) * qty
-                return_amount = payout_per_contract * qty
-            elif trade_type == TradeType.SELL_YES:
-                # Short YES: collect filled_price, owe event payout.
-                profit = (filled_price - settlement_contract_value) * qty
-                return_amount = profit
-            elif trade_type == TradeType.SELL_NO:
-                # Short NO: collect NO price, owe non-event payout.
-                no_price = 1.0 - filled_price
-                no_payout = 1.0 - settlement_contract_value
-                profit = (no_price - no_payout) * qty
-                return_amount = profit
-            else:
-                continue
-
-            # Update the trade with settlement data
-            realized_pnl = profit
-            c.execute("""
-                UPDATE trades
-                SET settled_value = ?, settlement_date_utc = ?,
-                    realized_pnl = ?, settlement_return_amount = ?,
-                    status = 'closed'
-                WHERE trade_uuid = ?
-            """, (settlement_value/100.0, settlement_date, profit, return_amount, trade_uuid))
-
-            # Update corresponding position (reduce by quantity)
-            trade_qty = qty
-
-            # Find position this trade affects and reduce quantity
-            c.execute("""
-                UPDATE positions
-                SET realized_pnl = realized_pnl + ?, quantity = quantity - ?,
-                    total_pnl = realized_pnl + ?
-                WHERE trade_uuids LIKE ?
-            """, (profit, trade_qty, profit, f'%{trade_uuid}%'))
-
-            # Check if trade was directionally correct by comparing signal direction with actual settlement direction
-            # Query the original trade for the signal direction and functionality
-            c.execute("SELECT signal_direction, functionality, confidence_indicator, forecast_prob FROM trades WHERE trade_uuid = ?", (trade_uuid,))
-            trade_row = c.fetchone()
-
-            if trade_row and HAS_CALIBRATION_PIPELINE and self._calibrator:
-                orig_signal_direction, functionality, raw_confidence, raw_forecast_prob = trade_row
-
-                # Determine if the prediction was directionally correct
-                settlement_is_up = settlement_contract_value > 0.5  # Settlement goes UP if > $0.50 (over 50F)
-                predicted_is_up = orig_signal_direction == "UP"  # Signal was UP/DOWN
-
-                # If signal was "UP" and settlement went UP, or signal was "DOWN" and settlement went DOWN, then correct
-                was_correct = (predicted_is_up == settlement_is_up)
-
-                # Extract signal name based on functionality
-                if "calendar" in functionality:
-                    signal_name = "calendar_climatology"
-                elif "momentum" in functionality or "late_day" in functionality:
-                    signal_name = "late_day_momentum"  # Using appropriate name for the late-day momentum signal
-                elif "nwp" in functionality or "analog" in functionality:
-                    signal_name = "nwp_analog"
-                elif "analysis" in functionality:
-                    signal_name = "late_day_analysis"
-                else:
-                    # Default to the functionality field as signal name
-                    signal_name = functionality
-
-                # Feed this result back to calibration pipeline
-                try:
-                    # Use raw_forecast_prob as primary confidence, fall back to raw_confidence if available
-                    conf_to_use = raw_forecast_prob if raw_forecast_prob is not None else (raw_confidence if raw_confidence is not None else 0.5)
-                    self._calibrator.update(signal_name, station, conf_to_use, was_correct)
-                except Exception as e:
-                    print(f"Error feeding trade to calibrator: {e}")
-
-            # Update RiskManager with realized P&L after settlement
-            settlement_trade_result = TradeResult(
-                trade_id=trade_uuid,
-                pnl=realized_pnl,
-                is_profitable=realized_pnl > 0,
-                trade_date=settlement_date
+        if not HAS_PNL_TRACKING or _pnl_tracking is None:
+            raise SettlementProcessingError(
+                "P&L tracking module unavailable; refusing to settle "
+                f"{settlement_date} without a validated strike-crossing path."
             )
-            risk_state_after_settlement = self._risk_manager.update_after_trade(settlement_trade_result)
-
-            settled_count += 1
-
-        conn.commit()
-        conn.close()
-        print(f"Processed {settled_count} trade settlements for date {settlement_date}")
+        try:
+            _pnl_tracking.process_settlements_for_date(self, settlement_date)
+        except SettlementProcessingError:
+            raise
+        except Exception as e:
+            raise SettlementProcessingError(
+                f"pnl_tracking.process_settlements_for_date failed for "
+                f"{settlement_date}: {e}"
+            ) from e
+        _LOGGER.info(
+            "pnl_tracking.process_settlements_for_date completed for %s",
+            settlement_date
+        )
 
     def daily_reconciliation(self, reconcile_date=None):
         """
