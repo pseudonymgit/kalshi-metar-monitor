@@ -24,6 +24,38 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.signals import SignalRegistry
 from core.calibration_pipeline import CalibrationPipeline
 
+# A4 (2026-10-09): the settlement axis is STRICT strike-crossing, not day-over-day.
+LABEL_AXIS = "strike_crossing"
+_STRIKE_LADDER_DB = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data", "kalshi_strike_ladder.db",
+)
+
+
+def load_strike_reference():
+    """{(station, date): [strike, ...]} for HIGH 'greater' strikes (authoritative)."""
+    ref = defaultdict(list)
+    if not os.path.exists(_STRIKE_LADDER_DB):
+        print(f"WARNING: strike ladder missing at {_STRIKE_LADDER_DB}")
+        return ref
+    c = sqlite3.connect(f"file:{_STRIKE_LADDER_DB}?mode=ro", uri=True)
+    try:
+        q = ("SELECT station, local_trading_date, strike_value FROM strike_ladder "
+             "WHERE market_type='HIGH' AND strike_type='greater'")
+        for st, d, sv in c.execute(q):
+            ref[(st, d)].append(float(sv))
+    finally:
+        c.close()
+    return ref
+
+
+def _nearest_strike(strikes, settlement_bucket):
+    if not strikes:
+        return None
+    if settlement_bucket is None:
+        return sorted(strikes)[len(strikes) // 2]
+    return min(strikes, key=lambda s: abs(s - settlement_bucket))
+
 
 def load_daily_data(conn: sqlite3.Connection) -> List[dict]:
     """Load daily aggregated METAR data ordered by date."""
@@ -49,11 +81,14 @@ def load_daily_data(conn: sqlite3.Connection) -> List[dict]:
     return days
 
 
-def load_market_directions(conn: sqlite3.Connection, station: str, market_type: str = 'HIGH') -> Dict[str, str]:
-    """Load settlement epoch directions as ground truth.
+def load_market_directions(conn: sqlite3.Connection, station: str, market_type: str = 'HIGH',
+                           strike_ref=None) -> Dict[str, str]:
+    """Load settlement ground truth on the STRICT strike-crossing axis.
 
     Returns dict of date -> 'up'/'down'/'flat' for the given market type.
-    Direction is: current day settlement vs previous day settlement.
+    A4 (2026-10-09): direction is strict strike-crossing (settlement > strike
+    => 'up'), NOT day-over-day. Falls back to the training-window median strike
+    when the authoritative ladder has no entry for a station-day.
     """
     cur = conn.cursor()
     cur.execute("""
@@ -62,25 +97,23 @@ def load_market_directions(conn: sqlite3.Connection, station: str, market_type: 
         WHERE station = ? AND market_type = ?
         ORDER BY local_trading_date ASC
     """, (station, market_type))
-    
+
     rows = cur.fetchall()
+    buckets = [b for _, b in rows if b is not None]
+    fallback_strike = (sorted(buckets)[len(buckets) // 2] if buckets else None)
+    strike_ref = strike_ref or {}
+
     market = {}
-    prev_bucket = None
     for date_str, bucket in rows:
         if bucket is None:
             market[date_str] = 'flat'
-            prev_bucket = bucket
             continue
-        if prev_bucket is not None:
-            if bucket > prev_bucket:
-                market[date_str] = 'up'
-            elif bucket < prev_bucket:
-                market[date_str] = 'down'
-            else:
-                market[date_str] = 'flat'
-        else:
-            market[date_str] = 'flat'  # first day, no direction
-        prev_bucket = bucket
+        strikes = strike_ref.get((station, date_str))
+        strike = _nearest_strike(strikes, bucket) if strikes else fallback_strike
+        if strike is None:
+            market[date_str] = 'flat'
+            continue
+        market[date_str] = 'up' if bucket > strike else 'down'
     return market
 
 
@@ -134,6 +167,9 @@ def main():
     active_signals = {k: v for k, v in all_signals.items() if k in desired_signals}
     print(f"Loaded {len(active_signals)} signals: {list(active_signals.keys())}")
     
+    # A4: realized strikes for the strict strike-crossing axis.
+    strike_ref = load_strike_reference()
+
     # Get stations
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
@@ -152,6 +188,7 @@ def main():
     
     # Per signal/station tracking
     total_observations = 0
+    print(f"label_axis: {LABEL_AXIS} (strict strike-crossing)")
     
     for station in all_stations:
         print(f"\n{'='*60}")
@@ -180,7 +217,7 @@ def main():
                 'temp': r[4], 'wind_dir': r[5], 'wind_speed': r[6], 'pressure': r[7]
             })
         
-        market = load_market_directions(conn, station, args.market_type)
+        market = load_market_directions(conn, station, args.market_type, strike_ref=strike_ref)
         conn.close()
         
         if len(station_days) < args.min_days:

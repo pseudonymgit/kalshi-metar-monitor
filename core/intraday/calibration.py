@@ -28,6 +28,12 @@ logger = logging.getLogger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# A4 (2026-10-09): the settlement axis is STRICT strike-crossing. This replaces
+# the old day-over-day warming axis (calibration_curves.json), which is a
+# DIFFERENT event than the strike-crossing label Kalshi pays on. Curves that
+# explicitly declare a non-strike_crossing axis are refused.
+LABEL_AXIS = "strike_crossing"
+STRIKE_AXIS_CURVES_PATH = str(REPO_ROOT / "data" / "strike_axis_calibration.json")
 DEFAULT_CURVES_PATH = str(REPO_ROOT / "data" / "calibration_curves.json")
 
 # Fallback calibration parameters (pooled global when no per-station curve exists)
@@ -85,7 +91,13 @@ class HourlyCalibration:
         self.curves_path = curves_path or DEFAULT_CURVES_PATH
         self._curves: Dict[str, Dict] = {}  # station -> {hour_before: {alpha, beta, n}}
         self._loaded = False
+        self._axis = "unlabeled"
         self._load_curves()
+
+    @property
+    def label_axis(self) -> str:
+        """The label axis the loaded curves were built on (A4 provenance)."""
+        return self._axis
 
     def _load_curves(self) -> None:
         """Load calibration curves from JSON file."""
@@ -98,6 +110,17 @@ class HourlyCalibration:
             with open(self.curves_path) as f:
                 data = json.load(f)
             self._curves = {}
+
+            # A4: reject a curve built on the wrong (day-over-day) axis.
+            declared_axis = data.get("axis", data.get("label_axis"))
+            self._axis = declared_axis or "unlabeled"
+            if declared_axis is not None and declared_axis != LABEL_AXIS:
+                logger.error(
+                    f"Refusing calibration curves at {self.curves_path}: declared "
+                    f"axis={declared_axis!r}, expected {LABEL_AXIS!r}"
+                )
+                self._loaded = False
+                return
 
             # Support both old and new format
             curves_section = data.get("curves", data.get("stations", data))

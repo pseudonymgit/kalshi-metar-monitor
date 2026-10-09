@@ -103,6 +103,50 @@ def load_station_data(station, conn):
     return days, market
 
 
+# A4 (2026-10-09): the Kalshi strike ladder is the authoritative source of
+# realized strikes + strict strike-crossing results. The metar settlement_epochs
+# table carries a NULL strike for ~99.9% of history, so the strike axis must be
+# keyed off kalshi_strike_ladder.db (see docs/plans/B2-REAL-PRICE-JOIN-SCHEMA).
+STRIKE_LADDER_DB = os.environ.get(
+    'KALSHI_STRIKE_LADDER_DB',
+    '/home/node/.openclaw/workspace/prototypes/weather-engine-source/data/kalshi_strike_ladder.db'
+)
+LABEL_AXIS = 'strike_crossing'
+
+
+def load_strike_reference(db_path=STRIKE_LADDER_DB):
+    """{(station, date): (strike, result)} for HIGH 'greater' strikes.
+
+    The strike is the realized threshold closest to the settlement bucket for
+    that station-day (nearest ±), giving a single strict strike-crossing label:
+    settlement > strike => 'up' (yes), else 'down' (no). Returns {} if the
+    ladder is unavailable so callers can no-op rather than mislabel.
+    """
+    ref = defaultdict(list)
+    if not db_path or not os.path.exists(db_path):
+        logger.warning("strike ladder DB missing at %s; strike axis unavailable", db_path)
+        return {}
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        q = """SELECT station, local_trading_date, strike_value, result
+               FROM strike_ladder
+               WHERE market_type='HIGH' AND strike_type='greater'"""
+        for st, d, sv, res in conn.execute(q):
+            ref[(st, d)].append(float(sv))
+    finally:
+        conn.close()
+    return {k: v for k, v in ref.items()}
+
+
+def nearest_strike(strikes, settlement_bucket):
+    """Pick the reference strike nearest the settlement bucket (single label)."""
+    if not strikes:
+        return None
+    if settlement_bucket is None:
+        return sorted(strikes)[len(strikes) // 2]
+    return min(strikes, key=lambda s: abs(s - settlement_bucket))
+
+
 def compute_sharpe(returns, fee_rate=None):
     """Compute Sharpe ratio from (confidence, correct) pairs."""
     if fee_rate is None:
@@ -128,7 +172,7 @@ def compute_brier(results):
     if not results:
         return 0.0
     total = 0.0
-    for pred, actual, conf in results:
+    for pred, actual, conf, *_ in results:
         prob_up = conf if pred == 'up' else 1.0 - conf
         outcome = 1.0 if actual == 'up' else 0.0
         total += (prob_up - outcome) ** 2
@@ -140,7 +184,7 @@ def compute_ece(results, n_bins=10):
     if not results:
         return 0.0
     bins = [[] for _ in range(n_bins)]
-    for pred, actual, conf in results:
+    for pred, actual, conf, *_ in results:
         bin_idx = min(int(conf * n_bins), n_bins - 1)
         ok = (pred == actual)
         bins[bin_idx].append((conf, ok))
@@ -160,7 +204,7 @@ def max_drawdown(results, initial=250.0, bet=10.0):
     bankroll = initial
     peak = bankroll
     max_dd = 0.0
-    for pred, actual, conf in results:
+    for pred, actual, conf, *_ in results:
         ok = (pred == actual)
         position = min(bet * conf, bankroll * 0.08)
         if ok:
@@ -236,10 +280,13 @@ def run_backtest(
             window=fusion_params.get('window', 30)
         )
 
-    all_results = []  # (pred, actual, conf)
+    all_results = []  # (pred, actual, conf, label_axis)
     per_signal_stats = defaultdict(lambda: {'correct': 0, 'total': 0})
     per_station_stats = defaultdict(lambda: {'correct': 0, 'total': 0})
     signal_fired_count = defaultdict(int)
+
+    # A4: realized strikes + strict strike-crossing results (authoritative ladder).
+    strike_ref = load_strike_reference()
 
     for station in stations:
         days, market = load_station_data(station, conn)
@@ -248,11 +295,10 @@ def run_backtest(
                 logger.warning("Station %s: insufficient data (%d days)", station, len(days))
             continue
 
-        # Direction is determined by comparing today's settlement to yesterday's.
-        # All signals predict directional change (today vs yesterday), not
-        # strike level (above/below median). See docs/plans/BACKTEST-AUDIT-FINDINGS.md
+        # A4: validation axis is STRICT strike-crossing (settlement vs strike),
+        # not day-over-day. See docs/plans/BACKTEST-AUDIT-FINDINGS.md.
         if verbose:
-            logger.debug("Station %s: using day-over-day directional validation", station)
+            logger.debug("Station %s: using strict strike-crossing validation", station)
 
         # Walk-forward backtest
         start = train_days
@@ -263,17 +309,19 @@ def run_backtest(
                 if actual is None:
                     continue
 
-                # Determine actual market outcome: directional change
-                # All signals predict 'up' = temp will be warmer than yesterday,
-                # 'down' = temp will be cooler than yesterday.
-                # This matches Phase 8/9 behavior documented at line 89-115 of
-                # scripts/phase8_combinatorial_search.py
+                # A4 (2026-10-09): settle on STRICT strike-crossing
+                # (settlement > strike => 'up'/yes; equality => 'down'/no), the
+                # axis Kalshi actually pays on. Not day-over-day (the prior
+                # `bucket > prev_bucket` scoring). Route through the strike
+                # ladder's realized thresholds via core.settlement_labels.
                 if actual['settlement_bucket'] is None:
                     continue
-                prev_bucket = actual.get('prev_bucket')
-                if prev_bucket is None:
-                    continue  # No previous day to compare
-                actual_direction = 'up' if actual['settlement_bucket'] > prev_bucket else 'down'
+                strikes = strike_ref.get((station, date))
+                strike = nearest_strike(strikes, actual['settlement_bucket']) if strikes else None
+                if strike is None:
+                    continue  # no strike => cannot label on the strike axis
+                actual_direction = 'up' if float(actual['settlement_bucket']) > strike else 'down'
+                label_axis = LABEL_AXIS
 
                 # Evaluate all signals
                 signal_outputs = []
@@ -325,7 +373,8 @@ def run_backtest(
                     continue
 
                 is_correct = (pred == actual_direction)
-                all_results.append((pred, actual_direction, conf))
+                # A4: carry label_axis provenance on every scored row.
+                all_results.append((pred, actual_direction, conf, label_axis))
                 per_station_stats[station]['total'] += 1
                 per_station_stats[station]['correct'] += int(is_correct)
                 for sig_name, _, _ in signal_outputs:
@@ -346,17 +395,25 @@ def run_backtest(
     if not all_results:
         return {
             'accuracy': 0.0, 'fee_adjusted_accuracy': 0.0, 'sharpe': 0.0, 'brier': 1.0, 'ece': 1.0,
-            'drawdown': 0.0, 'trades': 0,
+            'drawdown': 0.0, 'trades': 0, 'label_axis': LABEL_AXIS,
             'per_signal_stats': {}, 'per_station_stats': {}
         }
 
     n = len(all_results)
-    correct = sum(1 for p, a, _ in all_results if p == a)
+    correct = sum(1 for p, a, *_ in all_results if p == a)
     accuracy = correct / n
-    sharpe = compute_sharpe([(c, p == a) for p, a, c in all_results])
+    sharpe = compute_sharpe([(c, p == a) for p, a, c, *_ in all_results])
     brier = compute_brier(all_results)
     ece = compute_ece(all_results)
     dd = max_drawdown(all_results)
+    # A4: reject a non-strike-crossing axis from any primary claim.
+    axes = {r[3] for r in all_results}
+    label_axis = LABEL_AXIS if axes == {LABEL_AXIS} else "MIXED_OR_NON_STRIKE_CROSSING"
+    if label_axis != LABEL_AXIS:
+        logger.error(
+            "A4: primary accuracy claim rejected — scored rows carry axes %s, "
+            "expected only %r", axes, LABEL_AXIS,
+        )
 
     # ⚠️ B-Mode R8 Cycle 4.1: PAPER ACCURACY — unconfirmed against settlement data
     # These accuracy numbers are computed from directional predictions compared
@@ -375,6 +432,7 @@ def run_backtest(
         'ece': ece,
         'drawdown': dd,
         'trades': n,
+        'label_axis': label_axis,  # A4: never ship a number without its axis
         'accuracy_type': 'PAPER_ACCURACY_UNCONFIRMED',  # B-Mode R8 Cycle 4.1
         'per_signal_stats': {
             sig: {

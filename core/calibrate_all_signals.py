@@ -25,6 +25,38 @@ if CORE_DIR not in sys.path:
 from signals import SignalRegistry
 from calibration_pipeline import CalibrationPipeline
 
+# A4 (2026-10-09): strict strike-crossing axis is the settlement axis.
+LABEL_AXIS = "strike_crossing"
+_STRIKE_LADDER_DB = os.environ.get(
+    "KALSHI_STRIKE_LADDER_DB",
+    os.path.join(CORE_DIR, "..", "data", "kalshi_strike_ladder.db"),
+)
+
+
+def load_strike_reference():
+    """{(station, date): [strike, ...]} for HIGH 'greater' strikes (authoritative)."""
+    ref = defaultdict(list)
+    if not os.path.exists(_STRIKE_LADDER_DB):
+        logger.warning(f"strike ladder missing at {_STRIKE_LADDER_DB}; strike axis unavailable")
+        return ref
+    c = sqlite3.connect(f"file:{_STRIKE_LADDER_DB}?mode=ro", uri=True)
+    try:
+        q = ("SELECT station, local_trading_date, strike_value FROM strike_ladder "
+             "WHERE market_type='HIGH' AND strike_type='greater'")
+        for st, d, sv in c.execute(q):
+            ref[(st, d)].append(float(sv))
+    finally:
+        c.close()
+    return ref
+
+
+def _nearest_strike(strikes, settlement_bucket):
+    if not strikes:
+        return None
+    if settlement_bucket is None:
+        return sorted(strikes)[len(strikes) // 2]
+    return min(strikes, key=lambda s: abs(s - settlement_bucket))
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -117,6 +149,8 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
         
         # Track ALL samples with their station for Brier computation
         all_samples = []  # list of (station, confidence, is_correct)
+        # A4: realized strikes for the strict strike-crossing axis.
+        strike_ref = load_strike_reference()
         
         signal_obj = registry.get_signal(signal_name)
         if signal_obj is None:
@@ -128,7 +162,9 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
             if len(days) < TRAIN_DAYS + TEST_DAYS:
                 continue
 
-            # Compute strike price from training data
+            # A4: strike reference for the strict strike-crossing axis. Prefer
+            # the authoritative realized ladder strike for each station-day;
+            # fall back to the training-window median when the ladder is absent.
             training_temps = [
                 market[d['date']]['settlement_bucket']
                 for d in days[:TRAIN_DAYS]
@@ -136,7 +172,7 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
             ]
             if not training_temps:
                 continue
-            strike = statistics.median(training_temps)
+            fallback_strike = statistics.median(training_temps)
 
             # Walk-forward backtest
             start = TRAIN_DAYS
@@ -147,6 +183,9 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
                     if actual is None or actual['settlement_bucket'] is None:
                         continue
 
+                    strikes = strike_ref.get((station, date))
+                    strike = _nearest_strike(strikes, actual['settlement_bucket']) if strikes else fallback_strike
+                    # A4: strict strike-crossing (settlement > strike => 'up').
                     actual_direction = 'up' if actual['settlement_bucket'] > strike else 'down'
 
                     try:
@@ -244,6 +283,7 @@ def calibrate_signal_single(signal_name, registry, signal_names_list, stations):
 
     result = {
         'signal': signal_name,
+        'label_axis': LABEL_AXIS,  # A4: never ship a number without its axis
         'raw_accuracy': round(raw_accuracy, 2),
         'raw_trades': total_trades,
         'raw_correct': total_correct,
