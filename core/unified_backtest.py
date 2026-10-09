@@ -31,7 +31,9 @@ import logging
 from core.signals import SignalRegistry
 
 logger = logging.getLogger(__name__)
-from core.signal_fusion import SignalFusionEngine, TimeDecaySignalManager
+# signal_fusion re-exports the class as LegacyFusionEngine (FusionEngine was
+# renamed); bind the real name so downstream call sites keep working.
+from core.signal_fusion import LegacyFusionEngine as SignalFusionEngine, TimeDecaySignalManager
 from core.market_cost_model import MARKET_COST_MODEL
 
 # Canonical signal name constants (replaced Phase 19-removed imports from signals/__init__.py)
