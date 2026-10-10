@@ -268,7 +268,10 @@ def run_backtest(
         }
 
     registry = SignalRegistry(db_path)
-    conn = sqlite3.connect(db_path)
+    # C4 (GR3): run_backtest only READS. Open the METAR DB read-only so the test
+    # sandbox guard (conftest db_write_sandbox) is satisfied and a test run can
+    # never take a write lock on a production archive.
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
 
     # ─── C2 (GR3 D4): FUSION IS PARKED — DO NOT WIRE ───────────────────
     # The live path is a majority vote, NOT the LLOP/UWC probability chain the
