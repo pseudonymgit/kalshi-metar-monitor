@@ -1,0 +1,53 @@
+{
+  "canonical_ledger": {
+    "designated": true,
+    "frozen": false,
+    "path": "data/kalshi_settlements.db",
+    "unexplained_rows": 0
+  },
+  "enforcement": {
+    "canonical_ledger_frozen": false,
+    "crons_disabled": [],
+    "halt_artifact": null,
+    "producer_crons": [
+      "weather-engine-paper-trading-prod",
+      "weather-engine-paper-trading-sbox",
+      "weather-engine-collector",
+      "weather-engine-settlement-upkeep"
+    ],
+    "settlements_blocked": false,
+    "trades_blocked": false
+  },
+  "extension_decision": null,
+  "forced_state": null,
+  "generated_at_utc": "2026-10-10T02:22:08.396835+00:00",
+  "governance": {
+    "events": [],
+    "fee_gate_bypass": false,
+    "sbox_to_dev_merge": false,
+    "settlement_gate_bypass": false,
+    "unapproved_live_exposure": false
+  },
+  "governed_experiment": "GR5-WE-001",
+  "hurdle": {
+    "events": 0,
+    "market_relative": true,
+    "metric": "net_ev_per_accepted_trade",
+    "min_events": 200,
+    "upper_95_bound_net_ev": null
+  },
+  "notes": "Machine-checkable stopping record (Workstream F). CI/cron must run `scripts/ci_stop_check.sh` (wraps --check) before any producer run.",
+  "preregistration": {
+    "artifact": "artifacts/preregistration/GR5-WE-001.json",
+    "experiment_id": "GR5-WE-001",
+    "ok": true,
+    "sha256": "1c81997965f7eb8720d2bac59d58384f71b2f9ef311b9e8c7b4ecb74a21143b3"
+  },
+  "repair_budget": {
+    "exhausted": false,
+    "note": "set exhausted=true when repair budget runs out"
+  },
+  "root_sunset": "2026-12-31",
+  "schema_version": 1,
+  "sunset_policy": "If no pre-registered test PASSES by root_sunset the project auto-terminates. Extensions require an explicit dated written decision recorded in extension_decision {decided_at_utc, new_sunset, authority, rationale}."
+}

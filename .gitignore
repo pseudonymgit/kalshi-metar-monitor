@@ -29,3 +29,6 @@ data/gefs_work/
 !artifacts/preregistration/
 !artifacts/preregistration/*.json
 !artifacts/preregistration/*.sha256
+
+# Governance stopping record MUST be committed (Workstream F off-switch)
+!stopping-record.json
