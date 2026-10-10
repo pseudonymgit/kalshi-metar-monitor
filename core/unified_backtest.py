@@ -270,11 +270,29 @@ def run_backtest(
     registry = SignalRegistry(db_path)
     conn = sqlite3.connect(db_path)
 
-    # Initialize fusion engine if needed
+    # ─── C2 (GR3 D4): FUSION IS PARKED — DO NOT WIRE ───────────────────
+    # The live path is a majority vote, NOT the LLOP/UWC probability chain the
+    # docs describe. Wiring fusion as-is would inject wrong-axis, possibly
+    # double-counted probability into sizing. It stays disabled until ALL of
+    # the following prerequisites hold:
+    #   1. axis fix (A4, landed)                — scored on strict strike-crossing
+    #   2. n_eff / rho correction (C3 / GR3 D6) — currently a dead config field,
+    #      applied after pooling instead of at combination time
+    #   3. LLOP weight positional alignment (C3 / GR3 D5) — else sum(w) != 1 and
+    #      log-odds are double-counted
+    #   4. confidence promoted from scaled score to probability (GR3 D7)
+    # A1-A4 certifies safety, not composition correctness; fusion output is still
+    # non-decision-grade. See docs/plans/GRAY-ROOM-3-SYNTHESIS-2026-10-09.md (D4).
+    assert use_fusion is False, "fusion not wired"
+    if use_fusion:  # pragma: no cover - unreachable while PARKED
+        raise NotImplementedError("fusion not wired")
+    logger.info(
+        "C2: fusion PARKED (use_fusion=False) — majority vote path. "
+        "Blocked on: axis fix (done), n_eff/rho correction, LLOP weight "
+        "alignment (C3), confidence-is-probability (GR3 D4/D5/D6/D7)."
+    )
     fusion_engine = None
     time_decay_mgr = None
-    if use_fusion:
-        fusion_engine = SignalFusionEngine(signal_names, stations)
     if use_time_decay:
         time_decay_mgr = TimeDecaySignalManager(
             signal_names, stations,
@@ -350,7 +368,10 @@ def run_backtest(
                     continue
 
                 # Fuse signals or use simple majority vote
-                if fusion_engine and len(signal_outputs) >= 2:
+                # C2 (GR3 D4): fusion_engine is always None while fusion is PARKED,
+                # so this branch is intentionally unreachable and the live path is
+                # the majority vote below. Kept as a marker for the unwired gap.
+                if fusion_engine and len(signal_outputs) >= 2:  # pragma: no cover
                     fused_dir, fused_prob, fused_conf = fusion_engine.fuse_signals(
                         signal_outputs, station,
                         time_decay_mgr=time_decay_mgr if use_time_decay else None
