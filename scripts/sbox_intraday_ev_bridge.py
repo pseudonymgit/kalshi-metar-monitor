@@ -35,6 +35,7 @@ CLI:
 """
 import argparse
 import json
+import os
 import sqlite3
 import sys
 import uuid
@@ -71,6 +72,22 @@ from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name,
 )
 from core.market_cost_model import MARKET_COST_MODEL  # noqa: E402
+
+# ── GR5 §2/§6 live-path wiring (2026-10-10) ──────────────────────────────────
+# The measurement substrate (pre-ingest gate G0–G5 + TradeCustodyRecord) is
+# imported here and CALLED by the record path, so it decides whether a trade is
+# booked and gives every booked trade a custody row. Import is guarded so a
+# substrate import failure can never break the bridge's other jobs. Set
+# WE_BOOKING_GATE=0 to disable. Never applies to --dry-run (no booking happens).
+try:
+    from core.booking_admission import (
+        admit_decision_candidate, record_custody,
+    )
+    _ADMISSION_IMPORTED = True
+except Exception:  # pragma: no cover - substrate missing => gate off, bridge runs
+    _ADMISSION_IMPORTED = False
+ENABLE_BOOKING_GATE = (_ADMISSION_IMPORTED
+                       and os.environ.get("WE_BOOKING_GATE", "1") != "0")
 
 DATA = REPO / "data"
 SBOX_DB = DATA / "paper_trading_sbox.db"
@@ -270,6 +287,14 @@ def _ensure_price_source_column(conn) -> None:
         conn.commit()
 
 
+def _fetch_trade_dict(conn, tuuid):
+    """Return the booked trades row as a dict (provenance for the TCR writer)."""
+    cur = conn.execute("SELECT * FROM trades WHERE trade_uuid=?", (tuuid,))
+    cols = [d[0] for d in cur.description]
+    row = cur.fetchone()
+    return dict(zip(cols, row)) if row else None
+
+
 def record_trade(conn, station, market_type, side, our_prob, market_price,
                  confidence, strike, ticker, size_usd, functionality, day_str,
                  probs: Optional[Dict] = None, price_source: Optional[str] = None,
@@ -305,7 +330,7 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
         _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
         conn.commit()
         return {"status": "enriched", "station": station,
-                "picked_strike": strike,
+                "trade_uuid": tuuid, "picked_strike": strike,
                 "p_gefs": probs.get("p_gefs"), "p_analog": probs.get("p_analog"),
                 "p_trajectory": probs.get("p_trajectory"), "p_fused": probs.get("p_fused"),
                 "agreement": probs.get("agreement"), "traj_verdict": probs.get("traj_verdict")}
@@ -338,6 +363,7 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
     _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
     conn.commit()
     return {"status": "executed", "station": station, "signal_direction": direction,
+            "trade_uuid": tuuid,
             "strike": strike, "ticker": ticker, "our_prob": round(our_prob, 4),
             "market_price": price, "position_size_usd": round(size_usd, 2),
             "edge": round(our_prob - price, 4),
@@ -542,11 +568,45 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                             "size": size_usd,
                             **prob_payload})
         else:
-            results.append(record_trade(
+            # GR5 §2 pre-ingest gate: the candidate must pass the decidable
+            # subset (G0 window-green · G1 identity/version · G4 axis) BEFORE it
+            # is booked; the verdict is appended to the append-only gate ledger.
+            # A rejected candidate is not booked. Fail-open (never break the
+            # booking path on a gate error) but loud.
+            if ENABLE_BOOKING_GATE:
+                try:
+                    gv, _g_admitted = admit_decision_candidate(
+                        trade_uuid=f"{INSTANCE}-{st}-{day_str}",
+                        instance=INSTANCE, station=st, market_type="HIGH",
+                        settlement_date=day_str, label_axis="strike_crossing",
+                        conn=conn, repo=REPO, suite_green=True)
+                except Exception as e:  # pragma: no cover
+                    diag.append({"station": st,
+                                 "booking_gate_error": f"{type(e).__name__}:{e}"})
+                else:
+                    if not _g_admitted:
+                        skipped.append((st, f"booking_gate_{gv.verdict}"))
+                        continue
+            rec = record_trade(
                 conn, st, "HIGH", sig.signal_type.name, our_prob, mkt,
                 abs(our_prob - 0.5) * 2.0, strike, ticker,
                 size_usd, "intraday_ev_strike", day_str, probs=prob_payload,
-                price_source=price_source, selected_side=picked["side"]))
+                price_source=price_source, selected_side=picked["side"])
+            # GR5 §1 TradeCustodyRecord: one chain-of-custody row per booked
+            # trade (idempotent). Read the just-booked row back for real
+            # provenance; never let a TCR failure un-book the trade.
+            if ENABLE_BOOKING_GATE:
+                tuuid = rec.get("trade_uuid")
+                if rec.get("status") == "executed" and tuuid:
+                    try:
+                        trow = _fetch_trade_dict(conn, tuuid)
+                        if trow is not None:
+                            rec["custody_hash"] = record_custody(
+                                conn, trow, instance=INSTANCE)
+                    except Exception as e:  # pragma: no cover
+                        diag.append({"station": st,
+                                     "custody_error": f"{type(e).__name__}:{e}"})
+            results.append(rec)
 
     if conn:
         conn.close()
