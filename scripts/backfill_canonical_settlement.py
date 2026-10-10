@@ -61,8 +61,67 @@ from core.canonical_settlement import (  # noqa: E402
     ensure_snapshot_table, freeze_snapshot, read_snapshot,
 )
 
+# The immutable `settlement_snapshot` accepts FINAL canonical truth ONLY. The
+# backfill's last-resort proxies (weatherapi/GHCN) are PROVISIONAL and must never
+# be frozen here (governance ruling 2026-10-10: provisional-into-immutable was
+# the root defect behind the 25 non-canonical rows). Provisional values are
+# diverted to the supersedable `settlement_provisional` layer instead.
+CANONICAL_SNAPSHOT_SOURCES = frozenset({CANONICAL_TEMP_SOURCE, "kalshi_finalized"})
+
 PAPER_DB = REPO / "data" / "paper_trading_sbox.db"
 METAR_DB = REPO / "data" / "metar_backfill.db"
+
+# Supersedable provisional layer (A4-lite): provisional values live here until
+# canonical finalization, then may be promoted ONCE into the immutable snapshot.
+# Unlike `settlement_snapshot` this table has NO immutability triggers: a value
+# can be revised (INSERT OR REPLACE) as better truth arrives.
+PROVISIONAL_TABLE = "settlement_provisional"
+PROVISIONAL_DDL = f"""
+CREATE TABLE IF NOT EXISTS {PROVISIONAL_TABLE} (
+    station            TEXT NOT NULL,
+    market_type        TEXT NOT NULL,
+    local_trading_date TEXT NOT NULL,
+    provisional_temp_f REAL NOT NULL,
+    temp_source        TEXT NOT NULL,
+    as_of_utc          TEXT,
+    created_at_utc     TEXT NOT NULL,
+    superseded_by      TEXT,            -- canonical source once promoted, else NULL
+    PRIMARY KEY (station, market_type, local_trading_date)
+);
+"""
+
+
+def ensure_provisional_table(conn: sqlite3.Connection) -> None:
+    """Idempotently create the supersedable provisional settlement layer."""
+    conn.executescript(PROVISIONAL_DDL)
+    conn.commit()
+
+
+def write_provisional(conn: sqlite3.Connection, rows: List[Dict[str, Any]],
+                      *, created_at_utc: str) -> int:
+    """Write provisional (non-canonical) values to the supersedable layer.
+
+    INSERT OR REPLACE so a later provisional read can revise an earlier one;
+    a canonical promotion is recorded by the caller setting superseded_by.
+    Returns the number of rows written.
+    """
+    ensure_provisional_table(conn)
+    n = 0
+    for r in rows:
+        conn.execute(
+            f"INSERT OR REPLACE INTO {PROVISIONAL_TABLE} "
+            "(station, market_type, local_trading_date, provisional_temp_f, "
+            " temp_source, as_of_utc, created_at_utc, superseded_by) "
+            "VALUES (?,?,?,?,?,?,?,"
+            " COALESCE((SELECT superseded_by FROM " + PROVISIONAL_TABLE +
+            " WHERE station=? AND market_type=? AND local_trading_date=?), NULL))",
+            (r["station"], r["market_type"], r["local_trading_date"],
+             r["settlement_temp_f"], r["temp_source"], r.get("settled_at_utc"),
+             created_at_utc,
+             r["station"], r["market_type"], r["local_trading_date"]))
+        n += 1
+    conn.commit()
+    return n
 KALSHI_DB = REPO / "data" / "kalshi_settlements.db"
 GHCN_DB = REPO / "data" / "ghcn_settlements.db"
 WEATHERAPI_DB = REPO / "data" / "weatherapi_archive.db"
@@ -252,14 +311,25 @@ def run(start: str, end: str, *, execute: bool, use_live: bool) -> int:
     cmap = build_canonical_map(stations, start, end, use_live=use_live)
     print(f"[canonical] map entries: {len(cmap)}")
 
-    # snapshot rows to freeze
+    # Partition the assembled map into FINAL canonical truth (may be frozen) and
+    # PROVISIONAL last-resort truth (must NOT be frozen). Root defect fix (A3):
+    # the immutable final-truth store accepts canonical sources only; a
+    # weatherapi/GHCN last-resort value is diverted to the supersedable
+    # `settlement_provisional` layer instead of being frozen into the snapshot.
     snap_rows = []
+    provisional_rows = []
     for (st, d), rec in cmap.items():
-        snap_rows.append({
+        row = {
             "station": st, "market_type": "HIGH", "local_trading_date": d,
             "settlement_temp_f": rec["temp_f"], "temp_source": rec["source"],
             "settled_at_utc": rec.get("settled_at_utc"),
-        })
+        }
+        (snap_rows if rec["source"] in CANONICAL_SNAPSHOT_SOURCES
+         else provisional_rows).append(row)
+    if provisional_rows:
+        print(f"[snapshot] BLOCKED {len(provisional_rows)} non-canonical row(s) "
+              f"from the immutable snapshot -> diverted to {PROVISIONAL_TABLE} "
+              f"{'(.db write)' if execute else '(dry-run)'}")
 
     # settle snapshot db is metar_backfill.db (single home for settlement truth)
     # DRY-RUN must not write: compare against existing frozen rows read-only and
@@ -273,6 +343,9 @@ def run(start: str, end: str, *, execute: bool, use_live: bool) -> int:
         inserted, skipped, conflicts = freeze_snapshot(rw, snap_rows,
                                                        frozen_at_utc=now,
                                                        conflict_raises=False)
+        if provisional_rows:
+            n_prov = write_provisional(rw, provisional_rows, created_at_utc=now)
+            print(f"[snapshot] wrote {n_prov} provisional row(s) to {PROVISIONAL_TABLE}")
     else:
         try:
             for r in snap_rows:
@@ -334,25 +407,35 @@ def run(start: str, end: str, *, execute: bool, use_live: bool) -> int:
                          "flip": flip, "match": match})
 
         if execute:
-            pconn.execute(
-                "UPDATE trades SET canonical_settled_f=?, canonical_source=?, "
-                "canonical_outcome=?, settlement_confirmed=1, settlement_outcome=? "
-                "WHERE trade_uuid=?",
-                (temp, rec["source"], cout, cout, r["trade_uuid"]))
+            # A canonical write into `trades` must be backed by FINAL canonical
+            # truth only. A provisional (weatherapi/GHCN) value is NOT copied
+            # onto canonical_settled_f / settlement_confirmed — otherwise the
+            # provisional value would be laundered as canonical trade truth.
+            # (No historical P&L is touched either way.)
+            if rec["source"] in CANONICAL_SNAPSHOT_SOURCES:
+                pconn.execute(
+                    "UPDATE trades SET canonical_settled_f=?, canonical_source=?, "
+                    "canonical_outcome=?, settlement_confirmed=1, settlement_outcome=? "
+                    "WHERE trade_uuid=?",
+                    (temp, rec["source"], cout, cout, r["trade_uuid"]))
 
-            # settlement_truth backfill (corrected-truth table)
-            rw.execute(
-                "INSERT OR REPLACE INTO settlement_truth (station, market_type,"
-                " local_trading_date, settlement_temp_f, temp_source, kalshi_temp_f,"
-                " strike_price, strike_type, trustworthy) VALUES (?,?,?,?,?,?,?,?,1)",
-                (r["station"], r["market_type"], r["trade_date_utc"], temp,
-                 rec["source"], temp,
-                 strike, "greater" if r["market_type"] == "HIGH" else "less"))
+                # settlement_truth backfill (corrected-truth table)
+                rw.execute(
+                    "INSERT OR REPLACE INTO settlement_truth (station, market_type,"
+                    " local_trading_date, settlement_temp_f, temp_source, kalshi_temp_f,"
+                    " strike_price, strike_type, trustworthy) VALUES (?,?,?,?,?,?,?,?,1)",
+                    (r["station"], r["market_type"], r["trade_date_utc"], temp,
+                     rec["source"], temp,
+                     strike, "greater" if r["market_type"] == "HIGH" else "less"))
 
-    # Backfill settlement_truth for ALL station-days in the window (not only trades)
+    # Backfill settlement_truth for ALL station-days in the window (not only
+    # trades) — canonical station-days only; a provisional station-day is not
+    # trustworthy final truth and is left for promotion once canonical arrives.
     if execute:
         g = _ro(GHCN_DB)
         for (st, d), rec in cmap.items():
+            if rec["source"] not in CANONICAL_SNAPSHOT_SOURCES:
+                continue
             strike = None
             rw.execute(
                 "INSERT OR REPLACE INTO settlement_truth (station, market_type,"
