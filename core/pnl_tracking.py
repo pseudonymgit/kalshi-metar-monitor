@@ -25,6 +25,7 @@ from .risk_controls import TradeResult
 from .canonical_settlement import (
     assert_canonical_immutable as _assert_canonical_immutable,
     canonical_outcome as _canonical_outcome,
+    is_canonical_temp_source as _is_canonical_temp_source,
     load_canonical_snapshots as _load_canonical_snapshots,
 )
 
@@ -98,6 +99,19 @@ def process_settlements_for_date(self, settlement_date):
                 "Cannot settle trade %s: no frozen canonical settlement for "
                 "station=%s market_type=%s date=%s. Trade left open.",
                 trade_uuid, station, market_type, settlement_date)
+            continue
+        # Fail closed on a provisional (non-canonical) row (2026-10-10): a
+        # snapshot row sourced from weatherapi/provisional/fallback/unknown is
+        # NOT a settlement. Booking it would permanently freeze a wrong value the
+        # immutable snapshot cannot self-heal when Kalshi finalizes. Leave the
+        # trade OPEN instead.
+        if not _is_canonical_temp_source(canonical.get("temp_source")):
+            _LOGGER.warning(
+                "Cannot settle trade %s: frozen snapshot for station=%s "
+                "market_type=%s date=%s is non-canonical (temp_source=%s); "
+                "provisional, not a settlement. Trade left open.",
+                trade_uuid, station, market_type, settlement_date,
+                canonical.get("temp_source"))
             continue
         canonical_temp = canonical["settlement_temp_f"]
         canonical_source = canonical.get("temp_source")

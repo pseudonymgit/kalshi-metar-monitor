@@ -34,6 +34,8 @@ __all__ = [
     "SNAPSHOT_TABLE",
     "SNAPSHOT_DDL",
     "CANONICAL_TEMP_SOURCE",
+    "CANONICAL_TEMP_SOURCES",
+    "is_canonical_temp_source",
     "ensure_snapshot_table",
     "freeze_snapshot",
     "read_snapshot",
@@ -48,6 +50,14 @@ __all__ = [
 
 SNAPSHOT_TABLE = "settlement_snapshot"
 CANONICAL_TEMP_SOURCE = "kalshi_live_api"
+
+# The ONLY `temp_source` values that are canonical settlement truth. Kalshi's
+# live API `expiration_value` and its finalized settlement record both encode the
+# official daily high. Every other value a snapshot row can carry (the backfill's
+# `weatherapi` blend, `fallback_cross_check`, or any unknown/NULL provenance) is a
+# PROVISIONAL proxy that must never be booked as a final settlement. Single-sourced
+# here so the settle read path and any other consumer share one definition.
+CANONICAL_TEMP_SOURCES = frozenset({CANONICAL_TEMP_SOURCE, "kalshi_finalized"})
 
 # Frozen, append-only snapshot of the canonical settlement per station/market/day.
 # PK is (station, market_type, local_trading_date). Triggers below make rows
@@ -84,6 +94,18 @@ def ensure_snapshot_table(conn: sqlite3.Connection) -> None:
     """Idempotently create the frozen snapshot table + immutability triggers."""
     conn.executescript(SNAPSHOT_DDL)
     conn.commit()
+
+
+def is_canonical_temp_source(temp_source: Any) -> bool:
+    """True iff `temp_source` marks canonical settlement truth.
+
+    Canonical == `kalshi_live_api` (Kalshi live API expiration_value) or
+    `kalshi_finalized` (Kalshi finalized settlement record). Anything else —
+    including the `weatherapi` provisional blend, `fallback_cross_check`, an
+    empty string, or None — is NOT final settlement truth and callers must fail
+    closed. See `CANONICAL_TEMP_SOURCES`.
+    """
+    return temp_source in CANONICAL_TEMP_SOURCES
 
 
 def canonical_settle_yes(settlement_temp_f: float, strike_price: float,
@@ -183,8 +205,11 @@ def load_canonical_snapshots(metar_db: str) -> Dict[Tuple[str, str, str], Dict[s
     Forward settle path: the writer must read canonical truth from the frozen
     `settlement_snapshot` (Kalshi live API / GHCN), NOT from the raw/epoch METAR
     extreme. Returns {(station, market_type, local_trading_date):
-    {settlement_temp_f, temp_source}}. Never raises on a missing/empty db — a
-    missing snapshot is a *gap*, reported by the caller, not a crash.
+    {settlement_temp_f, temp_source}}, INCLUDING ONLY rows whose `temp_source` is
+    canonical (`CANONICAL_TEMP_SOURCES`). A row from any other source is a
+    provisional proxy and is omitted so the caller fails closed. Never raises on
+    a missing/empty db — a missing snapshot is a *gap*, reported by the caller,
+    not a crash.
     """
     out: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
     if not metar_db or not os.path.exists(metar_db):
@@ -203,6 +228,12 @@ def load_canonical_snapshots(metar_db: str) -> Dict[Tuple[str, str, str], Dict[s
     for st, mt, d, temp, src in rows:
         if temp is None:
             continue
+        # Fail closed (2026-10-10): a row whose temp_source is not canonical is a
+        # provisional proxy (e.g. the backfill's weatherapi blend), NOT final
+        # settlement truth. Exclude it so the settle writer leaves the trade OPEN
+        # instead of booking a value that will not self-heal when Kalshi finalizes.
+        if not is_canonical_temp_source(src):
+            continue
         out[(st, mt, d)] = {"settlement_temp_f": float(temp), "temp_source": src}
     return out
 
@@ -210,13 +241,19 @@ def load_canonical_snapshots(metar_db: str) -> Dict[Tuple[str, str, str], Dict[s
 def resolve_canonical_settlement(conn: sqlite3.Connection, station: str,
                                  market_type: str, local_trading_date: str
                                  ) -> Optional[Dict[str, Any]]:
-    """Canonical settlement for one station/market/day, or None when unfrozen.
+    """Canonical settlement for one station/market/day, or None when unfrozen or
+    non-canonical.
 
     A thin, explicit read over the frozen snapshot so the settle writer has a
-    single named entry point: canonical truth exists iff a snapshot row exists.
+    single named entry point: canonical truth exists iff a snapshot row exists
+    AND its `temp_source` is canonical. A row from a non-canonical source
+    (weatherapi/provisional/fallback/unknown) returns None — the settle writer
+    then fails closed and leaves the trade OPEN rather than booking a proxy.
     """
     snap = read_snapshot(conn, station, market_type, local_trading_date)
     if snap is None:
+        return None
+    if not is_canonical_temp_source(snap["temp_source"]):
         return None
     return {"settlement_temp_f": float(snap["settlement_temp_f"]),
             "temp_source": snap["temp_source"]}
