@@ -86,7 +86,7 @@ if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 from gate_composer import (  # noqa: E402
     compose_gate, GateCheck, GateLedger, GateVerdict, VERDICT_ADMITTED,
-    VERDICT_HALT, VERDICT_REJECTED, _candidate_hash,
+    VERDICT_HALT, VERDICT_REJECTED, _candidate_hash, verdict_idempotency_key,
     gate_g0_suite_green, gate_g1_provenance, gate_g4_axis,
     INTRADAY_ENTRY_LOCAL_HHMM, AXIS_VALUE, settled_binary,
 )
@@ -466,12 +466,22 @@ def admit_settled_trades(trades_db: Path | str, *,
 
     led = ledger_of(gate_db)
     admitted, rejected, custody = [], [], {}
+    ledger_written = ledger_duplicates = 0
     for row in rows:
         cand = candidate_from_trades_row(row, canonical_map=canonical_map,
                                          finalization_map=finalization_map)
         v = compose_gate(cand, Path(repo), frozen_version=FROZEN_TRADE_VERSION,
                          suite_green=True)
-        led.append(v)
+        # Idempotency: a given (trade, check-set) admission writes its verdict at
+        # most once. The key is derived from ROW identity (trade_uuid, frozen
+        # gate_version, verdict, decision instant) — never wall-clock now() — so
+        # re-running this writer over the same settled rows is a no-op, not a
+        # duplicate. Append-only: a duplicate is skipped, never overwritten.
+        wrote = led.append(v, idempotency_key=verdict_idempotency_key(
+            v.trade_uuid, cand.get("trade_version"), v.verdict,
+            cand.get("created_at_utc")))
+        ledger_written += int(wrote)
+        ledger_duplicates += int(not wrote)
         if v.verdict == VERDICT_ADMITTED:
             admitted.append(row["trade_uuid"])
             custody[row["trade_uuid"]] = record_custody_for_trade(
@@ -484,6 +494,8 @@ def admit_settled_trades(trades_db: Path | str, *,
     led.conn.close()
     return {"admitted": admitted, "rejected": rejected,
             "custody_hashes": custody,
+            "ledger_written": ledger_written,
+            "ledger_duplicates": ledger_duplicates,
             "prereg": {"ok": prereg.get("ok"), "sha256": prereg.get("sha256")}}
 
 

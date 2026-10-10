@@ -123,6 +123,23 @@ def _candidate_hash(candidate: Dict[str, Any]) -> str:
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
+def verdict_idempotency_key(trade_uuid: Optional[str], gate_version: Optional[str],
+                            verdict: Optional[str], checked_at: Optional[str]) -> str:
+    """sha256(trade_uuid|gate_version|verdict|checked_at) — the ledger's UNIQUE key.
+
+    Mirrors `core.trade_custody.idempotency_key` (`sha256(instance|market_ticker|
+    decision_ts)`) so the two admission audit surfaces share one idempotency
+    pattern. Every component is derived deterministically from ROW identity
+    (`gate_version` = the candidate's frozen trade_version; `checked_at` = the
+    candidate's decision instant `created_at_utc`) — never wall-clock now() — so
+    a re-run of the same settled row reproduces the same key and is a no-op.
+    A None component renders as the empty string to keep the key reproducible.
+    """
+    raw = "|".join(str(x) if x is not None else ""
+                   for x in (trade_uuid, gate_version, verdict, checked_at))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
 # ─── Individual gates ───────────────────────────────────────────────────────
 def gate_g0_suite_green(repo: Path, *, suite_green: Optional[bool] = None) -> GateCheck:
     """G0: window may not open unless the structural gates certify green.
@@ -393,7 +410,15 @@ def compose_gate(candidate: Dict[str, Any], repo: Path = REPO_DEFAULT,
 
 # ─── Append-only ledger ─────────────────────────────────────────────────────
 class GateLedger:
-    """Append-only verdict ledger. Rows are immutable (UPDATE/DELETE abort)."""
+    """Append-only, idempotent verdict ledger (rows immutable; UPDATE/DELETE abort).
+
+    A verdict is written AT MOST ONCE per (trade, check-set). The append point
+    carries a deterministic `idempotency_key` with a UNIQUE index and uses
+    `INSERT OR IGNORE`, so a duplicate append is a silent no-op — never an
+    overwrite and never a second row. Legacy rows written before the key existed
+    keep a NULL key (NULLs are distinct under a UNIQUE index, so the index still
+    builds and no prior row is mutated).
+    """
 
     TABLE = "gate_ledger"
 
@@ -410,8 +435,18 @@ class GateLedger:
                 candidate_hash TEXT,
                 verdict TEXT NOT NULL,
                 failed_gate TEXT,
-                detail TEXT
+                detail TEXT,
+                idempotency_key TEXT
             )""")
+        # Migrate a pre-idempotency ledger in place: ADD COLUMN is DDL, not an
+        # UPDATE, so the immutability triggers never fire and no row is rewritten.
+        cols = {r[1] for r in self.conn.execute(f"PRAGMA table_info({self.TABLE})")}
+        if "idempotency_key" not in cols:
+            self.conn.execute(
+                f"ALTER TABLE {self.TABLE} ADD COLUMN idempotency_key TEXT")
+        self.conn.execute(
+            f"CREATE UNIQUE INDEX IF NOT EXISTS ux_{self.TABLE}_idem "
+            f"ON {self.TABLE}(idempotency_key)")
         self.conn.execute(
             f"""CREATE TRIGGER IF NOT EXISTS trg_{self.TABLE}_no_update
                 BEFORE UPDATE ON {self.TABLE}
@@ -422,17 +457,32 @@ class GateLedger:
                 BEGIN SELECT RAISE(ABORT, '{self.TABLE} is append-only'); END""")
         self.conn.commit()
 
-    def append(self, v: GateVerdict, *, logged_at_utc: Optional[str] = None) -> None:
+    def append(self, v: GateVerdict, *, logged_at_utc: Optional[str] = None,
+               idempotency_key: Optional[str] = None) -> bool:
+        """Append a verdict; a duplicate idempotency key is a no-op.
+
+        `idempotency_key` should be supplied by the admission writer as
+        `verdict_idempotency_key(trade_uuid, gate_version, verdict, checked_at)`.
+        When omitted (direct callers), a deterministic fallback key is derived
+        from the verdict's own identity so the append is still idempotent.
+        Returns True when a row was written, False when it was ignored.
+        """
         failed = next((c.gate for c in v.checks
                        if c.status in ("REJECT", "HALT")), None)
         detail = "; ".join(f"{c.gate}:{c.status}:{c.detail}"
                            for c in v.checks if c.status != "PASS")
-        self.conn.execute(
-            f"INSERT INTO {self.TABLE} (logged_at_utc, trade_uuid, candidate_hash, "
-            f"verdict, failed_gate, detail) VALUES (?,?,?,?,?,?)",
+        if idempotency_key is None:
+            idempotency_key = verdict_idempotency_key(
+                v.trade_uuid, None, v.verdict, v.candidate_hash)
+        cur = self.conn.execute(
+            f"INSERT OR IGNORE INTO {self.TABLE} (logged_at_utc, trade_uuid, "
+            f"candidate_hash, verdict, failed_gate, detail, idempotency_key) "
+            f"VALUES (?,?,?,?,?,?,?)",
             (logged_at_utc or datetime.now(timezone.utc).isoformat(),
-             v.trade_uuid, v.candidate_hash, v.verdict, failed, detail))
+             v.trade_uuid, v.candidate_hash, v.verdict, failed, detail,
+             idempotency_key))
         self.conn.commit()
+        return cur.rowcount == 1
 
 
 # ─── Self-check ─────────────────────────────────────────────────────────────

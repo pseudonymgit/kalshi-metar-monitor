@@ -342,5 +342,101 @@ def test_two_trades_same_day_get_distinct_custody_rows():
     assert ok, problems
 
 
+# ─── ledger idempotency guard (production writer) ───────────────────────────
+def test_settled_admission_rerun_is_idempotent(tmp_path):
+    """The production writer's append point is idempotent per (trade, check-set).
+
+    Re-running `admit_settled_trades()` over the same settled rows must not
+    double the append-only gate ledger. Regression for the measured 93 -> 157
+    duplication (the reconcile driver guarded this itself; the production
+    writer did not).
+    """
+    book = tmp_path / "book.db"
+    c = sqlite3.connect(book)
+    for stmt in _book_db().execute(
+            "SELECT sql FROM sqlite_master WHERE sql IS NOT NULL"):
+        c.execute(stmt[0])
+    c.commit()
+    # one clean ADMITTED row + one lookahead REJECTED row (every verdict must
+    # each be written at most once).
+    c.execute(
+        "INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,"
+        " signal_direction, market_price, trade_type, quantity,"
+        " position_size_usd, trade_price, trade_cost, trade_version,"
+        " functionality, created_at_utc, label_axis, settlement_confirmed,"
+        " settlement_outcome, settled_value, realized_pnl, snapshot_time_utc)"
+        " VALUES ('clean','2026-10-04','KNYC','HIGH','UP',0.3,'buy_yes',100,"
+        "30,0.3,30,'v3.1_sbox','intraday_ev_strike','2026-10-04T17:00:00Z',"
+        "'strike_crossing',1,'correct',75.0,10.0,'2026-10-04T17:30:00Z')")
+    c.execute(
+        "INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,"
+        " signal_direction, market_price, trade_type, quantity,"
+        " position_size_usd, trade_price, trade_cost, trade_version,"
+        " functionality, created_at_utc, label_axis, settlement_confirmed,"
+        " settlement_outcome, settled_value, realized_pnl, snapshot_time_utc)"
+        " VALUES ('leak','2026-10-04','KSFO','HIGH','UP',0.3,'buy_yes',100,"
+        "30,0.3,30,'v3.1_sbox','intraday_ev_strike','2026-10-04T17:00:00Z',"
+        "'strike_crossing',1,'correct',1,10.0,'2026-10-04T21:00:00Z')")
+    c.commit()
+    c.close()
+
+    anchors = {("KNYC", "HIGH", "2026-10-04"): "2026-10-05T05:00:00Z",
+               ("KSFO", "HIGH", "2026-10-04"): "2026-10-05T05:00:00Z"}
+    gate_db, custody_db = str(tmp_path / "gate.db"), str(tmp_path / "custody.db")
+
+    def _ledger_count():
+        g = sqlite3.connect(f"file:{gate_db}?mode=ro", uri=True)
+        n = g.execute("SELECT COUNT(*) FROM gate_ledger").fetchone()[0]
+        g.close()
+        return n
+
+    out1 = admit_settled_trades(
+        str(book), gate_db=gate_db, custody_db=custody_db,
+        canonical_map={}, finalization_map=anchors)
+    n1 = _ledger_count()
+    assert out1["ledger_written"] == 2 and out1["ledger_duplicates"] == 0
+
+    out2 = admit_settled_trades(
+        str(book), gate_db=gate_db, custody_db=custody_db,
+        canonical_map={}, finalization_map=anchors)
+    n2 = _ledger_count()
+    assert n2 == n1, f"re-run duplicated ledger rows: {n1} -> {n2}"
+    assert out2["ledger_written"] == 0 and out2["ledger_duplicates"] == 2
+    # the custody writer stays idempotent too
+    assert out2["custody_hashes"].get("clean") == out1["custody_hashes"].get("clean")
+    cc = sqlite3.connect(f"file:{custody_db}?mode=ro", uri=True)
+    assert cc.execute("SELECT COUNT(*) FROM trade_custody").fetchone()[0] == 1
+    ok, problems = verify_chain(cc)
+    cc.close()
+    assert ok, problems
+
+
+def test_ledger_append_idempotent_key_unique():
+    """Direct ledger append: the same (trade, check-set) writes once; a changed
+    key gets its own row."""
+    from gate_composer import GateLedger, compose_gate, verdict_idempotency_key
+
+    conn = sqlite3.connect(":memory:")
+    led = GateLedger(conn)
+    v = compose_gate(
+        {"trade_uuid": "u1", "instance": "SBOX",
+         "trade_version": FROZEN_TRADE_VERSION,
+         "created_at_utc": "2026-10-04T17:00:00Z",
+         "settlement_date": "2026-10-04", "quantity": 100,
+         "fill_price": 0.30, "fee_total": kalshi_fee(100, 0.30),
+         "settlement_confirmed": 1, "settlement_outcome": "correct",
+         "canonical_outcome": "correct", "label_axis": "strike_crossing",
+         "snapshot_time_utc": "2026-10-04T17:30:00Z"},
+        REPO, frozen_version=FROZEN_TRADE_VERSION, suite_green=True)
+    key = verdict_idempotency_key("u1", FROZEN_TRADE_VERSION, v.verdict,
+                                  "2026-10-04T17:00:00Z")
+    assert led.append(v, idempotency_key=key) is True
+    assert led.append(v, idempotency_key=key) is False
+    # the key is a pure function of row identity (reproducible across runs)
+    assert key == verdict_idempotency_key(
+        "u1", FROZEN_TRADE_VERSION, v.verdict, "2026-10-04T17:00:00Z")
+    assert conn.execute("SELECT COUNT(*) FROM gate_ledger").fetchone()[0] == 1
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))
