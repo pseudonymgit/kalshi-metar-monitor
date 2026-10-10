@@ -73,21 +73,21 @@ class TestKalshiApiEdgeCases:
                 kalshi_monitor.get_public_markets(limit=1)
 
     def test_price_fetcher_none_market(self):
-        """Price fetcher's public-markets reader is a documented CORE DEFECT.
+        """Price fetcher's public-markets reader must return a list, not raise.
 
-        ``core/price_fetcher.py:357`` calls ``_kalshi_public_get`` with
-        undefined names (``series_ticker``, ``normalized_station``) → NameError
-        on any call. This is genuine breakage, NOT test staleness (flag for
-        Workstream E report); the old ``except Exception: pass`` hid it.
+        ``core/price_fetcher.py::_get_all_public_markets`` previously called
+        ``_kalshi_public_get`` with undefined names (``series_ticker``,
+        ``normalized_station``) → NameError on any call, hidden by a bare
+        ``except Exception: pass`` upstream. Fixed: the loop now uses its own
+        paging variables and passes a real ``/markets`` path.
         """
         from core import price_fetcher
 
-        pytest.xfail(
-            "core defect: price_fetcher._get_all_public_markets references "
-            "undefined series_ticker/normalized_station (line 357-364)"
-        )
-        result = price_fetcher._get_all_public_markets(max_pages=1, page_limit=1)
+        with patch.object(price_fetcher, "_kalshi_public_get",
+                          return_value={"markets": [], "cursor": None}):
+            result = price_fetcher._get_all_public_markets(max_pages=1, page_limit=1)
         assert isinstance(result, list)
+        assert result == []
 
 
 # ─── Position Sizing Edge Cases ─────────────────────────────────────────────

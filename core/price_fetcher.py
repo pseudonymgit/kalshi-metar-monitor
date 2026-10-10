@@ -345,16 +345,24 @@ def get_public_markets(limit=5):
         "count": len(data.get("markets", [])),
         "markets": data.get("markets", []),
     }
-def _get_all_public_markets(max_pages=5, page_limit=200):
+def _get_all_public_markets(max_pages=5, page_limit=200, series_ticker=None, station=None):
+    """Fetch public markets across pages.
+
+    Pages through ``/markets`` using the cursor returned per page. The optional
+    ``series_ticker``/``station`` arguments are diagnostic labels only: they are
+    echoed in the probe log lines and are never required to make the call.
+    """
     markets = []
     cursor = None
+    normalized_station = (station or "").strip().upper()
+    series_ticker = str(series_ticker).strip().upper() if series_ticker else ""
 
     for _ in range(max_pages):
         path = f"/markets?limit={int(page_limit)}"
         if cursor:
             path = f"{path}&cursor={cursor}"
 
-        data = _kalshi_public_get(f"/markets?series_ticker={series_ticker}&limit=200")
+        data = _kalshi_public_get(path)
 
         _LOGGER.warning(
             "kalshi_probe station=%s series=%s response_keys=%s",
@@ -363,15 +371,16 @@ def _get_all_public_markets(max_pages=5, page_limit=200):
             list(data.keys()) if isinstance(data, dict) else type(data),
         )
 
-        markets = data.get("markets") or []
+        page_markets = (data.get("markets") if isinstance(data, dict) else None) or []
+        markets.extend(page_markets)
 
         _LOGGER.warning(
             "kalshi_probe_market_count station=%s markets=%s",
             normalized_station,
-            len(markets),
+            len(page_markets),
         )
-        
-        cursor = data.get("cursor")
+
+        cursor = data.get("cursor") if isinstance(data, dict) else None
         if not cursor:
             break
 
