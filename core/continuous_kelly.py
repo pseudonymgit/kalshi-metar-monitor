@@ -181,6 +181,7 @@ def kelly_fraction(
     station: str = "",
     signal_name: str = "",
     state: Optional[KellyState] = None,
+    direction: str = "up",
 ) -> int:
     """
     Compute position size using continuous Kelly criterion.
@@ -208,6 +209,8 @@ def kelly_fraction(
         station: Station code for concentration limits
         signal_name: Signal name for concentration limits
         state: Optional persistent KellyState for drawdown tracking
+        direction: 'up' (buy YES) or 'down' (buy NO). Selects the correct net
+            odds for the side actually being bought (C1 / GR3 D10).
 
     Returns:
         Number of contracts (integer)
@@ -221,8 +224,17 @@ def kelly_fraction(
 
     # Kelly formula for binary bet
     # f* = (p * b - q) / b
-    # where b = (1 / price) - 1 for YES bets
-    b = (1.0 / market_price) - 1.0
+    # where p = probability the CHOSEN SIDE wins and b = its net odds.
+    #
+    # C1 (GR3 D10): the prior code always used YES odds b = (1/mp) - 1, even for
+    # direction='down'. At mp=0.65 that under-sized NO bets to ~0.67x the
+    # correct fraction (yes-odds misapplication). Branch on the side bought:
+    #   YES @ mp:   b = (1 - mp) / mp      (win pays 1, cost mp)
+    #   NO  @ 1-mp: b = mp / (1 - mp)      (win pays 1, cost 1-mp)
+    if direction == "down":
+        b = market_price / (1.0 - market_price)
+    else:
+        b = (1.0 / market_price) - 1.0
     q = 1.0 - confidence
     kelly = (confidence * b - q) / b
 
@@ -304,7 +316,7 @@ def fee_aware_kelly(
     edge = kelly_calculate_edge(pred_price, market_price, direction=direction)
     return kelly_fraction(
         edge, confidence, kelly_frac, max_contracts,
-        market_price, capital, station, signal_name, state
+        market_price, capital, station, signal_name, state, direction
     )
 
 

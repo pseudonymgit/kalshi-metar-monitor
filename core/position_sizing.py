@@ -3,7 +3,7 @@
 Confidence-Weighted Position Sizing Module with Fee-Aware Kelly (SH3 Enhancement)
 
 Implements fee-adjusted Kelly position sizing per requirement:
-- Formula: Kelly fraction = edge / (1 - fee) / variance  
+- Formula: Kelly fraction = (p - c) / (1 - c)   (binary Kelly, fee-aware)
 - Cap max position at 25% of balance
 - Use 30-day rolling win rate for edge estimation
 - High-confidence signals → larger position size. Low-confidence → smaller.
@@ -73,8 +73,8 @@ class KellyPositionSizer:
     """
     Implements fee-aware Kelly criterion with fractional Kelly sizing per SH3.
     
-    Formula: Kelly fraction = edge / (1-fee) / variance
-    Edge estimated from 30-day rolling win rate.
+    Formula: Kelly fraction = (p - c) / (1 - c)  (binary Kelly, fee-aware).
+    Edge estimated from 30-day rolling win rate vs. market price.
     """
     
     def __init__(self, fee_rate: float = EXECUTION_COST_RATE, fraction_kelly: float = 0.5,
@@ -118,41 +118,46 @@ class KellyPositionSizer:
         wins = sum(1 for r in recent_results if r['win'])
         return wins / len(recent_results) if recent_results else 0.5
 
-    def calculate_edge_from_win_rate(self, win_rate: float) -> float:
+    def calculate_edge_from_win_rate(self, win_rate: float, market_price: float = 0.50) -> float:
         """
-        Calculate statistical edge from win rate.
+        Statistical edge = calibrated win probability minus the price you pay.
+
+        C1 (GR3 D8): the prior form returned ``2*win_rate - 1`` — it ignored the
+        market price entirely, so a 60% win rate always looked like a 20% edge
+        regardless of whether the contract cost 0.50 or 0.90.  Edge is now
+        ``win_rate - market_price`` (GR14 P0), on the same probability basis as
+        the Kelly fraction.
         """
-        # Edge = expected value of prediction
-        # If you predict up with probability p and win with rate w, expected edge = p*w - (1-p)*(1-w) 
-        # Simplified: edge ≈ 2*win_rate - 1  (when predicting optimistically)
-        return 2 * win_rate - 1
+        return win_rate - market_price
 
-    def calculate_kelly_fraction(self, edge: float, win_rate: float) -> float:
+    def calculate_kelly_fraction(self, edge: float, win_rate: float,
+                                 market_price: float = 0.50) -> float:
         """
-        Calculate Kelly fraction accounting for fees per formula kelly = edge / (1-fee) / variance.
-        This is adapted from the general Kelly formula assuming binary outcomes.
+        Fee-aware binary Kelly fraction (C1 / GR3 D8).
+
+        Canonical form (GR14 P0): ``f* = (p - c) / (1 - c)`` where ``p`` is the
+        calibrated win probability and ``c`` is the round-trip cost fraction.
+
+        The prior implementation used ``(edge - fee) / (p*(1-p))`` with
+        ``edge = 2p - 1``.  At p=0.60 that returns ~1.26x the intended fraction
+        (0.374 vs 0.296) and amplifies position size ~26%.  It also divided by
+        the binary variance ``p(1-p)``, which is not part of the standard binary
+        Kelly and blows the fraction up near p=0 or p=1.
         """
-        # For binary outcomes where success has probability p, variance ≈ p*(1-p)
-        variance_estimate = win_rate * (1 - win_rate) if win_rate and win_rate < 1 else 0.25  # Conservative 0.25 when unclear
-        
-        if variance_estimate == 0:
-            variance_estimate = 0.25  # Minimum variance to avoid division issues
-
-        # Kelly formula component: edge / variance
-        basic_kelly = edge / variance_estimate if variance_estimate != 0 else 0.0
-
-        # Apply fee adjustment per formula kelly = edge / (1 - fee) / variance
-        # Actually, the formula in description says "edge / (1 - fee) / variance"
-        # If edge = 2*p - 1, the actual expected value after fees = edge_net = 2*p - 1 - fee_adjustment
-        # To keep things aligned with the requirement statement:
-        adjusted_edge = edge - self.fee_rate  # Adjusting edge directly for fees
-        kelly_fraction = (adjusted_edge / variance_estimate) if variance_estimate != 0 else 0.0
-
-        # Apply fractional Kelly
+        p = win_rate
+        if p is None or p <= 0.0 or p >= 1.0:
+            return 0.0
+        c = self.fee_rate
+        # Net of round-trip cost; reject a non-positive net edge (no position).
+        net_p = p - c
+        if net_p <= 0.0:
+            return 0.0
+        # f* = (p - c) / (1 - c)  (binary Kelly, fee-aware)
+        kelly_fraction = net_p / (1.0 - c) if c < 1.0 else 0.0
+        # Apply fractional Kelly.
         fractional_kelly = kelly_fraction * self.fraction_kelly
-
-        # Cap between practical limits
-        return max(-0.1, min(0.5, fractional_kelly))  # Limit to reasonable ranges
+        # Cap between practical limits.
+        return max(-0.1, min(0.5, fractional_kelly))
 
 
 def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
@@ -259,10 +264,11 @@ def compute_position_size(
     
     # Calculate win rate and derived edge
     current_win_rate = kelly_sizer.get_rolling_win_rate()
-    edge = kelly_sizer.calculate_edge_from_win_rate(current_win_rate)
-    
+    edge = kelly_sizer.calculate_edge_from_win_rate(current_win_rate, market_price)
+
     # Calculate Kelly fraction with fee awareness
-    kelly_fraction = kelly_sizer.calculate_kelly_fraction(edge, current_win_rate)
+    kelly_fraction = kelly_sizer.calculate_kelly_fraction(
+        edge, current_win_rate, market_price)
     
     # Size is Kelly fraction of balance, modulated by confidence and disagreement-based kelly_multiplier
     # But also ensure it doesn't exceed 25% of balance per requirements
@@ -547,7 +553,7 @@ def main():
         print(f"{signal_type:<35} {confidence:<5.2f} {meta['calculated_win_rate']:<8.3f} {meta['raw_kelly_fraction']:<12.4f} ${size:<11.2f} {cap_applied:<12}")
     
     print(f"\nSH3 Compliance Summary:")
-    print(f"✓ Formula: Kelly fraction = edge / (1-fee) / variance - Implemented")
+    print(f"✓ Formula: Kelly fraction = (p - c) / (1 - c) (binary Kelly) - Implemented")
     print(f"✓ 50% fractional Kelly - Implemented")  
     print(f"✓ 25% max position of balance - Enforced")
     print(f"✓ 30-day rolling win rate - Used for edge estimation")
