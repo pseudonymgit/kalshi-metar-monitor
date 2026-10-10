@@ -214,7 +214,27 @@ def create_settlement_epochs_table(conn: sqlite3.Connection):
 
 
 def insert_epochs(conn: sqlite3.Connection, epochs: List[Dict[str, Any]]):
-    """Insert settlement epochs into database."""
+    """Insert settlement epochs into database.
+
+    Frozen-settlement invariant (2026-10-10): a settlement value cannot change
+    when the epoch table is regenerated. Before writing, every row whose
+    (station, market_type, local_trading_date) has a frozen canonical snapshot
+    is checked; a regeneration that would move the value FAILS CLOSED.
+    """
+    try:
+        from core.canonical_settlement import verify_regeneration_invariants
+        violations = verify_regeneration_invariants(
+            conn, ({"station": e["station"], "market_type": e["market_type"],
+                    "local_trading_date": e["local_trading_date"],
+                    "settlement_bucket": e["settlement_bucket"]} for e in epochs))
+    except ImportError:
+        violations = []
+    if violations:
+        raise RuntimeError(
+            "settlement-epoch regeneration refused: it would move a frozen "
+            "canonical settlement value (invariant: settlement value is "
+            "immutable across epoch regeneration):\n  " + "\n  ".join(violations))
+
     cursor = conn.cursor()
     
     for epoch in epochs:

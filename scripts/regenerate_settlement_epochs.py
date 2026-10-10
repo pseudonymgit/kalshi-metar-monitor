@@ -262,6 +262,33 @@ def execute_rewrite() -> None:
     updated = 0
     unresolved = 0
 
+    # Frozen-settlement invariant (2026-10-10): refuse the rewrite if it would
+    # move a frozen canonical settlement value. Fail closed, before any write.
+    try:
+        from core.canonical_settlement import verify_regeneration_invariants
+        candidates = []
+        for mkt in ("HIGH", "LOW"):
+            for st, dt in corrupt[mkt]:
+                row = cur.execute(
+                    "SELECT settlement_bucket FROM settlement_epochs "
+                    "WHERE station=? AND market_type=? AND local_trading_date=?",
+                    (st, mkt, dt)).fetchone()
+                if row is not None:
+                    candidates.append({"station": st, "market_type": mkt,
+                                       "local_trading_date": dt,
+                                       "settlement_bucket": row[0]})
+        violations = verify_regeneration_invariants(metar, candidates)
+        if violations:
+            print("ERROR: regeneration refused — would move a frozen canonical "
+                  "settlement value:")
+            for v in violations:
+                print("  " + v)
+            metar.close()
+            kalshi.close()
+            sys.exit(3)
+    except ImportError:
+        pass
+
     for mkt in ("HIGH", "LOW"):
         for st, dt in corrupt[mkt]:
             # Determine whether CURRENT bucket is corrupt (prior-bucket-only
