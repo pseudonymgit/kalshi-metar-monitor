@@ -50,29 +50,40 @@ def test_fee_rate_is_non_zero():
 
 
 def test_kelly_fraction_formula():
-    """Verify Kelly formula: f* = (p - c) / (1 - c)."""
+    """Kelly fraction is MARKET-PRICE aware (Gray Room R13/R14 E4).
+
+    HEAD (`core/position_sizer.py:222`): ``f* = |p - market_price| / (1 - c)``.
+    The pre-R14 ``(p - c) / (1 - c)`` form ignored the market price entirely and
+    over-bet 3.8x at M=0.50.  The 2026-10-10 C1 ``(p-c)/(1-c)`` correction lands
+    in ``core/position_sizing.py`` — a *different* module with its own sizer.
+    """
     sizer = PositionSizer(bankroll=10000.0)
-    k = sizer.calculate_kelly_fraction(win_rate=0.60)
-    expected = (0.60 - DEFAULT_COST_FRACTION) / (1.0 - DEFAULT_COST_FRACTION)
+    k = sizer.calculate_kelly_fraction(win_rate=0.60, market_price=0.40)
+    expected = abs(0.60 - 0.40) / (1.0 - DEFAULT_COST_FRACTION)
     assert abs(k - expected) < 1e-6, f"Expected {expected}, got {k}"
-    print(f"  ✓ Kelly fraction (p=0.60): f*={k:.4f}")
+    print(f"  ✓ Kelly fraction (p=0.60, M=0.40): f*={k:.4f}")
 
 
 def test_kelly_fraction_low_win_rate():
-    """Kelly fraction should be small but positive for win rate just above cost."""
+    """Kelly stays small but positive for a win rate just above the market price."""
     sizer = PositionSizer(bankroll=10000.0)
-    k = sizer.calculate_kelly_fraction(win_rate=DEFAULT_COST_FRACTION + 0.01)
-    assert k > 0, f"Expected positive Kelly for win_rate > cost, got {k}"
+    k = sizer.calculate_kelly_fraction(win_rate=0.33, market_price=0.30)
+    assert k > 0, f"Expected positive Kelly for win_rate > market_price, got {k}"
     assert k < 0.1, f"Expected small Kelly, got {k}"
-    print(f"  ✓ Kelly fraction (p=cost+0.01): f*={k:.6f}")
+    print(f"  ✓ Kelly fraction (p=0.33, M=0.30): f*={k:.6f}")
 
 
-def test_kelly_fraction_zero_below_cost():
-    """Kelly fraction should be 0 when win rate <= cost."""
+def test_kelly_fraction_zero_at_fair_value():
+    """Kelly fraction is 0 when the win rate equals the market price (no edge).
+
+    Renamed from ``test_kelly_fraction_zero_below_cost``: under the R13/R14
+    market-price-aware formula there is no ``win_rate <= cost`` zero branch — a
+    low win rate against a high market price is a large |edge| (a DOWN bet).
+    """
     sizer = PositionSizer(bankroll=10000.0)
-    k = sizer.calculate_kelly_fraction(win_rate=0.01)
-    assert k == 0.0, f"Expected 0 Kelly for win_rate < cost, got {k}"
-    print(f"  ✓ Kelly fraction (p=0.01): f*={k}")
+    k = sizer.calculate_kelly_fraction(win_rate=0.45, market_price=0.45)
+    assert k == 0.0, f"Expected 0 Kelly at fair value, got {k}"
+    print(f"  ✓ Kelly fraction (p=M=0.45): f*={k}")
 
 
 def test_adaptive_multiplier():
@@ -278,7 +289,7 @@ def main():
         ("Fee rate is non-zero", test_fee_rate_is_non_zero),
         ("Kelly fraction formula", test_kelly_fraction_formula),
         ("Kelly fraction low win rate", test_kelly_fraction_low_win_rate),
-        ("Kelly fraction zero below cost", test_kelly_fraction_zero_below_cost),
+        ("Kelly fraction zero at fair value", test_kelly_fraction_zero_at_fair_value),
         ("Adaptive multiplier", test_adaptive_multiplier),
         ("Bankroll cap", test_bankroll_cap),
         ("Drawdown protection", test_drawdown_protection),

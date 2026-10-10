@@ -135,17 +135,22 @@ class TestKellyPositionSizer:
         kelly = default_sizer.calculate_kelly_fraction(edge=0.3, win_rate=0.65)
         assert kelly > 0
 
-    def test_per_signal_win_rate(self, default_sizer):
-        """Different signal IDs should have separate win rates."""
-        date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-        # Add 10 wins for signal A, 0 wins for signal B
-        for i in range(10):
-            default_sizer.add_win_result(date, win=True, signal_id="signal_a")
-            default_sizer.add_win_result(date, win=False, signal_id="signal_b")
+    def test_rolling_win_rate_is_global(self, default_sizer):
+        """The sizer keeps ONE global rolling win rate — there is no per-signal split.
 
-        wr_a = default_sizer.get_rolling_win_rate(signal_id="signal_a")
-        wr_b = default_sizer.get_rolling_win_rate(signal_id="signal_b")
-        assert wr_a > wr_b
+        ``add_win_result(date_string, win, prob_predicted=None)`` and
+        ``get_rolling_win_rate()`` have never accepted a ``signal_id``; the
+        old ``test_per_signal_win_rate`` used a keyword argument removed from a
+        different sizer. Assert the real contract instead of an invented one.
+        """
+        date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        for _ in range(10):
+            default_sizer.add_win_result(date, win=True)
+        assert default_sizer.get_rolling_win_rate() == 1.0
+
+        default_sizer.add_win_result(date, win=False)
+        # 10 wins + 1 loss -> 10/11, a single pooled rate.
+        assert abs(default_sizer.get_rolling_win_rate() - (10.0 / 11.0)) < 1e-9
 
 
 @pytest.mark.unit
@@ -164,9 +169,15 @@ class TestComputePositionSize:
         assert size > 0
         assert meta["confidence_tier"] == "high"
 
-    def test_negative_edge_zero_size(self, default_sizer):
-        """With negative edge and no wins, should return 0."""
-        # Add all losses
+    def test_negative_edge_no_positive_sizing(self, default_sizer):
+        """A no-edge signal earns NO positive-edge sizing.
+
+        C1 made the Kelly fraction 0 (not negative) when p <= market price; the
+        sizing pipeline then clamps the zero result up to ``config.min_size_usd``
+        (a pre-existing unconditional floor — see the register note). Assert the
+        invariant that matters: no edge -> the raw Kelly is not positive and the
+        size never exceeds the min floor.
+        """
         for i in range(10):
             date = (datetime.now(timezone.utc) - timedelta(days=i)).strftime('%Y-%m-%d')
             default_sizer.add_win_result(date, win=False)
@@ -177,9 +188,10 @@ class TestComputePositionSize:
             market_price=0.5,
             kelly_sizer=default_sizer,
         )
-        # Kelly fraction will be negative, so size = 0
-        if meta.get("raw_kelly_fraction", 0) <= 0:
-            assert size == 0.0
+        assert meta["raw_kelly_fraction"] <= 0.0, "no-edge trade reported positive Kelly"
+        assert meta["calculated_edge"] < 0.0, "all-losses rolling rate must be a negative edge"
+        # Zero edge is not a positive-edge allocation; at most the min floor.
+        assert size <= PositionSizingConfig().min_size_usd
 
     def test_max_position_cap(self, default_sizer):
         """Position size should not exceed 25% of balance."""
