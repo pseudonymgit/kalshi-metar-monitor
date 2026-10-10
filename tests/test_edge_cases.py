@@ -49,43 +49,45 @@ class TestKalshiApiEdgeCases:
     """Test Kalshi API wrapper with mock HTTP errors, rate limits, empty responses."""
 
     def test_empty_market_response(self):
-        """Verify graceful handling of empty market list."""
-        try:
-            from core.market_monitor import discover_kalshi_weather_markets
-        except ImportError:
-            pytest.skip("market_monitor module not available")
+        """Verify graceful handling of an empty market list (mocked, deterministic)."""
+        from core import market_monitor
 
-        # discover_kalshi_weather_markets takes max_pages and page_limit
-        try:
-            result = discover_kalshi_weather_markets(max_pages=0, page_limit=1)
-            assert result is not None
-        except Exception as e:
-            # Network-dependent, skip on failure
-            pytest.skip(f"discover_kalshi_weather_markets raised: {e}")
+        with patch.object(market_monitor, "_kalshi_public_get",
+                          return_value={"markets": []}):
+            result = market_monitor.discover_kalshi_weather_markets(max_pages=1, page_limit=1)
+        # An empty feed must degrade to an empty discovery, not raise.
+        assert result == []
 
     def test_connection_error_mock(self):
-        """Mock connection error and verify graceful degradation."""
-        try:
-            from core.kalshi_monitor import get_public_markets
-        except ImportError:
-            pytest.skip("kalshi_monitor not available")
-        try:
-            result = get_public_markets()
-            assert result is not None
-        except Exception:
-            pass
+        """A connection error must surface, not be silently swallowed.
+
+        Was `except Exception: pass` — a working call was indistinguishable from
+        a crash (a vacuous pass). Now assert the real degradation contract: the
+        transport error propagates so the caller can back off.
+        """
+        from core import kalshi_monitor
+
+        with patch.object(kalshi_monitor, "_kalshi_public_get",
+                          side_effect=ConnectionError("mock network down")):
+            with pytest.raises(Exception):
+                kalshi_monitor.get_public_markets(limit=1)
 
     def test_price_fetcher_none_market(self):
-        """Verify price fetcher handles None market gracefully."""
-        try:
-            from core.price_fetcher import _get_all_public_markets
-        except ImportError:
-            pytest.skip("price_fetcher not available")
-        try:
-            result = _get_all_public_markets()
-            assert result is not None
-        except Exception:
-            pass
+        """Price fetcher's public-markets reader is a documented CORE DEFECT.
+
+        ``core/price_fetcher.py:357`` calls ``_kalshi_public_get`` with
+        undefined names (``series_ticker``, ``normalized_station``) → NameError
+        on any call. This is genuine breakage, NOT test staleness (flag for
+        Workstream E report); the old ``except Exception: pass`` hid it.
+        """
+        from core import price_fetcher
+
+        pytest.xfail(
+            "core defect: price_fetcher._get_all_public_markets references "
+            "undefined series_ticker/normalized_station (line 357-364)"
+        )
+        result = price_fetcher._get_all_public_markets(max_pages=1, page_limit=1)
+        assert isinstance(result, list)
 
 
 # ─── Position Sizing Edge Cases ─────────────────────────────────────────────
@@ -317,52 +319,42 @@ class TestAlertDispatchEdgeCases:
 
     def test_alert_retry_queue_empty(self):
         """Alert retry queue should handle empty queue."""
-        try:
-            from core.alert_retry_queue import _get_queue_stats, _retry_delivery_batch
-        except ImportError:
-            pytest.skip("alert_retry_queue module not available")
+        from core.alert_retry_queue import _get_queue_stats, _retry_delivery_batch
 
-        try:
-            result = _retry_delivery_batch(batch_size=1)
-            assert result is not None
-        except Exception as e:
-            pytest.skip(f"_retry_delivery_batch raised: {e}")
+        # An empty queue processes cleanly and returns a zero-count result
+        # (was skip-on-exception — a vacuous pass that hid real regressions).
+        result = _retry_delivery_batch(batch_size=1)
+        assert isinstance(result, dict), f"retry batch returned {type(result).__name__}"
+        assert result.get("processed") == 0, f"empty queue processed {result.get('processed')} entries"
 
     def test_alert_state_machine_invalid_transition(self, temp_db):
         """Alert state machine should handle invalid transitions."""
-        try:
-            from core.alert_state_machine import AlertStateMachine, AlertState
-        except ImportError:
-            pytest.skip("alert_state_machine module not available")
+        from core.alert_state_machine import AlertStateMachine, AlertState
 
         machine = AlertStateMachine(db_path=temp_db)
-        try:
-            result = machine.transition(
-                alert_id="nonexistent",
-                target_state=AlertState.ISSUED,
-            )
-            assert result is not None
-        except Exception as e:
-            pytest.skip(f"AlertStateMachine raised: {e}")
+        # A transition on an unknown alert must be rejected, not crash
+        # (was skip-on-exception — a vacuous pass).
+        ok, reason = machine.transition(
+            alert_id="nonexistent",
+            target_state=AlertState.ISSUED,
+        )
+        assert ok is False, "invalid transition on unknown alert was accepted"
+        assert "not found" in str(reason).lower(), f"unexpected rejection reason: {reason!r}"
 
     def test_alert_throttle_excessive(self, temp_db):
         """Alert throttle should handle excessive alerts."""
-        try:
-            from core.alert_throttle import AlertThrottle
-        except ImportError:
-            pytest.skip("alert_throttle module not available")
+        from core.alert_throttle import AlertThrottle
 
         throttle = AlertThrottle(db_path=temp_db)
+        # 100 rapid alerts across 10 types must never crash and must always
+        # return a boolean decision (was skip-on-exception — a vacuous pass).
         for i in range(100):
-            try:
-                result = throttle.should_send_alert(
-                    station=f"KATL",
-                    alert_type=f"test_type_{i % 10}",
-                    current_state="PENDING",
-                )
-                assert result is not None
-            except Exception as e:
-                pytest.skip(f"AlertThrottle raised: {e}")
+            result = throttle.should_send_alert(
+                station="KATL",
+                alert_type=f"test_type_{i % 10}",
+                current_state="PENDING",
+            )
+            assert isinstance(result, bool), f"throttle returned {type(result).__name__}"
 
     def test_alert_formatter_none_values(self):
         """Alert formatter should handle None values."""
@@ -469,12 +461,14 @@ class TestTradeJournalEdgeCases:
             'confidence': 0.7,
             'alert_id': 'test_dup_001',
         }
-        # Use append_entry
-        try:
-            journal.append_entry(**entry)
-            journal.append_entry(**entry)
-        except Exception:
-            pass  # Duplicate may raise, that's acceptable
+        # Duplicate append must be a clean no-op or an explicit rejection — but
+        # it must NEVER silently swallow an exception (was `except Exception:
+        # pass`). Call it twice directly; any raise fails the test.
+        journal.append_entry(**entry)
+        journal.append_entry(**entry)
+        rows = [t for t in journal.get_recent_trades()
+                if t.get("alert_id") == entry["alert_id"]]
+        assert len(rows) >= 1, "duplicate append lost the original row"
 
     def test_journal_with_missing_fields(self, temp_db):
         """Journal should handle entries with missing optional fields."""
@@ -500,13 +494,14 @@ class TestTradeJournalEdgeCases:
         from core.trade_journal import TradeJournal
 
         journal = TradeJournal(db_path=temp_db)
-        try:
-            journal.update_outcome(
-                alert_id='nonexistent_id',
-                outcome='EXECUTED',
-            )
-        except Exception:
-            pass
+        # Updating a missing row must be a clean no-op, not an unhandled crash
+        # (was `except Exception: pass` — a vacuous pass).
+        result = journal.update_outcome(
+            alert_id='nonexistent_id',
+            outcome='EXECUTED',
+        )
+        assert result is False or result is None, \
+            f"updating a missing alert_id must report no rows, got {result!r}"
 
 
 # ─── Signal Factory Edge Cases ───────────────────────────────────────────────

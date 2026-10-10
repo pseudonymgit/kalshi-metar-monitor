@@ -131,14 +131,13 @@ class TestPaperTradingEngineFacade:
         """Verify settlement handling is present."""
         # R/T (2026-09-28): SettlementProcessor is not re-exported from
         # paper_trading_engine; settlement lives in core.settlement_processor.
-        import importlib
-        try:
-            importlib.import_module('core.settlement_processor')
-            ok = True
-        except Exception:
-            ok = False
+        # Workstream E (2026-10-10): the old `... or True` made this assertion
+        # vacuous (pyflakes B015). Assert the real, current contract: the
+        # settlement module exposes SettlementProcessor and the engine imports.
+        from core.settlement_processor import SettlementProcessor
+        assert SettlementProcessor is not None
         from core.paper_trading_engine import PaperTrader
-        assert ok or hasattr(PaperTrader, 'process_settlements') or True
+        assert PaperTrader is not None
 
     def test_import_from_core_works(self):
         """Import path: core.paper_trading_engine has key attributes."""

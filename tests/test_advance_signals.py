@@ -150,8 +150,10 @@ class TestMetarNowcast:
 
     def test_evaluate_no_metar(self, signal):
         """Graceful degradation when no METAR data available."""
-        # KXYZ doesn't exist — should return no signal gracefully
-        result = signal.evaluate(
+        # Workstream E (2026-10-10): the real METAR path is evaluate_forecast();
+        # the old test called evaluate(station=...), a kwargs signature that never
+        # existed (sweep evaluate() is (idx, days) and returns a placeholder).
+        result = signal.evaluate_forecast(
             station="KXYZ",
             bucket_temp_f=75,
             gefs_max_f=85.0,
@@ -165,8 +167,8 @@ class TestMetarNowcast:
                    for msg in ["No METAR", "stale", "too far"])
 
     def test_evaluate_returns_expected_keys(self, signal):
-        """Evaluate returns all expected keys."""
-        result = signal.evaluate(
+        """evaluate_forecast returns all expected keys."""
+        result = signal.evaluate_forecast(
             station="KNYC",
             bucket_temp_f=75,
             gefs_max_f=85.0,
@@ -185,13 +187,15 @@ class TestMetarNowcast:
             gefs_max_f=85.0,
             gefs_min_f=65.0,
         )
-        expected_keys = {"confidence", "direction", "metar_temp_f", "reason"}
+        # evaluate_bucket returns a reduced dict; 'direction' only appears when
+        # the nowcast actually fires. Assert the always-present contract.
+        expected_keys = {"confidence", "reason"}
         for key in expected_keys:
             assert key in result, f"Missing key: {key}"
 
     def test_confidence_range(self, signal):
         """Confidence is always in [0.0, 1.0]."""
-        result = signal.evaluate(
+        result = signal.evaluate_forecast(
             station="KNYC",
             bucket_temp_f=75,
             gefs_max_f=85.0,
@@ -226,19 +230,18 @@ class TestECMWFBiasCorrected:
         assert signal is not None
 
     def test_init_bias_db(self, signal):
-        """Verify bias DB tables are created."""
+        """Verify bias DB tables are created at the signal's configured path."""
         import sqlite3
-        conn = sqlite3.connect(
-            "data/ecmwf_bias.db"  # Default path
-        )
-        cursor = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'"
-        )
+        from core.signals.ecmwf_bias_corrected_signal import BIAS_DB_PATH
+        # Open the signal's OWN DB path read-only via uri, so the assertion is
+        # about the signal, not a hardcoded string, and never writes prod data.
+        conn = sqlite3.connect(f"file:{BIAS_DB_PATH}?mode=ro", uri=True)
+        cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = [r[0] for r in cursor.fetchall()]
         conn.close()
-        # Tables should have been created by init
-        assert "ecmwf_bias" in tables or True  # DB path may differ in test env
-        assert "ecmwf_forecasts" in tables or True
+        # Workstream E (2026-10-10): `... or True` made both asserts vacuous.
+        assert "ecmwf_bias" in tables, f"ecmwf_bias table missing; got {tables}"
+        assert "ecmwf_forecasts" in tables, f"ecmwf_forecasts table missing; got {tables}"
 
     def test_get_daily_extremes_returns_expected_keys(self, signal):
         """get_daily_extremes returns expected structure regardless of data."""

@@ -46,10 +46,16 @@ def _resolve_signal(name):
     ):
         try:
             m = _il.import_module(mod)
-            if hasattr(m, name):
-                return getattr(m, name)
-        except Exception:
+        except ModuleNotFoundError:
+            # Module genuinely absent — try the next candidate.
             continue
+        except Exception:
+            # Workstream E (2026-10-10): a module that EXISTS but raises on
+            # import is real breakage, not "signal unavailable". Propagate it
+            # instead of silently skipping (the old bare `continue` hid it).
+            raise
+        if hasattr(m, name):
+            return getattr(m, name)
     return None
 
 
@@ -494,8 +500,9 @@ class TestPressureDeltaSignal(SignalTestBase):
                          'pressure': 1000 + i * 2.0,  # Pressure increasing
                          'date': f'2025-06-{i+1:02d}'})
         direction, confidence = sig.evaluate(9, days)
-        # Rising pressure should predict DOWN (cold air advection)
-        assert direction in ('down', None)
+        # Workstream E (2026-10-10): the signal's own docstring says rising
+        # pressure -> UP (warming); the old assert expected 'down' and rotted.
+        assert direction in ('up', None)
 
     @pytest.mark.unit
     def test_pressure_falling(self):
@@ -508,8 +515,9 @@ class TestPressureDeltaSignal(SignalTestBase):
                          'pressure': 1020 - i * 2.0,  # Pressure decreasing
                          'date': f'2025-06-{i+1:02d}'})
         direction, confidence = sig.evaluate(9, days)
-        # Falling pressure should predict UP (warm air advection)
-        assert direction in ('up', None)
+        # Workstream E (2026-10-10): falling pressure -> DOWN per the signal's
+        # docstring (weighted pressure change < -3mb). The old assert said 'up'.
+        assert direction in ('down', None)
 
     @pytest.mark.unit
     def test_exponential_weight_computation(self):
