@@ -84,17 +84,15 @@ def test_gamma_signal_set_shape():
         assert expect in names, f"missing gamma signal {expect}"
 
 
-@pytest.mark.xfail(
-    strict=False,
-    reason="GENUINE CORE DEFECT (gamma_signals.py:_load_gefs_members): `import struct` "
-           "is inside the try block but `except (..., struct.error, ...)` is evaluated "
-           "when the GEFS query raises sqlite3.Error (e.g. missing gefs_archive table / "
-           "unopenable DB) -> UnboundLocalError. `struct` must be imported at module top. "
-           "Test stays red until core is fixed; reported, not hacked.",
-)
 def test_individual_gamma_signals_contract():
     """Every gamma signal must return a (direction, confidence) contract or raise
-    NotImplementedError — but NOT an arbitrary exception."""
+    NotImplementedError — but NOT an arbitrary exception.
+
+    Regression: gamma_signals.py:_load_gefs_members had `import struct` inside
+    the try block while `except (..., struct.error, ...)` was evaluated when the
+    GEFS query raised sqlite3.Error -> UnboundLocalError. `struct` is now a
+    module-level import, so the graceful (None, 0.0) degradation is reachable.
+    """
     days = _mock_days()
     failures = []
     for sig in get_gamma_signals():

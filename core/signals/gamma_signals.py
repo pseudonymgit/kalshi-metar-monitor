@@ -9,6 +9,7 @@ Implements 6 distinct Gamma signal classes designed to complement the
 import os
 import math
 import sqlite3
+import struct
 import numpy as np
 from typing import Optional, Tuple, List, Dict
 from datetime import datetime, timedelta
@@ -88,7 +89,6 @@ class GammaBaseSignal(BaseSignal):
             mean, blob, n = row
             if mean is None or not blob or n is None or n < 2 or len(blob) < n:
                 return np.array([])
-            import struct
 
             offsets = struct.unpack(f"{n}b", blob[:n])
             return np.array([mean + o * 0.1 for o in offsets], dtype=float)
