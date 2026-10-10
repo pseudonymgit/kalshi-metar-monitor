@@ -16,6 +16,8 @@ import os
 import importlib
 import inspect
 
+import pytest
+
 # Ensure we can import from core/
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -226,6 +228,78 @@ def test_no_hardcoded_fee_zeros():
         )
 
 
+# ─── Dynamic fee oracle (Workstream E4 / GR4 G3) ─────────────────────────────
+#
+# The suite used to pin the OBSOLETE 0.0205 flat fee and assert on source
+# substrings, so it could never detect fee divergence and rotted on refactor.
+# These tests instead RECOMPUTE the canonical fee for a P x qty matrix and
+# check every consumer equals fee_per_contract(P) * qty.
+
+def _fee_oracle_matrix():
+    prices = [0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99]
+    quantities = [1, 7, 100]
+    return [(p, q) for p in prices for q in quantities]
+
+
+def test_fee_oracle_primitive_is_per_contract_ceil():
+    """fee_per_contract(P) = ceil(0.07 * P * (1-P) * 100) / 100, els 0 at edges."""
+    import math
+    for price in [0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99]:
+        expected = math.ceil(0.07 * price * (1 - price) * 100.0) / 100.0
+        assert canonical_fees.fee_per_contract(price) == pytest.approx(expected, abs=1e-12), \
+            f"fee_per_contract({price}) diverged from the recomputed oracle"
+    # Degenerate prices short-circuit to 0.0.
+    assert canonical_fees.fee_per_contract(0.0) == 0.0
+    assert canonical_fees.fee_per_contract(1.0) == 0.0
+
+
+def test_fee_oracle_every_consumer_matches():
+    """Recompute fee_per_contract(P)*qty and assert each consumer matches."""
+    from core.market_cost_model import MARKET_COST_MODEL
+    import core.continuous_kelly as ck
+    import core.paper_trading_engine as pte
+    import core.canary_harness as ch
+    import core.strike_selection_ev as sev
+
+    failures = []
+    for price, qty in _fee_oracle_matrix():
+        oracle = canonical_fees.fee_per_contract(price) * qty
+
+        # (contracts, price) consumers
+        for label, fn in (
+            ("fees.kalshi_fee", canonical_fees.kalshi_fee),
+            ("market_cost_model.kalshi_fee", MARKET_COST_MODEL.kalshi_fee),
+            ("continuous_kelly.kalshi_fee", ck.kalshi_fee),
+            ("paper_trading_engine._canonical_kalshi_fee",
+             lambda c, p: pte._canonical_kalshi_fee(c, p)),
+        ):
+            got = fn(qty, price)
+            if abs(got - oracle) > 1e-9:
+                failures.append(f"{label}({qty}, {price}) = {got}, oracle {oracle}")
+
+        # (price) per-contract consumers
+        per_contract = canonical_fees.fee_per_contract(price)
+        for label, fn in (
+            ("fees.taker_fee_rate", canonical_fees.taker_fee_rate),
+            ("canary_harness.fee_per_contract_canonical", ch.fee_per_contract_canonical),
+            ("strike_selection_ev._fee_per_contract", sev._fee_per_contract),
+            ("paper_trading_engine._canonical_fee_per_contract",
+             pte._canonical_fee_per_contract),
+        ):
+            got = fn(price)
+            if abs(got - per_contract) > 1e-9:
+                failures.append(f"{label}({price}) = {got}, oracle {per_contract}")
+
+    assert not failures, "fee consumers diverged from the oracle:\n" + "\n".join(failures)
+
+
+def test_fee_oracle_round_trip_is_double_side():
+    """round_trip_fee == 2 x per-side fee across the matrix."""
+    for price, qty in _fee_oracle_matrix():
+        side = canonical_fees.kalshi_fee(qty, price)
+        assert canonical_fees.round_trip_fee(qty, price) == pytest.approx(2.0 * side, abs=1e-9)
+
+
 # ─── Standalone runner ───────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -242,6 +316,9 @@ if __name__ == "__main__":
         test_fee_aware_filter,
         test_instance_configs,
         test_no_hardcoded_fee_zeros,
+        test_fee_oracle_primitive_is_per_contract_ceil,
+        test_fee_oracle_every_consumer_matches,
+        test_fee_oracle_round_trip_is_double_side,
     ]
     passed = 0
     failed = 0
