@@ -3096,7 +3096,10 @@ def daily_paper_run(run_date=None):
                 run_datetime = datetime.strptime(run_date, '%Y-%m-%d')
             except ValueError:
                 # Try ISO format if not basic format
-                from datetime import datetime, timezone
+                # NOTE: `datetime`/`timezone` are imported at module scope; a
+                # local `from datetime import datetime, timezone` here would
+                # shadow the module binding for the whole function and break
+                # the `datetime.now(...)` call above (UnboundLocalError).
                 run_datetime = datetime.fromisoformat(run_date.replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
                 
             modulated_signals = []

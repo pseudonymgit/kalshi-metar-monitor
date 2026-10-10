@@ -89,6 +89,33 @@ class TestKalshiApiEdgeCases:
         assert isinstance(result, list)
         assert result == []
 
+    def test_daily_paper_run_does_not_shadow_datetime(self):
+        """H2: `daily_paper_run` must not locally shadow the module `datetime`.
+
+        A `from datetime import datetime, timezone` inside the function body made
+        `datetime` a local name for the whole scope, so `datetime.now(...)` at
+        the top raised UnboundLocalError under the background loop. Importing
+        datetime at module scope (no local rebinding) fixes it; this asserts the
+        no-argument call reaches the trader instead of erroring on `datetime`.
+        """
+        import ast
+        from pathlib import Path
+
+        src = (Path(__file__).resolve().parents[1]
+               / "core" / "paper_trading_engine.py").read_text()
+        tree = ast.parse(src)
+        fn = next(n for n in ast.walk(tree)
+                  if isinstance(n, ast.FunctionDef) and n.name == "daily_paper_run")
+        local_dt_imports = [
+            n for n in ast.walk(fn)
+            if isinstance(n, (ast.Import, ast.ImportFrom))
+            and "datetime" in ast.dump(n)
+        ]
+        assert not local_dt_imports, (
+            "daily_paper_run locally imports datetime, shadowing the module "
+            "binding (H2 regression)"
+        )
+
 
 # ─── Position Sizing Edge Cases ─────────────────────────────────────────────
 
