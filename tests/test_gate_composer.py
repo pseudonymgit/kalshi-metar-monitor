@@ -36,7 +36,7 @@ def _good(**over):
         "created_at_utc": "2026-10-09T12:00:00Z",
         "settlement_date": "2026-10-10", "quantity": 100, "fill_price": 0.50,
         "fee_total": kalshi_fee(100, 0.50), "settlement_confirmed": 1,
-        "settlement_outcome": "correct", "settled_value": 1,
+        "settlement_outcome": "correct", "settled_value": 72.0,
         "label_axis": AXIS_VALUE, "snapshot_time_utc": "2026-10-09T12:00:00Z",
     }
     base.update(over)
@@ -183,6 +183,50 @@ def test_g3_unconfirmed_rejected():
     v = compose_gate(_good(settlement_confirmed=0), REPO, suite_green=True,
                      frozen_version="v3.1_sbox")
     assert any(c.gate == "G3" and c.status == "REJECT" for c in v.checks)
+
+
+# ─── G3 reconciliation (2026-10-10): the book stores a TEMPERATURE ──────────
+# The book's canonical correction writes `settled_value` as the settlement
+# temperature (°F) and the strike-crossing `canonical_outcome`. G3's intent is
+# "settlement is final and binary-decidable", which canonical_outcome IS.
+def test_g3_admits_temperature_settled_value():
+    # a temperature-valued settled_value must NOT fail G3 by itself.
+    v = compose_gate(_good(settled_value=91.0, canonical_outcome="correct"),
+                     REPO, suite_green=True, frozen_version="v3.1_sbox")
+    g3 = [c for c in v.checks if c.gate == "G3"][0]
+    assert g3.status == "PASS"
+    assert v.verdict in (VERDICT_ADMITTED, VERDICT_REJECTED)  # only other gates may reject
+    assert not any(c.gate == "G3" and c.status == "REJECT" for c in v.checks)
+
+
+def test_g3_derived_binary_matches_canonical_outcome():
+    from gate_composer import settled_binary
+    assert settled_binary({"canonical_outcome": "correct"}) == 1
+    assert settled_binary({"canonical_outcome": "incorrect"}) == 0
+    assert settled_binary({"settlement_outcome": "correct"}) == 1
+    assert settled_binary({}) is None  # not decidable -> no binary
+
+
+def test_g3_rejects_non_strike_crossing_axis():
+    # outcome must be strike-crossing derived, not day-over-day.
+    v = compose_gate(_good(label_axis="day_over_day"), REPO, suite_green=True,
+                     frozen_version="v3.1_sbox")
+    assert any(c.gate == "G3" and c.status == "REJECT" for c in v.checks)
+
+
+def test_g3_rejects_missing_outcome_even_with_temperature():
+    v = compose_gate(_good(settled_value=91.0, settlement_outcome=None),
+                     REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert any(c.gate == "G3" and c.status == "REJECT" for c in v.checks)
+
+
+def test_g3_prefers_canonical_outcome_over_booked():
+    # canonical (strike-crossing) outcome wins over a stale booked one.
+    v = compose_gate(_good(settlement_outcome="incorrect",
+                           canonical_outcome="correct"),
+                     REPO, suite_green=True, frozen_version="v3.1_sbox")
+    g3 = [c for c in v.checks if c.gate == "G3"][0]
+    assert g3.status == "PASS" and "correct" in g3.detail
 
 
 def test_g1_version_mismatch_halt():

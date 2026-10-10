@@ -9,8 +9,11 @@ One ordered filter for a trade candidate, cheapest-first:
   G1 provenance      required identity fields non-null; trade_uuid unique;
                      trade_version == the frozen version hash.
   G2 fee-canonical   abs(stored_fee - kalshi_fee(qty, price)) <= $0.005.
-  G3 settlement      settlement_confirmed=1 and outcome in {correct, incorrect}
-                     and settled_value in {0,1} and dates sane.
+  G3 settlement      settlement is FINAL and BINARY-DECIDABLE: settlement_confirmed=1
+                     and a strike-crossing outcome in {correct, incorrect}, dates
+                     sane. The book's settled_value is the settlement TEMPERATURE
+                     (°F); G3 does NOT require it to be {0,1}. Derive the binary
+                     with settled_binary() when a downstream consumer needs it.
   G4 axis-correct    label basis == strike-crossing; reject day-over-day.
   G5 as-of           branches by strategy class (2026-10-10 methodology ruling):
                      the INTRADAY family (B2 sweep, SBOX EV-strike bridge) bounds
@@ -182,24 +185,58 @@ def gate_g2_fee_canonical(candidate: Dict[str, Any]) -> GateCheck:
     return GateCheck("G2", "PASS", f"fee within ${FEE_TOLERANCE} (delta={delta:.4f})")
 
 
+def settled_binary(candidate: Dict[str, Any]) -> Optional[int]:
+    """Derive the binary settlement (1=correct, 0=incorrect) from the canonical
+    strike-crossing outcome.
+
+    The book stores `settled_value` as the settlement TEMPERATURE, never a binary,
+    so the binary is DERIVED here for any downstream consumer that needs one. The
+    stored temperature is never rewritten. Returns None when no valid outcome is
+    present (callers must treat None as not-decided).
+    """
+    outcome = candidate.get("canonical_outcome") or candidate.get("settlement_outcome")
+    if outcome not in VALID_OUTCOMES:
+        return None
+    return 1 if outcome == "correct" else 0
+
+
 def gate_g3_settlement(candidate: Dict[str, Any]) -> GateCheck:
-    """G3: settlement_confirmed=1, outcome valid, settled_value in {0,1}, dates sane."""
+    """G3: settlement is FINAL and BINARY-DECIDABLE (temperature-aware).
+
+    PASS iff `settlement_confirmed=1` AND a strike-crossing outcome in
+    {correct, incorrect} is present AND the declared axis (when given) is
+    strike-crossing (a day-over-day basis is not a strike-crossing settlement) AND
+    the settlement date is sane.
+
+    Reconciles the book's actual finality representation: the canonical correction
+    writes `settled_value` as the settlement TEMPERATURE (°F) plus
+    `canonical_outcome` (the strike-crossing win/loss), so the frozen `{0,1}`
+    requirement on `settled_value` is dropped — it is the temperature, not a
+    binary. Use `settled_binary()` to derive the binary when needed.
+    """
     if candidate.get("settlement_axis") is not None:
         # canary/analytics rows may not be settlement rows; only gate trades
         pass
     confirmed = candidate.get("settlement_confirmed")
-    outcome = candidate.get("settlement_outcome")
-    settled = candidate.get("settled_value")
+    # Canonical strike-crossing outcome takes precedence over the booked one: the
+    # canonical correction is the strike-crossing label (core.canonical_settlement
+    # .canonical_outcome), which is exactly the binary-decidable finality G3 wants.
+    outcome = candidate.get("canonical_outcome") or candidate.get("settlement_outcome")
+    axis = candidate.get("label_axis")
     sdate = candidate.get("settlement_date")
     if confirmed != 1:
         return GateCheck("G3", "REJECT", f"settlement_confirmed={confirmed!r} != 1")
     if outcome not in VALID_OUTCOMES:
-        return GateCheck("G3", "REJECT", f"settlement_outcome={outcome!r} not in {VALID_OUTCOMES}")
-    if settled not in (0, 1):
-        return GateCheck("G3", "REJECT", f"settled_value={settled!r} not in {{0,1}}")
+        return GateCheck("G3", "REJECT",
+                         f"outcome={outcome!r} not in {VALID_OUTCOMES} "
+                         f"(settlement not binary-decidable)")
+    if axis is not None and axis != AXIS_VALUE:
+        return GateCheck("G3", "REJECT",
+                         f"outcome axis={axis!r} != {AXIS_VALUE!r} (day-over-day basis)")
     if not sdate or len(str(sdate)) < 10:
         return GateCheck("G3", "REJECT", f"settlement_date={sdate!r} not sane")
-    return GateCheck("G3", "PASS", "settlement confirmed with a valid outcome")
+    return GateCheck("G3", "PASS",
+                     f"settlement confirmed, outcome={outcome!r} (binary={settled_binary(candidate)})")
 
 
 def gate_g4_axis(candidate: Dict[str, Any]) -> GateCheck:
@@ -406,7 +443,8 @@ def _self_check(repo: Path) -> int:
         "created_at_utc": "2026-10-09T12:00:00Z",
         "settlement_date": "2026-10-10", "quantity": 100, "fill_price": 0.50,
         "fee_total": kalshi_fee(100, 0.50), "settlement_confirmed": 1,
-        "settlement_outcome": "correct", "settled_value": 1,
+        "settlement_outcome": "correct", "canonical_outcome": "correct",
+        "settled_value": 72.0,  # settlement TEMPERATURE (book), not a binary
         "label_axis": AXIS_VALUE, "snapshot_time_utc": "2026-10-09T12:00:00Z",
     }
     bad_fee = dict(good, trade_uuid="u2", fee_total=20.0)

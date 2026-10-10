@@ -88,7 +88,7 @@ from gate_composer import (  # noqa: E402
     compose_gate, GateCheck, GateLedger, GateVerdict, VERDICT_ADMITTED,
     VERDICT_HALT, VERDICT_REJECTED, _candidate_hash,
     gate_g0_suite_green, gate_g1_provenance, gate_g4_axis,
-    INTRADAY_ENTRY_LOCAL_HHMM,
+    INTRADAY_ENTRY_LOCAL_HHMM, AXIS_VALUE, settled_binary,
 )
 
 GOVERNED_EXPERIMENT = "GR5-WE-001"
@@ -340,12 +340,15 @@ def candidate_from_trades_row(row: Dict[str, Any], *,
     `finalization_utc` is the real frozen `settlement_snapshot.settled_at_utc`
     anchor when a canonical snapshot map is supplied.
 
-    NOTE (data contract): the SBOX book stores `settled_value` as the settlement
-    *temperature* (°F) — that is what `pnl_tracking` writes — while the gate's
-    frozen G3 contract expects the binary `{0,1}`. This is the documented booked-
-    vs-canonical divergence (GR5-D receipt finding #1); the candidate passes the
-    stored value through unchanged so G3's verdict is an accurate reflection of
-    the book, not a value the candidate builder manufactures.
+    NOTE (data contract): the SBOX book's canonical correction writes
+    `settled_value` as the settlement *temperature* (°F) — that is what
+    `pnl_tracking` writes — while the old frozen G3 contract expected the binary
+    `{0,1}`. That divergence is now reconciled in G3: the gate reads the
+    strike-crossing `canonical_outcome` (`correct`/`incorrect`) as the binary-
+    decidable finality and no longer requires the temperature-valued
+    `settled_value` to be `{0,1}`. This builder passes the stored value through
+    unchanged and additionally surfaces `canonical_outcome`/`canonical_settled_f`
+    so G3's verdict reflects the book's real finality representation.
     """
     station = row.get("station")
     settlement_date = (row.get("trade_date_utc")
@@ -377,14 +380,26 @@ def candidate_from_trades_row(row: Dict[str, Any], *,
         "fee_total": fee_total,
         "settlement_confirmed": row.get("settlement_confirmed"),
         "settlement_outcome": row.get("settlement_outcome"),
+        "canonical_outcome": row.get("canonical_outcome"),
+        "canonical_settled_f": row.get("canonical_settled_f"),
         "settled_value": row.get("settled_value"),
-        "label_axis": row.get("label_axis"),
+        "label_axis": row.get("label_axis") or "strike_crossing",
         "snapshot_time_utc": row.get("snapshot_time_utc"),
         "obs_max_source_ts": row.get("obs_max_source_ts"),
         "created_at_utc": row.get("created_at_utc"),
         "entry_time_utc": pinned_entry_time_utc(station, settlement_date),
         "finalization_utc": finalization_utc,
     }
+
+
+def settled_binary_for_row(row: Dict[str, Any]) -> Optional[int]:
+    """Derived binary settlement (1=correct, 0=incorrect) for a `trades` row.
+
+    Thin wrapper over `gate_composer.settled_binary` for callers holding a raw
+    book row. The stored `settled_value` (a temperature) is never rewritten.
+    """
+    return settled_binary({"canonical_outcome": row.get("canonical_outcome"),
+                           "settlement_outcome": row.get("settlement_outcome")})
 
 
 # ─── pre-registration epoch for the diagnostic run ──────────────────────────

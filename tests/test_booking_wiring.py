@@ -163,7 +163,8 @@ def _settled(**over):
             "signal_family": "intraday", "settlement_date": "2026-10-04",
             "quantity": 100, "fill_price": 0.30,
             "fee_total": kalshi_fee(100, 0.30), "settlement_confirmed": 1,
-            "settlement_outcome": "correct", "settled_value": 1,
+            "settlement_outcome": "correct", "canonical_outcome": "correct",
+            "settled_value": 91.0,  # settlement TEMPERATURE (book), not a binary
             "label_axis": "strike_crossing",
             "snapshot_time_utc": "2026-10-04T17:30:00Z",
             "created_at_utc": "2026-10-04T17:00:00Z",
@@ -177,6 +178,19 @@ def test_full_gate_admits_clean_settled():
     g = sqlite3.connect(":memory:")
     v = admit_candidate(_settled(), conn=g, suite_green=True)
     assert v.verdict == VERDICT_ADMITTED
+
+
+def test_full_gate_admits_temperature_settled_value():
+    # The book's real finality representation: settled_value is the settlement
+    # TEMPERATURE plus canonical_outcome (the strike-crossing win/loss). G3 must
+    # admit this — the frozen {0,1} requirement is reconciled away.
+    g = sqlite3.connect(":memory:")
+    v = admit_candidate(_settled(settled_value=79.0, canonical_outcome="correct",
+                                 settlement_outcome="correct"),
+                        conn=g, suite_green=True)
+    assert v.verdict == VERDICT_ADMITTED
+    g3 = [c for c in v.checks if c.gate == "G3"][0]
+    assert g3.status == "PASS"
 
 
 def test_full_gate_rejects_lookahead_and_raises():
@@ -263,7 +277,8 @@ def test_settled_admission_logs_verdicts_and_custodies_admits(tmp_path):
             "SELECT sql FROM sqlite_master WHERE sql IS NOT NULL"):
         c.execute(stmt[0])
     c.commit()
-    # a clean settled row (entry == pin, fee canonical, settled_value binary)
+    # a clean settled row (entry == pin, fee canonical, canonical_outcome correct)
+    # with a TEMPERATURE settled_value — the book's real representation.
     c.execute(
         "INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,"
         " signal_direction, market_price, trade_type, quantity,"
@@ -272,7 +287,7 @@ def test_settled_admission_logs_verdicts_and_custodies_admits(tmp_path):
         " settlement_outcome, settled_value, realized_pnl, snapshot_time_utc,"
         " market_price) VALUES ('clean','2026-10-04','KNYC','HIGH','UP',0.3,"
         "'buy_yes',100,30,0.3,30,'v3.1_sbox','intraday_ev_strike',"
-        "'2026-10-04T17:00:00Z','strike_crossing',1,'correct',1,10.0,"
+        "'2026-10-04T17:00:00Z','strike_crossing',1,'correct',75.0,10.0,"
         "'2026-10-04T17:30:00Z',0.3)")
     # a lookahead row (post-decision input)
     c.execute(
