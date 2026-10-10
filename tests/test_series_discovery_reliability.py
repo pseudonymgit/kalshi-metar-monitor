@@ -19,7 +19,7 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         kalshi_monitor._LAST_SERIES_DISCOVERY_SUCCESS_UTC = self.original_last_success
         kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
 
-    def test_discovery_prefers_deterministic_primary_ticker(self):
+    def test_discovery_retains_legacy_and_canonical_high_tickers(self):
         series_items = {
             "series": [
                 {"frequency": "daily", "title": "Denver highest temperature", "ticker": "KXDENHIGH"},
@@ -29,10 +29,10 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        # Current discovery derives the station AND market type from the ticker
-        # token alone (it no longer consults the series title), so only the
-        # canonical KXHIGH<CODE> ticker is retained.
-        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN"])
+        # H6: the series title is passed to _infer_series_market_type and the
+        # legacy KXDENHIGH form (KX + DEN + HIGH) is parsed, so BOTH distinct
+        # high-temperature series identifiers are retained.
+        self.assertEqual(discovered.get("KDEN"), ["KXDENHIGH", "KXHIGHDEN"])
 
     def test_discovery_includes_low_only_series(self):
         series_items = {
@@ -56,9 +56,9 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        # Deterministic sorted order; KXDENHIGH is dropped because it encodes
-        # neither a HIGH/LOW token nor a recognised station token.
-        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN"])
+        # Deterministic sorted order; KXDENHIGH is retained because the series
+        # title supplies the HIGH intent and the ticker supplies the station.
+        self.assertEqual(discovered.get("KDEN"), ["KXDENHIGH", "KXHIGHDEN", "KXLOWDEN"])
 
     def test_discovery_uses_market_derived_station_codes_outside_static_mapping(self):
         series_items = {

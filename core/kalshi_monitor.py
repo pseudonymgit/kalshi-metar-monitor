@@ -1383,9 +1383,9 @@ def _infer_series_market_type(*, ticker: str = "", title: str = "", source: str 
     if source.upper() == "HOURLY":
         return "HOURLY"
 
-    if any(token in marker_blob for token in ("KXHIGH", " HIGH", "HIGH ", "HIGHEST TEMPERATURE", "DAILY HIGH")):
+    if any(token in marker_blob for token in ("KXHIGH", "HIGH", "HIGHEST TEMPERATURE", "DAILY HIGH")):
         return "HIGH"
-    if any(token in marker_blob for token in ("KXLOW", " LOW", "LOW ", "LOWEST TEMPERATURE", "DAILY LOW")):
+    if any(token in marker_blob for token in ("KXLOW", "LOW", "LOWEST TEMPERATURE", "DAILY LOW")):
         return "LOW"
     return None
 
@@ -1434,8 +1434,14 @@ def _discover_series_for_stations():
         settlement_source = item.get("settlement_source", "")
         source_type = item.get("source", "")  # Could be "HOURLY" for NYC hourly markets
         
-        # Infer market type from ticker and source
-        market_type = _infer_series_market_type(ticker=ticker, source=source_type)
+        # Infer market type from ticker, title, and source. The title carries the
+        # HIGH/LOW intent for legacy identifiers (e.g. KXDENHIGH) whose ticker
+        # encodes no explicit market-type token.
+        market_type = _infer_series_market_type(
+            ticker=ticker,
+            title=str(item.get("title") or ""),
+            source=source_type,
+        )
         if market_type not in {"HIGH", "LOW", "HOURLY"}:
             continue
         
@@ -1534,7 +1540,21 @@ def _extract_station_from_ticker(ticker: str) -> str | None:
     }
     
     cleaned_upper = cleaned.upper()
-    return city_to_icao.get(cleaned_upper)
+    station = city_to_icao.get(cleaned_upper)
+    if station:
+        return station
+    # Some API series use the station token before the HIGH/LOW suffix
+    # (for example KXDENHIGH: KX + DEN + HIGH). Only accept known city tokens;
+    # do not guess from arbitrary ticker text.
+    for suffix in ("HIGH", "LOW"):
+        if cleaned_upper.endswith(suffix):
+            candidate = cleaned_upper[: -len(suffix)]
+            if candidate.startswith("KX"):
+                candidate = candidate[2:]
+            found = city_to_icao.get(candidate)
+            if found:
+                return found
+    return None
 
 
 def ensure_series_discovery_loaded():
