@@ -19,7 +19,7 @@ class HydrationQueueTests(unittest.TestCase):
         kalshi_monitor._hydration_backoff_until = self.orig_backoff
         kalshi_monitor._last_hydration_request_ts = self.orig_last_ts
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})
     @patch("core.kalshi_monitor.time.time", return_value=1000.0)
     def test_enqueue_order_is_deterministic(self, _time, _hydrate, _domain):
@@ -37,7 +37,7 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(snapshot["next_backoff_expiry"], None)
         self.assertEqual(snapshot["last_hydration_request_ts"], 0.0)
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     @patch("core.kalshi_monitor._LOGGER")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})
     @patch("core.kalshi_monitor.time.time", side_effect=[1000.0, 1000.4, 1001.2])
@@ -54,7 +54,7 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(third["status"], "hydrated")
         self.assertEqual(mock_hydrate.call_count, 2)
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     @patch("core.kalshi_monitor._LOGGER")
     @patch("core.kalshi_monitor.time.time", side_effect=[2000.0, 2001.0, 2002.0, 2003.0])
     def test_429_sets_backoff_and_prevents_immediate_retry(self, _time, _logger, _domain):

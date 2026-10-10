@@ -556,7 +556,7 @@ class StructuralHardeningTests(unittest.TestCase):
         result = kalshi_monitor.ensure_ladder_hydration_prerequisite("KDEN")
         self.assertEqual(result["status"], "cache_missing")
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXDENHIGH"]})
     @patch("core.kalshi_monitor.build_structured_snapshot", return_value={"markets": []})
     @patch(

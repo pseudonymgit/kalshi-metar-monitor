@@ -11,6 +11,14 @@ _REPO_ROOT_STR = str(_REPO_ROOT)
 if _REPO_ROOT_STR not in sys.path:
     sys.path.insert(0, _REPO_ROOT_STR)
 
+# Hermeticity: do not start the in-process paper-trading background daemon under
+# pytest. app.py autostarts it at import when PAPER_TRADING_ENABLED=1 (the
+# production default); the daemon calls daily_paper_run() in-process, which
+# generates signals and mutates global market-discovery state that other tests
+# assume pristine. Set before any test module imports app. (Previously the
+# daemon died instantly on an UnboundLocalError, which masked this leak.)
+os.environ.setdefault("PAPER_TRADING_ENABLED", "0")
+
 # R/T (2026-09-29): production data directory — tests must never OPEN these for
 # writing. Corruption of data/*.db is how a test run can destroy a real archive.
 _PROD_DATA_DIR = (_REPO_ROOT / "data").resolve()
@@ -93,3 +101,45 @@ def db_write_sandbox(monkeypatch):
 
     monkeypatch.setattr(sqlite3, "connect", guarded_connect)
     yield
+
+
+@pytest.fixture(autouse=True)
+def _isolate_market_discovery_state():
+    """Restore process-global market-discovery state around every test.
+
+    ``ensure_series_discovery_loaded`` / ``discover_market_derived_station_codes``
+    mutate module-level state in ``core.kalshi_monitor`` (``_SERIES_BY_STATION``,
+    ``_SERIES_DISCOVERED``, caches). Tests that merely exercise a production
+    code path can populate it and leak into unrelated observability tests.
+    Snapshot + restore keeps discovery state hermetic per test.
+    """
+    import core.kalshi_monitor as _km
+
+    _FIELDS = (
+        "_SERIES_BY_STATION",
+        "_SERIES_DISCOVERED",
+        "_SERIES_MARKETS_CACHE",
+        "_DISCOVERED_WEATHER_MARKETS",
+        "_DISCOVERED_WEATHER_MARKETS_BY_STATION",
+    )
+
+    def _snap():
+        out = {}
+        for name in _FIELDS:
+            if hasattr(_km, name):
+                val = getattr(_km, name)
+                if isinstance(val, dict):
+                    out[name] = dict(val)
+                elif isinstance(val, list):
+                    out[name] = list(val)
+                else:
+                    out[name] = val
+        return out
+
+    before = _snap()
+    try:
+        yield
+    finally:
+        for name, val in before.items():
+            setattr(_km, name, val)
+

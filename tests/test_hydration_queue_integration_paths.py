@@ -52,7 +52,7 @@ class HydrationQueueIntegrationPathTests(unittest.TestCase):
 
 class ConfiguredHydrationMarketTypeTests(unittest.TestCase):
     @patch.dict("os.environ", {"KALSHI_TARGET_MARKET_TYPE": "HIGH,LOW"}, clear=False)
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})
     def test_hydration_queue_worker_uses_configured_market_types_by_default(self, mock_hydrate, _domain):
         from core import kalshi_monitor

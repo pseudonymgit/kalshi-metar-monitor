@@ -22,7 +22,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
         kalshi_monitor._LAST_HYDRATION_EXECUTION = dict(self.original_last_hydration_execution)
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     def test_connectivity_snapshot_records_series_discovery_success(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}
@@ -39,7 +39,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertIsNotNone(snapshot["last_series_discovery_success_utc"])
         self.assertIsNone(snapshot["last_series_discovery_error"])
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     def test_connectivity_snapshot_records_last_discovery_failure(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}
@@ -56,7 +56,7 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertEqual(snapshot["last_series_discovery_error"], "series-api-down")
         self.assertIsNone(snapshot["last_series_discovery_success_utc"])
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     def test_observability_context_does_not_mutate_connectivity_counters(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}

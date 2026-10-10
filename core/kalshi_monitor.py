@@ -285,7 +285,8 @@ class kalshi_execution_domain:
 
 def _current_kalshi_execution_domain() -> str:
     domain = str(_KALSHI_EXECUTION_DOMAIN.get() or "production").strip().lower() or "production"
-    # Ensure domain is normalized to canonical form
+    # Ensure domain is normalized to canonical short form: production -> "prod".
+    # Callers MUST compare against "prod" (not "production") or the guard always fires.
     return {
         "production": "prod",
         "prod": "prod",
@@ -1547,7 +1548,7 @@ def ensure_series_discovery_loaded():
             }
 
         record_connectivity_state = True
-        if _current_kalshi_execution_domain() != "production":
+        if _current_kalshi_execution_domain() != "prod":
             record_connectivity_state = False
         if has_request_context() and str(request.path or "").startswith("/observability/"):
             record_connectivity_state = False
@@ -1855,7 +1856,7 @@ def hydration_queue_snapshot(*, reference_ts: float | None = None) -> dict:
 def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict:
     global _last_hydration_request_ts
 
-    if _current_kalshi_execution_domain() != "production":
+    if _current_kalshi_execution_domain() != "prod":
         return {"status": "skipped", "reason": "non_production_domain"}
 
     now_ts = time.time()
@@ -1910,7 +1911,7 @@ def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict
 # Replay safety rule: hydration is production-only because it performs
 # live market reads; replay must use persisted deterministic history.
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
-    if _current_kalshi_execution_domain() != "production":
+    if _current_kalshi_execution_domain() != "prod":
         raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
 
     normalized_station = (station or "").strip().upper()

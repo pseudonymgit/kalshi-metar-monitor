@@ -72,7 +72,7 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
 
         self.assertEqual(discovered.get("KSEA"), ["KXHIGHSEA"])
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     def test_ensure_discovery_raises_and_does_not_mark_discovered_on_empty_mapping(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}

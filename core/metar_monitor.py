@@ -2729,7 +2729,7 @@ def _log_transition_event(
     except Exception:
         execution_domain = "production"
 
-    if execution_domain != "production":
+    if execution_domain != "prod":
         return None
 
     now_iso = _now_utc_iso()

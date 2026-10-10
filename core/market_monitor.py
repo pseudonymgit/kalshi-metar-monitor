@@ -962,7 +962,7 @@ def hydration_queue_snapshot(*, reference_ts: float | None = None) -> dict:
 def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict:
     global _last_hydration_request_ts
 
-    if _current_kalshi_execution_domain() != "production":
+    if _current_kalshi_execution_domain() != "prod":
         return {"status": "skipped", "reason": "non_production_domain"}
 
     now_ts = time.time()
@@ -1013,7 +1013,7 @@ def process_hydration_queue_worker(market_types: set[str] | None = None) -> dict
             return {"status": "backoff", "station": station, "retry_after": HYDRATION_BACKOFF_SECONDS}
         raise
 def hydrate_station_ladder_snapshot(station: str, market_types: set[str]) -> dict:
-    if _current_kalshi_execution_domain() != "production":
+    if _current_kalshi_execution_domain() != "prod":
         raise RuntimeError("hydrate_station_ladder_snapshot requires production execution domain")
 
     normalized_station = (station or "").strip().upper()

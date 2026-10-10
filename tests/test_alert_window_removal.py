@@ -27,7 +27,7 @@ class AlertWindowRemovalTests(unittest.TestCase):
             os.unlink(self.temp_db.name)
         os.environ.pop("ALERT_DB_PATH", None)
 
-    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="prod")
     @patch("core.metar_monitor._emit_alert")
     def test_alert_fires_without_time_window(self, mock_emit_alert, _domain):
         alerts = metar_monitor._process_temperature_event(
