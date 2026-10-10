@@ -681,11 +681,76 @@ def _ensure_alert_schema() -> None:
                 )
                 """
             )
+            # Legacy Layer 0 tables (L0-T4) — established here so a
+            # freshly-created alert DB is backward-compatible, not dependent on
+            # each lazy writer. DDL is writer-compatible with
+            # core/metar_monitor._log_transition_event / _audit_alert and
+            # core/settlement_epoch_logger.py.
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS alerts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    created_utc TEXT,
+                    station TEXT,
+                    market_type TEXT,
+                    event_ticker TEXT,
+                    alert_type TEXT,
+                    direction TEXT,
+                    temp_f REAL,
+                    bucket_index INTEGER,
+                    metadata_json TEXT
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS settlement_epochs (
+                    id INTEGER PRIMARY KEY,
+                    station TEXT NOT NULL,
+                    market_type TEXT,
+                    local_trading_date TEXT NOT NULL,
+                    settlement_bucket INTEGER NOT NULL,
+                    prior_settlement_bucket INTEGER,
+                    settlement_timestamp_utc TEXT NOT NULL,
+                    settlement_jump_magnitude INTEGER,
+                    epoch_status TEXT NOT NULL,
+                    epoch_close_reason TEXT,
+                    epoch_close_timestamp_utc TEXT,
+                    reversion_occurred INTEGER NOT NULL DEFAULT 0,
+                    first_reversion_timestamp_utc TEXT,
+                    max_excursion_above_settlement REAL NOT NULL DEFAULT 0,
+                    duration_at_or_above_settlement_seconds REAL NOT NULL DEFAULT 0,
+                    duration_strictly_above_settlement_seconds REAL NOT NULL DEFAULT 0,
+                    terminal_state_reached INTEGER NOT NULL DEFAULT 0,
+                    settlement_transition_event_id INTEGER,
+                    last_transition_event_id INTEGER,
+                    last_transition_timestamp_utc TEXT,
+                    last_transition_temp_f REAL
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS transition_events (
+                    id INTEGER PRIMARY KEY,
+                    created_utc TEXT,
+                    station TEXT,
+                    transition_type TEXT,
+                    instant_bucket_before INTEGER,
+                    instant_bucket_after INTEGER,
+                    settlement_bucket INTEGER,
+                    running_max REAL,
+                    current_temp REAL,
+                    metadata_json TEXT
+                )
+                """
+            )
             # Signal layer state persistence (L0-T1)
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS signal_layer_state (
-                    signal_name TEXT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    signal_name TEXT UNIQUE NOT NULL,
                     state_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 )
@@ -695,7 +760,8 @@ def _ensure_alert_schema() -> None:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS market_cache (
-                    market_id TEXT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    market_id TEXT UNIQUE NOT NULL,
                     station TEXT NOT NULL,
                     cache_json TEXT NOT NULL,
                     discovered_at TEXT NOT NULL,
@@ -705,8 +771,8 @@ def _ensure_alert_schema() -> None:
                 """
             )
             conn.commit()
-            
-            # Upgrade: Add last_hydrated_utc column if missing (existing databases)
+
+            # Upgrade: Add missing columns on pre-existing databases (migration).
             try:
                 cursor = conn.execute("PRAGMA table_info(market_cache)")
                 columns = {row[1] for row in cursor.fetchall()}
@@ -716,7 +782,7 @@ def _ensure_alert_schema() -> None:
                     _LOGGER.info("market_cache_schema_upgraded added_last_hydrated_utc")
             except Exception as e:
                 _LOGGER.info("market_cache_schema_upgrade_skipped error=%s", str(e))
-            
+
         finally:
             conn.close()
 
