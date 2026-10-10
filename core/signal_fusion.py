@@ -12,6 +12,18 @@ Layer 4: Regime/State modulators (Family D as precision modulators)
 Correlation correction via effective-sample-size (n_eff):
   |rho| >= 0.7 → halved weight (conservative within-pool)
 
+────────────────────────────────────────────────────────────────────────────
+C3 (GR3 D6): n_eff/rho CORRECTION IS A DEAD CONFIG FIELD — PARKED.
+`FusionModeConfig.correlation_penalty_threshold` (|rho| >= 0.7 → halved
+weight) is documented but NOT enforced at combination time. PoolOfPools
+applies n_eff modulators in `_apply_modulators` AFTER pool posteriors are
+built, so the adjustment mutates only the cross-pool input
+(compute_cross_pool_n_eff) rather than the within-pool combination weights.
+Fusion is PARKED (C2, `use_fusion is False`); do NOT wire until the rho
+correction is applied where the weights are combined. See
+docs/plans/GRAY-ROOM-3-SYNTHESIS-2026-10-09.md (D6).
+────────────────────────────────────────────────────────────────────────────
+
 Output: (direction, confidence, bayesian_conf, n_signals_agree) tuple
 
 Preserves backward compatibility — re-exports existing fusion classes.
@@ -81,6 +93,10 @@ class FusionModeConfig:
     allow_ai_signals: bool = False               # GATE for AI composite
     freshness_half_life_multiplier: float = 1.0
     correlation_penalty_threshold: float = 0.7   # |rho| >= this → halved weight
+    # C3 (GR3 D6): NOTE — `correlation_penalty_threshold` is a DEAD config field.
+    # It is documented but not applied at combination time (PoolOfPools applies
+    # n_eff modulation after pooling). Fusion is PARKED (C2); do not treat this
+    # field as active. See docs/plans/GRAY-ROOM-3-SYNTHESIS-2026-10-09.md (D6).
     min_signals_for_fusion: int = 2
     min_edge_threshold: float = 0.01             # minimum edge to trade
     kelly_fraction_cap: float = 0.25             # max fraction of bankroll

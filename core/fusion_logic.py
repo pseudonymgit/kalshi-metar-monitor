@@ -2,6 +2,25 @@
 Fusion logic Module
 
 Extracted from signal_fusion.py during Phase 20.1 monolith decomposition.
+
+────────────────────────────────────────────────────────────────────────────
+C3 (GR3 D5/D6/D7): FUSION IS PARKED — DO NOT WIRE.
+This module is NOT on the live path: core/unified_backtest.py asserts
+`use_fusion is False` (C2), so the live decision is a majority vote. The
+composition defects below are documented, not fixed, and must stay unwired
+until the prerequisites clear:
+  D5 — LLOP weight positional mismatch (see fuse_signals): weights are built
+       against self.signal_names but combined positionally against the
+       caller's `calibrated_signals`; any subset/reorder makes sum(w) != 1 and
+       double-counts log-odds.
+  D6 — n_eff/rho correction is a dead config field: see
+       FusionModeConfig.correlation_penalty_threshold in core/signal_fusion.py;
+       PoolOfPools applies n_eff modulation AFTER pool posteriors are built, so
+       only the cross-pool input is mutated, not combination-time weights.
+  D7 — `confidence` is a re-scaled score, not a probability:
+       confidence = P(dir) * diversity_modifier(0.75..1.0) (see fuse_signals).
+References: docs/plans/GRAY-ROOM-3-SYNTHESIS-2026-10-09.md (D4-D7).
+────────────────────────────────────────────────────────────────────────────
 """
 
 
@@ -618,6 +637,16 @@ class SignalFusionEngine:
         # If no calibrated signals, return defaults
         if not calibrated_signals:
             return None, 0.0, 0.0
+
+        # ─── C3 (GR3 D5): LLOP WEIGHT POSITIONAL MISMATCH (KNOWN, PARKED) ───
+        # `fusion_weights` is derived from/ordered by self.signal_names, but it is
+        # zipped positionally with the caller's `calibrated_signals` below. When
+        # the caller passes a subset (empty signals are dropped) or a different
+        # order, the weights no longer align with their signal: sum(w) != 1 and
+        # the weighted log-odds double-count some signals. Fusion is PARKED (C2)
+        # so this is not exercised on the live path; the length guard below is
+        # only a partial mitigation, not a fix. Wire only after realigning
+        # weights to signal identity. Do NOT wire while PARKED.
             
         # Layer 1 & 2: Compute weights and perform Log-Odds Linear Opinion Pooling
         # Use MI-based weights if available, fall back to equal weights
@@ -674,6 +703,12 @@ class SignalFusionEngine:
         # If 4 up, 3 down: max_vote_share=0.57, diversity=0.86
         # Modifier: final_confidence *= (0.75 + 0.25*diversity)
         # This penalizes unanimous votes (they don't add much information)
+        #
+        # ─── C3 (GR3 D7): CONFIDENCE IS A RE-SCALED SCORE, NOT A PROBABILITY ───
+        # `confidence` returned below is P(dir) * diversity_modifier(0.75..1.0),
+        # so it lives in [0,1] but is NOT calibrated P(win). Do not feed it to
+        # Kelly or any probability consumer as if it were a probability. Known
+        # and PARKED (C2); see docs/plans/GRAY-ROOM-3-SYNTHESIS-2026-10-09.md D7.
         if n_signals >= 2:
             up_count = sum(1 for d, _, _ in calibrated_signals if d == 'up')
             down_count = n_signals - up_count
