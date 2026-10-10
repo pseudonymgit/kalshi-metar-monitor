@@ -12,7 +12,13 @@ One ordered filter for a trade candidate, cheapest-first:
   G3 settlement      settlement_confirmed=1 and outcome in {correct, incorrect}
                      and settled_value in {0,1} and dates sane.
   G4 axis-correct    label basis == strike-crossing; reject day-over-day.
-  G5 as-of           every input ts < settlement_date T00:00:00Z; zero tolerance.
+  G5 as-of           branches by strategy class (2026-10-10 methodology ruling):
+                     the INTRADAY family (B2 sweep, SBOX EV-strike bridge) bounds
+                     every input at the trade's pinned entry instant (13:30
+                     station-local -> tz-aware UTC) and REJECTS anything after the
+                     decision; the OBSERVATIONAL/prior-day family keeps its date
+                     boundary (obs date_utc < settlement_date). `settlement_date`
+                     stays a DATE, never an as-of timestamp.
 
 Verdict per candidate: ADMITTED | REJECTED | HALT, appended to an append-only
 ledger. HALT is reserved for a window-level/structural failure (G0 or a
@@ -34,6 +40,7 @@ import json
 import sqlite3
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -42,6 +49,14 @@ sys.path.insert(0, str(REPO_DEFAULT))
 
 from core.fees import kalshi_fee, fee_per_contract  # noqa: E402
 from core.observational_asof_gate import is_asof_safe, settlement_window_open  # noqa: E402
+from core.station_time import parse_iso_utc, station_timezone_name  # noqa: E402
+
+try:  # py3.9+
+    from zoneinfo import ZoneInfo  # type: ignore
+    _HAS_ZONEINFO = True
+except Exception:  # pragma: no cover - stdlib fallback
+    ZoneInfo = None  # type: ignore
+    _HAS_ZONEINFO = False
 
 # ─── frozen constants (aligned with A4 / verify_gate) ───────────────────────
 AXIS_VALUE = "strike_crossing"
@@ -58,6 +73,19 @@ GATE_SCRIPTS = ("scripts/verify_gate.py", "scripts/substrate_gate.py")
 
 REQUIRED_IDENTITY = ("trade_uuid", "instance", "trade_version", "created_at_utc")
 VALID_OUTCOMES = ("correct", "incorrect")
+
+# ─── G5 as-of methodology (2026-10-10 ruling) ───────────────────────────────
+# The intraday family decides at the observed high-so-far pinned to 13:30
+# STATION-LOCAL (H3 pin; the B2 sweep and the SBOX EV-strike bridge both use it).
+# That instant is load-bearing provenance: a bare run once silently defaulted to
+# 13:00, so the gate verifies the candidate's own entry_time_utc against the pin.
+INTRADAY_ENTRY_LOCAL_HHMM = (13, 30)
+INTRADAY_FAMILIES = frozenset({"intraday", "intraday_ev_strike"})
+
+# Input timestamps consulted for the intraday boundary when the candidate does not
+# supply an explicit `input_timestamps` list.
+INTRADAY_INPUT_FIELDS = ("snapshot_time_utc", "obs_max_source_ts",
+                         "created_at_utc", "nwp_fetch_date")
 
 
 @dataclass
@@ -183,8 +211,30 @@ def gate_g4_axis(candidate: Dict[str, Any]) -> GateCheck:
     return GateCheck("G4", "PASS", f"label_axis={AXIS_VALUE!r}")
 
 
-def gate_g5_asof(candidate: Dict[str, Any]) -> GateCheck:
-    """G5: every input ts < settlement_date T00:00:00Z; zero tolerance."""
+def _pinned_entry_time_utc(station: Any, settlement_date: Any) -> Optional[datetime]:
+    """13:30 station-local on `settlement_date` -> tz-aware UTC instant (or None).
+
+    Station-specific: KNYC in EDT is 17:30Z; KSFO in PDT is 20:30Z. This is the
+    intraday family's pinned decision instant.
+    """
+    if not station or not settlement_date or not _HAS_ZONEINFO:
+        return None
+    try:
+        tz = ZoneInfo(station_timezone_name(str(station)))
+        hh, mm = INTRADAY_ENTRY_LOCAL_HHMM
+        local = datetime.fromisoformat(f"{str(settlement_date)[:10]}T{hh:02d}:{mm:02d}:00")
+        return local.replace(tzinfo=tz).astimezone(timezone.utc)
+    except Exception:
+        return None
+
+
+def _g5_observational(candidate: Dict[str, Any]) -> GateCheck:
+    """Observational / prior-day family: every input ts < settlement_date T00:00:00Z.
+
+    Unchanged by the 2026-10-10 ruling — this boundary is correct for a signal that
+    reads the settlement day's own observation stream. Any candidate without an
+    explicit intraday family falls here, so no unknown family opens a lookahead hole.
+    """
     sdate = candidate.get("settlement_date")
     if not sdate:
         return GateCheck("G5", "REJECT", "no settlement_date for as-of check")
@@ -207,6 +257,73 @@ def gate_g5_asof(candidate: Dict[str, Any]) -> GateCheck:
                              f"{settlement_window_open(sdate)}")
         checked += 1
     return GateCheck("G5", "PASS", f"{checked} input timestamp(s) all pre-window")
+
+
+def _g5_intraday(candidate: Dict[str, Any]) -> GateCheck:
+    """Intraday family: bound every input at the pinned entry instant.
+
+    PASS iff every input ts <= entry_time_utc AND entry_time_utc < finalization_utc.
+    The pinned entry time is 13:30 station-local -> UTC; a candidate whose
+    entry_time_utc does not equal that pin is a provenance mismatch -> REJECT.
+    """
+    station = candidate.get("station")
+    sdate = candidate.get("settlement_date")
+    if not station or not sdate:
+        return GateCheck("G5", "REJECT",
+                         "intraday: no station/settlement_date for entry-instant check")
+    sdate = str(sdate)[:10]
+    pinned = _pinned_entry_time_utc(station, sdate)
+    if pinned is None:
+        return GateCheck("G5", "REJECT",
+                         f"intraday: cannot resolve 13:30 local for station={station!r} "
+                         f"on {sdate}")
+
+    entry = parse_iso_utc(candidate.get("entry_time_utc"))
+    if entry is None:
+        return GateCheck("G5", "REJECT",
+                         "intraday: missing/unparseable entry_time_utc (decision instant)")
+    if entry != pinned:
+        return GateCheck("G5", "REJECT",
+                         f"provenance: entry_time_utc {entry.isoformat()} != pinned "
+                         f"13:30-local {pinned.isoformat()} for {station} {sdate}")
+
+    final = parse_iso_utc(candidate.get("finalization_utc")
+                          or candidate.get("settled_at_utc"))
+    if final is None:
+        return GateCheck("G5", "REJECT",
+                         "intraday: missing finalization_utc "
+                         "(settlement_snapshot.settled_at_utc)")
+    if not (entry < final):
+        return GateCheck("G5", "REJECT",
+                         f"decision after finalization: entry {entry.isoformat()} "
+                         f">= final {final.isoformat()}")
+
+    inputs = candidate.get("input_timestamps")
+    if inputs is None:
+        inputs = [candidate.get(k) for k in INTRADAY_INPUT_FIELDS]
+    checked = 0
+    for raw in inputs:
+        if not raw:
+            continue
+        ts = parse_iso_utc(raw)
+        if ts is None:
+            return GateCheck("G5", "REJECT", f"intraday: unparseable input ts {raw!r}")
+        if ts > entry:
+            return GateCheck("G5", "REJECT",
+                             f"post-decision input {ts.isoformat()} > "
+                             f"entry {entry.isoformat()}")
+        checked += 1
+    return GateCheck("G5", "PASS",
+                     f"intraday: {checked} input(s) <= entry {entry.isoformat()} "
+                     f"< finalization {final.isoformat()}")
+
+
+def gate_g5_asof(candidate: Dict[str, Any]) -> GateCheck:
+    """G5: as-of boundary branches by strategy class (2026-10-10 ruling)."""
+    family = candidate.get("signal_family")
+    if family in INTRADAY_FAMILIES:
+        return _g5_intraday(candidate)
+    return _g5_observational(candidate)
 
 
 # ─── Composer ───────────────────────────────────────────────────────────────
@@ -269,7 +386,6 @@ class GateLedger:
         self.conn.commit()
 
     def append(self, v: GateVerdict, *, logged_at_utc: Optional[str] = None) -> None:
-        from datetime import datetime, timezone
         failed = next((c.gate for c in v.checks
                        if c.status in ("REJECT", "HALT")), None)
         detail = "; ".join(f"{c.gate}:{c.status}:{c.detail}"
@@ -297,9 +413,18 @@ def _self_check(repo: Path) -> int:
     bad_axis = dict(good, trade_uuid="u3", label_axis="day_over_day")
     bad_asof = dict(good, trade_uuid="u4", snapshot_time_utc="2026-10-10T01:00:00Z")
     loose = dict(good, trade_uuid="u5", trade_version="v9_mismatch")
+    # Intraday family (KNYC 2026-10-04 EDT): pinned entry 17:30Z, final 05:00Z next day.
+    intraday = dict(good, trade_uuid="u6", instance="B2", station="KNYC",
+                    signal_family="intraday", settlement_date="2026-10-04",
+                    snapshot_time_utc="2026-10-04T17:30:00Z",
+                    created_at_utc="2026-10-04T17:00:00Z",
+                    entry_time_utc="2026-10-04T17:30:00Z",
+                    finalization_utc="2026-10-05T05:00:00Z")
+    intraday_leak = dict(intraday, trade_uuid="u7",
+                         snapshot_time_utc="2026-10-04T18:00:00Z")
 
     out = []
-    for c in (good, bad_fee, bad_axis, bad_asof, loose):
+    for c in (good, bad_fee, bad_axis, bad_asof, loose, intraday, intraday_leak):
         v = compose_gate(c, repo, frozen_version="v3.1_sbox", suite_green=True)
         out.append(v)
     led = GateLedger(sqlite3.connect(":memory:"))

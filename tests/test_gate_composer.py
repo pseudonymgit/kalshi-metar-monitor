@@ -7,6 +7,9 @@ Locks GR5 §2:
   - a fee off by >$0.005 is REJECTED (G2) and the canonical fee is reused;
   - a day-over-day axis is REJECTED (G4);
   - a lookahead input is REJECTED (G5);
+  - G5 branches by strategy class (2026-10-10 ruling): the intraday family is
+    bounded at the pinned 13:30 station-local entry instant (provenance-guarded),
+    the observational/prior-day family keeps the settlement-date boundary;
   - a version mismatch is HALT (G1) and G0 failure is HALT;
   - verdicts are appended to an append-only ledger (UPDATE/DELETE refused).
 """
@@ -72,6 +75,108 @@ def test_g5_lookahead_rejected():
                      suite_green=True, frozen_version="v3.1_sbox")
     assert v.verdict == VERDICT_REJECTED
     assert any(c.gate == "G5" and c.status == "REJECT" for c in v.checks)
+
+
+# ─── G5 methodology ruling 2026-10-10: branch by strategy class ──────────────
+# Intraday family (B2 sweep, SBOX EV-strike bridge) decides at the pinned
+# 13:30 station-local instant. KNYC 2026-10-04 is EDT -> 17:30Z; KSFO PDT -> 20:30Z.
+
+def _intraday(**over):
+    base = _good(
+        trade_uuid="i1", instance="B2", station="KNYC", signal_family="intraday",
+        settlement_date="2026-10-04",
+        created_at_utc="2026-10-04T17:00:00Z",
+        snapshot_time_utc="2026-10-04T17:30:00Z",
+        entry_time_utc="2026-10-04T17:30:00Z",
+        finalization_utc="2026-10-05T05:00:00Z",
+    )
+    base.update(over)
+    return base
+
+
+def test_g5_intraday_same_day_legit_input_admitted():
+    # The reproduced failure: a same-day 17:30Z input previously REJECTED as
+    # lookahead. After the ruling it is the decision instant -> ADMITTED.
+    v = compose_gate(_intraday(), REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert v.verdict == VERDICT_ADMITTED
+    assert all(c.status == "PASS" for c in v.checks)
+
+
+def test_g5_intraday_station_specific_pin():
+    # KSFO 2026-10-04 PDT -> pinned entry 20:30Z, and the same-day obs at 20:30Z passes.
+    v = compose_gate(_intraday(station="KSFO", entry_time_utc="2026-10-04T20:30:00Z",
+                               snapshot_time_utc="2026-10-04T20:30:00Z"),
+                     REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert v.verdict == VERDICT_ADMITTED
+    # but a KNYC-pinned 17:30Z entry on KSFO is a provenance mismatch.
+    v2 = compose_gate(_intraday(station="KSFO", entry_time_utc="2026-10-04T17:30:00Z"),
+                      REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert v2.verdict == VERDICT_REJECTED
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v2.checks)
+
+
+def test_g5_prior_day_family_unchanged():
+    v = compose_gate(_good(trade_uuid="p1",
+                           signal_family="observational_prior_day",
+                           created_at_utc="2026-10-09T12:00:00Z",
+                           snapshot_time_utc="2026-10-09T12:00:00Z"),
+                     REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert v.verdict == VERDICT_ADMITTED
+    # settlement-day observation still REJECTED for the observational family.
+    v2 = compose_gate(_good(trade_uuid="p2",
+                            signal_family="observational_prior_day",
+                            snapshot_time_utc="2026-10-10T01:00:00Z"),
+                      REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v2.checks)
+    # unknown/missing family falls through to the strict observational check.
+    v3 = compose_gate(_good(trade_uuid="p3", settlement_date="2026-10-04",
+                            created_at_utc="2026-10-04T17:00:00Z",
+                            snapshot_time_utc="2026-10-04T17:30:00Z"),
+                      REPO, suite_green=True, frozen_version="v3.1_sbox")
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v3.checks)
+
+
+def test_g5_intraday_post_decision_input_rejected():
+    # an input strictly after the pinned entry instant is genuine lookahead.
+    v = compose_gate(_intraday(snapshot_time_utc="2026-10-04T18:00:00Z"), REPO,
+                     suite_green=True, frozen_version="v3.1_sbox")
+    assert v.verdict == VERDICT_REJECTED
+    assert any(c.gate == "G5" and c.status == "REJECT" and "post-decision" in c.detail
+               for c in v.checks)
+    # boundary: an input exactly AT entry is admitted (known at decision time).
+    v2 = compose_gate(_intraday(obs_max_source_ts="2026-10-04T17:30:00Z"), REPO,
+                      suite_green=True, frozen_version="v3.1_sbox")
+    assert v2.verdict == VERDICT_ADMITTED
+    v3 = compose_gate(_intraday(obs_max_source_ts="2026-10-04T17:30:01Z"), REPO,
+                      suite_green=True, frozen_version="v3.1_sbox")
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v3.checks)
+
+
+def test_g5_intraday_provenance_mismatch_rejected():
+    # H3 provenance guard: a bare run silently defaulted entry to 13:00Z. A
+    # candidate whose decision instant != the pinned 13:30-local -> REJECT.
+    v = compose_gate(_intraday(entry_time_utc="2026-10-04T13:00:00Z"), REPO,
+                     suite_green=True, frozen_version="v3.1_sbox")
+    assert v.verdict == VERDICT_REJECTED
+    assert any(c.gate == "G5" and c.status == "REJECT" and "provenance" in c.detail
+               for c in v.checks)
+
+
+def test_g5_intraday_missing_entry_or_finalization_rejected():
+    v = compose_gate(_intraday(entry_time_utc=None), REPO, suite_green=True,
+                     frozen_version="v3.1_sbox")
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v.checks)
+    v2 = compose_gate(_intraday(finalization_utc=None), REPO, suite_green=True,
+                      frozen_version="v3.1_sbox")
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v2.checks)
+
+
+def test_g5_intraday_decision_after_finalization_rejected():
+    v = compose_gate(_intraday(entry_time_utc="2026-10-05T06:00:00Z"), REPO,
+                     suite_green=True, frozen_version="v3.1_sbox")
+    assert any(c.gate == "G5" and c.status == "REJECT" for c in v.checks)
+    # non-pinned and after finalization are both rejections; the boundary is what matters.
+    assert v.verdict == VERDICT_REJECTED
 
 
 def test_g3_unconfirmed_rejected():
