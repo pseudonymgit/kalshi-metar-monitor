@@ -24,3 +24,8 @@ graphify-out
 
 # GEFS backfill working dir — disposable GRIB .idx cache (untracked 2026-10-05)
 data/gefs_work/
+
+# Pre-registration freezes are write-once and MUST be committed (GR5 D2)
+!artifacts/preregistration/
+!artifacts/preregistration/*.json
+!artifacts/preregistration/*.sha256

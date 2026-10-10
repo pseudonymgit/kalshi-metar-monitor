@@ -1,0 +1,131 @@
+{
+  "analysis_code": {
+    "combined_sha256": "e68c74e1c9a76cf0f2eb5cfd7d587497c6931f17db99779fe8cfff984bee39fe",
+    "modules": {
+      "core/calibrate_all_signals.py": "c1b68165d79450eb4cec90990c51ee5c0e2b243ac7ecec9a73ed12e1540c05f6",
+      "core/intraday/calibration.py": "e5bfd35f0767f84cb87aa2bd19550db1762f981af2414f3315790f9d762fa0c8",
+      "core/unified_backtest.py": "a1ab1323dc8cfb4fec9502cdb61c69654463c1fbbc069693395a871edc885654",
+      "scripts/run_calibration_pipeline.py": "cb07be16378ee1ab0811344cbc8b9b6437621567b87d9e738525a256b77309c3"
+    }
+  },
+  "axis": "strike_crossing",
+  "bootstrap_reps": 10000,
+  "canary": {
+    "alpha_canary": 0.01,
+    "cusum_halt_sigma": 5.0,
+    "ids": [
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5"
+    ],
+    "master_seed": 20261010,
+    "seeds": {
+      "C1": {
+        "alpha_canary": 0.01,
+        "derived_seed": 1064861147,
+        "seed": 20261010
+      },
+      "C2": {
+        "alpha_canary": 0.01,
+        "derived_seed": 1471704702,
+        "seed": 20261010
+      },
+      "C3": {
+        "alpha_canary": 0.01,
+        "derived_seed": 3483353649,
+        "seed": 20261010
+      },
+      "C4": {
+        "alpha_canary": 0.01,
+        "derived_seed": 3731076810,
+        "seed": 20261010
+      },
+      "C5": {
+        "alpha_canary": 0.01,
+        "derived_seed": 946254168,
+        "seed": 20261010
+      }
+    }
+  },
+  "cluster_keys": [
+    "station",
+    "market_type",
+    "settlement_date"
+  ],
+  "cohort": {
+    "N": 640,
+    "cell_claim_min_dates": 3,
+    "cell_claim_min_n_eff": 24,
+    "cell_claim_min_raw": 48,
+    "cells": 40,
+    "cells_raw_target": 1920,
+    "market_types": [
+      "HIGH",
+      "LOW"
+    ],
+    "pooled_min_n_eff": 320,
+    "raw_per_cell": 16,
+    "stations": 20
+  },
+  "experiment_id": "GR5-WE-001",
+  "fee_formula": "ceil(0.07*P*(1-P)*100)/100 per contract (core.fees)",
+  "frozen_at_utc": "2026-10-10T00:35:30.026685+00:00",
+  "frozen_exclusions": [
+    "settlement_confirmed != 1",
+    "settlement_outcome not in {correct, incorrect}",
+    "label_axis != strike_crossing",
+    "asof (G5) violation",
+    "duplicate (station, market_type, settlement_date)",
+    "fail-open 0.5 provenance row"
+  ],
+  "primary_metric": {
+    "name": "net_ev_per_accepted_trade",
+    "thresholds": {
+      "min_accuracy": 0.58,
+      "min_confidence": 0.65,
+      "min_net_ev": 0.0,
+      "min_sharpe": 1.0,
+      "min_trades": 100
+    }
+  },
+  "repo_git_sha": "ea77e1648f6c66a0861defcaf8d4795e6f93bcc6",
+  "schema_version": 1,
+  "secondary_metrics": [
+    {
+      "name": "directional_accuracy",
+      "threshold": 0.58
+    },
+    {
+      "name": "brier_skill_score",
+      "threshold": 0.0
+    },
+    {
+      "name": "sharpe",
+      "threshold": 1.0
+    },
+    {
+      "name": "expectancy_per_trade",
+      "threshold": 0.0
+    },
+    {
+      "name": "calibration_ece",
+      "threshold": 0.05
+    }
+  ],
+  "stopping_rule": {
+    "looks": [
+      200,
+      400,
+      640
+    ],
+    "no_optional_stopping": true,
+    "type": "fixed_n_with_obrien_fleming_interim",
+    "z_bounds": [
+      3.0,
+      2.6,
+      2.2
+    ]
+  }
+}
