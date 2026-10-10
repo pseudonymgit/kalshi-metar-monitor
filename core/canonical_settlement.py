@@ -24,6 +24,7 @@ B-Mode compliant. Deterministic. No AI/ML. Does not mutate historical P&L.
 """
 from __future__ import annotations
 
+import os
 import sqlite3
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -36,6 +37,9 @@ __all__ = [
     "ensure_snapshot_table",
     "freeze_snapshot",
     "read_snapshot",
+    "load_canonical_snapshots",
+    "resolve_canonical_settlement",
+    "assert_canonical_immutable",
     "canonical_settle_yes",
     "canonical_outcome",
     "verify_regeneration_invariants",
@@ -171,6 +175,67 @@ def freeze_snapshot(conn: sqlite3.Connection, rows: Iterable[Dict[str, Any]], *,
         inserted += 1
     conn.commit()
     return inserted, skipped, conflicts
+
+
+def load_canonical_snapshots(metar_db: str) -> Dict[Tuple[str, str, str], Dict[str, Any]]:
+    """Read the frozen canonical snapshot read-only; {} when the table is absent.
+
+    Forward settle path: the writer must read canonical truth from the frozen
+    `settlement_snapshot` (Kalshi live API / GHCN), NOT from the raw/epoch METAR
+    extreme. Returns {(station, market_type, local_trading_date):
+    {settlement_temp_f, temp_source}}. Never raises on a missing/empty db — a
+    missing snapshot is a *gap*, reported by the caller, not a crash.
+    """
+    out: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
+    if not metar_db or not os.path.exists(metar_db):
+        return out
+    try:
+        ro = sqlite3.connect(f"file:{metar_db}?mode=ro", uri=True)
+        try:
+            rows = ro.execute(
+                f"SELECT station, market_type, local_trading_date, "
+                f"settlement_temp_f, temp_source FROM {SNAPSHOT_TABLE}"
+            ).fetchall()
+        finally:
+            ro.close()
+    except sqlite3.Error:
+        return out
+    for st, mt, d, temp, src in rows:
+        if temp is None:
+            continue
+        out[(st, mt, d)] = {"settlement_temp_f": float(temp), "temp_source": src}
+    return out
+
+
+def resolve_canonical_settlement(conn: sqlite3.Connection, station: str,
+                                 market_type: str, local_trading_date: str
+                                 ) -> Optional[Dict[str, Any]]:
+    """Canonical settlement for one station/market/day, or None when unfrozen.
+
+    A thin, explicit read over the frozen snapshot so the settle writer has a
+    single named entry point: canonical truth exists iff a snapshot row exists.
+    """
+    snap = read_snapshot(conn, station, market_type, local_trading_date)
+    if snap is None:
+        return None
+    return {"settlement_temp_f": float(snap["settlement_temp_f"]),
+            "temp_source": snap["temp_source"]}
+
+
+def assert_canonical_immutable(existing_value: Any, fetched_value: Any,
+                              key: Any) -> None:
+    """Fail loud when a canonical value would move.
+
+    Invariant: once a canonical settlement value exists for a station/day, a
+    later fetch must not move it. Both values may be None (nothing to compare).
+    Raises ImmutableSettlementError on a real move.
+    """
+    if existing_value is None or fetched_value is None:
+        return
+    if float(existing_value) != float(fetched_value):
+        raise ImmutableSettlementError(
+            f"canonical settlement moved for {key}: "
+            f"existing={existing_value} fetched={fetched_value}")
 
 
 def verify_regeneration_invariants(conn: sqlite3.Connection,

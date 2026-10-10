@@ -20,6 +20,14 @@ from .trade_execution import TradeType
 # to the legacy buggy path.
 from .risk_controls import TradeResult
 
+# Forward settle path (2026-10-10): canonical settlement truth is the FROZEN
+# snapshot (Kalshi live API / GHCN), NOT the unreliable settle-time METAR read.
+from .canonical_settlement import (
+    assert_canonical_immutable as _assert_canonical_immutable,
+    canonical_outcome as _canonical_outcome,
+    load_canonical_snapshots as _load_canonical_snapshots,
+)
+
 # Import calibration pipeline flag (from paper_trading_engine module-level constant)
 HAVE_CALIBRATION_PIPELINE = False
 try:
@@ -48,6 +56,13 @@ def process_settlements_for_date(self, settlement_date):
     c = conn.cursor()
     c.execute("ATTACH DATABASE ? AS metar", (self.metar_db,))
 
+    # Forward settle path (2026-10-10): settlement truth is the FROZEN canonical
+    # snapshot (Kalshi live API / GHCN), NOT the raw/epoch METAR extreme. Load it
+    # once; a station-day absent from the snapshot is a hard skip (fail closed),
+    # never a silent booking from the unreliable settle-time read.
+    _ensure_canonical_trade_columns(c)
+    canonical_map = _load_canonical_snapshots(self.metar_db)
+
     # Get all open trades for which settlements are available
     c.execute("""
         SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
@@ -73,14 +88,29 @@ def process_settlements_for_date(self, settlement_date):
         except ValueError:
             continue
 
+        # Canonical settlement truth (frozen snapshot). Read-forward (2026-10-10):
+        # the epoch `settlement_bucket` is the unreliable partial-METAR extreme the
+        # ruling flagged; canonical truth comes from settlement_snapshot. No
+        # canonical row -> leave the trade OPEN (fail closed), never book raw.
+        canonical = canonical_map.get((station, market_type, settlement_date))
+        if canonical is None:
+            _LOGGER.warning(
+                "Cannot settle trade %s: no frozen canonical settlement for "
+                "station=%s market_type=%s date=%s. Trade left open.",
+                trade_uuid, station, market_type, settlement_date)
+            continue
+        canonical_temp = canonical["settlement_temp_f"]
+        canonical_source = canonical.get("temp_source")
+
         # Get the strike price from Kalshi market metadata
         strike_price = _get_strike_price(station, market_type, settlement_date, self.paper_db, self.metar_db)
 
-        # Calculate settlement payout based on actual temperature vs strike price.
+        # Calculate settlement payout based on CANONICAL temperature vs strike.
         # Kalshi binary options:
         #   HIGH contract: pays $1.00 if settlement_temp > strike_price
         #   LOW contract:  pays $1.00 if settlement_temp < strike_price
-        settlement_temp = settlement_value  # settlement_bucket = actual daily max/min temp in °F
+        settlement_temp = canonical_temp  # canonical truth (Kalshi/GHCN), not the epoch bucket
+        settlement_value = canonical_temp  # booked value going forward = canonical truth
         if strike_price is not None:
             if market_type == "HIGH":
                 settlement_contract_value = 1.0 if settlement_temp > strike_price else 0.0
@@ -128,35 +158,35 @@ def process_settlements_for_date(self, settlement_date):
         else:
             continue
 
-        # B-Mode R8 Cycle 4.2: Determine settlement outcome direction
-        # settlement_contract_value = 1.0 means temp breached strike (ITM)
-        # For HIGH: temp breached strike = temp > strike = UP outcome
-        # For LOW: temp breached strike = temp < strike = DOWN outcome
-        contract_is_itm = settlement_contract_value > 0.5
-        if market_type == "HIGH":
-            actual_settlement_direction = "UP" if contract_is_itm else "DOWN"
-        else:
-            # LOW market: temp < strike = ITM = DOWN outcome
-            actual_settlement_direction = "DOWN" if contract_is_itm else "UP"
+        # Canonical outcome on the STRICT strike-crossing axis (equality == not-ITM).
+        # Single source: core.canonical_settlement.canonical_outcome. The old
+        # UP/DOWN-direction derivation is gone — outcome and label must agree.
+        canonical_settlement_outcome = _canonical_outcome(
+            signal_direction, market_type, canonical_temp, strike_price)
 
-        # Compare signal_direction to actual settlement direction
-        predicted_correctly = (signal_direction == actual_settlement_direction)
-        settlement_outcome = "correct" if predicted_correctly else "incorrect"
+        # Immutability assertion (invariant): once a canonical value exists for a
+        # station-day, a later fetch must not move it. Fail loud if it would.
+        existing = c.execute(
+            "SELECT canonical_settled_f FROM trades WHERE trade_uuid = ?",
+            (trade_uuid,)).fetchone()
+        _assert_canonical_immutable(
+            existing[0] if existing else None, canonical_temp,
+            (station, market_type, settlement_date))
 
-        # Update the trade with settlement data
+        # Update the trade with settlement data. The booked value going forward IS
+        # canonical truth; realized_pnl/filled_price mechanics are unchanged.
         realized_pnl = profit
-        # R/T (2026-10-01): the original UPDATE referenced settlement_confirmed
-        # and settlement_outcome columns that do not exist on `trades`, so the
-        # whole statement raised and the exception was swallowed by the engine,
-        # which then fell through to a buggy legacy settlement path. Write only
-        # the columns that exist.
         c.execute("""
             UPDATE trades
             SET settled_value = ?, settlement_date_utc = ?,
                 realized_pnl = ?, settlement_return_amount = ?,
+                settlement_confirmed = 1, settlement_outcome = ?,
+                canonical_settled_f = ?, canonical_source = ?, canonical_outcome = ?,
                 status = 'closed'
             WHERE trade_uuid = ?
-        """, (settlement_value, settlement_date, profit, return_amount, trade_uuid))
+        """, (settlement_value, settlement_date, profit, return_amount,
+              canonical_settlement_outcome, canonical_temp, canonical_source,
+              canonical_settlement_outcome, trade_uuid))
 
         # Update corresponding position (reduce by quantity)
         trade_qty = qty
@@ -419,6 +449,23 @@ def daily_reconciliation(self, reconcile_date=None):
         'skilled_stations_count': skilled_stations_count,
         'total_stations_count': total_stations_count
     }
+def _ensure_canonical_trade_columns(c) -> None:
+    """Idempotently ensure the canonical-truth columns exist on `trades`.
+
+    SAFE TO RE-RUN: each ALTER is wrapped; a duplicate-column error is ignored.
+    Called by the settle writer before it reads/writes canonical truth.
+    """
+    for _ddl in (
+        "ALTER TABLE trades ADD COLUMN canonical_settled_f REAL",
+        "ALTER TABLE trades ADD COLUMN canonical_outcome TEXT DEFAULT NULL",
+        "ALTER TABLE trades ADD COLUMN canonical_source TEXT DEFAULT NULL",
+    ):
+        try:
+            c.execute(_ddl)
+        except Exception:
+            pass
+
+
 def _migrate_settlement_columns(self, for_date=None):
     """
     B-Mode R8 Cycle 4.1/4.2: Ensure settlement confirmation columns exist
@@ -456,6 +503,19 @@ def _migrate_settlement_columns(self, for_date=None):
         )
     except Exception:
         pass
+
+    # Forward settle path (2026-10-10): canonical truth columns on `trades`.
+    # New settlements write the canonical value + source + outcome alongside the
+    # booked value so the read path can distinguish booked P&L from truth.
+    for _ddl in (
+        "ALTER TABLE trades ADD COLUMN canonical_settled_f REAL",
+        "ALTER TABLE trades ADD COLUMN canonical_outcome TEXT DEFAULT NULL",
+        "ALTER TABLE trades ADD COLUMN canonical_source TEXT DEFAULT NULL",
+    ):
+        try:
+            c.execute(_ddl)
+        except Exception:
+            pass
 
     conn.commit()
     conn.close()
