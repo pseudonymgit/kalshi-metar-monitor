@@ -87,7 +87,7 @@ class SignalLayerAlertTests(unittest.TestCase):
         runtime = metar_monitor.get_latest_station_signal_runtime("KDEN").get("KDEN", {})
         self.assertEqual(runtime.get("suppression_reason"), "STATION_COOLDOWN_ACTIVE")
 
-    def test_goldilocks_reversion_alert_emits_in_same_epoch(self):
+    def test_microstructure_spike_reversion_alert_emits_in_same_epoch(self):
         metar_monitor._SIGNAL_EPOCH_COUNTER["KDEN"] = 1
         metar_monitor._SIGNAL_GOLDILOCKS_EPOCH_TRACKER[("KDEN", 1)] = {
             "settlement_bucket_at_up": 70,
@@ -103,7 +103,8 @@ class SignalLayerAlertTests(unittest.TestCase):
             ]
         )
 
-        self.assertIn("goldilocks_reversion_alert", [row["signal_type"] for row in emitted])
+        # Signal renamed (A3): goldilocks_reversion_alert -> microstructure_spike_reversion.
+        self.assertIn("microstructure_spike_reversion", [row["signal_type"] for row in emitted])
 
     def test_signal_sequence_is_replay_deterministic(self):
         observations = [

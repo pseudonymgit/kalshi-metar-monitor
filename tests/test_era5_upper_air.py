@@ -357,7 +357,7 @@ class TestExistingDBIntegration:
         if not db_path.exists():
             pytest.skip("NWP database not found — skipping integration test")
 
-        conn = sqlite3.connect(str(db_path))
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         c = conn.cursor()
 
         # Verify required columns exist
@@ -374,7 +374,7 @@ class TestExistingDBIntegration:
         if not db_path.exists():
             pytest.skip("NWP database not found — skipping integration test")
 
-        conn = sqlite3.connect(str(db_path))
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         c = conn.cursor()
 
         c.execute("SELECT COUNT(DISTINCT model) FROM nwp_forecasts")
@@ -390,7 +390,7 @@ class TestExistingDBIntegration:
         if not db_path.exists():
             pytest.skip("NWP database not found — skipping integration test")
 
-        conn = sqlite3.connect(str(db_path))
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         c = conn.cursor()
 
         c.execute("SELECT DISTINCT variable FROM nwp_forecasts WHERE variable = ?",

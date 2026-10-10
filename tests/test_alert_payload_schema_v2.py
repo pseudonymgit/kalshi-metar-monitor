@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from core import kalshi_monitor
+from core.alert_schema import ALERT_SCHEMA_VERSION
 
 
 class AlertPayloadSchemaV2Tests(unittest.TestCase):
@@ -79,7 +80,11 @@ class AlertPayloadSchemaV2Tests(unittest.TestCase):
         self.assertEqual(result["webhook_status_code"], 204)
         self.assertIsNone(result["webhook_exception"])
         sent_payload = mock_post.call_args.kwargs["json"]
-        self.assertEqual(int(sent_payload["alert_schema_version"]), 2)
+        # Layer 4 alert schema is frozen at "1.0" (core/alert_schema.py::ALERT_SCHEMA_VERSION);
+        # the legacy integer "2" is only accepted on ingress. The composed payload carries
+        # the frozen string version in both schema_version and alert_schema_version.
+        self.assertEqual(sent_payload["alert_schema_version"], ALERT_SCHEMA_VERSION)
+        self.assertEqual(sent_payload["alert_schema_version"], "1.0")
         self.assertEqual(sent_payload["alert_classification"], "MARKET_ELIGIBLE")
         self.assertIn("alert_summary", sent_payload)
         self.assertIn("transition_correlation", sent_payload)

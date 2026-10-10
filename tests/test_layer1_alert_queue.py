@@ -8,7 +8,7 @@ import time
 from datetime import datetime, timezone, timedelta
 from unittest.mock import patch
 
-from core import metar_monitor
+from core import kalshi_monitor, metar_monitor
 
 
 class AlertDeliveryQueueTests(unittest.TestCase):
@@ -63,7 +63,7 @@ class AlertDeliveryQueueTests(unittest.TestCase):
         try:
             conn = __import__("sqlite3").connect(db_path, timeout=1)
             row = conn.execute(
-                "SELECT alert_id, webhook_url, payload_json FROM alert_delivery_queue WHERE alert_id = ?",
+                "SELECT alert_id, webhook_url, alert_payload_json FROM alert_delivery_queue WHERE alert_id = ?",
                 (alert_id,),
             ).fetchone()
             self.assertIsNotNone(row)
@@ -114,10 +114,8 @@ class AlertDeliveryQueueTests(unittest.TestCase):
 
         # Simulate failed deliveries
         for attempt in range(1, 4):
-            # Update attempt count and calculate next retry
-            next_retry_ts = int(time.time()) + 60 * (2 ** attempt)  # Exponential: 120s, 240s, 480s
-            import datetime
-            next_retry_iso = datetime.datetime.fromtimestamp(next_retry_ts, tz=datetime.timezone.utc).isoformat()
+            # Core backoff is 60 * 2**attempt_count seconds (first retry 60s),
+            # capped at 3600s. attempt_count is 0-based across calls.
             metar_monitor._update_alert_delivery_queue_attempt(alert_id, f"HTTP_500")
 
             # Verify next_retry_at is updated
@@ -131,10 +129,10 @@ class AlertDeliveryQueueTests(unittest.TestCase):
                 ).fetchone()
                 self.assertIsNotNone(row)
                 self.assertGreaterEqual(row[0], attempt)
-                # Next retry should be in the future
-                next_retry_dt = __import__("datetime").datetime.fromisoformat(row[1].replace("Z", "+00:00"))
-                future_threshold = datetime.datetime.now(datetime.timezone.utc) + timedelta(seconds=60)
-                self.assertGreater(next_retry_dt.replace(tzinfo=datetime.timezone.utc), future_threshold)
+                # Next retry should be in the future (core schedules >= 60s out).
+                next_retry_dt = datetime.fromisoformat(row[1].replace("Z", "+00:00"))
+                future_threshold = datetime.now(timezone.utc) + timedelta(seconds=30)
+                self.assertGreater(next_retry_dt.replace(tzinfo=timezone.utc), future_threshold)
             finally:
                 if conn:
                     conn.close()
@@ -185,15 +183,25 @@ class AlertDeliveryQueueTests(unittest.TestCase):
 
             results = metar_monitor._retry_delivery_batch()
 
-            # Verify batch results
-            self.assertGreaterEqual(len(results), 1)
-            for result in results:
-                if "success" in result:
-                    self.assertTrue(result["success"])
+            # _retry_delivery_batch returns a summary dict (not a list).
+            self.assertEqual(results["status"], "processed")
+            self.assertEqual(results["processed"], 2)
+            entries = results["entries"]
+            self.assertEqual(len(entries), 2)
+            for entry in entries:
+                self.assertIn("status", entry)
+                self.assertIn(
+                    entry["status"],
+                    {"delivered", "scheduled_retry", "moved_to_dead_letter"},
+                )
+            self.assertEqual(
+                results["success"] + results["backed_off"] + results["failed"],
+                results["processed"],
+            )
 
-        # Verify pending is empty (or reduced)
+        # Entries scheduled for retry remain pending; delivered entries leave the queue.
         pending = metar_monitor._get_pending_deliveries()
-        self.assertEqual(len(pending), 0)
+        self.assertEqual(len(pending), 2 - results["success"])
 
 
 class AlertQueueSchemaTests(unittest.TestCase):
@@ -229,9 +237,9 @@ class AlertQueueSchemaTests(unittest.TestCase):
             columns = {row[1]: row[2] for row in cursor.fetchall()}
 
             expected_columns = [
-                "id", "alert_id", "webhook_url", "payload_json",
+                "id", "alert_id", "webhook_url", "alert_payload_json",
                 "attempt_count", "next_retry_at", "last_error",
-                "created_at", "dead_lettered_at"
+                "created_at", "updated_at", "status"
             ]
             for col in expected_columns:
                 self.assertIn(col, columns, f"alert_delivery_queue should have '{col}' column")
@@ -247,11 +255,16 @@ class AlertQueueSchemaTests(unittest.TestCase):
                 conn.close()
 
     def test_l1_schema_creates_kalshi_rate_limit_table(self):
-        """L1-T4: kalshi_rate_limit table is created with correct schema."""
+        """L1-T4: kalshi_rate_limit table is created with correct schema.
 
-        metar_monitor._ensure_alert_schema()
+        The kalshi_rate_limit table is owned by core.kalshi_monitor._ensure_alert_schema
+        (core/kalshi_monitor.py); metar_monitor._ensure_alert_schema only creates the
+        alert queue + signal/cache tables.
+        """
 
-        db_path = metar_monitor._alert_db_path()
+        kalshi_monitor._ensure_alert_schema()
+
+        db_path = kalshi_monitor._alert_db_path()
         conn = None
         try:
             conn = __import__("sqlite3").connect(db_path, timeout=1)

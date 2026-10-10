@@ -1,0 +1,41 @@
+name: tests
+
+# Workstream E2 (GR4 R2 / GR5-D9) — the missing pytest gate.
+#
+# Before this workflow, no CI ran pytest at all: `run_regression_gate.sh` was
+# ~8 hand-picked checks and `make test-backtest` used `--threshold-* 0`. The
+# suite was red and unpoliced. This job runs the FULL pytest suite and FAILS the
+# build on any failure or error.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # pytest + the runtime deps the suite imports at collection time.
+          pip install pytest requests
+
+      - name: Run full pytest suite (fails on red)
+        run: |
+          python -m pytest tests/ -q -p no:cacheprovider
+        # The DB sandbox (tests/conftest.py) makes the suite hermetic against the
+        # real data/ directory; no OPENCLAW_TESTS_ALLOW_PROD_WRITE is set here,
+        # so a test that tries to write a production DB fails the gate.

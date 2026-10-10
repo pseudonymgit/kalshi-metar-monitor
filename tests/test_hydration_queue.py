@@ -38,9 +38,10 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(snapshot["last_hydration_request_ts"], 0.0)
 
     @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._LOGGER")
     @patch("core.kalshi_monitor.hydrate_station_ladder_snapshot", return_value={"status": "hydrated"})
     @patch("core.kalshi_monitor.time.time", side_effect=[1000.0, 1000.4, 1001.2])
-    def test_worker_processes_one_request_per_interval(self, _time, mock_hydrate, _domain):
+    def test_worker_processes_one_request_per_interval(self, _time, mock_hydrate, _logger, _domain):
         kalshi_monitor.enqueue_station_hydration("KDEN")
         kalshi_monitor.enqueue_station_hydration("KPHL")
 
@@ -54,8 +55,9 @@ class HydrationQueueTests(unittest.TestCase):
         self.assertEqual(mock_hydrate.call_count, 2)
 
     @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    @patch("core.kalshi_monitor._LOGGER")
     @patch("core.kalshi_monitor.time.time", side_effect=[2000.0, 2001.0, 2002.0, 2003.0])
-    def test_429_sets_backoff_and_prevents_immediate_retry(self, _time, _domain):
+    def test_429_sets_backoff_and_prevents_immediate_retry(self, _time, _logger, _domain):
         response = type("Response", (), {"status_code": 429})()
         error = kalshi_monitor.requests.HTTPError("rate limited")
         error.response = response

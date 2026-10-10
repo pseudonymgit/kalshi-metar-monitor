@@ -556,6 +556,7 @@ class StructuralHardeningTests(unittest.TestCase):
         result = kalshi_monitor.ensure_ladder_hydration_prerequisite("KDEN")
         self.assertEqual(result["status"], "cache_missing")
 
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
     @patch("core.kalshi_monitor.ensure_series_discovery_loaded", return_value={"KDEN": ["KXHIGHDEN", "KXDENHIGH"]})
     @patch("core.kalshi_monitor.build_structured_snapshot", return_value={"markets": []})
     @patch(
@@ -566,6 +567,8 @@ class StructuralHardeningTests(unittest.TestCase):
         ],
     )
     def test_hydrate_snapshot_reads_all_series_cache_entries(self, *_mocks):
+        # hydrate_station_ladder_snapshot gates on the production execution domain;
+        # core normalizes "production" -> "prod" so pin the accessor for this unit test.
         with kalshi_monitor.kalshi_execution_domain("production"):
             result = kalshi_monitor.hydrate_station_ladder_snapshot("KDEN", {"HIGH"})
         self.assertEqual(result["hydrated_at_utc"], "2025-01-01T10:05:00+00:00")

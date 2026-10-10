@@ -222,7 +222,27 @@ class TestECMWFBiasCorrected:
     """Tests for the ECMWF IFS Bias-Corrected Signal."""
 
     @pytest.fixture
-    def signal(self):
+    def signal(self, tmp_path, monkeypatch):
+        """Hermetic signal: redirect the bias DB + forecast cache to tmp_path and
+        stub the Open-Meteo fetch so no test touches production data/ or network."""
+        import core.signals.ecmwf_bias_corrected_signal as m
+        from datetime import datetime, timezone, timedelta
+
+        monkeypatch.setattr(m, "BIAS_DB_PATH", str(tmp_path / "ecmwf_bias.db"))
+        monkeypatch.setattr(m, "_ECMWF_CACHE_DIR", str(tmp_path / "ecmwf_cache"))
+
+        # Synthetic 4-day hourly forecast (includes "tomorrow", the default target).
+        now = datetime.now(timezone.utc)
+        times, temps = [], []
+        for d in range(4):
+            day = (now + timedelta(days=d)).strftime("%Y-%m-%d")
+            for h in range(24):
+                times.append(f"{day}T{h:02d}:00")
+                temps.append(60.0 + (h % 12))
+        monkeypatch.setattr(
+            m.ECMWFBiasCorrectedSignal, "_fetch_from_open_meteo",
+            lambda self, lat, lon: {"hourly": {"time": times, "temperature_2m": temps}},
+        )
         return ECMWFBiasCorrectedSignal()
 
     def test_constructor(self, signal):

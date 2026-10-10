@@ -324,7 +324,12 @@ class TestTradeJournalAccuracy:
 class TestTradeJournalSingleton:
     """Test the module-level get_journal singleton."""
 
-    def test_singleton(self):
+    def test_singleton(self, tmp_path, monkeypatch):
+        # Hermetic: point the module default at a temp DB and reset the cached
+        # singleton so get_journal() never opens production data/trade_journal.db.
+        import core.trade_journal as tj
+        monkeypatch.setattr(tj, "DEFAULT_JOURNAL_PATH", str(tmp_path / "trade_journal.db"))
+        monkeypatch.setattr(tj, "_JOURNAL", None)
         j1 = get_journal()
         j2 = get_journal()
         assert j1 is j2

@@ -1,18 +1,31 @@
 # Makefile for Weather Engine Tests
 # Run with: make test-all
 
-.PHONY: test-all test-stations test-backtest test-signals test-pnl help
+# Workstream E2 (GR4 R2 / GR5-D9): `make ci` is the FULL pytest gate.
+# It runs the entire suite and fails on any failure/error. This is what CI
+# (.github/workflows/tests.yml) invokes. The older `test-*` targets below are
+# ~8 hand-picked smoke checks and are NOT the gate.
+PYTEST ?= .venv-gefs/bin/python -m pytest
+
+.PHONY: ci test-all test-stations test-backtest test-signals test-pnl help
 
 help:
 	@echo "Weather Engine Test Suite"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make test-all     Run all tests"
+	@echo "  make ci           Run the FULL pytest suite (CI gate; fails on red)"
+	@echo "  make test-all     Run the hand-picked smoke checks"
 	@echo "  make test-stations  Validate station registry"
 	@echo "  make test-backtest  Run backtest and check accuracy baseline"
 	@echo "  make test-signals   Verify signal modules import correctly"
 	@echo "  make test-pnl       Verify P&L sanity"
 	@echo ""
+
+# CI gate: full pytest suite, fails on any red. Run hermetically (the DB
+# sandbox in tests/conftest.py blocks any write to the real data/ directory).
+ci:
+	@echo "Running full pytest suite (CI gate)..."
+	$(PYTEST) tests/ -q -p no:cacheprovider
 
 # Run all tests
 test-all: test-stations test-backtest test-signals test-pnl

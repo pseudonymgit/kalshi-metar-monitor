@@ -317,8 +317,12 @@ class TestAlertDispatchEdgeCases:
         except (ImportError, TypeError) as e:
             pytest.skip(f"dispatch_alert raised: {e}")
 
-    def test_alert_retry_queue_empty(self):
+    def test_alert_retry_queue_empty(self, temp_db, monkeypatch):
         """Alert retry queue should handle empty queue."""
+        from core import alert_retry_queue
+        # Hermetic: point the queue at a temp DB (was opening the prod
+        # alert_retry_queue.db, which the conftest DB sandbox blocks).
+        monkeypatch.setenv("ALERT_DB_PATH", temp_db)
         from core.alert_retry_queue import _get_queue_stats, _retry_delivery_batch
 
         # An empty queue processes cleanly and returns a zero-count result

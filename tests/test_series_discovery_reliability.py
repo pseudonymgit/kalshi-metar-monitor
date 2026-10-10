@@ -29,7 +29,10 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXDENHIGH"])
+        # Current discovery derives the station AND market type from the ticker
+        # token alone (it no longer consults the series title), so only the
+        # canonical KXHIGH<CODE> ticker is retained.
+        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN"])
 
     def test_discovery_includes_low_only_series(self):
         series_items = {
@@ -53,7 +56,9 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
         with patch("core.kalshi_monitor._kalshi_public_get", return_value=series_items):
             discovered = kalshi_monitor._discover_series_for_stations()
 
-        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN", "KXDENHIGH"])
+        # Deterministic sorted order; KXDENHIGH is dropped because it encodes
+        # neither a HIGH/LOW token nor a recognised station token.
+        self.assertEqual(discovered.get("KDEN"), ["KXHIGHDEN", "KXLOWDEN"])
 
     def test_discovery_uses_market_derived_station_codes_outside_static_mapping(self):
         series_items = {
@@ -67,7 +72,8 @@ class SeriesDiscoveryReliabilityTests(unittest.TestCase):
 
         self.assertEqual(discovered.get("KSEA"), ["KXHIGHSEA"])
 
-    def test_ensure_discovery_raises_and_does_not_mark_discovered_on_empty_mapping(self):
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    def test_ensure_discovery_raises_and_does_not_mark_discovered_on_empty_mapping(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}
         kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0

@@ -22,7 +22,8 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         kalshi_monitor._LAST_SERIES_DISCOVERY_ERROR = self.original_last_error
         kalshi_monitor._LAST_HYDRATION_EXECUTION = dict(self.original_last_hydration_execution)
 
-    def test_connectivity_snapshot_records_series_discovery_success(self):
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    def test_connectivity_snapshot_records_series_discovery_success(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}
         kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
@@ -38,7 +39,8 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertIsNotNone(snapshot["last_series_discovery_success_utc"])
         self.assertIsNone(snapshot["last_series_discovery_error"])
 
-    def test_connectivity_snapshot_records_last_discovery_failure(self):
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    def test_connectivity_snapshot_records_last_discovery_failure(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}
         kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
@@ -54,7 +56,8 @@ class KalshiConnectivitySnapshotTests(unittest.TestCase):
         self.assertEqual(snapshot["last_series_discovery_error"], "series-api-down")
         self.assertIsNone(snapshot["last_series_discovery_success_utc"])
 
-    def test_observability_context_does_not_mutate_connectivity_counters(self):
+    @patch("core.kalshi_monitor._current_kalshi_execution_domain", return_value="production")
+    def test_observability_context_does_not_mutate_connectivity_counters(self, _domain):
         kalshi_monitor._SERIES_DISCOVERED = False
         kalshi_monitor._SERIES_BY_STATION = {}
         kalshi_monitor._SERIES_DISCOVERY_ATTEMPT_COUNT = 0
