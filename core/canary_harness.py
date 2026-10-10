@@ -156,15 +156,6 @@ def evaluate_series(canary_id: str, values: Sequence[float],
         note=note,
     )
 
-    return CanaryResult(
-        canary_id=canary_id, n=n, mean=round(mean, 6), std=round(std, 6),
-        z=round(z, 6), p_value=round(p, 6), alpha=alpha,
-        significant=significant, profitable_side=profitable_side,
-        ci_low=round(ci_low, 6), ci_high=round(ci_high, 6),
-        cusum=round(cusum, 6), cusum_halt=cusum_halt, rejected=rejected,
-        note=note,
-    )
-
 
 # ─── The canary "trade" record the harness consumes ─────────────────────────
 @dataclass
@@ -184,6 +175,7 @@ class CanaryTrade:
     settlement_temp_f: Optional[float]
     settlement_date: str
     fee_per_contract: float = 0.0  # charged separately by the harness
+    label_source: str = ""    # canonical | settlements_db | booked_fallback
 
 
 def _payoff(trade: CanaryTrade, fee: float) -> Optional[float]:

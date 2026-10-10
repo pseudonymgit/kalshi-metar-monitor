@@ -88,21 +88,26 @@ def _yy_to_iso(date_yy: str) -> Optional[str]:
 def build_canary_trades():
     """Build CanaryTrade records + a truth-quality diagnostic.
 
-    Independently sources the settlement temp from kalshi_settlements (finalized)
-    and compares it against the trade's own booked settled_value. A row whose
-    independent truth is implausible (outside the °F band) is EXCLUDED, so a
-    canary halt is never an artifact of corrupt truth; disagreements > 3°F are
-    reported for attribution.
+    Label source hierarchy (GR5 §3 settled-admission gate alignment):
+      1. trades.canonical_settled_f / canonical_outcome — the canonical truth
+      2. kalshi_settlements.db (finalized/historical_api) — fallback
+      3. trades.settled_value (booked) — last resort, marked
+
+    Rows whose label source is implausible (outside the °F band) are EXCLUDED.
+    Disagreements >3°F between canonical and booked are reported for attribution
+    but no longer drive the label.
     """
     if not SBOX_DB.exists():
-        return [], {"excluded_unverifiable": 0, "disagreements": []}
+        return [], {"excluded_unverifiable": 0, "disagreements": [],
+                    "canonical_source": 0, "settlements_source": 0,
+                    "booked_fallback": 0}
     settle = load_settlement_index()
     c = _ro(SBOX_DB)
     try:
         rows = c.execute(
             "SELECT station, market_type, trade_type, trade_price, quantity, "
-            "settled_value, settlement_date_utc, notes FROM trades "
-            "WHERE status='closed'"
+            "settled_value, settlement_date_utc, notes, canonical_settled_f, "
+            "canonical_outcome FROM trades WHERE status='closed'"
         ).fetchall()
     finally:
         c.close()
@@ -110,26 +115,45 @@ def build_canary_trades():
     trades: List[CanaryTrade] = []
     excluded = 0
     disagreements: List[dict] = []
-    for (station, mtype, ttype, price, qty, settled, sdate, notes) in rows:
+    canonical_source_n = 0
+    settlements_source_n = 0
+    booked_fallback_n = 0
+    for (station, mtype, ttype, price, qty, settled, sdate, notes,
+         canon_f, canon_outcome) in rows:
         strike = _strike_from_notes(notes or "")
         if strike is None or price is None:
             continue
         iso = str(sdate)[:10] if sdate else None
-        temp = settle.get((station, iso)) if iso else None
-        booked = float(settled) if settled is not None else None
 
-        if temp is not None:
-            if not (TEMP_MIN_F <= temp <= TEMP_MAX_F):
-                excluded += 1
-                continue
-            if booked is not None and abs(temp - booked) > 3.0:
-                disagreements.append({"station": station, "date": iso,
-                                      "independent": temp, "booked": booked})
+        # ── Label source: canonical #1 ──
+        if canon_f is not None:
+            temp = float(canon_f)
+            label_source = "canonical"
+            canonical_source_n += 1
         else:
-            if booked is None or not (TEMP_MIN_F <= booked <= TEMP_MAX_F):
-                excluded += 1
-                continue
-            temp = booked
+            # ── Label source: independent settlements DB #2 ──
+            temp_ind = settle.get((station, iso)) if iso else None
+            if temp_ind is not None and (TEMP_MIN_F <= temp_ind <= TEMP_MAX_F):
+                temp = float(temp_ind)
+                label_source = "settlements_db"
+                settlements_source_n += 1
+            else:
+                # ── Label source: booked fallback #3 (explicitly marked) ──
+                booked = float(settled) if settled is not None else None
+                if booked is None or not (TEMP_MIN_F <= booked <= TEMP_MAX_F):
+                    excluded += 1
+                    continue
+                temp = booked
+                label_source = "booked_fallback"
+                booked_fallback_n += 1
+
+        # Track canonical-vs-booked divergence for attribution (diagnostic only)
+        booked = float(settled) if settled is not None else None
+        if booked is not None and label_source != "booked_fallback":
+            if abs(temp - booked) > 3.0:
+                disagreements.append({"station": station, "date": iso,
+                                      "label_temp": temp, "booked": booked,
+                                      "label_source": label_source})
 
         direction = "UP" if (ttype or "").lower().endswith("yes") else "DOWN"
         trades.append(CanaryTrade(
@@ -138,9 +162,13 @@ def build_canary_trades():
             quantity=int(qty or 0), direction=direction,
             settlement_temp_f=float(temp),
             settlement_date=iso or "0000-00-00",
+            label_source=label_source,
         ))
     return trades, {"excluded_unverifiable": excluded,
-                    "disagreements": disagreements}
+                    "disagreements": disagreements,
+                    "canonical_source": canonical_source_n,
+                    "settlements_source": settlements_source_n,
+                    "booked_fallback": booked_fallback_n}
 
 
 def main(argv=None) -> int:
@@ -173,7 +201,10 @@ def main(argv=None) -> int:
         print(f"canaries on {out['n_trades_loaded']} closed trades "
               f"({out['settled']} settled), seed={seed}")
         print(f"truth: {diag['excluded_unverifiable']} unverifiable excluded, "
-              f"{len(diag['disagreements'])} independent/booked disagreements")
+              f"{len(diag['disagreements'])} canonical/booked disagreements")
+        print(f"label sources: {diag['canonical_source']} canonical, "
+              f"{diag['settlements_source']} settlements_db, "
+              f"{diag['booked_fallback']} booked_fallback")
         for cid, r in out["canaries"].items():
             flag = "REJECTED" if r["rejected"] else ("SIG" if r["significant"] else "null")
             print(f"  {cid}: n={r['n']} mean={r['mean']} z={r['z']} "
