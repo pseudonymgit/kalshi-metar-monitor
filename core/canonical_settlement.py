@@ -41,6 +41,10 @@ __all__ = [
     "read_snapshot",
     "load_canonical_snapshots",
     "resolve_canonical_settlement",
+    "resolve_finalized_settlement",
+    "resolve_settlement_truth",
+    "KALSHI_SETTLEMENTS_DB",
+    "FINALIZED_SOURCE",
     "assert_canonical_immutable",
     "canonical_settle_yes",
     "canonical_outcome",
@@ -50,6 +54,14 @@ __all__ = [
 
 SNAPSHOT_TABLE = "settlement_snapshot"
 CANONICAL_TEMP_SOURCE = "kalshi_live_api"
+
+# Step-2 source label: a Kalshi *finalized* settlement row (source_type='finalized')
+# in `data/kalshi_settlements.db`. Same repo-relative default as
+# `core.lane_goldilocks.DEFAULT_SETTLEMENTS_DB`; overridable for tests/ops.
+FINALIZED_SOURCE = "kalshi_finalized"
+KALSHI_SETTLEMENTS_DB = os.environ.get("KALSHI_SETTLEMENTS_DB") or os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data", "kalshi_settlements.db")
 
 # The ONLY `temp_source` values that are canonical settlement truth. Kalshi's
 # live API `expiration_value` and its finalized settlement record both encode the
@@ -257,6 +269,86 @@ def resolve_canonical_settlement(conn: sqlite3.Connection, station: str,
         return None
     return {"settlement_temp_f": float(snap["settlement_temp_f"]),
             "temp_source": snap["temp_source"]}
+
+
+def resolve_finalized_settlement(station: str, market_type: str,
+                                 local_trading_date: str, *,
+                                 kalshi_db: Optional[str] = None
+                                 ) -> Optional[Dict[str, Any]]:
+    """A4 promotion, step 2 of the settle resolution order.
+
+    Canonical truth for a station-day may exist in a finalized form before it is
+    frozen into `settlement_snapshot` (e.g. Oct 9, which the backfill froze from
+    the `weatherapi` provisional source write-once). This reads the finalized
+    Kalshi settlement row (`source_type='finalized'`) from
+    `data/kalshi_settlements.db` and returns it labeled `kalshi_finalized`.
+
+    HIGH only: the table carries the KXHIGH series; a LOW request returns None so
+    the caller fails closed. Read-only; never raises on a missing/empty/locked db
+    (a missing finalized row is a *gap* to fail closed on, not a crash).
+    """
+    if str(market_type).upper() != "HIGH":
+        return None
+    db = kalshi_db or KALSHI_SETTLEMENTS_DB
+    if not db or not os.path.exists(db):
+        return None
+    try:
+        ro = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        try:
+            row = ro.execute(
+                "SELECT kalshi_temp FROM kalshi_settlements WHERE station=? "
+                "AND target_date=? AND source_type='finalized' "
+                "AND kalshi_temp IS NOT NULL ORDER BY id DESC LIMIT 1",
+                (station, str(local_trading_date)[:10]),
+            ).fetchone()
+        finally:
+            ro.close()
+    except sqlite3.Error:
+        return None
+    if not row or row[0] is None:
+        return None
+    return {"settlement_temp_f": float(row[0]), "temp_source": FINALIZED_SOURCE}
+
+
+def resolve_settlement_truth(conn: sqlite3.Connection, station: str,
+                             market_type: str, local_trading_date: str, *,
+                             canonical_map: Optional[Dict] = None,
+                             kalshi_db: Optional[str] = None
+                             ) -> Tuple[Optional[Dict[str, Any]], str]:
+    """A4 promotion — the single settle resolution order, fail-closed.
+
+      1. canonical frozen snapshot row (`kalshi_live_api`/`kalshi_finalized`);
+      2. finalized `kalshi_settlements` row (station/day, `source_type='finalized'`);
+      3. fail closed (`None`) — NEVER book a provisional/snapshot proxy.
+
+    Returns `(record, reason)` where `record` is None on failure and `reason`
+    names which step resolved (or why the caller must leave the trade OPEN).
+
+    `canonical_map` is a pre-loaded `load_canonical_snapshots()` result (the
+    settle writer always supplies one). When it is given, step 1 is answered
+    from it — a map that already contains canonical sources only. When it is
+    None, `conn` is read as the snapshot DB (a real snapshot connection, not the
+    trade connection) so a caller with a raw snapshot handle still resolves.
+    """
+    key = (station, market_type, local_trading_date)
+    snap = None
+    if canonical_map is not None:
+        snap = canonical_map.get(key)
+        if snap is not None and is_canonical_temp_source(snap.get("temp_source")):
+            return snap, "canonical_snapshot"
+    elif conn is not None:
+        try:
+            snap = resolve_canonical_settlement(conn, station, market_type,
+                                                local_trading_date)
+        except sqlite3.Error:
+            snap = None
+        if snap is not None:
+            return snap, "canonical_snapshot"
+    fin = resolve_finalized_settlement(station, market_type, local_trading_date,
+                                       kalshi_db=kalshi_db)
+    if fin is not None:
+        return fin, "finalized_settlements_row"
+    return None, "no_canonical_truth"
 
 
 def assert_canonical_immutable(existing_value: Any, fetched_value: Any,

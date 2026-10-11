@@ -27,6 +27,7 @@ from .canonical_settlement import (
     canonical_outcome as _canonical_outcome,
     is_canonical_temp_source as _is_canonical_temp_source,
     load_canonical_snapshots as _load_canonical_snapshots,
+    resolve_settlement_truth as _resolve_settlement_truth,
 )
 
 # Import calibration pipeline flag (from paper_trading_engine module-level constant)
@@ -89,29 +90,27 @@ def process_settlements_for_date(self, settlement_date):
         except ValueError:
             continue
 
-        # Canonical settlement truth (frozen snapshot). Read-forward (2026-10-10):
-        # the epoch `settlement_bucket` is the unreliable partial-METAR extreme the
-        # ruling flagged; canonical truth comes from settlement_snapshot. No
-        # canonical row -> leave the trade OPEN (fail closed), never book raw.
-        canonical = canonical_map.get((station, market_type, settlement_date))
+        # Settlement-truth resolution order (A4 promotion, 2026-10-11): the
+        # epoch `settlement_bucket` is the unreliable partial-METAR extreme the
+        # ruling flagged, so it is never read. Truth comes from, in order:
+        #   1. the frozen canonical snapshot (kalshi_live_api/kalshi_finalized);
+        #   2. a finalized `kalshi_settlements` row (source_type='finalized');
+        #   3. fail closed -> leave the trade OPEN. Never book a provisional
+        #      weatherapi/fallback proxy frozen into the snapshot.
+        canonical, _truth_reason = _resolve_settlement_truth(
+            c, station, market_type, settlement_date,
+            canonical_map=canonical_map)
         if canonical is None:
             _LOGGER.warning(
-                "Cannot settle trade %s: no frozen canonical settlement for "
-                "station=%s market_type=%s date=%s. Trade left open.",
-                trade_uuid, station, market_type, settlement_date)
+                "Cannot settle trade %s: no canonical settlement truth for "
+                "station=%s market_type=%s date=%s (%s). Trade left open.",
+                trade_uuid, station, market_type, settlement_date, _truth_reason)
             continue
-        # Fail closed on a provisional (non-canonical) row (2026-10-10): a
-        # snapshot row sourced from weatherapi/provisional/fallback/unknown is
-        # NOT a settlement. Booking it would permanently freeze a wrong value the
-        # immutable snapshot cannot self-heal when Kalshi finalizes. Leave the
-        # trade OPEN instead.
         if not _is_canonical_temp_source(canonical.get("temp_source")):
             _LOGGER.warning(
-                "Cannot settle trade %s: frozen snapshot for station=%s "
-                "market_type=%s date=%s is non-canonical (temp_source=%s); "
-                "provisional, not a settlement. Trade left open.",
-                trade_uuid, station, market_type, settlement_date,
-                canonical.get("temp_source"))
+                "Cannot settle trade %s: settlement source=%s is not canonical "
+                "for station=%s date=%s. Trade left open.",
+                trade_uuid, canonical.get("temp_source"), station, settlement_date)
             continue
         canonical_temp = canonical["settlement_temp_f"]
         canonical_source = canonical.get("temp_source")

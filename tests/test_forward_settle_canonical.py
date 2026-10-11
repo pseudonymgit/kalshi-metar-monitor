@@ -164,7 +164,7 @@ def test_epoch_bucket_would_have_flipped_the_outcome(tmp_path):
     assert t["realized_pnl"] > 0
 
 
-def test_no_canonical_row_leaves_trade_open(tmp_path):
+def test_no_canonical_row_leaves_trade_open(tmp_path, monkeypatch):
     paper_db, metar_db = _make_dbs(tmp_path)
     # Wipe the frozen snapshot -> no canonical truth for the station-day.
     m = sqlite3.connect(metar_db)
@@ -172,6 +172,12 @@ def test_no_canonical_row_leaves_trade_open(tmp_path):
     m.execute("DELETE FROM settlement_snapshot")
     m.commit()
     m.close()
+    # A4 (2026-10-11): the settle path now also falls through to a finalized
+    # `kalshi_settlements` row. Point that source at an absent file so this test
+    # still exercises the true fail-closed contract (neither snapshot nor
+    # finalized truth -> leave OPEN).
+    import core.canonical_settlement as cs
+    monkeypatch.setattr(cs, "KALSHI_SETTLEMENTS_DB", str(tmp_path / "absent.db"))
 
     pnl_tracking.process_settlements_for_date(_fake_trader(paper_db, metar_db), _DATE)
     t = _trade(paper_db)
