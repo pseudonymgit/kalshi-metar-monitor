@@ -35,6 +35,7 @@ Deterministic only. Read-only on every DB. No AI/ML.
 
 from __future__ import annotations
 
+import math
 import os
 from typing import Optional
 
@@ -65,10 +66,24 @@ def overlay_enabled(flag: Optional[bool] = None) -> bool:
     )
 
 
-def fold_confidence(engine_conf: float, sig_conf: float,
+def fold_confidence(engine_conf: Optional[float], sig_conf: Optional[float],
                     weight: float = OVERLAY_CONF_WEIGHT) -> float:
-    """Deterministic 50/50 fold: weight*engine + (1-weight)*overlay."""
-    return weight * engine_conf + (1.0 - weight) * sig_conf
+    """Deterministic fold: weight*engine + (1-weight)*overlay.
+
+    Fail-closed: a missing (None) or non-finite input cannot be folded — there
+    is no meaningful arithmetic on an absent confidence. Raise rather than
+    silently substituting a mid (0.5) value, so an absent input never becomes a
+    real-looking confidence.
+    """
+    if engine_conf is None or sig_conf is None:
+        raise ValueError(
+            f"cannot fold absent confidence (engine={engine_conf!r}, "
+            f"overlay={sig_conf!r}) — fail-closed, no mid default")
+    if not (math.isfinite(float(engine_conf)) and math.isfinite(float(sig_conf))):
+        raise ValueError(
+            f"cannot fold non-finite confidence (engine={engine_conf!r}, "
+            f"overlay={sig_conf!r})")
+    return weight * float(engine_conf) + (1.0 - weight) * float(sig_conf)
 
 
 def live_overlay_signal(
@@ -118,7 +133,14 @@ def evaluate_with_overlay(
     if engine_direction is None or engine_direction != overlay_signal.direction:
         return raw
 
-    folded = fold_confidence(confidence, overlay_signal.confidence)
+    # Fail-closed: only fold when BOTH confidences are actually present/numeric.
+    # An overlay trigger whose confidence is absent cannot be folded into a
+    # real-looking number — leave the raw engine decision unchanged.
+    overlay_conf = getattr(overlay_signal, "confidence", None)
+    if overlay_conf is None or not isinstance(overlay_conf, (int, float)):
+        return raw
+
+    folded = fold_confidence(confidence, overlay_conf)
     return engine.evaluate_hour(
         hour=hour,
         hour_before_settlement=hour_before_settlement,

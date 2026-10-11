@@ -53,7 +53,7 @@ class EntrySignal:
     edge: float               # |our_probability - market_price|
     our_probability: float    # Our calibrated probability
     market_price: float       # Market-implied probability
-    confidence: float         # Our confidence [0, 1]
+    confidence: Optional[float]  # Our confidence [0, 1], or None when absent
 
     @property
     def is_entry(self) -> bool:
@@ -154,24 +154,29 @@ class EntryTimingEngine:
         hour_before_settlement: int,
         our_probability: float,
         market_price: float,
-        confidence: float,
+        confidence: Optional[float],
     ) -> EntrySignal:
         """
         Evaluate whether to enter a trade at the current hour.
 
         Decision cascade:
-          1. Is hour within trading hours?
-          2. Is probability far enough from 0.5 (above min_prob_gate)?
-          3. Is edge (|our_prob - market_price|) above threshold?
-          4. Is direction consistent? (BUY if our_prob > market_price, SELL if <)
-          5. Compute Kelly-optimal position size
+          1. A confidence must be present (absent -> fail-closed PASS)
+          2. Is hour within trading hours?
+          3. Is probability far enough from 0.5 (above min_prob_gate)?
+          4. Is edge (|our_prob - market_price|) above threshold?
+          5. Is direction consistent? (BUY if our_prob > market_price, SELL if <)
+          6. Compute Kelly-optimal position size
 
         Args:
             hour: Current UTC hour (0-23)
             hour_before_settlement: Hours until settlement
             our_probability: Our calibrated probability [0, 1]
             market_price: Current market price [0, 1]
-            confidence: Our confidence in the signal [0, 1]
+            confidence: Our confidence in the signal [0, 1]. A missing value
+                (None) or a non-finite value is FAIL-CLOSED: it does NOT default
+                to a mid (0.5) confidence — the decision is excluded with an
+                explicit PASS, so an absent input can never masquerade as a real
+                mid-confidence trade.
 
         Returns:
             EntrySignal with signal_type and position_size
@@ -179,7 +184,27 @@ class EntryTimingEngine:
         # Clamp inputs
         our_prob = np.clip(our_probability, 0.0, 1.0)
         mp = np.clip(market_price, 0.0, 1.0)
-        conf = np.clip(confidence, 0.0, 1.0)
+
+        # Gate 0: Fail-closed confidence sentinel.
+        # A missing/absent or non-finite confidence must never be coerced to a
+        # mid (0.5) value: that is indistinguishable from a real signal and is
+        # the fail-open class this engine eliminates. Refuse the decision — an
+        # explicit PASS — and leave `confidence=None` on the signal so callers
+        # can see the input was absent rather than genuinely mid.
+        if confidence is None or not math.isfinite(float(confidence)):
+            logger.warning(
+                f"PASS {hour}: confidence absent/non-finite ({confidence!r}) "
+                f"— fail-closed, no mid default"
+            )
+            return EntrySignal(
+                signal_type=SignalType.PASS,
+                position_size=0.0,
+                edge=0.0,
+                our_probability=our_prob,
+                market_price=mp,
+                confidence=None,
+            )
+        conf = float(np.clip(confidence, 0.0, 1.0))
 
         # Gate 1: Trading hours
         if not self._is_trading_hour(hour):
