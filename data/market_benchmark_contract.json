@@ -1,0 +1,188 @@
+{
+  "generated_at_utc": "2026-10-11T13:20:21.750479+00:00",
+  "contract_version": "MARKET-BENCHMARK-CONTRACT-2026-10-11",
+  "sensitivity_grid": {
+    "local/ladder": {
+      "n": 144,
+      "brier": 0.0208,
+      "base_rate": 0.0486,
+      "mean_mid": 0.0693
+    },
+    "local/ksett": {
+      "n": 789,
+      "brier": 0.4825,
+      "base_rate": 0.4702,
+      "mean_mid": 0.1352
+    },
+    "local/truth": {
+      "n": 564,
+      "brier": 0.4528,
+      "base_rate": 0.4699,
+      "mean_mid": 0.1339
+    },
+    "utc/ladder": {
+      "n": 197,
+      "brier": 0.0218,
+      "base_rate": 0.0457,
+      "mean_mid": 0.0695
+    },
+    "utc/ksett": {
+      "n": 958,
+      "brier": 0.4922,
+      "base_rate": 0.4906,
+      "mean_mid": 0.1162
+    },
+    "utc/truth": {
+      "n": 763,
+      "brier": 0.4818,
+      "base_rate": 0.5098,
+      "mean_mid": 0.1102
+    }
+  },
+  "canonical": {
+    "align": "local",
+    "label": "ladder",
+    "all_quotes": {
+      "n": 144,
+      "brier": 0.0208,
+      "base_rate": 0.0486,
+      "ci95": {
+        "lo": 0.009,
+        "hi": 0.0366,
+        "n_dates": 42
+      }
+    },
+    "windows": {
+      "06Z": {
+        "n": 37,
+        "brier": 0.058,
+        "base_rate": 0.0811,
+        "ci95": {
+          "lo": 0.0019,
+          "hi": 0.1127,
+          "n_dates": 8
+        }
+      },
+      "10Z": {
+        "n": 52,
+        "brier": 0.0465,
+        "base_rate": 0.0577,
+        "ci95": {
+          "lo": 0.0031,
+          "hi": 0.0946,
+          "n_dates": 9
+        }
+      },
+      "12Z": {
+        "n": 33,
+        "brier": 0.064,
+        "base_rate": 0.0909,
+        "ci95": {
+          "lo": 0.0022,
+          "hi": 0.1365,
+          "n_dates": 7
+        }
+      },
+      "14Z": {
+        "n": 30,
+        "brier": 0.0387,
+        "base_rate": 0.0667,
+        "ci95": {
+          "lo": 0.0021,
+          "hi": 0.0966,
+          "n_dates": 6
+        }
+      },
+      "16Z": {
+        "n": 26,
+        "brier": 0.0812,
+        "base_rate": 0.1154,
+        "ci95": {
+          "lo": 0.0032,
+          "hi": 0.2052,
+          "n_dates": 6
+        }
+      },
+      "17Z": {
+        "n": 29,
+        "brier": 0.0735,
+        "base_rate": 0.1379,
+        "ci95": {
+          "lo": 0.008,
+          "hi": 0.1894,
+          "n_dates": 7
+        }
+      },
+      "18Z": {
+        "n": 16,
+        "brier": 0.0869,
+        "base_rate": 0.1875,
+        "ci95": {
+          "lo": 0.0079,
+          "hi": 0.1827,
+          "n_dates": 5
+        }
+      },
+      "20Z": {
+        "n": 7,
+        "brier": 0.0554,
+        "base_rate": 0.1429,
+        "ci95": {
+          "lo": 0.0002,
+          "hi": 0.1683,
+          "n_dates": 3
+        }
+      },
+      "22Z": {
+        "n": 0
+      }
+    },
+    "reliability": {
+      "0.0-0.1": {
+        "n": 127,
+        "mean_mid": 0.028,
+        "emp": 0.008
+      },
+      "0.1-0.2": {
+        "n": 5,
+        "mean_mid": 0.132,
+        "emp": 0.0
+      },
+      "0.2-0.3": {
+        "n": 3,
+        "mean_mid": 0.253,
+        "emp": 0.0
+      },
+      "0.3-0.4": {
+        "n": 1,
+        "mean_mid": 0.325,
+        "emp": 1.0
+      },
+      "0.4-0.5": {
+        "n": 3,
+        "mean_mid": 0.43,
+        "emp": 0.333
+      },
+      "0.5-0.6": {
+        "n": 1,
+        "mean_mid": 0.505,
+        "emp": 0.0
+      },
+      "0.6-0.7": {
+        "n": 2,
+        "mean_mid": 0.647,
+        "emp": 1.0
+      },
+      "0.7-0.8": {
+        "n": 1,
+        "mean_mid": 0.77,
+        "emp": 1.0
+      },
+      "0.8-0.9": {
+        "n": 1,
+        "mean_mid": 0.84,
+        "emp": 1.0
+      }
+    }
+  }
+}
