@@ -8,7 +8,14 @@ to fetch short-range weather forecasts at 3km resolution, hourly step.
 Applies rolling bias correction per station to improve forecast accuracy.
 
 API endpoint: https://api.open-meteo.com/v1/forecast
-Parameters: latitude, longitude, hourly=temperature_2m, forecast_days=3
+Parameters: latitude, longitude, hourly=temperature_2m, models=ncep_hrrr_conus,
+            forecast_days=3
+
+E1-a (2026-10-11): the fetch now pins `models=ncep_hrrr_conus` so the data is
+really HRRR. Previously the `models` parameter was omitted, so Open-Meteo served
+its `best_match` blend while this module claimed HRRR. HRRR is CONUS-only; a
+request outside the domain fails closed rather than silently substituting another
+model.
 
 B-Mode compliant. No AI/ML.
 
@@ -39,6 +46,17 @@ if REPO_ROOT not in sys.path:
 
 # Open-Meteo free tier: 10,000 requests/day, no API key needed
 OPEN_METEO_BASE = "https://api.open-meteo.com/v1/forecast"
+
+# E1-a fix (2026-10-11): this signal previously omitted `models`, so Open-Meteo
+# silently served its `best_match` auto-selection (a blend that is NOT HRRR) while
+# the module, class, and DB all claimed "HRRR". Pin the real HRRR model instead.
+# Open-Meteo's current HRRR identifier is `ncep_hrrr_conus` (CONUS domain, 3km);
+# verified live 2026-10-11 — the bare `hrrr` string is rejected by the API.
+HRRR_MODEL_ID = "ncep_hrrr_conus"
+# HRRR is CONUS-only: Open-Meteo returns "No data is available for this
+# location" outside it. The signal must fail loudly rather than silently fall
+# back to a non-HRRR model and keep calling the result "HRRR".
+HRRR_CONUS_ONLY = True
 RATE_LIMIT_DELAY = 0.5  # 500ms between requests (well within 10k/day limit)
 
 # Bias correction
@@ -60,6 +78,17 @@ STATIONS = {
     "KSEA": (47.45, -122.31), "KSFO": (37.62, -122.37),
     "KDCA": (38.85, -77.04), "KAUS": (30.19, -97.67),
 }
+
+
+def us_location(lat: float, lon: float) -> bool:
+    """Best-effort CONUS bounding-box check for the HRRR domain.
+
+    HRRR (`ncep_hrrr_conus`) covers the contiguous United States. The box is
+    deliberately generous; Open-Meteo remains the authority (it returns an error
+    for out-of-domain points) and this guard only prevents an obvious
+    out-of-domain fetch from being mislabelled HRRR.
+    """
+    return 24.0 <= lat <= 50.0 and -125.0 <= lon <= -66.5
 
 
 class HRRRBiasCorrectedSignal:
@@ -100,15 +129,18 @@ class HRRRBiasCorrectedSignal:
 
     def _fetch_from_open_meteo(self, lat: float, lon: float) -> Optional[Dict]:
         """
-        Fetch HRRR forecast from Open-Meteo API.
+        Fetch an explicitly-HRRR forecast from the Open-Meteo API.
 
-        Open-Meteo's "best_match" model selection picks HRRR for US locations
-        automatically when no model override is specified. For explicit HRRR,
-        we can use `models=best_match` or omit (it auto-selects).
+        E1-a fix: `models={HRRR_MODEL_ID}` is pinned so the returned data is
+        genuinely HRRR (`ncep_hrrr_conus`). We do NOT rely on Open-Meteo's
+        `best_match` auto-selection, which is a multi-model blend and not HRRR.
+        Outside the CONUS domain HRRR has no data; the caller fails closed
+        rather than substituting another model under the HRRR name.
         """
         params = (
             f"latitude={lat}&longitude={lon}"
             f"&hourly=temperature_2m"
+            f"&models={HRRR_MODEL_ID}"
             f"&forecast_days=3"
             f"&temperature_unit=fahrenheit"
             f"&timezone=auto"
@@ -119,6 +151,13 @@ class HRRRBiasCorrectedSignal:
             req = Request(url, headers={"User-Agent": "WeatherEngine/1.0"})
             resp = urlopen(req, timeout=15)
             data = json.loads(resp.read().decode())
+            if isinstance(data, dict) and data.get("error"):
+                # e.g. HRRR outside CONUS. Do NOT fall back to a non-HRRR model.
+                logger.error(
+                    "Open-Meteo HRRR (%s) unavailable for %.3f,%.3f: %s",
+                    HRRR_MODEL_ID, lat, lon, data.get("reason"),
+                )
+                return None
             return data
         except Exception as e:
             logger.error(f"Open-Meteo fetch failed: {e}")
@@ -130,6 +169,13 @@ class HRRRBiasCorrectedSignal:
 
         Returns dict with hourly temperature forecasts.
         """
+        if HRRR_CONUS_ONLY and not us_location(lat, lon):
+            logger.error(
+                "HRRR is CONUS-only; %.3f,%.3f is outside the domain — refusing "
+                "to substitute a non-HRRR model.", lat, lon,
+            )
+            return None
+
         time.sleep(RATE_LIMIT_DELAY)  # Rate limit safety
 
         raw = self._fetch_from_open_meteo(lat, lon)
