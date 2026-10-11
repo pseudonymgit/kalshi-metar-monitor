@@ -1,0 +1,358 @@
+{
+  "generated_at_utc": "2026-10-11T13:27:22.667675+00:00",
+  "cohort": {
+    "station_days": 16512,
+    "samples": 128308,
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "windows_utc": [
+      6,
+      10,
+      12,
+      14,
+      16,
+      17,
+      18,
+      20,
+      22
+    ],
+    "note": "full ASOS station-day cohort; independent of the market gate"
+  },
+  "windows": {
+    "06Z": {
+      "n": 14310,
+      "base_rate_p_cross": 0.8201,
+      "brier_base_rate": 0.1475,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.8187,
+            "n_up": 1644,
+            "p_down": 0.8001,
+            "n_down": 6895,
+            "sep_pp": 1.86,
+            "ci95_pp": [
+              -0.38,
+              4.13
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1472
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.8057,
+            "n_up": 1045,
+            "p_down": 0.7781,
+            "n_down": 3714,
+            "sep_pp": 2.76,
+            "ci95_pp": [
+              -0.27,
+              5.79
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1469
+        }
+      }
+    },
+    "10Z": {
+      "n": 13952,
+      "base_rate_p_cross": 0.82,
+      "brier_base_rate": 0.1476,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.872,
+            "n_up": 1578,
+            "p_down": 0.7784,
+            "n_down": 4788,
+            "sep_pp": 9.36,
+            "ci95_pp": [
+              7.34,
+              11.37
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1467
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.8857,
+            "n_up": 551,
+            "p_down": 0.7497,
+            "n_down": 1966,
+            "sep_pp": 13.59,
+            "ci95_pp": [
+              10.25,
+              16.78
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1468
+        }
+      }
+    },
+    "12Z": {
+      "n": 14244,
+      "base_rate_p_cross": 0.8245,
+      "brier_base_rate": 0.1447,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.9236,
+            "n_up": 4671,
+            "p_down": 0.7272,
+            "n_down": 3079,
+            "sep_pp": 19.64,
+            "ci95_pp": [
+              17.74,
+              21.58
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1392
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.9533,
+            "n_up": 2590,
+            "p_down": 0.7203,
+            "n_down": 1337,
+            "sep_pp": 23.3,
+            "ci95_pp": [
+              20.66,
+              26.03
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1405
+        }
+      }
+    },
+    "14Z": {
+      "n": 14534,
+      "base_rate_p_cross": 0.8272,
+      "brier_base_rate": 0.143,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.8948,
+            "n_up": 10156,
+            "p_down": 0.5945,
+            "n_down": 915,
+            "sep_pp": 30.03,
+            "ci95_pp": [
+              26.77,
+              33.31
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.132
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.9259,
+            "n_up": 7719,
+            "p_down": 0.5788,
+            "n_down": 406,
+            "sep_pp": 34.71,
+            "ci95_pp": [
+              29.58,
+              39.68
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1315
+        }
+      }
+    },
+    "16Z": {
+      "n": 14224,
+      "base_rate_p_cross": 0.8084,
+      "brier_base_rate": 0.1549,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.866,
+            "n_up": 11395,
+            "p_down": 0.4021,
+            "n_down": 577,
+            "sep_pp": 46.39,
+            "ci95_pp": [
+              42.42,
+              50.31
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1401
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.8864,
+            "n_up": 9041,
+            "p_down": 0.3555,
+            "n_down": 301,
+            "sep_pp": 53.09,
+            "ci95_pp": [
+              47.63,
+              58.35
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1421
+        }
+      }
+    },
+    "17Z": {
+      "n": 14077,
+      "base_rate_p_cross": 0.7606,
+      "brier_base_rate": 0.1821,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.8277,
+            "n_up": 10786,
+            "p_down": 0.3739,
+            "n_down": 698,
+            "sep_pp": 45.38,
+            "ci95_pp": [
+              41.96,
+              48.87
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1657
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.8535,
+            "n_up": 8034,
+            "p_down": 0.3254,
+            "n_down": 378,
+            "sep_pp": 52.81,
+            "ci95_pp": [
+              48.07,
+              57.34
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1679
+        }
+      }
+    },
+    "18Z": {
+      "n": 14025,
+      "base_rate_p_cross": 0.6753,
+      "brier_base_rate": 0.2193,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.7785,
+            "n_up": 9776,
+            "p_down": 0.2556,
+            "n_down": 1025,
+            "sep_pp": 52.29,
+            "ci95_pp": [
+              49.45,
+              55.16
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1916
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.8088,
+            "n_up": 6827,
+            "p_down": 0.183,
+            "n_down": 519,
+            "sep_pp": 62.58,
+            "ci95_pp": [
+              59.24,
+              65.93
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1971
+        }
+      }
+    },
+    "20Z": {
+      "n": 14385,
+      "base_rate_p_cross": 0.363,
+      "brier_base_rate": 0.2312,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.5512,
+            "n_up": 6858,
+            "p_down": 0.0686,
+            "n_down": 2173,
+            "sep_pp": 48.26,
+            "ci95_pp": [
+              46.54,
+              49.95
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.1958
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.5911,
+            "n_up": 3857,
+            "p_down": 0.0468,
+            "n_down": 1048,
+            "sep_pp": 54.44,
+            "ci95_pp": [
+              52.31,
+              56.57
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.2079
+        }
+      }
+    },
+    "22Z": {
+      "n": 14557,
+      "base_rate_p_cross": 0.0582,
+      "brier_base_rate": 0.0548,
+      "thresholds": {
+        "\u00b10.5": {
+          "separation": {
+            "p_up": 0.1838,
+            "n_up": 2753,
+            "p_down": 0.0047,
+            "n_down": 5483,
+            "sep_pp": 17.91,
+            "ci95_pp": [
+              16.4,
+              19.45
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.0507
+        },
+        "\u00b11.0": {
+          "separation": {
+            "p_up": 0.2087,
+            "n_up": 1260,
+            "p_down": 0.0018,
+            "n_down": 2734,
+            "sep_pp": 20.69,
+            "ci95_pp": [
+              18.42,
+              23.07
+            ]
+          },
+          "brier_rate_conditioned_loo": 0.0523
+        }
+      }
+    }
+  }
+}
