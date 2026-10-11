@@ -36,6 +36,7 @@ CLI:
 import argparse
 import json
 import os
+import re
 import sqlite3
 import sys
 import uuid
@@ -287,6 +288,67 @@ def _ensure_price_source_column(conn) -> None:
         conn.commit()
 
 
+# ── trade uniqueness (E4-b, 2026-10-11) ──────────────────────────────────────
+# The SBOX `trades` DDL only carried `trade_uuid UNIQUE`. A second insert for the
+# same decision intent (double-down, cron re-run) therefore multi-booked silently
+# because each new row drew a fresh uuid4. The decision identity here is
+# `(station, market_ticker, decision instant)` — the SBOX book has no
+# `market_ticker` column, so the ticker is recovered from the `<functionality>`
+# provenance (`... <ticker> @ <strike>F; inst=...`) with a stable fallback.
+# `decision instant` = `created_at_utc`, which is deterministic within one bridge
+# pass (the replay/live writer builds it once per run). A backfill stamps the
+# legacy rows' ticker as `legacy:<functionality>` so the partial UNIQUE index
+# always builds over pre-existing data without mutating real column semantics.
+UNIQUE_INTENT_INDEX = "ux_trades_station_ticker_decision"
+
+
+def _covered_ticker(blob: Optional[str]) -> Optional[str]:
+    """Recover the market_ticker encoded in a provenance string.
+
+    e.g. 'multi-forecaster EV-strike KXHIGHNY-26OCT04-B77 @ 77F; inst=SBOX'
+    -> 'KXHIGHNY-26OCT04-B77'. Returns None when no ticker-shaped token exists.
+    """
+    if not blob:
+        return None
+    m = re.search(r'(KX[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+)', blob)
+    return m.group(1) if m else None
+
+
+def _ensure_trade_uniqueness(conn) -> None:
+    """Idempotent (E4-b): add the row-identity uniqueness constraint on `trades`.
+
+    Adds a `market_ticker` provenance column (additive; matches the custody
+    record's identity facets), backfills it from the row's provenance string so
+    the UNIQUE index builds over legacy rows, then creates a partial UNIQUE index
+    on (station, market_ticker, created_at_utc) WHERE market_ticker IS NOT NULL.
+    A duplicate decision intent is refused by the DB, not merely by an
+    application-level get-then-insert race.
+
+    Legacy rows whose ticker cannot be recovered get a stable
+    `legacy:<functionality>` placeholder so the index remains valid; those rows
+    predate the constraint and cannot collide with a new intent (whose ticker is
+    a real KX ticker).
+    """
+    cols = {d[1] for d in conn.execute("PRAGMA table_info(trades)")}
+    if "market_ticker" not in cols:
+        conn.execute("ALTER TABLE trades ADD COLUMN market_ticker TEXT")
+    has_notes = "notes" in cols
+    sel = ("SELECT trade_uuid, functionality, notes FROM trades "
+           "WHERE market_ticker IS NULL" if has_notes else
+           "SELECT trade_uuid, functionality, NULL FROM trades "
+           "WHERE market_ticker IS NULL")
+    for tuuid, functionality, notes in conn.execute(sel).fetchall():
+        tk = (_covered_ticker(notes) or _covered_ticker(functionality)
+              or f"legacy:{functionality}")
+        conn.execute("UPDATE trades SET market_ticker=? WHERE trade_uuid=?",
+                     (tk, tuuid))
+    conn.execute(
+        f"CREATE UNIQUE INDEX IF NOT EXISTS {UNIQUE_INTENT_INDEX} "
+        f"ON trades(station, market_ticker, created_at_utc) "
+        f"WHERE market_ticker IS NOT NULL")
+    conn.commit()
+
+
 def _fetch_trade_dict(conn, tuuid):
     """Return the booked trades row as a dict (provenance for the TCR writer)."""
     cur = conn.execute("SELECT * FROM trades WHERE trade_uuid=?", (tuuid,))
@@ -310,8 +372,17 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
     second trade. It ENRICHES the existing row in place with the multi-forecaster
     probabilities and refreshes the companion row (status="enriched"). The
     canonical `trades` columns and existing semantics are untouched.
+
+    E4-b (2026-10-11): the book now carries a row-identity uniqueness constraint
+    `(station, market_ticker, created_at_utc)`. The stamp is deterministic within
+    one bridge pass, so a cron re-run/partial re-invoke is excluded by the
+    DB-level constraint rather than relying only on the (race-prone)
+    get-then-insert lookup above. The lookup remains the fast path; the index is
+    the backstop.
     """
     probs = probs or {}
+    _ensure_price_source_column(conn)
+    _ensure_trade_uniqueness(conn)
     existing = conn.execute(
         "SELECT trade_uuid FROM trades WHERE station=? AND trade_date_utc=? "
         "AND functionality=?",
@@ -345,21 +416,45 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
         "yes" if side == "BUY" else "no")
     direction = "UP" if leg == "yes" else "DOWN"
     tuuid = str(uuid.uuid4())
-    conn.execute(
-        """INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,
-           signal_direction, forecast_prob, market_price, trade_type, quantity,
-           position_size_usd, trade_price, trade_cost, trade_version, functionality,
-           status, notes, implied_prob, analytical_prob, calibration_error,
-           confidence_indicator, created_at_utc,
-           p_gefs, p_analog, p_trajectory, p_fused, price_source)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-        (tuuid, day_str, station, market_type, direction, our_prob, price,
-         ("buy_yes" if leg == "yes" else "buy_no"), qty, size_usd, price, cost,
-         f"v3.1_{INSTANCE.lower()}", functionality, "open",
-         f"multi-forecaster EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
-         price, our_prob, abs(our_prob - price), confidence, now,
-         probs.get("p_gefs"), probs.get("p_analog"),
-         probs.get("p_trajectory"), probs.get("p_fused"), price_source))
+    try:
+        conn.execute(
+            """INSERT INTO trades (trade_uuid, trade_date_utc, station, market_type,
+               signal_direction, forecast_prob, market_price, trade_type, quantity,
+               position_size_usd, trade_price, trade_cost, trade_version, functionality,
+               status, notes, implied_prob, analytical_prob, calibration_error,
+               confidence_indicator, created_at_utc,
+               p_gefs, p_analog, p_trajectory, p_fused, price_source, market_ticker)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (tuuid, day_str, station, market_type, direction, our_prob, price,
+             ("buy_yes" if leg == "yes" else "buy_no"), qty, size_usd, price, cost,
+             f"v3.1_{INSTANCE.lower()}", functionality, "open",
+             f"multi-forecaster EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
+             price, our_prob, abs(our_prob - price), confidence, now,
+             probs.get("p_gefs"), probs.get("p_analog"),
+             probs.get("p_trajectory"), probs.get("p_fused"), price_source,
+             ticker))
+    except sqlite3.IntegrityError:
+        # E4-b: a duplicate decision intent is refused by the UNIQUE index. Treat
+        # it as an idempotent no-op — re-read the intent's row and enrich it in
+        # place, exactly like the fast-path hit above — never insert a twin row.
+        dup = conn.execute(
+            "SELECT trade_uuid FROM trades WHERE station=? AND market_ticker=? "
+            "AND created_at_utc=?", (station, ticker, now)).fetchone()
+        if dup is None:
+            raise
+        tuuid = dup[0]
+        conn.execute(
+            "UPDATE trades SET p_gefs=?, p_analog=?, p_trajectory=?, p_fused=? "
+            "WHERE trade_uuid=?",
+            (probs.get("p_gefs"), probs.get("p_analog"),
+             probs.get("p_trajectory"), probs.get("p_fused"), tuuid))
+        _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
+        conn.commit()
+        return {"status": "duplicate_intent_noop", "station": station,
+                "trade_uuid": tuuid, "picked_strike": strike,
+                "market_ticker": ticker,
+                "p_gefs": probs.get("p_gefs"), "p_analog": probs.get("p_analog"),
+                "p_trajectory": probs.get("p_trajectory"), "p_fused": probs.get("p_fused")}
     _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
     conn.commit()
     return {"status": "executed", "station": station, "signal_direction": direction,
