@@ -46,6 +46,14 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 DEFAULT_DB = PROJECT_ROOT / "data" / "nwp_forecasts.db"
 
+# Sprint B / I4: run-provenance seam (run_init_utc + fetched_at).
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from core.nwp_provenance import (  # noqa: E402
+    ensure_provenance_columns,
+    run_init_utc_from_cycle,
+)
+
 ENSEMBLE_API = "https://ensemble-api.open-meteo.com/v1/ensemble"
 MODEL_NAME = "gefs_ens"
 OPEN_METEO_MODEL = "ncep_gefs025"
@@ -83,9 +91,13 @@ def init_db(conn):
             variable TEXT NOT NULL,
             value REAL,
             fetch_timestamp TEXT NOT NULL,
+            run_init_utc TEXT,
+            fetched_at TEXT,
             UNIQUE(fetch_date, target_date, station, model, variable)
         )
     """)
+    # Sprint B / I4: migrate pre-existing tables in place (no row rewrite).
+    ensure_provenance_columns(conn, "nwp_forecasts")
     conn.commit()
 
 
@@ -166,6 +178,7 @@ def main():
     now = datetime.now(timezone.utc)
     fetch_date = now.strftime("%Y-%m-%d")
     fetch_ts = now.isoformat()
+    run_init = run_init_utc_from_cycle(now)  # GEFS cycle the data came from
 
     print(f"GEFS Ensemble Collection — {fetch_ts}")
     print(f"Model: {MODEL_NAME} via {OPEN_METEO_MODEL} | stations: {len(cities)} | days: {args.forecast_days}")
@@ -209,9 +222,11 @@ def main():
                 if conn is not None:
                     conn.execute(
                         """INSERT OR REPLACE INTO nwp_forecasts
-                           (fetch_date, target_date, station, model, variable, value, fetch_timestamp)
-                           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                        (fetch_date, target_date, station, MODEL_NAME, var, float(val), fetch_ts),
+                           (fetch_date, target_date, station, model, variable, value, fetch_timestamp,
+                            run_init_utc, fetched_at)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                        (fetch_date, target_date, station, MODEL_NAME, var, float(val), fetch_ts,
+                         run_init, fetch_ts),
                     )
                 rows += 1
                 day_members[target_date] += 1

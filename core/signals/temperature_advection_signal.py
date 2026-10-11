@@ -30,6 +30,12 @@ from datetime import datetime, timezone
 import logging
 from .base_signal import BaseSignal
 
+# Sprint B / I4: run provenance stamped on advection rows.
+try:
+    from ..nwp_provenance import run_init_utc_from_cycle
+except (ImportError, ValueError):  # pragma: no cover - direct-script fallback
+    from core.nwp_provenance import run_init_utc_from_cycle
+
 logger = logging.getLogger(__name__)
 
 # ── Configuration ──────────────────────────────────────────────────────
@@ -385,16 +391,20 @@ def store_advection(db_path: str, station: str, fetch_date: str, target_date: st
         advection: Computed advection value
         model: NWP model used
     """
-    fetch_timestamp = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(timezone.utc)
+    fetch_timestamp = now.isoformat()
+    # Sprint B / I4: stamp run provenance at write time.
+    run_init_utc = run_init_utc_from_cycle(now)
     try:
         conn = sqlite3.connect(db_path, timeout=10)
         c = conn.cursor()
         c.execute("""
             INSERT OR REPLACE INTO nwp_forecasts
-            (fetch_date, target_date, station, model, variable, value, fetch_timestamp)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (fetch_date, target_date, station, model, variable, value, fetch_timestamp,
+             run_init_utc, fetched_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (fetch_date, target_date, station, model, "advection_850hPa",
-              float(advection), fetch_timestamp))
+              float(advection), fetch_timestamp, run_init_utc, fetch_timestamp))
         conn.commit()
         conn.close()
     except Exception as e:

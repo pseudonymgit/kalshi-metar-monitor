@@ -32,6 +32,14 @@ NWP_DB_PATH_DEFAULT = "data/nwp_forecasts.db"  # Relative to project root (paren
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent  # weather-engine-source/
 
+# Sprint B / I4: run-provenance seam (run_init_utc + fetched_at).
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from core.nwp_provenance import (  # noqa: E402
+    ensure_provenance_columns,
+    run_init_utc_from_cycle,
+)
+
 # Parse command line arguments
 def parse_args():
     parser = argparse.ArgumentParser(description="NWP Forecast Collection")
@@ -119,9 +127,14 @@ def init_db(db_path):
             variable TEXT NOT NULL,
             value REAL,
             fetch_timestamp TEXT NOT NULL,
+            run_init_utc TEXT,
+            fetched_at TEXT,
             UNIQUE(fetch_date, target_date, station, model, variable)
         )
     """)
+
+    # Sprint B / I4: migrate pre-existing tables in place (no row rewrite).
+    ensure_provenance_columns(conn, "nwp_forecasts")
 
     c.execute("""
         CREATE INDEX IF NOT EXISTS idx_nwp_lookup
@@ -203,11 +216,24 @@ def fetch_forecast(api_url, lat, lon):
         return {"error": str(e), "url": url}
 
 
-def parse_and_store(conn, data, model_name, station, fetch_date, fetch_timestamp):
-    """Parse Open-Meteo response and store forecasts in DB."""
+def parse_and_store(conn, data, model_name, station, fetch_date, fetch_timestamp,
+                    run_init_utc=None):
+    """Parse Open-Meteo response and store forecasts in DB.
+
+    `run_init_utc` is the model cycle the data came from (Sprint B / I4); when
+    omitted it falls back to flooring the fetch timestamp to the last cycle hour.
+    `fetched_at` is populated with the same instant as `fetch_timestamp`.
+    """
     c = conn.cursor()
     stored = 0
     errors = []
+
+    if run_init_utc is None:
+        run_init_utc = run_init_utc_from_cycle(
+            datetime.fromisoformat(fetch_timestamp) if isinstance(fetch_timestamp, str)
+            else fetch_timestamp
+        )
+    fetched_at = fetch_timestamp
 
     if "error" in data:
         return 0, [data["error"]]
@@ -226,9 +252,11 @@ def parse_and_store(conn, data, model_name, station, fetch_date, fetch_timestamp
                 try:
                     c.execute("""
                         INSERT OR REPLACE INTO nwp_forecasts
-                        (fetch_date, target_date, station, model, variable, value, fetch_timestamp)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """, (fetch_date, target_date, station, model_name, var, float(values[i]), fetch_timestamp))
+                        (fetch_date, target_date, station, model, variable, value, fetch_timestamp,
+                         run_init_utc, fetched_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (fetch_date, target_date, station, model_name, var, float(values[i]),
+                          fetch_timestamp, run_init_utc, fetched_at))
                     stored += 1
                 except Exception as e:
                     errors.append(f"DB error ({var}, {target_date}): {e}")
@@ -258,10 +286,12 @@ def parse_and_store(conn, data, model_name, station, fetch_date, fetch_timestamp
                 try:
                     c.execute("""
                         INSERT OR REPLACE INTO nwp_forecasts
-                        (fetch_date, target_date, station, model, variable, value, fetch_timestamp)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        (fetch_date, target_date, station, model, variable, value, fetch_timestamp,
+                         run_init_utc, fetched_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (fetch_date, target_date, station, model_name,
-                          f"{var}_daily_mean", daily_mean, fetch_timestamp))
+                          f"{var}_daily_mean", daily_mean, fetch_timestamp,
+                          run_init_utc, fetched_at))
                     stored += 1
                 except Exception as e:
                     errors.append(f"DB error ({var}, {target_date}): {e}")
@@ -279,6 +309,7 @@ def main():
 
     fetch_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     fetch_timestamp = datetime.now(timezone.utc).isoformat()
+    run_init_utc = run_init_utc_from_cycle(datetime.now(timezone.utc))
 
     total_stored = 0
     total_errors = []
@@ -301,7 +332,8 @@ def main():
                 continue
 
             stored, errors = parse_and_store(
-                conn, data, model_name, station, fetch_date, fetch_timestamp)
+                conn, data, model_name, station, fetch_date, fetch_timestamp,
+                run_init_utc=run_init_utc)
             model_stored += stored
             model_errors.extend(errors)
             stations_ok += 1
