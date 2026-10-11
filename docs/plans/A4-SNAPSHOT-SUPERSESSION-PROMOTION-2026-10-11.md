@@ -61,7 +61,7 @@ P&L = buy_yes payout `(1.0 − fill) × qty` (all 4 are `buy_yes`): KDFW
 - **Idempotent:** re-running settle for 10-09/10-08/10-07 → `count=0` each; no
   column drift.
 - **Tests:** `tests/` settle/canonical/gate/custody/booking/pnl/provenance/prereg
-  surface — 216 passed, 1 skipped, 0 failed.
+  surface — 229 passed, 1 skipped, 0 failed.
 
 ## Flags
 
