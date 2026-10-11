@@ -294,55 +294,55 @@ class TestAlertDispatchEdgeCases:
 
     def test_alert_builder_empty_payload(self):
         """Alert builder should handle empty payload gracefully."""
-        try:
-            from core.alert_builder import build_paper_trade_alert
-        except ImportError:
-            pytest.skip("alert_builder module not available")
+        # F5 (2026-10-11): was skip-on-ImportError / skip-on-exception — a silent
+        # gap. core.alert_builder.build_paper_trade_alert EXISTS and handles an
+        # empty trade_result; a regression must now FAIL, not skip.
+        from core.alert_builder import build_paper_trade_alert
 
-        try:
-            result = build_paper_trade_alert(
-                trade_result={}, station="KATL", market_type="HIGH", direction="UP"
-            )
-            assert result is not None
-            assert isinstance(result, dict)
-        except (ImportError, TypeError) as e:
-            pytest.skip(f"build_paper_trade_alert raised: {e}")
+        result = build_paper_trade_alert(
+            trade_result={}, station="KATL", market_type="HIGH", direction="UP"
+        )
+        assert result is not None
+        assert isinstance(result, dict)
 
     def test_alert_dispatcher_missing_webhook(self):
         """Alert dispatcher should handle missing webhook URL."""
-        try:
-            from core.alert_dispatcher import dispatch_alert
-        except ImportError:
-            pytest.skip("alert_dispatcher module not available")
+        # F5 (2026-10-11): was skip-on-ImportError / skip-on-exception.
+        # core.alert_dispatcher.dispatch_alert EXISTS; with no webhook it returns
+        # a well-formed {"delivered": False, "error": ...} dict. This path is
+        # local-only (no network), so assert the real contract.
+        from core.alert_dispatcher import dispatch_alert
 
-        try:
-            result = dispatch_alert(
-                alert_data={"test": True},
-                discord_payload={"content": "test"},
-                webhook_url=None,
-            )
-            assert result is not None
-            assert isinstance(result, dict)
-        except (ImportError, TypeError) as e:
-            pytest.skip(f"dispatch_alert raised: {e}")
+        result = dispatch_alert(
+            alert_data={"test": True},
+            discord_payload={"content": "test"},
+            webhook_url=None,
+        )
+        assert result is not None
+        assert isinstance(result, dict)
+        assert result["delivered"] is False
+        assert result["error"] == "No webhook URL configured"
 
     def test_alert_dispatcher_malformed_payload(self):
         """Alert dispatcher should handle malformed payload."""
-        try:
-            from core.alert_dispatcher import dispatch_alert
-        except ImportError:
-            pytest.skip("alert_dispatcher module not available")
+        # F5 (2026-10-11): was skip-on-exception. Mock the HTTP POST so the test
+        # is hermetic (no real POST to hooks.example.com); a Discord 400 must
+        # degrade to {"delivered": False, ...}, never raise.
+        from core import alert_dispatcher
 
-        try:
-            result = dispatch_alert(
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        mock_response.text = "Bad Request"
+        with patch.object(alert_dispatcher.requests, "post", return_value=mock_response):
+            result = alert_dispatcher.dispatch_alert(
                 alert_data={},
                 discord_payload={},
                 webhook_url="https://hooks.example.com/alert",
             )
-            assert result is not None
-            assert isinstance(result, dict)
-        except (ImportError, TypeError) as e:
-            pytest.skip(f"dispatch_alert raised: {e}")
+        assert result is not None
+        assert isinstance(result, dict)
+        assert result["delivered"] is False
+        assert result["status_code"] == 400
 
     def test_alert_retry_queue_empty(self, temp_db, monkeypatch):
         """Alert retry queue should handle empty queue."""
@@ -389,21 +389,17 @@ class TestAlertDispatchEdgeCases:
 
     def test_alert_formatter_none_values(self):
         """Alert formatter should handle None values."""
-        try:
-            from core.alert_formatter import format_alert
-        except ImportError:
-            pytest.skip("alert_formatter module not available")
+        # F5 (2026-10-11): was skip-on-ImportError / skip-on-exception.
+        # core.alert_formatter.format_alert EXISTS and handles these kwargs.
+        from core.alert_formatter import format_alert
 
-        try:
-            result = format_alert(
-                station="KATL", market_type="HIGH", direction="UP",
-                event_ticker="KXHIGHTATL", position_size=100.0,
-                conviction_details={"method": "test"}, balance=10000.0,
-            )
-            assert result is not None
-            assert isinstance(result, dict)
-        except (ImportError, TypeError) as e:
-            pytest.skip(f"format_alert raised: {e}")
+        result = format_alert(
+            station="KATL", market_type="HIGH", direction="UP",
+            event_ticker="KXHIGHTATL", position_size=100.0,
+            conviction_details={"method": "test"}, balance=10000.0,
+        )
+        assert result is not None
+        assert isinstance(result, dict)
 
 
 # ─── Agreement Gate Edge Cases ──────────────────────────────────────────────
@@ -506,19 +502,18 @@ class TestTradeJournalEdgeCases:
         from core.trade_journal import TradeJournal
 
         journal = TradeJournal(db_path=temp_db)
-        try:
-            journal.append_entry(
-                station='KATL',
-                market='HIGH',
-                direction='up',
-                outcome='pending',
-                confidence=0.5,
-                alert_id='test_missing_001',
-            )
-            trades = journal.get_recent_trades()
-            assert len(trades) >= 1
-        except Exception as e:
-            pytest.skip(f"Minimal journal entry raised: {e}")
+        # F5 (2026-10-11): was skip-on-exception — a silent gap. The minimal
+        # entry must append cleanly and be readable; a regression FAILS now.
+        journal.append_entry(
+            station='KATL',
+            market='HIGH',
+            direction='up',
+            outcome='pending',
+            confidence=0.5,
+            alert_id='test_missing_001',
+        )
+        trades = journal.get_recent_trades()
+        assert len(trades) >= 1
 
     def test_journal_update_nonexistent(self, temp_db):
         """Updating nonexistent entry should not crash."""

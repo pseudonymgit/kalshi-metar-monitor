@@ -245,11 +245,21 @@ class SignalTestBase:
 
     @pytest.fixture(autouse=True)
     def _require_signal_class(self):
-        # WAVE-D/13 (2026-09-28): some signals are disabled/absent (e.g.
-        # HrrrBiasCorrectedSignal, SpreadBasedEntrySignal). If the class cannot be
-        # resolved, SKIP rather than fail — the signal isn't part of the live system.
+        # WAVE-D/13 (2026-09-28): some signals are disabled/absent. F5
+        # (2026-10-11): a bare default previously skip()'d ANY subclass that
+        # forgot to set SIGNAL_CLASS — a silent gap that hid real test loss.
+        # Only an EXPLICIT SIGNAL_CLASS_SKIP_REASON (set by a subclass that
+        # documents a genuinely absent signal) may skip here; otherwise the
+        # missing class is a hard failure, not a silent pass.
         if self.SIGNAL_CLASS is None:
-            pytest.skip(f"{type(self).__name__}: signal class not available")
+            reason = getattr(self, "SIGNAL_CLASS_SKIP_REASON", None)
+            if reason:
+                pytest.skip(f"{type(self).__name__}: {reason}")
+            pytest.fail(
+                f"{type(self).__name__}.SIGNAL_CLASS is None and no "
+                f"SIGNAL_CLASS_SKIP_REASON is set — resolve the class or "
+                f"document why it is absent (do not skip silently)."
+            )
 
     @pytest.mark.unit
     def test_insufficient_history(self, short_days):
@@ -305,7 +315,13 @@ class SignalTestBase:
         sig = self.SIGNAL_CLASS()
         idx = max(sig.min_lookback + 5, 10)
         if idx >= len(long_days):
-            pytest.skip("Not enough test data")
+            # F5 (2026-10-11): the synthetic fixture is smaller than this
+            # signal's lookback, so idx lands past the data. Legit data gap
+            # (not a silent skip) — xfail(strict=False) stays visible and
+            # flips to XPASS once long_days grows past the lookback.
+            pytest.xfail(
+                f"not enough synthetic fixture data for {type(self).__name__} lookback"
+            )
         result = sig.evaluate(idx, long_days)
         assert isinstance(result, tuple)
         assert len(result) == 2
@@ -575,7 +591,19 @@ class TestPressureTendencySignal(SignalTestBase):
 
 
 class TestHrrrBiasCorrectedSignal(SignalTestBase):
-    SIGNAL_CLASS = _resolve_signal('HrrrBiasCorrectedSignal')
+    # F5 (2026-10-11): was `_resolve_signal('HrrrBiasCorrectedSignal')` -> None,
+    # so all six inherited SignalTestBase cases silently skipped ("signal class
+    # not available"). The class EXISTS as HRRRBiasCorrectedSignal (capital
+    # acronym) but is NOT a BaseSignal — it has no evaluate()/min_lookback, so
+    # the inherited BaseSignal contract tests do not apply. The signal's own
+    # surface is covered by tests/test_signals/test_hrrr_bias_corrected.py.
+    # We no longer fake-attach it to the BaseSignal contract; inheriting
+    # SignalTestBase with a documented skip reason keeps it visible.
+    SIGNAL_CLASS = None
+    SIGNAL_CLASS_SKIP_REASON = (
+        "HRRRBiasCorrectedSignal is not a BaseSignal (no evaluate/min_lookback) — "
+        "BaseSignal contract N/A; covered by tests/test_signals/test_hrrr_bias_corrected.py"
+    )
 
 
 class TestEsdrSignal(SignalTestBase):
@@ -639,7 +667,13 @@ class TestSeasonalRegimeClassifier(SignalTestBase):
         sig = self._get_sig()
         idx = max(sig.min_lookback + 5, 10)
         if idx >= len(long_days):
-            pytest.skip("Not enough test data")
+            # F5 (2026-10-11): the synthetic fixture is smaller than this
+            # signal's lookback, so idx lands past the data. Legit data gap
+            # (not a silent skip) — xfail(strict=False) stays visible and
+            # flips to XPASS once long_days grows past the lookback.
+            pytest.xfail(
+                f"not enough synthetic fixture data for {type(self).__name__} lookback"
+            )
         result = sig.evaluate(idx, long_days)
         assert isinstance(result, tuple)
         assert len(result) == 2
@@ -702,7 +736,13 @@ class TestSettlementTimeArbitrageSignal(SignalTestBase):
         sig = self._get_sig()
         idx = max(sig.min_lookback + 5, 10)
         if idx >= len(long_days):
-            pytest.skip("Not enough test data")
+            # F5 (2026-10-11): the synthetic fixture is smaller than this
+            # signal's lookback, so idx lands past the data. Legit data gap
+            # (not a silent skip) — xfail(strict=False) stays visible and
+            # flips to XPASS once long_days grows past the lookback.
+            pytest.xfail(
+                f"not enough synthetic fixture data for {type(self).__name__} lookback"
+            )
         result = sig.evaluate(idx, long_days)
         assert isinstance(result, tuple)
         assert len(result) == 2
@@ -713,30 +753,41 @@ class TestSettlementTimeArbitrageSignal(SignalTestBase):
 
 
 class TestSpreadBasedEntrySignal(SignalTestBase):
-    # SpreadBasedEntryDetector is an ADVANCE signal — not in registry.
-    # Test via direct import.
+    # F5 (2026-10-11): was `_resolve_signal('SpreadBasedEntryDetector')` -> None,
+    # so all six inherited SignalTestBase cases silently skipped. The detector
+    # (core.signals.spread_based_entry_signal.SpreadBasedEntryDetector) EXISTS and
+    # IS a BaseSignal, but it is an execution-layer optimizer: evaluate() returns a
+    # constant (None, 0.5)/(None, 0.0) placeholder. The generic direction/confidence
+    # contract is still valid, so run it for real via direct import.
     @pytest.fixture(autouse=True)
-    def _setup_sig(self):
-        try:
-            from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
-            self._sig = SpreadBasedEntryDetector()
-        except ImportError:
-            pytest.skip("SpreadBasedEntryDetector not available")
-
-    def _get_sig(self):
-        return getattr(self, '_sig', None)
+    def _c(self):
+        from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
+        self.SIGNAL_CLASS = SpreadBasedEntryDetector
 
     @pytest.mark.unit
     def test_interface(self):
-        sig = self._get_sig()
-        if sig is None:
-            pytest.skip("Signal not available")
-        # Verify the detector interface
+        from core.signals.spread_based_entry_signal import SpreadBasedEntryDetector
+        sig = SpreadBasedEntryDetector()
+        # F5 (2026-10-11): was `assert 0.0 <= confidence` (NameError — `confidence`
+        # was never defined), latent behind a skip because the class never resolved.
+        # Verify the detector interface with the real attributes instead.
         assert hasattr(sig, 'check')
         assert hasattr(sig, 'check_exit')
         assert hasattr(sig, 'record_spread')
         assert hasattr(sig, 'get_spread_percentile')
-        assert 0.0 <= confidence <= 1.0
+
+    @pytest.mark.unit
+    def test_insufficient_history(self, short_days):
+        """Execution-layer placeholder contract (overrides the BaseSignal one).
+
+        F5 (2026-10-11): SpreadBasedEntryDetector.evaluate() is a documented
+        placeholder — it returns (None, 0.5) for any non-empty days list and
+        ignores min_lookback, so the generic 'insufficient history -> 0.0'
+        assertion does not apply. Assert the real contract instead.
+        """
+        sig = self.SIGNAL_CLASS()
+        assert sig.evaluate(len(short_days), short_days) == (None, 0.5)
+        assert sig.evaluate(0, []) == (None, 0.0)
 
 
 class TestVolumeMomentumSignal(SignalTestBase):
@@ -792,7 +843,13 @@ class TestVolumeMomentumSignal(SignalTestBase):
         sig = self._get_sig()
         idx = max(sig.min_lookback + 5, 10)
         if idx >= len(long_days):
-            pytest.skip("Not enough test data")
+            # F5 (2026-10-11): the synthetic fixture is smaller than this
+            # signal's lookback, so idx lands past the data. Legit data gap
+            # (not a silent skip) — xfail(strict=False) stays visible and
+            # flips to XPASS once long_days grows past the lookback.
+            pytest.xfail(
+                f"not enough synthetic fixture data for {type(self).__name__} lookback"
+            )
         result = sig.evaluate(idx, long_days)
         assert isinstance(result, tuple)
         assert len(result) == 2

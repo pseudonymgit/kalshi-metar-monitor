@@ -348,16 +348,50 @@ class TestStationRegistry:
 
 # ── Integration test with existing DB ───────────────────────────────────
 
+@pytest.fixture(scope="module")
+def nwp_db_path(tmp_path_factory):
+    """Path to a NWP DB with the expected schema.
+
+    F5 (2026-10-11): prefers the real archive (read-only); when absent, builds a
+    temp DB via the same init_db() the backfill uses, plus minimal ERA5
+    upper-air rows including VAR_ADVECTION. This lets the schema/coverage
+    integration checks run instead of silently skipping.
+    """
+    real = REPO_ROOT / "data" / "nwp_forecasts.db"
+    if real.exists():
+        return real
+
+    db_path = tmp_path_factory.mktemp("nwp_fixture") / "nwp_forecasts.db"
+    init_db(db_path)
+    conn = sqlite3.connect(str(db_path))
+    ts = "2026-06-15T00:00:00Z"
+    rows = [
+        ("2026-06-15", "2026-06-16", "KNYC", MODEL_NAME, var, 1.0, ts)
+        for var in (VAR_TEMP_850, VAR_U_850, VAR_V_850, VAR_GEO_500, VAR_ADVECTION)
+    ]
+    conn.executemany(
+        "INSERT INTO nwp_forecasts "
+        "(fetch_date, target_date, station, model, variable, value, fetch_timestamp) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        rows,
+    )
+    conn.commit()
+    conn.close()
+    return db_path
+
+
 class TestExistingDBIntegration:
     """Test that the backfill data integrates with the existing NWP database."""
 
-    def test_db_schema_compatible(self):
-        """Verify the existing NWP DB schema is compatible with backfill."""
-        db_path = REPO_ROOT / "data" / "nwp_forecasts.db"
-        if not db_path.exists():
-            pytest.skip("NWP database not found — skipping integration test")
+    # F5 (2026-10-11): these three tests used to skip() wholesale when
+    # data/nwp_forecasts.db was absent — a silent gap. The `nwp_db_path` fixture
+    # prefers the real archive and otherwise builds a temp DB with the SAME schema
+    # (scripts.init_db) plus minimal ERA5 upper-air rows, so the schema/coverage
+    # assertions always execute.
 
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    def test_db_schema_compatible(self, nwp_db_path):
+        """Verify the NWP DB schema is compatible with backfill."""
+        conn = sqlite3.connect(f"file:{nwp_db_path}?mode=ro", uri=True)
         c = conn.cursor()
 
         # Verify required columns exist
@@ -368,13 +402,9 @@ class TestExistingDBIntegration:
 
         conn.close()
 
-    def test_era5_model_exists(self):
-        """Check that ERA5 model already has data in the DB."""
-        db_path = REPO_ROOT / "data" / "nwp_forecasts.db"
-        if not db_path.exists():
-            pytest.skip("NWP database not found — skipping integration test")
-
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    def test_era5_model_exists(self, nwp_db_path):
+        """Check that ERA5 model has data in the DB."""
+        conn = sqlite3.connect(f"file:{nwp_db_path}?mode=ro", uri=True)
         c = conn.cursor()
 
         c.execute("SELECT COUNT(DISTINCT model) FROM nwp_forecasts")
@@ -384,13 +414,9 @@ class TestExistingDBIntegration:
         conn.close()
         print(f"\n  Database has {model_count} models")
 
-    def test_advection_variable_ready(self):
+    def test_advection_variable_ready(self, nwp_db_path):
         """Check that the temperature_advection_850hPa variable exists or can be created."""
-        db_path = REPO_ROOT / "data" / "nwp_forecasts.db"
-        if not db_path.exists():
-            pytest.skip("NWP database not found — skipping integration test")
-
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        conn = sqlite3.connect(f"file:{nwp_db_path}?mode=ro", uri=True)
         c = conn.cursor()
 
         c.execute("SELECT DISTINCT variable FROM nwp_forecasts WHERE variable = ?",
