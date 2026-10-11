@@ -162,12 +162,19 @@ def admit_decision_candidate(*, trade_uuid: str, instance: str = "SBOX",
     decidable failure (REJECTED/HALT). Returns (verdict, admitted).
     """
     if candidate is None:
+        # Decision instant = ROW IDENTITY, never wall-clock now(). For the
+        # intraday family the decision instant is the pinned entry instant
+        # (13:30 station-local); when that cannot be resolved, fall back to a
+        # deterministic function of the row identity (`identity:<trade_uuid>`),
+        # NOT `datetime.now()`. A wall-clock instant makes the ledger key differ
+        # on every run, so a re-run silently duplicates — the E4-a defect.
+        decision_instant = (pinned_entry_time_utc(station, settlement_date)
+                            or f"identity:{trade_uuid}")
         candidate = {
             "trade_uuid": trade_uuid, "instance": instance,
             "trade_version": trade_version, "station": station,
             "market_type": market_type, "settlement_date": settlement_date,
-            "label_axis": label_axis, "created_at_utc":
-                datetime.now(timezone.utc).isoformat(),
+            "label_axis": label_axis, "created_at_utc": decision_instant,
         }
     checks = [
         gate_g0_suite_green(Path(repo), suite_green=suite_green),
@@ -187,11 +194,17 @@ def admit_decision_candidate(*, trade_uuid: str, instance: str = "SBOX",
         verdict = VERDICT_ADMITTED
     gv = GateVerdict(verdict=verdict, checks=checks, trade_uuid=trade_uuid,
                      candidate_hash=_candidate_hash(candidate))
+    # Key on ROW IDENTITY (trade_uuid + gate_version + verdict + decision
+    # instant) matching the TCR pattern — never wall-clock now(). A re-run of
+    # the same booking intent reproduces the same key and is a true no-op.
+    idem = verdict_idempotency_key(
+        trade_uuid, candidate.get("trade_version"), verdict,
+        candidate.get("created_at_utc"))
     if conn is not None:
-        _open_ledger(conn).append(gv)
+        _open_ledger(conn).append(gv, idempotency_key=idem)
     else:
         led = ledger_of(gate_db)
-        led.append(gv)
+        led.append(gv, idempotency_key=idem)
         led.conn.close()
     return gv, gv.verdict == VERDICT_ADMITTED
 

@@ -438,5 +438,40 @@ def test_ledger_append_idempotent_key_unique():
     assert conn.execute("SELECT COUNT(*) FROM gate_ledger").fetchone()[0] == 1
 
 
+def test_decision_time_gate_rerun_is_idempotent(tmp_path):
+    """E4-a: the booking-time gate must key the ledger on row identity, not
+    wall-clock now(). A double-run of the SAME booking intent leaves the ledger
+    count unchanged (the fresh candidate used to carry `datetime.now()` as its
+    decision instant, so every run produced a new secret key and duplicated)."""
+    gate_db = str(tmp_path / "gate.db")
+
+    def _count():
+        g = sqlite3.connect(f"file:{gate_db}?mode=ro", uri=True)
+        n = g.execute("SELECT COUNT(*) FROM gate_ledger").fetchone()[0]
+        g.close()
+        return n
+
+    for _ in range(2):
+        admit_decision_candidate(
+            trade_uuid="SBOX-KNYC-2026-10-04", station="KNYC",
+            settlement_date="2026-10-04", label_axis="strike_crossing",
+            gate_db=gate_db, repo=REPO, suite_green=True)
+    assert _count() == 1, "booking-time re-run duplicated a ledger row"
+
+
+def test_decision_time_decision_instant_is_not_wall_clock(tmp_path):
+    """The candidate's decision instant is the pinned 13:30-local entry (or a
+    deterministic identity fallback), never now()."""
+    gate_db = str(tmp_path / "gate.db")
+    admit_decision_candidate(
+        trade_uuid="SBOX-KNYC-2026-10-04", station="KNYC",
+        settlement_date="2026-10-04", label_axis="strike_crossing",
+        gate_db=gate_db, repo=REPO, suite_green=True)
+    g = sqlite3.connect(f"file:{gate_db}?mode=ro", uri=True)
+    row = g.execute("SELECT trade_uuid FROM gate_ledger").fetchone()
+    g.close()
+    assert row[0] == "SBOX-KNYC-2026-10-04"
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))
