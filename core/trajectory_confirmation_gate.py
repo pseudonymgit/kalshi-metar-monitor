@@ -513,7 +513,11 @@ class AnalogMatcher:
             print(f"  [TrajectoryGate] Epoch DB not found. Building...")
             self._builder.build_epoch_db(output_db=self.epoch_db)
 
-        zone_stations: List[str] = CLIMATE_ZONES.get(zone, [])
+        # Copy before extending: CLIMATE_ZONES.get() returns the module dict's
+        # own list, so .extend() here would mutate shared state in place. Repeated
+        # calls grow the placeholder list until SQLite raises "too many SQL
+        # variables" (seen at trade 48/68 in the F3 backtest replay).
+        zone_stations: List[str] = list(CLIMATE_ZONES.get(zone, []))
         if include_adjacent:
             for adj_zone in ZONE_ADJACENCY.get(zone, []):
                 zone_stations.extend(CLIMATE_ZONES.get(adj_zone, []))
