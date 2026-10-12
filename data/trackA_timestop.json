@@ -1,0 +1,792 @@
+{
+  "generated_at_utc": "2026-10-12T05:22:13.318146+00:00",
+  "variant": "Track A-3 \u2014 time-stop / settlement-avoidance",
+  "base_artifact": "data/trackA_spread_filter.json (commit 326a2180b)",
+  "base_commit": "c05e5b8e3",
+  "windows_utc": [
+    "14Z",
+    "17Z",
+    "20Z"
+  ],
+  "triggers": {
+    "rule1": 0.2,
+    "rule2": 0.1,
+    "rule3": 0.2
+  },
+  "base_209": {
+    "n_trades": 209,
+    "net_pnl": -839.685,
+    "gross_pnl": -478.785,
+    "win_rate": 0.244,
+    "exit_distribution": {
+      "sell_095": 2,
+      "settlement": 122,
+      "stop_loss": 48,
+      "take_profit_20": 37
+    },
+    "net_pnl_by_exit": {
+      "sell_095": 44.52,
+      "settlement": -1402.85,
+      "stop_loss": -354.58,
+      "take_profit_20": 873.23
+    }
+  },
+  "data_limitation": "The committed set stores the REALIZED exit price (payoff 0/1 for settlement, q_mid for stop/tp/.95) but NOT the mid at any hypothetical time-stop window. A time-stop's value is therefore an exact affine function of an unknown q; each variant below is reported at 4 anchor q's plus a sweep. This is a bound, not a point estimate, and is the reason the verdict is 'indeterminate at this data depth' rather than a single P&L number.",
+  "affected_counts": {
+    "rule1": {
+      "n_affected": 156,
+      "contracts": 21835,
+      "n_settle_losers": 96,
+      "n_settle_winners": 12,
+      "note": "rule3 = settlement losers only; rule1/2 also re-stop the same-window stop-loss exits (\u2248no-op delta) and, in the naive form, the settlement winners."
+    },
+    "rule2": {
+      "n_affected": 156,
+      "contracts": 21835,
+      "n_settle_losers": 96,
+      "n_settle_winners": 12,
+      "note": "rule3 = settlement losers only; rule1/2 also re-stop the same-window stop-loss exits (\u2248no-op delta) and, in the naive form, the settlement winners."
+    },
+    "rule3": {
+      "n_affected": 96,
+      "contracts": 15069,
+      "n_settle_losers": 96,
+      "n_settle_winners": 0,
+      "note": "rule3 = settlement losers only; rule1/2 also re-stop the same-window stop-loss exits (\u2248no-op delta) and, in the naive form, the settlement winners."
+    }
+  },
+  "variants": {
+    "rule1": {
+      "all_affected|ceiling_q=entry_mid*(1+0.20)": {
+        "n_trades": 209,
+        "net_pnl": 397.71,
+        "gross_pnl": 906.825,
+        "win_rate": 0.3254,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -330.51
+        },
+        "delta_net_vs_base": 1237.395,
+        "delta_gross_vs_base": 1385.61
+      },
+      "all_affected|no_move_q=entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -264.375,
+        "gross_pnl": 244.74,
+        "win_rate": 0.1722,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -992.59
+        },
+        "delta_net_vs_base": 575.31,
+        "delta_gross_vs_base": 723.525
+      },
+      "all_affected|half_q=0.5*entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -1883.5575,
+        "gross_pnl": -1374.4425,
+        "win_rate": 0.1722,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -2611.77
+        },
+        "delta_net_vs_base": -1043.8725,
+        "delta_gross_vs_base": -895.6575
+      },
+      "all_affected|floor_q=0": {
+        "n_trades": 209,
+        "net_pnl": -3309.18,
+        "gross_pnl": -2800.065,
+        "win_rate": 0.1722,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -4037.4
+        },
+        "delta_net_vs_base": -2469.495,
+        "delta_gross_vs_base": -2321.28
+      },
+      "all_affected|mean_entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 236.908,
+        "gross_pnl": 746.023,
+        "win_rate": 0.5646,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -491.31
+        },
+        "delta_net_vs_base": 1076.593,
+        "delta_gross_vs_base": 1224.808
+      },
+      "losers_only|ceiling_q=entry_mid*(1+0.20)": {
+        "n_trades": 209,
+        "net_pnl": 967.835,
+        "gross_pnl": 1451.865,
+        "win_rate": 0.311,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -275.66
+        },
+        "delta_net_vs_base": 1807.52,
+        "delta_gross_vs_base": 1930.65
+      },
+      "losers_only|no_move_q=entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 616.835,
+        "gross_pnl": 1100.865,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -626.66
+        },
+        "delta_net_vs_base": 1456.52,
+        "delta_gross_vs_base": 1579.65
+      },
+      "losers_only|half_q=0.5*entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -240.1,
+        "gross_pnl": 243.93,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -1483.6
+        },
+        "delta_net_vs_base": 599.585,
+        "delta_gross_vs_base": 722.715
+      },
+      "losers_only|floor_q=0": {
+        "n_trades": 209,
+        "net_pnl": -962.815,
+        "gross_pnl": -478.785,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -2206.31
+        },
+        "delta_net_vs_base": -123.13,
+        "delta_gross_vs_base": 0.0
+      },
+      "losers_only|mean_entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 1018.9155,
+        "gross_pnl": 1502.9455,
+        "win_rate": 0.4976,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -224.58
+        },
+        "delta_net_vs_base": 1858.6005,
+        "delta_gross_vs_base": 1981.7305
+      }
+    },
+    "rule2": {
+      "all_affected|ceiling_q=entry_mid*(1+0.10)": {
+        "n_trades": 209,
+        "net_pnl": 67.7675,
+        "gross_pnl": 576.8825,
+        "win_rate": 0.1914,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -660.45
+        },
+        "delta_net_vs_base": 907.4525,
+        "delta_gross_vs_base": 1055.6675
+      },
+      "all_affected|no_move_q=entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -264.375,
+        "gross_pnl": 244.74,
+        "win_rate": 0.1722,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -992.59
+        },
+        "delta_net_vs_base": 575.31,
+        "delta_gross_vs_base": 723.525
+      },
+      "all_affected|half_q=0.5*entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -1883.5575,
+        "gross_pnl": -1374.4425,
+        "win_rate": 0.1722,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -2611.77
+        },
+        "delta_net_vs_base": -1043.8725,
+        "delta_gross_vs_base": -895.6575
+      },
+      "all_affected|floor_q=0": {
+        "n_trades": 209,
+        "net_pnl": -3309.18,
+        "gross_pnl": -2800.065,
+        "win_rate": 0.1722,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -4037.4
+        },
+        "delta_net_vs_base": -2469.495,
+        "delta_gross_vs_base": -2321.28
+      },
+      "all_affected|mean_entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 236.908,
+        "gross_pnl": 746.023,
+        "win_rate": 0.5646,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 14,
+          "take_profit_20": 37,
+          "time_stop": 156
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": -189.53,
+          "take_profit_20": 873.23,
+          "time_stop": -491.31
+        },
+        "delta_net_vs_base": 1076.593,
+        "delta_gross_vs_base": 1224.808
+      },
+      "losers_only|ceiling_q=entry_mid*(1+0.10)": {
+        "n_trades": 209,
+        "net_pnl": 792.4,
+        "gross_pnl": 1276.43,
+        "win_rate": 0.2488,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -451.09
+        },
+        "delta_net_vs_base": 1632.085,
+        "delta_gross_vs_base": 1755.215
+      },
+      "losers_only|no_move_q=entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 616.835,
+        "gross_pnl": 1100.865,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -626.66
+        },
+        "delta_net_vs_base": 1456.52,
+        "delta_gross_vs_base": 1579.65
+      },
+      "losers_only|half_q=0.5*entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -240.1,
+        "gross_pnl": 243.93,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -1483.6
+        },
+        "delta_net_vs_base": 599.585,
+        "delta_gross_vs_base": 722.715
+      },
+      "losers_only|floor_q=0": {
+        "n_trades": 209,
+        "net_pnl": -962.815,
+        "gross_pnl": -478.785,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -2206.31
+        },
+        "delta_net_vs_base": -123.13,
+        "delta_gross_vs_base": 0.0
+      },
+      "losers_only|mean_entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 1018.9155,
+        "gross_pnl": 1502.9455,
+        "win_rate": 0.4976,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -224.58
+        },
+        "delta_net_vs_base": 1858.6005,
+        "delta_gross_vs_base": 1981.7305
+      }
+    },
+    "rule3": {
+      "all_affected|ceiling_q=entry_mid*(1+0.20)": {
+        "n_trades": 209,
+        "net_pnl": 967.835,
+        "gross_pnl": 1451.865,
+        "win_rate": 0.311,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -275.66
+        },
+        "delta_net_vs_base": 1807.52,
+        "delta_gross_vs_base": 1930.65
+      },
+      "all_affected|no_move_q=entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 616.835,
+        "gross_pnl": 1100.865,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -626.66
+        },
+        "delta_net_vs_base": 1456.52,
+        "delta_gross_vs_base": 1579.65
+      },
+      "all_affected|half_q=0.5*entry_mid": {
+        "n_trades": 209,
+        "net_pnl": -240.1,
+        "gross_pnl": 243.93,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -1483.6
+        },
+        "delta_net_vs_base": 599.585,
+        "delta_gross_vs_base": 722.715
+      },
+      "all_affected|floor_q=0": {
+        "n_trades": 209,
+        "net_pnl": -962.815,
+        "gross_pnl": -478.785,
+        "win_rate": 0.244,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -2206.31
+        },
+        "delta_net_vs_base": -123.13,
+        "delta_gross_vs_base": 0.0
+      },
+      "all_affected|mean_entry_mid": {
+        "n_trades": 209,
+        "net_pnl": 1018.9155,
+        "gross_pnl": 1502.9455,
+        "win_rate": 0.4976,
+        "exit_distribution": {
+          "sell_095": 2,
+          "settlement": 26,
+          "stop_loss": 48,
+          "take_profit_20": 37,
+          "time_stop": 96
+        },
+        "net_pnl_by_exit": {
+          "sell_095": 44.52,
+          "settlement": 680.33,
+          "stop_loss": -354.58,
+          "take_profit_20": 873.23,
+          "time_stop": -224.58
+        },
+        "delta_net_vs_base": 1858.6005,
+        "delta_gross_vs_base": 1981.7305
+      }
+    }
+  },
+  "q_sweep_settlement_losers": {
+    "rule1": [
+      {
+        "q_frac_of_entry_mid": 0.0,
+        "net_pnl": -962.815,
+        "gross_pnl": -478.785,
+        "win_rate": 0.244,
+        "delta_net_vs_base": -123.13
+      },
+      {
+        "q_frac_of_entry_mid": 0.25,
+        "net_pnl": -671.0425,
+        "gross_pnl": -187.0125,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 168.6425
+      },
+      {
+        "q_frac_of_entry_mid": 0.5,
+        "net_pnl": -240.1,
+        "gross_pnl": 243.93,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 599.585
+      },
+      {
+        "q_frac_of_entry_mid": 0.64,
+        "net_pnl": 1.529,
+        "gross_pnl": 485.559,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 841.214
+      },
+      {
+        "q_frac_of_entry_mid": 0.75,
+        "net_pnl": 187.9225,
+        "gross_pnl": 671.9525,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 1027.6075
+      },
+      {
+        "q_frac_of_entry_mid": 1.0,
+        "net_pnl": 616.835,
+        "gross_pnl": 1100.865,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 1456.52
+      },
+      {
+        "q_frac_of_entry_mid": 1.2,
+        "net_pnl": 967.835,
+        "gross_pnl": 1451.865,
+        "win_rate": 0.311,
+        "delta_net_vs_base": 1807.52
+      }
+    ],
+    "rule2": [
+      {
+        "q_frac_of_entry_mid": 0.0,
+        "net_pnl": -962.815,
+        "gross_pnl": -478.785,
+        "win_rate": 0.244,
+        "delta_net_vs_base": -123.13
+      },
+      {
+        "q_frac_of_entry_mid": 0.25,
+        "net_pnl": -671.0425,
+        "gross_pnl": -187.0125,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 168.6425
+      },
+      {
+        "q_frac_of_entry_mid": 0.5,
+        "net_pnl": -240.1,
+        "gross_pnl": 243.93,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 599.585
+      },
+      {
+        "q_frac_of_entry_mid": 0.64,
+        "net_pnl": 1.529,
+        "gross_pnl": 485.559,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 841.214
+      },
+      {
+        "q_frac_of_entry_mid": 0.75,
+        "net_pnl": 187.9225,
+        "gross_pnl": 671.9525,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 1027.6075
+      },
+      {
+        "q_frac_of_entry_mid": 1.0,
+        "net_pnl": 616.835,
+        "gross_pnl": 1100.865,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 1456.52
+      },
+      {
+        "q_frac_of_entry_mid": 1.1,
+        "net_pnl": 792.4,
+        "gross_pnl": 1276.43,
+        "win_rate": 0.2488,
+        "delta_net_vs_base": 1632.085
+      }
+    ],
+    "rule3": [
+      {
+        "q_frac_of_entry_mid": 0.0,
+        "net_pnl": -962.815,
+        "gross_pnl": -478.785,
+        "win_rate": 0.244,
+        "delta_net_vs_base": -123.13
+      },
+      {
+        "q_frac_of_entry_mid": 0.25,
+        "net_pnl": -671.0425,
+        "gross_pnl": -187.0125,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 168.6425
+      },
+      {
+        "q_frac_of_entry_mid": 0.5,
+        "net_pnl": -240.1,
+        "gross_pnl": 243.93,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 599.585
+      },
+      {
+        "q_frac_of_entry_mid": 0.64,
+        "net_pnl": 1.529,
+        "gross_pnl": 485.559,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 841.214
+      },
+      {
+        "q_frac_of_entry_mid": 0.75,
+        "net_pnl": 187.9225,
+        "gross_pnl": 671.9525,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 1027.6075
+      },
+      {
+        "q_frac_of_entry_mid": 1.0,
+        "net_pnl": 616.835,
+        "gross_pnl": 1100.865,
+        "win_rate": 0.244,
+        "delta_net_vs_base": 1456.52
+      },
+      {
+        "q_frac_of_entry_mid": 1.2,
+        "net_pnl": 967.835,
+        "gross_pnl": 1451.865,
+        "win_rate": 0.311,
+        "delta_net_vs_base": 1807.52
+      }
+    ]
+  },
+  "breakeven_q_frac_settlement_losers": 0.6391,
+  "naive_winner_preemption": {
+    "rule1": {
+      "n_trades": 209,
+      "net_pnl": 397.71,
+      "gross_pnl": 906.825,
+      "win_rate": 0.3254,
+      "exit_distribution": {
+        "sell_095": 2,
+        "settlement": 14,
+        "take_profit_20": 37,
+        "time_stop": 156
+      },
+      "net_pnl_by_exit": {
+        "sell_095": 44.52,
+        "settlement": -189.53,
+        "take_profit_20": 873.23,
+        "time_stop": -330.51
+      },
+      "delta_net_vs_base": 1237.395
+    },
+    "rule2": {
+      "n_trades": 209,
+      "net_pnl": 67.7675,
+      "gross_pnl": 576.8825,
+      "win_rate": 0.1914,
+      "exit_distribution": {
+        "sell_095": 2,
+        "settlement": 14,
+        "take_profit_20": 37,
+        "time_stop": 156
+      },
+      "net_pnl_by_exit": {
+        "sell_095": 44.52,
+        "settlement": -189.53,
+        "take_profit_20": 873.23,
+        "time_stop": -660.45
+      },
+      "delta_net_vs_base": 907.4525
+    }
+  }
+}
