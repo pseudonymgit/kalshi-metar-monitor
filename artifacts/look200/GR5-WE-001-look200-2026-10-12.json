@@ -1,0 +1,338 @@
+{
+  "anomalies": [],
+  "by_station": {
+    "KATL": {
+      "accuracy": 0.9167,
+      "correct": 11,
+      "distinct_dates": 12,
+      "n": 12
+    },
+    "KAUS": {
+      "accuracy": 0.8,
+      "correct": 4,
+      "distinct_dates": 5,
+      "n": 5
+    },
+    "KBOS": {
+      "accuracy": 1.0,
+      "correct": 8,
+      "distinct_dates": 8,
+      "n": 8
+    },
+    "KDCA": {
+      "accuracy": 0.75,
+      "correct": 6,
+      "distinct_dates": 8,
+      "n": 8
+    },
+    "KDEN": {
+      "accuracy": 0.3,
+      "correct": 3,
+      "distinct_dates": 10,
+      "n": 10
+    },
+    "KDFW": {
+      "accuracy": 0.8,
+      "correct": 4,
+      "distinct_dates": 5,
+      "n": 5
+    },
+    "KHOU": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "distinct_dates": 1,
+      "n": 1
+    },
+    "KLAX": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "distinct_dates": 1,
+      "n": 1
+    },
+    "KMDW": {
+      "accuracy": 0.6667,
+      "correct": 2,
+      "distinct_dates": 3,
+      "n": 3
+    },
+    "KMIA": {
+      "accuracy": 0.5,
+      "correct": 1,
+      "distinct_dates": 2,
+      "n": 2
+    },
+    "KMSP": {
+      "accuracy": 0.5,
+      "correct": 1,
+      "distinct_dates": 2,
+      "n": 2
+    },
+    "KNYC": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "distinct_dates": 1,
+      "n": 1
+    },
+    "KPHL": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "distinct_dates": 1,
+      "n": 1
+    },
+    "KPHX": {
+      "accuracy": 0.5,
+      "correct": 1,
+      "distinct_dates": 2,
+      "n": 2
+    },
+    "KSAT": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "distinct_dates": 1,
+      "n": 1
+    },
+    "KSEA": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "distinct_dates": 2,
+      "n": 2
+    },
+    "KSFO": {
+      "accuracy": 0.5,
+      "correct": 2,
+      "distinct_dates": 4,
+      "n": 4
+    }
+  },
+  "canaries": {
+    "alpha_canary": 0.01,
+    "canaries": {
+      "C1": {
+        "alpha": 0.01,
+        "canary_id": "C1",
+        "ci_high": 0.334826,
+        "ci_low": -0.016444,
+        "cusum": 0.620761,
+        "cusum_halt": false,
+        "detail": {},
+        "mean": 0.159191,
+        "n": 68,
+        "note": "seeded coin-flip direction vs settled truth",
+        "p_value": 0.075652,
+        "profitable_side": false,
+        "rejected": false,
+        "significant": false,
+        "std": 0.738941,
+        "z": 1.776493
+      },
+      "C2": {
+        "alpha": 0.01,
+        "canary_id": "C2",
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "cusum": 0.0,
+        "cusum_halt": false,
+        "detail": {
+          "axis_correct": false,
+          "expected_axis": "strike_crossing"
+        },
+        "mean": 0.0,
+        "n": 68,
+        "note": "REJECTED: day-over-day axis is not the strike-crossing label basis (GR5 G4); canary is structurally disabled",
+        "p_value": 1.0,
+        "profitable_side": false,
+        "rejected": true,
+        "significant": false,
+        "std": 0.0,
+        "z": 0.0
+      },
+      "C3": {
+        "alpha": 0.01,
+        "canary_id": "C3",
+        "ci_high": 0.978224,
+        "ci_low": 0.613651,
+        "cusum": 26.232626,
+        "cusum_halt": true,
+        "detail": {},
+        "mean": 0.795938,
+        "n": 16,
+        "note": "static (station,month) base-rate floor (leave-one-out)",
+        "p_value": 0.0,
+        "profitable_side": true,
+        "rejected": false,
+        "significant": true,
+        "std": 0.372014,
+        "z": 8.558157
+      },
+      "C4": {
+        "alpha": 0.01,
+        "canary_id": "C4",
+        "ci_high": 0.491731,
+        "ci_low": 0.26018,
+        "cusum": 12.567309,
+        "cusum_halt": true,
+        "detail": {},
+        "mean": 0.375956,
+        "n": 68,
+        "note": "settlement dates shuffled (block-preserving)",
+        "p_value": 0.0,
+        "profitable_side": true,
+        "rejected": false,
+        "significant": true,
+        "std": 0.487096,
+        "z": 6.364678
+      },
+      "C5": {
+        "alpha": 0.01,
+        "canary_id": "C5",
+        "ci_high": 0.672857,
+        "ci_low": 0.426408,
+        "cusum": 38.945593,
+        "cusum_halt": true,
+        "detail": {},
+        "mean": 0.549632,
+        "n": 68,
+        "note": "same trades, fee=0 (fee-fragility)",
+        "p_value": 0.0,
+        "profitable_side": true,
+        "rejected": false,
+        "significant": true,
+        "std": 0.518436,
+        "z": 8.742411
+      }
+    },
+    "cusum_halt_sigma": 5.0,
+    "halt": false,
+    "halts": [],
+    "master_seed": 20261010,
+    "min_n": 200,
+    "provisional": [
+      {
+        "canary": "C3",
+        "note": "n=16 < min_n=200: PROVISIONAL, not a halt",
+        "reason": "canary C3 significant (p=0.0) on the profitable side (mean=0.795938)",
+        "trigger": "HT1"
+      },
+      {
+        "canary": "C3",
+        "note": "n=16 < min_n=200: PROVISIONAL, not a halt",
+        "reason": "canary C3 CUSUM 26.232626 > 5.0sigma",
+        "trigger": "HT2"
+      },
+      {
+        "canary": "C4",
+        "note": "n=68 < min_n=200: PROVISIONAL, not a halt",
+        "reason": "canary C4 significant (p=0.0) on the profitable side (mean=0.375956)",
+        "trigger": "HT1"
+      },
+      {
+        "canary": "C4",
+        "note": "n=68 < min_n=200: PROVISIONAL, not a halt",
+        "reason": "canary C4 CUSUM 12.567309 > 5.0sigma",
+        "trigger": "HT2"
+      },
+      {
+        "canary": "C5",
+        "note": "n=68 < min_n=200: PROVISIONAL, not a halt",
+        "reason": "canary C5 significant (p=0.0) on the profitable side (mean=0.549632)",
+        "trigger": "HT1"
+      },
+      {
+        "canary": "C5",
+        "note": "n=68 < min_n=200: PROVISIONAL, not a halt",
+        "reason": "canary C5 CUSUM 38.945593 > 5.0sigma",
+        "trigger": "HT2"
+      }
+    ]
+  },
+  "cohort": {
+    "accuracy": 0.6765,
+    "accuracy_ci95_wilson": [
+      0.5584,
+      0.7756
+    ],
+    "axis_crosscheck_agree": "68/68",
+    "below_hurdle_min_events": true,
+    "correct": 46,
+    "is_provisional": true,
+    "n_distinct_settlement_dates": 24,
+    "n_usable": 68,
+    "prereg_N_threshold": 640,
+    "primary_min_trades": 100
+  },
+  "east_west_split": {
+    "East": {
+      "accuracy": 0.8163,
+      "ci95": [
+        0.6864,
+        0.9002
+      ],
+      "correct": 40,
+      "n": 49
+    },
+    "West": {
+      "accuracy": 0.3158,
+      "ci95": [
+        0.1536,
+        0.5399
+      ],
+      "correct": 6,
+      "n": 19
+    }
+  },
+  "experiment_id": "GR5-WE-001",
+  "generated_for": "look-200 (provisional; N<200)",
+  "hurdle_a3": {
+    "can_trigger_at_this_n": false,
+    "events": 68,
+    "metric": "net_ev_per_accepted_trade",
+    "min_events": 200,
+    "note": "A3 needs >=200 events; at n=68 it cannot fire. Upper 95% bound reported for trajectory only.",
+    "upper_95_bound_net_ev_per_contract_usd": 0.641451
+  },
+  "pnl": {
+    "block_bootstrap_ci95_mean_net_per_contract_usd": [
+      0.403219,
+      0.664044
+    ],
+    "block_bootstrap_ci95_mean_net_per_trade_usd": [
+      314.785809,
+      664.057792
+    ],
+    "bootstrap_block_key": "settlement_date",
+    "bootstrap_reps": 10000,
+    "fee_total_usd": 485.22,
+    "gross_total_usd": 33811.8,
+    "mean_net_per_contract_usd": 0.537721,
+    "mean_net_per_trade_usd": 490.096765,
+    "net_total_usd": 33326.58,
+    "sensitivity_drop_non_yes_row": {
+      "mean_net_per_trade_usd": 490.096765,
+      "sharpe": 0.8067
+    },
+    "sharpe_per_contract": 1.0341,
+    "sharpe_per_trade_usd_NOT_bankroll_compounded": 0.8067,
+    "std_net_per_contract_usd": 0.519991,
+    "std_net_per_trade_usd": 607.563666
+  },
+  "prereg": {
+    "analysis_code_combined_match": true,
+    "analysis_code_live_combined": "e68c74e1c9a76cf0f2eb5cfd7d587497c6931f17db99779fe8cfff984bee39fe",
+    "analysis_code_modules_match": true,
+    "artifact_sha256": "1c81997965f7eb8720d2bac59d58384f71b2f9ef311b9e8c7b4ecb74a21143b3",
+    "frozen_at_utc": "2026-10-10T00:35:30.026685+00:00",
+    "repo_git_sha": "ea77e1648f6c66a0861defcaf8d4795e6f93bcc6"
+  },
+  "win_rate_by_direction": {
+    "DOWN": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "n": 1
+    },
+    "UP": {
+      "accuracy": 0.6716,
+      "correct": 45,
+      "n": 67
+    }
+  }
+}

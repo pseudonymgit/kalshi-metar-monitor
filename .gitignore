@@ -28,6 +28,10 @@ data/gefs_work/
 # Pre-registration freezes are write-once and MUST be committed (GR5 D2)
 !artifacts/preregistration/
 !artifacts/preregistration/*.json
+
+# Pre-registered measurement read-outs are committed analysis artifacts (GR5)
+!artifacts/look200/
+!artifacts/look200/*.json
 !artifacts/preregistration/*.sha256
 
 # Governance stopping record MUST be committed (Workstream F off-switch)
