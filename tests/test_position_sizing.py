@@ -246,20 +246,20 @@ class TestConfigFactory:
 
     def test_prod_config(self):
         config = get_config_for_instance("PROD")
-        assert config.base_size_usd == 100.0
-        assert config.max_size_usd == 500.0
-        assert config.min_size_usd == 25.0
-        assert config.max_position_fraction == 0.25
+        assert config.base_size_usd == 10.0
+        assert config.max_size_usd == 25.0
+        assert config.min_size_usd == 5.0
+        assert config.max_position_fraction == 0.125
 
     def test_dev_config(self):
         config = get_config_for_instance("DEV")
-        assert config.base_size_usd == 50.0
-        assert config.max_size_usd == 250.0
+        assert config.base_size_usd == 10.0
+        assert config.max_size_usd == 25.0
 
     def test_sbox_config(self):
         config = get_config_for_instance("SBOX")
         assert config.base_size_usd == 10.0
-        assert config.max_size_usd == 50.0
+        assert config.max_size_usd == 25.0
 
     def test_invalid_instance(self):
         with pytest.raises(ValueError, match="Unknown instance"):
@@ -268,7 +268,7 @@ class TestConfigFactory:
     def test_case_insensitive(self):
         config = get_config_for_instance("prod")
         assert config is not None
-        assert config.base_size_usd == 100.0
+        assert config.base_size_usd == 10.0
 
 
 @pytest.mark.unit

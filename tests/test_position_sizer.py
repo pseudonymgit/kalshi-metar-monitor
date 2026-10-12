@@ -105,12 +105,12 @@ def test_adaptive_multiplier():
 
 
 def test_bankroll_cap():
-    """Verify 8% bankroll cap per position."""
+    """Verify the 12.5% bankroll cap per position ($25 on the $200 book)."""
     sizer = PositionSizer(bankroll=10000.0)
     size, details = sizer.compute_position_size(
         confidence=0.90, win_rate=0.80, edge=0.50
     )
-    expected_cap = 10000.0 * MAX_BANKROLL_PCT  # 800
+    expected_cap = 10000.0 * MAX_BANKROLL_PCT  # 1250
     assert size <= expected_cap, (
         f"Position ${size:.2f} exceeds cap ${expected_cap:.2f}"
     )
@@ -118,6 +118,16 @@ def test_bankroll_cap():
         f"Expected ${expected_cap:.2f} (cap), got ${size:.2f}"
     )
     print(f"  ✓ Bankroll cap: ${size:.2f} <= ${expected_cap:.2f}")
+
+
+def test_dan_200_book_cap_is_25():
+    """On a $200 bankroll the per-position cap is exactly $25 (Dan 2026-10-12)."""
+    sizer = PositionSizer(bankroll=200.0)
+    size, details = sizer.compute_position_size(
+        confidence=0.90, win_rate=0.80, edge=0.50
+    )
+    assert size == 25.0, f"Expected $25 cap on $200 book, got ${size:.2f}"
+    print(f"  ✓ $200 book cap: ${size:.2f}")
 
 
 def test_drawdown_protection():
@@ -203,16 +213,19 @@ def test_kelly_multiplier_from_disagreement():
 
 
 def test_instance_config():
-    """Verify instance config factory."""
+    """Verify instance config factory.
+
+    All instances share the $200 book, so all cap at $25 (Dan 2026-10-12).
+    """
     prod = get_config_for_instance("PROD")
     assert prod.fee_rate == DEFAULT_COST_FRACTION
     assert prod.fraction_kelly == 0.5
     assert prod.max_position_fraction == 0.25
-    assert abs(prod.base_size_usd - 100.0) < 0.01
+    assert abs(prod.base_size_usd - 10.0) < 0.01
 
     dev = get_config_for_instance("DEV")
     assert dev.fee_rate == DEFAULT_COST_FRACTION
-    assert abs(dev.base_size_usd - 50.0) < 0.01
+    assert abs(dev.base_size_usd - 10.0) < 0.01
 
     sbox = get_config_for_instance("SBOX")
     assert sbox.fee_rate == DEFAULT_COST_FRACTION

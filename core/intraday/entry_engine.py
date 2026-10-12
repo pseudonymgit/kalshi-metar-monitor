@@ -33,7 +33,7 @@ SETTLEMENT_HOUR_UTC = 18
 # Default risk parameters
 DEFAULT_MIN_PROB_GATE = 0.55       # Minimum calibrated probability to enter
 DEFAULT_EDGE_THRESHOLD = 0.03      # Minimum |prob - market_price| to act
-DEFAULT_MAX_POSITION_USD = 250.0   # Maximum position size in USD
+DEFAULT_MAX_POSITION_USD = 25.0   # Maximum position size in USD ($200 book, 2026-10-12)
 DEFAULT_STOP_LOSS_PCT = 0.15       # Fraction of position to risk
 DEFAULT_KELLY_FRACTION = 0.25      # Fraction of Kelly to use (conservative)
 
@@ -89,7 +89,7 @@ class EntryTimingEngine:
             our_probability=0.62, market_price=0.55, confidence=0.7,
         )
         # signal.signal_type -> SignalType.BUY
-        # signal.position_size -> 125.0
+        # signal.position_size -> <= 25.0
     """
 
     def __init__(self, guardrails: Optional[RiskGuardrails] = None):

@@ -13,7 +13,7 @@ Features:
 - Fractional Kelly (half-Kelly default)
 - Disagreement-based Kelly multiplier (B-Mode Cycle 6)
 - Instance config factory (PROD, DEV, SBOX)
-- 8% bankroll cap per position (kelly_position_sizer.py default)
+- 12.5% bankroll cap per position — $25 max on the $200 book (Dan 2026-10-12)
 - Trailing 10% max drawdown protection
 - Rolling win rate tracking (30-day window)
 
@@ -32,7 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 
-MAX_BANKROLL_PCT = 0.05         # 5% cap per position (GLM 5.2 Gray Room R14 — corrected from 8%)
+MAX_BANKROLL_PCT = 0.125        # 12.5% cap per position — $25 max on the $200 book (Dan 2026-10-12; was 5% = $10, too low to allow a sure-thing)
 MAX_DRAWDOWN_PCT = 0.15          # 15% trailing drawdown (GLM 5.2 — relaxed from 10% for smaller positions)
 MAX_POSITION_PCT = 0.25          # 25% max of balance (legacy SH3 cap)
 
@@ -395,7 +395,7 @@ class PositionSizer:
         adjusted_kelly = kelly * combined_multiplier
         details["adjusted_kelly"] = round(adjusted_kelly, 6)
 
-        # 4. Bankroll cap (8%)
+        # 4. Bankroll cap (12.5% → $25 on the $200 book)
         max_position = self.bankroll * MAX_BANKROLL_PCT
         raw_position = adjusted_kelly * self.bankroll
         position = min(raw_position, max_position)
@@ -480,22 +480,13 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
     Returns:
         PositionSizingConfig with instance-appropriate sizing parameters
     """
+    # Dan's $200-bankroll rules (2026-10-12): regular trades $5-10, high-confidence
+    # "sure things" max $25. Every instance shares the $200 book, so all three cap
+    # at $25 — the $50 SBOX cap was 25% of bankroll and is retired.
     name = instance_name.upper().strip()
-    if name == "PROD":
+    if name in ("PROD", "DEV", "SBOX"):
         return PositionSizingConfig(
-            base_size_usd=100.0, max_size_usd=500.0, min_size_usd=25.0,
-            fee_rate=DEFAULT_COST_FRACTION, fraction_kelly=0.5,
-            max_position_fraction=MAX_POSITION_PCT, window_days=30,
-        )
-    elif name == "DEV":
-        return PositionSizingConfig(
-            base_size_usd=50.0, max_size_usd=250.0, min_size_usd=10.0,
-            fee_rate=DEFAULT_COST_FRACTION, fraction_kelly=0.5,
-            max_position_fraction=MAX_POSITION_PCT, window_days=30,
-        )
-    elif name == "SBOX":
-        return PositionSizingConfig(
-            base_size_usd=10.0, max_size_usd=50.0, min_size_usd=5.0,
+            base_size_usd=10.0, max_size_usd=25.0, min_size_usd=5.0,
             fee_rate=DEFAULT_COST_FRACTION, fraction_kelly=0.5,
             max_position_fraction=MAX_POSITION_PCT, window_days=30,
         )
@@ -604,9 +595,9 @@ if __name__ == "__main__":
           f"final={details['final_position']}")
     # edge=0.10 → strong_edge (1.0x), conf=0.65 → adaptive=1.0x
     # kelly = 0.0812, adjusted = 0.0812 * 1.0 * 1.0 = 0.0812
-    # raw = 0.0812 * $10000 = $812, cap = $500 (5%)
-    # → position = $500
-    assert abs(size - 500.0) < 1.0, f"Expected position ~$500, got ${size}"
+    # raw = 0.0812 * $10000 = $812, cap = 12.5% * $10000 = $1250
+    # → position = $812 (under the cap)
+    assert abs(size - 811.64) < 1.0, f"Expected position ~$811.64, got ${size}"
 
     # 5. (Fee-aware Kelly formula removed — Fix 3: use standard binary Kelly)
 

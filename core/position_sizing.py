@@ -43,9 +43,9 @@ class PositionSizingConfig:
     When use_kelly=False, uses simple confidence-weighted sizing.
     """
     base_size_usd: float = 10.0        # Base position size
-    max_size_usd: float = 20.0         # Cap per position
+    max_size_usd: float = 25.0         # Cap per position ($25 on the $200 book, Dan 2026-10-12)
     min_size_usd: float = 5.0          # Minimum position size
-    max_position_fraction: float = 0.25  # 25% max of balance (SH3)
+    max_position_fraction: float = 0.125  # 12.5% max of balance ($25 on the $200 book)
     high_confidence_threshold: float = 0.70
     medium_confidence_threshold: float = 0.50
     high_multiplier: float = 1.5
@@ -174,38 +174,17 @@ def get_config_for_instance(instance_name: str) -> PositionSizingConfig:
         ValueError: If instance_name is not recognized
     """
     instance_name = instance_name.upper().strip()
-    
-    if instance_name == "PROD":
-        # PROD: Production-like, conservative sizing, higher fee rate
-        return KellyPositionSizingConfig(
-            base_size_usd=100.0,
-            max_size_usd=500.0,
-            min_size_usd=25.0,
-            fee_rate=EXECUTION_COST_RATE,  # A3: execution cost (spread/2+slippage)
-            fraction_kelly=0.5,
-            max_position_fraction=0.25,
-            window_days=30,
-        )
-    elif instance_name == "DEV":
-        # DEV: Development, smaller sizing
-        return KellyPositionSizingConfig(
-            base_size_usd=50.0,
-            max_size_usd=250.0,
-            min_size_usd=10.0,
-            fee_rate=EXECUTION_COST_RATE,  # A3: execution cost (spread/2+slippage)
-            fraction_kelly=0.5,
-            max_position_fraction=0.25,
-            window_days=30,
-        )
-    elif instance_name == "SBOX":
-        # SBOX: Sandbox, tiny sizing for testing
+
+    # Dan's $200-bankroll rules (2026-10-12): regular trades $5-10, high-confidence
+    # "sure things" max $25. Every instance shares the book, so all cap at $25.
+    if instance_name in ("PROD", "DEV", "SBOX"):
         return KellyPositionSizingConfig(
             base_size_usd=10.0,
-            max_size_usd=50.0,
+            max_size_usd=25.0,
             min_size_usd=5.0,
             fee_rate=EXECUTION_COST_RATE,  # A3: execution cost (spread/2+slippage)
             fraction_kelly=0.5,
-            max_position_fraction=0.25,
+            max_position_fraction=0.125,
             window_days=30,
         )
     else:
