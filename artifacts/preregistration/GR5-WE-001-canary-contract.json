@@ -1,0 +1,14 @@
+{
+  "experiment_id": "GR5-WE-001",
+  "frozen_at_utc": "2026-10-12T15:56:04.752771+00:00",
+  "measurement_code": {
+    "combined_sha256": "66cecd270b67fc4ddfdb140e638bdfcd76568f822a35129d78f8b75508a09015",
+    "modules": {
+      "core/canary_harness.py": "b36eac03ae3dfbec8d14564e01bd5b7b057d06cd5e44e560f6e255e48dcbf619",
+      "scripts/look200_measurement.py": "ab941b3784e4b97df5d2a7dde141ffb7c9c9231b3536b7721fa3f05271012300",
+      "scripts/run_canaries.py": "683199f92954a1bfef0849ec6dc85f6fec21d9e82fcf6c6ee0b1656a96844900"
+    }
+  },
+  "note": "F-3: measurement-path freeze. The prereg artifact's analysis_code hash does not cover the canary harness/runners; this sidecar does, so a post-freeze edit invalidates it.",
+  "schema_version": 1
+}

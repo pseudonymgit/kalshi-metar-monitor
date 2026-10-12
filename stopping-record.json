@@ -20,7 +20,7 @@
   },
   "extension_decision": null,
   "forced_state": null,
-  "generated_at_utc": "2026-10-10T02:22:08.396835+00:00",
+  "generated_at_utc": "2026-10-12T15:56:36.728086+00:00",
   "governance": {
     "events": [],
     "fee_gate_bypass": false,
@@ -30,11 +30,12 @@
   },
   "governed_experiment": "GR5-WE-001",
   "hurdle": {
-    "events": 0,
+    "events": 68,
     "market_relative": true,
     "metric": "net_ev_per_accepted_trade",
     "min_events": 200,
-    "upper_95_bound_net_ev": null
+    "treated_as": "live",
+    "upper_95_bound_net_ev": 0.641451
   },
   "notes": "Machine-checkable stopping record (Workstream F). CI/cron must run `scripts/ci_stop_check.sh` (wraps --check) before any producer run.",
   "preregistration": {

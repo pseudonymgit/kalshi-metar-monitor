@@ -321,6 +321,14 @@
     "analysis_code_modules_match": true,
     "artifact_sha256": "1c81997965f7eb8720d2bac59d58384f71b2f9ef311b9e8c7b4ecb74a21143b3",
     "frozen_at_utc": "2026-10-10T00:35:30.026685+00:00",
+    "measurement_code_combined": "66cecd270b67fc4ddfdb140e638bdfcd76568f822a35129d78f8b75508a09015",
+    "measurement_contract_modules": {
+      "core/canary_harness.py": "b36eac03ae3dfbec8d14564e01bd5b7b057d06cd5e44e560f6e255e48dcbf619",
+      "scripts/look200_measurement.py": "ab941b3784e4b97df5d2a7dde141ffb7c9c9231b3536b7721fa3f05271012300",
+      "scripts/run_canaries.py": "683199f92954a1bfef0849ec6dc85f6fec21d9e82fcf6c6ee0b1656a96844900"
+    },
+    "measurement_contract_ok": true,
+    "measurement_contract_sha256": "7e07f635eeecee1d1cc986fe72a3b72e6a6ff5f59bea2832b8744b4e633ae88c",
     "repo_git_sha": "ea77e1648f6c66a0861defcaf8d4795e6f93bcc6"
   },
   "win_rate_by_direction": {

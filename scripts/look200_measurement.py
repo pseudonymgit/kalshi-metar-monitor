@@ -44,6 +44,9 @@ from core.canary_harness import (                  # noqa: E402
 from core.preregistration import (                 # noqa: E402
     verify_preregistration, analysis_code_hash, ANALYSIS_CODE_MODULES,
 )
+from core.canary_contract import (                 # noqa: E402
+    verify_measurement_contract,
+)
 
 SBOX_DB = REPO / "data" / "paper_trading_sbox.db"
 EXPERIMENT_ID = "GR5-WE-001"
@@ -215,6 +218,14 @@ def main(argv=None) -> int:
         live_code["modules"].get(k) == v
         for k, v in art["analysis_code"]["modules"].items()
     )
+    # F-3: the prereg analysis hash does not cover the canary harness/runners;
+    # the measurement-contract sidecar freezes them and is checked here.
+    mc = verify_measurement_contract(REPO, args.experiment_id)
+    if not mc["ok"]:
+        # The measured analysis is not frozen -> refuse the read-out.
+        raise SystemExit(
+            "FAIL-CLOSED (F-3): measurement contract not verified: "
+            + str(mc.get("reason")))
 
     # ── 1) cohort ────────────────────────────────────────────────────────────
     cohort = load_cohort()
@@ -334,6 +345,10 @@ def main(argv=None) -> int:
             "analysis_code_combined_match": code_ok,
             "analysis_code_modules_match": module_ok,
             "analysis_code_live_combined": live_code["combined_sha256"],
+            "measurement_contract_ok": mc["ok"],
+            "measurement_contract_sha256": mc.get("sha256"),
+            "measurement_code_combined": mc.get("combined_sha256"),
+            "measurement_contract_modules": mc.get("modules"),
         },
         "cohort": {
             "n_usable": n,

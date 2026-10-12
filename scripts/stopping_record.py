@@ -43,12 +43,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
+import sqlite3
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 # ─── Constants ───────────────────────────────────────────────────────────────
 SCHEMA_VERSION = 1
@@ -64,6 +67,29 @@ PREREG_DIR = "artifacts/preregistration"
 
 # A3 threshold: need at least this many events to judge the hurdle.
 HURDLE_MIN_EVENTS = 200
+
+# A3 reads the measured cohort from the SBOX book (read-only). `events` is the
+# count of usable settled trades; the bound is the one-sided 95% upper bound on
+# mean net-EV per contract, net of the canonical Kalshi fee — identical to the
+# read-out scripts/look200_measurement.py produces.
+SBOX_BOOK = "data/paper_trading_sbox.db"
+HURDLE_Z_95 = 1.645
+
+# F-2: how the hurdle inputs were sourced. This is a closed union, not a bare
+# `str` — the constructor annotation must be Optional[HurdleSource].
+HurdleSource = Literal["live", "record", "unavailable"]
+
+
+@dataclass
+class HurdleReadout:
+    """A3 hurdle inputs, with the provenance of where they came from (F-2)."""
+    events: int
+    upper_95_bound_net_ev: Optional[float]
+    treated_as: Optional[HurdleSource] = None
+    mean_net_ev_per_contract: Optional[float] = None
+    fee_total_usd: Optional[float] = None
+    gross_total_usd: Optional[float] = None
+    note: str = ""
 
 # Where a falsification certificate may legitimately be dropped.
 DEFAULT_CERT_DIRS = ("", "artifacts/governance")
@@ -83,6 +109,92 @@ STATES = ("ACTIVE", "ACTIVE-BOUNDED", "PARKED", "STOPPED",
 EXIT_PROCEED = 0
 EXIT_STOPPED = 1
 EXIT_FAIL_CLOSED = 2
+
+
+# ─── A3 hurdle: events + bound computed from real data (F-1, F-5) ─────────────
+def compute_relevant_events(repo: Path,
+                            book_rel: str = SBOX_BOOK) -> HurdleReadout:
+    """Compute A3's events + the market-relative upper 95% bound on net-of-cost EV.
+
+    F-5: this used to be named `compute_events`, which made the debug path and
+    the gate disagree about what an "event" is. An event is a *usable settled*
+    trade in the measured cohort (`settlement_confirmed=1 AND canonical_outcome
+    IS NOT NULL`) — exactly the cohort the look-200 battery reads — hence
+    `compute_relevant_events`.
+
+    The bound mirrors scripts/look200_measurement.py: mean net-EV per contract
+    (net of the canonical fee) + 1.645 · SE. Per-contract values are invariant
+    to position size, so the bound is unaffected by the sizing fix.
+
+    Read-only; deterministic. Returns treated_as="unavailable" when the book is
+    absent or the canonical fee model cannot be imported, "live" otherwise.
+    """
+    repo = Path(repo)
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+    from core.fees import fee_per_contract  # canonical, price-dependent fee
+    book = repo / book_rel
+    if not book.exists():
+        return HurdleReadout(0, None, treated_as="unavailable",
+                             note=f"book missing: {book}")
+    con = sqlite3.connect(f"file:{book}?mode=ro", uri=True)
+    try:
+        rows = con.execute(
+            "SELECT trade_price, quantity, realized_pnl FROM trades "
+            "WHERE settlement_confirmed=1 AND canonical_outcome IS NOT NULL"
+        ).fetchall()
+    finally:
+        con.close()
+
+    net_per_contract: List[float] = []
+    gross_total = fee_total = 0.0
+    for price, qty, pnl in rows:
+        q = int(qty or 0)
+        if not q or pnl is None or price is None:
+            continue
+        g = float(pnl)
+        fee = fee_per_contract(float(price)) * q
+        gross_total += g
+        fee_total += fee
+        net_per_contract.append((g - fee) / q)
+
+    n = len(net_per_contract)
+    if n == 0:
+        return HurdleReadout(0, None, treated_as="live",
+                             note="no usable events in book")
+    mean = sum(net_per_contract) / n
+    var = (sum((x - mean) ** 2 for x in net_per_contract) / (n - 1)
+           if n > 1 else 0.0)
+    se = (var ** 0.5) / math.sqrt(n) if var > 0 else 0.0
+    upper = mean + HURDLE_Z_95 * se
+    return HurdleReadout(
+        events=n,
+        upper_95_bound_net_ev=round(upper, 6),
+        treated_as="live",
+        mean_net_ev_per_contract=round(mean, 6),
+        fee_total_usd=round(fee_total, 2),
+        gross_total_usd=round(gross_total, 2),
+        note="live from SBOX book cohort (net of canonical fee)",
+    )
+
+
+def _hurdle_readout(repo: Path, committed: Dict[str, Any]) -> HurdleReadout:
+    """Prefer the live computation (F-1); fall back to the committed record."""
+    try:
+        live = compute_relevant_events(repo)
+    except (ImportError, OSError, sqlite3.Error) as exc:
+        live = HurdleReadout(0, None, treated_as="unavailable",
+                             note=f"live compute failed: {exc}")
+    if live.events > 0 or live.treated_as == "live":
+        return live
+    # Live unavailable -> use the committed record, still typing the source.
+    try:
+        events = int(committed.get("events", 0) or 0)
+    except (TypeError, ValueError):
+        events = 0
+    upper = committed.get("upper_95_bound_net_ev")
+    return HurdleReadout(events, upper, treated_as="record",
+                         note="from committed stopping-record.json")
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -146,6 +258,29 @@ def _sunset_passed(sunset: str) -> bool:
         return True
 
 
+def _measurement_contract(repo: Path, experiment: str = GOVERNED_EXPERIMENT
+                          ) -> Dict[str, Any]:
+    """F-3: report whether the measurement path is frozen (canary sidecar).
+
+    The prereg analysis_code hash does not cover the canary harness/runners; the
+    sidecar (`core.canary_contract.py`) does. This surfaces the check state in
+    the stopping record; the look gate enforces it.
+    """
+    try:
+        from core.canary_contract import verify_measurement_contract
+    except ImportError:
+        if str(repo) not in sys.path:
+            sys.path.insert(0, str(repo))
+        from core.canary_contract import verify_measurement_contract
+    try:
+        r = verify_measurement_contract(Path(repo), experiment)
+        return {"ok": bool(r.get("ok")), "sha256": r.get("sha256"),
+                "combined_sha256": r.get("combined_sha256"),
+                "reason": r.get("reason")}
+    except Exception as exc:  # never let a metadata check mask the record
+        return {"ok": False, "reason": f"check failed: {exc}"}
+
+
 # ─── Evaluation ──────────────────────────────────────────────────────────────
 def evaluate(repo: Path, cert_dirs: Optional[List[str]] = None) -> Dict[str, Any]:
     """Compute the stopping state + which A-conditions fired."""
@@ -179,12 +314,17 @@ def evaluate(repo: Path, cert_dirs: Optional[List[str]] = None) -> Dict[str, Any
 
     # ── A3 Hurdle failed ──
     hurdle = rec.get("hurdle", {}) or {}
-    try:
-        events = int(hurdle.get("events", 0) or 0)
-    except (TypeError, ValueError):
-        events = 0
-    upper = hurdle.get("upper_95_bound_net_ev")
+    # F-1: events + the market-relative upper 95% bound are computed from real
+    # data (the book cohort), not read from a hand-maintained literal.
+    readout = _hurdle_readout(repo, hurdle)
+    events = readout.events
+    upper = readout.upper_95_bound_net_ev
     a3 = False
+    # F-6: consistent zero/empty handling. Previously the same field was coerced
+    # three different ways (`or 0`, a try/int, and a later `is not None`); now
+    # `events` is one int and emptiness is always tested with `== 0` / `is None`.
+    if events == 0:
+        upper = None
     if events >= HURDLE_MIN_EVENTS and upper is not None:
         try:
             a3 = float(upper) <= 0.0
@@ -257,9 +397,19 @@ def evaluate(repo: Path, cert_dirs: Optional[List[str]] = None) -> Dict[str, Any
         "a2_unmeasurable": a2,
         "a3_hurdle_failed": a3,
         "a4_governance_breach": a4,
+        "hurdle_readout": {
+            "events": readout.events,
+            "upper_95_bound_net_ev": readout.upper_95_bound_net_ev,
+            "treated_as": readout.treated_as,
+            "mean_net_ev_per_contract": readout.mean_net_ev_per_contract,
+            "gross_total_usd": readout.gross_total_usd,
+            "fee_total_usd": readout.fee_total_usd,
+            "note": readout.note,
+        },
         "sunset": sunset,
         "sunset_passed": sunset_passed,
         "preregistration": prereg,
+        "measurement_contract": _measurement_contract(repo),
         "certificate": (cert.get("_path") if a1 else None),
         "evaluated_at_utc": _utc_now(),
     }
@@ -336,6 +486,11 @@ def enforce_stop(repo: Path, ev: Dict[str, Any], reason: str) -> Dict[str, Any]:
 # ─── Default committed record ────────────────────────────────────────────────
 def default_record(repo: Path) -> Dict[str, Any]:
     prereg = _verify_prereg(repo, GOVERNED_EXPERIMENT)
+    # F-1: the hurdle's `events`/`upper_95_bound_net_ev` come from real data.
+    try:
+        _ro = compute_relevant_events(repo)
+    except (ImportError, OSError, sqlite3.Error):
+        _ro = HurdleReadout(0, None, treated_as="unavailable")
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at_utc": _utc_now(),
@@ -366,8 +521,9 @@ def default_record(repo: Path) -> Dict[str, Any]:
             "metric": "net_ev_per_accepted_trade",
             "market_relative": True,
             "min_events": HURDLE_MIN_EVENTS,
-            "events": 0,
-            "upper_95_bound_net_ev": None,
+            "events": _ro.events,
+            "upper_95_bound_net_ev": _ro.upper_95_bound_net_ev,
+            "treated_as": _ro.treated_as,
         },
         "governance": {
             "events": [],
