@@ -1,0 +1,142 @@
+{
+  "KATL": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1024,
+    "brier_reanchor": 0.1688,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KAUS": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.0812,
+    "brier_reanchor": 0.1548,
+    "spread": null,
+    "lead_h": 9.0
+  },
+  "KBOS": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1829,
+    "brier_reanchor": 0.1909,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KDCA": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1388,
+    "brier_reanchor": 0.1819,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KDEN": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1319,
+    "brier_reanchor": 0.1913,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KDFW": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.0909,
+    "brier_reanchor": 0.1648,
+    "spread": 0.015,
+    "lead_h": 9.0
+  },
+  "KHOU": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1464,
+    "brier_reanchor": 0.1832,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KLAS": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1083,
+    "brier_reanchor": 0.1733,
+    "spread": null,
+    "lead_h": 9.0
+  },
+  "KLAX": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.2,
+    "brier_reanchor": 0.2049,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KMDW": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1624,
+    "brier_reanchor": 0.1828,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KMIA": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1828,
+    "brier_reanchor": 0.1929,
+    "spread": null,
+    "lead_h": 9.0
+  },
+  "KMSP": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1131,
+    "brier_reanchor": 0.158,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KMSY": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1556,
+    "brier_reanchor": 0.1764,
+    "spread": null,
+    "lead_h": 9.0
+  },
+  "KNYC": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1627,
+    "brier_reanchor": 0.1846,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KOKC": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.0943,
+    "brier_reanchor": 0.1699,
+    "spread": null,
+    "lead_h": 9.0
+  },
+  "KPHL": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1338,
+    "brier_reanchor": 0.174,
+    "spread": null,
+    "lead_h": 9.0
+  },
+  "KPHX": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.0908,
+    "brier_reanchor": 0.2041,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KSAT": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.0728,
+    "brier_reanchor": 0.1441,
+    "spread": 0.02,
+    "lead_h": 9.0
+  },
+  "KSEA": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1166,
+    "brier_reanchor": 0.1478,
+    "spread": 0.01,
+    "lead_h": 9.0
+  },
+  "KSFO": {
+    "pin_local_hhmm": "15:00:00",
+    "brier": 0.1505,
+    "brier_reanchor": 0.1851,
+    "spread": 0.01,
+    "lead_h": 9.0
+  }
+}
