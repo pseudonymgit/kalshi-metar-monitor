@@ -1,0 +1,516 @@
+{
+  "generated": "2026-10-13T07:25:48.700080+00:00",
+  "window": {
+    "hours": 122,
+    "first": "2026-10-08 05",
+    "last": "2026-10-13 07"
+  },
+  "radius_mi": 5.0,
+  "radius_fallback_mi": 12.0,
+  "min_cover": 0.5,
+  "targets": {
+    "KLAX": {
+      "n_pws_picked": 11,
+      "pws_stations": [
+        {
+          "id": "FW9784 Westchester                CA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 1.544,
+          "cover": 1.0
+        },
+        {
+          "id": "SCE Ballona Creek                CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 2.497,
+          "cover": 1.0
+        },
+        {
+          "id": "EW6618 Manhattan Beach            CA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 3.201,
+          "cover": 0.992
+        },
+        {
+          "id": "SCE Parent Elementary            CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 3.304,
+          "cover": 1.0
+        },
+        {
+          "id": "SCE Esterina Way                 CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.056,
+          "cover": 1.0
+        },
+        {
+          "id": "SCE S La Cienega Blvd            CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.147,
+          "cover": 1.0
+        },
+        {
+          "id": "SCE Inglewood                    CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.553,
+          "cover": 0.943
+        },
+        {
+          "id": "SCE Overhill Dr                  CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.681,
+          "cover": 1.0
+        },
+        {
+          "id": "FW9262 Mar Vista                  CA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 4.745,
+          "cover": 1.0
+        },
+        {
+          "id": "SCE Baldwin Hills                CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.806,
+          "cover": 1.0
+        },
+        {
+          "id": "SCE Blair Hills                  CA US SC-EDISON",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.908,
+          "cover": 1.0
+        }
+      ],
+      "hours": 122,
+      "pws_count_median": 11,
+      "rate_asos": {
+        "n": 119,
+        "mean": -0.076,
+        "sd": 1.247,
+        "min": -4.0,
+        "max": 4.0
+      },
+      "rate_pws_mean": {
+        "n": 121,
+        "mean": -0.109,
+        "sd": 1.234,
+        "min": -4.058,
+        "max": 3.952
+      },
+      "rate_pws_mean_debiased": {
+        "n": 121,
+        "mean": -0.109,
+        "sd": 1.234,
+        "min": -4.058,
+        "max": 3.952
+      },
+      "rate_blend": {
+        "n": 121,
+        "mean": -0.109,
+        "sd": 1.134,
+        "min": -4.029,
+        "max": 3.453
+      },
+      "corr_asos_vs_pws": 0.642,
+      "corr_asos_vs_pws_deb": 0.642,
+      "mean_abs_divergence_pws_vs_asos": 0.809,
+      "asos_hourly_sd": 4.587
+    },
+    "KATL": {
+      "n_pws_picked": 2,
+      "pws_stations": [
+        {
+          "id": "FW6303 East Point                 GA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 1.639,
+          "cover": 1.0
+        },
+        {
+          "id": "I285-00110-CCW-01                GA US GADOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 3.677,
+          "cover": 0.992
+        }
+      ],
+      "hours": 122,
+      "pws_count_median": 2,
+      "rate_asos": {
+        "n": 119,
+        "mean": 0.017,
+        "sd": 1.885,
+        "min": -5.0,
+        "max": 7.0
+      },
+      "rate_pws_mean": {
+        "n": 121,
+        "mean": 0.01,
+        "sd": 1.799,
+        "min": -4.952,
+        "max": 6.215
+      },
+      "rate_pws_mean_debiased": {
+        "n": 121,
+        "mean": 0.01,
+        "sd": 1.799,
+        "min": -4.952,
+        "max": 6.215
+      },
+      "rate_blend": {
+        "n": 121,
+        "mean": 0.013,
+        "sd": 1.76,
+        "min": -4.476,
+        "max": 6.608
+      },
+      "corr_asos_vs_pws": 0.845,
+      "corr_asos_vs_pws_deb": 0.845,
+      "mean_abs_divergence_pws_vs_asos": 0.777,
+      "asos_hourly_sd": 6.607
+    },
+    "KDEN": {
+      "n_pws_picked": 18,
+      "pws_stations": [
+        {
+          "id": "GUNCLW                           CO US UPR",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 7.65,
+          "cover": 1.0
+        },
+        {
+          "id": "Smith Road                            SSI",
+          "provider": "CO_E-470",
+          "type": "e470met",
+          "dist_mi": 7.797,
+          "cover": 1.0
+        },
+        {
+          "id": "070W28570RWS1RHS at Tower Rd     CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 8.479,
+          "cover": 1.0
+        },
+        {
+          "id": "EW8073 Commerce City              CO US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 8.495,
+          "cover": 1.0
+        },
+        {
+          "id": "070E28520RWS1RHS - 0.7 miles E o CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 8.642,
+          "cover": 1.0
+        },
+        {
+          "id": "070E28465RWS1RHS at N Airport Bl CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 8.822,
+          "cover": 1.0
+        },
+        {
+          "id": "6th Parkway                            SSI",
+          "provider": "CO_E-470",
+          "type": "e470met",
+          "dist_mi": 9.629,
+          "cover": 1.0
+        },
+        {
+          "id": "070W28280RWS1RHS at I-225        CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 9.864,
+          "cover": 1.0
+        },
+        {
+          "id": "ARSENAL                          CO US",
+          "provider": "RAWS",
+          "type": "RAWS",
+          "dist_mi": 9.904,
+          "cover": 0.984
+        },
+        {
+          "id": "070W28235RWS1RP1 - 1.0 mile E of CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 10.168,
+          "cover": 1.0
+        },
+        {
+          "id": "EW8119 AURORA                     CO US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 10.296,
+          "cover": 1.0
+        },
+        {
+          "id": "070W28155RWS1RHS at Peoria St Un CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 10.803,
+          "cover": 1.0
+        },
+        {
+          "id": "070E28150RWS1RHS at Peoria St    CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 10.848,
+          "cover": 1.0
+        },
+        {
+          "id": "HUGHES                           CO US UPR",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 10.907,
+          "cover": 0.992
+        },
+        {
+          "id": "SOUTH PLATTE RIVER AT HENDERSON  CO US",
+          "provider": "HADS",
+          "type": "HADS",
+          "dist_mi": 11.311,
+          "cover": 0.992
+        },
+        {
+          "id": "Platte River Bridge                    SSI",
+          "provider": "CO_E-470",
+          "type": "e470met",
+          "dist_mi": 11.555,
+          "cover": 1.0
+        },
+        {
+          "id": "070W28060RWS1RHS at Havana St Un CO US CDOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 11.591,
+          "cover": 1.0
+        },
+        {
+          "id": "EW4490 Lochbuie                   CO US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 11.971,
+          "cover": 1.0
+        }
+      ],
+      "hours": 122,
+      "pws_count_median": 18,
+      "rate_asos": {
+        "n": 119,
+        "mean": -0.076,
+        "sd": 3.228,
+        "min": -8.0,
+        "max": 9.0
+      },
+      "rate_pws_mean": {
+        "n": 121,
+        "mean": -0.073,
+        "sd": 2.671,
+        "min": -7.481,
+        "max": 6.086
+      },
+      "rate_pws_mean_debiased": {
+        "n": 121,
+        "mean": -0.074,
+        "sd": 2.671,
+        "min": -7.481,
+        "max": 6.086
+      },
+      "rate_blend": {
+        "n": 121,
+        "mean": -0.078,
+        "sd": 2.77,
+        "min": -7.241,
+        "max": 6.767
+      },
+      "corr_asos_vs_pws": 0.779,
+      "corr_asos_vs_pws_deb": 0.779,
+      "mean_abs_divergence_pws_vs_asos": 1.564,
+      "asos_hourly_sd": 8.604
+    },
+    "KSEA": {
+      "n_pws_picked": 7,
+      "pws_stations": [
+        {
+          "id": "DW1735 Seatac                     WA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 1.732,
+          "cover": 1.0
+        },
+        {
+          "id": "CW8553 Des Moines                 WA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 1.856,
+          "cover": 1.0
+        },
+        {
+          "id": "GW0795 Des Moines                 WA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 1.966,
+          "cover": 1.0
+        },
+        {
+          "id": "S144TH TUKWILA                   WA US WA DOT",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 2.471,
+          "cover": 0.992
+        },
+        {
+          "id": "GW7501 NORMANDY PARK              WA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 2.498,
+          "cover": 1.0
+        },
+        {
+          "id": "KF4PPJ DES MOINES                 WA US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 2.554,
+          "cover": 1.0
+        },
+        {
+          "id": "SPRING BROOK CREEK NEAR ORILLIA  WA US",
+          "provider": "HADS",
+          "type": "HADS",
+          "dist_mi": 4.065,
+          "cover": 0.992
+        }
+      ],
+      "hours": 122,
+      "pws_count_median": 7,
+      "rate_asos": {
+        "n": 119,
+        "mean": -0.042,
+        "sd": 1.619,
+        "min": -5.0,
+        "max": 5.0
+      },
+      "rate_pws_mean": {
+        "n": 121,
+        "mean": -0.059,
+        "sd": 1.665,
+        "min": -5.122,
+        "max": 5.357
+      },
+      "rate_pws_mean_debiased": {
+        "n": 121,
+        "mean": -0.057,
+        "sd": 1.666,
+        "min": -5.122,
+        "max": 5.357
+      },
+      "rate_blend": {
+        "n": 121,
+        "mean": -0.065,
+        "sd": 1.539,
+        "min": -3.561,
+        "max": 4.941
+      },
+      "corr_asos_vs_pws": 0.744,
+      "corr_asos_vs_pws_deb": 0.744,
+      "mean_abs_divergence_pws_vs_asos": 0.81,
+      "asos_hourly_sd": 5.202
+    },
+    "KMIA": {
+      "n_pws_picked": 6,
+      "pws_stations": [
+        {
+          "id": "WELL G-3465 NEAR MIAMI INTERNATI FL US",
+          "provider": "HADS",
+          "type": "HADS-DCP",
+          "dist_mi": 1.019,
+          "cover": 0.984
+        },
+        {
+          "id": "GW6740 CORAL GABLES               FL US",
+          "provider": "APRSWXNET",
+          "type": "APRSWXNET",
+          "dist_mi": 2.917,
+          "cover": 1.0
+        },
+        {
+          "id": "TAMIAMI CANAL NEAR CORAL GABLES  FL US",
+          "provider": "HADS",
+          "type": "HADS-DCP",
+          "dist_mi": 3.156,
+          "cover": 0.992
+        },
+        {
+          "id": "Coral Gables Sr High School      FL US NGLO",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.409,
+          "cover": 0.877
+        },
+        {
+          "id": "U of Miami Health System         FL US WEATHERSTEM",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.658,
+          "cover": 0.992
+        },
+        {
+          "id": "SBA 20                           FL US CCU",
+          "provider": "MesoWest",
+          "type": "utmesnet",
+          "dist_mi": 4.759,
+          "cover": 0.951
+        }
+      ],
+      "hours": 122,
+      "pws_count_median": 6,
+      "rate_asos": {
+        "n": 119,
+        "mean": 0.017,
+        "sd": 1.311,
+        "min": -3.0,
+        "max": 3.0
+      },
+      "rate_pws_mean": {
+        "n": 121,
+        "mean": -0.01,
+        "sd": 0.756,
+        "min": -2.622,
+        "max": 2.59
+      },
+      "rate_pws_mean_debiased": {
+        "n": 121,
+        "mean": -0.009,
+        "sd": 0.747,
+        "min": -2.658,
+        "max": 2.59
+      },
+      "rate_blend": {
+        "n": 121,
+        "mean": -0.005,
+        "sd": 0.957,
+        "min": -2.622,
+        "max": 2.795
+      },
+      "corr_asos_vs_pws": 0.665,
+      "corr_asos_vs_pws_deb": 0.68,
+      "mean_abs_divergence_pws_vs_asos": 0.764,
+      "asos_hourly_sd": 3.21
+    }
+  }
+}
