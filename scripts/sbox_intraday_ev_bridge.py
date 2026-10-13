@@ -73,6 +73,7 @@ from core.intraday.multi_forecaster_fusion import (  # noqa: E402
 from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name, settlement_time_utc,
 )
+from core.station_params import get_station_params  # noqa: E402  (F4)
 from core.market_cost_model import MARKET_COST_MODEL  # noqa: E402
 
 # ── GR5 §2/§6 live-path wiring (2026-10-10) ──────────────────────────────────
@@ -641,11 +642,25 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # settlement instant cannot be resolved.
         _hb = _hours_before_settlement(st, day_str, now_utc)
         hours_to_settlement = _hb if _hb is not None else 6.0
+        # F4 (2026-10-13): per-station entry/position params. Defaults preserve the
+        # historical T-18h..T-2h window; marine regimes open earlier and convective
+        # regimes later, so the window varies by regime instead of one global bound.
+        sp = get_station_params(st)
 
         if not ignore_window:
             ok, reason = is_within_entry_window(st, day_str, now_utc=now_utc)
-            if not ok:
+            # Keep the trading-day / already-settled guards, but defer the hour
+            # bounds to the per-station window below (the global constants are
+            # only the default regime's bound).
+            if not ok and not reason.startswith(
+                    ("too_far_from_settlement", "too_close_to_settlement")):
                 skipped.append((st, reason))
+                continue
+            if hours_to_settlement > sp["entry_window_start_hb"]:
+                skipped.append((st, f"outside_station_window_before_T-{hours_to_settlement:.1f}h"))
+                continue
+            if hours_to_settlement < sp["entry_window_end_hb"]:
+                skipped.append((st, f"outside_station_window_after_T-{hours_to_settlement:.1f}h"))
                 continue
 
         ens = gefs_ens(st, day_str)
@@ -782,6 +797,10 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         if size_usd <= 0:
             skipped.append((st, "below_min_confidence_tier"))
             continue
+        # F4 (2026-10-13): per-station confidence floor (default 0.0 == no change).
+        if confidence < sp["confidence_floor"]:
+            skipped.append((st, f"below_station_confidence_floor_{sp['confidence_floor']}"))
+            continue
 
         # F7 (2026-10-13): opportunity grade gate. Grade on the booked side's
         # calibrated probability vs the price paid; F grade does not enter and the
@@ -793,6 +812,9 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             continue
         grade_cap = grade_position_cap(grade)
         size_usd = min(size_usd, grade_cap)
+        # F4: per-station position cap (default $25 == the current max, so no change
+        # for defaults; a station may be tightened below the grade cap).
+        size_usd = min(size_usd, sp["position_cap_usd"])
         if size_usd <= 0:
             skipped.append((st, f"grade_{grade}_zero_cap"))
             continue
