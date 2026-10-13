@@ -1,0 +1,459 @@
+{
+ "generated_at_utc": "2026-10-13T05:06:19.541271+00:00",
+ "source_db": "data/paper_trading_sbox.db (read-only)",
+ "n_closed": 68,
+ "current_fusion_rule": "fuse_v1:blend(gefs.55/analog.45)@agree|.5/.5@split|.5x@disagree;traj(x.75d|1.05c|.95s)",
+ "schema_answer": {
+  "stores_p_gefs_and_p_analog_separately": true,
+  "component_columns_on_trades": [
+   "p_gefs",
+   "p_analog",
+   "p_trajectory",
+   "p_fused"
+  ],
+  "companion_table": "trade_forecaster_probs",
+  "companion_extra_columns": [
+   "n_analog",
+   "n_traj",
+   "agreement",
+   "edge_mult",
+   "traj_verdict",
+   "traj_mult",
+   "fusion_rule"
+  ],
+  "null_component_rows_on_closed": {
+   "p_gefs": 0,
+   "p_analog": 0,
+   "p_trajectory": 0,
+   "p_fused": 0
+  },
+  "market_component_available_as": "market_price (market-implied P(high>=strike))",
+  "missing_for_per_station_weighted_fusion": [
+   "no per-station/per-region weight store (weights are a single global rule: gefs .55 / analog .45)",
+   "no market_weight column (market enters only via the entry-EV comparison, not the fusion)",
+   "no applied-weight stamp per trade (cannot reproduce which weights produced p_fused)",
+   "no per-component confidence (only the probability); 'confidence' must be derived as |p-0.5|"
+  ]
+ },
+ "agreement": {
+  "gefs_vs_analog": {
+   "n": 68,
+   "agree": 68,
+   "rate_pct": 100.0,
+   "band_rule": "fusion 'agree' = |p_gefs - p_analog| <= 0.10 (W_GEFS_AGREE=0.55)"
+  },
+  "gefs_vs_trajectory": {
+   "n": 68,
+   "agree": 65,
+   "rate_pct": 95.6
+  },
+  "analog_vs_trajectory": {
+   "n": 68,
+   "agree": 65,
+   "rate_pct": 95.6
+  }
+ },
+ "component_accuracy": {
+  "p_gefs": {
+   "n": 68,
+   "correct_direction": 49,
+   "accuracy_pct": 72.1
+  },
+  "p_analog": {
+   "n": 68,
+   "correct_direction": 49,
+   "accuracy_pct": 72.1
+  },
+  "p_trajectory": {
+   "n": 68,
+   "correct_direction": 48,
+   "accuracy_pct": 70.6
+  }
+ },
+ "second_model_adds": {
+  "top1_accuracy_pct": 72.1,
+  "confidence_weighted_majority_accuracy_pct": 72.1,
+  "fused_accuracy_pct": 72.1,
+  "second_ranked_model_accuracy_pct": 69.1,
+  "second_ranked_rescue_rate_pct": 0.0,
+  "n_top1_wrong_with_2nd": 19,
+  "consensus_tiers": {
+   "unanimous": {
+    "n": 65,
+    "majority_correct_pct": 72.3
+   },
+   "2of3": {
+    "n": 3,
+    "majority_correct_pct": 66.7
+   },
+   "split": {
+    "n": 0,
+    "majority_correct_pct": 0.0
+   }
+  },
+  "verdict": "On this book the components are highly collinear (they mostly agree) and the 2nd/3rd model adds little discriminating power; the fused probability tracks the top component. Weighting therefore buys little until the components are made genuinely independent (different data sources / horizons)."
+ },
+ "per_station": [
+  {
+   "station": "KATL",
+   "n": 12,
+   "accuracy_pct": {
+    "p_gefs": 91.7,
+    "p_analog": 91.7,
+    "p_trajectory": 91.7
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KAUS",
+   "n": 5,
+   "accuracy_pct": {
+    "p_gefs": 80.0,
+    "p_analog": 80.0,
+    "p_trajectory": 80.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KBOS",
+   "n": 8,
+   "accuracy_pct": {
+    "p_gefs": 100.0,
+    "p_analog": 100.0,
+    "p_trajectory": 100.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KDCA",
+   "n": 8,
+   "accuracy_pct": {
+    "p_gefs": 75.0,
+    "p_analog": 75.0,
+    "p_trajectory": 75.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KDEN",
+   "n": 10,
+   "accuracy_pct": {
+    "p_gefs": 50.0,
+    "p_analog": 50.0,
+    "p_trajectory": 50.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KDFW",
+   "n": 5,
+   "accuracy_pct": {
+    "p_gefs": 100.0,
+    "p_analog": 100.0,
+    "p_trajectory": 80.0
+   },
+   "proposed_weights": {
+    "gefs": 0.385,
+    "analog": 0.385,
+    "trajectory": 0.231,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KHOU",
+   "n": 1,
+   "accuracy_pct": {
+    "p_gefs": 100.0,
+    "p_analog": 100.0,
+    "p_trajectory": 100.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KLAX",
+   "n": 1,
+   "accuracy_pct": {
+    "p_gefs": 100.0,
+    "p_analog": 100.0,
+    "p_trajectory": 0.0
+   },
+   "proposed_weights": {
+    "gefs": 0.5,
+    "analog": 0.5,
+    "trajectory": 0.0,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KMDW",
+   "n": 3,
+   "accuracy_pct": {
+    "p_gefs": 33.3,
+    "p_analog": 33.3,
+    "p_trajectory": 66.7
+   },
+   "proposed_weights": {
+    "gefs": 0.0,
+    "analog": 0.0,
+    "trajectory": 1.0,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KMIA",
+   "n": 2,
+   "accuracy_pct": {
+    "p_gefs": 50.0,
+    "p_analog": 50.0,
+    "p_trajectory": 50.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KMSP",
+   "n": 2,
+   "accuracy_pct": {
+    "p_gefs": 50.0,
+    "p_analog": 50.0,
+    "p_trajectory": 50.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KNYC",
+   "n": 1,
+   "accuracy_pct": {
+    "p_gefs": 0.0,
+    "p_analog": 0.0,
+    "p_trajectory": 0.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KPHL",
+   "n": 1,
+   "accuracy_pct": {
+    "p_gefs": 100.0,
+    "p_analog": 100.0,
+    "p_trajectory": 100.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KPHX",
+   "n": 2,
+   "accuracy_pct": {
+    "p_gefs": 50.0,
+    "p_analog": 50.0,
+    "p_trajectory": 50.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KSAT",
+   "n": 1,
+   "accuracy_pct": {
+    "p_gefs": 100.0,
+    "p_analog": 100.0,
+    "p_trajectory": 100.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KSEA",
+   "n": 2,
+   "accuracy_pct": {
+    "p_gefs": 0.0,
+    "p_analog": 0.0,
+    "p_trajectory": 0.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  },
+  {
+   "station": "KSFO",
+   "n": 4,
+   "accuracy_pct": {
+    "p_gefs": 50.0,
+    "p_analog": 50.0,
+    "p_trajectory": 50.0
+   },
+   "proposed_weights": {
+    "gefs": 0.333,
+    "analog": 0.333,
+    "trajectory": 0.333,
+    "market": 0.0
+   }
+  }
+ ],
+ "proposed_per_station_weights": {
+  "KATL": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KAUS": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KBOS": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KDCA": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KDEN": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KDFW": {
+   "gefs": 0.385,
+   "analog": 0.385,
+   "trajectory": 0.231,
+   "market": 0.0
+  },
+  "KHOU": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KLAX": {
+   "gefs": 0.5,
+   "analog": 0.5,
+   "trajectory": 0.0,
+   "market": 0.0
+  },
+  "KMDW": {
+   "gefs": 0.0,
+   "analog": 0.0,
+   "trajectory": 1.0,
+   "market": 0.0
+  },
+  "KMIA": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KMSP": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KNYC": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KPHL": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KPHX": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KSAT": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KSEA": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  },
+  "KSFO": {
+   "gefs": 0.333,
+   "analog": 0.333,
+   "trajectory": 0.333,
+   "market": 0.0
+  }
+ },
+ "weighting_method": "weight_c \u221d max(0, historical_directional_accuracy_c - 0.5), normalized so GEFS_weight + analog_weight + trajectory_weight + market_weight = 1 (non-overlap constraint). Per station; fall back to equal weights when a station has < 8 closed trades. Tuned by sweeping weights on the per-station closed-trade history and maximizing directional accuracy (or minimizing Brier).",
+ "note": "The per-station weights below are a DATA-LIMITED first pass (n as low as 1 per station). They are a design artifact for the spec, not a validated calibration. market_weight is left 0.0 pending an explicit market-accuracy measurement."
+}
