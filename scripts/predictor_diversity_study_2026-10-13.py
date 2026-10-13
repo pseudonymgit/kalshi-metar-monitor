@@ -103,6 +103,51 @@ def dir_acc(ps, ys) -> float:
     return sum(1 for p, y in zip(ps, ys) if (p > 0.5) == bool(y)) / len(ps)
 
 
+def calibration_metrics(ps, ys, n_bins=10):
+    """Reliability + Murphy Brier decomposition for P(cross) vs settled truth.
+
+    PRIMARY evidence for the crossing-probability axis:
+      brier        = mean((p - y)^2)
+      reliability  = sum_k n_k/N (p_k - o_k)^2      (calibration;  LOWER better)
+      resolution   = sum_k n_k/N (o_k - o_base)^2   (discrimination; HIGHER better)
+      uncertainty  = o_base (1 - o_base)            (irreducible)
+      brier        = reliability - resolution + uncertainty
+      ece          = sum_k n_k/N |p_k - o_k|        (expected calibration error)
+      mce          = max_k |p_k - o_k|              (max calibration error)
+    Bins are FIXED probability deciles (0.0,0.1,...,1.0] so they are comparable
+    across sources regardless of each source's p-distribution.
+    """
+    n = len(ps)
+    base = sum(ys) / n
+    edges = [i / n_bins for i in range(n_bins + 1)]
+    bins = [[] for _ in range(n_bins)]
+    for p, y in zip(ps, ys):
+        idx = min(n_bins - 1, max(0, int(p * n_bins)))
+        bins[idx].append((p, y))
+    rel = res = ece = 0.0
+    mce = 0.0
+    table = []
+    for i, b in enumerate(bins):
+        if not b:
+            table.append({"bin": f"{edges[i]:.1f}-{edges[i+1]:.1f}", "n": 0,
+                          "mean_p": None, "emp_rate": None, "gap": None})
+            continue
+        nk = len(b)
+        pk = sum(p for p, _ in b) / nk
+        ok = sum(y for _, y in b) / nk
+        rel += nk / n * (pk - ok) ** 2
+        res += nk / n * (ok - base) ** 2
+        ece += nk / n * abs(pk - ok)
+        mce = max(mce, abs(pk - ok))
+        table.append({"bin": f"{edges[i]:.1f}-{edges[i+1]:.1f}", "n": nk,
+                      "mean_p": round(pk, 4), "emp_rate": round(ok, 4),
+                      "gap": round(pk - ok, 4)})
+    return {"reliability": round(rel, 4), "resolution": round(res, 4),
+            "uncertainty": round(base * (1 - base), 4),
+            "ece": round(ece, 4), "mce": round(mce, 4),
+            "calibration_table": table}
+
+
 def pearson(xs, ys) -> float:
     n = len(xs)
     if n < 2:
@@ -565,6 +610,7 @@ def task1(grid):
         ps = [r[pk] for r in rows]
         ys = [r["y"] for r in rows]
         dates = sorted(r["date"] for r in rows)
+        cal = calibration_metrics(ps, ys)
         out[s] = {
             "n": len(rows),
             "brier": round(brier(ps, ys), 4),
@@ -572,6 +618,12 @@ def task1(grid):
             "base_rate": round(sum(ys) / len(ys), 4),
             "date_min": dates[0], "date_max": dates[-1],
             "mean_p": round(sum(ps) / len(ps), 4),
+            "reliability": cal["reliability"],
+            "resolution": cal["resolution"],
+            "uncertainty": cal["uncertainty"],
+            "ece": cal["ece"],
+            "mce": cal["mce"],
+            "calibration_table": cal["calibration_table"],
         }
     return out
 
@@ -723,8 +775,9 @@ def main():
     out = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "window": [MIGRATION_START, MIGRATION_END],
-        "strike_rule": "T = floor(day-of-year climatological mean_high) + 1",
+        "strike_rule": "T = floor(high-so-far at 13:30 station-local pin) + 1 (climatology fallback if ASOS absent)",
         "label_rule": "crossed = settled_max > T (strict; == is a LOSS)",
+        "primary_metric": "Brier + calibration of P(cross) vs settled truth",
         "sigma_det_F": SIGMA_DET_F, "sigma_gefs_min": SIGMA_GEFS_MIN,
         "sigma_rate": SIGMA_RATE,
         "task1_per_source": t1,
@@ -738,18 +791,48 @@ def main():
     OUT.write_text(json.dumps(out, indent=2))
 
     # ---- console report ----
-    print("=" * 78)
-    print("TASK 1 — per-source accuracy on the strict strike-crossing axis")
-    print("=" * 78)
-    print(f"{'source':10} {'n':>6} {'Brier':>8} {'dir_acc':>8} {'base':>7} {'date range':>23}")
+    print("=" * 92)
+    print("TASK 1 (PRIMARY) — P(cross) Brier + calibration vs settled truth")
+    print("=" * 92)
+    print(f"{'source':10} {'n':>6} {'Brier':>8} {'ECE':>7} {'MCE':>7} "
+          f"{'reliab':>7} {'resol':>7} {'base':>6} {'mean_p':>7}  range")
     for s in SOURCES:
         r = t1[s]
         if r.get("n", 0) == 0:
             print(f"{s:10} {'0':>6}")
             continue
-        print(f"{s:10} {r['n']:>6} {r['brier']:>8.4f} {r['dir_acc']:>8.4f} "
-              f"{r['base_rate']:>7.3f} {r['date_min']}..{r['date_max']}")
+        print(f"{s:10} {r['n']:>6} {r['brier']:>8.4f} {r['ece']:>7.4f} {r['mce']:>7.4f} "
+              f"{r['reliability']:>7.4f} {r['resolution']:>7.4f} {r['base_rate']:>6.3f} "
+              f"{r['mean_p']:>7.3f}  {r['date_min']}..{r['date_max']}")
+    print("  (Brier = reliability - resolution + uncertainty; LOWER Brier/ECE/reliab better,")
+    print("   HIGHER resolution better. dir. acc is secondary: see results JSON.)")
     print()
+    print("=" * 92)
+    print("TASK 1b (SECONDARY) — directional accuracy on the strict axis")
+    print("=" * 92)
+    print(f"{'source':10} {'n':>6} {'dir_acc':>8} {'base_rate':>10}")
+    for s in SOURCES:
+        r = t1[s]
+        if r.get("n", 0) == 0:
+            continue
+        print(f"{s:10} {r['n']:>6} {r['dir_acc']:>8.4f} {r['base_rate']:>10.3f}")
+    print()
+    print("=" * 92)
+    print("TASK 1C — reliability tables (P(cross) decile -> observed rate)")
+    print("=" * 92)
+    for s in SOURCES:
+        r = t1[s]
+        if r.get("n", 0) == 0:
+            continue
+        print(f"{s}  (n={r['n']}, ECE={r['ece']}, MCE={r['mce']})")
+        print(f"  {'bin':>10} {'n':>6} {'mean_p':>8} {'obs':>8} {'gap':>8}")
+        for row in r["calibration_table"]:
+            if row["n"] == 0:
+                print(f"  {row['bin']:>10} {0:>6}      -        -        -")
+                continue
+            print(f"  {row['bin']:>10} {row['n']:>6} {row['mean_p']:>8.4f} "
+                  f"{row['emp_rate']:>8.4f} {row['gap']:>+8.4f}")
+        print()
     print("=" * 78)
     print("TASK 2 — pairwise correlation of per-station-day forecasts (P(cross))")
     print("=" * 78)
