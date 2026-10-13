@@ -261,7 +261,11 @@ class EntryTimingEngine:
             # We think probability is lower than market → SELL
             signal_type = SignalType.SELL
 
-        # Compute Kelly-optimal position size
+        # Compute Kelly-optimal position size (F8, 2026-10-13): this value is an
+        # ENTRY GATE byproduct only. The bridge reads signal_type (BUY/SELL) to
+        # decide whether to enter, then DISCARDS this position_size and sizes from
+        # Dan's confidence ladder (_position_size_usd). PositionSizer is the single
+        # canonical sizer; do not add a second sizing path off this value.
         kelly_frac = self._compute_kelly_size(our_prob, mp)
         # Apply Kelly fraction (conservative: 25% of Kelly by default)
         position_size = (

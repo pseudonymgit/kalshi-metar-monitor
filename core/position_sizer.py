@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 """
-Unified Position Sizer — Phase 1 Build
+Unified Position Sizer — CANONICAL sizing implementation (F8, 2026-10-13)
+
+F8 (2026-10-13): this module is THE canonical position sizer. Four sizing paths
+previously coexisted (kelly_position_sizer, fee_aware_kelly_position_sizing,
+position_sizing, entry_engine._compute_kelly_size). The SBOX/intraday book sizes
+off Dan's confidence ladder (`_position_size_usd`); the confidence-weighted
+`PositionSizer` here is the canonical Kelly/tier sizer for the hourly engine.
+`kelly_position_sizer` and `fee_aware_kelly_position_sizing` are now thin shims
+that route to this class, so a fee, cap, or drawdown change lands in exactly one
+place. `entry_engine._compute_kelly_size` is retained only as an entry GATE
+(decides BUY/SELL vs PASS); its computed size is discarded at the bridge, which
+sizes from the ladder.
 
 Merge of kelly_position_sizer.py (Edge 13, Phase 3 risk management) and
 position_sizing.py (SH3 enhancement).  kelly_position_sizer.py is the primary
