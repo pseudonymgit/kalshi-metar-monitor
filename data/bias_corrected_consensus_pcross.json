@@ -1,0 +1,769 @@
+{
+  "axis": "strike-crossing P(cross) at 13:30 station-local pin",
+  "sigma_F": 4.0,
+  "train_dates": [
+    "2026-09-13",
+    "2026-10-02"
+  ],
+  "test_dates": [
+    "2026-10-03",
+    "2026-10-10"
+  ],
+  "n_train_dates": 20,
+  "n_test_dates": 8,
+  "window_distinct_dates": 28,
+  "n_grid": 558,
+  "n_train": 399,
+  "n_test": 159,
+  "bias_per_source_station": {
+    "ecmwf|KATL": -0.29,
+    "ecmwf|KAUS": -1.91,
+    "ecmwf|KBOS": -0.25,
+    "ecmwf|KDCA": 0.09,
+    "ecmwf|KDEN": -1.03,
+    "ecmwf|KDFW": -1.81,
+    "ecmwf|KHOU": -2.34,
+    "ecmwf|KLAS": -0.7,
+    "ecmwf|KLAX": 7.83,
+    "ecmwf|KMDW": -0.59,
+    "ecmwf|KMIA": -3.7,
+    "ecmwf|KMSP": -0.67,
+    "ecmwf|KMSY": -2.95,
+    "ecmwf|KNYC": 0.09,
+    "ecmwf|KOKC": -2.81,
+    "ecmwf|KPHL": -1.92,
+    "ecmwf|KPHX": -1.84,
+    "ecmwf|KSAT": -1.23,
+    "ecmwf|KSEA": -2.63,
+    "ecmwf|KSFO": -1.8,
+    "gefs_ens|KATL": 1.289,
+    "gefs_ens|KAUS": -0.839,
+    "gefs_ens|KBOS": -1.377,
+    "gefs_ens|KDCA": 1.087,
+    "gefs_ens|KDEN": -0.303,
+    "gefs_ens|KDFW": 0.183,
+    "gefs_ens|KHOU": 1.016,
+    "gefs_ens|KLAS": -2.56,
+    "gefs_ens|KLAX": 0.244,
+    "gefs_ens|KMDW": 1.092,
+    "gefs_ens|KMIA": -2.107,
+    "gefs_ens|KMSP": 0.239,
+    "gefs_ens|KMSY": 1.346,
+    "gefs_ens|KNYC": 2.232,
+    "gefs_ens|KOKC": 0.429,
+    "gefs_ens|KPHL": -2.161,
+    "gefs_ens|KPHX": -2.566,
+    "gefs_ens|KSAT": -0.854,
+    "gefs_ens|KSEA": 0.344,
+    "gefs_ens|KSFO": 1.288,
+    "gem|KATL": -1.88,
+    "gem|KAUS": -2.39,
+    "gem|KBOS": 1.01,
+    "gem|KDCA": 1.75,
+    "gem|KDEN": 0.0,
+    "gem|KDFW": -2.33,
+    "gem|KHOU": -0.18,
+    "gem|KLAS": -0.16,
+    "gem|KLAX": 2.42,
+    "gem|KMDW": 1.54,
+    "gem|KMIA": -4.71,
+    "gem|KMSP": 2.03,
+    "gem|KMSY": -1.08,
+    "gem|KNYC": 1.15,
+    "gem|KOKC": -1.32,
+    "gem|KPHL": 1.44,
+    "gem|KPHX": -2.18,
+    "gem|KSAT": -1.9,
+    "gem|KSEA": 1.37,
+    "gem|KSFO": -0.63,
+    "gfs|KATL": 0.52,
+    "gfs|KAUS": -1.61,
+    "gfs|KBOS": -0.41,
+    "gfs|KDCA": 0.52,
+    "gfs|KDEN": 0.77,
+    "gfs|KDFW": -0.9,
+    "gfs|KHOU": 1.5,
+    "gfs|KLAS": 0.92,
+    "gfs|KLAX": -0.8,
+    "gfs|KMDW": -1.44,
+    "gfs|KMIA": -3.09,
+    "gfs|KMSP": -0.51,
+    "gfs|KMSY": -0.66,
+    "gfs|KNYC": -0.45,
+    "gfs|KOKC": -1.71,
+    "gfs|KPHL": -1.65,
+    "gfs|KPHX": 0.18,
+    "gfs|KSAT": -0.7,
+    "gfs|KSEA": 0.2,
+    "gfs|KSFO": 2.1,
+    "icon|KATL": -0.91,
+    "icon|KAUS": -1.65,
+    "icon|KBOS": 0.1,
+    "icon|KDCA": -0.2,
+    "icon|KDEN": -1.0,
+    "icon|KDFW": -0.23,
+    "icon|KHOU": -0.52,
+    "icon|KLAS": -0.61,
+    "icon|KLAX": 3.33,
+    "icon|KMDW": 0.56,
+    "icon|KMIA": -2.55,
+    "icon|KMSP": -0.67,
+    "icon|KMSY": -0.5,
+    "icon|KNYC": 0.87,
+    "icon|KOKC": -0.86,
+    "icon|KPHL": -1.41,
+    "icon|KPHX": -2.7,
+    "icon|KSAT": -0.91,
+    "icon|KSEA": -1.79,
+    "icon|KSFO": 1.53,
+    "nws|KATL": 0.95,
+    "nws|KAUS": 0.9,
+    "nws|KBOS": -1.0,
+    "nws|KDCA": 0.45,
+    "nws|KDEN": 0.95,
+    "nws|KDFW": -0.05,
+    "nws|KHOU": 0.05,
+    "nws|KLAS": 0.0,
+    "nws|KLAX": 1.5,
+    "nws|KMDW": -0.55,
+    "nws|KMIA": -0.5,
+    "nws|KMSP": 0.45,
+    "nws|KMSY": -0.05,
+    "nws|KNYC": 0.55,
+    "nws|KOKC": -1.0,
+    "nws|KPHL": -1.0,
+    "nws|KPHX": 0.0,
+    "nws|KSAT": -0.55,
+    "nws|KSEA": -1.45,
+    "nws|KSFO": 0.4,
+    "om_dmi|KATL": -0.71,
+    "om_dmi|KAUS": -1.29,
+    "om_dmi|KBOS": -0.54,
+    "om_dmi|KDCA": -1.15,
+    "om_dmi|KDEN": -0.3,
+    "om_dmi|KDFW": -0.37,
+    "om_dmi|KHOU": -1.6,
+    "om_dmi|KLAS": -1.33,
+    "om_dmi|KLAX": -0.75,
+    "om_dmi|KMDW": -0.88,
+    "om_dmi|KMIA": -2.53,
+    "om_dmi|KMSP": -1.12,
+    "om_dmi|KMSY": -1.81,
+    "om_dmi|KNYC": 0.8,
+    "om_dmi|KOKC": -2.04,
+    "om_dmi|KPHL": -2.07,
+    "om_dmi|KPHX": -3.02,
+    "om_dmi|KSAT": -2.09,
+    "om_dmi|KSEA": -1.53,
+    "om_dmi|KSFO": 0.98,
+    "om_ecmwf|KATL": -1.48,
+    "om_ecmwf|KAUS": -1.85,
+    "om_ecmwf|KBOS": -0.63,
+    "om_ecmwf|KDCA": -0.22,
+    "om_ecmwf|KDEN": -0.55,
+    "om_ecmwf|KDFW": -2.08,
+    "om_ecmwf|KHOU": -2.34,
+    "om_ecmwf|KLAS": -1.07,
+    "om_ecmwf|KLAX": 6.56,
+    "om_ecmwf|KMDW": -0.9,
+    "om_ecmwf|KMIA": -3.28,
+    "om_ecmwf|KMSP": -1.59,
+    "om_ecmwf|KMSY": -2.44,
+    "om_ecmwf|KNYC": 0.44,
+    "om_ecmwf|KOKC": -2.98,
+    "om_ecmwf|KPHL": -2.21,
+    "om_ecmwf|KPHX": -2.66,
+    "om_ecmwf|KSAT": -1.73,
+    "om_ecmwf|KSEA": -2.43,
+    "om_ecmwf|KSFO": -1.96,
+    "om_gem|KATL": -1.72,
+    "om_gem|KAUS": -1.72,
+    "om_gem|KBOS": 0.74,
+    "om_gem|KDCA": 1.71,
+    "om_gem|KDEN": 0.08,
+    "om_gem|KDFW": -2.1,
+    "om_gem|KHOU": 0.18,
+    "om_gem|KLAS": 0.01,
+    "om_gem|KLAX": 1.95,
+    "om_gem|KMDW": 1.76,
+    "om_gem|KMIA": -2.59,
+    "om_gem|KMSP": 1.31,
+    "om_gem|KMSY": -1.21,
+    "om_gem|KNYC": 1.06,
+    "om_gem|KOKC": -1.53,
+    "om_gem|KPHL": 0.5,
+    "om_gem|KPHX": -1.78,
+    "om_gem|KSAT": -2.14,
+    "om_gem|KSEA": 0.0,
+    "om_gem|KSFO": -1.51,
+    "om_gfs|KATL": -0.19,
+    "om_gfs|KAUS": -1.49,
+    "om_gfs|KBOS": -0.58,
+    "om_gfs|KDCA": -0.35,
+    "om_gfs|KDEN": -0.27,
+    "om_gfs|KDFW": -0.16,
+    "om_gfs|KHOU": 0.81,
+    "om_gfs|KLAS": -0.49,
+    "om_gfs|KLAX": -0.54,
+    "om_gfs|KMDW": -0.28,
+    "om_gfs|KMIA": -2.4,
+    "om_gfs|KMSP": -0.38,
+    "om_gfs|KMSY": -0.7,
+    "om_gfs|KNYC": 0.72,
+    "om_gfs|KOKC": -0.91,
+    "om_gfs|KPHL": -1.68,
+    "om_gfs|KPHX": -1.62,
+    "om_gfs|KSAT": 0.29,
+    "om_gfs|KSEA": -1.03,
+    "om_gfs|KSFO": 1.29,
+    "om_icon|KATL": -0.86,
+    "om_icon|KAUS": -1.71,
+    "om_icon|KBOS": -0.37,
+    "om_icon|KDCA": -0.4,
+    "om_icon|KDEN": -1.58,
+    "om_icon|KDFW": -0.56,
+    "om_icon|KHOU": -0.49,
+    "om_icon|KLAS": -0.88,
+    "om_icon|KLAX": 2.19,
+    "om_icon|KMDW": 0.69,
+    "om_icon|KMIA": -2.39,
+    "om_icon|KMSP": -1.74,
+    "om_icon|KMSY": -0.53,
+    "om_icon|KNYC": 0.99,
+    "om_icon|KOKC": -1.81,
+    "om_icon|KPHL": -1.99,
+    "om_icon|KPHX": -2.98,
+    "om_icon|KSAT": -0.99,
+    "om_icon|KSEA": -2.56,
+    "om_icon|KSFO": 0.45,
+    "om_jma|KATL": -3.62,
+    "om_jma|KAUS": -8.13,
+    "om_jma|KBOS": -2.26,
+    "om_jma|KDCA": -1.81,
+    "om_jma|KDEN": -3.86,
+    "om_jma|KDFW": -3.88,
+    "om_jma|KHOU": -2.33,
+    "om_jma|KLAS": -2.68,
+    "om_jma|KLAX": -1.5,
+    "om_jma|KMDW": -4.27,
+    "om_jma|KMIA": -2.08,
+    "om_jma|KMSP": -2.26,
+    "om_jma|KMSY": -1.86,
+    "om_jma|KNYC": -1.83,
+    "om_jma|KOKC": -7.72,
+    "om_jma|KPHL": -3.23,
+    "om_jma|KPHX": -5.42,
+    "om_jma|KSAT": -5.24,
+    "om_jma|KSEA": -2.65,
+    "om_jma|KSFO": -6.84,
+    "om_knmi|KATL": -0.71,
+    "om_knmi|KAUS": -1.29,
+    "om_knmi|KBOS": -0.54,
+    "om_knmi|KDCA": -1.15,
+    "om_knmi|KDEN": -0.3,
+    "om_knmi|KDFW": -0.37,
+    "om_knmi|KHOU": -1.6,
+    "om_knmi|KLAS": -1.33,
+    "om_knmi|KLAX": -0.75,
+    "om_knmi|KMDW": -0.88,
+    "om_knmi|KMIA": -2.53,
+    "om_knmi|KMSP": -1.12,
+    "om_knmi|KMSY": -1.81,
+    "om_knmi|KNYC": 0.8,
+    "om_knmi|KOKC": -2.04,
+    "om_knmi|KPHL": -2.07,
+    "om_knmi|KPHX": -3.02,
+    "om_knmi|KSAT": -2.09,
+    "om_knmi|KSEA": -1.53,
+    "om_knmi|KSFO": 0.98,
+    "om_mf|KATL": -0.66,
+    "om_mf|KAUS": -0.04,
+    "om_mf|KBOS": -1.56,
+    "om_mf|KDCA": -0.34,
+    "om_mf|KDEN": -1.04,
+    "om_mf|KDFW": -0.67,
+    "om_mf|KHOU": 0.43,
+    "om_mf|KLAS": 0.14,
+    "om_mf|KLAX": -2.51,
+    "om_mf|KMDW": -1.36,
+    "om_mf|KMIA": -2.84,
+    "om_mf|KMSP": -1.06,
+    "om_mf|KMSY": -2.14,
+    "om_mf|KNYC": -0.67,
+    "om_mf|KOKC": -1.76,
+    "om_mf|KPHL": -2.43,
+    "om_mf|KPHX": -1.42,
+    "om_mf|KSAT": -0.53,
+    "om_mf|KSEA": -1.9,
+    "om_mf|KSFO": -10.38,
+    "om_ukmo|KATL": -2.24,
+    "om_ukmo|KAUS": -2.33,
+    "om_ukmo|KBOS": -0.58,
+    "om_ukmo|KDCA": -0.13,
+    "om_ukmo|KDEN": -0.18,
+    "om_ukmo|KDFW": -1.59,
+    "om_ukmo|KHOU": -0.8,
+    "om_ukmo|KLAS": -1.74,
+    "om_ukmo|KLAX": -1.88,
+    "om_ukmo|KMDW": -0.68,
+    "om_ukmo|KMIA": -1.58,
+    "om_ukmo|KMSP": -1.16,
+    "om_ukmo|KMSY": 1.72,
+    "om_ukmo|KNYC": 0.85,
+    "om_ukmo|KOKC": -1.75,
+    "om_ukmo|KPHL": -1.3,
+    "om_ukmo|KPHX": -1.96,
+    "om_ukmo|KSAT": -2.42,
+    "om_ukmo|KSEA": -1.11,
+    "om_ukmo|KSFO": 1.05
+  },
+  "bias_global_per_source": {
+    "ecmwf": -1.4,
+    "gefs_ens": 0.172,
+    "gem": -0.16,
+    "gfs": -0.18,
+    "icon": -0.5,
+    "nws": 0.0,
+    "om_dmi": -1.24,
+    "om_ecmwf": -1.66,
+    "om_gem": -0.56,
+    "om_gfs": -0.58,
+    "om_icon": -0.9,
+    "om_jma": -3.38,
+    "om_knmi": -1.24,
+    "om_mf": -1.34,
+    "om_ukmo": -1.26
+  },
+  "train_mae_per_source": {
+    "ecmwf": 2.883,
+    "gefs_ens": 2.767,
+    "gem": 2.464,
+    "gfs": 2.154,
+    "icon": 2.318,
+    "nws": 1.738,
+    "om_dmi": 1.901,
+    "om_ecmwf": 2.466,
+    "om_gem": 1.856,
+    "om_gfs": 1.372,
+    "om_icon": 1.852,
+    "om_jma": 4.124,
+    "om_knmi": 1.901,
+    "om_mf": 2.681,
+    "om_ukmo": 1.92
+  },
+  "inv_mae_weights": {
+    "ecmwf": 0.0497,
+    "gefs_ens": 0.0517,
+    "gem": 0.0581,
+    "gfs": 0.0664,
+    "icon": 0.0617,
+    "nws": 0.0823,
+    "om_dmi": 0.0753,
+    "om_ecmwf": 0.058,
+    "om_gem": 0.0771,
+    "om_gfs": 0.1043,
+    "om_icon": 0.0773,
+    "om_jma": 0.0347,
+    "om_knmi": 0.0753,
+    "om_mf": 0.0534,
+    "om_ukmo": 0.0746
+  },
+  "singles_test": {
+    "nws": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1803,
+        "dir_acc": 0.6981,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1792,
+        "dir_acc": 0.7484,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1803,
+        "dir_acc": 0.6981,
+        "base_rate": 0.7233
+      }
+    },
+    "gfs": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1786,
+        "dir_acc": 0.7421,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1734,
+        "dir_acc": 0.7547,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1757,
+        "dir_acc": 0.7358,
+        "base_rate": 0.7233
+      }
+    },
+    "ecmwf": {
+      "raw": {
+        "n": 159,
+        "brier": 0.2568,
+        "dir_acc": 0.5786,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.2219,
+        "dir_acc": 0.6478,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.2155,
+        "dir_acc": 0.6855,
+        "base_rate": 0.7233
+      }
+    },
+    "icon": {
+      "raw": {
+        "n": 159,
+        "brier": 0.2194,
+        "dir_acc": 0.6478,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.2004,
+        "dir_acc": 0.7421,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.2066,
+        "dir_acc": 0.7296,
+        "base_rate": 0.7233
+      }
+    },
+    "gem": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1938,
+        "dir_acc": 0.717,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.192,
+        "dir_acc": 0.7421,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1905,
+        "dir_acc": 0.7421,
+        "base_rate": 0.7233
+      }
+    },
+    "gefs_ens": {
+      "raw": {
+        "n": 159,
+        "brier": 0.2713,
+        "dir_acc": 0.5786,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.2693,
+        "dir_acc": 0.5786,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.2774,
+        "dir_acc": 0.5409,
+        "base_rate": 0.7233
+      }
+    },
+    "om_gfs": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1378,
+        "dir_acc": 0.8491,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1346,
+        "dir_acc": 0.8302,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1313,
+        "dir_acc": 0.8365,
+        "base_rate": 0.7233
+      }
+    },
+    "om_ecmwf": {
+      "raw": {
+        "n": 159,
+        "brier": 0.201,
+        "dir_acc": 0.7044,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1656,
+        "dir_acc": 0.7987,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1655,
+        "dir_acc": 0.7987,
+        "base_rate": 0.7233
+      }
+    },
+    "om_icon": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1742,
+        "dir_acc": 0.7799,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1487,
+        "dir_acc": 0.8113,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1577,
+        "dir_acc": 0.8113,
+        "base_rate": 0.7233
+      }
+    },
+    "om_gem": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1632,
+        "dir_acc": 0.7799,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1561,
+        "dir_acc": 0.7925,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1559,
+        "dir_acc": 0.7987,
+        "base_rate": 0.7233
+      }
+    },
+    "om_mf": {
+      "raw": {
+        "n": 159,
+        "brier": 0.2222,
+        "dir_acc": 0.6792,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.195,
+        "dir_acc": 0.7107,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1905,
+        "dir_acc": 0.7799,
+        "base_rate": 0.7233
+      }
+    },
+    "om_ukmo": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1967,
+        "dir_acc": 0.7044,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1623,
+        "dir_acc": 0.761,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1715,
+        "dir_acc": 0.7547,
+        "base_rate": 0.7233
+      }
+    },
+    "om_jma": {
+      "raw": {
+        "n": 159,
+        "brier": 0.3385,
+        "dir_acc": 0.4528,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.2142,
+        "dir_acc": 0.6792,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.249,
+        "dir_acc": 0.6541,
+        "base_rate": 0.7233
+      }
+    },
+    "om_knmi": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1843,
+        "dir_acc": 0.6981,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1621,
+        "dir_acc": 0.7799,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1595,
+        "dir_acc": 0.7862,
+        "base_rate": 0.7233
+      }
+    },
+    "om_dmi": {
+      "raw": {
+        "n": 159,
+        "brier": 0.1843,
+        "dir_acc": 0.6981,
+        "base_rate": 0.7233
+      },
+      "bc_per_station": {
+        "n": 159,
+        "brier": 0.1621,
+        "dir_acc": 0.7799,
+        "base_rate": 0.7233
+      },
+      "bc_global": {
+        "n": 159,
+        "brier": 0.1595,
+        "dir_acc": 0.7862,
+        "base_rate": 0.7233
+      }
+    }
+  },
+  "consensus_test": {
+    "mean_ps": {
+      "n": 159,
+      "brier": 0.1654,
+      "dir_acc": 0.7736,
+      "base_rate": 0.7233
+    },
+    "mean_glob": {
+      "n": 159,
+      "brier": 0.1638,
+      "dir_acc": 0.8365,
+      "base_rate": 0.7233
+    },
+    "median_ps": {
+      "n": 159,
+      "brier": 0.1593,
+      "dir_acc": 0.7925,
+      "base_rate": 0.7233
+    },
+    "median_glob": {
+      "n": 159,
+      "brier": 0.1609,
+      "dir_acc": 0.8239,
+      "base_rate": 0.7233
+    },
+    "trim_ps": {
+      "n": 159,
+      "brier": 0.1632,
+      "dir_acc": 0.7736,
+      "base_rate": 0.7233
+    },
+    "trim_glob": {
+      "n": 159,
+      "brier": 0.162,
+      "dir_acc": 0.8302,
+      "base_rate": 0.7233
+    },
+    "inv_mae_ps": {
+      "n": 159,
+      "brier": 0.1605,
+      "dir_acc": 0.7862,
+      "base_rate": 0.7233
+    },
+    "inv_mae_glob": {
+      "n": 159,
+      "brier": 0.1588,
+      "dir_acc": 0.8302,
+      "base_rate": 0.7233
+    }
+  },
+  "best_single_bc_per_station": {
+    "source": "om_gfs",
+    "brier": 0.1346
+  },
+  "best_single_raw": {
+    "source": "om_gfs",
+    "brier": 0.1378
+  },
+  "best_consensus": {
+    "variant": "inv_mae_glob",
+    "brier": 0.1588
+  },
+  "consensus_minus_best_single": 0.0242,
+  "mean_single_bc_brier": 0.1825,
+  "bias_correction_gain": {
+    "nws": 0.0011,
+    "gfs": 0.0052,
+    "ecmwf": 0.0349,
+    "icon": 0.019,
+    "gem": 0.0018,
+    "gefs_ens": 0.002,
+    "om_gfs": 0.0032,
+    "om_ecmwf": 0.0354,
+    "om_icon": 0.0255,
+    "om_gem": 0.0071,
+    "om_mf": 0.0272,
+    "om_ukmo": 0.0344,
+    "om_jma": 0.1243,
+    "om_knmi": 0.0222,
+    "om_dmi": 0.0222
+  },
+  "verdict": {
+    "aggregation_beats_best_single_on_crossing_axis": false,
+    "delta_brier": 0.0242,
+    "best_single": {
+      "source": "om_gfs",
+      "brier": 0.1346
+    },
+    "best_consensus": {
+      "variant": "inv_mae_glob",
+      "brier": 0.1588
+    },
+    "bias_correction_helps_singles": true,
+    "conclusion": "Bias-adjusting each source works (every source improves), but aggregation STILL LOSES to the best single source on the strike-crossing axis \u2014 confirms Workstream Q's level-axis verdict on the axis that matters. The sources' errors are correlated (shared synoptic driver), so averaging re-centres but does not reduce variance; it drags the sharp source (om_gfs) toward the poorly-calibrated members.",
+    "precedent": "Workstream Q (level MAE): best single 1.116 vs best consensus 1.184."
+  }
+}
