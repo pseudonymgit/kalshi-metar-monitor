@@ -1,0 +1,768 @@
+{
+  "generated_at_utc": "2026-10-13T08:12:18.039801+00:00",
+  "window": [
+    "2026-04-21",
+    "2026-10-09"
+  ],
+  "fetch_window": [
+    "2026-04-21",
+    "2026-10-12"
+  ],
+  "station_count": 20,
+  "om_model": "gfs_seamless",
+  "strike_rule": "T = floor(high-so-far at 13:30 station-local pin) + 1 (climatology fallback if ASOS absent)",
+  "label_rule": "crossed = settled_max > T (strict; == is a LOSS)",
+  "primary_metric": "Brier of P(cross) vs canonical settled truth",
+  "bias_correction": "rolling station-level bias over the study window (primary = global pooled bias; per-station variant reported)",
+  "sigma_model": "per-station std(ddof=1) of om_gfs(raw) - settled over window (global fallback if n<3); dispersion fitted and scored on the same window (disclosed optimistic knob)",
+  "collect": {
+    "station_days_fetched": 3500,
+    "stations_with_data": 20,
+    "source": "cache"
+  },
+  "grid_rows": 3440,
+  "scored_rows_omgfs": 3160,
+  "common_rows_omgfs_rate": 2464,
+  "global_bias_F": -0.6506,
+  "global_sigma_F": 1.5964,
+  "per_station": {
+    "KATL": {
+      "n": 158,
+      "bias": -1.2132,
+      "mae": 1.3608,
+      "sigma": 1.1735
+    },
+    "KAUS": {
+      "n": 158,
+      "bias": -1.3325,
+      "mae": 1.3796,
+      "sigma": 0.9003
+    },
+    "KBOS": {
+      "n": 158,
+      "bias": -0.4981,
+      "mae": 1.1768,
+      "sigma": 1.4349
+    },
+    "KDCA": {
+      "n": 158,
+      "bias": -0.6138,
+      "mae": 1.2199,
+      "sigma": 1.4613
+    },
+    "KDEN": {
+      "n": 158,
+      "bias": -1.0735,
+      "mae": 1.23,
+      "sigma": 1.0951
+    },
+    "KDFW": {
+      "n": 158,
+      "bias": -0.7553,
+      "mae": 1.1044,
+      "sigma": 1.2519
+    },
+    "KHOU": {
+      "n": 158,
+      "bias": -0.2044,
+      "mae": 1.6341,
+      "sigma": 2.1039
+    },
+    "KLAS": {
+      "n": 158,
+      "bias": -0.8285,
+      "mae": 1.1561,
+      "sigma": 1.3864
+    },
+    "KLAX": {
+      "n": 158,
+      "bias": -0.5072,
+      "mae": 0.8814,
+      "sigma": 1.0587
+    },
+    "KMDW": {
+      "n": 158,
+      "bias": -0.5313,
+      "mae": 1.0589,
+      "sigma": 1.3357
+    },
+    "KMIA": {
+      "n": 158,
+      "bias": -1.4723,
+      "mae": 1.6227,
+      "sigma": 1.2756
+    },
+    "KMSP": {
+      "n": 158,
+      "bias": -1.1505,
+      "mae": 1.3199,
+      "sigma": 1.1258
+    },
+    "KMSY": {
+      "n": 158,
+      "bias": -0.6884,
+      "mae": 1.339,
+      "sigma": 1.5289
+    },
+    "KNYC": {
+      "n": 158,
+      "bias": 1.4461,
+      "mae": 1.822,
+      "sigma": 1.6282
+    },
+    "KOKC": {
+      "n": 158,
+      "bias": -0.6377,
+      "mae": 1.0319,
+      "sigma": 1.1122
+    },
+    "KPHL": {
+      "n": 158,
+      "bias": -1.6999,
+      "mae": 1.812,
+      "sigma": 1.2855
+    },
+    "KPHX": {
+      "n": 158,
+      "bias": -1.2299,
+      "mae": 1.3906,
+      "sigma": 0.9601
+    },
+    "KSAT": {
+      "n": 158,
+      "bias": 0.0263,
+      "mae": 0.9808,
+      "sigma": 1.401
+    },
+    "KSEA": {
+      "n": 158,
+      "bias": -1.0054,
+      "mae": 1.1396,
+      "sigma": 1.038
+    },
+    "KSFO": {
+      "n": 158,
+      "bias": 0.9567,
+      "mae": 1.9471,
+      "sigma": 2.6232
+    }
+  },
+  "scores": {
+    "om_gfs_raw": {
+      "name": "om_gfs_raw",
+      "n": 2464,
+      "brier": 0.1392,
+      "dir_acc": 0.8019,
+      "base_rate": 0.8052,
+      "mean_p": 0.6991,
+      "reliability": 0.0254,
+      "resolution": 0.0428,
+      "uncertainty": 0.1569,
+      "ece": 0.1101,
+      "mce": 0.3041,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 170,
+          "mean_p": 0.0366,
+          "emp_rate": 0.3353,
+          "gap": -0.2987
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 119,
+          "mean_p": 0.1496,
+          "emp_rate": 0.4538,
+          "gap": -0.3041
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 137,
+          "mean_p": 0.2496,
+          "emp_rate": 0.4891,
+          "gap": -0.2395
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 133,
+          "mean_p": 0.3546,
+          "emp_rate": 0.6316,
+          "gap": -0.277
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 126,
+          "mean_p": 0.4513,
+          "emp_rate": 0.6825,
+          "gap": -0.2312
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 136,
+          "mean_p": 0.5509,
+          "emp_rate": 0.7353,
+          "gap": -0.1843
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 148,
+          "mean_p": 0.6529,
+          "emp_rate": 0.8378,
+          "gap": -0.1849
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 187,
+          "mean_p": 0.7516,
+          "emp_rate": 0.8235,
+          "gap": -0.0719
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 257,
+          "mean_p": 0.8569,
+          "emp_rate": 0.9144,
+          "gap": -0.0575
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1051,
+          "mean_p": 0.9781,
+          "emp_rate": 0.9734,
+          "gap": 0.0047
+        }
+      ]
+    },
+    "om_gfs_bc": {
+      "name": "om_gfs_bc",
+      "n": 2464,
+      "brier": 0.1182,
+      "dir_acc": 0.8336,
+      "base_rate": 0.8052,
+      "mean_p": 0.7825,
+      "reliability": 0.006,
+      "resolution": 0.0443,
+      "uncertainty": 0.1569,
+      "ece": 0.0462,
+      "mce": 0.2853,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 92,
+          "mean_p": 0.0408,
+          "emp_rate": 0.3261,
+          "gap": -0.2853
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 71,
+          "mean_p": 0.1474,
+          "emp_rate": 0.338,
+          "gap": -0.1906
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 65,
+          "mean_p": 0.245,
+          "emp_rate": 0.4154,
+          "gap": -0.1704
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 106,
+          "mean_p": 0.3502,
+          "emp_rate": 0.4528,
+          "gap": -0.1026
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 112,
+          "mean_p": 0.4561,
+          "emp_rate": 0.5268,
+          "gap": -0.0707
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 126,
+          "mean_p": 0.5562,
+          "emp_rate": 0.6032,
+          "gap": -0.0469
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 142,
+          "mean_p": 0.6503,
+          "emp_rate": 0.6972,
+          "gap": -0.0469
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 162,
+          "mean_p": 0.7488,
+          "emp_rate": 0.7654,
+          "gap": -0.0167
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 244,
+          "mean_p": 0.8523,
+          "emp_rate": 0.8279,
+          "gap": 0.0244
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1344,
+          "mean_p": 0.9807,
+          "emp_rate": 0.9635,
+          "gap": 0.0172
+        }
+      ]
+    },
+    "om_gfs_bc_per_station_bias": {
+      "name": "om_gfs_bc_per_station_bias",
+      "n": 2464,
+      "brier": 0.1128,
+      "dir_acc": 0.8401,
+      "base_rate": 0.8052,
+      "mean_p": 0.7862,
+      "reliability": 0.0052,
+      "resolution": 0.049,
+      "uncertainty": 0.1569,
+      "ece": 0.0394,
+      "mce": 0.2592,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 70,
+          "mean_p": 0.0408,
+          "emp_rate": 0.3,
+          "gap": -0.2592
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 76,
+          "mean_p": 0.1466,
+          "emp_rate": 0.3684,
+          "gap": -0.2219
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 89,
+          "mean_p": 0.2483,
+          "emp_rate": 0.3708,
+          "gap": -0.1225
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 102,
+          "mean_p": 0.3512,
+          "emp_rate": 0.4314,
+          "gap": -0.0801
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 101,
+          "mean_p": 0.4506,
+          "emp_rate": 0.495,
+          "gap": -0.0444
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 123,
+          "mean_p": 0.5494,
+          "emp_rate": 0.6585,
+          "gap": -0.1091
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 158,
+          "mean_p": 0.6517,
+          "emp_rate": 0.6392,
+          "gap": 0.0124
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 149,
+          "mean_p": 0.7519,
+          "emp_rate": 0.7315,
+          "gap": 0.0203
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 236,
+          "mean_p": 0.8523,
+          "emp_rate": 0.8008,
+          "gap": 0.0515
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1360,
+          "mean_p": 0.9824,
+          "emp_rate": 0.9765,
+          "gap": 0.0059
+        }
+      ]
+    },
+    "rate_1h": {
+      "name": "rate_1h",
+      "n": 2464,
+      "brier": 0.0922,
+      "dir_acc": 0.8908,
+      "base_rate": 0.8052,
+      "mean_p": 0.7212,
+      "reliability": 0.0222,
+      "resolution": 0.0862,
+      "uncertainty": 0.1569,
+      "ece": 0.112,
+      "mce": 0.3904,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 5,
+          "mean_p": 0.0096,
+          "emp_rate": 0.4,
+          "gap": -0.3904
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 2,
+          "mean_p": 0.1411,
+          "emp_rate": 0.0,
+          "gap": 0.1411
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 168,
+          "mean_p": 0.272,
+          "emp_rate": 0.1369,
+          "gap": 0.1351
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 232,
+          "mean_p": 0.3557,
+          "emp_rate": 0.306,
+          "gap": 0.0497
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 242,
+          "mean_p": 0.4503,
+          "emp_rate": 0.5083,
+          "gap": -0.058
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 196,
+          "mean_p": 0.5422,
+          "emp_rate": 0.8214,
+          "gap": -0.2792
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 162,
+          "mean_p": 0.653,
+          "emp_rate": 0.9568,
+          "gap": -0.3038
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 211,
+          "mean_p": 0.7487,
+          "emp_rate": 0.9858,
+          "gap": -0.237
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 322,
+          "mean_p": 0.8494,
+          "emp_rate": 0.9938,
+          "gap": -0.1443
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 924,
+          "mean_p": 0.9696,
+          "emp_rate": 0.9968,
+          "gap": -0.0271
+        }
+      ]
+    },
+    "gfs_raw_sigma4": {
+      "name": "gfs_raw_sigma4",
+      "n": 2960,
+      "brier": 0.1597,
+      "dir_acc": 0.7882,
+      "base_rate": 0.7963,
+      "mean_p": 0.6775,
+      "reliability": 0.0256,
+      "resolution": 0.0277,
+      "uncertainty": 0.1622,
+      "ece": 0.1446,
+      "mce": 0.2542,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 41,
+          "mean_p": 0.0532,
+          "emp_rate": 0.1463,
+          "gap": -0.0932
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 68,
+          "mean_p": 0.1564,
+          "emp_rate": 0.3529,
+          "gap": -0.1965
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 139,
+          "mean_p": 0.2494,
+          "emp_rate": 0.5036,
+          "gap": -0.2542
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 181,
+          "mean_p": 0.3536,
+          "emp_rate": 0.5249,
+          "gap": -0.1712
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 246,
+          "mean_p": 0.4495,
+          "emp_rate": 0.6301,
+          "gap": -0.1806
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 318,
+          "mean_p": 0.5521,
+          "emp_rate": 0.7893,
+          "gap": -0.2372
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 440,
+          "mean_p": 0.6522,
+          "emp_rate": 0.8545,
+          "gap": -0.2024
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 487,
+          "mean_p": 0.7495,
+          "emp_rate": 0.8994,
+          "gap": -0.1499
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 424,
+          "mean_p": 0.8482,
+          "emp_rate": 0.9057,
+          "gap": -0.0575
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 616,
+          "mean_p": 0.9677,
+          "emp_rate": 0.9058,
+          "gap": 0.0619
+        }
+      ]
+    },
+    "om_gfs_bc_all_rows": {
+      "name": "om_gfs_bc_all_rows",
+      "n": 3160,
+      "brier": 0.1079,
+      "dir_acc": 0.8478,
+      "base_rate": 0.7886,
+      "mean_p": 0.7763,
+      "reliability": 0.0033,
+      "resolution": 0.0613,
+      "uncertainty": 0.1667,
+      "ece": 0.0355,
+      "mce": 0.1621,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 181,
+          "mean_p": 0.0272,
+          "emp_rate": 0.1823,
+          "gap": -0.1551
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 90,
+          "mean_p": 0.149,
+          "emp_rate": 0.3111,
+          "gap": -0.1621
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 82,
+          "mean_p": 0.2448,
+          "emp_rate": 0.4024,
+          "gap": -0.1576
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 125,
+          "mean_p": 0.3511,
+          "emp_rate": 0.432,
+          "gap": -0.0809
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 137,
+          "mean_p": 0.4533,
+          "emp_rate": 0.4818,
+          "gap": -0.0284
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 148,
+          "mean_p": 0.5567,
+          "emp_rate": 0.5743,
+          "gap": -0.0176
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 155,
+          "mean_p": 0.65,
+          "emp_rate": 0.6645,
+          "gap": -0.0145
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 188,
+          "mean_p": 0.7502,
+          "emp_rate": 0.7553,
+          "gap": -0.0051
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 271,
+          "mean_p": 0.8523,
+          "emp_rate": 0.8376,
+          "gap": 0.0147
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1783,
+          "mean_p": 0.9835,
+          "emp_rate": 0.9652,
+          "gap": 0.0183
+        }
+      ]
+    }
+  },
+  "scores_note": "om_gfs_raw/bc/bc_ps and rate_1h share the SAME common rows; gfs_raw_sigma4 and om_gfs_bc_all_rows use their own row sets",
+  "baseline_briers": {
+    "rate_1h_study_n2464": 0.0921,
+    "rate_1h_window_n123": 0.1241,
+    "rate_1h_recomputed_common_rows": 0.0922
+  },
+  "correlations": {
+    "level_om_gfs_vs_rate_1h": {
+      "n": 2464,
+      "pearson": 0.9924,
+      "spearman": 0.9902
+    },
+    "pcross_om_gfs_bc_vs_rate_1h": {
+      "n": 2464,
+      "pearson": 0.6865,
+      "spearman": 0.7982
+    },
+    "level_om_gfs_vs_local_gfs": {
+      "n": 2960,
+      "pearson": 0.9728,
+      "spearman": 0.9722
+    },
+    "level_rate_1h_vs_local_gfs": {
+      "n": 2311,
+      "pearson": 0.9645,
+      "spearman": 0.9619
+    }
+  },
+  "fcerr": {
+    "definition": "Pearson corr of (om_gfs bias-corrected forecast Tmax level) vs (rate_1h mu = high-so-far + deflated rate_1h); flag at |r| >= 0.85. P(cross) corr also reported.",
+    "level_pooled": 0.9924,
+    "level_within_station_demeaned": 0.988,
+    "pcross_pooled": 0.6865,
+    "max_abs": 0.9924,
+    "flag_threshold": 0.85,
+    "collinear": true
+  },
+  "level_mae": {
+    "om_gfs_raw": 1.3304,
+    "om_gfs_bc_global": 0.6798,
+    "gfs_raw": 2.0946,
+    "rate_1h_mu": 0.765,
+    "om_gfs_bc_minus_gfs_raw": -1.4148
+  },
+  "blend_test": {
+    "common_n": 2464,
+    "rate_1h_alone_brier": 0.0922,
+    "om_gfs_bc_alone_brier": 0.1182,
+    "weight_grid": {
+      "w_om=0.0": {
+        "brier": 0.0922,
+        "dir_acc": 0.8908
+      },
+      "w_om=0.1": {
+        "brier": 0.0904,
+        "dir_acc": 0.8933
+      },
+      "w_om=0.2": {
+        "brier": 0.0895,
+        "dir_acc": 0.8916
+      },
+      "w_om=0.3": {
+        "brier": 0.0897,
+        "dir_acc": 0.886
+      },
+      "w_om=0.5": {
+        "brier": 0.0929,
+        "dir_acc": 0.8673
+      },
+      "w_om=0.7": {
+        "brier": 0.1001,
+        "dir_acc": 0.8543
+      },
+      "w_om=1.0": {
+        "brier": 0.1182,
+        "dir_acc": 0.8336
+      }
+    },
+    "best_weight_on_om": 0.25,
+    "best_blend_brier": 0.0895,
+    "best_blend_minus_rate_alone": -0.0027,
+    "paired_delta_mean": -0.00271,
+    "paired_delta_se": 0.00098,
+    "paired_t": -2.773,
+    "significant_at_2se": true,
+    "adds_value": true,
+    "note": "paired_delta = (blend_sq_err - rate_only_sq_err); NEGATIVE means the blend improves on rate_1h. Weight w is picked in-sample by min Brier, so the gain is selection-inflated; treat the magnitude as an upper bound."
+  },
+  "nwp_level_substitution": {
+    "level_mae_gain_F": 1.4148,
+    "brier_gfs_raw": 0.1597,
+    "brier_om_gfs_bc_all_rows": 0.1079,
+    "om_gfs_bc_better_than_local_gfs_level": true
+  },
+  "decision": {
+    "criterion_a_brier_le_rate_1h": false,
+    "criterion_b_fcerr_lt_0.85": false,
+    "om_gfs_bc_brier": 0.1182,
+    "rate_1h_brier": 0.0922,
+    "verdict": "DO_NOT_WIRE",
+    "verdicts": {
+      "WIRE_AS_SECOND_MEMBER": "Brier <= rate_1h AND fcerr < 0.85 -> wire om_gfs into fusion",
+      "REPLACE_LOCAL_GFS_ONLY_NO_DIVERSITY_GAIN": "better/equal Brier but collinear -> swap out raw local GFS, no diversity claim",
+      "DO_NOT_WIRE": "worse Brier -> do not wire"
+    }
+  }
+}
