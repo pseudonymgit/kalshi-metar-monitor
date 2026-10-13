@@ -279,6 +279,47 @@ def _station_spread_model(ladder: List[Dict]):
     return _StationSpreadModel()
 
 
+def _ensure_grade_columns(conn) -> None:
+    """F7 (2026-10-13): grade columns on the companion table (idempotent).
+
+    ``grade_entered`` (S/A/B/C/D) and ``grade_cap_usd`` (the grade's position
+    cap) let the book be analysed by opportunity grade without re-deriving it.
+    """
+    exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' "
+        "AND name='trade_forecaster_probs'").fetchone()
+    if not exists:
+        return
+    cols = {d[1] for d in conn.execute("PRAGMA table_info(trade_forecaster_probs)")}
+    if "grade_entered" not in cols:
+        conn.execute("ALTER TABLE trade_forecaster_probs ADD COLUMN grade_entered TEXT")
+    if "grade_cap_usd" not in cols:
+        conn.execute("ALTER TABLE trade_forecaster_probs ADD COLUMN grade_cap_usd REAL")
+    conn.commit()
+
+
+# F7 (2026-10-13): grade -> position cap. F is not enterable (0 == no trade).
+GRADE_POSITION_CAP_USD = {"S": 25.0, "A": 15.0, "B": 10.0, "C": 5.0}
+
+
+def compute_trade_grade(calibrated_p: float, market_price: float) -> tuple:
+    """F7: (grade_str, edge) from the opportunity-grade scale on edge alone.
+
+    The SBOX bridge does not model a Sharpe ratio, so the grade reduces to its
+    edge ladder (GRADE_THRESHOLDS edge_min: S>=0.12, A>=0.09, B>=0.06, C>=0.03,
+    D>=0.01, else F). ``calibrated_p`` is our calibrated probability for the
+    booked side (the bridge's fused/our_prob).
+    """
+    from core.alert_builder import compute_opportunity_grade  # local: heavy import
+    grade, edge = compute_opportunity_grade(calibrated_p, market_price, 99.0)
+    return grade.value, edge
+
+
+def grade_position_cap(grade: str) -> float:
+    """F7: position cap in USD for a grade; 0.0 for F/unknown (no entry)."""
+    return GRADE_POSITION_CAP_USD.get(grade, 0.0)
+
+
 def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs):
     """Insert-or-replace the companion per-trade forecaster row (idempotent)."""
     now = datetime.now(timezone.utc).isoformat()
@@ -286,22 +327,25 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
         """INSERT INTO trade_forecaster_probs
            (trade_uuid, station, trade_date_utc, strike, side, ticker,
             p_gefs, p_analog, p_trajectory, p_fused, n_analog, n_traj,
-            agreement, edge_mult, traj_verdict, traj_mult, fusion_rule, created_at_utc)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            agreement, edge_mult, traj_verdict, traj_mult, fusion_rule, created_at_utc,
+            grade_entered, grade_cap_usd)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
            ON CONFLICT(trade_uuid) DO UPDATE SET
              p_gefs=excluded.p_gefs, p_analog=excluded.p_analog,
              p_trajectory=excluded.p_trajectory, p_fused=excluded.p_fused,
              n_analog=excluded.n_analog, n_traj=excluded.n_traj,
              agreement=excluded.agreement, edge_mult=excluded.edge_mult,
              traj_verdict=excluded.traj_verdict, traj_mult=excluded.traj_mult,
-             fusion_rule=excluded.fusion_rule, created_at_utc=excluded.created_at_utc""",
+             fusion_rule=excluded.fusion_rule, created_at_utc=excluded.created_at_utc,
+             grade_entered=excluded.grade_entered, grade_cap_usd=excluded.grade_cap_usd""",
         (tuuid, station, day_str, strike, side, ticker,
          probs.get("p_gefs"), probs.get("p_analog"),
          probs.get("p_trajectory"), probs.get("p_fused"),
          probs.get("n_analog"), probs.get("n_traj"),
          probs.get("agreement"), probs.get("edge_mult"),
          probs.get("traj_verdict"), probs.get("traj_mult"),
-         FUSION_RULE_ID, now))
+         FUSION_RULE_ID, now,
+         probs.get("grade_entered"), probs.get("grade_cap_usd")))
 
 
 def _position_size_usd(confidence: float) -> float:
@@ -432,6 +476,7 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
     probs = probs or {}
     _ensure_price_source_column(conn)
     _ensure_trade_uniqueness(conn)
+    _ensure_grade_columns(conn)  # F7: companion-table grade columns
     existing = conn.execute(
         "SELECT trade_uuid FROM trades WHERE station=? AND trade_date_utc=? "
         "AND functionality=?",
@@ -712,17 +757,32 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             skipped.append((st, "below_min_confidence_tier"))
             continue
 
+        # F7 (2026-10-13): opportunity grade gate. Grade on the booked side's
+        # calibrated probability vs the price paid; F grade does not enter and the
+        # grade caps the position (S=$25, A=$15, B=$10, C=$5). The ladder size was
+        # already computed, so the cap only ever tightens it.
+        grade, grade_edge = compute_trade_grade(our_prob, mkt)
+        if grade == "F":
+            skipped.append((st, f"grade_F_edge:{round(grade_edge, 4)}"))
+            continue
+        grade_cap = grade_position_cap(grade)
+        size_usd = min(size_usd, grade_cap)
+        if size_usd <= 0:
+            skipped.append((st, f"grade_{grade}_zero_cap"))
+            continue
+
         prob_payload = {"p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
                         "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
                         "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
                         "agreement": both["agreement"], "edge_mult": both["edge_mult"],
-                        "traj_verdict": both["traj_verdict"], "traj_mult": both["traj_mult"]}
+                        "traj_verdict": both["traj_verdict"], "traj_mult": both["traj_mult"],
+                        "grade_entered": grade, "grade_cap_usd": grade_cap}
 
         if dry_run:
             results.append({"status": "would_execute", "station": st,
                             "side": sig.signal_type.name, "strike": strike,
                             "our_prob": round(our_prob, 4), "market_price": mkt,
-                            "size": size_usd,
+                            "size": size_usd, "grade": grade,
                             **prob_payload})
         else:
             # GR5 §2 pre-ingest gate: the candidate must pass the decidable
