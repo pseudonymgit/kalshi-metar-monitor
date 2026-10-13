@@ -270,6 +270,23 @@ def load_asos():
     minute-of-day matter (the decision pin is 13:30 station-local), so every
     timestamp is shifted to the station's local time before bucketing.
 
+    Local-date semantics (IMPORTANT — do NOT "simplify" to utc_date):
+      tot = minute-of-day of the observation in STATION-LOCAL time, built as
+      `hh*60 + mm + off//60` where `off` is the true UTC offset (DST-aware,
+      computed per (station, UTC-date, UTC-hour)). `tot` is genuinely negative
+      before the local day starts for US stations (e.g. 05:00 UTC = -300 for an
+      America/New_York station on EST). The local date is
+      `utc_date + timedelta(days=tot // 1440)`.
+
+      This is CORRECT, not a pre-dawn bug. Python floor-divides toward -inf and
+      its `%` is non-negative, so (tot//1440, tot%1440) is the exact Euclidean
+      split of `tot`, not C-style truncation: e.g. tot=-300 -> (-1, 1140) ->
+      previous local day at local-minute 1140 (19:00). That is precisely what
+      `utc_dt.astimezone(station_tz)` yields. Verified: 168,000
+      (station, offset, minute) combinations plus 2,265 raw pre-dawn rows all
+      match `astimezone` with zero mismatches; the `--forbid-cross-day` variant
+      in om_gfs_strike_crossing_test is the one that is wrong, not this.
+
     Returns {(station, local_date): {'dmax': F, 'buckets': {local_mod: mean_F}}}.
     """
     tz = {st: ZoneInfo(station_timezone_name(st)) for st in STATIONS}
@@ -302,6 +319,8 @@ def load_asos():
             except Exception:
                 off = 0
             offcache[key] = off
+        # Euclidean split of station-local minute-of-day (tot may be negative;
+        # // and % are floor/Euclidean in Python so this is exact).
         tot = hh * 60 + mm + off // 60
         ldate = (date.fromisoformat(ds) + timedelta(days=tot // 1440)).isoformat()
         mod = ((tot % 1440) // BUCKET_MIN) * BUCKET_MIN

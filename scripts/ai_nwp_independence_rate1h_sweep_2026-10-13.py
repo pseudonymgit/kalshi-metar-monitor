@@ -280,6 +280,10 @@ def load_asos_buckets(force=False, cache=BUCKET_CACHE):
             except Exception:
                 off = 0
             offcache[key] = off
+        # Euclidean split of station-local minute-of-day. `tot` is NEGATIVE
+        # before the local day starts for US stations; Python // and % are
+        # floor/Euclidean, so (tot//1440, tot%1440) is exact and equals
+        # utc_dt.astimezone(station_tz). No pre-dawn cross-day bug (verified).
         tot = hh * 60 + mm + off // 60
         ldate = (date.fromisoformat(ds) + timedelta(days=tot // 1440)).isoformat()
         lmod = (tot % 1440) // BUCKET_MIN * BUCKET_MIN

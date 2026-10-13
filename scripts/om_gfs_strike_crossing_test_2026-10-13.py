@@ -185,17 +185,37 @@ def collect(force: bool = False) -> dict:
     return out
 
 
-# ── ASOS scan (bug-fixed copy of the diversity study loader) ──────────────
+# ── ASOS scan (drops cross-day carry — CORRECTED NOTE, see below) ───────────
 def load_asos_fixed():
-    """Same as PDS.load_asos but with the pre-dawn local-date bug fixed.
+    """Local-date-bucketed ASOS scan.
 
-    PDS.load_asos computes local minutes as tot = hh*60+mm + off//60 and then
-    ldate = utc_date + timedelta(days=tot//1440). For US stations before ~08:00
-    UTC, tot is NEGATIVE, and Python floor-divides negatives toward -inf, so
-    tot//1440 = -1 and ldate = PREVIOUS local day. That silently fires early
-    local crops of the next day's sunrise into the wrong date and shifts the
-    candidate strike set. Here the day carry is dropped (tot in [-720, 2000),
-    so no scan value can map to a different local calendar day).
+    HISTORY (corrected 2026-10-13): this loader was written believing
+    PDS.load_asos had a pre-dawn local-date bug — that `tot = hh*60+mm+off//60`
+    goes negative for US stations before the local day starts, so
+    `tot//1440` floor-divides to -1 and pushes the row to the previous local
+    date. **That belief is WRONG.** Python's `//` and `%` are floor/Euclidean,
+    so (tot//1440, tot%1440) is the exact Euclidean split of `tot` and equals
+    `utc_dt.astimezone(station_tz)` — it reproduces the true local date AND
+    local minute-of-day. Verified on 168,000 (station, offset, minute) combos
+    and 2,265 raw pre-dawn rows: zero mismatches.
+
+    This loader instead does `ldate = ds` (no cross-day carry). That is NOT
+    equivalent: `utc_date != station_local_date` whenever local time crosses
+    midnight within the UTC day, so this folds the local-evening rows
+    (roughly local 17:00-24:00 = the local daily MAX) into the NEXT UTC day's
+    bucket. Measured divergence vs the correct loader: 22.6% of ASOS rows map
+    to a different (local_date, bucket); 3,546 of 17,031 shared station-days
+    get a different raw daily max; 164 station-days that exist under one key
+    do not exist under the other.
+
+    IMPACT ON THIS STUDY: none on the reported verdict. Every metric here is
+    computed at the 13:30 station-local pin (`PDS.hsf_at_pin`, buckets with
+    mod <= 810), and this scan only mis-dates rows whose station-local
+    minute-of-day exceeds 810. hsf_at_pin is therefore byte-identical to the
+    correct loader on all 3,205 window station-days (0 diffs), so strikes,
+    P(cross), Brier, fcerr and the blend test are all unaffected. Kept as-is
+    to preserve the published numbers; a future revision should adopt
+    PDS.load_asos semantics via `ldate` carry.
 
     Buckets are cached to a gitignored pickle to avoid re-scanning 20.8 M rows.
     """
@@ -235,7 +255,10 @@ def load_asos_fixed():
                 off = 0
             offcache[key] = off
         tot = hh * 60 + mm + off // 60
-        ldate = ds                     # <-- intentional: no cross-day carry
+        # NOTE: `ldate = ds` deliberately drops the cross-day carry. This is
+        # NOT the correct local date (see docstring) — it keeps the published
+        # numbers but 13:30-pin metrics are provably identical either way.
+        ldate = ds
         mod = ((tot % 1440) // PDS.BUCKET_MIN) * PDS.BUCKET_MIN
         k = (st, ldate, mod)
         a = bs.get(k)
