@@ -61,6 +61,23 @@ TRAJ_DISCOUNT = 0.75
 TRAJ_CONFIRM = 1.05
 TRAJ_SOFT = 0.95
 
+# --- F2 (2026-10-13): calibrated confidence ceiling -------------------------
+# data/ws_p_distribution.json -> holdout_metrics.brier_decomp_calibrated:
+#   resolution = 0.0004, uncertainty = 0.2498
+# Near-zero resolution means the ensemble separates outcomes no better than a
+# constant base-rate predictor, so the 0.99 confidence tail is not earned by
+# the data (EXPERT-METHODOLOGY-REVIEW-2026-10-13 E2).
+HOLDOUT_RESOLUTION = 0.0004
+HOLDOUT_UNCERTAINTY = 0.2498
+RESOLUTION_FULL_SKILL = 0.05   # resolution at which the ceiling reaches full skill
+CALIBRATION_FLOOR = 0.75       # ceiling at zero resolution (near-zero skill)
+MAX_CEILING = 0.99             # never exceed the historical hard clip
+CALIBRATED_MIN = 0.50          # floor of the ceiling itself
+CLIP_ZONE = 0.90               # amplifier disabled once p_core is already here
+
+# --- weighted fusion (WEIGHTED-FUSION-SPEC-2026-10-13) ----------------------
+DEFAULT_WEIGHTS = {"gefs": 0.25, "analog": 0.25, "traj": 0.25, "market": 0.25}
+
 
 def _ro(p):
     return sqlite3.connect(f"file:{p}?mode=ro", uri=True)
@@ -298,55 +315,182 @@ class TrajectoryForecaster:
 # -----------------------------------------------------------------------------
 # 4. Fusion
 # -----------------------------------------------------------------------------
-def fuse(p_gefs: float, p_analog: float, p_trajectory: float) -> Tuple[float, Dict]:
-    """Combine three P(high>=X) votes into (p_fused, meta)."""
+def calibrated_ceiling(resolution: Optional[float] = None) -> float:
+    """Per-station p_fused ceiling derived from holdout Brier resolution.
+
+    Maps the Brier-decomposition `resolution` term to a confidence ceiling:
+    zero resolution -> CALIBRATION_FLOOR (0.75, the current-data result),
+    resolution >= RESOLUTION_FULL_SKILL -> MAX_CEILING. Refit by passing a
+    per-station or refreshed `resolution`. This is the mechanism that turns
+    "0.99 is not earned by the data" into a numeric cap.
+    """
+    r = HOLDOUT_RESOLUTION if resolution is None else float(resolution)
+    if r != r:  # NaN
+        r = 0.0
+    r = max(0.0, r)
+    frac = min(1.0, r / RESOLUTION_FULL_SKILL) if RESOLUTION_FULL_SKILL > 0 else 0.0
+    return round(min(MAX_CEILING,
+                     CALIBRATION_FLOOR + (MAX_CEILING - CALIBRATION_FLOOR) * frac), 4)
+
+
+def component_conf(p: Optional[float]) -> float:
+    """Derived component confidence: 0 at a coin flip, 1 at certainty."""
+    if p is None or p != p:
+        return 0.0
+    return abs(float(p) - 0.5) * 2.0
+
+
+def composite_confidence(p_gefs, p_analog, p_trajectory, p_market, weights) -> float:
+    """Weighted mean of component confidences over the components present.
+
+    spec §2.3: composite_conf(s) = sum_i w_i * |p_i - 0.5| * 2.
+    """
+    num = den = 0.0
+    for key, p in (("gefs", p_gefs), ("analog", p_analog),
+                   ("traj", p_trajectory), ("market", p_market)):
+        w = float(weights.get(key, 0.0) or 0.0)
+        if w <= 0 or p is None or p != p:
+            continue
+        num += w * component_conf(p)
+        den += w
+    return round(num / den, 4) if den > 0 else 0.0
+
+
+# Dan's 2026-10-12 grade ladder (composite confidence -> per-trade cap in USD).
+GRADE_LADDER = (("S", 0.90, 25), ("A", 0.80, 15), ("B", 0.70, 10),
+                ("C", 0.60, 5), ("F", 0.0, 0))
+
+
+def grade_from_confidence(conf: Optional[float]) -> str:
+    """Letter grade from composite confidence per the 2026-10-12 ladder."""
+    c = 0.0 if conf is None or conf != conf else float(conf)
+    for grade, threshold, _cap in GRADE_LADDER:
+        if c >= threshold:
+            return grade
+    return "F"
+
+
+def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
+         weights: Optional[Dict] = None, use_weights: bool = False,
+         p_market: Optional[float] = None,
+         ceiling: Optional[float] = None) -> Tuple[float, Dict]:
+    """Combine P(high>=X) votes into (p_fused, meta).
+
+    F2 (2026-10-13) fixes the saturation root cause:
+      * the traj CONFIRM x1.05 amplifier is neutralized once p_core is already
+        in the clip zone (>= CLIP_ZONE) — it can only push p_fused toward an
+        unjustified ceiling, never add information;
+      * p_fused is clamped to a calibrated ceiling [1-ce, ce] derived from the
+        holdout Brier resolution (default 0.75 here), not 0.99.
+
+    ``use_weights`` selects the spec §2.1 weighted core blend
+    (sum_i w_i * p_i over {gefs, analog, traj, market}) instead of the legacy
+    0.55/0.45 agree-band blend. ``p_market`` is optional; when absent the market
+    weight is renormalized out. ``ceiling`` overrides the derived per-station
+    cap (a per-station refit hook).
+    """
     def _cl(v):
         return min(0.999, max(0.001, float(v)))
 
     pg, pa = _cl(p_gefs), _cl(p_analog)
     gap = abs(pg - pa)
     if gap <= AGREE_BAND:
-        p_core = W_GEFS_AGREE * pg + (1 - W_GEFS_AGREE) * pa
         agreement, edge_mult = "agree", 1.0
     elif gap <= SPLIT_BAND:
-        p_core = 0.5 * pg + 0.5 * pa
         agreement, edge_mult = "split", 1.25
+    else:
+        agreement, edge_mult = "disagree", 1.50
+
+    w = dict(weights) if weights else dict(DEFAULT_WEIGHTS)
+    pm = None if (p_market is None or p_market != p_market) else _cl(p_market)
+    ptv = 0.0 if p_trajectory != p_trajectory else float(p_trajectory)
+
+    if use_weights:
+        comps = [("gefs", pg, w.get("gefs", 0.0)),
+                 ("analog", pa, w.get("analog", 0.0)),
+                 ("traj", ptv, w.get("traj", 0.0))]
+        if pm is not None:
+            comps.append(("market", pm, w.get("market", 0.0)))
+        den = sum(max(0.0, wi) for _, _, wi in comps)
+        if den > 0:
+            p_core = sum(max(0.0, wi) * pv for _, pv, wi in comps) / den
+        else:
+            p_core = 0.5 * pg + 0.5 * pa
+    elif gap <= AGREE_BAND:
+        p_core = W_GEFS_AGREE * pg + (1 - W_GEFS_AGREE) * pa
+    elif gap <= SPLIT_BAND:
+        p_core = 0.5 * pg + 0.5 * pa
     else:
         p_core = 0.5 * pg + 0.5 * pa
         p_core = 0.5 + SHRINK_DISAGREE * (p_core - 0.5)  # shrink toward 0.5
-        agreement, edge_mult = "disagree", 1.50
 
-    pt = p_trajectory
-    if pt != pt:  # NaN -> gate could not speak
+    if p_trajectory != p_trajectory:  # NaN -> gate could not speak
         mult, traj_verdict = 1.0, "unavailable"
-    elif pt <= 0.001:
+    elif ptv <= 0.001:
         mult, traj_verdict = TRAJ_DISCOUNT, "discount"
-    elif pt >= 0.50:
+    elif ptv >= 0.50:
         mult, traj_verdict = TRAJ_CONFIRM, "confirm"
     else:
         mult, traj_verdict = TRAJ_SOFT, "soft"
 
-    p_fused = min(0.99, max(0.01, 0.5 + mult * (p_core - 0.5)))
+    # F2: the x1.05 amplifier cannot act inside the clip zone.
+    amplifier_neutralized = False
+    if mult > 1.0 and p_core >= CLIP_ZONE:
+        mult, amplifier_neutralized = 1.0, True
+
+    ce = calibrated_ceiling() if ceiling is None else float(ceiling)
+    ce = min(MAX_CEILING, max(CALIBRATED_MIN, ce))
+    raw = 0.5 + mult * (p_core - 0.5)
+    p_fused = min(0.99, max(0.01, raw))          # legacy hard clip
+    calibrated_p = min(ce, max(1.0 - ce, p_fused))  # calibrated ceiling clamp
+
+    conf = composite_confidence(pg, pa, ptv, pm, w)
     meta = {"agreement": agreement, "edge_mult": edge_mult,
             "traj_verdict": traj_verdict, "traj_mult": mult,
-            "p_core": round(p_core, 4), "gap": round(gap, 4)}
-    return p_fused, meta
+            "p_core": round(p_core, 4), "gap": round(gap, 4),
+            "amplifier_neutralized": amplifier_neutralized,
+            "ceiling": round(ce, 4), "calibrated_p": round(calibrated_p, 4),
+            "composite_conf": conf, "grade": grade_from_confidence(conf),
+            "p_market": (round(pm, 4) if pm is not None else None),
+            "use_weights": bool(use_weights),
+            "weights_applied": {k: round(float(v), 4) for k, v in w.items()}}
+    return calibrated_p, meta
 
 
 def fuse_strike(p_gefs_fn, p_analog_fn, p_trajectory_fn, x: float,
-                high_so_far: Optional[float] = None) -> Dict:
+                high_so_far: Optional[float] = None, *,
+                weights: Optional[Dict] = None, use_weights: bool = False,
+                p_market: Optional[float] = None,
+                ceiling: Optional[float] = None) -> Dict:
     """Fuse one strike. Returns dict with all p_* and fusion meta."""
     pg = p_gefs_fn(x)
     pa = p_analog_fn(x)
     pt = p_trajectory_fn(x)
-    pf, meta = fuse(pg, pa, pt)
+    pf, meta = fuse(pg, pa, pt, weights=weights, use_weights=use_weights,
+                    p_market=p_market, ceiling=ceiling)
     return {"p_gefs": round(float(pg), 4), "p_analog": round(float(pa), 4),
             "p_trajectory": (round(float(pt), 4) if pt == pt else None),
             "p_fused": round(float(pf), 4), **meta}
 
 
+# F2 (2026-10-13): the fusion rule string now includes the calibration clamp and
+# the optional weighted blend, so booked trades are self-describing.
+FUSION_RULE_ID = (
+    "fuse_v2:blend(gefs.55/analog.45)@agree|.5/.5@split|.5x@disagree"
+    ";traj(x.75d|1.05c|.95s;x1.05 neutralized@pcore>=0.90)"
+    ";clamp<=calibrated_ceiling(resolution)"
+    ";weights=equal(.25gef/.25ana/.25traj/.25mkt)")
+
+
 def ensure_schema(conn: sqlite3.Connection) -> None:
-    """Additive schema: forecaster columns on `trades` + companion table."""
+    """Additive schema: forecaster columns on `trades` + companion tables.
+
+    All changes are additive (never mutate existing columns/rows). F2/weighted
+    fusion adds: per-trade calibration columns on the companion
+    ``trade_forecaster_probs``, a per-station weight store
+    (``station_weights``), and a calibration companion table
+    (``trade_calibration``).
+    """
     cols = {d[1] for d in conn.execute("PRAGMA table_info(trades)")}
     for name in ("p_gefs", "p_analog", "p_trajectory", "p_fused"):
         if name not in cols:
@@ -366,7 +510,73 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
             UNIQUE(trade_uuid)
         )
     """)
+    # Additive calibration columns on the companion table (may pre-exist).
+    tfp_cols = {d[1] for d in conn.execute("PRAGMA table_info(trade_forecaster_probs)")}
+    for name in ("calibrated_p", "p_market", "composite_conf", "grade",
+                 "ceiling", "weights_applied"):
+        if name not in tfp_cols:
+            conn.execute(f"ALTER TABLE trade_forecaster_probs ADD COLUMN {name} "
+                         + ("TEXT" if name == "weights_applied" else "REAL"))
+    # Per-station weight store (WEIGHTED-FUSION-SPEC-2026-10-13 §4).
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS station_weights (
+            station TEXT PRIMARY KEY,
+            weight_gefs REAL NOT NULL DEFAULT 0.25,
+            weight_analog REAL NOT NULL DEFAULT 0.25,
+            weight_traj REAL NOT NULL DEFAULT 0.25,
+            weight_market REAL NOT NULL DEFAULT 0.25,
+            composite_conf REAL,
+            rolling_n INTEGER NOT NULL DEFAULT 0,
+            updated_at_utc TEXT NOT NULL
+        )
+    """)
+    # Calibration companion table — F2 asks for a calibrated_p column on the
+    # companion table OR a new calibration table. Provide the latter so the
+    # calibration is independently addressable and never mutates trades.
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS trade_calibration (
+            trade_uuid TEXT PRIMARY KEY,
+            station TEXT NOT NULL,
+            trade_date_utc TEXT NOT NULL,
+            strike REAL, side TEXT, ticker TEXT,
+            p_fused_raw REAL, calibrated_p REAL, ceiling REAL,
+            p_gefs REAL, p_analog REAL, p_trajectory REAL, p_market REAL,
+            composite_conf REAL, grade TEXT,
+            amplifier_neutralized INTEGER, fusion_rule TEXT,
+            created_at_utc TEXT NOT NULL
+        )
+    """)
     conn.commit()
 
 
-FUSION_RULE_ID = "fuse_v1:blend(gefs.55/analog.45)@agree|.5/.5@split|.5x@disagree;traj(x.75d|1.05c|.95s)"
+def ensure_station_weights_defaults(conn: sqlite3.Connection) -> int:
+    """Seed the per-station weight store with EQUAL weights (0.25 each).
+
+    Spec §3.3: a station below the n>=30 candidate floor keeps equal weights, so
+    the store's default IS the shipping configuration until a refit runs.
+    Returns the number of stations seeded. Additive/idempotent.
+    """
+    now = datetime.now(timezone.utc).isoformat()
+    stations = [r[0] for r in conn.execute(
+        "SELECT DISTINCT station FROM trades WHERE station IS NOT NULL")]
+    n = 0
+    for st in stations:
+        cur = conn.execute(
+            "INSERT OR IGNORE INTO station_weights "
+            "(station, weight_gefs, weight_analog, weight_traj, weight_market, "
+            " composite_conf, rolling_n, updated_at_utc) "
+            "VALUES (?,?,?,?,?,?,?,?)",
+            (st, 0.25, 0.25, 0.25, 0.25, None, 0, now))
+        n += cur.rowcount
+    conn.commit()
+    return n
+
+
+def load_weights(conn: sqlite3.Connection, station: str) -> Dict[str, float]:
+    """Per-station weights from `station_weights`, defaulting to equal."""
+    row = conn.execute(
+        "SELECT weight_gefs, weight_analog, weight_traj, weight_market "
+        "FROM station_weights WHERE station=?", (station,)).fetchone()
+    if not row:
+        return dict(DEFAULT_WEIGHTS)
+    return {"gefs": row[0], "analog": row[1], "traj": row[2], "market": row[3]}
