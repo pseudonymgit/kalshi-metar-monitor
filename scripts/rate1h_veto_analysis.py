@@ -1,231 +1,249 @@
 #!/usr/bin/env python3
 """
-rate1h_veto_analysis.py — evaluate a rate_1h pre-trade veto for Track B.
+rate1h_veto_analysis.py — evaluate the rate_1h separation as a PRE-TRADE veto
+for Track B, using the 68 settled trades in the live book.
 
-The veto: "do not enter this station-day if the rate_1h separation at the
-entry window is below the station's median." Uses the rate_1h separation
-reconstructed from the ASOS 1-min archive exactly as
-scripts/sweep_intraday_rate1h_crossing.py does (the published JSON stores only
-window-level separation, no per-station detail).
+For each settled trade:
+  * decision window = the fixed UTC grid hour nearest the entry time
+  * station-window rate_1h separation (pp) at that window, derived from the
+    ASOS 1-minute archive with the SAME method as
+    scripts/sweep_intraday_rate1h_crossing.py (+-0.5 degF trigger)
+  * outcome = canonical_outcome (correct / incorrect)
 
-Reads the 68 usable rows (settlement_confirmed=1, canonical_outcome NOT NULL).
-READ-ONLY. No DB writes.
-Output: data/rate1h_veto_results.json
+Contingency (per spec):
+  sep <  5 pp & incorrect  -> "veto would have helped avoid a loss"
+  sep > 30 pp & correct    -> "veto would have been fine, trade was good"
+  sep > 30 pp & incorrect  -> "veto would have missed a loser that looked good"
+  sep <  5 pp & correct    -> "veto would have skipped a winner (cost)"
+
+Net-P&L veto rule (per spec): skip any trade whose station-window sep is below
+that STATION's median sep (across the 9 decision windows). Compare realised P&L
+of the surviving book against the full book.
+
+Read-only. Writes data/rate1h_veto.json.
+
+Usage:
+    python3 scripts/rate1h_veto_analysis.py
 """
 from __future__ import annotations
 
+import importlib.util
 import json
-import math
-import statistics
 import sqlite3
+import statistics
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 REPO = Path(__file__).resolve().parents[1]
 BOOK = REPO / "data" / "paper_trading_sbox.db"
-ASOS = REPO / "data" / "iem_asos_1min.db"
-OUT = REPO / "data" / "rate1h_veto_results.json"
+SWEEP = REPO / "scripts" / "sweep_intraday_rate1h_crossing.py"
+OUT = REPO / "data" / "rate1h_veto.json"
 
 GRID_HOURS = [6, 10, 12, 14, 16, 17, 18, 20, 22]
-MOM_LOOKBACK = 4
-SEP_THRESHOLD = 1.0
-LOW_PP = 5.0
-HIGH_PP = 30.0
-MIN_CELL = 10
-
-_TZ = {
-    "KATL": "America/New_York", "KAUS": "America/Chicago", "KBOS": "America/New_York",
-    "KDCA": "America/New_York", "KDEN": "America/Denver", "KDFW": "America/Chicago",
-    "KHOU": "America/Chicago", "KLAS": "America/Los_Angeles", "KLAX": "America/Los_Angeles",
-    "KMDW": "America/Chicago", "KMIA": "America/New_York", "KMSP": "America/Chicago",
-    "KMSY": "America/Chicago", "KNYC": "America/New_York", "KOKC": "America/Chicago",
-    "KPHL": "America/New_York", "KPHX": "America/Phoenix", "KSAT": "America/Chicago",
-    "KSEA": "America/Los_Angeles", "KSFO": "America/Los_Angeles",
-}
+SEP_THRESHOLD = 0.5
+LOW_SEP = 5.0     # spec bucket boundary
+HIGH_SEP = 30.0   # spec bucket boundary
 
 
-def nearest_grid_hour(h):
-    c = [g for g in GRID_HOURS if g <= h]
-    return c[-1] if c else GRID_HOURS[0]
+def _ro(p: Path) -> sqlite3.Connection:
+    return sqlite3.connect(f"file:{p}?mode=ro", uri=True)
 
 
-def build_separations():
-    con = sqlite3.connect(f"file:{ASOS}?mode=ro", uri=True)
-    cur = con.execute(
-        "SELECT station, substr(valid,1,10), "
-        "(cast(substr(valid,12,2) as integer)*60 + (cast(substr(valid,15,2) as integer)/15)*15), "
-        "avg(tmpf) FROM observations WHERE tmpf IS NOT NULL GROUP BY station, 2, 3"
-    )
-    bm = {}
-    for st, d, mod, m in cur:
-        try:
-            base = datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        except ValueError:
-            continue
-        dt = base + timedelta(minutes=mod)
-        loc = dt.astimezone(ZoneInfo(_TZ.get(st, "America/New_York")))
-        bm[(st, loc.date().isoformat(), mod)] = m
+def load_sweep_module():
+    spec = importlib.util.spec_from_file_location("sweep_rate1h", SWEEP)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def per_station_separation(mod) -> dict:
+    buckets = mod.load_bucket_means()
+    samples = mod.evaluate(buckets, GRID_HOURS)
+    acc = defaultdict(lambda: {"up": [0, 0], "dn": [0, 0]})
+    for st, _ld, h, rate, _hs, _k, crossed in samples:
+        if rate >= SEP_THRESHOLD:
+            acc[(st, h)]["up"][0] += crossed
+            acc[(st, h)]["up"][1] += 1
+        elif rate <= -SEP_THRESHOLD:
+            acc[(st, h)]["dn"][0] += crossed
+            acc[(st, h)]["dn"][1] += 1
+    sep = {}
+    for key, d in acc.items():
+        if d["up"][1] and d["dn"][1]:
+            sep[key] = 100.0 * (d["up"][0] / d["up"][1] - d["dn"][0] / d["dn"][1])
+    return sep
+
+
+def nearest_window(entry_dt: datetime) -> int:
+    h = entry_dt.hour + entry_dt.minute / 60.0
+    return min(GRID_HOURS, key=lambda g: (abs(g - h), -g))
+
+
+def build():
+    gen = datetime.now(timezone.utc).isoformat()
+    con = _ro(BOOK)
+    cur = con.cursor()
+    trades = cur.execute(
+        """SELECT id, trade_date_utc, station, market_ticker, created_at_utc,
+                  canonical_outcome, realized_pnl, p_fused, market_price,
+                  position_size_usd, trade_cost
+           FROM trades WHERE status='closed' ORDER BY id"""
+    ).fetchall()
     con.close()
 
-    by_sd = defaultdict(dict)
-    for (st, ld, mod), m in bm.items():
-        by_sd[(st, ld)][mod] = m
+    print("deriving per-station rate_1h separation from ASOS (this takes ~90s) ...")
+    mod = load_sweep_module()
+    sep = per_station_separation(mod)
+    med = {}
+    for st in {k[0] for k in sep}:
+        med[st] = statistics.median(v for (s, _h), v in sep.items() if s == st)
 
-    samples = []
-    for (st, ld), mods in by_sd.items():
-        ordered = sorted(mods.items())
-        minutes = [m for m, _ in ordered]
-        means = [v for _, v in ordered]
-        dmax = max(means)
-        for h in GRID_HOURS:
-            dec = h * 60
-            if dec not in mods:
-                continue
-            i = minutes.index(dec)
-            if i < MOM_LOOKBACK:
-                continue
-            rate = means[i] - sum(means[i - MOM_LOOKBACK:i]) / MOM_LOOKBACK
-            hs = max(means[: i + 1])
-            crossed = 1 if dmax > math.floor(hs) + 1.0 else 0
-            samples.append((st, ld, h, rate, crossed))
+    rows = []
+    buckets = {
+        "veto would have helped avoid a loss": [],
+        "veto would have been fine, trade was good": [],
+        "veto would have missed a loser that looked good": [],
+        "veto would have skipped a winner (cost)": [],
+        "mid-band (no veto call)": [],
+    }
+    for (i, tdate, stn, ticker, created, outcome, pnl, pfused,
+         mkt, pos, cost) in trades:
+        entry_dt = datetime.fromisoformat(created)
+        if entry_dt.tzinfo is None:
+            entry_dt = entry_dt.replace(tzinfo=timezone.utc)
+        win = nearest_window(entry_dt)
+        sep_pp = sep.get((stn, win))
+        station_med = med.get(stn)
 
-    def sep_of(rows):
-        up = [s for s in rows if s[3] >= SEP_THRESHOLD]
-        dn = [s for s in rows if s[3] <= -SEP_THRESHOLD]
-        pu = sum(s[4] for s in up) / len(up) if up else 0.0
-        pd = sum(s[4] for s in dn) / len(dn) if dn else 0.0
-        return round(100 * (pu - pd), 2), len(up), len(dn)
+        if sep_pp is None:
+            bucket = "mid-band (no veto call)"
+        elif sep_pp < LOW_SEP and outcome == "incorrect":
+            bucket = "veto would have helped avoid a loss"
+        elif sep_pp > HIGH_SEP and outcome == "correct":
+            bucket = "veto would have been fine, trade was good"
+        elif sep_pp > HIGH_SEP and outcome == "incorrect":
+            bucket = "veto would have missed a loser that looked good"
+        elif sep_pp < LOW_SEP and outcome == "correct":
+            bucket = "veto would have skipped a winner (cost)"
+        else:
+            bucket = "mid-band (no veto call)"
 
-    per_cell = {}
-    for st in {s[0] for s in samples}:
-        for h in GRID_HOURS:
-            sep, nu, nd = sep_of([s for s in samples if s[0] == st and s[2] == h])
-            per_cell[(st, h)] = {"sep_pp": sep, "n_up": nu, "n_down": nd}
+        kept = (station_med is None or sep_pp is None or sep_pp >= station_med)
+        buckets[bucket].append(i)
+        rows.append({
+            "id": i,
+            "trade_date_utc": tdate,
+            "station": stn,
+            "market_ticker": ticker,
+            "entry_time_utc": entry_dt.isoformat(),
+            "decision_window_utc": f"{win:02d}Z",
+            "station_window_sep_pp": round(sep_pp, 3) if sep_pp is not None else None,
+            "station_median_sep_pp": round(station_med, 3) if station_med is not None else None,
+            "above_station_median": kept,
+            "outcome": outcome,
+            "realized_pnl": pnl,
+            "position_size_usd": pos,
+            "trade_cost": cost,
+            "veto_bucket": bucket,
+        })
 
-    per_station = {}
-    for st in {s[0] for s in samples}:
-        sep, nu, nd = sep_of([s for s in samples if s[0] == st])
-        # median of the station's per-window separations = the veto baseline
-        win_seps = [per_cell[(st, h)]["sep_pp"] for h in GRID_HOURS
-                    if (st, h) in per_cell
-                    and per_cell[(st, h)]["n_up"] >= MIN_CELL
-                    and per_cell[(st, h)]["n_down"] >= MIN_CELL]
-        per_station[st] = {
-            "sep_pp": sep, "n_up": nu, "n_down": nd,
-            "median_window_sep_pp": round(statistics.median(win_seps), 2) if win_seps else None,
-            "n_windows_used": len(win_seps),
+    total_pnl = sum((r["realized_pnl"] or 0.0) for r in rows)
+    kept_pnl = sum((r["realized_pnl"] or 0.0) for r in rows if r["above_station_median"])
+    skipped_pnl = sum((r["realized_pnl"] or 0.0) for r in rows if not r["above_station_median"])
+    n_kept = sum(1 for r in rows if r["above_station_median"])
+    n_skipped = len(rows) - n_kept
+
+    def _cnt(ids):
+        return {
+            "count": len(ids),
+            "pnl": round(sum((next(r for r in rows if r["id"] == x)["realized_pnl"] or 0.0)
+                             for x in ids), 2),
         }
-    return per_cell, per_station
+
+    contingency = {
+        "veto would have helped avoid a loss": _cnt(buckets["veto would have helped avoid a loss"]),
+        "veto would have been fine, trade was good": _cnt(buckets["veto would have been fine, trade was good"]),
+        "veto would have missed a loser that looked good": _cnt(buckets["veto would have missed a loser that looked good"]),
+        "veto would have skipped a winner (cost)": _cnt(buckets["veto would have skipped a winner (cost)"]),
+        "mid-band (no veto call)": _cnt(buckets["mid-band (no veto call)"]),
+    }
+
+    saved = len(buckets["veto would have helped avoid a loss"])
+    missed = len(buckets["veto would have skipped a winner (cost)"])
+
+    report = {
+        "generated_at_utc": gen,
+        "source_book": "data/paper_trading_sbox.db:trades (status=closed, n=68)",
+        "source_separation": "derived from data/iem_asos_1min.db via "
+                             "scripts/sweep_intraday_rate1h_crossing.py method",
+        "read_only": True,
+        "parameters": {
+            "sep_threshold_degf": SEP_THRESHOLD,
+            "low_sep_pp": LOW_SEP,
+            "high_sep_pp": HIGH_SEP,
+            "veto_rule": "skip trade when station-window sep < station median sep",
+        },
+        "station_median_sep_pp": {k: round(v, 3) for k, v in med.items()},
+        "summary": {
+            "settled_trades": len(rows),
+            "contingency": contingency,
+            "saved_vs_missed": {
+                "losses_avoided": saved,
+                "winners_skipped": missed,
+                "net_trade_count": saved - missed,
+                "losers_looking_good (sep>30 & incorrect)": len(buckets["veto would have missed a loser that looked good"]),
+                "good_trades_kept (sep>30 & correct)": len(buckets["veto would have been fine, trade was good"]),
+            },
+            "net_pnl_veto": {
+                "rule": "skip station-window sep < station median sep",
+                "full_book_trades": len(rows),
+                "full_book_pnl": round(total_pnl, 2),
+                "kept_trades": n_kept,
+                "kept_pnl": round(kept_pnl, 2),
+                "skipped_trades": n_skipped,
+                "skipped_pnl": round(skipped_pnl, 2),
+                "veto_delta_pnl": round(kept_pnl - total_pnl, 2),
+                "vetoed_winners_pnl": round(sum((r["realized_pnl"] or 0.0)
+                                                for r in rows
+                                                if not r["above_station_median"]
+                                                and r["outcome"] == "correct"), 2),
+                "vetoed_losers_pnl": round(sum((r["realized_pnl"] or 0.0)
+                                               for r in rows
+                                               if not r["above_station_median"]
+                                               and r["outcome"] == "incorrect"), 2),
+            },
+        },
+        "trades": rows,
+    }
+    return report, rows
 
 
-def zone_of(sep_pp):
-    if sep_pp is None:
-        return "unknown"
-    if sep_pp < LOW_PP:
-        return "low(<5pp)"
-    if sep_pp <= HIGH_PP:
-        return "mid(5-30pp)"
-    return "high(>30pp)"
+def print_report(report, rows):
+    print(f"\n{'id':>4} {'stn':<5} {'win':<4} {'sep_pp':>7} {'stn_med':>8} "
+          f"{'keep':<5} {'outcome':<10} {'pnl':>10}  bucket")
+    print("-" * 120)
+    for r in rows:
+        sep_s = f"{r['station_window_sep_pp']:.2f}" if r["station_window_sep_pp"] is not None else "n/a"
+        med_s = f"{r['station_median_sep_pp']:.2f}" if r["station_median_sep_pp"] is not None else "n/a"
+        print(f"{r['id']:>4} {r['station']:<5} {r['decision_window_utc']:<4} "
+              f"{sep_s:>7} {med_s:>8} "
+              f"{('Y' if r['above_station_median'] else 'N'):<5} "
+              f"{str(r['outcome']):<10} "
+              f"{(r['realized_pnl'] if r['realized_pnl'] is not None else 0.0):>10.2f}  "
+              f"{r['veto_bucket']}")
+    print("-" * 120)
+    s = report["summary"]
+    print("contingency:", json.dumps(s["contingency"], indent=2))
+    print("saved vs missed:", json.dumps(s["saved_vs_missed"], indent=2))
+    print("net pnl veto:", json.dumps(s["net_pnl_veto"], indent=2))
 
 
 def main():
-    per_cell, per_station = build_separations()
-
-    book = sqlite3.connect(f"file:{BOOK}?mode=ro", uri=True)
-    book.row_factory = sqlite3.Row
-    trades = [dict(r) for r in book.execute(
-        "SELECT * FROM trades WHERE settlement_confirmed=1 AND canonical_outcome IS NOT NULL "
-        "ORDER BY trade_date_utc, id"
-    )]
-    book.close()
-
-    rows = []
-    def seps_for(st, win):
-        cell = per_cell.get((st, win))
-        if cell and cell["n_up"] >= MIN_CELL and cell["n_down"] >= MIN_CELL:
-            return cell["sep_pp"], f"station-window {win:02d}Z"
-        ps = per_station.get(st)
-        if ps and ps["n_up"] >= MIN_CELL and ps["n_down"] >= MIN_CELL:
-            return ps["sep_pp"], "station-all-windows"
-        return None, "unavailable"
-
-    contingency = defaultdict(lambda: {"correct": 0, "incorrect": 0})
-    helped = []      # low sep & incorrect
-    fine = []        # high sep & correct
-    missed = []      # high sep & incorrect
-    veto_saved = []  # blocked by median veto & incorrect
-    veto_missed = [] # blocked by median veto & correct
-
-    for t in trades:
-        st = t["station"]
-        ts = datetime.fromisoformat(t["created_at_utc"])
-        win = nearest_grid_hour(ts.hour)
-        sep_pp, src = seps_for(st, win)
-        z = zone_of(sep_pp)
-        median_sep = per_station.get(st, {}).get("median_window_sep_pp")
-        veto_blocked = (sep_pp is not None and median_sep is not None and sep_pp < median_sep)
-        outcome = t["canonical_outcome"]
-        contingency[z][outcome] += 1
-
-        entry = {
-            "trade_uuid": t["trade_uuid"], "station": st, "date": t["trade_date_utc"],
-            "window": f"{win:02d}Z", "sep_pp": sep_pp, "sep_source": src, "zone": z,
-            "station_median_sep_pp": median_sep, "veto_blocked": veto_blocked,
-            "outcome": outcome,
-        }
-        rows.append(entry)
-
-        if sep_pp is not None and sep_pp < LOW_PP and outcome == "incorrect":
-            helped.append(entry)
-        if sep_pp is not None and sep_pp > HIGH_PP and outcome == "correct":
-            fine.append(entry)
-        if sep_pp is not None and sep_pp > HIGH_PP and outcome == "incorrect":
-            missed.append(entry)
-        if veto_blocked and outcome == "incorrect":
-            veto_saved.append(entry)
-        if veto_blocked and outcome == "correct":
-            veto_missed.append(entry)
-
-    actual_winners = sum(1 for r in rows if r["outcome"] == "correct")
-    result = {
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "usable_trades": len(rows),
-        "actual_book": {"correct": actual_winners, "incorrect": len(rows) - actual_winners},
-        "veto_rule": ("do not enter this station-day if the rate_1h separation at the "
-                      "entry window is below the station's median window separation"),
-        "zone_thresholds_pp": {"low": LOW_PP, "high": HIGH_PP},
-        "contingency_zone_x_outcome": {z: dict(v) for z, v in contingency.items()},
-        "flags": {
-            "veto_would_have_helped (sep<5pp & incorrect)": len(helped),
-            "veto_would_have_been_fine (sep>30pp & correct)": len(fine),
-            "veto_would_have_missed (sep>30pp & incorrect)": len(missed),
-        },
-        "median_veto": {
-            "blocked_total": len(veto_saved) + len(veto_missed),
-            "would_have_saved_losers": len(veto_saved),
-            "would_have_blocked_winners": len(veto_missed),
-            "net_pnl_proxy": f"saved {len(veto_saved)} losers vs {len(veto_missed)} winners blocked",
-            "blocked_winners": [r["trade_uuid"] for r in veto_missed],
-        },
-        "station_medians": {st: v["median_window_sep_pp"] for st, v in per_station.items()},
-        "per_trade": rows,
-    }
-    OUT.write_text(json.dumps(result, indent=2))
-
-    print(f"usable trades: {len(rows)} | actual correct {actual_winners}/{len(rows)}")
-    print("contingency (zone x outcome):")
-    for z in ("low(<5pp)", "mid(5-30pp)", "high(>30pp)", "unknown"):
-        if z in contingency:
-            c = contingency[z]
-            print(f"  {z:12} correct={c['correct']:3} incorrect={c['incorrect']:3}")
-    print(f"veto helped (sep<5 & incorrect): {len(helped)}")
-    print(f"veto fine   (sep>30 & correct): {len(fine)}")
-    print(f"veto missed (sep>30 & incorrect): {len(missed)}")
-    print(f"median veto: blocked {len(veto_saved)+len(veto_missed)} "
-          f"({len(veto_saved)} losers saved, {len(veto_missed)} winners blocked)")
-    print(f"wrote {OUT}")
+    report, rows = build()
+    OUT.write_text(json.dumps(report, indent=2))
+    print_report(report, rows)
+    print(f"\nwrote {OUT.relative_to(REPO)}")
 
 
 if __name__ == "__main__":

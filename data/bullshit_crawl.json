@@ -1,79 +1,81 @@
 {
-  "generated_at_utc": "2026-10-13T03:40:19.548556+00:00",
-  "source": "data/paper_trading_sbox.db (read-only)",
-  "bankroll_usd": 193.85,
+  "generated_at_utc": "2026-10-13T03:42:10.004400+00:00",
+  "source_db": "data/paper_trading_sbox.db",
+  "bankroll_usd": 200.0,
   "total_trades": 82,
-  "flagged": 81,
-  "passed": 1,
-  "flag_pct": 98.8,
-  "rule_definitions": {
-    "pnl over cap": "realized_pnl > 2000 (200 x 10)",
-    "over max position": "position_size_usd > 25.0",
-    "low conf but entered": "position_size_usd > 0 and p_fused < 0.6 (per grade F)",
-    "S grade on flat signal": "p_fused >= 0.9 (F4: 0.9 and 0.6 same outcome)",
-    "extreme edge": "(p_fused - market_price)/market_price > 0.5",
-    "over-market position": "quantity > 25% of strike open_interest"
-  },
-  "rule_hit_counts": {
-    "pnl over cap": 0,
+  "flagged_trades": 81,
+  "clean_trades": 1,
+  "flagged_pct": 98.8,
+  "flags_per_rule": {
+    "bankroll/position mismatch": 0,
     "over max position": 0,
     "low conf but entered": 5,
     "S grade on flat signal": 52,
-    "extreme edge": 77,
-    "over-market position": 38
+    "extreme edge": 77
   },
-  "flagged_trades": [
+  "rule_definitions": {
+    "bankroll/position mismatch": "realized_pnl > 200.0 x 10.0 = 2000",
+    "over max position": "position_size_usd > 25.0",
+    "low conf but entered": "position_size_usd > 0 and p_fused < 0.6",
+    "S grade on flat signal": "p_fused >= 0.9 (F4: 0.9 and 0.6 settle the same)",
+    "extreme edge": "(p_fused - market_price)/market_price > 0.5"
+  },
+  "flagged": [
     {
       "trade_uuid": "c8e3dc6b-f398-4fc4-9a67-86826b03c39b",
       "station": "KSEA",
       "trade_date_utc": "2026-10-09",
-      "market_ticker": "KXHIGHTSEA-26OCT09-T59",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1550.0,
-        "market_price": 0.060000000000000005
+        "market_price": 0.060000000000000005,
+        "edge_pct": 1550.0
       }
     },
     {
       "trade_uuid": "2813eced-43b1-4285-8cfc-c36748345f12",
       "station": "KMDW",
       "trade_date_utc": "2026-10-09",
-      "market_ticker": "KXHIGHCHI-26OCT09-T71",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 80.0,
-        "market_price": 0.55
+        "market_price": 0.55,
+        "edge_pct": 80.0
       }
     },
     {
       "trade_uuid": "bddcc7b9-2097-4eff-b609-5dcff053184f",
       "station": "KDFW",
       "trade_date_utc": "2026-10-09",
-      "market_ticker": "KXHIGHTDAL-26OCT09-T93",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "low conf but entered",
         "extreme edge"
       ],
       "values": {
-        "p_fused": 0.2499,
         "position_size_usd": 5.0,
-        "edge_pct": 354.4,
-        "market_price": 0.055
+        "p_fused": 0.2499,
+        "market_price": 0.055,
+        "edge_pct": 354.4
       }
     },
     {
       "trade_uuid": "173b3fe4-a6d4-4dc1-ae4d-861578905e35",
       "station": "KSFO",
       "trade_date_utc": "2026-10-09",
-      "market_ticker": "KXHIGHTSFO-26OCT09-T70",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal"
       ],
@@ -85,914 +87,874 @@
       "trade_uuid": "973e2f5c-fc0d-4f9b-8c48-3a0b47ee9b9a",
       "station": "KDCA",
       "trade_date_utc": "2026-10-10",
-      "market_ticker": "KXHIGHTDC-26OCT10-T70",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 645.7,
-        "market_price": 0.11499999999999999
+        "p_fused": 0.8575,
+        "market_price": 0.11499999999999999,
+        "edge_pct": 645.7
       }
     },
     {
       "trade_uuid": "51d1bfad-2a13-463e-bf0a-430267c17c83",
       "station": "KNYC",
       "trade_date_utc": "2026-10-10",
-      "market_ticker": "KXHIGHNY-26OCT10-T66",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 2294.3,
-        "market_price": 0.035
+        "p_fused": 0.838,
+        "market_price": 0.035,
+        "edge_pct": 2294.3
       }
     },
     {
       "trade_uuid": "4b4ab77f-2760-4fb7-a328-69eec10e74a5",
       "station": "KPHX",
       "trade_date_utc": "2026-10-10",
-      "market_ticker": "KXHIGHTPHX-26OCT10-T96",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9671,
-        "edge_pct": 452.6,
-        "market_price": 0.175
+        "market_price": 0.175,
+        "edge_pct": 452.6
       }
     },
     {
       "trade_uuid": "0cb2b344-8344-4a5b-b475-0aba2ef4620e",
       "station": "KATL",
       "trade_date_utc": "2026-08-01",
-      "market_ticker": "KXHIGHTATL-26AUG01-T82",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 582.8,
         "market_price": 0.14500000000000002,
-        "quantity_pct_of_oi": 37.26,
-        "open_interest": 461.57
+        "edge_pct": 582.8
       }
     },
     {
       "trade_uuid": "b761fe6e-a8b7-4181-81d1-dd13732cc353",
       "station": "KATL",
       "trade_date_utc": "2026-08-04",
-      "market_ticker": "KXHIGHTATL-26AUG04-T84",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 633.3,
         "market_price": 0.135,
-        "quantity_pct_of_oi": 210.08,
-        "open_interest": 88.06
+        "edge_pct": 633.3
       }
     },
     {
       "trade_uuid": "3dafbbc1-26c6-45b4-a13f-0df7c5d46ad2",
       "station": "KATL",
       "trade_date_utc": "2026-08-05",
-      "market_ticker": "KXHIGHTATL-26AUG05-T84",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1423.1,
         "market_price": 0.065,
-        "quantity_pct_of_oi": 84.8,
-        "open_interest": 452.82
+        "edge_pct": 1423.1
       }
     },
     {
       "trade_uuid": "1c6e03ba-4a3f-4564-92e6-fcaf0aaa839b",
       "station": "KATL",
       "trade_date_utc": "2026-08-09",
-      "market_ticker": "KXHIGHTATL-26AUG09-T88",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.9533,
-        "edge_pct": 2018.4,
         "market_price": 0.045,
-        "quantity_pct_of_oi": 357.74,
-        "open_interest": 155.42
+        "edge_pct": 2018.4
       }
     },
     {
       "trade_uuid": "5a5446c1-48a2-4645-b8dc-83580aa1ec82",
       "station": "KATL",
       "trade_date_utc": "2026-08-10",
-      "market_ticker": "KXHIGHTATL-26AUG10-T88",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 2728.6,
         "market_price": 0.035,
-        "quantity_pct_of_oi": 295.41,
-        "open_interest": 241.7
+        "edge_pct": 2728.6
       }
     },
     {
       "trade_uuid": "078e8a52-c361-486d-933e-f04d527e06f2",
       "station": "KATL",
       "trade_date_utc": "2026-08-11",
-      "market_ticker": "KXHIGHTATL-26AUG11-T89",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 155.69,
-        "open_interest": 642.32
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "d584dbbc-ae4b-4c41-86f6-74a2b1941fdc",
       "station": "KATL",
       "trade_date_utc": "2026-08-12",
-      "market_ticker": "KXHIGHTATL-26AUG12-T89",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "edge_pct": 2932.0,
+        "p_fused": 0.758,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 67.92,
-        "open_interest": 294.45
+        "edge_pct": 2932.0
       }
     },
     {
       "trade_uuid": "a4b4bd66-bd0a-478d-a83d-50dd90153281",
       "station": "KATL",
       "trade_date_utc": "2026-08-13",
-      "market_ticker": "KXHIGHTATL-26AUG13-T92",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 2100.0,
         "market_price": 0.045,
-        "quantity_pct_of_oi": 130.37,
-        "open_interest": 426.47
+        "edge_pct": 2100.0
       }
     },
     {
       "trade_uuid": "a59450e7-8366-4973-bab5-7848b58bcd32",
       "station": "KATL",
       "trade_date_utc": "2026-08-14",
-      "market_ticker": "KXHIGHTATL-26AUG14-T93",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1423.1,
         "market_price": 0.065,
-        "quantity_pct_of_oi": 169.07,
-        "open_interest": 227.13
+        "edge_pct": 1423.1
       }
     },
     {
       "trade_uuid": "d7caff0f-77a1-44a4-b5d5-b76aaffa2172",
       "station": "KATL",
       "trade_date_utc": "2026-08-18",
-      "market_ticker": "KXHIGHTATL-26AUG18-T92",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.9046,
-        "edge_pct": 2915.3,
         "market_price": 0.03,
-        "quantity_pct_of_oi": 50.45,
-        "open_interest": 660.01
+        "edge_pct": 2915.3
       }
     },
     {
       "trade_uuid": "d11018c5-f086-43e2-b96f-f5cf01c26440",
       "station": "KATL",
       "trade_date_utc": "2026-09-04",
-      "market_ticker": "KXHIGHTATL-26SEP04-T92",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "edge_pct": 1911.8,
+        "p_fused": 0.8047,
         "market_price": 0.04,
-        "quantity_pct_of_oi": 28.09,
-        "open_interest": 445.01
+        "edge_pct": 1911.8
       }
     },
     {
       "trade_uuid": "574917ec-82a0-4c89-a74f-c3e3f9c1b217",
       "station": "KATL",
       "trade_date_utc": "2026-09-20",
-      "market_ticker": "KXHIGHTATL-26SEP20-T88",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 141.3,
-        "market_price": 0.365
+        "p_fused": 0.8807,
+        "market_price": 0.365,
+        "edge_pct": 141.3
       }
     },
     {
       "trade_uuid": "48bc81da-1406-460b-b3f4-9b0271854f9a",
       "station": "KAUS",
       "trade_date_utc": "2026-08-01",
-      "market_ticker": "KXHIGHAUS-26AUG01-T96",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.9538,
-        "edge_pct": 2019.6,
         "market_price": 0.045,
-        "quantity_pct_of_oi": 27.09,
-        "open_interest": 2052.72
+        "edge_pct": 2019.6
       }
     },
     {
       "trade_uuid": "49889f90-9ef9-49a3-90cd-ab8113e51231",
       "station": "KAUS",
       "trade_date_utc": "2026-09-04",
-      "market_ticker": "KXHIGHAUS-26SEP04-T93",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9177,
-        "edge_pct": 222.0,
-        "market_price": 0.28500000000000003
+        "market_price": 0.28500000000000003,
+        "edge_pct": 222.0
       }
     },
     {
       "trade_uuid": "1f7f30cc-77f9-4793-935d-1ff5f9e7108c",
       "station": "KAUS",
       "trade_date_utc": "2026-09-15",
-      "market_ticker": "KXHIGHAUS-26SEP15-T98",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
-        "market_price": 0.025
+        "market_price": 0.025,
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "ef0be569-b7e8-4118-81be-01f46413eff3",
       "station": "KAUS",
       "trade_date_utc": "2026-09-17",
-      "market_ticker": "KXHIGHAUS-26SEP17-T95",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 3249.2,
-        "market_price": 0.025
+        "p_fused": 0.8373,
+        "market_price": 0.025,
+        "edge_pct": 3249.2
       }
     },
     {
       "trade_uuid": "ca072d7b-f449-4316-a7f8-4f6cfa8b6114",
       "station": "KAUS",
       "trade_date_utc": "2026-09-29",
-      "market_ticker": "KXHIGHAUS-26SEP29-T93",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1137.5,
-        "market_price": 0.08
+        "market_price": 0.08,
+        "edge_pct": 1137.5
       }
     },
     {
       "trade_uuid": "3a0d3d10-95b8-4c39-a19c-7c269ced8487",
       "station": "KBOS",
       "trade_date_utc": "2026-08-04",
-      "market_ticker": "KXHIGHTBOS-26AUG04-T81",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 2100.0,
         "market_price": 0.045,
-        "quantity_pct_of_oi": 101.13,
-        "open_interest": 549.77
+        "edge_pct": 2100.0
       }
     },
     {
       "trade_uuid": "3105f577-1555-4306-a0d3-7e95050f0b9d",
       "station": "KBOS",
       "trade_date_utc": "2026-08-11",
-      "market_ticker": "KXHIGHTBOS-26AUG11-T85",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1700.0,
         "market_price": 0.055,
-        "quantity_pct_of_oi": 55.93,
-        "open_interest": 811.71
+        "edge_pct": 1700.0
       }
     },
     {
       "trade_uuid": "06a4e96c-7c60-4dc2-b369-d61587ccf295",
       "station": "KBOS",
       "trade_date_utc": "2026-08-12",
-      "market_ticker": "KXHIGHTBOS-26AUG12-T83",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 148.8,
-        "market_price": 0.305
+        "p_fused": 0.7588,
+        "market_price": 0.305,
+        "edge_pct": 148.8
       }
     },
     {
       "trade_uuid": "771c2065-75af-4525-b437-0604c38db15f",
       "station": "KBOS",
       "trade_date_utc": "2026-08-13",
-      "market_ticker": "KXHIGHTBOS-26AUG13-T81",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 760.9,
         "market_price": 0.11499999999999999,
-        "quantity_pct_of_oi": 60.3,
-        "open_interest": 361.52
+        "edge_pct": 760.9
       }
     },
     {
       "trade_uuid": "0871092f-e4d2-48a5-8996-0a3f0825a653",
       "station": "KBOS",
       "trade_date_utc": "2026-08-14",
-      "market_ticker": "KXHIGHTBOS-26AUG14-T80",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1700.0,
         "market_price": 0.055,
-        "quantity_pct_of_oi": 162.46,
-        "open_interest": 279.45
+        "edge_pct": 1700.0
       }
     },
     {
       "trade_uuid": "54bc6710-3190-44f5-b4d4-181be33745e2",
       "station": "KBOS",
       "trade_date_utc": "2026-09-05",
-      "market_ticker": "KXHIGHTBOS-26SEP05-T70",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1220.0,
         "market_price": 0.07500000000000001,
-        "quantity_pct_of_oi": 31.37,
-        "open_interest": 1064.6
+        "edge_pct": 1220.0
       }
     },
     {
       "trade_uuid": "448ce128-73bf-49b2-b44b-1568bb8dc45a",
       "station": "KBOS",
       "trade_date_utc": "2026-09-08",
-      "market_ticker": "KXHIGHTBOS-26SEP08-T78",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 538.7,
         "market_price": 0.155,
-        "quantity_pct_of_oi": 38.31,
-        "open_interest": 422.82
+        "edge_pct": 538.7
       }
     },
     {
       "trade_uuid": "19fc6cf3-f558-4982-930e-8b727757d24a",
       "station": "KBOS",
       "trade_date_utc": "2026-09-15",
-      "market_ticker": "KXHIGHTBOS-26SEP15-T65",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 2728.6,
         "market_price": 0.035,
-        "quantity_pct_of_oi": 75.98,
-        "open_interest": 939.74
+        "edge_pct": 2728.6
       }
     },
     {
       "trade_uuid": "b9c1ff08-2d23-42a5-888e-0204335b3e70",
       "station": "KDCA",
       "trade_date_utc": "2026-08-05",
-      "market_ticker": "KXHIGHTDC-26AUG05-T84",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1700.0,
         "market_price": 0.055,
-        "quantity_pct_of_oi": 972.16,
-        "open_interest": 46.7
+        "edge_pct": 1700.0
       }
     },
     {
       "trade_uuid": "e9553e2b-e018-4c58-9a34-6bdf1803f321",
       "station": "KDCA",
       "trade_date_utc": "2026-08-09",
-      "market_ticker": "KXHIGHTDC-26AUG09-T90",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 2728.6,
         "market_price": 0.035,
-        "quantity_pct_of_oi": 810.9,
-        "open_interest": 88.05
+        "edge_pct": 2728.6
       }
     },
     {
       "trade_uuid": "2c0273ad-1562-48a9-987d-e2363a25d637",
       "station": "KDCA",
       "trade_date_utc": "2026-08-11",
-      "market_ticker": "KXHIGHTDC-26AUG11-T89",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 274.6,
-        "market_price": 0.235
+        "p_fused": 0.8803,
+        "market_price": 0.235,
+        "edge_pct": 274.6
       }
     },
     {
       "trade_uuid": "365b9927-bf87-43b8-8822-0fbdc36531ee",
       "station": "KDCA",
       "trade_date_utc": "2026-08-12",
-      "market_ticker": "KXHIGHTDC-26AUG12-T85",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "edge_pct": 1257.1,
+        "p_fused": 0.8821,
         "market_price": 0.065,
-        "quantity_pct_of_oi": 59.59,
-        "open_interest": 258.42
+        "edge_pct": 1257.1
       }
     },
     {
       "trade_uuid": "79066ebd-ca5f-4d72-8402-f13afe5901a9",
       "station": "KDCA",
       "trade_date_utc": "2026-08-13",
-      "market_ticker": "KXHIGHTDC-26AUG13-T87",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "edge_pct": 3110.4,
+        "p_fused": 0.8026,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 56.63,
-        "open_interest": 353.19
+        "edge_pct": 3110.4
       }
     },
     {
       "trade_uuid": "e0bc7a28-e7ae-40a8-afcf-36afe1aab621",
       "station": "KDCA",
       "trade_date_utc": "2026-08-18",
-      "market_ticker": "KXHIGHTDC-26AUG18-T86",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1423.1,
         "market_price": 0.065,
-        "quantity_pct_of_oi": 135.69,
-        "open_interest": 283.0
+        "edge_pct": 1423.1
       }
     },
     {
       "trade_uuid": "45400aac-22ea-4840-89aa-5993a103d597",
       "station": "KDCA",
       "trade_date_utc": "2026-09-05",
-      "market_ticker": "KXHIGHTDC-26SEP05-T82",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 582.8,
         "market_price": 0.14500000000000002,
-        "quantity_pct_of_oi": 81.57,
-        "open_interest": 210.87
+        "edge_pct": 582.8
       }
     },
     {
       "trade_uuid": "12a97c57-724b-463d-89de-88f9652db6f3",
       "station": "KDCA",
       "trade_date_utc": "2026-09-29",
-      "market_ticker": "KXHIGHTDC-26SEP29-T74",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 984.1,
-        "market_price": 0.07500000000000001
+        "p_fused": 0.8131,
+        "market_price": 0.07500000000000001,
+        "edge_pct": 984.1
       }
     },
     {
       "trade_uuid": "d3070f6e-aad3-4123-ad2c-69fb1b83ad4b",
       "station": "KDEN",
       "trade_date_utc": "2026-08-01",
-      "market_ticker": "KXHIGHDEN-26AUG01-T95",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "low conf but entered",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "p_fused": 0.1924,
         "position_size_usd": 5.0,
-        "edge_pct": 83.2,
+        "p_fused": 0.1924,
         "market_price": 0.10500000000000001,
-        "quantity_pct_of_oi": 27.73,
-        "open_interest": 173.1
+        "edge_pct": 83.2
       }
     },
     {
       "trade_uuid": "b364af2a-7206-4c52-8e70-dd2e40e3e4dd",
       "station": "KDEN",
       "trade_date_utc": "2026-08-04",
-      "market_ticker": "KXHIGHDEN-26AUG04-T82",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 350.96,
-        "open_interest": 284.93
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "4707ae5b-e653-4183-9393-8035c7bf9720",
       "station": "KDEN",
       "trade_date_utc": "2026-08-09",
-      "market_ticker": "KXHIGHDEN-26AUG09-T94",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 2728.6,
         "market_price": 0.035,
-        "quantity_pct_of_oi": 571.61,
-        "open_interest": 124.91
+        "edge_pct": 2728.6
       }
     },
     {
       "trade_uuid": "e6a9eae7-1b53-493d-a7be-7d11601762cb",
       "station": "KDEN",
       "trade_date_utc": "2026-08-11",
-      "market_ticker": "KXHIGHDEN-26AUG11-T93",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 660.2,
-        "open_interest": 151.47
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "a1546ff1-e56d-4679-87f5-d3c69ef4ffcd",
       "station": "KDEN",
       "trade_date_utc": "2026-08-13",
-      "market_ticker": "KXHIGHDEN-26AUG13-T85",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.9744,
-        "edge_pct": 3797.6,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 129.2,
-        "open_interest": 774.0
+        "edge_pct": 3797.6
       }
     },
     {
       "trade_uuid": "20442991-4e70-4c39-bdd7-6cde98ba7d1e",
       "station": "KDEN",
       "trade_date_utc": "2026-09-04",
-      "market_ticker": "KXHIGHDEN-26SEP04-T95",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "low conf but entered",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "p_fused": 0.2002,
         "position_size_usd": 5.0,
-        "edge_pct": 344.9,
+        "p_fused": 0.2002,
         "market_price": 0.045,
-        "quantity_pct_of_oi": 102.77,
-        "open_interest": 108.01
+        "edge_pct": 344.9
       }
     },
     {
       "trade_uuid": "09bf7a81-2eae-4580-9f79-9047a1b9648f",
       "station": "KDEN",
       "trade_date_utc": "2026-09-15",
-      "market_ticker": "KXHIGHDEN-26SEP15-T70",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1700.0,
-        "market_price": 0.05500000000000001
+        "market_price": 0.05500000000000001,
+        "edge_pct": 1700.0
       }
     },
     {
       "trade_uuid": "a12eb9cb-9864-4d52-a42e-cc2b035eb9ea",
       "station": "KDEN",
       "trade_date_utc": "2026-09-19",
-      "market_ticker": "KXHIGHDEN-26SEP19-T80",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "edge_pct": 3407.6,
+        "p_fused": 0.8769,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 26.4,
-        "open_interest": 1514.89
+        "edge_pct": 3407.6
       }
     },
     {
       "trade_uuid": "367e24e9-0eab-4322-b0d6-85e097342134",
       "station": "KDEN",
       "trade_date_utc": "2026-09-20",
-      "market_ticker": "KXHIGHDEN-26SEP20-T74",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9494,
-        "edge_pct": 272.3,
-        "market_price": 0.255
+        "market_price": 0.255,
+        "edge_pct": 272.3
       }
     },
     {
       "trade_uuid": "742475c0-89bb-470b-a0b4-29654cbf1ffb",
       "station": "KDEN",
       "trade_date_utc": "2026-09-30",
-      "market_ticker": "KXHIGHDEN-26SEP30-T66",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 1489.8,
-        "market_price": 0.05500000000000001
+        "p_fused": 0.8744,
+        "market_price": 0.05500000000000001,
+        "edge_pct": 1489.8
       }
     },
     {
       "trade_uuid": "cb46ffbd-5f52-4700-96ed-d350e4e402ca",
       "station": "KDFW",
       "trade_date_utc": "2026-08-01",
-      "market_ticker": "KXHIGHTDAL-26AUG01-T95",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3200.0,
         "market_price": 0.03,
-        "quantity_pct_of_oi": 165.2,
-        "open_interest": 504.85
+        "edge_pct": 3200.0
       }
     },
     {
       "trade_uuid": "34f9518e-de44-4a07-bb9a-63af8d441813",
       "station": "KDFW",
       "trade_date_utc": "2026-08-05",
-      "market_ticker": "KXHIGHTDAL-26AUG05-T99",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
-        "edge_pct": 3413.6,
+        "p_fused": 0.8784,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 46.43,
-        "open_interest": 861.5
+        "edge_pct": 3413.6
       }
     },
     {
       "trade_uuid": "d1b4b630-983c-4799-971b-567165be1263",
       "station": "KDFW",
       "trade_date_utc": "2026-09-03",
-      "market_ticker": "KXHIGHTDAL-26SEP03-T91",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9775,
-        "edge_pct": 210.3,
-        "market_price": 0.315
+        "market_price": 0.315,
+        "edge_pct": 210.3
       }
     },
     {
       "trade_uuid": "571e740d-c9c5-42a1-85d3-edf3d9d0aeda",
       "station": "KDFW",
       "trade_date_utc": "2026-09-04",
-      "market_ticker": "KXHIGHTDAL-26SEP04-T93",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1220.0,
         "market_price": 0.075,
-        "quantity_pct_of_oi": 41.94,
-        "open_interest": 796.34
+        "edge_pct": 1220.0
       }
     },
     {
       "trade_uuid": "9e8488e6-33bb-4bf0-8e6c-e580451cd32b",
       "station": "KHOU",
       "trade_date_utc": "2026-09-08",
-      "market_ticker": "KXHIGHTHOU-26SEP08-T91",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 309.7,
-        "open_interest": 322.89
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "430ffb91-fe8f-4484-8ced-fb9910266c4d",
       "station": "KLAX",
       "trade_date_utc": "2026-09-14",
-      "market_ticker": "KXHIGHLAX-26SEP14-T82",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "low conf but entered",
         "extreme edge"
       ],
       "values": {
-        "p_fused": 0.2354,
         "position_size_usd": 5.0,
-        "edge_pct": 176.9,
-        "market_price": 0.08499999999999999
+        "p_fused": 0.2354,
+        "market_price": 0.08499999999999999,
+        "edge_pct": 176.9
       }
     },
     {
       "trade_uuid": "aff13489-b2cd-4c3c-8bab-1bda0fc845f8",
       "station": "KMDW",
       "trade_date_utc": "2026-09-15",
-      "market_ticker": "KXHIGHCHI-26SEP15-T87",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "low conf but entered"
       ],
       "values": {
-        "p_fused": 0.0183,
-        "position_size_usd": 25.0
+        "position_size_usd": 25.0,
+        "p_fused": 0.0183
       }
     },
     {
       "trade_uuid": "31daf3fa-58a4-4e7f-87ac-647f5de6e650",
       "station": "KMDW",
       "trade_date_utc": "2026-09-19",
-      "market_ticker": "KXHIGHCHI-26SEP19-T72",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 233.0,
-        "market_price": 0.23500000000000001
+        "p_fused": 0.7826,
+        "market_price": 0.23500000000000001,
+        "edge_pct": 233.0
       }
     },
     {
       "trade_uuid": "5d295523-ed45-4b55-8ed8-e210ffcdaa31",
       "station": "KMIA",
       "trade_date_utc": "2026-09-08",
-      "market_ticker": "KXHIGHMIA-26SEP08-T86",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
         "market_price": 0.025,
-        "quantity_pct_of_oi": 64.81,
-        "open_interest": 1543.0
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "6ee10832-8fe6-480f-b17c-baf39d2e0aed",
       "station": "KMIA",
       "trade_date_utc": "2026-09-17",
-      "market_ticker": "KXHIGHMIA-26SEP17-T84",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal"
       ],
@@ -1004,208 +966,226 @@
       "trade_uuid": "01cb75df-ddfd-47ee-a6ee-9742936bb02a",
       "station": "KMSP",
       "trade_date_utc": "2026-09-08",
-      "market_ticker": "KXHIGHTMIN-26SEP08-T79",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
-        "extreme edge",
-        "over-market position"
+        "extreme edge"
       ],
       "values": {
         "p_fused": 0.972,
-        "edge_pct": 825.7,
         "market_price": 0.105,
-        "quantity_pct_of_oi": 33.83,
-        "open_interest": 703.46
+        "edge_pct": 825.7
       }
     },
     {
       "trade_uuid": "21635e0a-875b-4689-88ef-3627147370f1",
       "station": "KMSP",
       "trade_date_utc": "2026-09-14",
-      "market_ticker": "KXHIGHTMIN-26SEP14-T64",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9754,
-        "edge_pct": 85.8,
-        "market_price": 0.525
+        "market_price": 0.525,
+        "edge_pct": 85.8
       }
     },
     {
       "trade_uuid": "945fdc4b-509a-4c0b-a077-3f66ea35ff11",
       "station": "KNYC",
       "trade_date_utc": "2026-09-08",
-      "market_ticker": "KXHIGHNY-26SEP08-T80",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 720.9,
-        "market_price": 0.095
+        "p_fused": 0.7799,
+        "market_price": 0.095,
+        "edge_pct": 720.9
       }
     },
     {
       "trade_uuid": "3238b821-44f4-40e1-b5e0-a6663577426c",
       "station": "KPHL",
       "trade_date_utc": "2026-09-20",
-      "market_ticker": "KXHIGHPHIL-26SEP20-T75",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1423.1,
-        "market_price": 0.065
+        "market_price": 0.065,
+        "edge_pct": 1423.1
       }
     },
     {
       "trade_uuid": "a92b1767-e955-4d9d-88fe-cbe22fb7ec60",
       "station": "KPHX",
       "trade_date_utc": "2026-09-14",
-      "market_ticker": "KXHIGHTPHX-26SEP14-T101",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 1700.0,
-        "market_price": 0.055
+        "market_price": 0.055,
+        "edge_pct": 1700.0
       }
     },
     {
       "trade_uuid": "039e88d2-b9d5-435f-ba24-80ce7195a15e",
       "station": "KPHX",
       "trade_date_utc": "2026-09-17",
-      "market_ticker": "KXHIGHTPHX-26SEP17-T91",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 1656.8,
-        "market_price": 0.05
+        "p_fused": 0.8784,
+        "market_price": 0.05,
+        "edge_pct": 1656.8
       }
     },
     {
       "trade_uuid": "3a504870-7e90-433f-8162-75d40d415bcf",
       "station": "KSAT",
       "trade_date_utc": "2026-09-30",
-      "market_ticker": "KXHIGHTSATX-26SEP30-T92",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 261.1,
-        "market_price": 0.21
+        "p_fused": 0.7583,
+        "market_price": 0.21,
+        "edge_pct": 261.1
       }
     },
     {
       "trade_uuid": "83129d80-d160-4fc5-ad17-f07885ec2ccd",
       "station": "KSEA",
       "trade_date_utc": "2026-09-18",
-      "market_ticker": "KXHIGHTSEA-26SEP18-T69",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9604,
-        "edge_pct": 967.1,
-        "market_price": 0.09
+        "market_price": 0.09,
+        "edge_pct": 967.1
       }
     },
     {
       "trade_uuid": "7af9226f-9e34-4ced-987d-8e5ea5a81d30",
       "station": "KSFO",
       "trade_date_utc": "2026-09-14",
-      "market_ticker": "KXHIGHTSFO-26SEP14-T72",
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 725.0,
-        "market_price": 0.12
+        "market_price": 0.12,
+        "edge_pct": 725.0
       }
     },
     {
       "trade_uuid": "25afef87-85c0-40ba-9075-1bff47085129",
       "station": "KSFO",
       "trade_date_utc": "2026-09-16",
-      "market_ticker": "KXHIGHTSFO-26SEP16-T66",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9528,
-        "edge_pct": 460.5,
-        "market_price": 0.16999999999999998
+        "market_price": 0.16999999999999998,
+        "edge_pct": 460.5
       }
     },
     {
       "trade_uuid": "2ae647d1-d5d4-467b-b2fc-d40d68bc65c6",
       "station": "KSFO",
       "trade_date_utc": "2026-09-20",
-      "market_ticker": "KXHIGHTSFO-26SEP20-T65",
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.9846,
-        "edge_pct": 100.9,
-        "market_price": 0.49
+        "market_price": 0.49,
+        "edge_pct": 100.9
       }
     },
     {
       "trade_uuid": "ca41d987-1725-46a7-a1d4-529d9296ed8a",
       "station": "KLAX",
       "trade_date_utc": "2026-10-10",
-      "market_ticker": "KXHIGHLAX-26OCT10-T75",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 1350.5,
-        "market_price": 0.055
+        "p_fused": 0.7978,
+        "market_price": 0.055,
+        "edge_pct": 1350.5
       }
     },
     {
       "trade_uuid": "2d780689-b131-418e-8897-4557d60b31e2",
       "station": "KHOU",
       "trade_date_utc": "2026-10-10",
-      "market_ticker": "KXHIGHTHOU-26OCT10-T88",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 298.3,
-        "market_price": 0.19
+        "p_fused": 0.7567,
+        "market_price": 0.19,
+        "edge_pct": 298.3
       }
     },
     {
       "trade_uuid": "4ea99515-2fd0-4877-b72c-b1849905b48b",
       "station": "KDCA",
       "trade_date_utc": "2026-10-11",
-      "market_ticker": "KXHIGHTDC-26OCT11-T68",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 108.2,
-        "market_price": 0.43
+        "p_fused": 0.8951,
+        "market_price": 0.43,
+        "edge_pct": 108.2
       }
     },
     {
       "trade_uuid": "5a2bbdc4-e9b8-492a-926c-24fc6feb484f",
       "station": "KLAS",
       "trade_date_utc": "2026-10-11",
-      "market_ticker": "KXHIGHTLV-26OCT11-T73",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "S grade on flat signal"
       ],
@@ -1217,84 +1197,93 @@
       "trade_uuid": "d2d89af5-f510-4bf9-9a73-26056918476c",
       "station": "KPHL",
       "trade_date_utc": "2026-10-11",
-      "market_ticker": "KXHIGHPHIL-26OCT11-T64",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 1222.5,
-        "market_price": 0.065
+        "p_fused": 0.8596,
+        "market_price": 0.065,
+        "edge_pct": 1222.5
       }
     },
     {
       "trade_uuid": "7ca7c67f-d5db-4077-8dcd-ae541d43d597",
       "station": "KBOS",
       "trade_date_utc": "2026-10-11",
-      "market_ticker": "KXHIGHTBOS-26OCT11-T60",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 72.7,
-        "market_price": 0.47
+        "p_fused": 0.8115,
+        "market_price": 0.47,
+        "edge_pct": 72.7
       }
     },
     {
       "trade_uuid": "a28fbd10-fb80-4c68-9ab0-d0460c075b67",
       "station": "KMDW",
       "trade_date_utc": "2026-10-11",
-      "market_ticker": "KXHIGHCHI-26OCT11-T73",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 3860.0,
-        "market_price": 0.025
+        "market_price": 0.025,
+        "edge_pct": 3860.0
       }
     },
     {
       "trade_uuid": "3054674c-a36e-4213-9b84-9467adb938fe",
       "station": "KMSP",
       "trade_date_utc": "2026-10-12",
-      "market_ticker": "KXHIGHTMIN-26OCT12-T81",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "extreme edge"
       ],
       "values": {
-        "edge_pct": 86.5,
-        "market_price": 0.425
+        "p_fused": 0.7928,
+        "market_price": 0.425,
+        "edge_pct": 86.5
       }
     },
     {
       "trade_uuid": "917e2a33-8a2c-4ac9-bb54-3aef0bda28b9",
       "station": "KNYC",
       "trade_date_utc": "2026-10-12",
-      "market_ticker": "KXHIGHNY-26OCT12-T69",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 842.9,
-        "market_price": 0.10500000000000001
+        "market_price": 0.10500000000000001,
+        "edge_pct": 842.9
       }
     },
     {
       "trade_uuid": "050021e6-dfd3-4dcc-9844-70c5683dcbf9",
       "station": "KBOS",
       "trade_date_utc": "2026-10-12",
-      "market_ticker": "KXHIGHTBOS-26OCT12-T71",
+      "status": "open",
+      "settlement_outcome": null,
       "rules": [
         "S grade on flat signal",
         "extreme edge"
       ],
       "values": {
         "p_fused": 0.99,
-        "edge_pct": 147.5,
-        "market_price": 0.4
+        "market_price": 0.4,
+        "edge_pct": 147.5
       }
     }
   ]
