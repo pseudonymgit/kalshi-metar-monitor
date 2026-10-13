@@ -30,6 +30,14 @@ from typing import Dict, List, Optional, Tuple
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from core.fees import fee_per_contract as _fee_per_contract  # noqa: E402  (canonical fee)
 
+# F1 (2026-10-13): per-contract EXECUTION cost (half-spread + slippage ~0.0205),
+# the fallback used when no live bid/ask is available. This is the SAME value
+# core/market_cost_model.py exposes as EXECUTION_COST_RATE (single source).
+try:
+    from core.market_cost_model import EXECUTION_COST_RATE as _FALLBACK_EXEC_COST  # noqa: E402
+except Exception:  # pragma: no cover - never let a cost import break selection
+    _FALLBACK_EXEC_COST = None
+
 min_edge = 0.0
 
 
@@ -59,37 +67,110 @@ def kalshi_fee(price: float, p: float = None) -> float:
     return _fee_per_contract(price)
 
 
-def ev_yes(mu: float, sigma: float, x: float, cost_yes: float, p_fn=None) -> float:
+def ev_yes(mu: float, sigma: float, x: float, cost_yes: float, p_fn=None,
+           entry_cost: float = 0.0, exit_cost: float = 0.0) -> float:
     p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
     fee = kalshi_fee(cost_yes, p) if cost_yes > 0 else 0.0
+    if entry_cost or exit_cost:
+        # F1 (2026-10-13): explicit execution-cost term. entry_cost is the actual
+        # fill price paid to cross the book (mid + half-spread); exit_cost is the
+        # cost to unwind at settlement/exit. The kalshi fee is charged on both legs
+        # (round trip), matching the canonical fee model:
+        #   ev = p * (1 - entry_cost - fee) - (1 - p) * (exit_cost + fee)
+        return p * (1.0 - entry_cost - fee) - (1.0 - p) * (exit_cost + fee)
+    # Legacy (no execution model): entry_cost == exit_cost == cost_yes.
     return p * (1 - cost_yes - fee) - (1 - p) * (cost_yes + fee)
 
 
-def ev_no(mu: float, sigma: float, x: float, cost_no: float, p_fn=None) -> float:
+def ev_no(mu: float, sigma: float, x: float, cost_no: float, p_fn=None,
+          entry_cost: float = 0.0, exit_cost: float = 0.0) -> float:
     p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
     fee = kalshi_fee(cost_no, p) if cost_no > 0 else 0.0
+    if entry_cost or exit_cost:
+        # F1 (2026-10-13): NO leg mirrors YES with p -> 1-p.
+        return (1.0 - p) * (1.0 - entry_cost - fee) - p * (exit_cost + fee)
     return (1 - p) * (1 - cost_no - fee) - p * (cost_no + fee)
 
 
-def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float = 0.0,
-                  p_fn=None) -> Optional[Dict]:
+def _entry_exec_cost(strike_row: Dict, cost_model, fail_closed: bool) -> float:
+    """F1: per-contract execution cost (fraction of $1) to add to the mid.
+
+    Live path: ``cost_model.get_dynamic_spread(ticker)`` -> half-spread.
+    Fallback:  the measured/execution cost (``EXECUTION_COST_RATE`` ~0.0205).
+    Fail-closed: with no live spread AND no fallback, raise instead of silently
+    pricing off the mid (entry_cost == mid).
+
+    ``cost_model`` is any object exposing ``get_dynamic_spread(ticker) -> spread``;
+    its own internal fallback (measured mean spread) always yields a usable value.
     """
-    strikes: list of {strike: float, yes_price: float, no_price: float}
-             (prices in dollars, 0-1).
+    if cost_model is not None:
+        ticker = strike_row.get("ticker")
+        live_spread = None
+        if ticker:
+            try:
+                live_spread = cost_model.get_dynamic_spread(ticker)
+            except Exception:
+                live_spread = None
+        if live_spread is not None and live_spread > 0:
+            # One-way execution cost = half-spread + slippage, matching the
+            # composition of EXECUTION_COST_RATE (MEASURED_MEAN_SPREAD/2 +
+            # DEFAULT_SLIPPAGE) so live and fallback costs are interchangeable.
+            slippage = float(getattr(cost_model, "slippage", 0.0) or 0.0)
+            return float(live_spread) / 2.0 + slippage
+    if _FALLBACK_EXEC_COST is not None:
+        return float(_FALLBACK_EXEC_COST)
+    if fail_closed:
+        raise ValueError(
+            "F1: execution spread unknown for strike "
+            f"{strike_row.get('strike')!r} and no fallback available (fail-closed)"
+        )
+    return 0.0
+
+
+def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float = 0.0,
+                  p_fn=None, cost_model=None, fail_closed: bool = False) -> Optional[Dict]:
+    """
+    strikes: list of {strike: float, yes_price: float, no_price: float,
+                      ticker?: str} (prices in dollars, 0-1).
     p_fn: optional callable x -> P(high >= x). REQUIRED when the caller holds a
           constrained/truncated distribution (e.g. intraday high_so_far); passing
           only (mu, sigma) would bypass that constraint and misprice locked wins.
-    Returns the best {strike, side, ev, p} or None.
+    cost_model: F1 (2026-10-13) optional execution-cost model (e.g.
+          core.market_cost_model.MARKET_COST_MODEL). When supplied, each strike's
+          EV is net of the modeled execution cost (mid + half-spread at entry,
+          half that at exit) rather than priced off the bare mid. When omitted,
+          behaviour is unchanged (legacy mid + taker-fee pricing).
+    fail_closed: when True and a strike has no resolvable spread and no fallback,
+          raise instead of silently pricing off the mid.
+    Returns the best {strike, side, ev, p, entry_cost} or None.
     """
     best = None
     for s in strikes:
         x = s["strike"]
         p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
-        e_yes = ev_yes(mu, sigma, x, s.get("yes_price", 0.5), p_fn=p_fn)
-        e_no = ev_no(mu, sigma, x, s.get("no_price", 0.5), p_fn=p_fn)
-        for side, ev in (("yes", e_yes), ("no", e_no)):
+        yes_px = float(s.get("yes_price", 0.5))
+        no_px = float(s.get("no_price", 1.0 - yes_px))
+        if cost_model is not None:
+            # F1 (2026-10-13): round-trip execution model. The leg is bought at its
+            # own mid + half-spread, and (for the intraday book, which exits before
+            # settlement) unwound at the same cross cost. Hold-to-settlement callers
+            # may pass a cost model with a zero exit via ev_* directly.
+            ec = _entry_exec_cost(s, cost_model, fail_closed)
+            entry_yes, exit_yes = yes_px + ec, yes_px + ec
+            entry_no, exit_no = no_px + ec, no_px + ec
+            e_yes = ev_yes(mu, sigma, x, yes_px, p_fn=p_fn,
+                           entry_cost=entry_yes, exit_cost=exit_yes)
+            e_no = ev_no(mu, sigma, x, no_px, p_fn=p_fn,
+                         entry_cost=entry_no, exit_cost=exit_no)
+        else:
+            ec = 0.0
+            entry_yes = yes_px
+            e_yes = ev_yes(mu, sigma, x, yes_px, p_fn=p_fn)
+            e_no = ev_no(mu, sigma, x, no_px, p_fn=p_fn)
+        for side, ev, leg_entry in (("yes", e_yes, entry_yes), ("no", e_no, no_px + ec)):
             if best is None or ev > best["ev"]:
-                best = {"strike": x, "side": side, "ev": round(ev, 4), "p": round(p, 4)}
+                best = {"strike": x, "side": side, "ev": round(ev, 4),
+                        "p": round(p, 4), "entry_cost": round(leg_entry, 5)}
     if best is None or best["ev"] <= min_edge:
         return None
     return best

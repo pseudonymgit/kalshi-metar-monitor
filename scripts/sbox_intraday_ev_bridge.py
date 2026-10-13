@@ -236,6 +236,48 @@ def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
     return sorted(seen.values(), key=lambda d: d["strike"])
 
 
+def _station_spread_model(ladder: List[Dict]):
+    """F1 (2026-10-13): one live spread probe per station-day for the EV cost model.
+
+    The picker now nets EV of the modeled execution cost (mid + half-spread +
+    slippage at entry). A full ladder is ~30 strikes; probing each ticker would
+    issue hundreds of Kalshi HTTP calls per cron pass, so the spread is resolved
+    ONCE per station from the highest-liquidity strike and applied to the station's
+    whole ladder (spread is a station-day-level market property).
+
+    Returns an object exposing ``get_dynamic_spread(ticker)`` for
+    ``core.strike_selection_ev.select_strike``. When the live probe is unavailable
+    (or ``WE_LIVE_SPREAD_EV=0``), it returns the model's measured-mean spread, so
+    the per-contract entry cost collapses to ``EXECUTION_COST_RATE``
+    (measured half-spread + slippage) — the same fallback F1 specifies.
+    """
+    slippage = float(getattr(MARKET_COST_MODEL, "slippage", 0.005) or 0.005)
+    slip_rate = slippage
+    live_enabled = os.environ.get("WE_LIVE_SPREAD_EV", "1") != "0"
+    probe = None
+    if live_enabled and ladder:
+        best = max(ladder, key=lambda r: r.get("volume_24h") or 0)
+        ticker = best.get("ticker")
+        if ticker:
+            try:
+                probe = MARKET_COST_MODEL.get_dynamic_spread(ticker)
+            except Exception as e:  # never break the pass on a live-data error
+                print(f"[warn] live spread probe {ticker} failed: {type(e).__name__}: {e}",
+                      file=sys.stderr)
+                probe = None
+
+    class _StationSpreadModel:
+        slippage = slip_rate
+
+        def get_dynamic_spread(self, ticker: str) -> float:
+            if probe is not None and probe > 0:
+                return float(probe)
+            # Documented fallback: measured mean spread (=> EXECUTION_COST_RATE).
+            return float(MARKET_COST_MODEL.spread)
+
+    return _StationSpreadModel()
+
+
 def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs):
     """Insert-or-replace the companion per-trade forecaster row (idempotent)."""
     now = datetime.now(timezone.utc).isoformat()
@@ -569,7 +611,12 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
 
         # -- fuse per strike; select on the FUSED probability --
         p_fn, meta_fn = build_fused_p_fn(state, cdf, traj, hsf)
-        picked = select_strike(state.mu, state.sigma, ladder, min_edge=0.0, p_fn=p_fn)
+        # F1 (2026-10-13): price the EV net of the modeled execution cost
+        # (half-spread + slippage) instead of the bare mid, so a strike that is
+        # only +EV on the mid is correctly rejected once crossing the book counts.
+        cost_model = _station_spread_model(ladder)
+        picked = select_strike(state.mu, state.sigma, ladder, min_edge=0.0, p_fn=p_fn,
+                               cost_model=cost_model, fail_closed=True)
         if not picked or picked.get("ev", 0) <= 0:
             skipped.append((st, "no_positive_ev_strike"))
             continue
