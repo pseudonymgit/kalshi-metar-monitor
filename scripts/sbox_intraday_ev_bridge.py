@@ -563,6 +563,13 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         day_str, day_start, day_end = local_day(st, now_utc)
         date_yy = _dt_yy(day_str)
         month = int(day_str[5:7])
+        # F5 (2026-10-13): the real hours-to-settlement for THIS station, not a
+        # hardcoded 6. Settlement is the station's local midnight (start of the
+        # next local day), so the value varies by timezone — e.g. at 03:00Z KNYC
+        # sits at ~T-1h while KLAX sits at ~T-4h. Fallback 6.0 only when the
+        # settlement instant cannot be resolved.
+        _hb = _hours_before_settlement(st, day_str, now_utc)
+        hours_to_settlement = _hb if _hb is not None else 6.0
 
         if not ignore_window:
             ok, reason = is_within_entry_window(st, day_str, now_utc=now_utc)
@@ -680,7 +687,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                 diag.append({"station": st,
                              "overlay_error": f"{type(e).__name__}:{e}"})
         sig = evaluate_with_overlay(
-            engine, hour=now_utc.hour, hour_before_settlement=6,
+            engine, hour=now_utc.hour, hour_before_settlement=hours_to_settlement,
             our_probability=our_prob, market_price=mkt,
             confidence=engine_conf, overlay_signal=overlay_sig,
             enabled=True,
