@@ -74,6 +74,9 @@ LIVE_BASE = "https://api.open-meteo.com/v1/forecast"
 BIAS_WINDOW_DAYS = 30
 MIN_BIAS_OBS = 3
 MAX_BIAS_MAGNITUDE_F = 5.0
+# Populate missing bias-window days from the historical endpoint (past dates
+# only). Tests set this False to stay hermetic (no network).
+BIAS_FETCH_MISSING = True
 
 # Intraday rate_1h nowcast sigma (matches predictor_diversity_study SIGMA_RATE).
 SIGMA_RATE_F = 1.5
@@ -270,7 +273,13 @@ def rolling_bias_f(station: str, as_of_date: str, *,
     (raw om_gfs) rather than a fabricated correction. The correction is capped at
     +/- MAX_BIAS_MAGNITUDE_F.
     """
-    key = (station, as_of_date, window_days, live)
+    # NB: the bias window is entirely HISTORICAL (it ends the day before the
+    # decision), so its om_gfs values are always served by the historical
+    # endpoint and cached under the `hist` src key -- regardless of whether the
+    # caller is fetching the CURRENT day live. Looking the residuals up under a
+    # `live` key when the bridge passes live=True silently yielded None (no bias
+    # correction at all). The memo key therefore excludes `live`.
+    key = (station, as_of_date, window_days)
     if key in _BIAS_MEMO:
         return _BIAS_MEMO[key]
 
@@ -281,7 +290,6 @@ def rolling_bias_f(station: str, as_of_date: str, *,
         _BIAS_MEMO[key] = None
         return None
 
-    src = "live" if live else "hist"
     cmap = cache if cache is not None else _cache_load()
 
     truth: Dict[str, float] = {}
@@ -300,9 +308,22 @@ def rolling_bias_f(station: str, as_of_date: str, *,
     except sqlite3.Error:
         truth = {}
 
+    # Populate any missing window days from the historical endpoint (past dates
+    # only; NO lookahead) so the correction is real rather than silently None.
+    if (BIAS_FETCH_MISSING and truth
+            and any(_cache_key(station, ds, "hist") not in cmap for ds in truth)):
+        try:
+            fetch_om_gfs_many([station], d0.isoformat(), d1.isoformat(), live=False)
+            if cache is None:  # fetch mutates/refreshes the shared memo
+                cmap = _cache_load()
+        except Exception as e:  # noqa: BLE001 - a fetch failure just drops obs
+            _log(f"{station} bias-window fetch failed: {type(e).__name__}: {e}")
+
     resid = []
     for ds, settled in truth.items():
-        v = cmap.get(_cache_key(station, ds, src))
+        v = cmap.get(_cache_key(station, ds, "hist"))
+        if v is None:  # tolerate a live-keyed value if that is all we have
+            v = cmap.get(_cache_key(station, ds, "live"))
         if v is not None:
             resid.append(v - settled)
 
