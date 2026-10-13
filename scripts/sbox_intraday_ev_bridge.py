@@ -320,6 +320,32 @@ def grade_position_cap(grade: str) -> float:
     return GRADE_POSITION_CAP_USD.get(grade, 0.0)
 
 
+# F9 (2026-10-13): portfolio exposure limits. The bridge admitted per-candidate
+# but applied no per-station cap, max-concurrent, or total-daily-exposure check.
+MAX_OPEN_PER_STATION = 3
+MAX_OPEN_PER_DAY = 10
+
+
+def exposure_skip_reason(conn, station: str, day_str: str) -> Optional[str]:
+    """F9: return the limit name that blocks this entry, or None if admitted.
+
+    Counts the live book's `status='open'` rows: >= MAX_OPEN_PER_STATION open for
+    this station, or >= MAX_OPEN_PER_DAY open for this station-day, blocks a new
+    entry. Read-only.
+    """
+    per_station = conn.execute(
+        "SELECT COUNT(*) FROM trades WHERE status='open' AND station=?",
+        (station,)).fetchone()[0]
+    if per_station >= MAX_OPEN_PER_STATION:
+        return f"exposure_station_cap_{per_station}"
+    per_day = conn.execute(
+        "SELECT COUNT(*) FROM trades WHERE status='open' AND trade_date_utc=?",
+        (day_str,)).fetchone()[0]
+    if per_day >= MAX_OPEN_PER_DAY:
+        return f"exposure_day_cap_{per_day}"
+    return None
+
+
 def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs):
     """Insert-or-replace the companion per-trade forecaster row (idempotent)."""
     now = datetime.now(timezone.utc).isoformat()
@@ -785,6 +811,13 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                             "size": size_usd, "grade": grade,
                             **prob_payload})
         else:
+            # F9 (2026-10-13): portfolio exposure gate BEFORE booking. Count the
+            # live open book: >=3 open for this station or >=10 open for this day
+            # blocks the candidate (and is logged, never silent).
+            skip_reason = exposure_skip_reason(conn, st, day_str)
+            if skip_reason:
+                skipped.append((st, skip_reason))
+                continue
             # GR5 §2 pre-ingest gate: the candidate must pass the decidable
             # subset (G0 window-green · G1 identity/version · G4 axis) BEFORE it
             # is booked; the verdict is appended to the append-only gate ledger.
