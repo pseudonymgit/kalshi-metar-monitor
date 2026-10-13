@@ -593,44 +593,97 @@ def run_intraday_cycle(
         logger.info("Dry run — no entry decisions")
     
     # 7. Exit logic — close positions that meet exit criteria
-    # Build open_positions from entry_results (live positions opened this cycle)
-    # In production, open_positions would come from a position tracker.
-    # For now, treat entry_results as open positions for exit evaluation.
+    # F3 (2026-10-13): open_positions must be the REAL book of open holdings, not
+    # this cycle's entries. The prior version built them from entry_results, so no
+    # exit rule ever saw a previously-booked position. We now read status='open'
+    # rows from the SBOX book and price each from the snapshot DB. The bridge's
+    # standalone `--exit-pass` remains the primary closer; this in-runner pass is
+    # read-only evaluation + logging (the bridge owns the write).
     try:
         from core.intraday.exit_logic import evaluate_exits
-        open_positions = []
-        for er in entry_results:
-            open_positions.append({
-                "station": er["station"],
-                "direction": "UP" if er["signal"] == "BUY" else "DOWN",
-                "entry_price": er.get("market_price", 0.5),
-                "position_size": er.get("position_size", 1.0),
-                "entry_hour": er.get("hour", target_hour),
-            })
-        
-        # Build live_prices map from the entry evaluation loop
+        from core.station_time import settlement_time_utc as _settlement_time_utc
+
+        def _runner_open_positions() -> List[Dict]:
+            """Real open SBOX holdings, or [] when the book is absent/unreadable."""
+            sbox_db = REPO_ROOT / "data" / "paper_trading_sbox.db"
+            if not sbox_db.exists():
+                return []
+            try:
+                conn = sqlite3.connect(f"file:{sbox_db}?mode=ro", uri=True)
+                try:
+                    rows = conn.execute(
+                        "SELECT trade_uuid, station, trade_date_utc, signal_direction, "
+                        "market_price, quantity, created_at_utc, market_ticker "
+                        "FROM trades WHERE status='open'").fetchall()
+                finally:
+                    conn.close()
+            except sqlite3.Error as e:
+                logger.warning(f"Exit pass: could not read open positions: {e}")
+                return []
+            out = []
+            for (tuuid, stn, dstr, direction, mprice, qty, created, ticker) in rows:
+                try:
+                    entry_hour = datetime.fromisoformat(created).hour if created else target_hour
+                except (TypeError, ValueError):
+                    entry_hour = target_hour
+                out.append({
+                    "trade_uuid": tuuid, "station": stn, "trade_date_utc": dstr,
+                    "direction": (direction or "UP").upper(), "ticker": ticker,
+                    "entry_price": float(mprice) if mprice is not None else 0.5,
+                    "position_size": float(qty) if qty is not None else 1.0,
+                    "entry_hour": entry_hour,
+                })
+            return out
+
+        def _runner_live_mid(ticker: str) -> Optional[float]:
+            """Newest snapshot mid at/before now for a ticker, or None."""
+            snaps = REPO_ROOT / "data" / "kalshi_market_snapshots.db"
+            if not ticker or not snaps.exists():
+                return None
+            try:
+                conn = sqlite3.connect(f"file:{snaps}?mode=ro", uri=True)
+                try:
+                    row = conn.execute(
+                        "SELECT mid_price FROM market_snapshots WHERE market_ticker=? "
+                        "AND mid_price IS NOT NULL AND snapshot_time < ? "
+                        "ORDER BY snapshot_time DESC LIMIT 1",
+                        (ticker, datetime.now(timezone.utc).isoformat())).fetchone()
+                finally:
+                    conn.close()
+            except sqlite3.Error:
+                return None
+            return float(row[0]) if row and row[0] is not None else None
+
+        open_positions = _runner_open_positions()
         live_prices = {}
-        for er in entry_results:
-            live_prices[er["station"]] = er.get("market_price", 0.5)
-        
-        # Determine current hour_before_settlement (use min across stations)
-        current_hb = min(
-            (calibrated[s].get("hour_before", 6) for s in calibrated),
-            default=6,
-        )
-        
-        exits = evaluate_exits(
-            open_positions=open_positions,
-            fused_results=fused_results,
-            live_prices=live_prices,
-            hour_before_settlement=current_hb,
-            current_hour=target_hour,
-        )
-        for exit_signal in exits:
-            logger.info(
-                f"EXIT: {exit_signal.station} {exit_signal.reason} "
-                f"pnl={exit_signal.estimated_pnl:.2f}"
+        hb_by_station = {}
+        now_utc = datetime.now(timezone.utc)
+        for pos in open_positions:
+            mid = _runner_live_mid(pos.get("ticker"))
+            if mid is not None:
+                live_prices[pos["station"]] = mid
+            settle = _settlement_time_utc(pos["station"], pos.get("trade_date_utc", ""))
+            if settle is not None:
+                hb_by_station[pos["station"]] = (settle - now_utc).total_seconds() / 3600.0
+
+        # Evaluate per-position so each station keeps its own hours-to-settlement
+        # (stations settle at different UTC instants). Skip already-settled rows:
+        # those are unreconciled, not open, and must not close at a fabricated mid.
+        for pos in open_positions:
+            mid = live_prices.get(pos["station"])
+            hb = hb_by_station.get(pos["station"])
+            if mid is None or hb is None or hb < 0:
+                continue
+            exits = evaluate_exits(
+                open_positions=[pos], fused_results=fused_results,
+                live_prices={pos["station"]: mid},
+                hour_before_settlement=hb, current_hour=target_hour,
             )
+            for exit_signal in exits:
+                logger.info(
+                    f"EXIT: {exit_signal.station} {exit_signal.reason} "
+                    f"pnl={exit_signal.estimated_pnl:.2f} (hb={hb:.1f})"
+                )
     except Exception as e:
         logger.warning(f"Exit logic failed: {e}")
     

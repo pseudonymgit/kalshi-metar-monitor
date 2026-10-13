@@ -12,7 +12,7 @@ Deterministic math only — no AI/ML.
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -67,12 +67,18 @@ def evaluate_exits(
     live_prices: Dict[str, float],
     hour_before_settlement: int,
     current_hour: int = 0,
+    enabled_rules: Optional[Set[str]] = None,
 ) -> List[ExitSignal]:
     """
     Evaluate all open positions against exit criteria.
 
     Checks are ordered by priority: auto-close (h-1) > take-profit > stop-loss > signal-flip.
     Each position closes on the first matching condition (continue keeps the loop moving).
+
+    F3 (2026-10-13): ``enabled_rules`` restricts evaluation to a subset of the
+    four reason strings (``"auto_close_h1"``, ``"take_profit"``, ``"stop_loss"``,
+    ``"signal_flip"``). ``None`` (default) enables all four — the historical
+    behaviour. The production exit pass starts with ``{"auto_close_h1"}`` only.
 
     Args:
         open_positions: List of open position dicts, each with:
@@ -87,11 +93,15 @@ def evaluate_exits(
         live_prices: Dict[station -> float] current market prices
         hour_before_settlement: int hours until settlement
         current_hour: int current UTC hour (for logging)
+        enabled_rules: optional subset of exit reasons to evaluate; None = all
 
     Returns:
         List of ExitSignal for positions that should be closed
     """
     exit_signals: List[ExitSignal] = []
+
+    def _rule_on(name: str) -> bool:
+        return enabled_rules is None or name in enabled_rules
 
     for position in open_positions:
         station = position.get("station", "")
@@ -104,7 +114,7 @@ def evaluate_exits(
         entry_is_up = _is_direction_up(direction)
 
         # 1. Auto-close at h-1 — highest priority
-        if hour_before_settlement <= MIN_HOURS_BEFORE_SETTLEMENT:
+        if _rule_on("auto_close_h1") and hour_before_settlement <= MIN_HOURS_BEFORE_SETTLEMENT:
             pnl = _estimate_pnl(direction, entry_price, current_price, position_size)
             exit_signals.append(ExitSignal(
                 station=station, reason="auto_close_h1",
@@ -120,7 +130,7 @@ def evaluate_exits(
             continue
 
         # 2. Take-profit
-        if entry_is_up and current_price >= TAKE_PROFIT_YES_PRICE:
+        if _rule_on("take_profit") and entry_is_up and current_price >= TAKE_PROFIT_YES_PRICE:
             pnl = _estimate_pnl(direction, entry_price, current_price, position_size)
             exit_signals.append(ExitSignal(
                 station=station, reason="take_profit",
@@ -135,7 +145,7 @@ def evaluate_exits(
             )
             continue
 
-        if not entry_is_up and current_price <= TAKE_PROFIT_NO_PRICE:
+        if _rule_on("take_profit") and not entry_is_up and current_price <= TAKE_PROFIT_NO_PRICE:
             pnl = _estimate_pnl(direction, entry_price, current_price, position_size)
             exit_signals.append(ExitSignal(
                 station=station, reason="take_profit",
@@ -156,7 +166,7 @@ def evaluate_exits(
         else:
             adverse_move_pp = (current_price - entry_price) * 100.0
 
-        if adverse_move_pp >= STOP_LOSS_PP:
+        if _rule_on("stop_loss") and adverse_move_pp >= STOP_LOSS_PP:
             pnl = _estimate_pnl(direction, entry_price, current_price, position_size)
             exit_signals.append(ExitSignal(
                 station=station, reason="stop_loss",
@@ -172,7 +182,7 @@ def evaluate_exits(
             continue
 
         # 4. Signal-flip reversal
-        if station in fused_results and fused_results[station] is not None:
+        if _rule_on("signal_flip") and station in fused_results and fused_results[station] is not None:
             fused = fused_results[station]
             # Support both dict-style .get() and attribute-style access
             if hasattr(fused, "direction"):

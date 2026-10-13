@@ -64,13 +64,14 @@ from core.intraday.timing_overlay_gate import (  # noqa: E402
     evaluate_with_overlay, live_overlay_signal, overlay_enabled,
 )
 from core.intraday.analog_cdf import _load_series  # noqa: E402
+from core.intraday.exit_logic import evaluate_exits  # noqa: E402
 from core.strike_selection_ev import select_strike, p_high_ge as gauss_p_high_ge  # noqa: E402
 from core.intraday.multi_forecaster_fusion import (  # noqa: E402
     TrajectoryForecaster, build_live_epoch, build_analog_cdf_today,
     fuse_strike, ensure_schema, FUSION_RULE_ID,
 )
 from core.station_time import (  # noqa: E402
-    is_within_entry_window, station_timezone_name,
+    is_within_entry_window, station_timezone_name, settlement_time_utc,
 )
 from core.market_cost_model import MARKET_COST_MODEL  # noqa: E402
 
@@ -917,6 +918,158 @@ def combined_report(stations=None) -> Dict:
 
 
 # =============================================================================
+# F3 (2026-10-13) — production exit pass over real open SBOX holdings
+# =============================================================================
+# Before F3, core/intraday/exit_logic.evaluate_exits had no production caller:
+# intraday_runner built `open_positions` from THIS cycle's entries only, so no
+# exit rule ever saw a real holding. This pass loads the actual status='open'
+# SBOX rows, prices them from the snapshot DB, and closes the triggered ones.
+#
+# Rule activation (safest first): only h-1 auto-close is enabled by default.
+# Take-profit / stop-loss / signal-flip are opt-in via env flags so they can be
+# rolled out behind a config switch, exactly as the sprint asks.
+EXIT_RULE_FLAGS = {
+    "take_profit": "WE_SBOX_EXIT_TAKE_PROFIT",
+    "stop_loss": "WE_SBOX_EXIT_STOP_LOSS",
+    "signal_flip": "WE_SBOX_EXIT_SIGNAL_FLIP",
+}
+
+
+def _enabled_exit_rules() -> set:
+    """Enabled exit rules: h-1 always on; the others gated on env flags."""
+    rules = {"auto_close_h1"}
+    for rule, flag in EXIT_RULE_FLAGS.items():
+        if os.environ.get(flag, "0") == "1":
+            rules.add(rule)
+    return rules
+
+
+def _exit_live_mid(ticker: Optional[str], before_iso: str) -> Optional[float]:
+    """Newest snapshot mid (at/before now) for a market ticker, or None."""
+    if not ticker:
+        return None
+    c = _ro(SNAPS)
+    try:
+        row = c.execute(
+            "SELECT mid_price FROM market_snapshots WHERE market_ticker=? "
+            "AND mid_price IS NOT NULL AND snapshot_time < ? "
+            "ORDER BY snapshot_time DESC LIMIT 1", (ticker, before_iso)).fetchone()
+    except sqlite3.Error:
+        row = None
+    finally:
+        c.close()
+    if row and row[0] is not None:
+        return float(row[0])
+    return None
+
+
+def open_exit_positions(conn) -> List[Dict]:
+    """Real open SBOX holdings -> exit_logic position dicts (F3).
+
+    entry_price is the mid the trade was booked at (market_price); direction is
+    the selected leg (UP=yes / DOWN=no). These are holdings, not this cycle's
+    entries — the distinction intraday_runner got wrong.
+    """
+    rows = conn.execute(
+        "SELECT trade_uuid, station, trade_date_utc, signal_direction, "
+        "market_price, quantity, position_size_usd, created_at_utc, market_ticker, notes "
+        "FROM trades WHERE status='open'").fetchall()
+    out = []
+    for (tuuid, station, dstr, direction, mprice, qty, pos_usd,
+         created, ticker, notes) in rows:
+        try:
+            entry_hour = datetime.fromisoformat(created).hour if created else 0
+        except (TypeError, ValueError):
+            entry_hour = 0
+        out.append({
+            "trade_uuid": tuuid, "station": station, "trade_date_utc": dstr,
+            "direction": (direction or "UP").upper(),
+            "entry_price": float(mprice) if mprice is not None else 0.5,
+            "position_size": float(qty) if qty is not None else 1.0,
+            "position_size_usd": float(pos_usd) if pos_usd is not None else 0.0,
+            "entry_hour": entry_hour, "ticker": ticker, "notes": notes,
+        })
+    return out
+
+
+def _hours_before_settlement(station: str, trading_date: str, now_utc: datetime) -> Optional[float]:
+    """Hours from now to the station's local-day settlement (negative = past)."""
+    settle = settlement_time_utc(station, trading_date)
+    if settle is None:
+        return None
+    return (settle - now_utc).total_seconds() / 3600.0
+
+
+def run_exit_pass(dry_run: bool = False, stations=None) -> Dict:
+    """Close open SBOX holdings whose exit rules have triggered (F3).
+
+    Read-only on every source DB other than the SBOX book itself. With
+    ``dry_run=True`` it reports the would-be closes and writes nothing.
+    """
+    now_utc = datetime.now(timezone.utc)
+    now_iso = now_utc.isoformat()
+    rules = _enabled_exit_rules()
+    conn = sqlite3.connect(SBOX_DB)
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        positions = open_exit_positions(conn)
+        if stations:
+            positions = [p for p in positions if p["station"] in stations]
+
+        closed, skipped = [], []
+        for pos in positions:
+            ticker = pos.get("ticker")
+            if not ticker:
+                skipped.append((pos["trade_uuid"], "no_market_ticker"))
+                continue
+            mid = _exit_live_mid(ticker, now_iso)
+            if mid is None:
+                skipped.append((pos["trade_uuid"], "no_live_price"))
+                continue
+            hb = _hours_before_settlement(pos["station"], pos["trade_date_utc"], now_utc)
+            if hb is None:
+                skipped.append((pos["trade_uuid"], "settlement_time_unknown"))
+                continue
+            if hb < 0:
+                # Already past settlement: this row is unreconciled, not an open
+                # holding. The exit pass must not fabricate a mid-based PnL for a
+                # market that has already settled — leave it to settlement
+                # reconciliation and surface it loudly.
+                skipped.append((pos["trade_uuid"], "already_settled_pending_reconciliation"))
+                continue
+            # Reason strings are the trade_uuid: one position per call keeps each
+            # station's own hours-to-settlement honest (stations settle at
+            # different UTC instants).
+            sigs = evaluate_exits(
+                [pos], fused_results={}, live_prices={pos["station"]: mid},
+                hour_before_settlement=hb, current_hour=now_utc.hour,
+                enabled_rules=rules)
+            if not sigs:
+                skipped.append((pos["trade_uuid"], "no_exit_rule_triggered"))
+                continue
+            sig = sigs[0]
+            pnl = round(sig.estimated_pnl, 4)
+            entry = {"trade_uuid": pos["trade_uuid"], "station": pos["station"],
+                     "reason": sig.reason, "entry_price": pos["entry_price"],
+                     "current_price": round(mid, 4), "size": pos["position_size"],
+                     "pnl": pnl, "hours_before_settlement": round(hb, 2)}
+            if not dry_run:
+                conn.execute(
+                    "UPDATE trades SET status='closed', realized_pnl=?, "
+                    "notes=COALESCE(notes,'') || ? WHERE trade_uuid=?",
+                    (pnl, f"; exit={sig.reason}@{now_iso[:19]}Z", pos["trade_uuid"]))
+                conn.commit()
+            closed.append(entry)
+        return {"date_utc": now_utc.strftime("%Y-%m-%d"),
+                "enabled_rules": sorted(rules),
+                "n_open": len(positions), "n_closed": len(closed),
+                "n_skipped": len(skipped), "closed": closed,
+                "skipped": skipped[:25], "dry_run": dry_run}
+    finally:
+        conn.close()
+
+
+# =============================================================================
 # E1/E3 (2026-10-02) — SBOX trade-fail / zero-trade notification path
 # =============================================================================
 def _notify_bridge_result(out: Dict) -> Optional[Dict]:
@@ -954,12 +1107,18 @@ def main():
     ap.add_argument("--ignore-window", action="store_true")
     ap.add_argument("--report", action="store_true")
     ap.add_argument("--combined-report", action="store_true")
+    ap.add_argument("--exit-pass", action="store_true",
+                    help="close open SBOX holdings whose exit rules triggered (F3)")
     ap.add_argument("--stations", nargs="*", default=None)
     ap.add_argument("--min-edge", type=float, default=0.03)
     ap.add_argument("--max-stations", type=int, default=None)
     a = ap.parse_args()
     if a.combined_report:
         print(json.dumps(combined_report(a.stations), indent=2, default=str))
+        return 0
+    if a.exit_pass:
+        out = run_exit_pass(dry_run=a.dry_run, stations=a.stations)
+        print(json.dumps(out, indent=2, default=str))
         return 0
     out = run(dry_run=a.dry_run, ignore_window=a.ignore_window,
               stations=a.stations, min_edge=a.min_edge, report=a.report,
