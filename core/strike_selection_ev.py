@@ -128,7 +128,8 @@ def _entry_exec_cost(strike_row: Dict, cost_model, fail_closed: bool) -> float:
 
 
 def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float = 0.0,
-                  p_fn=None, cost_model=None, fail_closed: bool = False) -> Optional[Dict]:
+                  p_fn=None, cost_model=None, fail_closed: bool = False,
+                  min_edge_scaler=None) -> Optional[Dict]:
     """
     strikes: list of {strike: float, yes_price: float, no_price: float,
                       ticker?: str} (prices in dollars, 0-1).
@@ -142,12 +143,20 @@ def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float 
           behaviour is unchanged (legacy mid + taker-fee pricing).
     fail_closed: when True and a strike has no resolvable spread and no fallback,
           raise instead of silently pricing off the mid.
-    Returns the best {strike, side, ev, p, entry_cost} or None.
+    min_edge_scaler: F6 (2026-10-13) optional callable x -> multiplier applied to
+          `min_edge` for the strike at price-level x. The scaled edge floor is
+          tested for EVERY candidate BEFORE ranking, so when the top-EV strike
+          fails its (e.g. disagreement-widened) floor the next-best candidate that
+          clears its own floor is selected — instead of the caller argmax-ing and
+          then rejecting the single pick. Returns the max-EV strike among those
+          clearing their floor.
+    Returns the best {strike, side, ev, p, entry_cost, required_edge} or None.
     """
     best = None
     for s in strikes:
         x = s["strike"]
         p = (p_fn(x) if p_fn else p_high_ge(mu, sigma, x))
+        required = min_edge * (float(min_edge_scaler(x)) if min_edge_scaler else 1.0)
         yes_px = float(s.get("yes_price", 0.5))
         no_px = float(s.get("no_price", 1.0 - yes_px))
         if cost_model is not None:
@@ -168,11 +177,13 @@ def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float 
             e_yes = ev_yes(mu, sigma, x, yes_px, p_fn=p_fn)
             e_no = ev_no(mu, sigma, x, no_px, p_fn=p_fn)
         for side, ev, leg_entry in (("yes", e_yes, entry_yes), ("no", e_no, no_px + ec)):
+            # F6: per-candidate floor (a strike below its scaled floor cannot win).
+            if ev <= required:
+                continue
             if best is None or ev > best["ev"]:
                 best = {"strike": x, "side": side, "ev": round(ev, 4),
-                        "p": round(p, 4), "entry_cost": round(leg_entry, 5)}
-    if best is None or best["ev"] <= min_edge:
-        return None
+                        "p": round(p, 4), "entry_cost": round(leg_entry, 5),
+                        "required_edge": round(required, 5)}
     return best
 
 

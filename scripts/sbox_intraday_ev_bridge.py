@@ -623,17 +623,18 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # (half-spread + slippage) instead of the bare mid, so a strike that is
         # only +EV on the mid is correctly rejected once crossing the book counts.
         cost_model = _station_spread_model(ladder)
-        picked = select_strike(state.mu, state.sigma, ladder, min_edge=0.0, p_fn=p_fn,
-                               cost_model=cost_model, fail_closed=True)
+        # F6 (2026-10-13): fold the disagreement-scaled min-edge into selection so
+        # a top-EV strike that fails its widened floor falls through to the
+        # next-best candidate that clears its own floor, instead of skipping the
+        # station outright. min_edge is the per-strike floor (base * edge_mult).
+        picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
+                               p_fn=p_fn, cost_model=cost_model, fail_closed=True,
+                               min_edge_scaler=lambda x: meta_fn(x)["edge_mult"])
         if not picked or picked.get("ev", 0) <= 0:
             skipped.append((st, "no_positive_ev_strike"))
             continue
         strike = picked["strike"]
         meta = meta_fn(strike)
-        # Item 5: wider required edge when forecasters disagree.
-        if picked["ev"] <= min_edge * meta["edge_mult"]:
-            skipped.append((st, f"edge_below_scaled_min:{meta['agreement']}"))
-            continue
 
         row = next((s for s in ladder if abs(s["strike"] - strike) < 1e-9), None)
         if row is None:
