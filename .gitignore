@@ -38,5 +38,10 @@ data/gefs_work/
 !artifacts/forecast-aggregation/
 !artifacts/forecast-aggregation/*.json
 
+# Ceiling-refit + per-station pin sweep (committed analysis artifacts, 2026-10-13)
+!artifacts/ceiling-refit/
+!artifacts/ceiling-refit/*.json
+!data/per_station_pins.json
+
 # Governance stopping record MUST be committed (Workstream F off-switch)
 !stopping-record.json

@@ -1,0 +1,504 @@
+{
+  "generated_at_utc": "2026-10-13T17:32:18.432433+00:00",
+  "signal": "rate_1h nowcast (window scan) + gefs_p (bridge NWP member)",
+  "axis": "strike-crossing: T=floor(hsf@13:30 pin)+1, crossed = settled_max > T",
+  "window": [
+    "2026-04-21",
+    "2026-10-09"
+  ],
+  "formula": {
+    "CALIBRATION_FLOOR": 0.75,
+    "MAX_CEILING": 0.99,
+    "RESOLUTION_FULL_SKILL": 0.05,
+    "expr": "0.75 + 0.24*min(1, resolution/0.05)"
+  },
+  "holdout_reference": {
+    "resolution": 0.0004,
+    "ceiling": 0.7519
+  },
+  "A_lookahead_rate1h": {
+    "study_window_max_780_1005": {
+      "n": 14853,
+      "brier": 0.1072,
+      "reliability": 0.023,
+      "resolution": 0.1046,
+      "uncertainty": 0.1897,
+      "ece": 0.1121,
+      "ceiling": 0.99
+    },
+    "to_15:00_scan_780_900": {
+      "n": 14434,
+      "brier": 0.1335,
+      "reliability": 0.0337,
+      "resolution": 0.0912,
+      "uncertainty": 0.1919,
+      "ece": 0.1439,
+      "ceiling": 0.99
+    },
+    "bounded_<=pin_780_810": {
+      "n": 14040,
+      "brier": 0.3293,
+      "reliability": 0.1542,
+      "resolution": 0.016,
+      "uncertainty": 0.1929,
+      "ece": 0.3889,
+      "ceiling": 0.8268
+    },
+    "single_point_810": {
+      "n": 13951,
+      "brier": 0.3386,
+      "reliability": 0.1701,
+      "resolution": 0.0223,
+      "uncertainty": 0.1928,
+      "ece": 0.4083,
+      "ceiling": 0.857
+    }
+  },
+  "A2_rate1h_bounded_per_station": {
+    "KATL": {
+      "n": 752,
+      "brier": 0.3694,
+      "reliability": 0.2579,
+      "resolution": 0.007,
+      "uncertainty": 0.1201,
+      "ece": 0.5061,
+      "ceiling": 0.7836
+    },
+    "KAUS": {
+      "n": 615,
+      "brier": 0.3752,
+      "reliability": 0.3044,
+      "resolution": 0.0102,
+      "uncertainty": 0.0814,
+      "ece": 0.5475,
+      "ceiling": 0.799
+    },
+    "KBOS": {
+      "n": 723,
+      "brier": 0.2981,
+      "reliability": 0.0698,
+      "resolution": 0.0082,
+      "uncertainty": 0.2397,
+      "ece": 0.2618,
+      "ceiling": 0.7894
+    },
+    "KDCA": {
+      "n": 606,
+      "brier": 0.3419,
+      "reliability": 0.1784,
+      "resolution": 0.0117,
+      "uncertainty": 0.1768,
+      "ece": 0.42,
+      "ceiling": 0.8062
+    },
+    "KDEN": {
+      "n": 788,
+      "brier": 0.3373,
+      "reliability": 0.179,
+      "resolution": 0.0135,
+      "uncertainty": 0.1728,
+      "ece": 0.421,
+      "ceiling": 0.8148
+    },
+    "KDFW": {
+      "n": 581,
+      "brier": 0.3739,
+      "reliability": 0.2885,
+      "resolution": 0.0108,
+      "uncertainty": 0.0967,
+      "ece": 0.5309,
+      "ceiling": 0.8018
+    },
+    "KHOU": {
+      "n": 812,
+      "brier": 0.323,
+      "reliability": 0.1449,
+      "resolution": 0.0188,
+      "uncertainty": 0.1992,
+      "ece": 0.3775,
+      "ceiling": 0.8402
+    },
+    "KLAS": {
+      "n": 544,
+      "brier": 0.3615,
+      "reliability": 0.2389,
+      "resolution": 0.0049,
+      "uncertainty": 0.128,
+      "ece": 0.4864,
+      "ceiling": 0.7735
+    },
+    "KLAX": {
+      "n": 748,
+      "brier": 0.2419,
+      "reliability": 0.021,
+      "resolution": 0.0244,
+      "uncertainty": 0.2477,
+      "ece": 0.1176,
+      "ceiling": 0.8671
+    },
+    "KMDW": {
+      "n": 798,
+      "brier": 0.3142,
+      "reliability": 0.1139,
+      "resolution": 0.0196,
+      "uncertainty": 0.2222,
+      "ece": 0.3306,
+      "ceiling": 0.8441
+    },
+    "KMIA": {
+      "n": 831,
+      "brier": 0.257,
+      "reliability": 0.0361,
+      "resolution": 0.0258,
+      "uncertainty": 0.2499,
+      "ece": 0.1707,
+      "ceiling": 0.8738
+    },
+    "KMSP": {
+      "n": 444,
+      "brier": 0.3489,
+      "reliability": 0.2193,
+      "resolution": 0.0233,
+      "uncertainty": 0.1548,
+      "ece": 0.46,
+      "ceiling": 0.8618
+    },
+    "KMSY": {
+      "n": 732,
+      "brier": 0.2935,
+      "reliability": 0.0954,
+      "resolution": 0.0319,
+      "uncertainty": 0.231,
+      "ece": 0.2942,
+      "ceiling": 0.9031
+    },
+    "KNYC": {
+      "n": 750,
+      "brier": 0.2913,
+      "reliability": 0.0712,
+      "resolution": 0.0171,
+      "uncertainty": 0.2392,
+      "ece": 0.2588,
+      "ceiling": 0.8321
+    },
+    "KOKC": {
+      "n": 707,
+      "brier": 0.3698,
+      "reliability": 0.2666,
+      "resolution": 0.0134,
+      "uncertainty": 0.1163,
+      "ece": 0.513,
+      "ceiling": 0.8143
+    },
+    "KPHL": {
+      "n": 878,
+      "brier": 0.3345,
+      "reliability": 0.1698,
+      "resolution": 0.0202,
+      "uncertainty": 0.1866,
+      "ece": 0.4068,
+      "ceiling": 0.847
+    },
+    "KPHX": {
+      "n": 643,
+      "brier": 0.3866,
+      "reliability": 0.3501,
+      "resolution": 0.0049,
+      "uncertainty": 0.0416,
+      "ece": 0.5889,
+      "ceiling": 0.7735
+    },
+    "KSAT": {
+      "n": 629,
+      "brier": 0.3913,
+      "reliability": 0.3419,
+      "resolution": 0.0038,
+      "uncertainty": 0.054,
+      "ece": 0.5825,
+      "ceiling": 0.7682
+    },
+    "KSEA": {
+      "n": 754,
+      "brier": 0.3369,
+      "reliability": 0.1789,
+      "resolution": 0.0229,
+      "uncertainty": 0.1831,
+      "ece": 0.414,
+      "ceiling": 0.8599
+    },
+    "KSFO": {
+      "n": 705,
+      "brier": 0.3025,
+      "reliability": 0.0977,
+      "resolution": 0.0212,
+      "uncertainty": 0.2267,
+      "ece": 0.3055,
+      "ceiling": 0.8518
+    }
+  },
+  "bounded_sigma_sweep": {
+    "0.75": {
+      "n": 14040,
+      "brier": 0.4293,
+      "reliability": 0.2552,
+      "resolution": 0.0176,
+      "ceiling": 0.8345
+    },
+    "1.0": {
+      "n": 14040,
+      "brier": 0.3801,
+      "reliability": 0.2054,
+      "resolution": 0.0171,
+      "ceiling": 0.8321
+    },
+    "1.25": {
+      "n": 14040,
+      "brier": 0.3495,
+      "reliability": 0.1749,
+      "resolution": 0.0165,
+      "ceiling": 0.8292
+    },
+    "1.5": {
+      "n": 14040,
+      "brier": 0.3293,
+      "reliability": 0.1542,
+      "resolution": 0.016,
+      "ceiling": 0.8268
+    },
+    "1.75": {
+      "n": 14040,
+      "brier": 0.3154,
+      "reliability": 0.141,
+      "resolution": 0.017,
+      "ceiling": 0.8316
+    },
+    "2.0": {
+      "n": 14040,
+      "brier": 0.3053,
+      "reliability": 0.1299,
+      "resolution": 0.0147,
+      "ceiling": 0.8206
+    },
+    "2.5": {
+      "n": 14040,
+      "brier": 0.2918,
+      "reliability": 0.1152,
+      "resolution": 0.0138,
+      "ceiling": 0.8162
+    },
+    "3.0": {
+      "n": 14040,
+      "brier": 0.2833,
+      "reliability": 0.1064,
+      "resolution": 0.0135,
+      "ceiling": 0.8148
+    },
+    "4.0": {
+      "n": 14040,
+      "brier": 0.2735,
+      "reliability": 0.0949,
+      "resolution": 0.0095,
+      "ceiling": 0.7956
+    }
+  },
+  "B_bridge_gefs_member": {
+    "pooled": {
+      "n": 2740,
+      "brier": 0.329,
+      "reliability": 0.1631,
+      "resolution": 0.0038,
+      "uncertainty": 0.1692,
+      "ece": 0.3243,
+      "ceiling": 0.7682
+    },
+    "per_station": {
+      "KATL": {
+        "n": 137,
+        "brier": 0.2315,
+        "reliability": 0.1474,
+        "resolution": 0.0149,
+        "uncertainty": 0.0975,
+        "ece": 0.2607,
+        "ceiling": 0.8215
+      },
+      "KAUS": {
+        "n": 137,
+        "brier": 0.1501,
+        "reliability": 0.0704,
+        "resolution": 0.0268,
+        "uncertainty": 0.1087,
+        "ece": 0.1745,
+        "ceiling": 0.8786
+      },
+      "KBOS": {
+        "n": 137,
+        "brier": 0.4634,
+        "reliability": 0.2576,
+        "resolution": 0.0195,
+        "uncertainty": 0.223,
+        "ece": 0.4533,
+        "ceiling": 0.8436
+      },
+      "KDCA": {
+        "n": 137,
+        "brier": 0.2934,
+        "reliability": 0.131,
+        "resolution": 0.0353,
+        "uncertainty": 0.1971,
+        "ece": 0.3065,
+        "ceiling": 0.9194
+      },
+      "KDEN": {
+        "n": 137,
+        "brier": 0.3218,
+        "reliability": 0.2386,
+        "resolution": 0.0037,
+        "uncertainty": 0.0859,
+        "ece": 0.3566,
+        "ceiling": 0.7678
+      },
+      "KDFW": {
+        "n": 137,
+        "brier": 0.1438,
+        "reliability": 0.0681,
+        "resolution": 0.0048,
+        "uncertainty": 0.0799,
+        "ece": 0.1288,
+        "ceiling": 0.773
+      },
+      "KHOU": {
+        "n": 137,
+        "brier": 0.2586,
+        "reliability": 0.0575,
+        "resolution": 0.0156,
+        "uncertainty": 0.2154,
+        "ece": 0.2317,
+        "ceiling": 0.8249
+      },
+      "KLAS": {
+        "n": 137,
+        "brier": 0.6437,
+        "reliability": 0.5712,
+        "resolution": 0.0078,
+        "uncertainty": 0.0799,
+        "ece": 0.6684,
+        "ceiling": 0.7874
+      },
+      "KLAX": {
+        "n": 137,
+        "brier": 0.3458,
+        "reliability": 0.1418,
+        "resolution": 0.0357,
+        "uncertainty": 0.243,
+        "ece": 0.3625,
+        "ceiling": 0.9214
+      },
+      "KMDW": {
+        "n": 137,
+        "brier": 0.4546,
+        "reliability": 0.239,
+        "resolution": 0.009,
+        "uncertainty": 0.223,
+        "ece": 0.4538,
+        "ceiling": 0.7932
+      },
+      "KMIA": {
+        "n": 137,
+        "brier": 0.366,
+        "reliability": 0.1484,
+        "resolution": 0.0309,
+        "uncertainty": 0.25,
+        "ece": 0.371,
+        "ceiling": 0.8983
+      },
+      "KMSP": {
+        "n": 137,
+        "brier": 0.2884,
+        "reliability": 0.189,
+        "resolution": 0.005,
+        "uncertainty": 0.1031,
+        "ece": 0.3022,
+        "ceiling": 0.774
+      },
+      "KMSY": {
+        "n": 137,
+        "brier": 0.3319,
+        "reliability": 0.111,
+        "resolution": 0.0172,
+        "uncertainty": 0.2403,
+        "ece": 0.3057,
+        "ceiling": 0.8326
+      },
+      "KNYC": {
+        "n": 137,
+        "brier": 0.3748,
+        "reliability": 0.1727,
+        "resolution": 0.0127,
+        "uncertainty": 0.2154,
+        "ece": 0.3537,
+        "ceiling": 0.811
+      },
+      "KOKC": {
+        "n": 137,
+        "brier": 0.2303,
+        "reliability": 0.1413,
+        "resolution": 0.0041,
+        "uncertainty": 0.0917,
+        "ece": 0.2581,
+        "ceiling": 0.7697
+      },
+      "KPHL": {
+        "n": 137,
+        "brier": 0.5246,
+        "reliability": 0.3981,
+        "resolution": 0.0112,
+        "uncertainty": 0.1348,
+        "ece": 0.5531,
+        "ceiling": 0.8038
+      },
+      "KPHX": {
+        "n": 137,
+        "brier": 0.4183,
+        "reliability": 0.3559,
+        "resolution": 0.0054,
+        "uncertainty": 0.0677,
+        "ece": 0.4806,
+        "ceiling": 0.7759
+      },
+      "KSAT": {
+        "n": 137,
+        "brier": 0.1173,
+        "reliability": 0.0634,
+        "resolution": 0.0126,
+        "uncertainty": 0.0677,
+        "ece": 0.1235,
+        "ceiling": 0.8105
+      },
+      "KSEA": {
+        "n": 137,
+        "brier": 0.1877,
+        "reliability": 0.1265,
+        "resolution": 0.0012,
+        "uncertainty": 0.0614,
+        "ece": 0.2166,
+        "ceiling": 0.7558
+      },
+      "KSFO": {
+        "n": 137,
+        "brier": 0.4341,
+        "reliability": 0.2383,
+        "resolution": 0.0232,
+        "uncertainty": 0.223,
+        "ece": 0.4471,
+        "ceiling": 0.8614
+      }
+    }
+  },
+  "bridge_decision_members": [
+    "p_gefs",
+    "p_analog",
+    "p_trajectory",
+    "p_market"
+  ],
+  "rate_1h_is_bridge_member": false
+}
