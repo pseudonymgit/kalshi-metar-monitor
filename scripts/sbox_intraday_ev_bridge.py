@@ -447,21 +447,18 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
 def _position_size_usd(confidence: float) -> float:
     """Dan's sizing ladder (revised 2026-10-12) — $200 bankroll.
 
-    Regular trades are $5-10; only high-confidence "sure things" reach $25.
-    The prior ladder (2026-10-01) returned $50 for confidence>0.85 — that is 25%
-    of a $200 bankroll on a single trade and was the source of the 46 $50 rows in
-    the SBOX book. The max is now $25 (12.5% of $200).
+    Capped at $10 (Dan, 2026-10-13: "let's scale to max $10"). The prior $25
+    top tier is removed — under the honest ceiling (~0.82-0.86, max composite
+    confidence ~0.72) it was unreachable anyway, and a $200 bankroll should not
+    risk >5% on one trade.
 
-    - very high confidence (>0.85): $25 (sure-thing max)
-    - high confidence (>0.7): $10
-    - medium confidence (>0.5): $5
+    - high confidence (>0.70): $10 (max)
+    - medium confidence (>0.50): $5
     - below 0.5: $0 (no trade)
     """
-    if confidence > 0.85:
-        return 25.0
-    elif confidence > 0.7:
+    if confidence > 0.70:
         return 10.0
-    elif confidence > 0.5:
+    elif confidence > 0.50:
         return 5.0
     return 0.0
 
