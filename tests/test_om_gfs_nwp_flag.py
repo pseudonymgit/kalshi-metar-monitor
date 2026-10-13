@@ -178,6 +178,7 @@ def test_rolling_bias_excludes_decision_day(monkeypatch, tmp_path):
     _tiny_settle_db(db)
     monkeypatch.setattr(m, "SETTLE_DB", db)
     monkeypatch.setattr(m, "_BIAS_MEMO", {})
+    monkeypatch.setattr(m, "BIAS_FETCH_MISSING", False)  # hermetic: no network
     # om_gfs 2 F above truth on the three in-window days (bias would be inflated
     # to a large negative if the lookahead day 2026-10-12 slipped into the window).
     monkeypatch.setattr(m, "_CACHE_MEMO", {
@@ -196,7 +197,31 @@ def test_rolling_bias_none_below_min_obs(monkeypatch, tmp_path):
     _tiny_settle_db(db)
     monkeypatch.setattr(m, "SETTLE_DB", db)
     monkeypatch.setattr(m, "_BIAS_MEMO", {})
+    monkeypatch.setattr(m, "BIAS_FETCH_MISSING", False)  # hermetic: no network
     monkeypatch.setattr(m, "_CACHE_MEMO", {
         m._cache_key("KNYC", "2026-10-09", "hist"): 73.0,
     })
     assert m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3) is None
+
+
+def test_rolling_bias_uses_hist_window_from_live_path(monkeypatch, tmp_path):
+    """Regression (2026-10-13): the bridge fetches the CURRENT day live but the
+    bias WINDOW is historical. The window must be read under the `hist` key even
+    when live=True; reading it under `live` silently produced None (no correction
+    at all — the live substitution was raw om_gfs)."""
+    m = _load_omgfs()
+    db = tmp_path / "settle.db"
+    _tiny_settle_db(db)
+    monkeypatch.setattr(m, "SETTLE_DB", db)
+    monkeypatch.setattr(m, "_BIAS_MEMO", {})
+    monkeypatch.setattr(m, "BIAS_FETCH_MISSING", False)
+    monkeypatch.setattr(m, "_CACHE_MEMO", {
+        m._cache_key("KNYC", "2026-10-09", "hist"): 73.0,
+        m._cache_key("KNYC", "2026-10-10", "hist"): 76.0,
+        m._cache_key("KNYC", "2026-10-11", "hist"): 82.0,
+    })
+    live = m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3, live=True)
+    m._BIAS_MEMO = {}
+    hist = m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3, live=False)
+    assert live == pytest.approx(2.0)
+    assert live == hist
