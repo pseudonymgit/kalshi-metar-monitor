@@ -55,11 +55,22 @@ CACHE_PATH = REPO / "data" / "_omgfs_nwp_cache.json"
 
 # ── flag ─────────────────────────────────────────────────────────────────────
 OM_GFS_FLAG_ENV = "USE_OM_GFS_NWP"
+# 2026-10-13 WIRE FLIP: a SECOND, additive flag lets om_gfs ALSO vote as a
+# fifth fusion member (core blend + composite confidence). The honest re-run
+# (`27463df0d`) found om_gfs(bc) Brier 0.123 beats honest rate_1h 0.362, so the
+# prior DO_NOT_WIRE verdict flips to WIRE. This is separate from the lever-axis
+# NWP substitution (USE_OM_GFS_NWP), which is unchanged and stays additive.
+OM_GFS_FUSION_FLAG_ENV = "USE_OM_GFS_FUSION"
 
 
 def om_gfs_enabled() -> bool:
     """True when the om_gfs NWP substitution is switched on."""
     return os.environ.get(OM_GFS_FLAG_ENV, "0") == "1"
+
+
+def om_gfs_fusion_enabled() -> bool:
+    """True when om_gfs additionally votes as a fifth fusion member."""
+    return os.environ.get(OM_GFS_FUSION_FLAG_ENV, "0") == "1"
 
 
 # ── constants (embedded, must match the validated study recipe) ─────────────

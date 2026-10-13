@@ -82,7 +82,9 @@ from core.intraday.multi_forecaster_fusion import (  # noqa: E402
 # Raw local GFS remains the fallback whenever om_gfs has no value for the day.
 # Import is guarded so a substrate import failure can never break the bridge.
 try:
-    from core.intraday.om_gfs_nwp import om_gfs_enabled, om_gfs_state_for_day
+    from core.intraday.om_gfs_nwp import (
+        om_gfs_enabled, om_gfs_fusion_enabled, om_gfs_state_for_day,
+    )
     _OM_GFS_IMPORTED = True
 except Exception:  # pragma: no cover - module missing => substitution unavailable
     _OM_GFS_IMPORTED = False
@@ -658,13 +660,18 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
 def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float],
                      weights: Optional[Dict] = None,
                      ticker_map: Optional[Dict[float, str]] = None,
-                     pin_iso: Optional[str] = None):
+                     pin_iso: Optional[str] = None,
+                     p_om_gfs_member=None):
     """Return (p_fn, meta_fn): per-strike x -> p_fused and the fusion meta dict.
 
     Weighted fusion (WEIGHTED-FUSION-SPEC-2026-10-13): when `weights` is given
     the core is the per-station weighted blend over {gefs, analog, traj, market},
     and the market component is the YES mid at the decision pin. Weights default
     to equal (0.25 each) until tuned.
+
+    ``p_om_gfs_member`` (2026-10-13 WIRE FLIP) is an optional per-strike callable
+    for the FIFTH member's P(high>=X). When supplied it joins the core blend and
+    the composite confidence ADDITIVELY; when None the fusion is unchanged.
     """
     cache: Dict[float, Dict] = {}
     mkt_cache: Dict[str, Optional[float]] = {}
@@ -683,7 +690,9 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
         row = fuse_strike(state.p_ge, cdf.p_high_ge,
                           lambda xx: traj.p_high_ge(xx, hsf), x,
                           weights=weights, use_weights=bool(weights),
-                          p_market=_market_for(x))
+                          p_market=_market_for(x),
+                          p_om_gfs=(p_om_gfs_member(x)
+                                    if p_om_gfs_member is not None else None))
         cache[x] = row
         return row
 
@@ -691,6 +700,30 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
         return _calc(x)["p_fused"]
 
     return p_fn, _calc
+
+
+def select_om_gfs_fusion_member(nwp_src, st, day_str, hsf, diag=None):
+    """om_gfs as the FIFTH fusion member (2026-10-13 WIRE FLIP, ADDITIVE).
+
+    Returns a DistributionState whose ``p_ge`` votes as ``p_om_gfs`` in the core
+    blend and composite confidence, or None. Suppressed in two cases:
+      * the fusion flag (USE_OM_GFS_FUSION) is off (default) -> pre-flip fusion
+        is byte-identical; and
+      * the NWP slot is ALREADY om_gfs (USE_OM_GFS_NWP on) -> the substitution
+        carries the same signal and it must not vote twice.
+    Never raises; a fetch failure leaves the fifth member out (weights rebalance).
+    """
+    if not (_OM_GFS_IMPORTED and om_gfs_fusion_enabled()):
+        return None
+    if nwp_src == "om_gfs":
+        return None  # already carried by the NWP member; no double count
+    try:
+        return om_gfs_state_for_day(st, day_str, live=True, high_so_far=hsf)
+    except Exception as e:  # noqa: BLE001 - never break the pass
+        if diag is not None:
+            diag.append({"station": st,
+                         "om_gfs_member_error": f"{type(e).__name__}:{e}"})
+        return None
 
 
 def select_nwp_state(st, day_str, hsf, dist, month, diag=None):
@@ -830,8 +863,14 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         weights = load_weights(conn, st) if conn is not None else dict(DEFAULT_WEIGHTS)
         pin_iso = pinned_decision_utc(st, day_str)
         ticker_map = {r["strike"]: r.get("ticker") for r in ladder}
-        p_fn, meta_fn = build_fused_p_fn(state, cdf, traj, hsf, weights=weights,
-                                         ticker_map=ticker_map, pin_iso=pin_iso)
+        # om_gfs 5th fusion member (2026-10-13 WIRE FLIP, ADDITIVE to the
+        # USE_OM_GFS_NWP lever substitution). Only active behind
+        # USE_OM_GFS_FUSION and only when the NWP slot is NOT already om_gfs.
+        om_member = select_om_gfs_fusion_member(nwp_src, st, day_str, hsf, diag)
+        p_fn, meta_fn = build_fused_p_fn(
+            state, cdf, traj, hsf, weights=weights,
+            ticker_map=ticker_map, pin_iso=pin_iso,
+            p_om_gfs_member=(om_member.p_ge if om_member is not None else None))
         # F1 (2026-10-13): price the EV net of the modeled execution cost
         # (half-spread + slippage) instead of the bare mid, so a strike that is
         # only +EV on the mid is correctly rejected once crossing the book counts.
@@ -885,6 +924,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                      "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
                      "calibrated_p": both.get("calibrated_p"),
                      "p_market": both.get("p_market"),
+                     "p_om_gfs": both.get("p_om_gfs"),
                      "composite_conf": both.get("composite_conf"),
                      "ceiling": both.get("ceiling"),
                      "agreement": both["agreement"], "traj_verdict": both["traj_verdict"],
@@ -961,6 +1001,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                         # F2: calibrated p_fused + weighted-fusion provenance.
                         "calibrated_p": both.get("calibrated_p"),
                         "p_market": both.get("p_market"),
+                        "p_om_gfs": both.get("p_om_gfs"),
                         "composite_conf": both.get("composite_conf"),
                         "grade": both.get("grade"),
                         "ceiling": both.get("ceiling"),

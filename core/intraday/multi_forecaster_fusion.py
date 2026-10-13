@@ -76,7 +76,29 @@ CALIBRATED_MIN = 0.50          # floor of the ceiling itself
 CLIP_ZONE = 0.90               # amplifier disabled once p_core is already here
 
 # --- weighted fusion (WEIGHTED-FUSION-SPEC-2026-10-13) ----------------------
-DEFAULT_WEIGHTS = {"gefs": 0.25, "analog": 0.25, "traj": 0.25, "market": 0.25}
+# om_gfs (2026-10-13 WIRE FLIP) — Open-Meteo bias-corrected GFS qualifies as a
+# FIFTH fusion member. The honest re-run (`27463df0d`) found om_gfs(bc) Brier
+# 0.123 beats honest rate_1h 0.362, flipping the prior DO_NOT_WIRE verdict.
+# This is ADDITIVE: the lever-axis NWP substitution behind USE_OM_GFS_NWP is
+# unchanged, and om_gfs now also casts a vote in the core blend + composite
+# confidence. It replaces nothing.
+OM_GFS_DEFAULT_WEIGHT = 0.15   # shipped per-station om_gfs vote weight
+DEFAULT_WEIGHTS = {"gefs": 0.25, "analog": 0.25, "traj": 0.25, "market": 0.25,
+                   "om_gfs": OM_GFS_DEFAULT_WEIGHT}
+
+
+def default_om_gfs_weight(weights: Optional[Dict] = None) -> float:
+    """The om_gfs vote-weight rule: mean of the NWP-family weights (gefs,
+    analog, traj) when supplied, else OM_GFS_DEFAULT_WEIGHT (0.15).
+
+    Used to reason about / seed a station below the refit floor; with the
+    shipped family weights (0.25 each) the mean is 0.25 — a per-station refit
+    may adopt it, while the shipped default stays the conservative 0.15.
+    """
+    w = weights or {}
+    fam = [w.get(k) for k in ("gefs", "analog", "traj")]
+    vals = [float(v) for v in fam if v is not None]
+    return round(sum(vals) / len(vals), 4) if vals else OM_GFS_DEFAULT_WEIGHT
 
 
 def _ro(p):
@@ -340,14 +362,21 @@ def component_conf(p: Optional[float]) -> float:
     return abs(float(p) - 0.5) * 2.0
 
 
-def composite_confidence(p_gefs, p_analog, p_trajectory, p_market, weights) -> float:
+def composite_confidence(p_gefs, p_analog, p_trajectory, p_market, weights,
+                         p_om_gfs=None) -> float:
     """Weighted mean of component confidences over the components present.
 
     spec §2.3: composite_conf(s) = sum_i w_i * |p_i - 0.5| * 2.
+
+    ``p_om_gfs`` is the optional FIFTH component (om_gfs, 2026-10-13 WIRE
+    FLIP). Existing callers passing the four original components + weights are
+    unchanged, and a missing om_gfs vote renormalizes out exactly like a
+    missing market vote.
     """
     num = den = 0.0
     for key, p in (("gefs", p_gefs), ("analog", p_analog),
-                   ("traj", p_trajectory), ("market", p_market)):
+                   ("traj", p_trajectory), ("market", p_market),
+                   ("om_gfs", p_om_gfs)):
         w = float(weights.get(key, 0.0) or 0.0)
         if w <= 0 or p is None or p != p:
             continue
@@ -373,6 +402,7 @@ def grade_from_confidence(conf: Optional[float]) -> str:
 def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
          weights: Optional[Dict] = None, use_weights: bool = False,
          p_market: Optional[float] = None,
+         p_om_gfs: Optional[float] = None,
          ceiling: Optional[float] = None) -> Tuple[float, Dict]:
     """Combine P(high>=X) votes into (p_fused, meta).
 
@@ -384,10 +414,10 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
         holdout Brier resolution (default 0.75 here), not 0.99.
 
     ``use_weights`` selects the spec §2.1 weighted core blend
-    (sum_i w_i * p_i over {gefs, analog, traj, market}) instead of the legacy
-    0.55/0.45 agree-band blend. ``p_market`` is optional; when absent the market
-    weight is renormalized out. ``ceiling`` overrides the derived per-station
-    cap (a per-station refit hook).
+    (sum_i w_i * p_i over {gefs, analog, traj, market, om_gfs}) instead of the
+    legacy 0.55/0.45 agree-band blend. ``p_market`` and ``p_om_gfs`` are
+    optional; when absent their weight is renormalized out. ``ceiling``
+    overrides the derived per-station cap (a per-station refit hook).
     """
     def _cl(v):
         return min(0.999, max(0.001, float(v)))
@@ -403,6 +433,7 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
 
     w = dict(weights) if weights else dict(DEFAULT_WEIGHTS)
     pm = None if (p_market is None or p_market != p_market) else _cl(p_market)
+    pog = None if (p_om_gfs is None or p_om_gfs != p_om_gfs) else _cl(p_om_gfs)
     ptv = 0.0 if p_trajectory != p_trajectory else float(p_trajectory)
 
     if use_weights:
@@ -411,6 +442,9 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
                  ("traj", ptv, w.get("traj", 0.0))]
         if pm is not None:
             comps.append(("market", pm, w.get("market", 0.0)))
+        # om_gfs (2026-10-13 WIRE FLIP): the fifth fusion member, ADDITIVE.
+        if pog is not None:
+            comps.append(("om_gfs", pog, w.get("om_gfs", 0.0)))
         den = sum(max(0.0, wi) for _, _, wi in comps)
         if den > 0:
             p_core = sum(max(0.0, wi) * pv for _, pv, wi in comps) / den
@@ -444,7 +478,7 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
     p_fused = min(0.99, max(0.01, raw))          # legacy hard clip
     calibrated_p = min(ce, max(1.0 - ce, p_fused))  # calibrated ceiling clamp
 
-    conf = composite_confidence(pg, pa, ptv, pm, w)
+    conf = composite_confidence(pg, pa, ptv, pm, w, p_om_gfs=pog)
     meta = {"agreement": agreement, "edge_mult": edge_mult,
             "traj_verdict": traj_verdict, "traj_mult": mult,
             "p_core": round(p_core, 4), "gap": round(gap, 4),
@@ -452,6 +486,7 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
             "ceiling": round(ce, 4), "calibrated_p": round(calibrated_p, 4),
             "composite_conf": conf, "grade": grade_from_confidence(conf),
             "p_market": (round(pm, 4) if pm is not None else None),
+            "p_om_gfs": (round(pog, 4) if pog is not None else None),
             "use_weights": bool(use_weights),
             "weights_applied": {k: round(float(v), 4) for k, v in w.items()}}
     return calibrated_p, meta
@@ -461,13 +496,14 @@ def fuse_strike(p_gefs_fn, p_analog_fn, p_trajectory_fn, x: float,
                 high_so_far: Optional[float] = None, *,
                 weights: Optional[Dict] = None, use_weights: bool = False,
                 p_market: Optional[float] = None,
+                p_om_gfs: Optional[float] = None,
                 ceiling: Optional[float] = None) -> Dict:
     """Fuse one strike. Returns dict with all p_* and fusion meta."""
     pg = p_gefs_fn(x)
     pa = p_analog_fn(x)
     pt = p_trajectory_fn(x)
     pf, meta = fuse(pg, pa, pt, weights=weights, use_weights=use_weights,
-                    p_market=p_market, ceiling=ceiling)
+                    p_market=p_market, p_om_gfs=p_om_gfs, ceiling=ceiling)
     return {"p_gefs": round(float(pg), 4), "p_analog": round(float(pa), 4),
             "p_trajectory": (round(float(pt), 4) if pt == pt else None),
             "p_fused": round(float(pf), 4), **meta}
@@ -479,7 +515,7 @@ FUSION_RULE_ID = (
     "fuse_v2:blend(gefs.55/analog.45)@agree|.5/.5@split|.5x@disagree"
     ";traj(x.75d|1.05c|.95s;x1.05 neutralized@pcore>=0.90)"
     ";clamp<=calibrated_ceiling(resolution)"
-    ";weights=equal(.25gef/.25ana/.25traj/.25mkt)")
+    ";weights=equal(.25gef/.25ana/.25traj/.25mkt/.15omgfs)")  # om_gfs 5th member (2026-10-13)
 
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
@@ -525,11 +561,18 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
             weight_analog REAL NOT NULL DEFAULT 0.25,
             weight_traj REAL NOT NULL DEFAULT 0.25,
             weight_market REAL NOT NULL DEFAULT 0.25,
+            weight_om_gfs REAL NOT NULL DEFAULT 0.15,
             composite_conf REAL,
             rolling_n INTEGER NOT NULL DEFAULT 0,
             updated_at_utc TEXT NOT NULL
         )
     """)
+    # Additive column for pre-existing stores (CREATE IF NOT EXISTS never adds
+    # a column to an already-created table). om_gfs 5th member, 2026-10-13.
+    sw_cols = {d[1] for d in conn.execute("PRAGMA table_info(station_weights)")}
+    if "weight_om_gfs" not in sw_cols:
+        conn.execute("ALTER TABLE station_weights ADD COLUMN "
+                     "weight_om_gfs REAL NOT NULL DEFAULT 0.15")
     # Calibration companion table — F2 asks for a calibrated_p column on the
     # companion table OR a new calibration table. Provide the latter so the
     # calibration is independently addressable and never mutates trades.
@@ -550,7 +593,8 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
 
 
 def ensure_station_weights_defaults(conn: sqlite3.Connection) -> int:
-    """Seed the per-station weight store with EQUAL weights (0.25 each).
+    """Seed the per-station weight store with EQUAL weights (0.25 each),
+    plus the om_gfs fifth member at OM_GFS_DEFAULT_WEIGHT (0.15).
 
     Spec §3.3: a station below the n>=30 candidate floor keeps equal weights, so
     the store's default IS the shipping configuration until a refit runs.
@@ -564,9 +608,9 @@ def ensure_station_weights_defaults(conn: sqlite3.Connection) -> int:
         cur = conn.execute(
             "INSERT OR IGNORE INTO station_weights "
             "(station, weight_gefs, weight_analog, weight_traj, weight_market, "
-            " composite_conf, rolling_n, updated_at_utc) "
-            "VALUES (?,?,?,?,?,?,?,?)",
-            (st, 0.25, 0.25, 0.25, 0.25, None, 0, now))
+            " weight_om_gfs, composite_conf, rolling_n, updated_at_utc) "
+            "VALUES (?,?,?,?,?,?,?,?,?)",
+            (st, 0.25, 0.25, 0.25, 0.25, OM_GFS_DEFAULT_WEIGHT, None, 0, now))
         n += cur.rowcount
     conn.commit()
     return n
@@ -575,8 +619,9 @@ def ensure_station_weights_defaults(conn: sqlite3.Connection) -> int:
 def load_weights(conn: sqlite3.Connection, station: str) -> Dict[str, float]:
     """Per-station weights from `station_weights`, defaulting to equal."""
     row = conn.execute(
-        "SELECT weight_gefs, weight_analog, weight_traj, weight_market "
-        "FROM station_weights WHERE station=?", (station,)).fetchone()
+        "SELECT weight_gefs, weight_analog, weight_traj, weight_market, "
+        "weight_om_gfs FROM station_weights WHERE station=?", (station,)).fetchone()
     if not row:
         return dict(DEFAULT_WEIGHTS)
-    return {"gefs": row[0], "analog": row[1], "traj": row[2], "market": row[3]}
+    return {"gefs": row[0], "analog": row[1], "traj": row[2], "market": row[3],
+            "om_gfs": (row[4] if row[4] is not None else OM_GFS_DEFAULT_WEIGHT)}
