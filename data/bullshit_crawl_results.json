@@ -1,0 +1,1044 @@
+{
+  "generated_at_utc": "2026-10-13T03:36:20.584612+00:00",
+  "bankroll_usd": 193.85,
+  "book_rows": 82,
+  "rows_flagged": 74,
+  "rows_passed": 8,
+  "pass_pct": 9.8,
+  "rule3_winrate_without_ci": [],
+  "flagged_trades": [
+    {
+      "trade_uuid": "c8e3dc6b-f398-4fc4-9a67-86826b03c39b",
+      "station": "KSEA",
+      "trade_date_utc": "2026-10-09",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1535.8,
+        "trade_price": 0.060000000000000005
+      }
+    },
+    {
+      "trade_uuid": "bddcc7b9-2097-4eff-b609-5dcff053184f",
+      "station": "KDFW",
+      "trade_date_utc": "2026-10-09",
+      "rules": [
+        "extreme edge",
+        "low conf but entered"
+      ],
+      "values": {
+        "implied_return_pct": 354.4,
+        "trade_price": 0.055,
+        "p_fused": 0.2499,
+        "position_size_usd": 5.0
+      }
+    },
+    {
+      "trade_uuid": "973e2f5c-fc0d-4f9b-8c48-3a0b47ee9b9a",
+      "station": "KDCA",
+      "trade_date_utc": "2026-10-10",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 594.1,
+        "trade_price": 0.11499999999999999
+      }
+    },
+    {
+      "trade_uuid": "51d1bfad-2a13-463e-bf0a-430267c17c83",
+      "station": "KNYC",
+      "trade_date_utc": "2026-10-10",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 2205.7,
+        "trade_price": 0.035
+      }
+    },
+    {
+      "trade_uuid": "4b4ab77f-2760-4fb7-a328-69eec10e74a5",
+      "station": "KPHX",
+      "trade_date_utc": "2026-10-10",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 425.7,
+        "trade_price": 0.175
+      }
+    },
+    {
+      "trade_uuid": "0cb2b344-8344-4a5b-b475-0aba2ef4620e",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-01",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 37.26,
+        "open_interest": 461.57,
+        "implied_return_pct": 582.8,
+        "trade_price": 0.14500000000000002
+      }
+    },
+    {
+      "trade_uuid": "b761fe6e-a8b7-4181-81d1-dd13732cc353",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-04",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 210.08,
+        "open_interest": 88.06,
+        "implied_return_pct": 633.3,
+        "trade_price": 0.135
+      }
+    },
+    {
+      "trade_uuid": "3dafbbc1-26c6-45b4-a13f-0df7c5d46ad2",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-05",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 84.8,
+        "open_interest": 452.82,
+        "implied_return_pct": 1423.1,
+        "trade_price": 0.065
+      }
+    },
+    {
+      "trade_uuid": "1c6e03ba-4a3f-4564-92e6-fcaf0aaa839b",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-09",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 357.74,
+        "open_interest": 155.42,
+        "implied_return_pct": 2018.4,
+        "trade_price": 0.045
+      }
+    },
+    {
+      "trade_uuid": "5a5446c1-48a2-4645-b8dc-83580aa1ec82",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-10",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 295.41,
+        "open_interest": 241.7,
+        "implied_return_pct": 2728.6,
+        "trade_price": 0.035
+      }
+    },
+    {
+      "trade_uuid": "078e8a52-c361-486d-933e-f04d527e06f2",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-11",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 155.69,
+        "open_interest": 642.32,
+        "implied_return_pct": 3860.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "d584dbbc-ae4b-4c41-86f6-74a2b1941fdc",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-12",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 67.92,
+        "open_interest": 294.45,
+        "implied_return_pct": 2932.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "a4b4bd66-bd0a-478d-a83d-50dd90153281",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-13",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 130.37,
+        "open_interest": 426.47,
+        "implied_return_pct": 2100.0,
+        "trade_price": 0.045
+      }
+    },
+    {
+      "trade_uuid": "a59450e7-8366-4973-bab5-7848b58bcd32",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-14",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 169.07,
+        "open_interest": 227.13,
+        "implied_return_pct": 1423.1,
+        "trade_price": 0.065
+      }
+    },
+    {
+      "trade_uuid": "d7caff0f-77a1-44a4-b5d5-b76aaffa2172",
+      "station": "KATL",
+      "trade_date_utc": "2026-08-18",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 50.45,
+        "open_interest": 660.01,
+        "implied_return_pct": 2915.3,
+        "trade_price": 0.03
+      }
+    },
+    {
+      "trade_uuid": "d11018c5-f086-43e2-b96f-f5cf01c26440",
+      "station": "KATL",
+      "trade_date_utc": "2026-09-04",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 28.09,
+        "open_interest": 445.01,
+        "implied_return_pct": 1911.8,
+        "trade_price": 0.04
+      }
+    },
+    {
+      "trade_uuid": "574917ec-82a0-4c89-a74f-c3e3f9c1b217",
+      "station": "KATL",
+      "trade_date_utc": "2026-09-20",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 141.3,
+        "trade_price": 0.365
+      }
+    },
+    {
+      "trade_uuid": "48bc81da-1406-460b-b3f4-9b0271854f9a",
+      "station": "KAUS",
+      "trade_date_utc": "2026-08-01",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 27.09,
+        "open_interest": 2052.72,
+        "implied_return_pct": 2019.6,
+        "trade_price": 0.045
+      }
+    },
+    {
+      "trade_uuid": "49889f90-9ef9-49a3-90cd-ab8113e51231",
+      "station": "KAUS",
+      "trade_date_utc": "2026-09-04",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 222.0,
+        "trade_price": 0.28500000000000003
+      }
+    },
+    {
+      "trade_uuid": "1f7f30cc-77f9-4793-935d-1ff5f9e7108c",
+      "station": "KAUS",
+      "trade_date_utc": "2026-09-15",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 3860.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "ef0be569-b7e8-4118-81be-01f46413eff3",
+      "station": "KAUS",
+      "trade_date_utc": "2026-09-17",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 3249.2,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "ca072d7b-f449-4316-a7f8-4f6cfa8b6114",
+      "station": "KAUS",
+      "trade_date_utc": "2026-09-29",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1137.5,
+        "trade_price": 0.08
+      }
+    },
+    {
+      "trade_uuid": "3a0d3d10-95b8-4c39-a19c-7c269ced8487",
+      "station": "KBOS",
+      "trade_date_utc": "2026-08-04",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 101.13,
+        "open_interest": 549.77,
+        "implied_return_pct": 2100.0,
+        "trade_price": 0.045
+      }
+    },
+    {
+      "trade_uuid": "3105f577-1555-4306-a0d3-7e95050f0b9d",
+      "station": "KBOS",
+      "trade_date_utc": "2026-08-11",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 55.93,
+        "open_interest": 811.71,
+        "implied_return_pct": 1700.0,
+        "trade_price": 0.055
+      }
+    },
+    {
+      "trade_uuid": "06a4e96c-7c60-4dc2-b369-d61587ccf295",
+      "station": "KBOS",
+      "trade_date_utc": "2026-08-12",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 148.8,
+        "trade_price": 0.305
+      }
+    },
+    {
+      "trade_uuid": "771c2065-75af-4525-b437-0604c38db15f",
+      "station": "KBOS",
+      "trade_date_utc": "2026-08-13",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 60.3,
+        "open_interest": 361.52,
+        "implied_return_pct": 760.9,
+        "trade_price": 0.11499999999999999
+      }
+    },
+    {
+      "trade_uuid": "0871092f-e4d2-48a5-8996-0a3f0825a653",
+      "station": "KBOS",
+      "trade_date_utc": "2026-08-14",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 162.46,
+        "open_interest": 279.45,
+        "implied_return_pct": 1700.0,
+        "trade_price": 0.055
+      }
+    },
+    {
+      "trade_uuid": "54bc6710-3190-44f5-b4d4-181be33745e2",
+      "station": "KBOS",
+      "trade_date_utc": "2026-09-05",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 31.37,
+        "open_interest": 1064.6,
+        "implied_return_pct": 1220.0,
+        "trade_price": 0.07500000000000001
+      }
+    },
+    {
+      "trade_uuid": "448ce128-73bf-49b2-b44b-1568bb8dc45a",
+      "station": "KBOS",
+      "trade_date_utc": "2026-09-08",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 38.31,
+        "open_interest": 422.82,
+        "implied_return_pct": 538.7,
+        "trade_price": 0.155
+      }
+    },
+    {
+      "trade_uuid": "19fc6cf3-f558-4982-930e-8b727757d24a",
+      "station": "KBOS",
+      "trade_date_utc": "2026-09-15",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 75.98,
+        "open_interest": 939.74,
+        "implied_return_pct": 2728.6,
+        "trade_price": 0.035
+      }
+    },
+    {
+      "trade_uuid": "b9c1ff08-2d23-42a5-888e-0204335b3e70",
+      "station": "KDCA",
+      "trade_date_utc": "2026-08-05",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 972.16,
+        "open_interest": 46.7,
+        "implied_return_pct": 1700.0,
+        "trade_price": 0.055
+      }
+    },
+    {
+      "trade_uuid": "e9553e2b-e018-4c58-9a34-6bdf1803f321",
+      "station": "KDCA",
+      "trade_date_utc": "2026-08-09",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 810.9,
+        "open_interest": 88.05,
+        "implied_return_pct": 2728.6,
+        "trade_price": 0.035
+      }
+    },
+    {
+      "trade_uuid": "2c0273ad-1562-48a9-987d-e2363a25d637",
+      "station": "KDCA",
+      "trade_date_utc": "2026-08-11",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 274.6,
+        "trade_price": 0.235
+      }
+    },
+    {
+      "trade_uuid": "365b9927-bf87-43b8-8822-0fbdc36531ee",
+      "station": "KDCA",
+      "trade_date_utc": "2026-08-12",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 59.59,
+        "open_interest": 258.42,
+        "implied_return_pct": 1257.1,
+        "trade_price": 0.065
+      }
+    },
+    {
+      "trade_uuid": "79066ebd-ca5f-4d72-8402-f13afe5901a9",
+      "station": "KDCA",
+      "trade_date_utc": "2026-08-13",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 56.63,
+        "open_interest": 353.19,
+        "implied_return_pct": 3110.4,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "e0bc7a28-e7ae-40a8-afcf-36afe1aab621",
+      "station": "KDCA",
+      "trade_date_utc": "2026-08-18",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 135.69,
+        "open_interest": 283.0,
+        "implied_return_pct": 1423.1,
+        "trade_price": 0.065
+      }
+    },
+    {
+      "trade_uuid": "45400aac-22ea-4840-89aa-5993a103d597",
+      "station": "KDCA",
+      "trade_date_utc": "2026-09-05",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 81.57,
+        "open_interest": 210.87,
+        "implied_return_pct": 582.8,
+        "trade_price": 0.14500000000000002
+      }
+    },
+    {
+      "trade_uuid": "12a97c57-724b-463d-89de-88f9652db6f3",
+      "station": "KDCA",
+      "trade_date_utc": "2026-09-29",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 984.1,
+        "trade_price": 0.07500000000000001
+      }
+    },
+    {
+      "trade_uuid": "d3070f6e-aad3-4123-ad2c-69fb1b83ad4b",
+      "station": "KDEN",
+      "trade_date_utc": "2026-08-01",
+      "rules": [
+        "over-market position",
+        "low conf but entered"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 27.73,
+        "open_interest": 173.1,
+        "p_fused": 0.1924,
+        "position_size_usd": 5.0
+      }
+    },
+    {
+      "trade_uuid": "b364af2a-7206-4c52-8e70-dd2e40e3e4dd",
+      "station": "KDEN",
+      "trade_date_utc": "2026-08-04",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 350.96,
+        "open_interest": 284.93,
+        "implied_return_pct": 3860.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "4707ae5b-e653-4183-9393-8035c7bf9720",
+      "station": "KDEN",
+      "trade_date_utc": "2026-08-09",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 571.61,
+        "open_interest": 124.91,
+        "implied_return_pct": 2728.6,
+        "trade_price": 0.035
+      }
+    },
+    {
+      "trade_uuid": "e6a9eae7-1b53-493d-a7be-7d11601762cb",
+      "station": "KDEN",
+      "trade_date_utc": "2026-08-11",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 660.2,
+        "open_interest": 151.47,
+        "implied_return_pct": 3860.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "a1546ff1-e56d-4679-87f5-d3c69ef4ffcd",
+      "station": "KDEN",
+      "trade_date_utc": "2026-08-13",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 129.2,
+        "open_interest": 774.0,
+        "implied_return_pct": 3797.6,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "20442991-4e70-4c39-bdd7-6cde98ba7d1e",
+      "station": "KDEN",
+      "trade_date_utc": "2026-09-04",
+      "rules": [
+        "over-market position",
+        "extreme edge",
+        "low conf but entered"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 102.77,
+        "open_interest": 108.01,
+        "implied_return_pct": 344.9,
+        "trade_price": 0.045,
+        "p_fused": 0.2002,
+        "position_size_usd": 5.0
+      }
+    },
+    {
+      "trade_uuid": "09bf7a81-2eae-4580-9f79-9047a1b9648f",
+      "station": "KDEN",
+      "trade_date_utc": "2026-09-15",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1700.0,
+        "trade_price": 0.05500000000000001
+      }
+    },
+    {
+      "trade_uuid": "a12eb9cb-9864-4d52-a42e-cc2b035eb9ea",
+      "station": "KDEN",
+      "trade_date_utc": "2026-09-19",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 26.4,
+        "open_interest": 1514.89,
+        "implied_return_pct": 3407.6,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "367e24e9-0eab-4322-b0d6-85e097342134",
+      "station": "KDEN",
+      "trade_date_utc": "2026-09-20",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 272.3,
+        "trade_price": 0.255
+      }
+    },
+    {
+      "trade_uuid": "742475c0-89bb-470b-a0b4-29654cbf1ffb",
+      "station": "KDEN",
+      "trade_date_utc": "2026-09-30",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1489.8,
+        "trade_price": 0.05500000000000001
+      }
+    },
+    {
+      "trade_uuid": "cb46ffbd-5f52-4700-96ed-d350e4e402ca",
+      "station": "KDFW",
+      "trade_date_utc": "2026-08-01",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 165.2,
+        "open_interest": 504.85,
+        "implied_return_pct": 3200.0,
+        "trade_price": 0.03
+      }
+    },
+    {
+      "trade_uuid": "34f9518e-de44-4a07-bb9a-63af8d441813",
+      "station": "KDFW",
+      "trade_date_utc": "2026-08-05",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 46.43,
+        "open_interest": 861.5,
+        "implied_return_pct": 3413.6,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "d1b4b630-983c-4799-971b-567165be1263",
+      "station": "KDFW",
+      "trade_date_utc": "2026-09-03",
+      "rules": [
+        "grade/divergence mismatch",
+        "extreme edge"
+      ],
+      "values": {
+        "p_fused": 0.9775,
+        "rate_1h": -0.75,
+        "rate1h_window": "18Z",
+        "implied_return_pct": 210.3,
+        "trade_price": 0.315
+      }
+    },
+    {
+      "trade_uuid": "571e740d-c9c5-42a1-85d3-edf3d9d0aeda",
+      "station": "KDFW",
+      "trade_date_utc": "2026-09-04",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 41.94,
+        "open_interest": 796.34,
+        "implied_return_pct": 1220.0,
+        "trade_price": 0.075
+      }
+    },
+    {
+      "trade_uuid": "9e8488e6-33bb-4bf0-8e6c-e580451cd32b",
+      "station": "KHOU",
+      "trade_date_utc": "2026-09-08",
+      "rules": [
+        "over-market position",
+        "grade/divergence mismatch",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 309.7,
+        "open_interest": 322.89,
+        "p_fused": 0.99,
+        "rate_1h": -1.417,
+        "rate1h_window": "18Z",
+        "implied_return_pct": 3860.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "430ffb91-fe8f-4484-8ced-fb9910266c4d",
+      "station": "KLAX",
+      "trade_date_utc": "2026-09-14",
+      "rules": [
+        "extreme edge",
+        "low conf but entered"
+      ],
+      "values": {
+        "implied_return_pct": 176.9,
+        "trade_price": 0.08499999999999999,
+        "p_fused": 0.2354,
+        "position_size_usd": 5.0
+      }
+    },
+    {
+      "trade_uuid": "aff13489-b2cd-4c3c-8bab-1bda0fc845f8",
+      "station": "KMDW",
+      "trade_date_utc": "2026-09-15",
+      "rules": [
+        "low conf but entered"
+      ],
+      "values": {
+        "p_fused": 0.0183,
+        "position_size_usd": 25.0
+      }
+    },
+    {
+      "trade_uuid": "31daf3fa-58a4-4e7f-87ac-647f5de6e650",
+      "station": "KMDW",
+      "trade_date_utc": "2026-09-19",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 233.0,
+        "trade_price": 0.23500000000000001
+      }
+    },
+    {
+      "trade_uuid": "5d295523-ed45-4b55-8ed8-e210ffcdaa31",
+      "station": "KMIA",
+      "trade_date_utc": "2026-09-08",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 64.81,
+        "open_interest": 1543.0,
+        "implied_return_pct": 3860.0,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "6ee10832-8fe6-480f-b17c-baf39d2e0aed",
+      "station": "KMIA",
+      "trade_date_utc": "2026-09-17",
+      "rules": [
+        "grade/divergence mismatch"
+      ],
+      "values": {
+        "p_fused": 0.99,
+        "rate_1h": -0.417,
+        "rate1h_window": "17Z"
+      }
+    },
+    {
+      "trade_uuid": "01cb75df-ddfd-47ee-a6ee-9742936bb02a",
+      "station": "KMSP",
+      "trade_date_utc": "2026-09-08",
+      "rules": [
+        "over-market position",
+        "extreme edge"
+      ],
+      "values": {
+        "quantity_pct_of_oi": 33.83,
+        "open_interest": 703.46,
+        "implied_return_pct": 825.7,
+        "trade_price": 0.105
+      }
+    },
+    {
+      "trade_uuid": "945fdc4b-509a-4c0b-a077-3f66ea35ff11",
+      "station": "KNYC",
+      "trade_date_utc": "2026-09-08",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 720.9,
+        "trade_price": 0.095
+      }
+    },
+    {
+      "trade_uuid": "3238b821-44f4-40e1-b5e0-a6663577426c",
+      "station": "KPHL",
+      "trade_date_utc": "2026-09-20",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1423.1,
+        "trade_price": 0.065
+      }
+    },
+    {
+      "trade_uuid": "a92b1767-e955-4d9d-88fe-cbe22fb7ec60",
+      "station": "KPHX",
+      "trade_date_utc": "2026-09-14",
+      "rules": [
+        "grade/divergence mismatch",
+        "extreme edge"
+      ],
+      "values": {
+        "p_fused": 0.99,
+        "rate_1h": -0.283,
+        "rate1h_window": "20Z",
+        "implied_return_pct": 1700.0,
+        "trade_price": 0.055
+      }
+    },
+    {
+      "trade_uuid": "039e88d2-b9d5-435f-ba24-80ce7195a15e",
+      "station": "KPHX",
+      "trade_date_utc": "2026-09-17",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1656.8,
+        "trade_price": 0.05
+      }
+    },
+    {
+      "trade_uuid": "3a504870-7e90-433f-8162-75d40d415bcf",
+      "station": "KSAT",
+      "trade_date_utc": "2026-09-30",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 261.1,
+        "trade_price": 0.21
+      }
+    },
+    {
+      "trade_uuid": "83129d80-d160-4fc5-ad17-f07885ec2ccd",
+      "station": "KSEA",
+      "trade_date_utc": "2026-09-18",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 967.1,
+        "trade_price": 0.09
+      }
+    },
+    {
+      "trade_uuid": "7af9226f-9e34-4ced-987d-8e5ea5a81d30",
+      "station": "KSFO",
+      "trade_date_utc": "2026-09-14",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 725.0,
+        "trade_price": 0.12
+      }
+    },
+    {
+      "trade_uuid": "25afef87-85c0-40ba-9075-1bff47085129",
+      "station": "KSFO",
+      "trade_date_utc": "2026-09-16",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 460.5,
+        "trade_price": 0.16999999999999998
+      }
+    },
+    {
+      "trade_uuid": "2ae647d1-d5d4-467b-b2fc-d40d68bc65c6",
+      "station": "KSFO",
+      "trade_date_utc": "2026-09-20",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 100.9,
+        "trade_price": 0.49
+      }
+    },
+    {
+      "trade_uuid": "ca41d987-1725-46a7-a1d4-529d9296ed8a",
+      "station": "KLAX",
+      "trade_date_utc": "2026-10-10",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 267.6,
+        "trade_price": 0.055
+      }
+    },
+    {
+      "trade_uuid": "2d780689-b131-418e-8897-4557d60b31e2",
+      "station": "KHOU",
+      "trade_date_utc": "2026-10-10",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 298.3,
+        "trade_price": 0.19
+      }
+    },
+    {
+      "trade_uuid": "d2d89af5-f510-4bf9-9a73-26056918476c",
+      "station": "KPHL",
+      "trade_date_utc": "2026-10-11",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 1222.5,
+        "trade_price": 0.065
+      }
+    },
+    {
+      "trade_uuid": "a28fbd10-fb80-4c68-9ab0-d0460c075b67",
+      "station": "KMDW",
+      "trade_date_utc": "2026-10-11",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 3204.4,
+        "trade_price": 0.025
+      }
+    },
+    {
+      "trade_uuid": "917e2a33-8a2c-4ac9-bb54-3aef0bda28b9",
+      "station": "KNYC",
+      "trade_date_utc": "2026-10-12",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 842.9,
+        "trade_price": 0.10500000000000001
+      }
+    },
+    {
+      "trade_uuid": "050021e6-dfd3-4dcc-9844-70c5683dcbf9",
+      "station": "KBOS",
+      "trade_date_utc": "2026-10-12",
+      "rules": [
+        "extreme edge"
+      ],
+      "values": {
+        "implied_return_pct": 147.5,
+        "trade_price": 0.4
+      }
+    }
+  ],
+  "rule_definitions": {
+    "bankroll/position mismatch": "realized_pnl > bankroll x 10.0",
+    "over-market position": "quantity > 25% of strike open_interest",
+    "no uncertainty": "win-rate claim in text with no CI width stated",
+    "grade/divergence mismatch": "p_fused >= 0.9 on a station-day whose rate_1h at the entry window is <= 0",
+    "extreme edge": "implied return (analytical-1)/price > 100% of price",
+    "over max position": "position_size_usd > 25.0",
+    "low conf but entered": "position_size_usd set but p_fused < 0.6"
+  }
+}
