@@ -68,7 +68,8 @@ from core.intraday.exit_logic import evaluate_exits  # noqa: E402
 from core.strike_selection_ev import select_strike, p_high_ge as gauss_p_high_ge  # noqa: E402
 from core.intraday.multi_forecaster_fusion import (  # noqa: E402
     TrajectoryForecaster, build_live_epoch, build_analog_cdf_today,
-    fuse_strike, ensure_schema, FUSION_RULE_ID,
+    fuse_strike, ensure_schema, ensure_station_weights_defaults, load_weights,
+    DEFAULT_WEIGHTS, FUSION_RULE_ID,
 )
 from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name, settlement_time_utc,
@@ -174,6 +175,47 @@ def high_so_far(station: str, day_start: datetime, day_end: datetime,
 
 
 PRICE_SNAPSHOT_SOURCE = "kalshi_market_snapshots.db:market_snapshots.mid_price"
+
+# H3 canonical decision pin: 13:30 station-local (see
+# scripts/b2_real_price_sweep.DEFAULT_ENTRY_UTC and GR5-WIRING-RECEIPT).
+DECISION_PIN_LOCAL_HHMM = "13:30:00"
+
+
+def pinned_decision_utc(station: str, day_str: str) -> Optional[str]:
+    """The 13:30 station-local decision pin for a day, as a UTC ISO string."""
+    if ZoneInfo is None:
+        return None
+    try:
+        tz = ZoneInfo(station_timezone_name(station))
+        local = datetime.fromisoformat(f"{day_str}T{DECISION_PIN_LOCAL_HHMM}")
+        return local.replace(tzinfo=tz).astimezone(timezone.utc).isoformat()
+    except Exception:
+        return None
+
+
+def market_mid_prob(ticker: str, pin_iso: Optional[str]) -> Optional[float]:
+    """Market mid as an implied P(YES) at the snapshot nearest the decision pin.
+
+    Read-only on kalshi_market_snapshots.db. The market's implied probability of
+    YES is the YES mid price; the fusion component uses ``1 - mid`` for the NO
+    side downstream. Returns None when no usable snapshot exists (fail-open: the
+    market component simply drops out of the weighted blend).
+    """
+    if not ticker or not pin_iso:
+        return None
+    c = _ro(SNAPS)
+    try:
+        row = c.execute(
+            "SELECT mid_price FROM market_snapshots WHERE market_ticker=? "
+            "AND mid_price IS NOT NULL "
+            "ORDER BY ABS(julianday(snapshot_time)-julianday(?)) ASC LIMIT 1",
+            (ticker, pin_iso)).fetchone()
+    finally:
+        c.close()
+    if not row or row[0] is None:
+        return None
+    p = float(row[0])
+    return p if 0.0 <= p <= 1.0 else None
 
 
 def strike_ladder(station: str, date_yy: str, before_iso: Optional[str] = None,
@@ -350,13 +392,17 @@ def exposure_skip_reason(conn, station: str, day_str: str) -> Optional[str]:
 def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs):
     """Insert-or-replace the companion per-trade forecaster row (idempotent)."""
     now = datetime.now(timezone.utc).isoformat()
+    wa = probs.get("weights_applied")
+    if not isinstance(wa, str):
+        wa = json.dumps(wa) if wa is not None else None
     conn.execute(
         """INSERT INTO trade_forecaster_probs
            (trade_uuid, station, trade_date_utc, strike, side, ticker,
             p_gefs, p_analog, p_trajectory, p_fused, n_analog, n_traj,
             agreement, edge_mult, traj_verdict, traj_mult, fusion_rule, created_at_utc,
-            grade_entered, grade_cap_usd)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            grade_entered, grade_cap_usd,
+            calibrated_p, p_market, composite_conf, grade, ceiling, weights_applied)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
            ON CONFLICT(trade_uuid) DO UPDATE SET
              p_gefs=excluded.p_gefs, p_analog=excluded.p_analog,
              p_trajectory=excluded.p_trajectory, p_fused=excluded.p_fused,
@@ -364,7 +410,10 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
              agreement=excluded.agreement, edge_mult=excluded.edge_mult,
              traj_verdict=excluded.traj_verdict, traj_mult=excluded.traj_mult,
              fusion_rule=excluded.fusion_rule, created_at_utc=excluded.created_at_utc,
-             grade_entered=excluded.grade_entered, grade_cap_usd=excluded.grade_cap_usd""",
+             grade_entered=excluded.grade_entered, grade_cap_usd=excluded.grade_cap_usd,
+             calibrated_p=excluded.calibrated_p, p_market=excluded.p_market,
+             composite_conf=excluded.composite_conf, grade=excluded.grade,
+             ceiling=excluded.ceiling, weights_applied=excluded.weights_applied""",
         (tuuid, station, day_str, strike, side, ticker,
          probs.get("p_gefs"), probs.get("p_analog"),
          probs.get("p_trajectory"), probs.get("p_fused"),
@@ -372,7 +421,10 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
          probs.get("agreement"), probs.get("edge_mult"),
          probs.get("traj_verdict"), probs.get("traj_mult"),
          FUSION_RULE_ID, now,
-         probs.get("grade_entered"), probs.get("grade_cap_usd")))
+         probs.get("grade_entered"), probs.get("grade_cap_usd"),
+         probs.get("calibrated_p"), probs.get("p_market"),
+         probs.get("composite_conf"), probs.get("grade"),
+         probs.get("ceiling"), wa))
 
 
 def _position_size_usd(confidence: float) -> float:
@@ -588,15 +640,35 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
             "agreement": probs.get("agreement"), "traj_verdict": probs.get("traj_verdict")}
 
 
-def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float]):
-    """Return (p_fn, meta_fn): per-strike x -> p_fused and the fusion meta dict."""
+def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float],
+                     weights: Optional[Dict] = None,
+                     ticker_map: Optional[Dict[float, str]] = None,
+                     pin_iso: Optional[str] = None):
+    """Return (p_fn, meta_fn): per-strike x -> p_fused and the fusion meta dict.
+
+    Weighted fusion (WEIGHTED-FUSION-SPEC-2026-10-13): when `weights` is given
+    the core is the per-station weighted blend over {gefs, analog, traj, market},
+    and the market component is the YES mid at the decision pin. Weights default
+    to equal (0.25 each) until tuned.
+    """
     cache: Dict[float, Dict] = {}
+    mkt_cache: Dict[str, Optional[float]] = {}
+
+    def _market_for(x: float) -> Optional[float]:
+        tk = (ticker_map or {}).get(x)
+        if tk is None:
+            return None
+        if tk not in mkt_cache:
+            mkt_cache[tk] = market_mid_prob(tk, pin_iso)
+        return mkt_cache[tk]
 
     def _calc(x: float) -> Dict:
         if x in cache:
             return cache[x]
         row = fuse_strike(state.p_ge, cdf.p_high_ge,
-                          lambda xx: traj.p_high_ge(xx, hsf), x)
+                          lambda xx: traj.p_high_ge(xx, hsf), x,
+                          weights=weights, use_weights=bool(weights),
+                          p_market=_market_for(x))
         cache[x] = row
         return row
 
@@ -624,6 +696,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
     if conn:
         conn.execute("PRAGMA journal_mode=WAL;")
         ensure_schema(conn)  # additive: p_* columns + companion table
+        ensure_station_weights_defaults(conn)  # F2: equal per-station weights
         _ensure_price_source_column(conn)  # E1: trade_uuid -> snapshot provenance
 
     # ONE matcher/climatology for the whole pass (the climatology build is the
@@ -704,7 +777,13 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             continue
 
         # -- fuse per strike; select on the FUSED probability --
-        p_fn, meta_fn = build_fused_p_fn(state, cdf, traj, hsf)
+        # F2/weighted (2026-10-13): per-station weights (equal by default) and the
+        # market mid at the 13:30 decision pin as the 4th fusion component.
+        weights = load_weights(conn, st) if conn is not None else dict(DEFAULT_WEIGHTS)
+        pin_iso = pinned_decision_utc(st, day_str)
+        ticker_map = {r["strike"]: r.get("ticker") for r in ladder}
+        p_fn, meta_fn = build_fused_p_fn(state, cdf, traj, hsf, weights=weights,
+                                         ticker_map=ticker_map, pin_iso=pin_iso)
         # F1 (2026-10-13): price the EV net of the modeled execution cost
         # (half-spread + slippage) instead of the bare mid, so a strike that is
         # only +EV on the mid is correctly rejected once crossing the book counts.
@@ -754,6 +833,10 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                      "our_prob": round(our_prob, 4), "mkt": mkt,
                      "p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
                      "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
+                     "calibrated_p": both.get("calibrated_p"),
+                     "p_market": both.get("p_market"),
+                     "composite_conf": both.get("composite_conf"),
+                     "ceiling": both.get("ceiling"),
                      "agreement": both["agreement"], "traj_verdict": both["traj_verdict"],
                      "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
                      "gate": verdict["verdict"], "p_warm": verdict.get("p_warm"),
@@ -824,7 +907,14 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                         "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
                         "agreement": both["agreement"], "edge_mult": both["edge_mult"],
                         "traj_verdict": both["traj_verdict"], "traj_mult": both["traj_mult"],
-                        "grade_entered": grade, "grade_cap_usd": grade_cap}
+                        "grade_entered": grade, "grade_cap_usd": grade_cap,
+                        # F2: calibrated p_fused + weighted-fusion provenance.
+                        "calibrated_p": both.get("calibrated_p"),
+                        "p_market": both.get("p_market"),
+                        "composite_conf": both.get("composite_conf"),
+                        "grade": both.get("grade"),
+                        "ceiling": both.get("ceiling"),
+                        "weights_applied": both.get("weights_applied")}
 
         if dry_run:
             results.append({"status": "would_execute", "station": st,
