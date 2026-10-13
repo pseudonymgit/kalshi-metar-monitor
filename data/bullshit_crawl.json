@@ -1,17 +1,17 @@
 {
-  "generated_at_utc": "2026-10-13T03:42:10.004400+00:00",
+  "generated_at_utc": "2026-10-13T18:09:24.720137+00:00",
   "source_db": "data/paper_trading_sbox.db",
   "bankroll_usd": 200.0,
-  "total_trades": 82,
-  "flagged_trades": 81,
+  "total_trades": 86,
+  "flagged_trades": 85,
   "clean_trades": 1,
   "flagged_pct": 98.8,
   "flags_per_rule": {
     "bankroll/position mismatch": 0,
     "over max position": 0,
-    "low conf but entered": 5,
+    "low conf but entered": 9,
     "S grade on flat signal": 52,
-    "extreme edge": 77
+    "extreme edge": 81
   },
   "rule_definitions": {
     "bankroll/position mismatch": "realized_pnl > 200.0 x 10.0 = 2000",
@@ -87,8 +87,8 @@
       "trade_uuid": "973e2f5c-fc0d-4f9b-8c48-3a0b47ee9b9a",
       "station": "KDCA",
       "trade_date_utc": "2026-10-10",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
@@ -102,8 +102,8 @@
       "trade_uuid": "51d1bfad-2a13-463e-bf0a-430267c17c83",
       "station": "KNYC",
       "trade_date_utc": "2026-10-10",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
@@ -117,8 +117,8 @@
       "trade_uuid": "4b4ab77f-2760-4fb7-a328-69eec10e74a5",
       "station": "KPHX",
       "trade_date_utc": "2026-10-10",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
@@ -1139,8 +1139,8 @@
       "trade_uuid": "ca41d987-1725-46a7-a1d4-529d9296ed8a",
       "station": "KLAX",
       "trade_date_utc": "2026-10-10",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
@@ -1154,8 +1154,8 @@
       "trade_uuid": "2d780689-b131-418e-8897-4557d60b31e2",
       "station": "KHOU",
       "trade_date_utc": "2026-10-10",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
@@ -1169,8 +1169,8 @@
       "trade_uuid": "4ea99515-2fd0-4877-b72c-b1849905b48b",
       "station": "KDCA",
       "trade_date_utc": "2026-10-11",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
@@ -1184,8 +1184,8 @@
       "trade_uuid": "5a2bbdc4-e9b8-492a-926c-24fc6feb484f",
       "station": "KLAS",
       "trade_date_utc": "2026-10-11",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal"
       ],
@@ -1197,8 +1197,8 @@
       "trade_uuid": "d2d89af5-f510-4bf9-9a73-26056918476c",
       "station": "KPHL",
       "trade_date_utc": "2026-10-11",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "extreme edge"
       ],
@@ -1212,8 +1212,8 @@
       "trade_uuid": "7ca7c67f-d5db-4077-8dcd-ae541d43d597",
       "station": "KBOS",
       "trade_date_utc": "2026-10-11",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "extreme edge"
       ],
@@ -1227,8 +1227,8 @@
       "trade_uuid": "a28fbd10-fb80-4c68-9ab0-d0460c075b67",
       "station": "KMDW",
       "trade_date_utc": "2026-10-11",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "correct",
       "rules": [
         "S grade on flat signal",
         "extreme edge"
@@ -1284,6 +1284,74 @@
         "p_fused": 0.99,
         "market_price": 0.4,
         "edge_pct": 147.5
+      }
+    },
+    {
+      "trade_uuid": "a17ce3e1-9ead-4044-abb9-61af6eda3300",
+      "station": "KDCA",
+      "trade_date_utc": "2026-10-13",
+      "status": "open",
+      "settlement_outcome": null,
+      "rules": [
+        "low conf but entered",
+        "extreme edge"
+      ],
+      "values": {
+        "position_size_usd": 5.0,
+        "p_fused": 0.2481,
+        "market_price": 0.025,
+        "edge_pct": 892.4
+      }
+    },
+    {
+      "trade_uuid": "45805a71-754e-431e-91cc-911a98c19f53",
+      "station": "KLAX",
+      "trade_date_utc": "2026-10-13",
+      "status": "open",
+      "settlement_outcome": null,
+      "rules": [
+        "low conf but entered",
+        "extreme edge"
+      ],
+      "values": {
+        "position_size_usd": 5.0,
+        "p_fused": 0.2481,
+        "market_price": 0.035,
+        "edge_pct": 608.9
+      }
+    },
+    {
+      "trade_uuid": "300f8783-b722-4a63-a7fb-3c06c73758cd",
+      "station": "KSFO",
+      "trade_date_utc": "2026-10-13",
+      "status": "open",
+      "settlement_outcome": null,
+      "rules": [
+        "low conf but entered",
+        "extreme edge"
+      ],
+      "values": {
+        "position_size_usd": 5.0,
+        "p_fused": 0.2481,
+        "market_price": 0.025,
+        "edge_pct": 892.4
+      }
+    },
+    {
+      "trade_uuid": "34a2b11b-8557-4582-aecb-7128b1429ab8",
+      "station": "KOKC",
+      "trade_date_utc": "2026-10-13",
+      "status": "open",
+      "settlement_outcome": null,
+      "rules": [
+        "low conf but entered",
+        "extreme edge"
+      ],
+      "values": {
+        "position_size_usd": 5.0,
+        "p_fused": 0.2481,
+        "market_price": 0.045,
+        "edge_pct": 451.3
       }
     }
   ]
