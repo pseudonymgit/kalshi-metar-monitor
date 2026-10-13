@@ -34,5 +34,9 @@ data/gefs_work/
 !artifacts/look200/*.json
 !artifacts/preregistration/*.sha256
 
+# Forecast-aggregation study outputs (committed analysis artifacts, 2026-10-13)
+!artifacts/forecast-aggregation/
+!artifacts/forecast-aggregation/*.json
+
 # Governance stopping record MUST be committed (Workstream F off-switch)
 !stopping-record.json
