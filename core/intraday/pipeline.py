@@ -25,6 +25,18 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
+# om_gfs (Open-Meteo bias-corrected GFS) substitution (Workstream P). Optional
+# import: if unavailable the flag is simply inert and the raw local GFS path is
+# used unchanged.
+try:
+    from core.intraday.om_gfs_nwp import (
+        om_gfs_enabled,
+        om_gfs_state_for_day,
+    )
+    OM_GFS_AVAILABLE = True
+except Exception:  # noqa: BLE001 - optional dependency
+    OM_GFS_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 # ─── Settlement UTC hour (Kalshi HIGH markets settle ~18 UTC / 12 ET) ────
@@ -363,6 +375,29 @@ class HourlyPipeline:
                 min(1.0, max(0.0, nwp["cloud_cover_daily_mean"] / 100.0))
                 if "cloud_cover_daily_mean" in nwp else None
             )
+
+            # ── om_gfs substitution (Workstream P, 2nd wiring point) ────────
+            # USE_OM_GFS_NWP=1 -> the temperature level is taken from om_gfs
+            # (Open-Meteo bias-corrected GFS Tmax, via core/intraday/om_gfs_nwp).
+            # om_gfs is a LEVER/level-axis substitution only (collinear with
+            # rate_1h), so only temperature is overridden; dew/wind/cloud stay
+            # from the raw local GFS block. Flag OFF -> byte-identical to the
+            # pre-change behaviour. Flag ON but om_gfs unavailable/failed -> raw
+            # local GFS fallback (never raises).
+            if OM_GFS_AVAILABLE and om_gfs_enabled():
+                try:
+                    om_state = om_gfs_state_for_day(station, date_str, live=True)
+                except Exception as e:  # noqa: BLE001 - never break enrichment
+                    logger.warning(
+                        f"om_gfs enrichment failed for {station} {date_str}: {e}"
+                    )
+                    om_state = None
+                if om_state is not None:
+                    temp_f = om_state.mu
+                    logger.info(
+                        f"NWP enrichment: om_gfs bias-corrected Tmax "
+                        f"{om_state.mu:.1f}F substituted for {station} {date_str}"
+                    )
 
             enriched = 0
             for v in vectors:
