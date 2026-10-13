@@ -49,5 +49,9 @@ data/gefs_work/
 !artifacts/low-market-backfill/
 !artifacts/low-market-backfill/*.json
 
+# HIGH market cohort extension (committed analysis artifact, 2026-10-13)
+!artifacts/market-benchmark-extension/
+!artifacts/market-benchmark-extension/*.json
+
 # Governance stopping record MUST be committed (Workstream F off-switch)
 !stopping-record.json

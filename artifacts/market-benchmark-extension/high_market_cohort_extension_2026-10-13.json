@@ -1,0 +1,46 @@
+{
+  "generated_at_utc": "2026-10-13T18:16:22.477043+00:00",
+  "note": "extension analysis for the frozen MARKET-BENCHMARK-CONTRACT; no contract change",
+  "high_market_cohort": {
+    "T_only(frozen)": {
+      "n": 152,
+      "n_dates": 43,
+      "n_stations": 19,
+      "brier": 0.0232,
+      "base_rate": 0.0592,
+      "ci95": {
+        "lo": 0.0106,
+        "hi": 0.0378,
+        "n_dates": 43
+      }
+    },
+    "B_only": {
+      "n": 1103,
+      "n_dates": 46,
+      "n_stations": 20,
+      "brier": 0.104,
+      "base_rate": 0.2158,
+      "ci95": {
+        "lo": 0.0843,
+        "hi": 0.1266,
+        "n_dates": 46
+      }
+    },
+    "T+B": {
+      "n": 1255,
+      "n_dates": 46,
+      "n_stations": 20,
+      "brier": 0.0942,
+      "base_rate": 0.1968,
+      "ci95": {
+        "lo": 0.0771,
+        "hi": 0.114,
+        "n_dates": 46
+      }
+    }
+  },
+  "trade_calibration_p_market": {
+    "rows": 143,
+    "filled": 143
+  }
+}
