@@ -1,0 +1,139 @@
+{
+  "generated_at_utc": "2026-10-13T18:06:00.085596+00:00",
+  "stage": "om_gfs re-validation under honest point-in-time rate_1h baseline",
+  "pin_mod_local": 810,
+  "common_rows": 2311,
+  "global_bias_F": -0.5906,
+  "global_sigma_F": 1.5927,
+  "scores": {
+    "rate_1h_pit_honest": {
+      "name": "rate_1h_pit",
+      "n": 2311,
+      "brier": 0.3617,
+      "dir_acc": 0.199,
+      "base_rate": 0.801,
+      "mean_p": 0.332,
+      "reliability": 0.2223,
+      "resolution": 0.0189,
+      "ece": 0.4689,
+      "mce": 0.4962
+    },
+    "om_gfs_raw": {
+      "name": "om_gfs_raw",
+      "n": 2311,
+      "brier": 0.1418,
+      "dir_acc": 0.7992,
+      "base_rate": 0.801,
+      "mean_p": 0.6999,
+      "reliability": 0.0239,
+      "resolution": 0.0415,
+      "ece": 0.1066,
+      "mce": 0.3024
+    },
+    "om_gfs_bc": {
+      "name": "om_gfs_bc",
+      "n": 2311,
+      "brier": 0.1231,
+      "dir_acc": 0.8256,
+      "base_rate": 0.801,
+      "mean_p": 0.778,
+      "reliability": 0.0067,
+      "resolution": 0.042,
+      "ece": 0.0488,
+      "mce": 0.3118
+    },
+    "om_gfs_bc_per_station_bias": {
+      "name": "om_gfs_bc_ps",
+      "n": 2311,
+      "brier": 0.1176,
+      "dir_acc": 0.8256,
+      "base_rate": 0.801,
+      "mean_p": 0.7816,
+      "reliability": 0.0066,
+      "resolution": 0.0472,
+      "ece": 0.0447,
+      "mce": 0.2926
+    },
+    "rate_1h_windowmax_REFERENCE": {
+      "name": "rate_1h_windowmax",
+      "n": 2311,
+      "brier": 0.094,
+      "dir_acc": 0.891,
+      "base_rate": 0.801,
+      "mean_p": 0.7146,
+      "reliability": 0.024,
+      "resolution": 0.0888,
+      "ece": 0.1185,
+      "mce": 0.3156
+    }
+  },
+  "fcerr": {
+    "level_pooled": 0.212,
+    "level_within_station_demeaned": 0.1766,
+    "pcross_pooled": 0.3286,
+    "max_abs": 0.3286,
+    "flag_threshold": 0.85,
+    "collinear": false
+  },
+  "level_mae": {
+    "om_gfs_raw": 1.3031,
+    "om_gfs_bc_global": 1.1477,
+    "gfs_raw": 2.0946,
+    "rate_1h_pit_mu_honest": 2.8145
+  },
+  "blend_test": {
+    "common_n": 2311,
+    "rate_1h_pit_alone": 0.3617,
+    "om_gfs_bc_alone": 0.1231,
+    "grid": {
+      "w_om=0.0": {
+        "brier": 0.3617,
+        "dir_acc": 0.199
+      },
+      "w_om=0.1": {
+        "brier": 0.3137,
+        "dir_acc": 0.3029
+      },
+      "w_om=0.2": {
+        "brier": 0.271,
+        "dir_acc": 0.444
+      },
+      "w_om=0.25": {
+        "brier": 0.2517,
+        "dir_acc": 0.5227
+      },
+      "w_om=0.3": {
+        "brier": 0.2337,
+        "dir_acc": 0.6339
+      },
+      "w_om=0.5": {
+        "brier": 0.1753,
+        "dir_acc": 0.8061
+      },
+      "w_om=0.7": {
+        "brier": 0.1383,
+        "dir_acc": 0.8217
+      },
+      "w_om=1.0": {
+        "brier": 0.1231,
+        "dir_acc": 0.8256
+      }
+    },
+    "best_weight_on_om": 1.0,
+    "best_blend_brier": 0.1231,
+    "best_blend_minus_honest_rate": -0.2386
+  },
+  "decision": {
+    "criterion_a_brier_le_honest_rate": true,
+    "criterion_b_fcerr_lt_0.85": true,
+    "om_gfs_bc_brier": 0.1231,
+    "honest_rate_1h_brier": 0.3617,
+    "published_rate_1h_brier_reference": 0.0921,
+    "verdict": "WIRE_AS_SECOND_MEMBER",
+    "verdicts": {
+      "WIRE_AS_SECOND_MEMBER": "Brier <= honest rate_1h AND fcerr < 0.85 -> wire",
+      "REPLACE_LOCAL_GFS_ONLY_NO_DIVERSITY_GAIN": "better/equal Brier but collinear",
+      "DO_NOT_WIRE": "worse Brier -> do not wire"
+    }
+  }
+}
