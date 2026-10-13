@@ -71,6 +71,21 @@ from core.intraday.multi_forecaster_fusion import (  # noqa: E402
     fuse_strike, ensure_schema, ensure_station_weights_defaults, load_weights,
     DEFAULT_WEIGHTS, FUSION_RULE_ID,
 )
+
+# ── om_gfs NWP substitution (USE_OM_GFS_NWP), 2026-10-13 ─────────────────────
+# The om_gfs strike-crossing validation found Open-Meteo's bias-corrected GFS is
+# a strictly better NWP input than our raw local GFS (level MAE 0.680 F vs
+# 2.095 F; crossing Brier 0.1079 vs 0.1597) but is COLLINEAR with rate_1h
+# (fcerr 0.99) — a LEVER-axis substitution, NOT a diversity gain. Behind the
+# flag, the NWP component uses om_gfs(bias-corrected); off (default) it is the
+# raw local GFS-seeded WS-P distribution, byte-identical to pre-flag behaviour.
+# Raw local GFS remains the fallback whenever om_gfs has no value for the day.
+# Import is guarded so a substrate import failure can never break the bridge.
+try:
+    from core.intraday.om_gfs_nwp import om_gfs_enabled, om_gfs_state_for_day
+    _OM_GFS_IMPORTED = True
+except Exception:  # pragma: no cover - module missing => substitution unavailable
+    _OM_GFS_IMPORTED = False
 from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name, settlement_time_utc,
 )
@@ -678,6 +693,36 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
     return p_fn, _calc
 
 
+def select_nwp_state(st, day_str, hsf, dist, month, diag=None):
+    """Select the NWP component's DistributionState for a station-day.
+
+    om_gfs (Open-Meteo bias-corrected GFS, USE_OM_GFS_NWP=1) is the PREFERRED
+    NWP member; the raw local GFS-seeded WS-P distribution is the fallback used
+    when the flag is off, when om_gfs is unavailable, or when the fetch fails.
+
+    Returns (state, nwp_src, ens):
+      * nwp_src == "om_gfs"        -> state built from om_gfs (ens=None)
+      * nwp_src == "gfs_local"     -> raw local GFS-seeded WS-P (pre-flag path)
+      * nwp_src == "no_gefs_step24"-> no NWP at all (state=None; caller skips)
+    `state` is NOT yet intraday-truncated; the caller applies update_from_intraday.
+    """
+    if _OM_GFS_IMPORTED and om_gfs_enabled():
+        try:
+            om_state = om_gfs_state_for_day(st, day_str, live=True, high_so_far=hsf)
+        except Exception as e:  # noqa: BLE001 - never break the pass
+            if diag is not None:
+                diag.append({"station": st, "om_gfs_error": f"{type(e).__name__}:{e}"})
+            om_state = None
+        if om_state is not None:
+            return om_state, "om_gfs", None
+    ens = gefs_ens(st, day_str)
+    if not ens:
+        return None, "no_gefs_step24", None
+    state = from_ws_p(dist, st, ens_mean=ens[0], ens_std=ens[1],
+                      month=month, date=day_str)
+    return state, "gfs_local", ens
+
+
 def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         report=False, max_stations=None):
     stations = stations or STATIONS
@@ -736,10 +781,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                 skipped.append((st, f"outside_station_window_after_T-{hours_to_settlement:.1f}h"))
                 continue
 
-        ens = gefs_ens(st, day_str)
-        if not ens:
-            skipped.append((st, "no_gefs_step24"))
-            continue
+        ens = None
         hsf = high_so_far(st, day_start, day_end, now_utc)
         if hsf is None:
             skipped.append((st, "no_intraday_obs_yet"))
@@ -747,7 +789,13 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
 
         frac = max(0.0, min(1.0, (now_utc - day_start).total_seconds()
                              / (day_end - day_start).total_seconds()))
-        state = from_ws_p(dist, st, ens_mean=ens[0], ens_std=ens[1], month=month, date=day_str)
+        # NWP component: om_gfs(bias-corrected) substitution behind USE_OM_GFS_NWP.
+        # Default OFF -> raw local GFS-seeded WS-P (pre-flag behaviour). When the
+        # flag is ON but om_gfs has no value/fails, fall through to raw local GFS.
+        state, nwp_src, ens = select_nwp_state(st, day_str, hsf, dist, month, diag)
+        if state is None:
+            skipped.append((st, nwp_src))
+            continue
         state = update_from_intraday(state, hsf, frac)
 
         ladder = strike_ladder(st, date_yy, before_iso=now_iso)
@@ -826,7 +874,9 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         verdict = traj.gate_verdict(gate_dir, abs(our_prob - 0.5) * 2.0)
 
         diag.append({"station": st, "day": day_str,
-                     "ens": [round(ens[0], 2), round(ens[1], 2)], "hsf": hsf,
+                     "nwp_src": nwp_src,
+                     "ens": ([round(ens[0], 2), round(ens[1], 2)] if ens else None),
+                     "hsf": hsf,
                      "frac": round(frac, 3), "mu": round(state.mu, 2),
                      "sigma": round(state.sigma, 2), "strike": strike,
                      "side": picked["side"], "ev": picked["ev"],
