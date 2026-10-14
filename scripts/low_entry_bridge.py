@@ -49,6 +49,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 from sbox_intraday_ev_bridge import (  # noqa: E402
     STATIONS, kelly_position_size, grade_position_cap, compute_trade_grade,
     record_trade, SOLE_FORECAST_RULE_ID, _hours_before_settlement,
+    _station_spread_model,
 )
 from core.strike_selection_ev import select_strike, make_truncated_p_fn  # noqa: E402
 from core.station_params import get_station_params  # noqa: E402
@@ -313,8 +314,16 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True):
             # exactly the surface `p_fn` returns. The EV picker therefore prices
             # the YES leg (min<=X) and the NO leg (min>X) directly against the
             # real mids — no axis flip anywhere in the LOW path.
+            #
+            # F3 (2026-10-14): price EV net of the modeled execution cost
+            # (station half-spread + slippage), exactly as HIGH does, and fail
+            # CLOSED — a missing/unresolvable calibrated p or spread must reject
+            # the trade rather than silently pricing off the bare mid (the LOW
+            # lane previously priced off the bare mid with no fail-closed guard,
+            # a systematic over-entry bias vs HIGH).
+            cost_model = _station_spread_model(ladder)
             picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
-                                   p_fn=p_fn, fail_closed=False)
+                                   p_fn=p_fn, cost_model=cost_model, fail_closed=True)
             if not picked or picked.get("ev", 0) <= 0:
                 skipped.append((st, day_str, "no_positive_ev_strike"))
                 continue
