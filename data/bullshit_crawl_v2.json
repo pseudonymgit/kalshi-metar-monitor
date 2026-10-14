@@ -1,9 +1,9 @@
 {
   "generated_at_utc": null,
-  "n_trades": 88,
-  "n_with_calibrated_p": 149,
-  "flips": 3,
-  "flip_pct": 3.4,
+  "n_trades": 91,
+  "n_with_calibrated_p": 152,
+  "flips": 1,
+  "flip_pct": 1.1,
   "flip_detail": [
     {
       "id": 246,
@@ -11,52 +11,14 @@
       "station": "KMDW",
       "date": "2026-09-15",
       "outcome": "correct",
-      "pnl": 24.44,
-      "p_fused": 0.0183,
-      "calibrated_p": 0.202,
+      "pnl": 0.94,
+      "p_fused": 0.202,
+      "calibrated_p": 0.1315,
       "ceiling": 0.8441,
       "market_price": 0.94,
-      "honest_ev": -0.7585,
+      "honest_ev": -0.829,
       "old_flags": [
         "low_conf_entered"
-      ],
-      "honest_flags": [
-        "honest_ev_too_low"
-      ]
-    },
-    {
-      "id": 249,
-      "uuid": "6ee10832-8fe6-480f-b17c-baf39d2e0aed",
-      "station": "KMIA",
-      "date": "2026-09-17",
-      "outcome": "incorrect",
-      "pnl": 8.84,
-      "p_fused": 0.99,
-      "calibrated_p": 0.8738,
-      "ceiling": 0.8738,
-      "market_price": 0.74,
-      "honest_ev": 0.11330000000000003,
-      "old_flags": [
-        "s_grade_on_flat"
-      ],
-      "honest_flags": [
-        "honest_ev_too_low"
-      ]
-    },
-    {
-      "id": 264,
-      "uuid": "5a2bbdc4-e9b8-492a-926c-24fc6feb484f",
-      "station": "KLAS",
-      "date": "2026-10-11",
-      "outcome": "correct",
-      "pnl": 5.55,
-      "p_fused": 0.99,
-      "calibrated_p": 0.7735,
-      "ceiling": 0.7735,
-      "market_price": 0.815,
-      "honest_ev": -0.061999999999999986,
-      "old_flags": [
-        "s_grade_on_flat"
       ],
       "honest_flags": [
         "honest_ev_too_low"

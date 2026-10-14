@@ -11,17 +11,19 @@ That is a clamp, not a calibration. The honest re-run measured the decision-time
 signal at the 13:30 station-local pin:
 
   * rate_1h Brier ≈ 0.36, resolution 0.019, **ECE 0.47** (grossly miscalibrated);
-  * honest decision-time ceiling **0.82–0.86** pooled (per-station 0.768–0.903);
-  * the crossing base rate for the chosen strike axis is ≈ **0.80**.
+  * honest decision-time ceiling **0.82–0.86** pooled (per-station 0.768–0.903).
 
-The recalibration therefore (a) regresses the raw fused probability toward the
-base rate in proportion to how unreliable the signal is (ECE/2), then (b) clamps
-at the honest per-station ceiling:
+**2026-10-14 correction (external bug-hunt finding #2).** The first honest
+formula, `p_fused·(1−ECE/2) + base_rate·(ECE/2)`, pulled EVERYTHING toward
+`BASE_RATE=0.80` one-sidedly, so a coin-flip `p_fused=0.50` became
+`calibrated_p=0.5705` — a manufactured YES edge. The shrink must instead act on
+the *distance from 0.5* and must be neutral at 0.5:
 
-    calibrated_p = min(ceiling, max(0.01, p_fused*(1 - ECE/2) + base_rate*ECE/2))
+    calibrated_p = clamp(ceiling, 0.5 + (p_fused − 0.5)·(1 − ECE/2))
 
-It is intentionally cheap and defensible: one linear shrink to the base rate,
-one clamp at the honest ceiling. No fitting on the target rows.
+This shrinks overconfidence toward 0.5 by the signal's unreliability (ECE/2)
+without manufacturing a directional edge: `honest_calibrated_p(0.5, ce) == 0.5`
+by construction. No fitting on the target rows; one shrink, one clamp.
 """
 from __future__ import annotations
 
@@ -33,7 +35,7 @@ REPO = Path(__file__).resolve().parents[2]
 
 # Honest constants (HONEST-ARSENAL-REEVALUATION-2026-10-13, corrected headlines).
 ECE = 0.47             # rate_1h expected calibration error at the 13:30 pin
-BASE_RATE = 0.80       # strike-crossing base rate for the chosen axis
+BASE_RATE = 0.80       # strike-crossing base rate (diagnostic only; NOT a shrink target)
 POOLED_CEILING = 0.84  # pooled honest decision-time ceiling (0.82–0.86)
 
 # Per-station ceilings from the ceiling refit (bounded ≤ pin).
@@ -79,10 +81,11 @@ def honest_calibrated_p(p_fused: float, ceiling: float, *,
                         base_rate: float = BASE_RATE) -> float:
     """Recalibrate a raw fused probability to the honest decision-time axis.
 
-    Shifts `p_fused` toward `base_rate` proportional to the signal's
-    unreliability (ECE/2), then clamps to `ceiling`. Values at/below the base
-    rate that were inflated by an unreliable signal are pulled *up* toward the
-    base rate; overconfident values are pulled down and clamped.
+    Shrinks the *distance from 0.5* by the signal's unreliability (ECE/2), then
+    clamps to `ceiling`. **Two-sided and neutral at 0.5**: a coin-flip signal
+    stays a coin flip — the transform can never manufacture a directional edge
+    from an uninformative input. `base_rate` is accepted for provenance/logging
+    only and is NOT a shrink target (the old one-sided shrink to 0.80 is gone).
 
     Raises ValueError on a non-finite `p_fused` (callers fail closed).
     """
@@ -90,7 +93,7 @@ def honest_calibrated_p(p_fused: float, ceiling: float, *,
         raise ValueError("honest_calibrated_p: p_fused is NaN")
     ce = _clamp(float(ceiling), 0.5, 0.999)
     lam = _clamp(float(ece) / 2.0, 0.0, 1.0)
-    v = float(p_fused) * (1.0 - lam) + float(base_rate) * lam
+    v = 0.5 + (float(p_fused) - 0.5) * (1.0 - lam)
     return round(min(ce, max(0.01, v)), 4)
 
 

@@ -100,7 +100,7 @@ def recalibrate(conn: sqlite3.Connection, *, dry_run: bool = False) -> dict:
         "n_updated": len(updates),
         "n_skipped": len(skipped),
         "skipped": skipped,
-        "formula": "calibrated_p = min(ceiling, max(0.01, p_fused*(1-ECE/2)+base*ECE/2))",
+        "formula": "calibrated_p = clamp(ceiling, 0.5 + (p_fused-0.5)*(1-ECE/2))",
         "ece": ECE,
         "base_rate": BASE_RATE,
         "pooled_ceiling": POOLED_CEILING,

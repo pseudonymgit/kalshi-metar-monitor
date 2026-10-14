@@ -34,10 +34,16 @@ def _load_bridge():
 
 
 # ── formula ──────────────────────────────────────────────────────────────────
-def test_base_rate_absorbed_for_unknown_signal():
-    # A raw 0.5 (coin flip) is pulled toward the base rate by ECE/2.
-    v = honest_calibrated_p(0.5, 0.99)
-    assert abs(v - (0.5 * (1 - ECE / 2) + BASE_RATE * ECE / 2)) < 1e-9
+def test_coin_flip_stays_a_coin_flip():
+    # 2026-10-14 bug-hunt finding #2: the shrink must be NEUTRAL at 0.5 — a raw
+    # 0.5 must NOT become a manufactured 0.5705 YES edge (the old one-sided
+    # shrink to base_rate did exactly that).
+    assert abs(honest_calibrated_p(0.5, 0.82) - 0.5) < 0.01
+    assert abs(honest_calibrated_p(0.5, 0.99) - 0.5) < 1e-9
+    # and it must be symmetric about 0.5 (two-sided).
+    lo = honest_calibrated_p(0.3, 0.99)
+    hi = honest_calibrated_p(0.7, 0.99)
+    assert abs((hi - 0.5) - (0.5 - lo)) < 1e-9
 
 
 def test_ceiling_clamps_overconfident_signal():
