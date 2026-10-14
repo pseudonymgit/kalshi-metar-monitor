@@ -35,7 +35,7 @@ minutes** depending on dataset load.
 
 ### Why our scripts hit the limit
 
-Three scripts were developed, all sharing the same API key `e543bdb6-...954e`:
+Three scripts were developed, all sharing the same API key `<REDACTED-ECDS-KEY>`:
 
 | Script | Request Strategy | Delay | Problem |
 |---|---|---|---|
