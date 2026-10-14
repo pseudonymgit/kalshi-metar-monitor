@@ -38,7 +38,7 @@ import os
 import sqlite3
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -50,11 +50,13 @@ from sbox_intraday_ev_bridge import (  # noqa: E402
     STATIONS, kelly_position_size, grade_position_cap, compute_trade_grade,
     record_trade, SOLE_FORECAST_RULE_ID, _hours_before_settlement,
 )
+from core.strike_selection_ev import select_strike, make_truncated_p_fn  # noqa: E402
 from core.station_params import get_station_params  # noqa: E402
 from core.station_time import is_within_entry_window, station_timezone_name  # noqa: E402
 
 DATA = REPO / "data"
 SBOX_DB = DATA / "paper_trading_sbox.db"
+METAR = DATA / "metar_backfill.db"
 LOW_CSV = (REPO / "artifacts" / "low-market-backfill"
            / "low_entry_price_series_2026-10-13.csv")
 
@@ -72,11 +74,13 @@ def _ro(p):
 
 
 # ── forecast: om_gfs Tmin (sole) ─────────────────────────────────────────────
-def om_gfs_tmin_state(station: str, day_str: str, *, live: bool = True):
+def om_gfs_tmin_state(station: str, day_str: str, *, live: bool = True,
+                      low_so_far: Optional[float] = None):
     """P(daily_min <= X) source: om_gfs(bc) Tmin DistributionState, or None.
 
     Uses the market_type='LOW' path added to core/intraday/om_gfs_nwp.py, which
     fetches `temperature_2m_min` and bias-corrects against LOW settlement truth.
+    ``low_so_far`` (F2) arms the running-low truncation on the returned state.
     Returns None (never raises) when om_gfs has no LOW value for the day.
     """
     try:
@@ -84,12 +88,14 @@ def om_gfs_tmin_state(station: str, day_str: str, *, live: bool = True):
     except Exception:
         return None
     try:
-        return om_gfs_state_for_day(station, day_str, live=live, market_type="LOW")
+        return om_gfs_state_for_day(station, day_str, live=live, market_type="LOW",
+                                    low_so_far=low_so_far)
     except Exception:
         return None
 
 
-def sole_tmin_p_fn(state, station: Optional[str] = None):
+def sole_tmin_p_fn(state, station: Optional[str] = None,
+                   low_so_far: Optional[float] = None):
     """Return p_fn: X -> calibrated P(daily_min <= X) for the sole om_gfs Tmin.
 
     The om_gfs LOW state's ``p_ge(X)`` is P(min >= X) (a lower-bound Gaussian);
@@ -97,17 +103,30 @@ def sole_tmin_p_fn(state, station: Optional[str] = None):
     honest decision-time recalibration the HIGH lane uses, clamped at the
     station ceiling, so both lanes book a comparable calibrated probability.
 
+    F2 (2026-10-14): ``low_so_far`` is the running-low truncation, the LOW mirror
+    of the HIGH ``high_so_far``. The state is built with that bound armed on
+    ``DistributionState.p_ge`` (P(min>=X)=0, hence P(min<=X)=1, for X at/below the
+    observed low — a locked win), exactly as HIGH imposes ``hsf`` on its state
+    before the sole p_fn reads it. ``low_so_far`` here is only for the meta flag.
+
     ``p_fn`` returns the CALIBRATED value; ``meta_fn(X)`` carries the raw +
     provenance row (schema-compatible with the HIGH companion row).
     """
     from core.intraday.honest_calibration import honest_calibrated_p, station_ceiling
     cache: Dict[float, Dict] = {}
     ceiling = station_ceiling(station) if station else None
+    rlow = low_so_far if low_so_far is not None else getattr(state, "low_so_far", None)
 
     def _calc(x: float) -> Dict:
         if x in cache:
             return cache[x]
+        # state.p_ge already carries the low_so_far bound -> a strike at/below the
+        # observed low returns 0.0 here, i.e. P(min<=X)=1 (locked win).
         p_min_le = 1.0 - float(state.p_ge(x))
+        # A strike at/ABOVE the observed running low is already breached (the min
+        # so far is <= it) -> P(min<=X)=1 (locked win). state.p_ge enforces this;
+        # the flag is diagnostic only.
+        locked = rlow is not None and x >= rlow
         ce = float(ceiling) if ceiling is not None else 0.84
         try:
             cal = honest_calibrated_p(p_min_le, ce)
@@ -125,6 +144,7 @@ def sole_tmin_p_fn(state, station: Optional[str] = None):
             "agreement_boost": {"enabled": False},
             "weights_applied": {"om_gfs_tmin": 1.0},
             "sole_forecast": True, "lane": LANE, "fusion_rule": FUSION_RULE_ID,
+            "low_so_far": rlow, "running_low_locked": locked,
         }
         return cache[x]
 
@@ -165,13 +185,82 @@ def low_ladder_from_csv(station: str, day_str: str) -> List[Dict]:
                         "strike": strike, "yes_price": mid,
                         "no_price": round(1 - mid, 4), "ticker": r["ticker"],
                         "volume_24h": None, "snapshot_time": None,
-                        "dist_pin_minutes": d if d < 9e9 else None, "_d": d,
+                        "dist_pin_minutes": d if d < 9e9 else None,
+                        "running_low_at_pin": _parse_running_low(r.get("running_low_at_pin")),
+                        "_d": d,
                     }
     except OSError:
         return []
     for v in ladder.values():
         v.pop("_d", None)
     return sorted(ladder.values(), key=lambda d: d["strike"])
+
+
+def _parse_running_low(raw) -> Optional[float]:
+    """F2: the observed running minimum at the pin from a backfill row, or None.
+
+    The backfill series carries ``running_low_at_pin`` on every row (constant per
+    station-day); a missing/degenerate value yields None so the truncation is
+    simply not armed rather than manufacturing a bound.
+    """
+    if raw in (None, "", "nan", "None"):
+        return None
+    try:
+        v = float(raw)
+    except (TypeError, ValueError):
+        return None
+    return v if v == v else None
+
+
+def running_low_at_pin(ladder: List[Dict]) -> Optional[float]:
+    """The observed running low (station-day) from any ladder row, or None."""
+    for r in ladder:
+        v = r.get("running_low_at_pin")
+        if v is not None:
+            return float(v)
+    return None
+
+
+def running_low(station: str, day_str: str, *,
+                pin_local_hhmm: str = DECISION_PIN_LOCAL_HHMM
+                ) -> Optional[float]:
+    """Min observed temp (F) over [station-local day start, pin). None if none.
+
+    F2 (2026-10-14): the LOW axis mirror of the HIGH bridge's ``high_so_far``.
+    The daily minimum cannot go ABOVE anything already observed, so the running
+    low at the decision pin bounds the LOW proposition P(min <= X)=1 for every
+    X at/below it. Read-only on metar_backfill.db; returns None when the station
+    timezone or any observation is unavailable (the caller then falls back to the
+    backfill series' own ``running_low_at_pin``).
+    """
+    tz = station_timezone_name(station)
+    if tz is None:
+        return None
+    from zoneinfo import ZoneInfo
+    try:
+        tzinfo = ZoneInfo(tz)
+    except Exception:
+        return None
+    try:
+        d = date.fromisoformat(day_str)
+    except ValueError:
+        return None
+    local_start = datetime(d.year, d.month, d.day, tzinfo=tzinfo)
+    pin_h, pin_m, pin_s = (int(x) for x in pin_local_hhmm.split(":"))
+    pin_local = datetime(d.year, d.month, d.day, pin_h, pin_m, pin_s, tzinfo=tzinfo)
+    start_utc = local_start.astimezone(timezone.utc)
+    pin_utc = pin_local.astimezone(timezone.utc)
+    c = _ro(METAR)
+    try:
+        row = c.execute(
+            "SELECT MIN(temp_f) FROM metar_observations WHERE station=? "
+            "AND timestamp_utc >= ? AND timestamp_utc < ?",
+            (station, start_utc.isoformat(), pin_utc.isoformat())).fetchone()
+    except sqlite3.Error:
+        return None
+    finally:
+        c.close()
+    return float(row[0]) if row and row[0] is not None else None
 
 
 def _market_cap(station: str) -> float:
@@ -210,12 +299,20 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True):
             if not ladder:
                 skipped.append((st, day_str, "no_low_ladder"))
                 continue
-            p_fn, meta_fn = sole_tmin_p_fn(state, station=st)
+            # F2 (2026-10-14): arm the running-low truncation, the LOW mirror of
+            # HIGH's high_so_far. The observed low at the pin is FACT: P(min<=X)=1
+            # for every X at/below it (a locked win). Mirrors HIGH, which imposes
+            # hsf on its DistributionState before the sole p_fn reads it.
+            rlow = running_low(st, day_str, pin_local_hhmm=DECISION_PIN_LOCAL_HHMM)
+            if rlow is None:
+                # Fall back to the backfill series' own pin reading (auditable).
+                rlow = running_low_at_pin(ladder)
+            state.low_so_far = rlow
+            p_fn, meta_fn = sole_tmin_p_fn(state, station=st, low_so_far=rlow)
             # NO mirror: the KXLOWT-X YES mid already IS the market's P(min<=X),
             # exactly the surface `p_fn` returns. The EV picker therefore prices
             # the YES leg (min<=X) and the NO leg (min>X) directly against the
             # real mids — no axis flip anywhere in the LOW path.
-            from core.strike_selection_ev import select_strike
             picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
                                    p_fn=p_fn, fail_closed=False)
             if not picked or picked.get("ev", 0) <= 0:

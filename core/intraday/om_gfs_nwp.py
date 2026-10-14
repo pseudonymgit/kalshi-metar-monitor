@@ -397,6 +397,7 @@ def rolling_bias_f(station: str, as_of_date: str, *,
 # ── state builder ────────────────────────────────────────────────────────────
 def from_om_gfs(station: str, om_gfs_tmax_f: float, date_str: str, *,
                 sigma: Optional[float] = None, high_so_far: Optional[float] = None,
+                low_so_far: Optional[float] = None,
                 bias_f: Optional[float] = None,
                 market_type: str = "HIGH") -> DistributionState:
     """Build a DistributionState from an om_gfs daily temp (°F).
@@ -410,17 +411,23 @@ def from_om_gfs(station: str, om_gfs_tmax_f: float, date_str: str, *,
 
     ``market_type`` is provenance only here (HIGH -> Tmax, LOW -> Tmin); the
     caller passes the matching value fetched for that axis. Default 'HIGH'.
+
+    ``low_so_far`` (F2, 2026-10-14): the LOW axis observed running minimum at the
+    pin, enforced by ``DistributionState.p_ge`` (P(min>=X)=0 for X >= low_so_far,
+    i.e. P(min<=X)=1 — a locked win). The HIGH axis uses ``high_so_far``.
     """
     sig = float(SIGMA_K_DEFAULT * SIGMA_RATE_F) if sigma is None else float(sigma)
     sig = max(0.8, sig)
     mu = float(om_gfs_tmax_f) - float(bias_f or 0.0)
     return DistributionState(station, date_str, mu, sig,
-                             high_so_far=high_so_far, base_sigma=sig)
+                             high_so_far=high_so_far, low_so_far=low_so_far,
+                             base_sigma=sig)
 
 
 def om_gfs_state_for_day(station: str, date_str: str, *, live: bool = True,
                          sigma: Optional[float] = None,
                          high_so_far: Optional[float] = None,
+                         low_so_far: Optional[float] = None,
                          market_type: str = "HIGH") -> Optional[DistributionState]:
     """Cache-aware one-call convenience: fetch + bias-correct -> DistributionState.
 
@@ -429,7 +436,8 @@ def om_gfs_state_for_day(station: str, date_str: str, *, live: bool = True,
 
     ``market_type='LOW'`` fetches the daily MINIMUM and bias-corrects it against
     the LOW settlement truth (Tmin); the returned state prices the LOW axis
-    P(daily_min <= X). Default 'HIGH' is byte-identical to pre-AF.
+    P(daily_min <= X). ``low_so_far`` (F2) arms the running-low truncation on the
+    LOW axis. Default 'HIGH' is byte-identical to pre-AF.
     """
     try:
         got = fetch_om_gfs_many([station], date_str, date_str, live=live,
@@ -442,5 +450,5 @@ def om_gfs_state_for_day(station: str, date_str: str, *, live: bool = True,
         return None
     bias = rolling_bias_f(station, date_str, live=live, market_type=market_type)
     return from_om_gfs(station, v, date_str, sigma=sigma,
-                       high_so_far=high_so_far, bias_f=bias,
-                       market_type=market_type)
+                       high_so_far=high_so_far, low_so_far=low_so_far,
+                       bias_f=bias, market_type=market_type)

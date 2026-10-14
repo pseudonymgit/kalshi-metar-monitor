@@ -53,6 +53,45 @@ def p_high_ge(mu: float, sigma: float, x: float) -> float:
     return 1.0 - norm_cdf((x - mu) / sigma)
 
 
+def truncated_p_ge(p_raw: float, x: float, *, high_so_far: Optional[float] = None,
+                   low_so_far: Optional[float] = None) -> float:
+    """Scalar truncation of a raw P(X >= x) by the observed axis bound (F2).
+
+    The observed bound is FACT, so it overrides the raw value at every x it
+    dominates (including equality):
+      * ``high_so_far`` (daily MAX so far): the max cannot go below it ->
+        P(X >= x) = 1.0 for x <= high_so_far (HIGH axis).
+      * ``low_so_far``  (daily MIN so far): the min cannot go above it ->
+        P(X >= x) = 0.0 for x >= low_so_far (LOW axis mirror; so
+        P(min <= x) = 1 - P(X >= x) = 1.0, a locked win priced as certain).
+    """
+    if high_so_far is not None and x <= high_so_far:
+        return 1.0
+    if low_so_far is not None and x >= low_so_far:
+        return 0.0
+    return float(p_raw)
+
+
+def make_truncated_p_fn(p_raw_fn, *, high_so_far: Optional[float] = None,
+                        low_so_far: Optional[float] = None):
+    """P(X >= x) wrapped with the observed-bound truncation (F2, 2026-10-14).
+
+    Both axes share this envelope (one truncation semantic, one source): the
+    HIGH lane arms ``high_so_far`` (mirrors DistributionState.p_ge); the LOW lane
+    arms ``low_so_far`` so P(min <= x) is 1.0 for every x at/below the observed
+    running low. Without it a strike already at/below the observed low is
+    mispriced as uncertain instead of a locked win.
+
+    ``DistributionState.p_ge`` already enforces ``high_so_far`` internally, so
+    passing it again here is a no-op; the LOW wrapper passes only ``low_so_far``.
+    The armed bound wins at exact equality (the observation is fact).
+    """
+    def p_ge_t(x: float) -> float:
+        return truncated_p_ge(p_raw_fn(x), x,
+                              high_so_far=high_so_far, low_so_far=low_so_far)
+    return p_ge_t
+
+
 def kalshi_fee(price: float, p: float = None) -> float:
     """Kalshi fee in dollars for ONE contract (price in dollars 0-1).
 

@@ -34,14 +34,22 @@ class DistributionState:
     sigma: float       # CURRENT predictive std (F)
     high_so_far: Optional[float] = None  # observed max so far today (F)
     base_sigma: Optional[float] = None   # unshrunk daily sigma (set once at seed)
+    low_so_far: Optional[float] = None   # observed min so far today (F) — LOW axis
 
     def p_ge(self, x: float) -> float:
         # WAVE-A/2 (2026-09-28): enforce the monotonicity boundary EXACTLY.
         # The daily max is >= high_so_far by construction, so P(high>=X)=1 for
         # every X <= high_so_far. A shifted Gaussian still leaves mass below
         # high_so_far (impossible events) -> we truncate explicitly.
+        #
+        # F2 (2026-10-14): the LOW axis mirror. The daily min is <= low_so_far,
+        # so P(min>=X)=0 for every X >= low_so_far (equivalently P(min<=X)=1 —
+        # a locked win). Enforced here so every caller of state.p_ge() sees the
+        # truncation, not just the LOW bridge's p_fn wrapper.
         if self.high_so_far is not None and x <= self.high_so_far:
             return 1.0
+        if self.low_so_far is not None and x >= self.low_so_far:
+            return 0.0
         return p_high_ge(self.mu, self.sigma, x)
 
 
