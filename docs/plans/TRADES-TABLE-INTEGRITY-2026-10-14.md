@@ -7,7 +7,7 @@
 **DB:** `data/paper_trading_sbox.db` (the live book)
 **Backup:** `data/paper_trading_sbox.db.bak-20261014` (taken before any write)
 **Tool:** `scripts/fix_trades_table_integrity_2026-10-14.py`
-**Commits:** `5950d8d37` (P1 settlement) · `9f2b61a57` (P2 sizing) · `ab6ba94c2` (P3 P&L)
+**Commits:** `5950d8d37` (P1 settlement) · `9f2b61a57` (P2 sizing) · `d1b140761` (P2 re-size to 2026-10-14 ladder) · `ab6ba94c2` (P3 P&L)
 
 ---
 
@@ -23,7 +23,7 @@ blocked the two exact ties, and did not fabricate the three rows with no truth.
 | Problem | Status | Result |
 |---|---|---|
 | 1 — 9 stale-open rows | **PARTIAL** | 4 settled · 2 BLOCKED (exact tie, rule Dan-gated) · 3 no-truth (left open) |
-| 2 — `position_size_usd` fiction | **DONE** | 88 rows re-sized from `calibrated_p`; old sizes preserved |
+| 2 — `position_size_usd` fiction | **DONE** | 88 rows re-sized from `calibrated_p` on the shipped 2026-10-14 ladder; old sizes preserved |
 | 3 — size-fiction P&L | **DONE** | 83 rows → honest constant-1-contract; old P&L preserved |
 | 4 — anomaly verification | **DONE** | 0 dup uuid · 0 closed-without-outcome · closed rows complete |
 
@@ -110,15 +110,23 @@ Old ladder gave 48 rows the dead `$25` tier. Backfilled from the honest ladder
 from the companion (`trade_forecaster_probs`, fallback `trade_calibration`).
 
 All 88 rows have a companion `calibrated_p` (0 missing). Old sizes preserved in
-new column `position_size_usd_old_2026`.
+new column `position_size_usd_old_2026` (idempotent: the ORIGINAL size is never
+overwritten on a re-run).
+
+**Ladder note.** The task stated the older ladder (`>0.70 → $10`, `>0.50 → $5`;
+commit `69556ede4`). During this sweep a concurrent commit (`5d9e8e587`, Dan
+2026-10-14) changed `_position_size_usd` to `conf > 0.50 → $10`, `conf > 0.30 →
+$5` (equivalently `p > 0.75 → $10`, `p > 0.65 → $5`). Per the same rule applied
+to Problem 1 — follow the shipped repo source over a stale premise — the book was
+re-sized to the **shipped 2026-10-14 ladder** (`d1b140761`).
 
 | | $0 | $5 | $10 | $25 |
 |---|---:|---:|---:|---:|
-| **before** | 0 | 29 | 11 | **48** |
-| **after** | 8 | 70 | 10 | 0 |
+| **original** (preserved) | 0 | 29 | 11 | **48** |
+| **after** | 6 | 2 | 80 | 0 |
 
-**67 rows changed size, 21 unchanged.** The 8 rows now at `$0` are
-non-directional (`calibrated_p < 0.50`): ids 189, 230, 235, 245, 271, 272, 273,
+**72 rows changed size, 16 unchanged.** The 6 rows now at `$0` are
+non-directional (below the `conf > 0.30` tier): ids 189, 245, 271, 272, 273,
 274. They are noted, not deleted; P&L/quantity handled in Problem 3.
 
 ---
@@ -185,7 +193,7 @@ task anticipated. Documented here; no write.
    mechanical settle is one tool run once ruled.
 2. **3 rows awaiting canonical truth** (272/273/276) — settle on the next
    upkeep run.
-3. **8 rows now at `$0` size** — non-directional; decide keep-as-recorded vs
-   purge.
+3. **6 rows now at `$0` size** (189, 245, 271, 272, 273, 274) —
+   non-directional; decide keep-as-recorded vs purge.
 4. **`quantity` vs `position_size_usd` inconsistency** — accepted, documented;
    revisit only alongside a `trade_cost` rewrite.
