@@ -39,7 +39,7 @@ import sqlite3
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -85,6 +85,53 @@ CLIP_ZONE = 0.90               # amplifier disabled once p_core is already here
 OM_GFS_DEFAULT_WEIGHT = 0.15   # shipped per-station om_gfs vote weight
 DEFAULT_WEIGHTS = {"gefs": 0.25, "analog": 0.25, "traj": 0.25, "market": 0.25,
                    "om_gfs": OM_GFS_DEFAULT_WEIGHT}
+
+# --- agreement-based additive bump (2026-10-14, Dan) ------------------------
+# The log-odds pool already blends the weaker signals implicitly; this is the
+# EXPLICIT n-of-k concurrence term Dan asked for: when independent members agree
+# on the same side of 0.5, nudge the fused probability further in that direction
+# (a small bump from the weaker signals, scaled to how many concur). Gated behind
+# USE_AGREEMENT_BOOST (default OFF) so the shipped fusion is byte-identical.
+AGREEMENT_BOOST_MAX = 0.03     # magnitude at full concurrence (5 of 5)
+AGREEMENT_BOOST_ENV = "USE_AGREEMENT_BOOST"
+
+
+def agreement_boost_enabled() -> bool:
+    """True when the explicit agreement bump is switched on (env, default OFF)."""
+    import os
+    return os.environ.get(AGREEMENT_BOOST_ENV, "0") != "0"
+
+
+def agreement_bump(votes: Sequence[Optional[float]], p_core: float,
+                   *, max_boost: float = AGREEMENT_BOOST_MAX) -> Tuple[float, int, str]:
+    """n-of-k concurrence bump for the fused probability.
+
+    ``votes`` are the present fusion members' P(high>=X) (None entries are
+    skipped). Counts how many sit on the same side of 0.5 as ``p_core``:
+
+      * >= 3 concur -> +max_boost * min(count - 2, 3) / 3 (3->0.01, 4->0.02, 5->0.03)
+      * <= 1 concur -> -max_boost * min(2 - count, 3) / 3 (1->-0.01, 0->-0.02)
+      * otherwise   -> 0
+
+    Returns (bump, concurrence_count, direction) where direction is "high" when
+    p_core >= 0.5 else "low".
+    """
+    present = [float(v) for v in votes if v is not None and v == v]
+    k = len(present)
+    if k == 0:
+        return 0.0, 0, ("high" if p_core >= 0.5 else "low")
+    direction = "high" if p_core >= 0.5 else "low"
+    if direction == "high":
+        count = sum(1 for v in present if v >= 0.5)
+    else:
+        count = sum(1 for v in present if v < 0.5)
+    if count >= 3:
+        bump = max_boost * min(count - 2, 3) / 3.0
+    elif count <= 1:
+        bump = -max_boost * min(2 - count, 3) / 3.0
+    else:
+        bump = 0.0
+    return round(bump, 4), count, direction
 
 
 def default_om_gfs_weight(weights: Optional[Dict] = None) -> float:
@@ -403,7 +450,8 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
          weights: Optional[Dict] = None, use_weights: bool = False,
          p_market: Optional[float] = None,
          p_om_gfs: Optional[float] = None,
-         ceiling: Optional[float] = None) -> Tuple[float, Dict]:
+         ceiling: Optional[float] = None,
+         use_agreement_boost: Optional[bool] = None) -> Tuple[float, Dict]:
     """Combine P(high>=X) votes into (p_fused, meta).
 
     F2 (2026-10-13) fixes the saturation root cause:
@@ -467,6 +515,18 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
     else:
         mult, traj_verdict = TRAJ_SOFT, "soft"
 
+    # agreement-based additive bump (2026-10-14): explicit n-of-k concurrence
+    # term over the present members, gated behind USE_AGREEMENT_BOOST (default
+    # OFF). Applied to the core blend BEFORE the trajectory modulator; the
+    # calibrated ceiling still clamps the result downstream.
+    boost_on = (agreement_boost_enabled() if use_agreement_boost is None
+                else bool(use_agreement_boost))
+    agree_bump, agree_count, agree_dir = 0.0, 0, "high"
+    if boost_on:
+        agree_bump, agree_count, agree_dir = agreement_bump(
+            [pg, pa, ptv, pm, pog], p_core)
+        p_core = min(0.99, max(0.01, p_core + agree_bump))
+
     # F2: the x1.05 amplifier cannot act inside the clip zone.
     amplifier_neutralized = False
     if mult > 1.0 and p_core >= CLIP_ZONE:
@@ -488,6 +548,9 @@ def fuse(p_gefs: float, p_analog: float, p_trajectory: float, *,
             "p_market": (round(pm, 4) if pm is not None else None),
             "p_om_gfs": (round(pog, 4) if pog is not None else None),
             "use_weights": bool(use_weights),
+            "agreement_boost": ({"enabled": True, "bump": agree_bump,
+                                 "count": agree_count, "direction": agree_dir}
+                                if boost_on else {"enabled": False}),
             "weights_applied": {k: round(float(v), 4) for k, v in w.items()}}
     return calibrated_p, meta
 
@@ -497,13 +560,15 @@ def fuse_strike(p_gefs_fn, p_analog_fn, p_trajectory_fn, x: float,
                 weights: Optional[Dict] = None, use_weights: bool = False,
                 p_market: Optional[float] = None,
                 p_om_gfs: Optional[float] = None,
-                ceiling: Optional[float] = None) -> Dict:
+                ceiling: Optional[float] = None,
+                use_agreement_boost: Optional[bool] = None) -> Dict:
     """Fuse one strike. Returns dict with all p_* and fusion meta."""
     pg = p_gefs_fn(x)
     pa = p_analog_fn(x)
     pt = p_trajectory_fn(x)
     pf, meta = fuse(pg, pa, pt, weights=weights, use_weights=use_weights,
-                    p_market=p_market, p_om_gfs=p_om_gfs, ceiling=ceiling)
+                    p_market=p_market, p_om_gfs=p_om_gfs, ceiling=ceiling,
+                    use_agreement_boost=use_agreement_boost)
     return {"p_gefs": round(float(pg), 4), "p_analog": round(float(pa), 4),
             "p_trajectory": (round(float(pt), 4) if pt == pt else None),
             "p_fused": round(float(pf), 4), **meta}
