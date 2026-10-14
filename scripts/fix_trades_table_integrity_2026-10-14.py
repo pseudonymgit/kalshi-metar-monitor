@@ -152,6 +152,11 @@ def problem1(conn, dry_run=False):
 def problem2(conn, dry_run=False):
     ensure_col(conn, "trades", "position_size_usd_old_2026", "REAL")
     c = conn
+    # Idempotency guard: only capture the ORIGINAL size the first time. On a
+    # re-run (e.g. after the ladder changed), keep the preserved original
+    # rather than overwriting it with an already-backfilled value.
+    existing_old = {r[0] for r in c.execute(
+        "SELECT id FROM trades WHERE position_size_usd_old_2026 IS NOT NULL")}
     calib = {r[0]: r[1] for r in c.execute(
         "SELECT trade_uuid, calibrated_p FROM trade_forecaster_probs "
         "WHERE calibrated_p IS NOT NULL")}
@@ -182,8 +187,12 @@ def problem2(conn, dry_run=False):
                 {"id": r["id"], "station": r["station"], "calibrated_p": cp,
                  "conf": round(conf, 4), "old": old, "new": new})
         if not dry_run:
-            c.execute("UPDATE trades SET position_size_usd_old_2026=?, "
-                      "position_size_usd=? WHERE id=?", (old, new, r["id"]))
+            if r["id"] in existing_old:
+                c.execute("UPDATE trades SET position_size_usd=? WHERE id=?",
+                          (new, r["id"]))
+            else:
+                c.execute("UPDATE trades SET position_size_usd_old_2026=?, "
+                          "position_size_usd=? WHERE id=?", (old, new, r["id"]))
     if not dry_run:
         c.commit()
     out["before_dist"] = {str(k): v for k, v in sorted(before.items())}
