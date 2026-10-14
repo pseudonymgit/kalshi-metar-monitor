@@ -87,3 +87,6 @@ data/gefs_work/
 !artifacts/fusion-alternatives/
 !artifacts/fusion-alternatives/*.json
 !data/fusion_alternatives_sweep_2026-10-14.json
+
+# LOW/HIGH end-to-end side-by-side (committed analysis artifact, 2026-10-14)
+!data/low_high_sidebyside_2026-10-14.json
