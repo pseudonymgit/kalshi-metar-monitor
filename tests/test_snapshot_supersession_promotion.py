@@ -196,7 +196,10 @@ def test_settle_books_finalized_not_frozen_proxy(tmp_path, monkeypatch):
     assert t["canonical_source"] == "kalshi_finalized"
     assert t["settled_value"] == _FINALIZED                 # not 64.94, not 61
     assert t["canonical_outcome"] == "correct"              # 71 > 70 -> ITM
-    assert t["realized_pnl"] == pytest.approx((1.0 - 0.7) * 71)
+    # realized_pnl is CONSTANT-1-CONTRACT (2026-10-14 basis): (1.0 - 0.7) * 1.
+    # Intentionally NOT scaled by quantity (71); see
+    # docs/plans/TRADES-TABLE-INTEGRITY-2026-10-14.md.
+    assert t["realized_pnl"] == pytest.approx((1.0 - 0.7) * 1)
 
 
 def test_settle_leaves_open_when_no_truth(tmp_path, monkeypatch):

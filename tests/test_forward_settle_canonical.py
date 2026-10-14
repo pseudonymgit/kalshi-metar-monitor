@@ -150,8 +150,10 @@ def test_new_settlement_populates_canonical_truth(tmp_path):
     # Booked value going forward is canonical truth — NOT the epoch bucket (57).
     assert t["settled_value"] == _CANONICAL
     assert t["settled_value"] != _EPOCH_BUCKET
-    # realized_pnl tracks the canonical payout: (1.0 - 0.04) * 2000 = 1920.
-    assert t["realized_pnl"] == pytest.approx(1920.0)
+    # realized_pnl is CONSTANT-1-CONTRACT (2026-10-14 basis): (1.0 - 0.04) * 1.
+    # It is intentionally NOT scaled by quantity (2000); see
+    # docs/plans/TRADES-TABLE-INTEGRITY-2026-10-14.md.
+    assert t["realized_pnl"] == pytest.approx(0.96)
 
 
 def test_epoch_bucket_would_have_flipped_the_outcome(tmp_path):

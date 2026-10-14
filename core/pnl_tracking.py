@@ -70,12 +70,19 @@ def process_settlements_for_date(self, settlement_date):
     _ensure_canonical_trade_columns(c)
     canonical_map = _load_canonical_snapshots(self.metar_db)
 
+    # Older/fixture `trades` tables may predate the `market_ticker` provenance
+    # column; select NULL for it when absent so the settle path still runs (the
+    # axis then resolves from the ticker encoded in `notes`, else fails closed).
+    _cols = {d[1] for d in c.execute("PRAGMA table_info(trades)")}
+    _ticker_sel = "t.market_ticker" if "market_ticker" in _cols else "NULL"
+    _tdate_sel = "t.trade_date_utc" if "trade_date_utc" in _cols else "NULL"
+
     # Get all open trades for which settlements are available
-    c.execute("""
+    c.execute(f"""
         SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
                t.quantity, t.market_type, t.signal_direction,
                p.settlement_bucket, p.prior_settlement_bucket,
-               t.market_ticker, t.trade_date_utc
+               {_ticker_sel}, {_tdate_sel}
         FROM trades t
         JOIN (SELECT station, market_type, local_trading_date, settlement_bucket, prior_settlement_bucket
               FROM metar.settlement_epochs
@@ -127,11 +134,12 @@ def process_settlements_for_date(self, settlement_date):
         # Resolve the market's OWN strike axis (greater / less / between). The
         # ticker suffix `-T##` is ambiguous between the "or above" and "or below"
         # tails; the operator MUST come from strike_type, not from market_type.
-        # When the axis cannot be resolved we fall back to the legacy
-        # market_type assumption (greater tail only) and log it.
+        # The ticker may be absent on older/fixture rows — recover it from the
+        # row's provenance (`notes`/`functionality`) before giving up.
+        _axis_ticker = market_ticker or _ticker_from_notes(c, trade_uuid)
         strike_axis = _resolve_strike_axis_row(
-            market_ticker, station, market_type,
-            (trade_date_utc or settlement_date))
+            _axis_ticker, station=station, market_type=market_type,
+            local_trading_date=(trade_date_utc or settlement_date))
         _strike_type = strike_axis.get("strike_type") if strike_axis else None
         _floor = strike_axis.get("floor_strike") if strike_axis else None
         _cap = strike_axis.get("cap_strike") if strike_axis else None
@@ -139,7 +147,7 @@ def process_settlements_for_date(self, settlement_date):
             _LOGGER.warning(
                 "Trade %s: strike axis unresolved for ticker=%s; falling back to "
                 "market_type=%s legacy operator (greater-tail only).",
-                trade_uuid, market_ticker, market_type)
+                trade_uuid, _axis_ticker, market_type)
 
         # Calculate settlement payout based on CANONICAL temperature vs the
         # market's OWN strike operator (strict on both tails).
@@ -179,29 +187,34 @@ def process_settlements_for_date(self, settlement_date):
             _LOGGER.warning(
                 "Cannot settle trade %s: strike axis strike_type=%s could not be "
                 "evaluated (ticker=%s). Trade left open.",
-                trade_uuid, _strike_type, market_ticker)
+                trade_uuid, _strike_type, _axis_ticker)
             continue
         qty = quantity or 0
 
+        # P&L BASIS (2026-10-14): constant-1-contract — see
+        # docs/plans/TRADES-TABLE-INTEGRITY-2026-10-14.md. `realized_pnl` is per
+        # ONE contract and is size-independent: it must NOT be multiplied by
+        # `quantity` (the book's `quantity`/`position_size_usd` are size metadata,
+        # and the whole constant-1-contract re-settle matches (S-price)*1).
         if trade_type == TradeType.BUY_YES:
             payout_per_contract = settlement_contract_value
             cost_per_contract = filled_price
-            profit = (payout_per_contract - cost_per_contract) * qty
-            return_amount = payout_per_contract * qty
+            profit = (payout_per_contract - cost_per_contract) * 1.0
+            return_amount = payout_per_contract * 1.0
         elif trade_type == TradeType.BUY_NO:
             payout_per_contract = 1.0 - settlement_contract_value
             cost_per_contract = 1.0 - filled_price
-            profit = (payout_per_contract - cost_per_contract) * qty
-            return_amount = payout_per_contract * qty
+            profit = (payout_per_contract - cost_per_contract) * 1.0
+            return_amount = payout_per_contract * 1.0
         elif trade_type == TradeType.SELL_YES:
             # Short YES: collect filled_price, owe event payout.
-            profit = (filled_price - settlement_contract_value) * qty
+            profit = (filled_price - settlement_contract_value) * 1.0
             return_amount = profit
         elif trade_type == TradeType.SELL_NO:
             # Short NO: collect NO price, owe non-event payout.
             no_price = 1.0 - filled_price
             no_payout = 1.0 - settlement_contract_value
-            profit = (no_price - no_payout) * qty
+            profit = (no_price - no_payout) * 1.0
             return_amount = profit
         else:
             continue
@@ -947,6 +960,31 @@ def update_risk_metrics_on_trade(self, trade_pnl: float, trade_result: str):
             # Re-evaluate risk state
     risk_state = evaluate_risk_state(self._risk_manager)
     self._risk_metrics.risk_state = risk_state
+
+
+def _ticker_from_notes(c, trade_uuid: str) -> Optional[str]:
+    """Recover a row's Kalshi ticker from its provenance when the column is empty.
+
+    Older/fixture `trades` tables predate `market_ticker`; the ticker is still
+    encoded in `notes`/`functionality` (e.g. "… KXHIGHTBOS-26SEP29-T69 @ 69.0F").
+    Returns None when nothing ticker-shaped is present (caller fails closed).
+    """
+    import re
+    try:
+        row = c.execute(
+            "SELECT notes, functionality FROM trades WHERE trade_uuid=?",
+            (trade_uuid,)).fetchone()
+    except sqlite3.Error:
+        return None
+    if not row:
+        return None
+    for blob in row:
+        if not blob:
+            continue
+        m = re.search(r"(KX[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+)", str(blob))
+        if m:
+            return m.group(1)
+    return None
 
 
 def _get_strike_price(station: str, market_type: str, date: str, paper_db: str, metar_db: str) -> Optional[int]:
