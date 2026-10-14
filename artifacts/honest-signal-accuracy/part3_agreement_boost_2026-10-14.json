@@ -1,0 +1,32 @@
+{
+  "generated_at_utc": "2026-10-14T16:01:49.401137+00:00",
+  "axis": "T = floor(hsf@pin)+1 ; crossed = settled_max > T (strict; == LOSS)",
+  "cohort_window": [
+    "2026-04-21",
+    "2026-10-09"
+  ],
+  "part3_agreement_boost": {
+    "n": 2296,
+    "concurrence_distribution": {
+      "1": 1,
+      "2": 172,
+      "3": 909,
+      "4": 1192,
+      "5": 22
+    },
+    "pct_ge3_concur": 92.47,
+    "pct_le1_concur": 0.04,
+    "brier_no_boost_core": 0.1458,
+    "brier_boost_core": 0.1463,
+    "delta_brier_core": 0.0005,
+    "brier_no_boost_calibrated": 0.1523,
+    "brier_boost_calibrated": 0.1517,
+    "delta_brier_calibrated": -0.0006,
+    "ece_no_boost_core": 0.0893,
+    "ece_boost_core": 0.0917,
+    "reliability_no_boost_core": 0.0114,
+    "reliability_boost_core": 0.0111,
+    "ceiling": 0.7519,
+    "note": "boost re-uses the shipped n-of-k rule: >=3 concur -> +0.03*min(count-2,3)/3 ; <=1 concur -> -0.03*min(2-count,3)/3"
+  }
+}
