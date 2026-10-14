@@ -82,3 +82,8 @@ data/gefs_work/
 !artifacts/weak-signal-salvage/
 !artifacts/weak-signal-salvage/*.json
 !data/weak_signal_salvage_2026-10-14.json
+
+# Fusion alternatives sweep — inverse-variance / BMA / stacking (committed analysis artifact, 2026-10-14)
+!artifacts/fusion-alternatives/
+!artifacts/fusion-alternatives/*.json
+!data/fusion_alternatives_sweep_2026-10-14.json

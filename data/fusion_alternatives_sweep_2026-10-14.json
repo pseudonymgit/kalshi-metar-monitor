@@ -1,0 +1,236 @@
+{
+  "generated_at_utc": "2026-10-14T20:00:04.805921+00:00",
+  "preregistration": {
+    "axis": "strict crossing, T=floor(hsf@13:30)+1, y=settled_max>T (== LOSS)",
+    "truth": "canonical GHCN settlement",
+    "cohort_n": 2296,
+    "window": [
+      "2026-04-21",
+      "2026-10-09"
+    ],
+    "look_ahead_free": true,
+    "split": "random 50/50 FIT/TEST",
+    "seed": 20261014,
+    "boot_resamples": 2000,
+    "beat_criterion": [
+      "DeltaBrier(TEST) < 0",
+      "paired-bootstrap P(alt better) >= 0.95",
+      "ECE(alt) <= ECE(om_gfs alone) + 0.02"
+    ]
+  },
+  "sources": [
+    "gefs",
+    "analog",
+    "traj",
+    "market",
+    "om_gfs"
+  ],
+  "market_present_rows": {
+    "cohort": 284,
+    "of": 2296
+  },
+  "fit_n": 1148,
+  "test_n": 1148,
+  "baselines_test": {
+    "om_gfs_bc_ps_alone": {
+      "n": 1148,
+      "brier": 0.10385,
+      "ece": 0.0329,
+      "reliability": 0.004,
+      "resolution": 0.0468,
+      "dir_acc": 0.8458,
+      "base_rate": 0.8206,
+      "mean_p": 0.801
+    },
+    "om_gfs_080_5member": {
+      "n": 1148,
+      "brier": 0.10075,
+      "ece": 0.0195,
+      "reliability": 0.0009,
+      "resolution": 0.0472,
+      "dir_acc": 0.8519,
+      "base_rate": 0.8206,
+      "mean_p": 0.8082
+    }
+  },
+  "alternative_A_inverse_variance": {
+    "solo_Brier_on_FIT": {
+      "gefs": 0.3387,
+      "analog": 0.18517,
+      "traj": 0.19889,
+      "market": 0.60401,
+      "om_gfs": 0.11531
+    },
+    "weights": {
+      "gefs": 0.06177,
+      "analog": 0.20668,
+      "traj": 0.17914,
+      "market": 0.01942,
+      "om_gfs": 0.53299
+    },
+    "test": {
+      "n": 1148,
+      "brier": 0.10615,
+      "ece": 0.0485,
+      "reliability": 0.0045,
+      "resolution": 0.0442,
+      "dir_acc": 0.8362,
+      "base_rate": 0.8206,
+      "mean_p": 0.8509
+    },
+    "beats_om_gfs_alone": false,
+    "delta_brier_vs_om_gfs_alone": 0.0023,
+    "delta_brier_vs_om_gfs_080": 0.0054,
+    "meets_ece_criterion": true,
+    "boot": {
+      "delta_brier": 0.0023,
+      "ci95": [
+        -0.00517,
+        0.00955
+      ],
+      "p_alt_better": 0.272
+    },
+    "sensitivity_exponent4": {
+      "weights": {
+        "gefs": 0.01051,
+        "analog": 0.11765,
+        "traj": 0.08838,
+        "market": 0.00104,
+        "om_gfs": 0.78241
+      },
+      "test": {
+        "n": 1148,
+        "brier": 0.10059,
+        "ece": 0.0166,
+        "reliability": 0.0008,
+        "resolution": 0.0469,
+        "dir_acc": 0.851,
+        "base_rate": 0.8206,
+        "mean_p": 0.8316
+      },
+      "delta_brier_vs_om_gfs_alone": -0.00326,
+      "delta_brier_vs_om_gfs_080": -0.00016
+    }
+  },
+  "alternative_B_bma": {
+    "source_mean_loglik_on_FIT": {
+      "gefs": {
+        "nll_mean": -1.3394,
+        "n": 1148
+      },
+      "analog": {
+        "nll_mean": -0.7864,
+        "n": 1148
+      },
+      "traj": {
+        "nll_mean": -0.8988,
+        "n": 1148
+      },
+      "market": {
+        "nll_mean": -2.2679,
+        "n": 149
+      },
+      "om_gfs": {
+        "nll_mean": -0.3632,
+        "n": 1148
+      }
+    },
+    "weights": {
+      "gefs": 0.13621,
+      "analog": 0.23679,
+      "traj": 0.21163,
+      "market": 0.05383,
+      "om_gfs": 0.36154
+    },
+    "test": {
+      "n": 1148,
+      "brier": 0.11535,
+      "ece": 0.0517,
+      "reliability": 0.0076,
+      "resolution": 0.0388,
+      "dir_acc": 0.8301,
+      "base_rate": 0.8206,
+      "mean_p": 0.8468
+    },
+    "beats_om_gfs_alone": false,
+    "delta_brier_vs_om_gfs_alone": 0.0115,
+    "delta_brier_vs_om_gfs_080": 0.0146,
+    "meets_ece_criterion": true,
+    "boot": {
+      "delta_brier": 0.0115,
+      "ci95": [
+        0.00196,
+        0.02087
+      ],
+      "p_alt_better": 0.009
+    },
+    "common_support_variant": {
+      "fit_rows_all5": 149,
+      "weights": {
+        "gefs": 0.21169,
+        "analog": 0.20661,
+        "traj": 0.19085,
+        "market": 0.05344,
+        "om_gfs": 0.33741
+      },
+      "test": {
+        "n": 1148,
+        "brier": 0.11978,
+        "ece": 0.0387,
+        "reliability": 0.0033,
+        "resolution": 0.0295,
+        "dir_acc": 0.8319,
+        "base_rate": 0.8206,
+        "mean_p": 0.8244
+      },
+      "delta_brier_vs_om_gfs_alone": 0.01593
+    }
+  },
+  "alternative_C_stacking": {
+    "model": "LogisticRegression(penalty=l1, liblinear, C=1.0) on logit(features)",
+    "coefficients": {
+      "gefs": -0.03051,
+      "analog": 0.306,
+      "traj": 0.0348,
+      "market": 0.00299,
+      "om_gfs": 1.6232
+    },
+    "zeroed_sources": [],
+    "missing_imputation": "0.5 for absent source probs (market absent on most rows)",
+    "test": {
+      "n": 1148,
+      "brier": 0.1016,
+      "ece": 0.0194,
+      "reliability": 0.0012,
+      "resolution": 0.0464,
+      "dir_acc": 0.851,
+      "base_rate": 0.8206,
+      "mean_p": 0.8071
+    },
+    "beats_om_gfs_alone": false,
+    "delta_brier_vs_om_gfs_alone": -0.00225,
+    "delta_brier_vs_om_gfs_080": 0.00085,
+    "meets_ece_criterion": true,
+    "boot": {
+      "delta_brier": -0.00225,
+      "ci95": [
+        -0.00627,
+        0.00163
+      ],
+      "p_alt_better": 0.88
+    }
+  },
+  "notes": [
+    "FIT/TEST split fixed at seed 20261014; no tuning on TEST.",
+    "om_gfs alone baseline recomputed on the SAME TEST rows as each alt.",
+    "Alt A weights are 1/Brier^2 of each source's solo FIT Brier.",
+    "Alt B weights are the normalized source likelihood (equal priors).",
+    "Alt C imputes absent source probs at 0.5 (market absent on ~88% of rows)."
+  ],
+  "summary": {
+    "any_beats_om_gfs_alone": false,
+    "beating_alternatives": [],
+    "om_gfs_alone_brier_test": 0.10385,
+    "om_gfs_080_brier_test": 0.10075
+  }
+}
