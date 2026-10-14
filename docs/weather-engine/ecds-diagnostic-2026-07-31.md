@@ -103,7 +103,7 @@ one attempt.
 
 ## Can We Use a Different API Key?
 
-The current key `e543bdb6-c396-48b4-bc1c-bebe08db954e` works for both CDS
+The current key `<REDACTED-ECDS-KEY>` works for both CDS
 and ECDS. It's a single ECMWF account key.
 
 **Options:**
