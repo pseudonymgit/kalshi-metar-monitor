@@ -53,5 +53,8 @@ data/gefs_work/
 !artifacts/market-benchmark-extension/
 !artifacts/market-benchmark-extension/*.json
 
+# WE status-dashboard data source (committed read-side artifact, 2026-10-14)
+!data/we-dashboard.json
+
 # Governance stopping record MUST be committed (Workstream F off-switch)
 !stopping-record.json
