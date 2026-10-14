@@ -17,25 +17,41 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
-from sbox_intraday_ev_bridge import _position_size_usd  # noqa: E402
+from sbox_intraday_ev_bridge import (  # noqa: E402
+    _position_size_usd, kelly_fraction, kelly_position_size,
+)
 from core.position_sizer import (  # noqa: E402
     MAX_BANKROLL_PCT, PositionSizer, get_config_for_instance,
 )
 
 
 @pytest.mark.unit
-def test_bridge_ladder_dan_rules():
-    assert _position_size_usd(0.90) == 25.0   # sure-thing max
-    assert _position_size_usd(0.80) == 10.0   # high
-    assert _position_size_usd(0.60) == 5.0    # medium
-    assert _position_size_usd(0.50) == 0.0    # no trade
-    assert _position_size_usd(0.99) == 25.0   # never $50
+def test_bridge_sizing_is_kelly():
+    # AF (2026-10-14): Kelly replaces the retired confidence ladder.
+    # p=0.55 @ 0.50 -> f*=0.10 -> $20 -> capped at $10
+    assert kelly_position_size(0.55, 0.50) == 10.0
+    # p=0.65 @ 0.50 -> f*=0.30 -> $60 -> capped at $10
+    assert kelly_position_size(0.65, 0.50) == 10.0
+    # p=0.55 @ 0.30 -> f*=0.833 -> capped at $10
+    assert kelly_position_size(0.55, 0.30) == 10.0
+    # no edge -> no trade
+    assert kelly_position_size(0.50, 0.50) == 0.0
+    # negative edge at a rich price -> no trade (kills the 19:1 asymmetry)
+    assert kelly_position_size(0.55, 0.94) == 0.0
+    # _position_size_usd delegates to Kelly
+    assert _position_size_usd(0.65, 0.50) == kelly_position_size(0.65, 0.50)
 
 
 @pytest.mark.unit
-def test_bridge_ladder_never_exceeds_25():
-    for c in [0.0, 0.3, 0.5, 0.55, 0.7, 0.86, 0.95, 1.0]:
-        assert _position_size_usd(c) <= 25.0, f"conf={c} exceeded $25"
+def test_bridge_kelly_capped_at_5pct_of_bankroll():
+    # f* > 0.05 is capped -> $10 max on the $200 book.
+    for p, m in [(0.60, 0.50), (0.70, 0.50), (0.99, 0.50), (0.90, 0.10)]:
+        assert kelly_position_size(p, m) <= 10.0
+    # A small edge gives a small (sub-cap) size, so cheap entries no longer
+    # balloon into absurd contract counts.
+    sz = kelly_position_size(0.52, 0.50)   # f*=0.04 -> $8
+    assert 0.0 < sz < 10.0
+    assert kelly_fraction(0.52, 0.50) == pytest.approx(0.04)
 
 
 @pytest.mark.unit

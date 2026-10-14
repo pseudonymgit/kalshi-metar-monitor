@@ -44,10 +44,9 @@ def test_grade_rejects_low_edge_as_F():
     assert b.grade_position_cap(grade) == 0.0
 
 
-def test_grade_cap_binds_below_the_ladder():
+def test_grade_cap_binds_below_the_kelly_size():
     b = _load_bridge()
-    # ladder gives $10 at conf>0.70 (capped at $10, Dan 2026-10-13); a C grade
-    # caps it to $5.
-    assert min(b._position_size_usd(0.95), b.grade_position_cap("C")) == 5.0
-    # S grade keeps the (now $10) ladder max.
-    assert min(b._position_size_usd(0.95), b.grade_position_cap("S")) == 10.0
+    # Kelly gives the $10 cap (big edge @ mid); a C grade tightens it to $5.
+    assert min(b.kelly_position_size(0.95, 0.5), b.grade_position_cap("C")) == 5.0
+    # S grade keeps the $10 Kelly max.
+    assert min(b.kelly_position_size(0.95, 0.5), b.grade_position_cap("S")) == 10.0

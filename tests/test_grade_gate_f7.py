@@ -50,8 +50,8 @@ def test_grade_caps():
 
 def test_grade_cap_never_exceeds_ladder():
     b = _load_bridge()
-    # ladder $25 at conf>0.85; a C grade caps it to $5.
-    assert min(b._position_size_usd(0.95), b.grade_position_cap("C")) == 5.0
+    # Kelly gives the $10 cap for a strong edge; a C grade tightens it to $5.
+    assert min(b.kelly_position_size(0.95, 0.5), b.grade_position_cap("C")) == 5.0
 
 
 def test_ensure_grade_columns_idempotent():

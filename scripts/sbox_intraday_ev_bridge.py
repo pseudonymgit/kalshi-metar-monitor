@@ -468,24 +468,66 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
          probs.get("ceiling"), wa))
 
 
-def _position_size_usd(confidence: float) -> float:
-    """Dan's sizing ladder (revised 2026-10-12) — $200 bankroll.
+# ── Kelly sizing (Workstream AF, 2026-10-14) ────────────────────────────────
+# The retired ladder posed `quantity = position_size_usd / trade_price`, which
+# produced absurd contract counts on cheap entries ($0.05 -> 200 contracts ->
+# +$190 win vs -$10 loss, a 19:1 asymmetry on a binary option). Sizing is now
+# standard binary Kelly on the CALIBRATED probability vs the price paid:
+#
+#     f* = (p - market_price) / market_price        (== edge / market_price)
+#     position_size_usd = min(bankroll * f*, max_position)
+#
+# with f* additionally capped at MAX_KELLY_FRACTION of the bankroll, so the
+# loss side (market_price * f* * bankroll) is ALWAYS <= the fraction cap — never
+# the $190 asymmetry. `bankroll=200`, `MAX_KELLY_FRACTION=0.05` ($10) and
+# `MAX_POSITION_USD=10` reproduce Dan's $200/$10 book.
+BANKROLL_USD = 200.0
+MAX_KELLY_FRACTION = 0.05     # 5% of bankroll per trade ($10 on a $200 book)
+MAX_POSITION_USD = 10.0       # hard per-trade cap (Dan 2026-10-13: max $10)
 
-    Capped at $10 (Dan, 2026-10-13: "let's scale to max $10"). The prior $25
-    top tier is removed. Dan 2026-10-14: "$10 trades acceptable above 75".
-    Given confidence = |p-0.5|*2, p>0.75 == confidence>0.50, so the $10 tier
-    now opens at confidence>0.50 (probability>0.75); $5 tier at confidence>0.30
-    (probability>0.65); below that, no trade.
 
-    - high confidence (>0.50, i.e. p>0.75): $10 (max)
-    - medium confidence (>0.30, i.e. p>0.65): $5
-    - below: $0 (no trade)
+def kelly_fraction(our_prob: float, market_price: float, *,
+                   fee_rate: float = 0.0) -> float:
+    """Standard binary Kelly fraction for a $1-payoff contract bought at mid.
+
+    ``f* = (p - market_price - fee_rate) / market_price``, clamped to >= 0.
+    ``our_prob`` is the CALIBRATED probability of the BOOKED side winning;
+    ``market_price`` is that side's entry price. A non-positive edge yields 0.0
+    (no trade). Never raises; a degenerate price (<=0 or >=1) yields 0.0.
     """
-    if confidence > 0.50:
-        return 10.0
-    elif confidence > 0.30:
-        return 5.0
-    return 0.0
+    p = float(our_prob)
+    m = float(market_price)
+    if not (0.0 < m < 1.0):
+        return 0.0
+    edge = p - m - float(fee_rate)
+    if edge <= 0.0:
+        return 0.0
+    return edge / m
+
+
+def kelly_position_size(our_prob: float, market_price: float, *,
+                        bankroll: float = BANKROLL_USD,
+                        max_fraction: float = MAX_KELLY_FRACTION,
+                        max_position: float = MAX_POSITION_USD,
+                        fee_rate: float = 0.0) -> float:
+    """Kelly-sized position in USD: ``min(bankroll * min(f*, cap), max_position)``.
+
+    Returns 0.0 when the calibrated probability carries no edge at the price.
+    """
+    f = kelly_fraction(our_prob, market_price, fee_rate=fee_rate)
+    if f <= 0.0:
+        return 0.0
+    f = min(f, float(max_fraction))
+    return round(min(float(bankroll) * f, float(max_position)), 2)
+
+
+def _position_size_usd(our_prob: float, market_price: float, **kw) -> float:
+    """Bridge sizing entry point — Kelly (Workstream AF, 2026-10-14).
+
+    Replaces the retired confidence ladder entirely. ``our_prob`` is the
+    calibrated probability of the booked side, ``market_price`` its entry price.
+    """
+    return kelly_position_size(our_prob, market_price, **kw)
 
 
 def _ensure_price_source_column(conn) -> None:
@@ -496,6 +538,18 @@ def _ensure_price_source_column(conn) -> None:
     cols = {d[1] for d in conn.execute("PRAGMA table_info(trades)")}
     if "price_source" not in cols:
         conn.execute("ALTER TABLE trades ADD COLUMN price_source TEXT")
+        conn.commit()
+
+
+def _ensure_lane_column(conn) -> None:
+    """Workstream AF (2026-10-14): additive `lane` column so HIGH and LOW books
+    co-exist in one table. Pre-existing rows are HIGH (the only lane until now).
+    Idempotent.
+    """
+    cols = {d[1] for d in conn.execute("PRAGMA table_info(trades)")}
+    if "lane" not in cols:
+        conn.execute("ALTER TABLE trades ADD COLUMN lane TEXT")
+        conn.execute("UPDATE trades SET lane='HIGH' WHERE lane IS NULL")
         conn.commit()
 
 
@@ -571,7 +625,7 @@ def _fetch_trade_dict(conn, tuuid):
 def record_trade(conn, station, market_type, side, our_prob, market_price,
                  confidence, strike, ticker, size_usd, functionality, day_str,
                  probs: Optional[Dict] = None, price_source: Optional[str] = None,
-                 selected_side: Optional[str] = None):
+                 selected_side: Optional[str] = None, lane: str = "HIGH"):
     """Record ONE SBOX trade per (station, day, functionality), idempotently.
 
     Extension (2026-09-30): the row also carries p_gefs/p_analog/p_trajectory/
@@ -593,6 +647,7 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
     """
     probs = probs or {}
     _ensure_price_source_column(conn)
+    _ensure_lane_column(conn)  # AF: HIGH/LOW co-existence
     _ensure_trade_uniqueness(conn)
     _ensure_grade_columns(conn)  # F7: companion-table grade columns
     existing = conn.execute(
@@ -635,16 +690,18 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
                position_size_usd, trade_price, trade_cost, trade_version, functionality,
                status, notes, implied_prob, analytical_prob, calibration_error,
                confidence_indicator, created_at_utc,
-               p_gefs, p_analog, p_trajectory, p_fused, price_source, market_ticker)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+               p_gefs, p_analog, p_trajectory, p_fused, price_source, market_ticker,
+               lane)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (tuuid, day_str, station, market_type, direction, our_prob, price,
              ("buy_yes" if leg == "yes" else "buy_no"), qty, size_usd, price, cost,
              f"v3.1_{INSTANCE.lower()}", functionality, "open",
-             f"multi-forecaster EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
+             f"{('LOW' if (lane or '').upper() == 'LOW' else 'multi-forecaster')} "
+             f"EV-strike {ticker} @ {strike}F; inst={INSTANCE}",
              price, our_prob, abs(our_prob - price), confidence, now,
              probs.get("p_gefs"), probs.get("p_analog"),
              probs.get("p_trajectory"), probs.get("p_fused"), price_source,
-             ticker))
+             ticker, (lane or "HIGH").upper()))
     except sqlite3.IntegrityError:
         # E4-b: a duplicate decision intent is refused by the UNIQUE index. Treat
         # it as an idempotent no-op — re-read the intent's row and enrich it in
@@ -1093,15 +1150,15 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                          "overlay_dir": overlay_sig.direction,
                          "overlay_conf": round(overlay_sig.confidence, 4)})
 
-        # R/T (2026-10-01): Dan's sizing ladder replaces the old EntryTimingEngine
-        # position_size, which was a fixed $100. Use our_prob-based ladder instead.
+        # Kelly sizing (Workstream AF, 2026-10-14): size on the calibrated
+        # probability of the BOOKED side vs the price paid. Replaces the retired
+        # confidence ladder that produced 19:1 win/loss asymmetry on cheap entries.
         confidence = abs(our_prob - 0.5) * 2.0
-        size_usd = _position_size_usd(confidence)
-        # Second half of A5 (2026-10-02): a $0 ladder tier means NO trade. Without
-        # this guard a $0 size still records a phantom row (qty floored to 1).
-        # The ladder is the only sizing path; below the lowest tier we pass.
+        size_usd = _position_size_usd(our_prob, mkt)
+        # A $0 Kelly size means no edge at this price -> NO trade. Without this
+        # guard a $0 size still records a phantom row (qty floored to 1).
         if size_usd <= 0:
-            skipped.append((st, "below_min_confidence_tier"))
+            skipped.append((st, "kelly_zero_edge"))
             continue
         # F4 (2026-10-13): per-station confidence floor (default 0.0 == no change).
         if confidence < sp["confidence_floor"]:

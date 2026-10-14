@@ -15,10 +15,10 @@ Three independent problems, three separate apply modes (each its own commit):
                canonical_source='kalshi_live_api', canonical_outcome,
                status='closed', settlement_date_utc
                (core/station_time.settlement_time_utc).
-  --problem 2  Backfill position_size_usd for all rows from the honest ladder
-               (_position_size_usd: >0.70->$10, >0.50->$5, else $0) on
-               conf = |calibrated_p - 0.5| * 2. Preserves the old size in
-               position_size_usd_old_2026.
+  --problem 2  Backfill position_size_usd for all rows from KELLY sizing
+               (AF 2026-10-14: kelly_position_size(our_prob, trade_price),
+               $200 bankroll / 5% cap / $10 max) on the BOOKED side's calibrated
+               probability. Preserves the old size in position_size_usd_old_2026.
   --problem 3  Replace realized_pnl (size fiction) with honest
                constant-1-contract P&L: buy_yes (S-price)*1, buy_no (price-S)*1,
                S from the STRICT axis on canonical_settled_f vs strike.
@@ -42,7 +42,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from core.station_time import settlement_time_utc  # noqa: E402
-from scripts.sbox_intraday_ev_bridge import _position_size_usd  # noqa: E402
+from scripts.sbox_intraday_ev_bridge import kelly_position_size  # noqa: E402
 
 BOOK = REPO / "data" / "paper_trading_sbox.db"
 KALSHI = REPO / "data" / "kalshi_settlements.db"
@@ -164,7 +164,8 @@ def problem2(conn, dry_run=False):
         "SELECT trade_uuid, calibrated_p FROM trade_calibration "
         "WHERE calibrated_p IS NOT NULL")}
     rows = [dict(r) for r in c.execute(
-        "SELECT id, trade_uuid, station, position_size_usd, trade_price "
+        "SELECT id, trade_uuid, station, position_size_usd, trade_price, "
+        "trade_type, signal_direction "
         "FROM trades ORDER BY id")]
     out = {"changes": [], "unchanged": 0, "no_calibrated_p": []}
     before = {}
@@ -173,19 +174,26 @@ def problem2(conn, dry_run=False):
         cp = calib.get(r["trade_uuid"], calib2.get(r["trade_uuid"]))
         old = r["position_size_usd"]
         before[old] = before.get(old, 0) + 1
-        if cp is None:
+        price = float(r["trade_price"] or 0.0)
+        if cp is None or not (0.0 < price < 1.0):
             out["no_calibrated_p"].append(r["id"])
             after[old] = after.get(old, 0) + 1
             continue
-        conf = abs(float(cp) - 0.5) * 2.0
-        new = _position_size_usd(conf)
+        # Kelly (AF 2026-10-14): size on the BOOKED side's calibrated prob vs
+        # the price paid. cp is P(high>=strike) (YES side).
+        leg = "no" if str(r["trade_type"] or "").lower() == "buy_no" else (
+            "yes" if str(r["trade_type"] or "").lower() == "buy_yes" else
+            ("yes" if str(r["signal_direction"]).upper() == "UP" else "no"))
+        our_prob = float(cp) if leg == "yes" else 1.0 - float(cp)
+        new = kelly_position_size(our_prob, price)
         after[new] = after.get(new, 0) + 1
         if new == old:
             out["unchanged"] += 1
         else:
             out["changes"].append(
                 {"id": r["id"], "station": r["station"], "calibrated_p": cp,
-                 "conf": round(conf, 4), "old": old, "new": new})
+                 "leg": leg, "our_prob": round(our_prob, 4), "price": price,
+                 "old": old, "new": new})
         if not dry_run:
             if r["id"] in existing_old:
                 c.execute("UPDATE trades SET position_size_usd=? WHERE id=?",

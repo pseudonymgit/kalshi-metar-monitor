@@ -253,7 +253,7 @@ def run_arm(p_fn: Callable[[float], float], edge_mult_fn, state, ladder: List[Di
     sig = entry_signal(now_utc.hour, our_prob, mkt, conf)
     if sig is None:
         return None
-    size = bridge._position_size_usd(conf)
+    size = bridge.kelly_position_size(our_prob, mkt)
     if size <= 0:
         return None
     qty = max(1, int(round(size / max(mkt, 0.01))))

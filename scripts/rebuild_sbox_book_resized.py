@@ -34,14 +34,14 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
-from sbox_intraday_ev_bridge import _position_size_usd  # noqa: E402
+from sbox_intraday_ev_bridge import kelly_position_size  # noqa: E402
 
 SBOX_DB = REPO / "data" / "paper_trading_sbox.db"
 
 
-def _new_size(confidence: float) -> float:
-    """The Dan rule, exposed for tests/import. confidence in [0,1]."""
-    return _position_size_usd(confidence)
+def _new_size(our_prob: float, market_price: float) -> float:
+    """Kelly size for the booked side, exposed for tests/import (AF 2026-10-14)."""
+    return kelly_position_size(our_prob, market_price)
 
 
 def rebuild(src: Path, dst: Path) -> dict:
@@ -53,7 +53,8 @@ def rebuild(src: Path, dst: Path) -> dict:
     c.row_factory = sqlite3.Row
     rows = c.execute(
         "SELECT id, position_size_usd, quantity, trade_price, settled_value, "
-        "realized_pnl, confidence_indicator, status, market_type, trade_type "
+        "realized_pnl, confidence_indicator, status, market_type, trade_type, "
+        "forecast_prob, market_price "
         "FROM trades"
     ).fetchall()
 
@@ -61,10 +62,10 @@ def rebuild(src: Path, dst: Path) -> dict:
     resized = 0
     pnl_before = pnl_after = 0.0
     for r in rows:
-        conf = r["confidence_indicator"]
-        if conf is None:
+        p, mp = r["forecast_prob"], r["market_price"]
+        if p is None or mp is None:
             continue
-        new_size = _new_size(float(conf))
+        new_size = _new_size(float(p), float(mp))
         dist[new_size] = dist.get(new_size, 0) + 1
         old_size = float(r["position_size_usd"])
         qty = int(r["quantity"] or 0)
@@ -116,11 +117,11 @@ def main(argv=None) -> int:
     if args.report:
         c = sqlite3.connect(f"file:{src}?mode=ro", uri=True)
         rows = c.execute(
-            "SELECT confidence_indicator FROM trades").fetchall()
+            "SELECT forecast_prob, market_price FROM trades").fetchall()
         c.close()
         dist: dict = {}
-        for (conf,) in rows:
-            s = _new_size(float(conf)) if conf is not None else 0.0
+        for p, mp in rows:
+            s = _new_size(float(p), float(mp)) if (p is not None and mp is not None) else 0.0
             dist[s] = dist.get(s, 0) + 1
         print("new-size distribution:", dict(sorted(dist.items(), reverse=True)))
         return 0
