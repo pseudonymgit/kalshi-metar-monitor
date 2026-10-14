@@ -1,0 +1,438 @@
+{
+  "generated_at_utc": "2026-10-14T18:37:26.846965+00:00",
+  "axis": "strict strike-crossing, T=floor(hsf@13:30)+1, crossed = settled_max > T (== is LOSS)",
+  "truth": "canonical GHCN settlement",
+  "cohort": {
+    "n": 2296,
+    "window": [
+      "2026-04-21",
+      "2026-10-09"
+    ],
+    "pin": "13:30 station-local",
+    "look_ahead_free": true
+  },
+  "baselines": {
+    "om_gfs_bc_ps_alone": {
+      "n": 2296,
+      "brier": 0.1096,
+      "ece": 0.0418,
+      "reliability": 0.0051,
+      "resolution": 0.0494,
+      "dir_acc": 0.8397,
+      "mean_p": 0.7968
+    },
+    "shipped_default_weights": {
+      "gefs": 0.25,
+      "analog": 0.25,
+      "traj": 0.25,
+      "market": 0.25,
+      "om_gfs": 0.15
+    },
+    "shipped_default_pcore": {
+      "n": 2296,
+      "brier": 0.1458,
+      "ece": 0.0893,
+      "reliability": 0.0114,
+      "resolution": 0.0196,
+      "dir_acc": 0.8158,
+      "mean_p": 0.8237
+    },
+    "shipped_default_raw": {
+      "n": 2296,
+      "brier": 0.1459,
+      "ece": 0.0879,
+      "reliability": 0.0103,
+      "resolution": 0.0172,
+      "dir_acc": 0.8158,
+      "mean_p": 0.8304
+    },
+    "shipped_default_calibrated": {
+      "n": 2296,
+      "brier": 0.1523,
+      "ece": 0.0942,
+      "reliability": 0.0106,
+      "resolution": 0.0133,
+      "dir_acc": 0.8158,
+      "mean_p": 0.7204
+    }
+  },
+  "sweep_5member": [
+    {
+      "weight_om_gfs": 0.2,
+      "weights_applied": {
+        "gefs": 0.2,
+        "analog": 0.2,
+        "traj": 0.2,
+        "market": 0.2,
+        "om_gfs": 0.2
+      },
+      "fused_Brier_pcore": 0.1365,
+      "fused_Brier_raw": 0.1366,
+      "fused_Brier_calibrated": 0.1492,
+      "ECE_pcore": 0.0498,
+      "delta_vs_om_gfs_alone": 0.0269,
+      "dir_acc_pcore": 0.8179,
+      "mean_p_pcore": 0.8208,
+      "delta_brier_vs_om_gfs_alone": 0.0269,
+      "ci95": [
+        0.01885,
+        0.03522
+      ],
+      "p_fused_better": 0.0
+    },
+    {
+      "weight_om_gfs": 0.3,
+      "weights_applied": {
+        "gefs": 0.175,
+        "analog": 0.175,
+        "traj": 0.175,
+        "market": 0.175,
+        "om_gfs": 0.3
+      },
+      "fused_Brier_pcore": 0.1258,
+      "fused_Brier_raw": 0.1256,
+      "fused_Brier_calibrated": 0.1445,
+      "ECE_pcore": 0.0448,
+      "delta_vs_om_gfs_alone": 0.0162,
+      "dir_acc_pcore": 0.8175,
+      "mean_p_pcore": 0.8168,
+      "delta_brier_vs_om_gfs_alone": 0.01617,
+      "ci95": [
+        0.00933,
+        0.02315
+      ],
+      "p_fused_better": 0.0
+    },
+    {
+      "weight_om_gfs": 0.4,
+      "weights_applied": {
+        "gefs": 0.15,
+        "analog": 0.15,
+        "traj": 0.15,
+        "market": 0.15,
+        "om_gfs": 0.4
+      },
+      "fused_Brier_pcore": 0.1178,
+      "fused_Brier_raw": 0.1174,
+      "fused_Brier_calibrated": 0.1401,
+      "ECE_pcore": 0.0489,
+      "delta_vs_om_gfs_alone": 0.0082,
+      "dir_acc_pcore": 0.821,
+      "mean_p_pcore": 0.8132,
+      "delta_brier_vs_om_gfs_alone": 0.00816,
+      "ci95": [
+        0.00247,
+        0.01397
+      ],
+      "p_fused_better": 0.003
+    },
+    {
+      "weight_om_gfs": 0.5,
+      "weights_applied": {
+        "gefs": 0.125,
+        "analog": 0.125,
+        "traj": 0.125,
+        "market": 0.125,
+        "om_gfs": 0.5
+      },
+      "fused_Brier_pcore": 0.1121,
+      "fused_Brier_raw": 0.1118,
+      "fused_Brier_calibrated": 0.137,
+      "ECE_pcore": 0.0383,
+      "delta_vs_om_gfs_alone": 0.0025,
+      "dir_acc_pcore": 0.8297,
+      "mean_p_pcore": 0.8099,
+      "delta_brier_vs_om_gfs_alone": 0.0025,
+      "ci95": [
+        -0.00215,
+        0.00726
+      ],
+      "p_fused_better": 0.149
+    },
+    {
+      "weight_om_gfs": 0.6,
+      "weights_applied": {
+        "gefs": 0.1,
+        "analog": 0.1,
+        "traj": 0.1,
+        "market": 0.1,
+        "om_gfs": 0.6
+      },
+      "fused_Brier_pcore": 0.1085,
+      "fused_Brier_raw": 0.1083,
+      "fused_Brier_calibrated": 0.1352,
+      "ECE_pcore": 0.0321,
+      "delta_vs_om_gfs_alone": -0.0011,
+      "dir_acc_pcore": 0.841,
+      "mean_p_pcore": 0.8068,
+      "delta_brier_vs_om_gfs_alone": -0.00112,
+      "ci95": [
+        -0.00483,
+        0.00262
+      ],
+      "p_fused_better": 0.719
+    },
+    {
+      "weight_om_gfs": 0.7,
+      "weights_applied": {
+        "gefs": 0.075,
+        "analog": 0.075,
+        "traj": 0.075,
+        "market": 0.075,
+        "om_gfs": 0.7
+      },
+      "fused_Brier_pcore": 0.1066,
+      "fused_Brier_raw": 0.107,
+      "fused_Brier_calibrated": 0.1345,
+      "ECE_pcore": 0.021,
+      "delta_vs_om_gfs_alone": -0.003,
+      "dir_acc_pcore": 0.8432,
+      "mean_p_pcore": 0.8039,
+      "delta_brier_vs_om_gfs_alone": -0.00298,
+      "ci95": [
+        -0.00572,
+        -0.00025
+      ],
+      "p_fused_better": 0.983
+    },
+    {
+      "weight_om_gfs": 0.8,
+      "weights_applied": {
+        "gefs": 0.05,
+        "analog": 0.05,
+        "traj": 0.05,
+        "market": 0.05,
+        "om_gfs": 0.8
+      },
+      "fused_Brier_pcore": 0.1063,
+      "fused_Brier_raw": 0.1069,
+      "fused_Brier_calibrated": 0.1345,
+      "ECE_pcore": 0.024,
+      "delta_vs_om_gfs_alone": -0.0033,
+      "dir_acc_pcore": 0.8432,
+      "mean_p_pcore": 0.8013,
+      "delta_brier_vs_om_gfs_alone": -0.00329,
+      "ci95": [
+        -0.00511,
+        -0.00149
+      ],
+      "p_fused_better": 1.0
+    },
+    {
+      "weight_om_gfs": 0.9,
+      "weights_applied": {
+        "gefs": 0.025,
+        "analog": 0.025,
+        "traj": 0.025,
+        "market": 0.025,
+        "om_gfs": 0.9
+      },
+      "fused_Brier_pcore": 0.1074,
+      "fused_Brier_raw": 0.1081,
+      "fused_Brier_calibrated": 0.1348,
+      "ECE_pcore": 0.0217,
+      "delta_vs_om_gfs_alone": -0.0022,
+      "dir_acc_pcore": 0.8449,
+      "mean_p_pcore": 0.7988,
+      "delta_brier_vs_om_gfs_alone": -0.00224,
+      "ci95": [
+        -0.00314,
+        -0.00135
+      ],
+      "p_fused_better": 1.0
+    }
+  ],
+  "best_5member": {
+    "weight_om_gfs": 0.8,
+    "weights_applied": {
+      "gefs": 0.05,
+      "analog": 0.05,
+      "traj": 0.05,
+      "market": 0.05,
+      "om_gfs": 0.8
+    },
+    "fused_Brier_pcore": 0.1063,
+    "fused_Brier_raw": 0.1069,
+    "fused_Brier_calibrated": 0.1345,
+    "ECE_pcore": 0.024,
+    "delta_vs_om_gfs_alone": -0.0033,
+    "dir_acc_pcore": 0.8432,
+    "mean_p_pcore": 0.8013,
+    "delta_brier_vs_om_gfs_alone": -0.00329,
+    "ci95": [
+      -0.00511,
+      -0.00149
+    ],
+    "p_fused_better": 1.0
+  },
+  "pair_om_gfs_market": {
+    "equal_weight_0.5": {
+      "weight_om_gfs": 0.5,
+      "Brier": 0.227,
+      "ECE": 0.2985,
+      "n": 284,
+      "delta_vs_om_gfs_alone": 0.1174
+    },
+    "best": {
+      "weight_om_gfs": 0.95,
+      "Brier": 0.1163,
+      "ECE": 0.0393,
+      "n": 284,
+      "delta_vs_om_gfs_alone": 0.0067
+    },
+    "sweep": [
+      {
+        "weight_om_gfs": 0.0,
+        "Brier": 0.6089,
+        "ECE": 0.6219,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.4993
+      },
+      {
+        "weight_om_gfs": 0.05,
+        "Brier": 0.5585,
+        "ECE": 0.5896,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.4489
+      },
+      {
+        "weight_om_gfs": 0.1,
+        "Brier": 0.5107,
+        "ECE": 0.5519,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.4011
+      },
+      {
+        "weight_om_gfs": 0.15,
+        "Brier": 0.4657,
+        "ECE": 0.5178,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.3561
+      },
+      {
+        "weight_om_gfs": 0.2,
+        "Brier": 0.4234,
+        "ECE": 0.4889,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.3138
+      },
+      {
+        "weight_om_gfs": 0.25,
+        "Brier": 0.3839,
+        "ECE": 0.458,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.2743
+      },
+      {
+        "weight_om_gfs": 0.3,
+        "Brier": 0.3471,
+        "ECE": 0.4258,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.2375
+      },
+      {
+        "weight_om_gfs": 0.35,
+        "Brier": 0.313,
+        "ECE": 0.3927,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.2034
+      },
+      {
+        "weight_om_gfs": 0.4,
+        "Brier": 0.2816,
+        "ECE": 0.3603,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.172
+      },
+      {
+        "weight_om_gfs": 0.45,
+        "Brier": 0.2529,
+        "ECE": 0.3297,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.1433
+      },
+      {
+        "weight_om_gfs": 0.5,
+        "Brier": 0.227,
+        "ECE": 0.2985,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.1174
+      },
+      {
+        "weight_om_gfs": 0.55,
+        "Brier": 0.2038,
+        "ECE": 0.2673,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0942
+      },
+      {
+        "weight_om_gfs": 0.6,
+        "Brier": 0.1833,
+        "ECE": 0.2362,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0737
+      },
+      {
+        "weight_om_gfs": 0.65,
+        "Brier": 0.1656,
+        "ECE": 0.2091,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.056
+      },
+      {
+        "weight_om_gfs": 0.7,
+        "Brier": 0.1505,
+        "ECE": 0.1753,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0409
+      },
+      {
+        "weight_om_gfs": 0.75,
+        "Brier": 0.1382,
+        "ECE": 0.1444,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0286
+      },
+      {
+        "weight_om_gfs": 0.8,
+        "Brier": 0.1287,
+        "ECE": 0.1318,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0191
+      },
+      {
+        "weight_om_gfs": 0.85,
+        "Brier": 0.1218,
+        "ECE": 0.1038,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0122
+      },
+      {
+        "weight_om_gfs": 0.9,
+        "Brier": 0.1177,
+        "ECE": 0.0687,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0081
+      },
+      {
+        "weight_om_gfs": 0.95,
+        "Brier": 0.1163,
+        "ECE": 0.0393,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.0067
+      },
+      {
+        "weight_om_gfs": 1.0,
+        "Brier": 0.1176,
+        "ECE": 0.0544,
+        "n": 284,
+        "delta_vs_om_gfs_alone": 0.008
+      }
+    ]
+  },
+  "notes": [
+    "p_core = shipped weighted core blend BEFORE the trajectory modulator; it is the exact quantity the honest baseline 0.1458 is measured on.",
+    "raw = 0.5 + traj_mult*(p_core-0.5); calibrated = per-station ceiling clamp.",
+    "The 4-member split is (1-w_om)/4 on each of gefs, analog, traj, market."
+  ]
+}

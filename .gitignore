@@ -67,3 +67,8 @@ data/gefs_work/
 # Settlement-axis ground truth + re-settle plan (committed analysis artifact, 2026-10-14)
 !artifacts/settlement-axis-truth/
 !artifacts/settlement-axis-truth/*.json
+
+# Fusion weight sweep (committed analysis artifact, 2026-10-14)
+!artifacts/fusion-weight-sweep/
+!artifacts/fusion-weight-sweep/*.json
+!data/fusion_weight_sweep_2026-10-14.json
