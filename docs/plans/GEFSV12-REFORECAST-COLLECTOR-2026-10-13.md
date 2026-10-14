@@ -145,8 +145,25 @@ P-workstream loader review fixed).
 | `.idx` byte-range decode verified (tmax_2m → °F, 2010-01-01) | ✅ |
 | Collector script (`probe` / `collect` / `status`) | ✅ prepared |
 | Schema + idempotency + rate limiting | ✅ |
-| **Bulk backfill** | ⛔ **NOT STARTED** (per instruction) |
+| **Bulk backfill** | ▶ **STARTED 2026-10-14** — `c00`-only, as bounded incremental cron (see below) |
 | Member-count correction (5, not 31) | ✅ documented |
 
-**Next action (owner: Dan):** decide whether to start a `c00`-only backfill. Effort
-estimate above; no code changes needed.
+---
+
+## Backfill execution (STARTED 2026-10-14)
+
+Dan approved starting the `c00`-only backfill. A multi-hour monolithic run cannot fit a cron
+timeout, so it runs as a **bounded incremental driver**:
+
+- **Driver:** `scripts/gefsv12_reforecast_cron.py` — finds the earliest missing init days and
+  collects them in order until a wall budget (default 2400 s / 40 min) is spent, then exits 0.
+  Resumable and idempotent (the collector pre-skips present rows).
+- **Cron:** `WE-GEFSv12-reforecast-backfill` — `30 22 * * *` UTC, command payload wrapped in
+  `scripts/we_cron_preflight.sh`, timeout 7200 s, no-output timeout 1200 s, no delivery.
+- **Scope:** `c00` control member only, 2000-01-01 → 2019-12-31, all 20 stations, days 1-10.
+- **Progress:** `scripts/gefsv12_reforecast_cron.py --status` → `member=c00 present=N/7305`.
+
+At ~40 min/night with the 2 s request spacing, the archive converges in ~2-3 weeks of nightly
+runs. `p01..p04` are added only if the analog/debias refit later shows member spread matters.
+
+**Next action:** let the cron run; check `--status` periodically.
