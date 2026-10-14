@@ -1,0 +1,467 @@
+{
+  "generated_at_utc": "2026-10-14T18:48:32.178040+00:00",
+  "prereg": "docs/plans/WEAK-SIGNAL-SALVAGE-PREREG-2026-10-14.md",
+  "axis": "strict strike-crossing, T=floor(hsf@13:30)+1, crossed = settled_max > T (== is LOSS)",
+  "truth": "canonical GHCN settlement",
+  "cohort": {
+    "n": 2927,
+    "window": [
+      "2026-04-21",
+      "2026-10-09"
+    ],
+    "pin": "13:30 station-local",
+    "look_ahead_free": true
+  },
+  "incumbent": {
+    "name": "om_gfs(bc,ps)",
+    "brier_1330": 0.1067,
+    "p_om_brier_this_cohort": 0.1067,
+    "dir_acc": 0.8439,
+    "ece": 0.0376
+  },
+  "tests": {
+    "H1_nwp_spread": {
+      "spread5": {
+        "n": 2762,
+        "quartiles": [
+          {
+            "q": 1,
+            "n": 688,
+            "spread_lo": null,
+            "spread_hi": 1.52,
+            "brier": 0.0855,
+            "mean_abs_om_err": 1.1726,
+            "mean_y": 0.8619
+          },
+          {
+            "q": 2,
+            "n": 691,
+            "spread_lo": 1.52,
+            "spread_hi": 2.19,
+            "brier": 0.1098,
+            "mean_abs_om_err": 1.3328,
+            "mean_y": 0.822
+          },
+          {
+            "q": 3,
+            "n": 692,
+            "spread_lo": 2.19,
+            "spread_hi": 3.17,
+            "brier": 0.1194,
+            "mean_abs_om_err": 1.321,
+            "mean_y": 0.8165
+          },
+          {
+            "q": 4,
+            "n": 691,
+            "spread_lo": 3.17,
+            "spread_hi": null,
+            "brier": 0.1097,
+            "mean_abs_om_err": 1.4652,
+            "mean_y": 0.7627
+          }
+        ],
+        "d_brier_q4_minus_q1": 0.0242,
+        "spearman_spread_vs_sqerr": 0.0761,
+        "spearman_p": 0.0001,
+        "monotone": "none",
+        "verdict": "SALVAGE"
+      },
+      "spread6": {
+        "n": 2762,
+        "quartiles": [
+          {
+            "q": 1,
+            "n": 693,
+            "spread_lo": null,
+            "spread_hi": 1.52,
+            "brier": 0.077,
+            "mean_abs_om_err": 1.156,
+            "mean_y": 0.8644
+          },
+          {
+            "q": 2,
+            "n": 684,
+            "spread_lo": 1.52,
+            "spread_hi": 2.17,
+            "brier": 0.1043,
+            "mean_abs_om_err": 1.3132,
+            "mean_y": 0.848
+          },
+          {
+            "q": 3,
+            "n": 692,
+            "spread_lo": 2.17,
+            "spread_hi": 3.12,
+            "brier": 0.1305,
+            "mean_abs_om_err": 1.3789,
+            "mean_y": 0.8107
+          },
+          {
+            "q": 4,
+            "n": 693,
+            "spread_lo": 3.12,
+            "spread_hi": null,
+            "brier": 0.1127,
+            "mean_abs_om_err": 1.444,
+            "mean_y": 0.7403
+          }
+        ],
+        "d_brier_q4_minus_q1": 0.0357,
+        "spearman_spread_vs_sqerr": 0.0833,
+        "spearman_p": 0.0,
+        "monotone": "none",
+        "verdict": "SALVAGE"
+      },
+      "range5": {
+        "n": 2762,
+        "quartiles": [
+          {
+            "q": 1,
+            "n": 678,
+            "spread_lo": null,
+            "spread_hi": 3.6,
+            "brier": 0.0828,
+            "mean_abs_om_err": 1.1665,
+            "mean_y": 0.8584
+          },
+          {
+            "q": 2,
+            "n": 704,
+            "spread_lo": 3.6,
+            "spread_hi": 5.29,
+            "brier": 0.1125,
+            "mean_abs_om_err": 1.3361,
+            "mean_y": 0.8168
+          },
+          {
+            "q": 3,
+            "n": 696,
+            "spread_lo": 5.29,
+            "spread_hi": 7.74,
+            "brier": 0.1211,
+            "mean_abs_om_err": 1.2965,
+            "mean_y": 0.8261
+          },
+          {
+            "q": 4,
+            "n": 684,
+            "spread_lo": 7.74,
+            "spread_hi": null,
+            "brier": 0.1074,
+            "mean_abs_om_err": 1.4918,
+            "mean_y": 0.7617
+          }
+        ],
+        "d_brier_q4_minus_q1": 0.0246,
+        "spearman_spread_vs_sqerr": 0.0747,
+        "spearman_p": 0.0001,
+        "monotone": "none",
+        "verdict": "SALVAGE"
+      }
+    },
+    "H1_robustness": {
+      "spread5": {
+        "n": 2762,
+        "quartiles": [
+          {
+            "q": 1,
+            "n": 688,
+            "brier": 0.0855,
+            "bss": 0.2816,
+            "base_rate": 0.8619,
+            "mean_err_signed": 0.5548,
+            "mean_abs_err": 1.1726
+          },
+          {
+            "q": 2,
+            "n": 691,
+            "brier": 0.1098,
+            "bss": 0.2495,
+            "base_rate": 0.822,
+            "mean_err_signed": 0.6468,
+            "mean_abs_err": 1.3328
+          },
+          {
+            "q": 3,
+            "n": 692,
+            "brier": 0.1194,
+            "bss": 0.2033,
+            "base_rate": 0.8165,
+            "mean_err_signed": 0.6292,
+            "mean_abs_err": 1.321
+          },
+          {
+            "q": 4,
+            "n": 691,
+            "brier": 0.1097,
+            "bss": 0.394,
+            "base_rate": 0.7627,
+            "mean_err_signed": 0.4743,
+            "mean_abs_err": 1.4652
+          }
+        ],
+        "gate_sim": {
+          "full_brier": 0.1061,
+          "drop_q4_brier": 0.1049,
+          "delta_brier_from_gate": -0.0012,
+          "full_mean_abs_err": 1.323,
+          "drop_q4_mean_abs_err": 1.2756,
+          "delta_abs_err_from_gate": -0.0474
+        },
+        "per_month_delta": [
+          {
+            "month": "2026-05",
+            "n": 553,
+            "d_brier_q4_minus_q1": 0.0245
+          },
+          {
+            "month": "2026-06",
+            "n": 559,
+            "d_brier_q4_minus_q1": 0.0078
+          },
+          {
+            "month": "2026-07",
+            "n": 592,
+            "d_brier_q4_minus_q1": 0.0443
+          },
+          {
+            "month": "2026-08",
+            "n": 527,
+            "d_brier_q4_minus_q1": 0.0399
+          },
+          {
+            "month": "2026-09",
+            "n": 351,
+            "d_brier_q4_minus_q1": 0.0741
+          },
+          {
+            "month": "2026-10",
+            "n": 180,
+            "d_brier_q4_minus_q1": -0.0325
+          }
+        ],
+        "n_months_positive": 5,
+        "n_months": 6
+      },
+      "spread6": {
+        "n": 2762,
+        "quartiles": [
+          {
+            "q": 1,
+            "n": 693,
+            "brier": 0.077,
+            "bss": 0.3431,
+            "base_rate": 0.8644,
+            "mean_err_signed": 0.5583,
+            "mean_abs_err": 1.156
+          },
+          {
+            "q": 2,
+            "n": 684,
+            "brier": 0.1043,
+            "bss": 0.1911,
+            "base_rate": 0.848,
+            "mean_err_signed": 0.6497,
+            "mean_abs_err": 1.3132
+          },
+          {
+            "q": 3,
+            "n": 692,
+            "brier": 0.1305,
+            "bss": 0.1496,
+            "base_rate": 0.8107,
+            "mean_err_signed": 0.64,
+            "mean_abs_err": 1.3789
+          },
+          {
+            "q": 4,
+            "n": 693,
+            "brier": 0.1127,
+            "bss": 0.414,
+            "base_rate": 0.7403,
+            "mean_err_signed": 0.4584,
+            "mean_abs_err": 1.444
+          }
+        ],
+        "gate_sim": {
+          "full_brier": 0.1061,
+          "drop_q4_brier": 0.1039,
+          "delta_brier_from_gate": -0.0022,
+          "full_mean_abs_err": 1.323,
+          "drop_q4_mean_abs_err": 1.2825,
+          "delta_abs_err_from_gate": -0.0405
+        },
+        "per_month_delta": [
+          {
+            "month": "2026-05",
+            "n": 553,
+            "d_brier_q4_minus_q1": 0.0503
+          },
+          {
+            "month": "2026-06",
+            "n": 559,
+            "d_brier_q4_minus_q1": 0.0105
+          },
+          {
+            "month": "2026-07",
+            "n": 592,
+            "d_brier_q4_minus_q1": 0.0501
+          },
+          {
+            "month": "2026-08",
+            "n": 527,
+            "d_brier_q4_minus_q1": 0.036
+          },
+          {
+            "month": "2026-09",
+            "n": 351,
+            "d_brier_q4_minus_q1": 0.0589
+          },
+          {
+            "month": "2026-10",
+            "n": 180,
+            "d_brier_q4_minus_q1": -0.0815
+          }
+        ],
+        "n_months_positive": 5,
+        "n_months": 6
+      }
+    },
+    "H2_rate1h_residual": {
+      "rate": {
+        "n": 2311,
+        "ols_slope": -0.020977,
+        "ols_r2": 0.00029,
+        "bootstrap": {
+          "slope": -0.020977,
+          "ci95": [
+            -0.081962,
+            0.049443
+          ],
+          "excludes_zero": false,
+          "p_positive": 0.258,
+          "n_rows": 2311,
+          "n_stations": 20,
+          "B": 2000
+        },
+        "holdout": {
+          "n_train": 1156,
+          "n_test": 1155,
+          "fit_a": 0.6447,
+          "fit_b": -0.030321,
+          "brier_test_uncorrected": 0.1153,
+          "brier_test_corrected": 0.1217,
+          "delta_brier_heldout": 0.0064
+        },
+        "verdict": "NO USE"
+      },
+      "rate_rise": {
+        "n": 2311,
+        "ols_slope": -0.136099,
+        "ols_r2": 0.00507,
+        "bootstrap": {
+          "slope": -0.136099,
+          "ci95": [
+            -0.213429,
+            -0.066707
+          ],
+          "excludes_zero": true,
+          "p_positive": 0.001,
+          "n_rows": 2311,
+          "n_stations": 20,
+          "B": 2000
+        },
+        "holdout": {
+          "n_train": 1156,
+          "n_test": 1155,
+          "fit_a": 0.5925,
+          "fit_b": -0.181762,
+          "brier_test_uncorrected": 0.1153,
+          "brier_test_corrected": 0.1238,
+          "delta_brier_heldout": 0.0084
+        },
+        "verdict": "NO USE"
+      }
+    },
+    "H3_market_residual": {
+      "n": 376,
+      "ols_slope": -0.236749,
+      "ols_r2": 0.00088,
+      "bootstrap": {
+        "slope": -0.236749,
+        "ci95": [
+          -2.479483,
+          1.627927
+        ],
+        "excludes_zero": false,
+        "p_positive": 0.477,
+        "n_rows": 376,
+        "n_stations": 20,
+        "B": 2000
+      },
+      "holdout": {
+        "n_train": 188,
+        "n_test": 188,
+        "fit_a": 0.3671,
+        "fit_b": 0.327962,
+        "brier_test_uncorrected": 0.1275,
+        "brier_test_corrected": 0.1369,
+        "delta_brier_heldout": 0.0095
+      },
+      "verdict": "NO USE"
+    },
+    "H4_gefs_spread": {
+      "n": 2575,
+      "spearman_sd_vs_abs_err": 0.0353,
+      "spearman_p": 0.0735,
+      "quartiles": [
+        {
+          "q": 1,
+          "n": 644,
+          "sd_lo": null,
+          "sd_hi": 0.87,
+          "mean_abs_om_err": 1.2807
+        },
+        {
+          "q": 2,
+          "n": 644,
+          "sd_lo": 0.87,
+          "sd_hi": 1.33,
+          "mean_abs_om_err": 1.3424
+        },
+        {
+          "q": 3,
+          "n": 637,
+          "sd_lo": 1.33,
+          "sd_hi": 1.92,
+          "mean_abs_om_err": 1.3034
+        },
+        {
+          "q": 4,
+          "n": 650,
+          "sd_lo": 1.92,
+          "sd_hi": null,
+          "mean_abs_om_err": 1.3683
+        }
+      ],
+      "q4_over_q1_abs_err_ratio": 1.068,
+      "bootstrap": {
+        "slope": 0.025609,
+        "ci95": [
+          -0.032724,
+          0.090132
+        ],
+        "excludes_zero": false,
+        "p_positive": 0.826,
+        "n_rows": 2575,
+        "n_stations": 20,
+        "B": 2000
+      },
+      "verdict": "NO USE"
+    }
+  },
+  "misc": {
+    "elapsed_s": 5.5
+  }
+}
