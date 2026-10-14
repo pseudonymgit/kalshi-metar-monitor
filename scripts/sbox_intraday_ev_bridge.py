@@ -71,6 +71,12 @@ from core.intraday.multi_forecaster_fusion import (  # noqa: E402
     fuse_strike, ensure_schema, ensure_station_weights_defaults, load_weights,
     DEFAULT_WEIGHTS, FUSION_RULE_ID,
 )
+# Honest decision-time recalibration (2026-10-14) — the EV gate must price off a
+# CALIBRATED probability, not the raw fusion output. Single source of the
+# formula, shared with scripts/recalibrate_companion.py.
+from core.intraday.honest_calibration import (  # noqa: E402
+    honest_calibrated_p, station_ceiling,
+)
 
 # ── om_gfs NWP substitution (USE_OM_GFS_NWP), 2026-10-13 ─────────────────────
 # The om_gfs strike-crossing validation found Open-Meteo's bias-corrected GFS is
@@ -658,8 +664,9 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
                      weights: Optional[Dict] = None,
                      ticker_map: Optional[Dict[float, str]] = None,
                      pin_iso: Optional[str] = None,
-                     p_om_gfs_member=None):
-    """Return (p_fn, meta_fn): per-strike x -> p_fused and the fusion meta dict.
+                     p_om_gfs_member=None,
+                     station: Optional[str] = None):
+    """Return (p_fn, meta_fn): per-strike x -> CALIBRATED p and the fusion meta.
 
     Weighted fusion (WEIGHTED-FUSION-SPEC-2026-10-13): when `weights` is given
     the core is the per-station weighted blend over {gefs, analog, traj, market},
@@ -669,6 +676,16 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
     ``p_om_gfs_member`` (2026-10-13 WIRE FLIP) is an optional per-strike callable
     for the FIFTH member's P(high>=X). When supplied it joins the core blend and
     the composite confidence ADDITIVELY; when None the fusion is unchanged.
+
+    **EV gate (2026-10-14):** `p_fn` now returns the HONEST `calibrated_p`
+    (recalibrated to the decision-time axis, clamped at the per-station ceiling)
+    rather than the raw fused probability — every EV computation and the booked
+    `our_prob` therefore price off the calibrated signal. The raw fused value is
+    still carried as `p_fused` for the faithful record. A strike whose honest
+    calibration is unavailable raises, so the caller falls closed (no entry).
+
+    ``station`` selects the per-station honest ceiling; when omitted the pooled
+    ceiling is used.
     """
     cache: Dict[float, Dict] = {}
     mkt_cache: Dict[str, Optional[float]] = {}
@@ -681,6 +698,8 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
             mkt_cache[tk] = market_mid_prob(tk, pin_iso)
         return mkt_cache[tk]
 
+    _ceiling = station_ceiling(station) if station else None
+
     def _calc(x: float) -> Dict:
         if x in cache:
             return cache[x]
@@ -689,12 +708,22 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
                           weights=weights, use_weights=bool(weights),
                           p_market=_market_for(x),
                           p_om_gfs=(p_om_gfs_member(x)
-                                    if p_om_gfs_member is not None else None))
+                                    if p_om_gfs_member is not None else None),
+                          ceiling=_ceiling)
+        p_fused = float(row["p_fused"])
+        ce = _ceiling if _ceiling is not None else float(row.get("ceiling") or 0.84)
+        # Recalibrate the raw fused value to the honest decision-time axis. A
+        # non-finite raw value raises -> the strike can never be traded.
+        cal = honest_calibrated_p(p_fused, ce)
+        row = dict(row)
+        row["ceiling"] = round(float(ce), 4)
+        row["calibrated_p"] = cal
+        row["composite_conf"] = round(abs(cal - 0.5) * 2.0, 4)
         cache[x] = row
         return row
 
     def p_fn(x: float) -> float:
-        return _calc(x)["p_fused"]
+        return _calc(x)["calibrated_p"]
 
     return p_fn, _calc
 
@@ -866,7 +895,7 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         om_member = select_om_gfs_fusion_member(nwp_src, st, day_str, hsf, diag)
         p_fn, meta_fn = build_fused_p_fn(
             state, cdf, traj, hsf, weights=weights,
-            ticker_map=ticker_map, pin_iso=pin_iso,
+            ticker_map=ticker_map, pin_iso=pin_iso, station=st,
             p_om_gfs_member=(om_member.p_ge if om_member is not None else None))
         # F1 (2026-10-13): price the EV net of the modeled execution cost
         # (half-spread + slippage) instead of the bare mid, so a strike that is
@@ -885,6 +914,14 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         strike = picked["strike"]
         meta = meta_fn(strike)
 
+        # EV gate (2026-10-14): no entry without a usable honest calibrated
+        # probability. `p_fn` (which priced the EV) returns calibrated_p; if it
+        # is absent/null/0 the calibration failed and we FAIL CLOSED.
+        calibrated_p = meta.get("calibrated_p")
+        if not calibrated_p or calibrated_p != calibrated_p or float(calibrated_p) <= 0.0:
+            skipped.append((st, "no_calibrated_p_fail_closed"))
+            continue
+
         row = next((s for s in ladder if abs(s["strike"] - strike) < 1e-9), None)
         if row is None:
             skipped.append((st, "no_real_price_for_picked_strike"))
@@ -895,8 +932,10 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         both.update({"p_gefs": meta["p_gefs"], "p_analog": meta["p_analog"],
                      "p_trajectory": meta["p_trajectory"],
                      "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs})
-        fused_at_strike = meta["p_fused"]
-        our_prob = fused_at_strike if picked["side"] == "yes" else 1.0 - fused_at_strike
+        # EV gate (2026-10-14): estimate on the HONEST calibrated probability,
+        # not the raw fused value. `calibrated_p` was captured at the gate above.
+        our_prob = (calibrated_p if picked["side"] == "yes"
+                    else 1.0 - float(calibrated_p))
         mkt = row["yes_price"] if picked["side"] == "yes" else row["no_price"]
         ticker = row["ticker"]
         # E1 provenance: trade_uuid -> ticker -> snapshot_time -> mid_price.

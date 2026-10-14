@@ -51,13 +51,18 @@ def test_fuse_first_return_is_calibrated_and_matches_meta():
     assert cal <= meta["ceiling"] + 1e-9
 
 
-def test_build_fused_p_fn_selection_uses_pfused_key():
-    """Source contract: the p_fn handed to select_strike reads the calibrated key."""
+def test_build_fused_p_fn_selection_uses_calibrated_key():
+    """Source contract: the p_fn handed to select_strike reads the calibrated key.
+
+    EV gate (2026-10-14): selection now reads the explicit HONEST `calibrated_p`
+    key (the raw recursive-clamped `p_fused` is preserved alongside for the
+    record), so the EV is priced on the decision-time-calibrated signal.
+    """
     import inspect
     b = _load_bridge()
     src = inspect.getsource(b.build_fused_p_fn)
-    assert 'return _calc(x)["p_fused"]' in src, \
-        "selection probability must come from the fused/calibrated key"
+    assert 'return _calc(x)["calibrated_p"]' in src, \
+        "selection probability must come from the honest calibrated key"
 
 
 def test_saturated_inputs_cannot_reach_099_in_selection():
