@@ -1,0 +1,227 @@
+{
+  "rtma_probe_2026-07-28_2026-08-26.json": {
+    "window": [
+      "2026-07-28",
+      "2026-08-26"
+    ],
+    "n_rows": 562,
+    "rtma_pin": {
+      "n": 478,
+      "fcerr_pooled": 0.9838,
+      "fcerr_demeaned": 0.9322,
+      "resid_pooled": 0.6626,
+      "resid_demeaned": 0.5725,
+      "sign_disagree": 0.0481,
+      "pcross_resid": 0.7111,
+      "murphy_rate": {
+        "bs": 0.0866,
+        "rel": 0.0255,
+        "res": 0.0735,
+        "unc": 0.1351,
+        "ident_resid": 0.00059
+      },
+      "murphy_rtma": {
+        "bs": 0.3651,
+        "rel": 0.2397,
+        "res": 0.0096,
+        "unc": 0.1351,
+        "ident_resid": 9e-05
+      },
+      "murphy_blend": {
+        "bs": 0.1724,
+        "rel": 0.1007,
+        "res": 0.0617,
+        "unc": 0.1351,
+        "ident_resid": 0.00176
+      },
+      "rescue_rate": 0.2979,
+      "criterion_a_fcerr_lt_085": false,
+      "criterion_b_resid_lt_070": true,
+      "verdict": "DO_NOT_WIRE"
+    },
+    "rtma_hsf": {
+      "n": 478,
+      "fcerr_pooled": 0.9863,
+      "fcerr_demeaned": 0.9492,
+      "resid_pooled": 0.604,
+      "resid_demeaned": 0.5662,
+      "sign_disagree": 0.0941,
+      "pcross_resid": 0.7709,
+      "murphy_rate": {
+        "bs": 0.0866,
+        "rel": 0.0255,
+        "res": 0.0735,
+        "unc": 0.1351,
+        "ident_resid": 0.00059
+      },
+      "murphy_rtma": {
+        "bs": 0.247,
+        "rel": 0.132,
+        "res": 0.0208,
+        "unc": 0.1351,
+        "ident_resid": -0.00069
+      },
+      "murphy_blend": {
+        "bs": 0.138,
+        "rel": 0.0621,
+        "res": 0.0581,
+        "unc": 0.1351,
+        "ident_resid": 0.00109
+      },
+      "rescue_rate": 0.3617,
+      "criterion_a_fcerr_lt_085": false,
+      "criterion_b_resid_lt_070": true,
+      "verdict": "DO_NOT_WIRE"
+    }
+  },
+  "rtma_probe_2026-08-01_2026-08-07.json": {
+    "window": [
+      "2026-08-01",
+      "2026-08-07"
+    ],
+    "n_rows": 139,
+    "rtma_pin": {
+      "n": 120,
+      "fcerr_pooled": 0.9766,
+      "fcerr_demeaned": 0.9039,
+      "resid_pooled": 0.4869,
+      "resid_demeaned": 0.3681,
+      "sign_disagree": 0.0333,
+      "pcross_resid": 0.7237,
+      "murphy_rate": {
+        "bs": 0.0829,
+        "rel": 0.0218,
+        "res": 0.0551,
+        "unc": 0.1156,
+        "ident_resid": -0.00072
+      },
+      "murphy_rtma": {
+        "bs": 0.3708,
+        "rel": 0.2769,
+        "res": 0.0202,
+        "unc": 0.1156,
+        "ident_resid": 0.00148
+      },
+      "murphy_blend": {
+        "bs": 0.1701,
+        "rel": 0.1081,
+        "res": 0.0516,
+        "unc": 0.1156,
+        "ident_resid": 0.00196
+      },
+      "rescue_rate": 0.2308,
+      "criterion_a_fcerr_lt_085": false,
+      "criterion_b_resid_lt_070": true,
+      "verdict": "DO_NOT_WIRE"
+    },
+    "rtma_hsf": {
+      "n": 120,
+      "fcerr_pooled": 0.983,
+      "fcerr_demeaned": 0.9338,
+      "resid_pooled": 0.5029,
+      "resid_demeaned": 0.4732,
+      "sign_disagree": 0.075,
+      "pcross_resid": 0.7786,
+      "murphy_rate": {
+        "bs": 0.0829,
+        "rel": 0.0218,
+        "res": 0.0551,
+        "unc": 0.1156,
+        "ident_resid": -0.00072
+      },
+      "murphy_rtma": {
+        "bs": 0.2451,
+        "rel": 0.1555,
+        "res": 0.0258,
+        "unc": 0.1156,
+        "ident_resid": 0.0002
+      },
+      "murphy_blend": {
+        "bs": 0.1335,
+        "rel": 0.0735,
+        "res": 0.0532,
+        "unc": 0.1156,
+        "ident_resid": 0.00235
+      },
+      "rescue_rate": 0.2308,
+      "criterion_a_fcerr_lt_085": false,
+      "criterion_b_resid_lt_070": true,
+      "verdict": "DO_NOT_WIRE"
+    }
+  },
+  "rtma_probe_2026-08-15_2026-08-21.json": {
+    "window": [
+      "2026-08-15",
+      "2026-08-21"
+    ],
+    "n_rows": 135,
+    "rtma_pin": {
+      "n": 110,
+      "fcerr_pooled": 0.9886,
+      "fcerr_demeaned": 0.9448,
+      "resid_pooled": 0.7928,
+      "resid_demeaned": 0.7942,
+      "sign_disagree": 0.0455,
+      "pcross_resid": 0.6658,
+      "murphy_rate": {
+        "bs": 0.0795,
+        "rel": 0.0326,
+        "res": 0.0829,
+        "unc": 0.1307,
+        "ident_resid": 0.00091
+      },
+      "murphy_rtma": {
+        "bs": 0.3557,
+        "rel": 0.2337,
+        "res": 0.008,
+        "unc": 0.1307,
+        "ident_resid": 0.00066
+      },
+      "murphy_blend": {
+        "bs": 0.1633,
+        "rel": 0.1177,
+        "res": 0.0847,
+        "unc": 0.1307,
+        "ident_resid": 0.00031
+      },
+      "rescue_rate": 0.4545,
+      "criterion_a_fcerr_lt_085": false,
+      "criterion_b_resid_lt_070": false,
+      "verdict": "DO_NOT_WIRE"
+    },
+    "rtma_hsf": {
+      "n": 110,
+      "fcerr_pooled": 0.989,
+      "fcerr_demeaned": 0.9565,
+      "resid_pooled": 0.6962,
+      "resid_demeaned": 0.7148,
+      "sign_disagree": 0.1091,
+      "pcross_resid": 0.7331,
+      "murphy_rate": {
+        "bs": 0.0795,
+        "rel": 0.0326,
+        "res": 0.0829,
+        "unc": 0.1307,
+        "ident_resid": 0.00091
+      },
+      "murphy_rtma": {
+        "bs": 0.2334,
+        "rel": 0.1397,
+        "res": 0.038,
+        "unc": 0.1307,
+        "ident_resid": -0.00102
+      },
+      "murphy_blend": {
+        "bs": 0.1277,
+        "rel": 0.0793,
+        "res": 0.083,
+        "unc": 0.1307,
+        "ident_resid": -0.00074
+      },
+      "rescue_rate": 0.6364,
+      "criterion_a_fcerr_lt_085": false,
+      "criterion_b_resid_lt_070": false,
+      "verdict": "DO_NOT_WIRE"
+    }
+  }
+}

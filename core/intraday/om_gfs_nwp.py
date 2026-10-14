@@ -12,10 +12,14 @@ GFS on BOTH axes over 2026-04-21..2026-10-09:
   * level MAE        0.680 F (bias-corrected) vs 2.095 F raw local GFS  (-1.415 F)
   * strike-crossing  Brier 0.1079 vs 0.1597
 
-It is however COLLINEAR with the rate_1h nowcast (fcerr 0.99 >= 0.85), so it is
-NOT a diversity member. This module exists ONLY for the LEVER/level-axis
-substitution: when enabled, the SBOX bridge's NWP component uses om_gfs
-(bias-corrected) instead of the raw local GFS-seeded WS-P distribution.
+Independence correction (2026-10-14, docs/plans/RTMA-INDEPENDENCE-HONEST-2026-10-14.md):
+the earlier "COLLINEAR, fcerr 0.99" claim was LEVEL correlation (0.9924), which is
+meaningless between two temperature views — all temps correlate. On the ERROR
+domain the honest re-run gets fcerr 0.21 (< 0.85) => om_gfs is NOT collinear and is
+WIRED as a fusion member (USE_OM_GFS_FUSION). Separately, this module still exists
+for the LEVER/level-axis substitution (USE_OM_GFS_NWP): when enabled, the SBOX
+bridge's NWP component uses om_gfs (bias-corrected) instead of the raw local
+GFS-seeded WS-P distribution.
 
 Source: Open-Meteo, free + keyless.
   * backfill : https://historical-forecast-api.open-meteo.com/v1/forecast
