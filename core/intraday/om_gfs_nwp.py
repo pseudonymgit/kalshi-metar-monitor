@@ -73,8 +73,14 @@ def om_gfs_enabled() -> bool:
 
 
 def om_gfs_fusion_enabled() -> bool:
-    """True when om_gfs additionally votes as a fifth fusion member."""
-    return os.environ.get(OM_GFS_FUSION_FLAG_ENV, "0") == "1"
+    """NO-OP (Workstream AF, 2026-10-14).
+
+    om_gfs is now the SOLE forecast behind USE_OM_GFS_NWP; there is no fusion
+    left for a fifth member to join, so this lever is retired. Kept importable
+    (and always False) so pre-existing callers/tests do not break, but it can no
+    longer enable a fusion vote.
+    """
+    return False
 
 
 # ── constants (embedded, must match the validated study recipe) ─────────────
@@ -181,26 +187,38 @@ def _http_get(url: str, timeout: int = 25) -> bytes:
         return r.read()
 
 
+# Workstream AF (2026-10-14): the daily variable is parametrized so the same
+# machinery serves the HIGH lane (Tmax) and the LOW lane (Tmin). The default
+# stays 'temperature_2m_max' so every pre-existing caller is byte-identical.
+VAR_TMAX = "temperature_2m_max"
+VAR_TMIN = "temperature_2m_min"
+
+def _daily_var(market_type: Optional[str]) -> str:
+    """market_type -> OM daily variable. LOW -> Tmin, everything else -> Tmax."""
+    return VAR_TMIN if (market_type or "HIGH").upper() == "LOW" else VAR_TMAX
+
+
 def _build_url(station: str, lat: float, lon: float, tz: str,
-               start_date: str, end_date: str, live: bool) -> str:
+               start_date: str, end_date: str, live: bool,
+               daily_var: str = VAR_TMAX) -> str:
     if live:
         today = date.today()
         past = max(0, (today - date.fromisoformat(start_date)).days)
         fwd = max(1, (date.fromisoformat(end_date) - today).days + 1)
-        q = (f"?latitude={lat}&longitude={lon}&daily=temperature_2m_max"
+        q = (f"?latitude={lat}&longitude={lon}&daily={daily_var}"
              f"&models={OM_MODEL}&past_days={past}&forecast_days={fwd}"
              f"&timezone={urllib.parse.quote(tz)}")
         return LIVE_BASE + q
-    q = (f"?latitude={lat}&longitude={lon}&daily=temperature_2m_max"
+    q = (f"?latitude={lat}&longitude={lon}&daily={daily_var}"
          f"&models={OM_MODEL}&start_date={start_date}&end_date={end_date}"
          f"&timezone={urllib.parse.quote(tz)}")
     return HIST_BASE + q
 
 
-def _parse_daily(d: dict) -> Dict[str, float]:
+def _parse_daily(d: dict, daily_var: str = VAR_TMAX) -> Dict[str, float]:
     daily = d.get("daily", {}) or {}
     times = daily.get("time", []) or []
-    series = daily.get("temperature_2m_max_" + OM_MODEL) or daily.get("temperature_2m_max")
+    series = daily.get(daily_var + "_" + OM_MODEL) or daily.get(daily_var)
     out: Dict[str, float] = {}
     if not series:
         return out
@@ -215,16 +233,17 @@ def _parse_daily(d: dict) -> Dict[str, float]:
 
 
 def _fetch_one(station: str, lat: float, lon: float, tz: str,
-               start_date: str, end_date: str, live: bool) -> Dict[str, float]:
-    """Fetch one station's daily Tmax over [start, end] (one request)."""
-    url = _build_url(station, lat, lon, tz, start_date, end_date, live)
+               start_date: str, end_date: str, live: bool,
+               daily_var: str = VAR_TMAX) -> Dict[str, float]:
+    """Fetch one station's daily variable (Tmax/Tmin) over [start, end]."""
+    url = _build_url(station, lat, lon, tz, start_date, end_date, live, daily_var)
     last_err: Optional[Exception] = None
     for attempt in range(MAX_ATTEMPTS):
         if attempt:
             time.sleep(DELAY_S * (2 ** attempt))
         try:
             data = json.loads(_http_get(url).decode("utf-8", "replace"))
-            return _parse_daily(data)
+            return _parse_daily(data, daily_var)
         except Exception as e:  # noqa: BLE001
             last_err = e
     raise RuntimeError(f"{station} fetch failed: {type(last_err).__name__}: {last_err}")
@@ -233,16 +252,25 @@ def _fetch_one(station: str, lat: float, lon: float, tz: str,
 # ── public fetch API ─────────────────────────────────────────────────────────
 def fetch_om_gfs_many(stations: List[str], start_date: str, end_date: str, *,
                       live: bool = False, force: bool = False,
-                      delay_s: Optional[float] = None) -> Dict[Tuple[str, str], float]:
-    """{(station, iso_date): om_gfs Tmax °F} for every requested station-date.
+                      delay_s: Optional[float] = None,
+                      market_type: str = "HIGH") -> Dict[Tuple[str, str], float]:
+    """{(station, iso_date): om_gfs daily temp °F} for every station-date.
 
     One HTTP request per station (spanning the whole date range), spaced
     >= delay_s (default DELAY_S) apart. Results are cached to disk; a fully
     cached station needs no network. Per-station failures are logged and skipped
     so one bad station cannot abort the batch.
+
+    Workstream AF (2026-10-14): ``market_type='LOW'`` fetches the daily MINIMUM
+    instead of the maximum, and the disk cache key is namespaced by market_type
+    so Tmax and Tmin never collide. Default 'HIGH' is byte-identical to pre-AF.
     """
     delay = DELAY_S if delay_s is None else float(delay_s)
-    src = "live" if live else "hist"
+    daily_var = _daily_var(market_type)
+    # Namespace the cache src by variable so a HIGH row can never be served to a
+    # LOW caller (and vice-versa). HIGH keeps the legacy 'live'/'hist' keys.
+    base = "live" if live else "hist"
+    src = base if daily_var == VAR_TMAX else f"{base}|{daily_var}"
     coords = _coords()
     cache = _cache_load()
     wanted = _daterange(start_date, end_date)
@@ -257,7 +285,8 @@ def fetch_om_gfs_many(stations: List[str], start_date: str, end_date: str, *,
             lat, lon = coords[st]
             tz = station_timezone_name(st)
             try:
-                got = _fetch_one(st, lat, lon, tz, start_date, end_date, live)
+                got = _fetch_one(st, lat, lon, tz, start_date, end_date, live,
+                                 daily_var)
             except Exception as e:  # noqa: BLE001
                 _log(f"{st} FAILED: {e}")
                 got = {}
@@ -279,6 +308,7 @@ def rolling_bias_f(station: str, as_of_date: str, *,
                    window_days: int = BIAS_WINDOW_DAYS,
                    min_obs: int = MIN_BIAS_OBS,
                    live: bool = False,
+                   market_type: str = "HIGH",
                    cache: Optional[Dict[str, float]] = None) -> Optional[float]:
     """Mean(om_gfs - settled truth) over the `window_days` before `as_of_date`.
 
@@ -294,7 +324,7 @@ def rolling_bias_f(station: str, as_of_date: str, *,
     # caller is fetching the CURRENT day live. Looking the residuals up under a
     # `live` key when the bridge passes live=True silently yielded None (no bias
     # correction at all). The memo key therefore excludes `live`.
-    key = (station, as_of_date, window_days)
+    key = (station, as_of_date, window_days, market_type)
     if key in _BIAS_MEMO:
         return _BIAS_MEMO[key]
 
@@ -313,10 +343,10 @@ def rolling_bias_f(station: str, as_of_date: str, *,
         try:
             for ds, v in conn.execute(
                     "SELECT local_trading_date, settlement_temp_f FROM settlement_truth "
-                    "WHERE station=? AND market_type='HIGH' AND trustworthy=1 "
+                    "WHERE station=? AND market_type=? AND trustworthy=1 "
                     "AND settlement_temp_f IS NOT NULL "
                     "AND local_trading_date >= ? AND local_trading_date <= ?",
-                    (station, d0.isoformat(), d1.isoformat())):
+                    (station, market_type, d0.isoformat(), d1.isoformat())):
                 truth[ds] = float(v)
         finally:
             conn.close()
@@ -354,8 +384,9 @@ def rolling_bias_f(station: str, as_of_date: str, *,
 # ── state builder ────────────────────────────────────────────────────────────
 def from_om_gfs(station: str, om_gfs_tmax_f: float, date_str: str, *,
                 sigma: Optional[float] = None, high_so_far: Optional[float] = None,
-                bias_f: Optional[float] = None) -> DistributionState:
-    """Build a DistributionState from an om_gfs daily Tmax (°F).
+                bias_f: Optional[float] = None,
+                market_type: str = "HIGH") -> DistributionState:
+    """Build a DistributionState from an om_gfs daily temp (°F).
 
     mu    = om_gfs_raw - rolling_bias   (the validated bias-corrected recipe).
     sigma = k * SIGMA_RATE_F (default k=SIGMA_K_DEFAULT) or an explicit value.
@@ -363,6 +394,9 @@ def from_om_gfs(station: str, om_gfs_tmax_f: float, date_str: str, *,
     The WS-P GEFS bias/offset/month terms are deliberately NOT re-applied: om_gfs
     is already bias-corrected upstream, so stacking the GEFS-fitted terms would
     double-correct. This matches the study's om_gfs_bc column.
+
+    ``market_type`` is provenance only here (HIGH -> Tmax, LOW -> Tmin); the
+    caller passes the matching value fetched for that axis. Default 'HIGH'.
     """
     sig = float(SIGMA_K_DEFAULT * SIGMA_RATE_F) if sigma is None else float(sigma)
     sig = max(0.8, sig)
@@ -373,20 +407,27 @@ def from_om_gfs(station: str, om_gfs_tmax_f: float, date_str: str, *,
 
 def om_gfs_state_for_day(station: str, date_str: str, *, live: bool = True,
                          sigma: Optional[float] = None,
-                         high_so_far: Optional[float] = None) -> Optional[DistributionState]:
+                         high_so_far: Optional[float] = None,
+                         market_type: str = "HIGH") -> Optional[DistributionState]:
     """Cache-aware one-call convenience: fetch + bias-correct -> DistributionState.
 
     Returns None (never raises) when the source has no value for the day, so the
     caller can fall back to the raw local GFS-seeded distribution.
+
+    ``market_type='LOW'`` fetches the daily MINIMUM and bias-corrects it against
+    the LOW settlement truth (Tmin); the returned state prices the LOW axis
+    P(daily_min <= X). Default 'HIGH' is byte-identical to pre-AF.
     """
     try:
-        got = fetch_om_gfs_many([station], date_str, date_str, live=live)
+        got = fetch_om_gfs_many([station], date_str, date_str, live=live,
+                                market_type=market_type)
     except Exception as e:  # noqa: BLE001
         _log(f"{station} fetch error: {type(e).__name__}: {e}")
         return None
     v = got.get((station, date_str))
     if v is None:
         return None
-    bias = rolling_bias_f(station, date_str, live=live)
+    bias = rolling_bias_f(station, date_str, live=live, market_type=market_type)
     return from_om_gfs(station, v, date_str, sigma=sigma,
-                       high_so_far=high_so_far, bias_f=bias)
+                       high_so_far=high_so_far, bias_f=bias,
+                       market_type=market_type)

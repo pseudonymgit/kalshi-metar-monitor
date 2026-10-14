@@ -69,13 +69,13 @@ from core.strike_selection_ev import select_strike, p_high_ge as gauss_p_high_ge
 from core.intraday.multi_forecaster_fusion import (  # noqa: E402
     TrajectoryForecaster, build_live_epoch, build_analog_cdf_today,
     fuse_strike, ensure_schema, ensure_station_weights_defaults, load_weights,
-    DEFAULT_WEIGHTS, FUSION_RULE_ID,
+    grade_from_confidence, DEFAULT_WEIGHTS, FUSION_RULE_ID,
 )
 # Honest decision-time recalibration (2026-10-14) — the EV gate must price off a
 # CALIBRATED probability, not the raw fusion output. Single source of the
 # formula, shared with scripts/recalibrate_companion.py.
 from core.intraday.honest_calibration import (  # noqa: E402
-    honest_calibrated_p, station_ceiling,
+    honest_calibrated_p, station_ceiling, POOLED_CEILING,
 )
 
 # ── om_gfs NWP substitution (USE_OM_GFS_NWP), 2026-10-13 ─────────────────────
@@ -94,6 +94,24 @@ try:
     _OM_GFS_IMPORTED = True
 except Exception:  # pragma: no cover - module missing => substitution unavailable
     _OM_GFS_IMPORTED = False
+
+
+# ── Workstream AF (2026-10-14): om_gfs is the SOLE forecast ──────────────────
+# Every analysis this week (fusion-weight sweep, 3-combiner comparison, LOW
+# side-by-side) concluded the same thing: om_gfs(bc,ps) Tmax is the best single
+# predictor (Brier 0.107) and every fusion variant loses to it. The GEFS/analog/
+# trajectory/market ensemble is dead weight, so behind the NWP-substitution flag
+# the bridge now forecasts on the single om_gfs value. The fusion machinery
+# below stays importable and intact — re-enabling it is a one-line change — but
+# it is NOT on the default path.
+def sole_forecast_enabled() -> bool:
+    """True when the bridge should forecast on om_gfs ALONE (Workstream AF).
+
+    Keyed on USE_OM_GFS_NWP: when the om_gfs NWP substitution is on, om_gfs IS
+    the sole forecast. When it is off (or the module is unavailable) the bridge
+    falls back to the legacy multi-forecaster fusion — the rollback path.
+    """
+    return bool(_OM_GFS_IMPORTED and om_gfs_enabled())
 from core.station_time import (  # noqa: E402
     is_within_entry_window, station_timezone_name, settlement_time_utc,
 )
@@ -443,7 +461,7 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
          probs.get("n_analog"), probs.get("n_traj"),
          probs.get("agreement"), probs.get("edge_mult"),
          probs.get("traj_verdict"), probs.get("traj_mult"),
-         FUSION_RULE_ID, now,
+         (probs.get("fusion_rule") or FUSION_RULE_ID), now,
          probs.get("grade_entered"), probs.get("grade_cap_usd"),
          probs.get("calibrated_p"), probs.get("p_market"),
          probs.get("composite_conf"), probs.get("grade"),
@@ -729,6 +747,66 @@ def build_fused_p_fn(state, cdf, traj: TrajectoryForecaster, hsf: Optional[float
     return p_fn, _calc
 
 
+# Workstream AF (2026-10-14): the sole-forecast probability rule id, recorded in
+# the companion table in place of the retired fusion rule.
+SOLE_FORECAST_RULE_ID = "om_gfs_sole:bc(bias-corrected,per-station);calibrated(honest_ceiling)"
+
+
+def build_om_gfs_sole_p_fn(state, station: Optional[str] = None):
+    """Return (p_fn, meta_fn): per-strike x -> CALIBRATED p for the SOLE om_gfs.
+
+    Workstream AF (2026-10-14): the forecast is the single om_gfs
+    (bias-corrected, per-station) DistributionState — no GEFS/analog/trajectory/
+    market members. ``state.p_ge(x)`` is P(high >= x) for the station-day; the
+    value is recalibrated to the SAME honest decision-time axis the fusion path
+    used (``honest_calibrated_p`` clamped at the per-station ceiling), so the EV
+    gate and booked ``our_prob`` are directly comparable to the pre-AF book —
+    only the raw signal changed (one om_gfs value instead of a blend).
+
+    The meta row keeps the fusion row's SHAPE (p_gefs/p_analog/p_trajectory/
+    p_fused/agreement/edge_mult/...) so the book, companion table and downstream
+    reports stay schema-compatible. p_gefs and p_fused both carry the om_gfs raw
+    P(high>=X) (under USE_OM_GFS_NWP the NWP member IS om_gfs); the dropped
+    members are None, with the single-source provenance recorded explicitly.
+    """
+    cache: Dict[float, Dict] = {}
+    _ceiling = station_ceiling(station) if station else float(POOLED_CEILING)
+
+    def _calc(x: float) -> Dict:
+        if x in cache:
+            return cache[x]
+        p_raw = float(state.p_ge(x))
+        ce = _ceiling if _ceiling is not None else float(POOLED_CEILING)
+        try:
+            cal = honest_calibrated_p(p_raw, ce)
+        except ValueError:
+            cal = float("nan")
+        conf = abs(cal - 0.5) * 2.0 if cal == cal else None
+        row = {
+            "p_gefs": round(p_raw, 4),
+            "p_analog": None, "p_trajectory": None,
+            "p_fused": round(p_raw, 4),
+            "agreement": "sole", "edge_mult": 1.0,
+            "traj_verdict": "unavailable", "traj_mult": 1.0,
+            "p_market": None, "p_om_gfs": round(p_raw, 4),
+            "ceiling": round(float(ce), 4),
+            "calibrated_p": cal,
+            "composite_conf": (round(conf, 4) if conf is not None else None),
+            "grade": (grade_from_confidence(conf) if conf is not None else None),
+            "use_weights": False,
+            "agreement_boost": {"enabled": False},
+            "weights_applied": {"om_gfs": 1.0},
+            "sole_forecast": True, "fusion_rule": SOLE_FORECAST_RULE_ID,
+        }
+        cache[x] = row
+        return row
+
+    def p_fn(x: float) -> float:
+        return _calc(x)["calibrated_p"]
+
+    return p_fn, _calc
+
+
 def select_om_gfs_fusion_member(nwp_src, st, day_str, hsf, diag=None):
     """om_gfs as the FIFTH fusion member (2026-10-13 WIRE FLIP, ADDITIVE).
 
@@ -863,41 +941,53 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             skipped.append((st, "no_strike_ladder"))
             continue
 
-        # -- Item 5: independent analog CDF forecaster (extend series to today) --
-        try:
-            cdf = build_analog_cdf_today(st, day_str, high_so_far=hsf)
-        except Exception as e:
-            skipped.append((st, f"analog_cdf_error:{type(e).__name__}"))
-            continue
+        # Workstream AF (2026-10-14): behind USE_OM_GFS_NWP, om_gfs is the SOLE
+        # forecast. The analog CDF and trajectory gate are fusion MEMBERS only,
+        # so the sole path skips them entirely (also a real perf win — no
+        # climatology build). The legacy fusion stays available when the flag is
+        # off, so rollback is a flag flip.
+        sole = sole_forecast_enabled()
+        cdf = None
+        traj = None
+        if not sole:
+            # -- Item 5: independent analog CDF forecaster (extend series to today) --
+            try:
+                cdf = build_analog_cdf_today(st, day_str, high_so_far=hsf)
+            except Exception as e:
+                skipped.append((st, f"analog_cdf_error:{type(e).__name__}"))
+                continue
 
-        # -- Item 4: trajectory analog gate -> p_trajectory + directional verdict --
-        try:
-            q_epoch = build_live_epoch(st, day_start, day_end, now_utc)
-            if q_epoch is None:
+            # -- Item 4: trajectory analog gate -> p_trajectory + directional verdict --
+            try:
+                q_epoch = build_live_epoch(st, day_start, day_end, now_utc)
+                if q_epoch is None:
+                    traj = None
+                else:
+                    traj = shared_traj.fit(q_epoch)
+            except Exception as e:
                 traj = None
-            else:
-                traj = shared_traj.fit(q_epoch)
-        except Exception as e:
-            traj = None
-            diag.append({"station": st, "traj_error": f"{type(e).__name__}:{e}"})
-        if traj is None:
-            skipped.append((st, "no_trajectory_query_epoch"))
-            continue
+                diag.append({"station": st, "traj_error": f"{type(e).__name__}:{e}"})
+            if traj is None:
+                skipped.append((st, "no_trajectory_query_epoch"))
+                continue
 
-        # -- fuse per strike; select on the FUSED probability --
-        # F2/weighted (2026-10-13): per-station weights (equal by default) and the
-        # market mid at the 13:30 decision pin as the 4th fusion component.
+        # -- forecast per strike; select on the CALIBRATED probability --
+        # AF (2026-10-14): sole om_gfs when the NWP-substitution flag is on, else
+        # the legacy weighted fusion (F2 2026-10-13: per-station weights + the
+        # market mid at the 13:30 pin as the 4th component).
         weights = load_weights(conn, st) if conn is not None else dict(DEFAULT_WEIGHTS)
         pin_iso = pinned_decision_utc(st, day_str)
         ticker_map = {r["strike"]: r.get("ticker") for r in ladder}
-        # om_gfs 5th fusion member (2026-10-13 WIRE FLIP, ADDITIVE to the
-        # USE_OM_GFS_NWP lever substitution). Only active behind
-        # USE_OM_GFS_FUSION and only when the NWP slot is NOT already om_gfs.
-        om_member = select_om_gfs_fusion_member(nwp_src, st, day_str, hsf, diag)
-        p_fn, meta_fn = build_fused_p_fn(
-            state, cdf, traj, hsf, weights=weights,
-            ticker_map=ticker_map, pin_iso=pin_iso, station=st,
-            p_om_gfs_member=(om_member.p_ge if om_member is not None else None))
+        if sole:
+            p_fn, meta_fn = build_om_gfs_sole_p_fn(state, station=st)
+        else:
+            # om_gfs 5th fusion member is a NO-OP now (om_gfs_fusion_enabled() is
+            # False); the call is retained so the legacy path is byte-identical.
+            om_member = select_om_gfs_fusion_member(nwp_src, st, day_str, hsf, diag)
+            p_fn, meta_fn = build_fused_p_fn(
+                state, cdf, traj, hsf, weights=weights,
+                ticker_map=ticker_map, pin_iso=pin_iso, station=st,
+                p_om_gfs_member=(om_member.p_ge if om_member is not None else None))
         # F1 (2026-10-13): price the EV net of the modeled execution cost
         # (half-spread + slippage) instead of the bare mid, so a strike that is
         # only +EV on the mid is correctly rejected once crossing the book counts.
@@ -929,10 +1019,12 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             continue
 
         p_gefs = state.p_ge(strike)
+        n_analog = cdf.n_analogs if cdf is not None else None
+        n_traj = traj.n_analogs if traj is not None else None
         both = dict(meta)
         both.update({"p_gefs": meta["p_gefs"], "p_analog": meta["p_analog"],
                      "p_trajectory": meta["p_trajectory"],
-                     "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs})
+                     "n_analog": n_analog, "n_traj": n_traj})
         # EV gate (2026-10-14): estimate on the HONEST calibrated probability,
         # not the raw fused value. `calibrated_p` was captured at the gate above.
         our_prob = (calibrated_p if picked["side"] == "yes"
@@ -947,7 +1039,10 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # Our proposition is P(high>=strike): YES side = we expect the high to
         # reach/exceed the strike -> trajectory direction "up"; NO -> "down".
         gate_dir = "up" if picked["side"] == "yes" else "down"
-        verdict = traj.gate_verdict(gate_dir, abs(our_prob - 0.5) * 2.0)
+        # AF: on the sole path the trajectory gate is absent, so the verdict is
+        # simply "unavailable" (diagnostic only — it never gates the entry).
+        verdict = (traj.gate_verdict(gate_dir, abs(our_prob - 0.5) * 2.0)
+                   if traj is not None else {"verdict": "unavailable"})
 
         diag.append({"station": st, "day": day_str,
                      "nwp_src": nwp_src,
@@ -965,8 +1060,9 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                      "composite_conf": both.get("composite_conf"),
                      "ceiling": both.get("ceiling"),
                      "agreement": both["agreement"], "traj_verdict": both["traj_verdict"],
-                     "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
+                     "n_analog": n_analog, "n_traj": n_traj,
                      "gate": verdict["verdict"], "p_warm": verdict.get("p_warm"),
+                     "sole_forecast": sole,
                      "n_strikes": len(ladder)})
         if report:
             continue
@@ -1031,10 +1127,11 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
 
         prob_payload = {"p_gefs": both["p_gefs"], "p_analog": both["p_analog"],
                         "p_trajectory": both["p_trajectory"], "p_fused": both["p_fused"],
-                        "n_analog": cdf.n_analogs, "n_traj": traj.n_analogs,
+                        "n_analog": n_analog, "n_traj": n_traj,
                         "agreement": both["agreement"], "edge_mult": both["edge_mult"],
                         "traj_verdict": both["traj_verdict"], "traj_mult": both["traj_mult"],
                         "grade_entered": grade, "grade_cap_usd": grade_cap,
+                        "fusion_rule": both.get("fusion_rule"),
                         # F2: calibrated p_fused + weighted-fusion provenance.
                         "calibrated_p": both.get("calibrated_p"),
                         "p_market": both.get("p_market"),
