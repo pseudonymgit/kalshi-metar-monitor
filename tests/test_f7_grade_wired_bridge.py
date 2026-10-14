@@ -46,7 +46,8 @@ def test_grade_rejects_low_edge_as_F():
 
 def test_grade_cap_binds_below_the_ladder():
     b = _load_bridge()
-    # ladder would give $25 at conf>0.85; a C grade caps it to $5.
+    # ladder gives $10 at conf>0.70 (capped at $10, Dan 2026-10-13); a C grade
+    # caps it to $5.
     assert min(b._position_size_usd(0.95), b.grade_position_cap("C")) == 5.0
-    # S grade keeps the ladder max.
-    assert min(b._position_size_usd(0.95), b.grade_position_cap("S")) == 25.0
+    # S grade keeps the (now $10) ladder max.
+    assert min(b._position_size_usd(0.95), b.grade_position_cap("S")) == 10.0
