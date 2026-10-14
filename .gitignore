@@ -58,3 +58,8 @@ data/gefs_work/
 
 # Governance stopping record MUST be committed (Workstream F off-switch)
 !stopping-record.json
+
+# Honest look-ahead-free signal-accuracy re-benchmark (committed analysis artifact, 2026-10-14)
+!artifacts/honest-signal-accuracy/
+!artifacts/honest-signal-accuracy/*.json
+!data/honest_signal_accuracy_2026-10-14.json
