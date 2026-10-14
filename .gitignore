@@ -63,3 +63,7 @@ data/gefs_work/
 !artifacts/honest-signal-accuracy/
 !artifacts/honest-signal-accuracy/*.json
 !data/honest_signal_accuracy_2026-10-14.json
+
+# Settlement-axis ground truth + re-settle plan (committed analysis artifact, 2026-10-14)
+!artifacts/settlement-axis-truth/
+!artifacts/settlement-axis-truth/*.json
