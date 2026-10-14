@@ -454,17 +454,18 @@ def _position_size_usd(confidence: float) -> float:
     """Dan's sizing ladder (revised 2026-10-12) — $200 bankroll.
 
     Capped at $10 (Dan, 2026-10-13: "let's scale to max $10"). The prior $25
-    top tier is removed — under the honest ceiling (~0.82-0.86, max composite
-    confidence ~0.72) it was unreachable anyway, and a $200 bankroll should not
-    risk >5% on one trade.
+    top tier is removed. Dan 2026-10-14: "$10 trades acceptable above 75".
+    Given confidence = |p-0.5|*2, p>0.75 == confidence>0.50, so the $10 tier
+    now opens at confidence>0.50 (probability>0.75); $5 tier at confidence>0.30
+    (probability>0.65); below that, no trade.
 
-    - high confidence (>0.70): $10 (max)
-    - medium confidence (>0.50): $5
-    - below 0.5: $0 (no trade)
+    - high confidence (>0.50, i.e. p>0.75): $10 (max)
+    - medium confidence (>0.30, i.e. p>0.65): $5
+    - below: $0 (no trade)
     """
-    if confidence > 0.70:
+    if confidence > 0.50:
         return 10.0
-    elif confidence > 0.50:
+    elif confidence > 0.30:
         return 5.0
     return 0.0
 
