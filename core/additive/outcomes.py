@@ -153,8 +153,12 @@ def _mk_outcome(temp_f, market_type="HIGH", strike_price=None, strike_type=None)
     if out["strike_price"] is not None:
         from core.settlement_labels import strike_crossing_yes
         try:
+            # Resolve from the market's OWN strike_type when the row carries it
+            # (greater/less/between); the market_type fallback is greater-tail
+            # only and mislabels an "or below" (-less) market.
             out["outcome_yes"] = 1 if strike_crossing_yes(
-                out["outcome_temp_f"], out["strike_price"], out["market_type"]
+                out["outcome_temp_f"], out["strike_price"], out["market_type"],
+                strike_type=strike_type,
             ) else 0
         except ValueError:
             out["outcome_yes"] = None

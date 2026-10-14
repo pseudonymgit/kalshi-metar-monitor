@@ -48,6 +48,7 @@ __all__ = [
     "assert_canonical_immutable",
     "canonical_settle_yes",
     "canonical_outcome",
+    "outcome_from_market_result",
     "verify_regeneration_invariants",
     "ImmutableSettlementError",
 ]
@@ -121,23 +122,58 @@ def is_canonical_temp_source(temp_source: Any) -> bool:
 
 
 def canonical_settle_yes(settlement_temp_f: float, strike_price: float,
-                         market_type: str = "HIGH") -> int:
-    """Canonical strike-crossing YES label (1/0). HIGH: temp > strike (strict)."""
-    return 1 if strike_crossing_yes(settlement_temp_f, strike_price, market_type) else 0
+                         market_type: str = "HIGH",
+                         strike_type: Optional[str] = None,
+                         floor_strike: Optional[float] = None,
+                         cap_strike: Optional[float] = None) -> int:
+    """Canonical YES label (1/0), resolved from the market's OWN strike_type.
+
+    Kalshi daily temperature markets offer BOTH an "or above" tail
+    (``strike_type='greater'``: YES iff temp > floor) and an "or below" tail
+    (``strike_type='less'``: YES iff temp < cap) for the same event; the `-T##`
+    ticker is ambiguous between them. Pass ``strike_type`` and the label uses the
+    market's own operator. When ``strike_type`` is omitted the legacy
+    market_type fallback (HIGH => greater, LOW => less) is used — correct only
+    for the greater-tail case. Both tails are STRICT (equality == not-ITM).
+    """
+    return 1 if strike_crossing_yes(
+        settlement_temp_f, strike_price, market_type,
+        strike_type, floor_strike, cap_strike) else 0
 
 
 def canonical_outcome(signal_direction: str, market_type: str, settlement_temp_f: float,
-                      strike_price: float) -> str:
+                      strike_price: float, strike_type: Optional[str] = None,
+                      floor_strike: Optional[float] = None,
+                      cap_strike: Optional[float] = None) -> str:
     """'correct'/'incorrect' from the STRICT strike-crossing axis.
 
-    HIGH: YES (ITM) iff temp > strike; LOW: YES iff temp < strike. A trade whose
-    signal_direction predicted the ITM side is 'correct'. Equality == not-ITM.
+    ITM is resolved from the market's own ``strike_type`` when supplied
+    (greater: temp > floor; less: temp < cap; between: floor<=temp<=cap), else
+    from the legacy market_type fallback (HIGH: temp > strike; LOW: temp <
+    strike). The HIGH/LOW mapping of ITM->signal token is preserved exactly as
+    before: for a HIGH market 'UP' is the YES/ITM leg; for a LOW market 'DOWN'
+    is. Equality == not-ITM.
     """
-    itm = canonical_settle_yes(settlement_temp_f, strike_price, market_type) == 1
+    itm = canonical_settle_yes(settlement_temp_f, strike_price, market_type,
+                               strike_type, floor_strike, cap_strike) == 1
     if (market_type or "HIGH").upper() == "HIGH":
         actual = "UP" if itm else "DOWN"
     else:  # LOW: ITM (temp < strike) means the DOWN side won
         actual = "DOWN" if itm else "UP"
+    return "correct" if str(signal_direction).upper() == actual else "incorrect"
+
+
+def outcome_from_market_result(signal_direction: str, kalshi_result: str) -> str:
+    """'correct'/'incorrect' from Kalshi's OWN settled ``result`` ('yes'/'no').
+
+    The maximally honest label: it consumes the market's recorded settlement
+    outcome instead of re-deriving it from temperature vs an assumed operator.
+    ``signal_direction`` 'UP' == we took the YES leg; 'DOWN' == the NO leg.
+    """
+    r = str(kalshi_result).lower()
+    if r not in ("yes", "no"):
+        raise ValueError(f"kalshi_result must be yes|no, got {kalshi_result!r}")
+    actual = "UP" if r == "yes" else "DOWN"
     return "correct" if str(signal_direction).upper() == actual else "incorrect"
 
 

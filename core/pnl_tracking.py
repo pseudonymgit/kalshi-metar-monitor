@@ -30,6 +30,11 @@ from .canonical_settlement import (
     resolve_settlement_truth as _resolve_settlement_truth,
 )
 
+# Strike axis: resolve the market's OWN strike_type (greater/less/between). The
+# `-T##` ticker is ambiguous between the "or above" and "or below" tails.
+from .settlement_labels import strike_crossing_yes
+from .strike_axis import resolve_strike_axis as _resolve_strike_axis_row
+
 # Import calibration pipeline flag (from paper_trading_engine module-level constant)
 HAVE_CALIBRATION_PIPELINE = False
 try:
@@ -69,7 +74,8 @@ def process_settlements_for_date(self, settlement_date):
     c.execute("""
         SELECT t.trade_uuid, t.station, t.trade_type, t.trade_price, t.market_price,
                t.quantity, t.market_type, t.signal_direction,
-               p.settlement_bucket, p.prior_settlement_bucket
+               p.settlement_bucket, p.prior_settlement_bucket,
+               t.market_ticker, t.trade_date_utc
         FROM trades t
         JOIN (SELECT station, market_type, local_trading_date, settlement_bucket, prior_settlement_bucket
               FROM metar.settlement_epochs
@@ -83,7 +89,7 @@ def process_settlements_for_date(self, settlement_date):
 
     settled_count = 0
     for row in unsettled_trades:
-        trade_uuid, station, trade_type_str, filled_price, market_price, quantity, market_type, signal_direction, settlement_value, prior_settlement_value = row
+        trade_uuid, station, trade_type_str, filled_price, market_price, quantity, market_type, signal_direction, settlement_value, prior_settlement_value, market_ticker, trade_date_utc = row
         # Convert trade type to enum
         try:
             trade_type = TradeType(trade_type_str)
@@ -118,14 +124,37 @@ def process_settlements_for_date(self, settlement_date):
         # Get the strike price from Kalshi market metadata
         strike_price = _get_strike_price(station, market_type, settlement_date, self.paper_db, self.metar_db)
 
-        # Calculate settlement payout based on CANONICAL temperature vs strike.
-        # Kalshi binary options:
-        #   HIGH contract: pays $1.00 if settlement_temp > strike_price
-        #   LOW contract:  pays $1.00 if settlement_temp < strike_price
+        # Resolve the market's OWN strike axis (greater / less / between). The
+        # ticker suffix `-T##` is ambiguous between the "or above" and "or below"
+        # tails; the operator MUST come from strike_type, not from market_type.
+        # When the axis cannot be resolved we fall back to the legacy
+        # market_type assumption (greater tail only) and log it.
+        strike_axis = _resolve_strike_axis_row(
+            market_ticker, station, market_type,
+            (trade_date_utc or settlement_date))
+        _strike_type = strike_axis.get("strike_type") if strike_axis else None
+        _floor = strike_axis.get("floor_strike") if strike_axis else None
+        _cap = strike_axis.get("cap_strike") if strike_axis else None
+        if _strike_type is None:
+            _LOGGER.warning(
+                "Trade %s: strike axis unresolved for ticker=%s; falling back to "
+                "market_type=%s legacy operator (greater-tail only).",
+                trade_uuid, market_ticker, market_type)
+
+        # Calculate settlement payout based on CANONICAL temperature vs the
+        # market's OWN strike operator (strict on both tails).
         settlement_temp = canonical_temp  # canonical truth (Kalshi/GHCN), not the epoch bucket
         settlement_value = canonical_temp  # booked value going forward = canonical truth
         if strike_price is not None:
-            if market_type == "HIGH":
+            if _strike_type is not None:
+                try:
+                    _yes = strike_crossing_yes(
+                        settlement_temp, strike_price, market_type,
+                        strike_type=_strike_type, floor_strike=_floor, cap_strike=_cap)
+                except ValueError:
+                    _yes = None
+                settlement_contract_value = (1.0 if _yes else 0.0) if _yes is not None else None
+            elif market_type == "HIGH":
                 settlement_contract_value = 1.0 if settlement_temp > strike_price else 0.0
             elif market_type == "LOW":
                 settlement_contract_value = 1.0 if settlement_temp < strike_price else 0.0
@@ -145,6 +174,12 @@ def process_settlements_for_date(self, settlement_date):
                 "Trade left open for manual resolution.",
                 trade_uuid, station, market_type, settlement_date
             )
+            continue
+        if settlement_contract_value is None:
+            _LOGGER.warning(
+                "Cannot settle trade %s: strike axis strike_type=%s could not be "
+                "evaluated (ticker=%s). Trade left open.",
+                trade_uuid, _strike_type, market_ticker)
             continue
         qty = quantity or 0
 
@@ -172,10 +207,12 @@ def process_settlements_for_date(self, settlement_date):
             continue
 
         # Canonical outcome on the STRICT strike-crossing axis (equality == not-ITM).
-        # Single source: core.canonical_settlement.canonical_outcome. The old
-        # UP/DOWN-direction derivation is gone — outcome and label must agree.
+        # Single source: core.canonical_settlement.canonical_outcome, resolved from
+        # the market's OWN strike_type when available (the `-T##` ticker does not
+        # disambiguate the greater/less tails).
         canonical_settlement_outcome = _canonical_outcome(
-            signal_direction, market_type, canonical_temp, strike_price)
+            signal_direction, market_type, canonical_temp, strike_price,
+            strike_type=_strike_type, floor_strike=_floor, cap_strike=_cap)
 
         # Immutability assertion (invariant): once a canonical value exists for a
         # station-day, a later fetch must not move it. Fail loud if it would.

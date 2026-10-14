@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
-"""A4 — evaluators/calibrators must use the strict strike-crossing axis.
+"""A4 — evaluators/calibrators must use the strict strike-crossing axis, and the
+operator must come from the market's OWN `strike_type`.
 
 Regression for the day-over-day `bucket > prev_bucket` scoring in
-core/unified_backtest.py and the calibration consumers. The Kalshi settlement
-axis is strict strike-crossing: settlement > strike => win; equality => loss
-(core/settlement_labels.py).
+core/unified_backtest.py and the calibration consumers, PLUS the 2026-10-14
+bug-hunt finding #3: Kalshi daily-high events publish BOTH an "or above" tail
+(`strike_type='greater'`, YES iff observed > floor) and an "or below" tail
+(`strike_type='less'`, YES iff observed < cap), and the `-T##` ticker suffix is
+used for BOTH. Resolving the operator from `market_type` alone INVERTS the label
+on every less tail.
+
+Tie rule — VERIFIED AGAINST KALSHI'S OWN API (2026-10-14). The bug-hunt report
+asserted Kalshi is inclusive (`>=`). It is NOT: Kalshi's own titles read ">96°"
+and "<92°", and every observed tie (observed == bound) settled `result='no'` on
+both tails. Both tails are STRICT; equality is a LOSS. That is pinned below.
 
 Run: python3 -m pytest tests/test_strike_crossing_axis.py -v
      python3 tests/test_strike_crossing_axis.py
@@ -14,16 +23,59 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from core.settlement_labels import strike_crossing_yes, strike_crossing_direction
+from core.settlement_labels import (
+    strike_crossing_yes, strike_crossing_direction, settle_yes_from_strike_type,
+)
 
 
 def test_strict_equality_is_a_loss():
-    """T == strike is a LOSS on both HIGH and LOW markets."""
+    """T == strike is a LOSS on both tails (verified vs Kalshi API result='no')."""
     assert strike_crossing_yes(70, 70, "HIGH") is False
     assert strike_crossing_yes(70, 70, "LOW") is False
     assert strike_crossing_yes(71, 70, "HIGH") is True
     assert strike_crossing_yes(69, 70, "LOW") is True
     assert strike_crossing_direction(70, 70, "HIGH") == "no"
+
+
+def test_operator_comes_from_strike_type_not_the_market_type():
+    """A HIGH `less` tail is an 'or below' market — NOT 'observed > strike'.
+
+    Real case: KXHIGHCHI-26OCT09-T71 is strike_type='less' (KMDW high 74).
+    A HIGH buy_yes there is a LOSS (74 is not < 71); the legacy market_type
+    fallback would wrongly call it a WIN.
+    """
+    # less tail: YES iff observed < cap
+    assert strike_crossing_yes(74, 71, "HIGH", strike_type="less", cap_strike=71) is False
+    assert strike_crossing_yes(68, 69, "HIGH", strike_type="less", cap_strike=69) is True
+    assert strike_crossing_yes(69, 69, "HIGH", strike_type="less", cap_strike=69) is False
+    # greater tail: YES iff observed > floor
+    assert strike_crossing_yes(74, 71, "HIGH", strike_type="greater", floor_strike=71) is True
+    assert strike_crossing_yes(71, 71, "HIGH", strike_type="greater", floor_strike=71) is False
+    # between: floor <= observed <= cap
+    assert strike_crossing_yes(70, 70, "HIGH", strike_type="between", floor_strike=69, cap_strike=70) is True
+    assert strike_crossing_yes(71, 70, "HIGH", strike_type="between", floor_strike=69, cap_strike=70) is False
+
+
+def test_settle_yes_from_strike_type_matrix():
+    assert settle_yes_from_strike_type(70, "greater", floor_strike=70) is False
+    assert settle_yes_from_strike_type(71, "greater", floor_strike=70) is True
+    assert settle_yes_from_strike_type(70, "less", cap_strike=70) is False
+    assert settle_yes_from_strike_type(69, "less", cap_strike=70) is True
+    assert settle_yes_from_strike_type(70, "between", floor_strike=70, cap_strike=72) is True
+    assert settle_yes_from_strike_type(73, "between", floor_strike=70, cap_strike=72) is False
+    # missing bound for a tail fails loud (no silent operator)
+    try:
+        settle_yes_from_strike_type(70, "greater")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("greater tail without floor_strike must raise")
+    try:
+        settle_yes_from_strike_type(70, "bogus", floor_strike=70)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("unknown strike_type must raise")
 
 
 def test_unified_backtest_uses_strike_axis_not_day_over_day():
@@ -63,7 +115,9 @@ def test_calibration_consumers_rekeyed():
 
 if __name__ == "__main__":
     test_strict_equality_is_a_loss()
+    test_operator_comes_from_strike_type_not_the_market_type()
+    test_settle_yes_from_strike_type_matrix()
     test_unified_backtest_uses_strike_axis_not_day_over_day()
-    test_calibration_consumers_rekeyed()
     test_unified_backtest_returns_label_axis()
+    test_calibration_consumers_rekeyed()
     print("test_strike_crossing_axis: PASS")
