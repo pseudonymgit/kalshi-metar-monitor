@@ -225,3 +225,84 @@ def test_rolling_bias_uses_hist_window_from_live_path(monkeypatch, tmp_path):
     hist = m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3, live=False)
     assert live == pytest.approx(2.0)
     assert live == hist
+
+
+def _tiny_settle_db_low(path):
+    """LOW (Tmin) settlement truth; the Tmax row is a decoy that must be ignored."""
+    c = sqlite3.connect(path)
+    c.execute("CREATE TABLE settlement_truth (station TEXT, market_type TEXT, "
+              "local_trading_date TEXT, settlement_temp_f REAL, trustworthy INTEGER)")
+    rows = [("KNYC", "LOW", "2026-10-09", 61.0, 1),
+            ("KNYC", "LOW", "2026-10-10", 62.0, 1),
+            ("KNYC", "LOW", "2026-10-11", 63.0, 1),
+            # DECOY: a HIGH row for a day that has no LOW truth must not be read.
+            ("KNYC", "HIGH", "2026-10-08", 95.0, 1)]
+    c.executemany("INSERT INTO settlement_truth VALUES (?,?,?,?,?)", rows)
+    c.commit()
+    c.close()
+
+
+def test_low_bias_reads_tmin_cache_key_not_tmax(monkeypatch, tmp_path):
+    """F1 regression (2026-10-14): the LOW (Tmin) bias must be measured against
+    the Tmin forecast cache key (`hist|temperature_2m_min`). Before the fix the
+    lookup used the un-namespaced `hist` key, so it read the cached Tmax
+    forecast as if it were Tmin (pooled +17.75F -> clamped +5.0 instead of the
+    correct -1.17F), silently. This test plants BOTH keys and asserts the Tmin
+    path uses the Tmin value and never the Tmax one."""
+    m = _load_omgfs()
+    db = tmp_path / "settle.db"
+    _tiny_settle_db_low(db)
+    monkeypatch.setattr(m, "SETTLE_DB", db)
+    monkeypatch.setattr(m, "_BIAS_MEMO", {})
+    monkeypatch.setattr(m, "BIAS_FETCH_MISSING", False)  # hermetic: no network
+    tmin = m.VAR_TMIN
+    monkeypatch.setattr(m, "_CACHE_MEMO", {
+        # Correct Tmin forecasts: 1 F BELOW the LOW truth -> bias = -1.0.
+        m._cache_key("KNYC", "2026-10-09", f"hist|{tmin}"): 60.0,
+        m._cache_key("KNYC", "2026-10-10", f"hist|{tmin}"): 61.0,
+        m._cache_key("KNYC", "2026-10-11", f"hist|{tmin}"): 62.0,
+        # DECOY Tmax keys (the bug's source): wildly hotter -> would give ~+17F.
+        m._cache_key("KNYC", "2026-10-09", "hist"): 78.0,
+        m._cache_key("KNYC", "2026-10-10", "hist"): 79.0,
+        m._cache_key("KNYC", "2026-10-11", "hist"): 80.0,
+    })
+    b = m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3,
+                         market_type="LOW")
+    # Tmin residual (60-61, 61-62, 62-63) = -1.0, NOT the Tmax residual (+17/+17/+17).
+    assert b == pytest.approx(-1.0)
+    assert b < 0, "LOW bias must never read the hotter Tmax cache axis"
+
+
+def test_low_bias_is_none_when_only_tmax_keys_present(monkeypatch, tmp_path):
+    """F1: with ONLY the Tmax cache keys populated, the Tmin bias must resolve to
+    None (no fabricated correction) rather than silently reusing the Tmax value."""
+    m = _load_omgfs()
+    db = tmp_path / "settle.db"
+    _tiny_settle_db_low(db)
+    monkeypatch.setattr(m, "SETTLE_DB", db)
+    monkeypatch.setattr(m, "_BIAS_MEMO", {})
+    monkeypatch.setattr(m, "BIAS_FETCH_MISSING", False)
+    monkeypatch.setattr(m, "_CACHE_MEMO", {
+        m._cache_key("KNYC", "2026-10-09", "hist"): 78.0,
+        m._cache_key("KNYC", "2026-10-10", "hist"): 79.0,
+        m._cache_key("KNYC", "2026-10-11", "hist"): 80.0,
+    })
+    assert m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3,
+                            market_type="LOW") is None
+
+
+def test_high_bias_still_reads_legacy_hist_key(monkeypatch, tmp_path):
+    """F1: the HIGH path is byte-identical to pre-fix (un-namespaced `hist`)."""
+    m = _load_omgfs()
+    db = tmp_path / "settle.db"
+    _tiny_settle_db(db)
+    monkeypatch.setattr(m, "SETTLE_DB", db)
+    monkeypatch.setattr(m, "_BIAS_MEMO", {})
+    monkeypatch.setattr(m, "BIAS_FETCH_MISSING", False)
+    monkeypatch.setattr(m, "_CACHE_MEMO", {
+        m._cache_key("KNYC", "2026-10-09", "hist"): 73.0,
+        m._cache_key("KNYC", "2026-10-10", "hist"): 76.0,
+        m._cache_key("KNYC", "2026-10-11", "hist"): 82.0,
+    })
+    assert m.rolling_bias_f("KNYC", "2026-10-12", window_days=30, min_obs=3) == \
+        pytest.approx(2.0)

@@ -337,6 +337,16 @@ def rolling_bias_f(station: str, as_of_date: str, *,
 
     cmap = cache if cache is not None else _cache_load()
 
+    # F1 (2026-10-14): the bias window is a HISTORICAL read of the SAME variable
+    # the state was built on, so the cache src MUST carry the variable namespace
+    # (LOW -> 'hist|temperature_2m_min'). Reading the un-namespaced 'hist' key
+    # served a LOW caller the cached Tmax forecast, so the residual became
+    # Tmax_fc - Tmin_truth (~+17.75F pooled) -> clamped to the +5.0 cap instead
+    # of the correct -1.17F. Silent (no error, plausible number).
+    _bvar = _daily_var(market_type)
+    _bhist = "hist" if _bvar == VAR_TMAX else f"hist|{_bvar}"
+    _blive = "live" if _bvar == VAR_TMAX else f"live|{_bvar}"
+
     truth: Dict[str, float] = {}
     try:
         conn = sqlite3.connect(f"file:{SETTLE_DB}?mode=ro", uri=True)
@@ -356,9 +366,12 @@ def rolling_bias_f(station: str, as_of_date: str, *,
     # Populate any missing window days from the historical endpoint (past dates
     # only; NO lookahead) so the correction is real rather than silently None.
     if (BIAS_FETCH_MISSING and truth
-            and any(_cache_key(station, ds, "hist") not in cmap for ds in truth)):
+            and any(_cache_key(station, ds, _bhist) not in cmap for ds in truth)):
         try:
-            fetch_om_gfs_many([station], d0.isoformat(), d1.isoformat(), live=False)
+            # F1: fetch the SAME variable the bias is measured against, or the
+            # backfill populates Tmax keys and the Tmin lookup stays empty.
+            fetch_om_gfs_many([station], d0.isoformat(), d1.isoformat(),
+                              live=False, market_type=market_type)
             if cache is None:  # fetch mutates/refreshes the shared memo
                 cmap = _cache_load()
         except Exception as e:  # noqa: BLE001 - a fetch failure just drops obs
@@ -366,9 +379,9 @@ def rolling_bias_f(station: str, as_of_date: str, *,
 
     resid = []
     for ds, settled in truth.items():
-        v = cmap.get(_cache_key(station, ds, "hist"))
+        v = cmap.get(_cache_key(station, ds, _bhist))
         if v is None:  # tolerate a live-keyed value if that is all we have
-            v = cmap.get(_cache_key(station, ds, "live"))
+            v = cmap.get(_cache_key(station, ds, _blive))
         if v is not None:
             resid.append(v - settled)
 
