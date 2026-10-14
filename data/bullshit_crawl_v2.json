@@ -1,9 +1,9 @@
 {
   "generated_at_utc": null,
-  "n_trades": 91,
-  "n_with_calibrated_p": 152,
+  "n_trades": 50,
+  "n_with_calibrated_p": 156,
   "flips": 1,
-  "flip_pct": 1.1,
+  "flip_pct": 2.0,
   "flip_detail": [
     {
       "id": 246,
@@ -11,7 +11,7 @@
       "station": "KMDW",
       "date": "2026-09-15",
       "outcome": "correct",
-      "pnl": 0.94,
+      "pnl": 0.0,
       "p_fused": 0.202,
       "calibrated_p": 0.1315,
       "ceiling": 0.8441,
