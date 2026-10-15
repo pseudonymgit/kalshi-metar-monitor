@@ -1,0 +1,101 @@
+{
+  "generated_by": "scripts/audit_ghcn_alignment_2026-10-15.py",
+  "ghcn_profile": {
+    "rows": 620036,
+    "date_min": "1869-01-01",
+    "date_max": "2026-10-11",
+    "stations": [
+      "KATL",
+      "KAUS",
+      "KBOS",
+      "KDAL",
+      "KDCA",
+      "KDEN",
+      "KDFW",
+      "KHOU",
+      "KLAS",
+      "KLAX",
+      "KMDW",
+      "KMIA",
+      "KMSP",
+      "KMSY",
+      "KNYC",
+      "KOKC",
+      "KPHL",
+      "KPHX",
+      "KSAT",
+      "KSEA",
+      "KSFO"
+    ],
+    "null_high": 75,
+    "null_low": 100,
+    "dup_station_date": 0
+  },
+  "metar_daily_stats_profile": {
+    "rows": 59201,
+    "date_min": "2021-01-01",
+    "date_max": "2026-10-15",
+    "stations": 30
+  },
+  "window": [
+    "2026-04-01",
+    "2026-10-11"
+  ],
+  "overlap_rows": 3695,
+  "sample_n": 200,
+  "same_day_abs_diff_F": {
+    "n": 200,
+    "mean": 2.148,
+    "median": 1.5,
+    "p90": 4.7,
+    "max": 17.6
+  },
+  "agree_within_1F": 67,
+  "agree_within_1F_rate": 0.335,
+  "agree_within_2F": 130,
+  "agree_within_2F_rate": 0.65,
+  "offset_test_sample": {
+    "-1": {
+      "n": 196,
+      "mean": 4.932,
+      "median": 3.6,
+      "p90": 10.2,
+      "max": 28.8
+    },
+    "0": {
+      "n": 200,
+      "mean": 2.148,
+      "median": 1.5,
+      "p90": 4.7,
+      "max": 17.6
+    },
+    "1": {
+      "n": 188,
+      "mean": 4.565,
+      "median": 3.4,
+      "p90": 10.6,
+      "max": 23.8
+    }
+  },
+  "offset_test_full": {
+    "-1": {
+      "mean": 4.59,
+      "n": 3586
+    },
+    "0": {
+      "mean": 2.031,
+      "n": 3695
+    },
+    "1": {
+      "mean": 4.318,
+      "n": 3588
+    }
+  },
+  "ghcn_autocorr": {
+    "lag1": 0.8947,
+    "lag2": 0.8173,
+    "n_lag1": 4050,
+    "n_lag2": 4029
+  },
+  "verdict": "clean"
+}
