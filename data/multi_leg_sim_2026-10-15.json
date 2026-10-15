@@ -1,0 +1,186 @@
+{
+  "generated_by": "scripts/multi_leg_sim_2026-10-15.py",
+  "cohort": {
+    "window": "2026-04-21..2026-10-09",
+    "pin_local": "13:30",
+    "leg_gap_F": 5.0,
+    "n_rows": 2927,
+    "n_with_kalshi_truth": 2455,
+    "truth_axis": "strict crossing y = 1{settled_max > T}; grid truth is GHCN-based",
+    "om_gfs_stats": {
+      "bias_global_F": -0.5906,
+      "sigma_global_F": 1.5927
+    }
+  },
+  "variant_fixed_sigma": {
+    "0h": {
+      "tau_mod": 810,
+      "n_rows": 2927,
+      "n_retained_legs": 5854,
+      "policy_split": {
+        "hold_both": 2927,
+        "hold_lo": 0,
+        "hold_hi": 0
+      },
+      "accuracy": 0.4722,
+      "confidence": 0.5032,
+      "brier": 0.0705,
+      "pnl_2leg_mean": -0.1065,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.078,
+      "sigma_mode": "fixed"
+    },
+    "1h": {
+      "tau_mod": 870,
+      "n_rows": 2927,
+      "n_retained_legs": 4396,
+      "policy_split": {
+        "hold_both": 1469,
+        "hold_lo": 1432,
+        "hold_hi": 26
+      },
+      "accuracy": 0.5883,
+      "confidence": 0.6256,
+      "brier": 0.0653,
+      "pnl_2leg_mean": -0.0613,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.0328,
+      "sigma_mode": "fixed"
+    },
+    "3h": {
+      "tau_mod": 990,
+      "n_rows": 2927,
+      "n_retained_legs": 3971,
+      "policy_split": {
+        "hold_both": 1044,
+        "hold_lo": 1754,
+        "hold_hi": 129
+      },
+      "accuracy": 0.6404,
+      "confidence": 0.6926,
+      "brier": 0.0662,
+      "pnl_2leg_mean": -0.0492,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.0207,
+      "sigma_mode": "fixed"
+    },
+    "6h": {
+      "tau_mod": 1170,
+      "n_rows": 2927,
+      "n_retained_legs": 3912,
+      "policy_split": {
+        "hold_both": 985,
+        "hold_lo": 1757,
+        "hold_hi": 185
+      },
+      "accuracy": 0.6426,
+      "confidence": 0.6985,
+      "brier": 0.0668,
+      "pnl_2leg_mean": -0.0467,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.0182,
+      "sigma_mode": "fixed"
+    }
+  },
+  "variant_decay_sigma": {
+    "0h": {
+      "tau_mod": 810,
+      "n_rows": 2927,
+      "n_retained_legs": 5854,
+      "policy_split": {
+        "hold_both": 2927,
+        "hold_lo": 0,
+        "hold_hi": 0
+      },
+      "accuracy": 0.4722,
+      "confidence": 0.5032,
+      "brier": 0.0705,
+      "pnl_2leg_mean": -0.1065,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.078,
+      "sigma_mode": "decay"
+    },
+    "1h": {
+      "tau_mod": 870,
+      "n_rows": 2927,
+      "n_retained_legs": 4396,
+      "policy_split": {
+        "hold_both": 1469,
+        "hold_lo": 1432,
+        "hold_hi": 26
+      },
+      "accuracy": 0.5883,
+      "confidence": 0.6258,
+      "brier": 0.0655,
+      "pnl_2leg_mean": -0.0631,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.0346,
+      "sigma_mode": "decay"
+    },
+    "3h": {
+      "tau_mod": 990,
+      "n_rows": 2927,
+      "n_retained_legs": 3971,
+      "policy_split": {
+        "hold_both": 1044,
+        "hold_lo": 1754,
+        "hold_hi": 129
+      },
+      "accuracy": 0.6404,
+      "confidence": 0.6926,
+      "brier": 0.0677,
+      "pnl_2leg_mean": -0.057,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.0285,
+      "sigma_mode": "decay"
+    },
+    "6h": {
+      "tau_mod": 1170,
+      "n_rows": 2927,
+      "n_retained_legs": 3912,
+      "policy_split": {
+        "hold_both": 985,
+        "hold_lo": 1757,
+        "hold_hi": 185
+      },
+      "accuracy": 0.6426,
+      "confidence": 0.6984,
+      "brier": 0.071,
+      "pnl_2leg_mean": -0.064,
+      "pnl_1leg_mean": -0.0285,
+      "pnl_gain": -0.0355,
+      "sigma_mode": "decay"
+    }
+  },
+  "kalshi_truth_variant": {
+    "0h": {
+      "n_rows": 2455,
+      "n_retained_legs": 4910,
+      "accuracy": 0.4483,
+      "confidence": 0.4989,
+      "brier": 0.0861
+    },
+    "1h": {
+      "n_rows": 2455,
+      "n_retained_legs": 3690,
+      "accuracy": 0.5645,
+      "confidence": 0.6248,
+      "brier": 0.0839
+    },
+    "3h": {
+      "n_rows": 2455,
+      "n_retained_legs": 3335,
+      "accuracy": 0.6123,
+      "confidence": 0.6911,
+      "brier": 0.0855
+    },
+    "6h": {
+      "n_rows": 2455,
+      "n_retained_legs": 3287,
+      "accuracy": 0.6127,
+      "confidence": 0.6969,
+      "brier": 0.0873
+    }
+  },
+  "note": "Simulation only. implied P&L uses the model's own probability as the entry/exit price proxy; it measures whether the two-leg + exit policy adds value under the model's own prices, not market-realized P&L."
+}
