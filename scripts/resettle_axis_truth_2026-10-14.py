@@ -124,11 +124,18 @@ def resolve_truth(row, cache, ladder):
             (L or {}).get("cap_strike") or (d or {}).get("cap_strike"), None)
 
 
-def pnl_1contract(trade_type, S, price):
+def pnl_contract_notional(trade_type, S, price, qty):
+    """Contract-notional P&L (Dan ruling 2026-10-15): (payout - price) * quantity.
+
+    S is the binary payout {0, 1} on the booked side. Formerly `pnl_1contract`
+    (the retired constant-1 basis); the book is qty-scaled (F7), so this tool
+    must write the same basis it reconciles against.
+    """
+    q = int(qty or 0)
     if trade_type == "buy_yes":
-        return (S - price) * 1.0
+        return (S - price) * q
     if trade_type == "buy_no":
-        return (price - S) * 1.0
+        return (price - S) * q
     return None
 
 
@@ -142,7 +149,7 @@ def main():
     ensure_cols(b)
     rows = [dict(r) for r in b.execute(
         "SELECT id, status, station, market_type, trade_type, signal_direction, "
-        "market_ticker, canonical_settled_f, trade_price, realized_pnl, "
+        "market_ticker, canonical_settled_f, trade_price, quantity, realized_pnl, "
         "canonical_outcome, settlement_outcome, settled_value, canonical_source "
         "FROM trades ORDER BY id")]
 
@@ -165,12 +172,12 @@ def main():
         else:
             outc = expect
             xcheck = None
-        pnl = pnl_1contract(r["trade_type"], S, r["trade_price"])
-        # per-contract payout going to the holder
+        pnl = pnl_contract_notional(r["trade_type"], S, r["trade_price"], r["quantity"])
+        # contract-notional payout going to the holder
         if r["trade_type"] == "buy_yes":
-            ret_amt = float(S)
+            ret_amt = float(S) * int(r["quantity"] or 0)
         elif r["trade_type"] == "buy_no":
-            ret_amt = float(1 - S)
+            ret_amt = float(1 - S) * int(r["quantity"] or 0)
         else:
             ret_amt = pnl
         changed = (r["canonical_outcome"] != outc) or (

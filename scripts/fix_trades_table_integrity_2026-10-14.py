@@ -9,8 +9,8 @@ Three independent problems, three separate apply modes (each its own commit):
                (core/settlement_labels.strike_crossing_yes; canonical_settle_yes;
                pnl_tracking.py:129; tests assert equality == LOSS).
                Exact-tie rows are BLOCKED (rule is Dan-gated; see --block-ties).
-               Writes: settled_value, realized_pnl (constant-1-contract basis),
-               settlement_return_amount, settlement_confirmed=1,
+               Writes: settled_value, realized_pnl (contract-notional basis,
+               qty-scaled), settlement_return_amount, settlement_confirmed=1,
                settlement_outcome, canonical_settled_f,
                canonical_source='kalshi_live_api', canonical_outcome,
                status='closed', settlement_date_utc
@@ -20,7 +20,7 @@ Three independent problems, three separate apply modes (each its own commit):
                $200 bankroll / 5% cap / $10 max) on the BOOKED side's calibrated
                probability. Preserves the old size in position_size_usd_old_2026.
   --problem 3  Replace realized_pnl (size fiction) with honest
-               constant-1-contract P&L: buy_yes (S-price)*1, buy_no (price-S)*1,
+               contract-notional P&L: buy_yes (S-price)*qty, buy_no (price-S)*qty,
                S from the STRICT axis on canonical_settled_f vs strike.
                Preserves the old P&L in realized_pnl_old_2026. Also caps
                quantity to floor(position_size_usd / trade_price) where sane.
@@ -77,12 +77,17 @@ def canonical_outcome(signal_direction, market_type, temp, strike):
     return "correct" if str(signal_direction).upper() == actual else "incorrect"
 
 
-def honest_pnl(trade_type, S, price):
-    """Constant-1-contract P&L."""
+def honest_pnl(trade_type, S, price, qty):
+    """Contract-notional P&L (Dan ruling 2026-10-15): (payout - price) * quantity.
+
+    The retired constant-1 basis (`* 1.0`) is gone; the shipped book is
+    qty-scaled (PWW-BUG-HUNT F7), so this sweep writes the same basis.
+    """
+    q = int(qty or 0)
     if trade_type == "buy_yes":
-        return (S - price) * 1.0
+        return (S - price) * q
     if trade_type == "buy_no":
-        return (price - S) * 1.0
+        return (price - S) * q
     return None
 
 
@@ -123,8 +128,8 @@ def problem1(conn, dry_run=False):
             continue
         S = settle_yes(r["market_type"], temp, strike)
         cout = canonical_outcome(r["signal_direction"], r["market_type"], temp, strike)
-        pnl = honest_pnl(r["trade_type"], S, r["trade_price"])
-        ret = (S if r["trade_type"] == "buy_yes" else (1 - S)) * 1.0
+        pnl = honest_pnl(r["trade_type"], S, r["trade_price"], r["quantity"])
+        ret = (S if r["trade_type"] == "buy_yes" else (1 - S)) * int(r["quantity"] or 0)
         sdt = settlement_time_utc(r["station"], r["trade_date_utc"])
         sdt_iso = sdt.astimezone(timezone.utc).isoformat() if sdt else None
         rec = {**r, "strike": strike, "temp": temp,

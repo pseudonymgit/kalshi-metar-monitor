@@ -191,33 +191,34 @@ def process_settlements_for_date(self, settlement_date):
             continue
         qty = quantity or 0
 
-        # P&L BASIS (2026-10-14, Dan ruling): CONTRACT-NOTIONAL dollars — see
+        # P&L BASIS (Dan APPROVED 2026-10-15): CONTRACT-NOTIONAL dollars — see
         # docs/plans/WE-COMPLETE-REGISTER-2026-10-13.md §AG-0. `realized_pnl` is
         # scored as (payout - price) * quantity, size-scaled; the shipped SBOX
         # book matches this basis (43/43) and 0 rows match constant-1 (F7). The
         # earlier "constant-1-contract" label (commit 690db06da) is RETIRED and
         # superseded by this line; constant-1 is not what the code produces.
-        # NOTE: the engine settle writer below still multiplies by 1 (legacy
-        # per-contract form) and is slated to be brought to the qty-scaled basis.
+        #
+        # This writer now matches: the legacy per-contract `* 1` form is GONE.
+        # `settlement_contract_value` is the binary payout {0, 1} after the
+        # strike-axis resolution above, so `profit` is the position's realized
+        # notional dollars and agrees with the qty-scaled book.
         if trade_type == TradeType.BUY_YES:
-            payout_per_contract = settlement_contract_value
-            cost_per_contract = filled_price
-            profit = (payout_per_contract - cost_per_contract) * 1.0
-            return_amount = payout_per_contract * 1.0
+            profit = (settlement_contract_value - filled_price) * qty
+            return_amount = settlement_contract_value * qty
         elif trade_type == TradeType.BUY_NO:
             payout_per_contract = 1.0 - settlement_contract_value
             cost_per_contract = 1.0 - filled_price
-            profit = (payout_per_contract - cost_per_contract) * 1.0
-            return_amount = payout_per_contract * 1.0
+            profit = (payout_per_contract - cost_per_contract) * qty
+            return_amount = payout_per_contract * qty
         elif trade_type == TradeType.SELL_YES:
             # Short YES: collect filled_price, owe event payout.
-            profit = (filled_price - settlement_contract_value) * 1.0
+            profit = (filled_price - settlement_contract_value) * qty
             return_amount = profit
         elif trade_type == TradeType.SELL_NO:
             # Short NO: collect NO price, owe non-event payout.
             no_price = 1.0 - filled_price
             no_payout = 1.0 - settlement_contract_value
-            profit = (no_price - no_payout) * 1.0
+            profit = (no_price - no_payout) * qty
             return_amount = profit
         else:
             continue
@@ -240,7 +241,8 @@ def process_settlements_for_date(self, settlement_date):
             (station, market_type, settlement_date))
 
         # Update the trade with settlement data. The booked value going forward IS
-        # canonical truth; realized_pnl/filled_price mechanics are unchanged.
+        # canonical truth; the P&L is contract-notional dollars (profit * qty),
+        # and `settlement_return_amount` is the qty-scaled payout to the holder.
         realized_pnl = profit
         c.execute("""
             UPDATE trades
@@ -250,11 +252,13 @@ def process_settlements_for_date(self, settlement_date):
                 canonical_settled_f = ?, canonical_source = ?, canonical_outcome = ?,
                 status = 'closed'
             WHERE trade_uuid = ?
-        """, (settlement_value, settlement_date, profit, return_amount,
+        """, (settlement_value, settlement_date, realized_pnl, return_amount,
               canonical_settlement_outcome, canonical_temp, canonical_source,
               canonical_settlement_outcome, trade_uuid))
 
-        # Update corresponding position (reduce by quantity)
+        # Update corresponding position (reduce by quantity). The position's
+        # realized_pnl/total_pnl are summed on the SAME contract-notional basis
+        # as the trade row so every downstream aggregate stays consistent.
         trade_qty = qty
 
         # Find position this trade affects and reduce quantity
@@ -263,7 +267,7 @@ def process_settlements_for_date(self, settlement_date):
             SET realized_pnl = realized_pnl + ?, quantity = quantity - ?,
                 total_pnl = realized_pnl + ?
             WHERE trade_uuids LIKE ?
-        """, (profit, trade_qty, profit, f'%{trade_uuid}%'))
+        """, (realized_pnl, trade_qty, realized_pnl, f'%{trade_uuid}%'))
 
         # Check if trade was correct: does signal direction match strike-based outcome?
         # Query the original trade for the signal direction and functionality

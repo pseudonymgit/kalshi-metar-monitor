@@ -18,17 +18,16 @@ still yields `(1 - 0.05) * 200 = $190`. The instruction and its own acceptance
 test ("|realized_pnl| must not exceed position_size_usd * 1.5") are mutually
 exclusive under any quantity-multiplied basis.
 
-The repository's SHIPPED basis (commit 690db06da, "constant-1-contract"; doc
-docs/plans/TRADES-TABLE-INTEGRITY-2026-10-14.md §3; core/pnl_tracking.py) is the
-honest, size-independent measure:
+The repository's SHIPPED basis is **contract-notional (qty-scaled)** — Dan
+ruled 2026-10-15 that P&L = `(payout − price) × quantity` (PWW-BUG-HUNT F7: the
+book is qty-scaled, 43/43 rows; 0 match constant-1). The earlier constant-1
+("* 1.0") basis this script originally wrote (690db06da) is RETIRED. This script
+now writes the same contract-notional basis as every other writer:
 
-    realized_pnl = (S - trade_price) * 1.0        # S in {0,1}, booked side
+    realized_pnl = (S − trade_price) * quantity   # S in {0,1}, booked side
 
-where S = 1 iff the BOOKED side won (canonical_outcome == 'correct'). This is the
-ONLY basis that is (a) sign-consistent with canonical_outcome, (b) bounded by the
-per-contract $1, and (c) reconciled with `quantity = position_size_usd/price` as
-the task also demands. We restore it for every closed row (the live DB had drifted
-back to the quantity basis).
+where S = 1 iff the BOOKED side won (canonical_outcome == 'correct') and
+`quantity` is the Kelly-implied MAX(1, ROUND(position_size_usd/trade_price)).
 
 Writes (closed rows only): realized_pnl, settlement_return_amount.
 `quantity` is asserted/reconciled to MAX(1, ROUND(position_size_usd/trade_price))
@@ -67,15 +66,15 @@ def ensure_col(conn, table, col, decl):
         conn.commit()
 
 
-def per_contract_pnl(trade_type, price, correct):
-    """Booked-side, constant-1-contract P&L. S=1 iff the booked side won.
+def contract_notional_pnl(trade_type, price, correct, qty):
+    """Booked-side, contract-notional P&L (Dan ruling 2026-10-15).
 
-    buy_yes and buy_no are identical here because `trade_price` is the BOOKED
-    side's entry price in both legs; the payout is $1 per winning contract.
+    P&L = (payout - price) * quantity, payout = $1 per winning contract. buy_yes
+    and buy_no are identical here because `trade_price` is the BOOKED side's entry
+    price in both legs. Supersedes the retired constant-1 (`* 1.0`) basis.
     """
     s = 1.0 if correct else 0.0
-    return round((s - float(price)) * 1.0, 4), s
-
+    return round((s - float(price)) * int(qty or 0), 4), s
 
 def fix(conn, dry_run=False):
     ensure_col(conn, "trades", "realized_pnl_pre1c_20261014", "REAL")
@@ -94,17 +93,17 @@ def fix(conn, dry_run=False):
         correct = co == "correct"
         price = float(r["trade_price"] or 0.0)
         psize = float(r["position_size_usd"] or 0.0)
+        # Kelly-implied contract count (0 on the honest zero-edge row).
+        want_qty = max(1, int(round(psize / price))) if (psize > 0 and price > 0) else 0
         if psize <= 0.0:
             # Honest zero-edge row: Kelly sized it to $0, so we held nothing.
             # Its settled fiction is preserved in realized_pnl_prekelly; the
             # honest booked P&L (and return) is 0.0.
             new_pnl, s, new_ret = 0.0, 0.0, 0.0
         else:
-            new_pnl, s = per_contract_pnl(r["trade_type"], price, correct)
-            new_ret = round(s * 1.0, 4)
+            new_pnl, s = contract_notional_pnl(r["trade_type"], price, correct, want_qty)
+            new_ret = round(s * want_qty, 4)
 
-        # Kelly-implied contract count.
-        want_qty = max(1, int(round(psize / price))) if (psize > 0 and price > 0) else 0
         if int(r["quantity"] or 0) != want_qty:
             out["qty_fixed"].append({"id": r["id"], "old": r["quantity"],
                                      "new": want_qty})
