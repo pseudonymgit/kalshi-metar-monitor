@@ -49,8 +49,16 @@ sys.path.insert(0, str(REPO / "scripts"))
 from sbox_intraday_ev_bridge import (  # noqa: E402
     STATIONS, kelly_position_size, grade_position_cap, compute_trade_grade,
     record_trade, SOLE_FORECAST_RULE_ID, _hours_before_settlement,
-    _station_spread_model,
+    _station_spread_model, exposure_skip_reason, ENABLE_BOOKING_GATE,
+    _fetch_trade_dict,
 )
+try:  # GR5 §2 booking gate + §1 custody (guarded exactly as the HIGH bridge)
+    from core.booking_admission import admit_decision_candidate, record_custody
+    _ADMISSION_IMPORTED = True
+except Exception:  # pragma: no cover - substrate missing => gate off
+    admit_decision_candidate = None
+    record_custody = None
+    _ADMISSION_IMPORTED = False
 from core.strike_selection_ev import select_strike, make_truncated_p_fn  # noqa: E402
 from core.station_params import get_station_params  # noqa: E402
 from core.station_time import is_within_entry_window, station_timezone_name  # noqa: E402
@@ -63,11 +71,16 @@ LOW_CSV = (REPO / "artifacts" / "low-market-backfill"
 
 INSTANCE = "SBOX"
 LANE = "LOW"
-# Arming flag (default OFF). Not read by anything yet — the bridge is unwired.
+# Arming flag (F4, 2026-10-14): defaults OFF and GATES run(). The module is
+# prepare-only until the flag is set — a non-dry-run pass refuses to book.
 LOW_BRIDGE_ENABLED = os.environ.get("LOW_BRIDGE_ENABLED", "0") == "1"
 # LOW gate mirrors HIGH: same 13:30 pin, same window/grade stack.
 DECISION_PIN_LOCAL_HHMM = "13:30:00"
 FUSION_RULE_ID = SOLE_FORECAST_RULE_ID
+# F5 (2026-10-14): the LOW lane has NO GFS-local fallback — if om_gfs Tmin is
+# unavailable the trade is not booked (fail closed). The provenance label below
+# is the TRUE source, so a booked row can never claim om_gfs when it is not.
+FORECAST_SRC = "om_gfs_tmin"
 
 
 def _ro(p):
@@ -269,13 +282,21 @@ def _market_cap(station: str) -> float:
 
 
 # ── entry pass ───────────────────────────────────────────────────────────────
-def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True):
+def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True,
+        allow_book=False):
     """Evaluate the LOW lane for each station-day in the LOW backfill panel.
 
-    PREPARE-ONLY pass: it computes what the LOW bridge WOULD book and (unless
-    dry_run) records it with lane='LOW'. It never touches the HIGH rows, and it
-    is never invoked by a cron.
+    F4 (2026-10-14): the ``LOW_BRIDGE_ENABLED`` flag now GATES booking. A
+    non-dry-run pass refuses to book unless the flag is set (or the explicit
+    ``allow_book`` override is passed) — the "prepare-only, safe by default"
+    claim is enforced, not decorative. Dry runs always compute but never book.
     """
+    if not dry_run and not (LOW_BRIDGE_ENABLED or allow_book):
+        raise RuntimeError(
+            "LOW bridge is not armed: set LOW_BRIDGE_ENABLED=1 (or pass "
+            "allow_book=True) to book LOW trades; use --dry-run to evaluate "
+            "without booking. The LOW lane stays dormant until explicitly armed."
+        )
     stations = stations or STATIONS
     now_utc = datetime.now(timezone.utc)
     conn = None if dry_run else sqlite3.connect(SBOX_DB)
@@ -294,7 +315,12 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True):
                     continue
             state = om_gfs_tmin_state(st, day_str, live=False)
             if state is None:
-                skipped.append((st, day_str, "no_om_gfs_tmin"))
+                # F5: fail closed + LOUD. There is no GFS-local fallback on the
+                # LOW axis (which would silently book a non-om_gfs forecast under
+                # om_gfs provenance); record the true reason and skip.
+                skipped.append((st, day_str, "sole_no_om_gfs"))
+                diag.append({"station": st, "day": day_str,
+                             "skip": "sole_no_om_gfs", "forecast_src": None})
                 continue
             ladder = low_ladder_from_csv(st, day_str)
             if not ladder:
@@ -369,22 +395,61 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True):
                      "composite_conf": meta.get("composite_conf"),
                      "grade": meta.get("grade"), "ceiling": meta.get("ceiling"),
                      "fusion_rule": FUSION_RULE_ID,
+                     "forecast_src": FORECAST_SRC,
                      "weights_applied": {"om_gfs_tmin": 1.0}}
             diag.append({"station": st, "day": day_str, "lane": LANE,
                          "strike": strike, "side": picked["side"],
                          "our_prob": round(our_prob, 4), "mkt": mkt,
                          "calibrated_p": meta.get("calibrated_p"),
-                         "size": size_usd, "grade": grade, "ev": picked["ev"]})
+                         "size": size_usd, "grade": grade, "ev": picked["ev"],
+                         "fusion_rule": FUSION_RULE_ID})
             if dry_run:
                 results.append({"status": "would_execute", "station": st,
                                 "day": day_str, "strike": strike,
                                 "side": picked["side"], "size": size_usd,
                                 "our_prob": round(our_prob, 4), "grade": grade})
             else:
+                # F9 exposure gate (F5, 2026-10-14): the shared book's portfolio
+                # caps (>=3 open per station, >=10 open per station-day). HIGH
+                # enforces them; LOW previously bypassed them.
+                skip_reason = exposure_skip_reason(conn, st, day_str)
+                if skip_reason:
+                    skipped.append((st, day_str, skip_reason))
+                    continue
+                # GR5 §2 pre-ingest gate (F5): the decidable subset (G0 window-
+                # green · G1 identity/version · G4 axis) must pass BEFORE booking.
+                # Fail-open (never break the booking path) but loud.
+                if ENABLE_BOOKING_GATE and admit_decision_candidate is not None:
+                    try:
+                        gv, _g_admitted = admit_decision_candidate(
+                            trade_uuid=f"{INSTANCE}-{st}-{day_str}",
+                            instance=INSTANCE, station=st, market_type="LOW",
+                            settlement_date=day_str, label_axis="strike_crossing",
+                            conn=conn, repo=REPO, suite_green=True)
+                    except Exception as e:  # pragma: no cover
+                        diag.append({"station": st, "day": day_str,
+                                     "booking_gate_error": f"{type(e).__name__}:{e}"})
+                    else:
+                        if not _g_admitted:
+                            skipped.append((st, day_str, f"booking_gate_{gv.verdict}"))
+                            continue
                 rec = record_trade(
                     conn, st, "LOW", picked["side"], our_prob, mkt, confidence,
                     strike, row["ticker"], size_usd, "low_entry_bridge", day_str,
                     probs=probs, selected_side=picked["side"], lane=LANE)
+                # GR5 §1 TradeCustodyRecord: one chain-of-custody row per booked
+                # trade (idempotent); never let a TCR failure un-book the trade.
+                if ENABLE_BOOKING_GATE and record_custody is not None:
+                    tuuid = rec.get("trade_uuid")
+                    if rec.get("status") == "executed" and tuuid:
+                        try:
+                            trow = _fetch_trade_dict(conn, tuuid)
+                            if trow is not None:
+                                rec["custody_hash"] = record_custody(
+                                    conn, trow, instance=INSTANCE)
+                        except Exception as e:  # pragma: no cover
+                            diag.append({"station": st, "day": day_str,
+                                         "custody_error": f"{type(e).__name__}:{e}"})
                 results.append(rec)
     if conn:
         conn.close()
