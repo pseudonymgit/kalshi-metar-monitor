@@ -1,0 +1,273 @@
+{
+  "generated_by": "scripts/kalshi_truth_switch_2026-10-15.py",
+  "axis": "T=floor(running_high@13:30)+1, y=1{settled_high>T}, strict",
+  "cohort": {
+    "window": "2026-04-21..2026-10-09",
+    "pin_local": "13:30",
+    "n_rows_axis": 3205
+  },
+  "truth_reconciliation": {
+    "kalshi_settlements_rows": 10194,
+    "kalshi_date_offset_rows_corrected": 623,
+    "n_cohort": 3205,
+    "n_both_truths": 2946,
+    "n_kalshi_only": 0,
+    "n_ghcn_only": 259,
+    "n_label_flips": 114,
+    "label_flip_rate": 0.0387,
+    "n_temp_disagree": 1182,
+    "temp_disagree_rate": 0.4012,
+    "median_abs_temp_diff_F": 0.0,
+    "mean_abs_temp_diff_F": 0.089,
+    "p90_abs_temp_diff_F": 0.1,
+    "max_abs_temp_diff_F": 10.8
+  },
+  "full_cohort_ghcn_truth": {
+    "om_gfs_raw": {
+      "n": 3205,
+      "brier": 0.1254,
+      "dir_acc": 0.824,
+      "base_rate": 0.809,
+      "mean_p": 0.7262
+    },
+    "om_gfs_bc": {
+      "n": 3205,
+      "brier": 0.1108,
+      "dir_acc": 0.8443,
+      "base_rate": 0.809,
+      "mean_p": 0.7967
+    },
+    "om_gfs_bc_ps": {
+      "n": 3205,
+      "brier": 0.1055,
+      "dir_acc": 0.8465,
+      "base_rate": 0.809,
+      "mean_p": 0.8004
+    },
+    "gfs": {
+      "n": 3040,
+      "brier": 0.1648,
+      "dir_acc": 0.7796,
+      "base_rate": 0.8118,
+      "mean_p": 0.6857
+    },
+    "ecmwf": {
+      "n": 3040,
+      "brier": 0.2149,
+      "dir_acc": 0.6822,
+      "base_rate": 0.8118,
+      "mean_p": 0.6224
+    },
+    "icon": {
+      "n": 3040,
+      "brier": 0.1887,
+      "dir_acc": 0.7247,
+      "base_rate": 0.8118,
+      "mean_p": 0.6572
+    },
+    "gem": {
+      "n": 2634,
+      "brier": 0.1829,
+      "dir_acc": 0.7339,
+      "base_rate": 0.8117,
+      "mean_p": 0.6802
+    },
+    "gefs": {
+      "n": 2853,
+      "brier": 0.3209,
+      "dir_acc": 0.6211,
+      "base_rate": 0.8041,
+      "mean_p": 0.6392
+    },
+    "rate_1h_pit": {
+      "n": 2346,
+      "brier": 0.3621,
+      "dir_acc": 0.1982,
+      "base_rate": 0.8018,
+      "mean_p": 0.3323
+    },
+    "market": {
+      "n": 584,
+      "brier": 0.6271,
+      "dir_acc": 0.274,
+      "base_rate": 0.7705,
+      "mean_p": 0.1581
+    }
+  },
+  "overlap_subcohort": {
+    "om_gfs_raw": {
+      "ghcn_truth": {
+        "n": 2946,
+        "brier": 0.1256,
+        "dir_acc": 0.8242,
+        "base_rate": 0.8143,
+        "mean_p": 0.7311
+      },
+      "kalshi_truth": {
+        "n": 2946,
+        "brier": 0.1195,
+        "dir_acc": 0.833,
+        "base_rate": 0.7858,
+        "mean_p": 0.7311
+      },
+      "brier_delta_kalshi_minus_ghcn": -0.0061
+    },
+    "om_gfs_bc": {
+      "ghcn_truth": {
+        "n": 2946,
+        "brier": 0.1108,
+        "dir_acc": 0.8473,
+        "base_rate": 0.8143,
+        "mean_p": 0.8007
+      },
+      "kalshi_truth": {
+        "n": 2946,
+        "brier": 0.1115,
+        "dir_acc": 0.8425,
+        "base_rate": 0.7858,
+        "mean_p": 0.8007
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0007
+    },
+    "om_gfs_bc_ps": {
+      "ghcn_truth": {
+        "n": 2946,
+        "brier": 0.1036,
+        "dir_acc": 0.851,
+        "base_rate": 0.8143,
+        "mean_p": 0.8
+      },
+      "kalshi_truth": {
+        "n": 2946,
+        "brier": 0.1021,
+        "dir_acc": 0.8557,
+        "base_rate": 0.7858,
+        "mean_p": 0.8
+      },
+      "brier_delta_kalshi_minus_ghcn": -0.0015
+    },
+    "gfs": {
+      "ghcn_truth": {
+        "n": 2823,
+        "brier": 0.1635,
+        "dir_acc": 0.7818,
+        "base_rate": 0.8172,
+        "mean_p": 0.6902
+      },
+      "kalshi_truth": {
+        "n": 2823,
+        "brier": 0.1651,
+        "dir_acc": 0.7783,
+        "base_rate": 0.7889,
+        "mean_p": 0.6902
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0016
+    },
+    "ecmwf": {
+      "ghcn_truth": {
+        "n": 2823,
+        "brier": 0.2136,
+        "dir_acc": 0.6851,
+        "base_rate": 0.8172,
+        "mean_p": 0.6302
+      },
+      "kalshi_truth": {
+        "n": 2823,
+        "brier": 0.2162,
+        "dir_acc": 0.6858,
+        "base_rate": 0.7889,
+        "mean_p": 0.6302
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0026
+    },
+    "icon": {
+      "ghcn_truth": {
+        "n": 2823,
+        "brier": 0.1871,
+        "dir_acc": 0.7276,
+        "base_rate": 0.8172,
+        "mean_p": 0.6632
+      },
+      "kalshi_truth": {
+        "n": 2823,
+        "brier": 0.1915,
+        "dir_acc": 0.7191,
+        "base_rate": 0.7889,
+        "mean_p": 0.6632
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0044
+    },
+    "gem": {
+      "ghcn_truth": {
+        "n": 2467,
+        "brier": 0.1804,
+        "dir_acc": 0.7369,
+        "base_rate": 0.8152,
+        "mean_p": 0.685
+      },
+      "kalshi_truth": {
+        "n": 2467,
+        "brier": 0.1886,
+        "dir_acc": 0.7231,
+        "base_rate": 0.7892,
+        "mean_p": 0.685
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0082
+    },
+    "gefs": {
+      "ghcn_truth": {
+        "n": 2616,
+        "brier": 0.3196,
+        "dir_acc": 0.6246,
+        "base_rate": 0.8104,
+        "mean_p": 0.6491
+      },
+      "kalshi_truth": {
+        "n": 2616,
+        "brier": 0.3259,
+        "dir_acc": 0.6181,
+        "base_rate": 0.7825,
+        "mean_p": 0.6491
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0063
+    },
+    "rate_1h_pit": {
+      "ghcn_truth": {
+        "n": 2120,
+        "brier": 0.3643,
+        "dir_acc": 0.1915,
+        "base_rate": 0.8085,
+        "mean_p": 0.3328
+      },
+      "kalshi_truth": {
+        "n": 2120,
+        "brier": 0.3485,
+        "dir_acc": 0.2283,
+        "base_rate": 0.7717,
+        "mean_p": 0.3328
+      },
+      "brier_delta_kalshi_minus_ghcn": -0.0158
+    },
+    "market": {
+      "ghcn_truth": {
+        "n": 583,
+        "brier": 0.6281,
+        "dir_acc": 0.2727,
+        "base_rate": 0.7719,
+        "mean_p": 0.1582
+      },
+      "kalshi_truth": {
+        "n": 583,
+        "brier": 0.6287,
+        "dir_acc": 0.271,
+        "base_rate": 0.7633,
+        "mean_p": 0.1582
+      },
+      "brier_delta_kalshi_minus_ghcn": 0.0006
+    }
+  },
+  "truth_sources": {
+    "kalshi_canonical": "data/kalshi_settlements.db (HIGH series) + settlement_truth.kalshi_temp_f",
+    "ghcn_fallback": "data/ghcn_settlements.db high_f (== grid settled_max)"
+  }
+}
