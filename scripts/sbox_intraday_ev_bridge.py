@@ -93,7 +93,11 @@ from core.intraday.honest_calibration import (  # noqa: E402
 # (fcerr 0.99) — a LEVER-axis substitution, NOT a diversity gain. Behind the
 # flag, the NWP component uses om_gfs(bias-corrected); off (default) it is the
 # raw local GFS-seeded WS-P distribution, byte-identical to pre-flag behaviour.
-# Raw local GFS remains the fallback whenever om_gfs has no value for the day.
+# Raw local GFS is reachable ONLY when the sole-forecast flag is OFF. When the
+# sole flag is ON (om_gfs IS the forecast) a missing/unavailable om_gfs makes
+# `select_nwp_state` fall through to nwp_src == "gfs_local", which the sole gate
+# below FAILS CLOSED on (`sole_no_om_gfs`) — the station-day is skipped, never
+# booked under om_gfs provenance. It is NOT a fallback on the sole path.
 # Import is guarded so a substrate import failure can never break the bridge.
 try:
     from core.intraday.om_gfs_nwp import (
@@ -906,8 +910,12 @@ def select_nwp_state(st, day_str, hsf, dist, month, diag=None):
     """Select the NWP component's DistributionState for a station-day.
 
     om_gfs (Open-Meteo bias-corrected GFS, USE_OM_GFS_NWP=1) is the PREFERRED
-    NWP member; the raw local GFS-seeded WS-P distribution is the fallback used
-    when the flag is off, when om_gfs is unavailable, or when the fetch fails.
+    NWP member; this function returns the raw local GFS-seeded WS-P distribution
+    (nwp_src == "gfs_local") when the flag is off or when om_gfs is unavailable.
+    Under the SOLE-forecast flag (om_gfs IS the forecast) the caller's DATA gate
+    rejects nwp_src == "gfs_local" and SKIPS the station-day (fail closed) — it
+    is not a fallback there. On the legacy fusion path (flag off) gfs_local is
+    the pre-flag NWP member.
 
     Returns (state, nwp_src, ens):
       * nwp_src == "om_gfs"        -> state built from om_gfs (ens=None)
@@ -1000,7 +1008,8 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                              / (day_end - day_start).total_seconds()))
         # NWP component: om_gfs(bias-corrected) substitution behind USE_OM_GFS_NWP.
         # Default OFF -> raw local GFS-seeded WS-P (pre-flag behaviour). When the
-        # flag is ON but om_gfs has no value/fails, fall through to raw local GFS.
+        # sole flag is ON, nwp_src == "gfs_local" is skipped by the sole DATA gate
+        # below (fail closed), NOT treated as a fallback.
         state, nwp_src, ens = select_nwp_state(st, day_str, hsf, dist, month, diag)
         if state is None:
             skipped.append((st, nwp_src))
