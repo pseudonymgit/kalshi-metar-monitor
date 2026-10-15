@@ -1,0 +1,1021 @@
+{
+  "generated_by": "scripts/honest_calibration_audit_2026-10-15.py",
+  "audited_formula": "calibrated_p = clamp[0.01,ce](0.5 + (p_fused-0.5)*(1-ECE/2))",
+  "constants": {
+    "ECE": 0.47,
+    "BASE_RATE": 0.8,
+    "POOLED_CEILING": 0.84
+  },
+  "neutrality": {
+    "at_0.5": {
+      "ce=0.5": 0.5,
+      "ce=0.75": 0.5,
+      "ce=0.84": 0.5,
+      "ce=0.9031": 0.5,
+      "ce=0.999": 0.5
+    },
+    "symmetry": {
+      "p=0.2": {
+        "cal": 0.2705,
+        "cal_mirror": 0.7295,
+        "symmetric": true
+      },
+      "p=0.3": {
+        "cal": 0.347,
+        "cal_mirror": 0.653,
+        "symmetric": true
+      },
+      "p=0.4": {
+        "cal": 0.4235,
+        "cal_mirror": 0.5765,
+        "symmetric": true
+      },
+      "p=0.6": {
+        "cal": 0.5765,
+        "cal_mirror": 0.4235,
+        "symmetric": true
+      },
+      "p=0.7": {
+        "cal": 0.653,
+        "cal_mirror": 0.347,
+        "symmetric": true
+      },
+      "p=0.8": {
+        "cal": 0.7295,
+        "cal_mirror": 0.2705,
+        "symmetric": true
+      }
+    }
+  },
+  "edge_cases": {
+    "p=0.01,ce=0.84": {
+      "result": 0.1251,
+      "raised": null
+    },
+    "p=0.50,ce=0.84": {
+      "result": 0.5,
+      "raised": null
+    },
+    "p=0.99,ce=0.84": {
+      "result": 0.84,
+      "raised": null
+    },
+    "p=NaN,ce=0.84": {
+      "result": null,
+      "raised": "ValueError"
+    },
+    "p=None,ce=0.84": {
+      "result": null,
+      "raised": "TypeError"
+    },
+    "p=0.7,ce=NaN": {
+      "result": 0.653,
+      "raised": null
+    },
+    "p=0.7,ce=None": {
+      "result": null,
+      "raised": "TypeError"
+    },
+    "p=0.7,ce=0.2(<0.5)": {
+      "result": 0.5,
+      "raised": null
+    },
+    "p=0.7,ce=1.5(>1)": {
+      "result": 0.653,
+      "raised": null
+    },
+    "p=-0.3": {
+      "result": 0.01,
+      "raised": null
+    },
+    "p=1.7": {
+      "result": 0.84,
+      "raised": null
+    }
+  },
+  "cohorts": {
+    "sole_om_gfs": {
+      "n": 2927,
+      "raw_om_gfs_bc_ps": {
+        "n": 2927,
+        "brier": 0.1067,
+        "reliability": 0.0047,
+        "resolution": 0.0494,
+        "uncertainty": 0.1524,
+        "ece": 0.0376,
+        "mce": 0.2547,
+        "base_rate": 0.8124,
+        "mean_p": 0.8019,
+        "calibration_table": [
+          {
+            "bin": "0.0-0.1",
+            "n": 77,
+            "mean_p": 0.044,
+            "emp_rate": 0.2987,
+            "gap": -0.2547
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 88,
+            "mean_p": 0.1488,
+            "emp_rate": 0.3977,
+            "gap": -0.249
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 93,
+            "mean_p": 0.2491,
+            "emp_rate": 0.3011,
+            "gap": -0.0519
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 109,
+            "mean_p": 0.3541,
+            "emp_rate": 0.422,
+            "gap": -0.0679
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 129,
+            "mean_p": 0.4509,
+            "emp_rate": 0.5426,
+            "gap": -0.0917
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 123,
+            "mean_p": 0.5526,
+            "emp_rate": 0.5366,
+            "gap": 0.016
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 166,
+            "mean_p": 0.6514,
+            "emp_rate": 0.6807,
+            "gap": -0.0293
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 181,
+            "mean_p": 0.7555,
+            "emp_rate": 0.7293,
+            "gap": 0.0262
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 240,
+            "mean_p": 0.8522,
+            "emp_rate": 0.7833,
+            "gap": 0.0689
+          },
+          {
+            "bin": "0.9-1.0",
+            "n": 1721,
+            "mean_p": 0.9839,
+            "emp_rate": 0.9744,
+            "gap": 0.0094
+          }
+        ]
+      },
+      "calibrated_by_shipped_formula": {
+        "n": 2927,
+        "brier": 0.1206,
+        "reliability": 0.0151,
+        "resolution": 0.0463,
+        "uncertainty": 0.1524,
+        "ece": 0.1147,
+        "mce": 0.1464,
+        "base_rate": 0.8124,
+        "mean_p": 0.6977,
+        "calibration_table": [
+          {
+            "bin": "0.0-0.1",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 88,
+            "mean_p": 0.1569,
+            "emp_rate": 0.2841,
+            "gap": -0.1271
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 117,
+            "mean_p": 0.253,
+            "emp_rate": 0.3675,
+            "gap": -0.1145
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 121,
+            "mean_p": 0.3529,
+            "emp_rate": 0.3967,
+            "gap": -0.0438
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 169,
+            "mean_p": 0.4499,
+            "emp_rate": 0.503,
+            "gap": -0.0531
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 171,
+            "mean_p": 0.5533,
+            "emp_rate": 0.5673,
+            "gap": -0.0139
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 218,
+            "mean_p": 0.6498,
+            "emp_rate": 0.6881,
+            "gap": -0.0383
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 952,
+            "mean_p": 0.7717,
+            "emp_rate": 0.9181,
+            "gap": -0.1464
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 1091,
+            "mean_p": 0.8334,
+            "emp_rate": 0.9679,
+            "gap": -0.1345
+          },
+          {
+            "bin": "0.9-1.0",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "mean_check": {
+        "base_rate": 0.8124,
+        "mean_p_raw": 0.8019,
+        "mean_p_calibrated_linear_expect": 0.7309,
+        "raw_gap_to_base": -0.0106,
+        "cal_gap_to_base": -0.0815
+      }
+    },
+    "fused_5member": {
+      "n": 2296,
+      "raw_fused_pre_ceiling": {
+        "n": 2296,
+        "brier": 0.1459,
+        "reliability": 0.0101,
+        "resolution": 0.0172,
+        "uncertainty": 0.1549,
+        "ece": 0.0868,
+        "mce": 0.1705,
+        "base_rate": 0.8084,
+        "mean_p": 0.8293,
+        "calibration_table": [
+          {
+            "bin": "0.0-0.1",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 11,
+            "mean_p": 0.3523,
+            "emp_rate": 0.1818,
+            "gap": 0.1705
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 30,
+            "mean_p": 0.4593,
+            "emp_rate": 0.3333,
+            "gap": 0.1259
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 120,
+            "mean_p": 0.5625,
+            "emp_rate": 0.5667,
+            "gap": -0.0042
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 294,
+            "mean_p": 0.6549,
+            "emp_rate": 0.6497,
+            "gap": 0.0053
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 508,
+            "mean_p": 0.7458,
+            "emp_rate": 0.8937,
+            "gap": -0.1479
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 329,
+            "mean_p": 0.8511,
+            "emp_rate": 0.7112,
+            "gap": 0.1399
+          },
+          {
+            "bin": "0.9-1.0",
+            "n": 1004,
+            "mean_p": 0.9636,
+            "emp_rate": 0.8934,
+            "gap": 0.0701
+          }
+        ]
+      },
+      "raw_fused_legacy_clamp": {
+        "n": 2296,
+        "brier": 0.1523,
+        "reliability": 0.0106,
+        "resolution": 0.0133,
+        "uncertainty": 0.1549,
+        "ece": 0.0942,
+        "mce": 0.1705,
+        "base_rate": 0.8084,
+        "mean_p": 0.7204,
+        "calibration_table": [
+          {
+            "bin": "0.0-0.1",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 11,
+            "mean_p": 0.3523,
+            "emp_rate": 0.1818,
+            "gap": 0.1705
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 30,
+            "mean_p": 0.4593,
+            "emp_rate": 0.3333,
+            "gap": 0.1259
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 120,
+            "mean_p": 0.5625,
+            "emp_rate": 0.5667,
+            "gap": -0.0042
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 294,
+            "mean_p": 0.6549,
+            "emp_rate": 0.6497,
+            "gap": 0.0053
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 1841,
+            "mean_p": 0.7476,
+            "emp_rate": 0.8609,
+            "gap": -0.1133
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.9-1.0",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "calibrated_by_shipped_formula": {
+        "n": 2296,
+        "brier": 0.1658,
+        "reliability": 0.022,
+        "resolution": 0.0089,
+        "uncertainty": 0.1549,
+        "ece": 0.1452,
+        "mce": 0.1606,
+        "base_rate": 0.8084,
+        "mean_p": 0.6686,
+        "calibration_table": [
+          {
+            "bin": "0.0-0.1",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 8,
+            "mean_p": 0.378,
+            "emp_rate": 0.25,
+            "gap": 0.128
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 33,
+            "mean_p": 0.4636,
+            "emp_rate": 0.303,
+            "gap": 0.1606
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 197,
+            "mean_p": 0.5636,
+            "emp_rate": 0.6091,
+            "gap": -0.0455
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 2058,
+            "mean_p": 0.6831,
+            "emp_rate": 0.8377,
+            "gap": -0.1546
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          },
+          {
+            "bin": "0.9-1.0",
+            "n": 0,
+            "mean_p": null,
+            "emp_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "mean_check": {
+        "base_rate": 0.8084,
+        "mean_p_raw": 0.7204,
+        "mean_p_calibrated_linear_expect": 0.6686,
+        "raw_gap_to_base": -0.0879,
+        "cal_gap_to_base": -0.1397
+      }
+    }
+  },
+  "ece_renormalization": {
+    "observed_ece": {
+      "rate_1h_pit (source of the 0.47 constant)": 0.4689,
+      "om_gfs_bc_ps (shipped sole signal)": 0.0376,
+      "fused_5 pre-ceiling": 0.0868
+    },
+    "renorm_sweep": {
+      "constant ECE (0.47, shipped)": {
+        "ece_used": 0.47,
+        "shrink_factor_1_minus_lam": 0.765,
+        "cal_0.90->": 0.806,
+        "brier_sole": 0.1206,
+        "mean_p": 0.6977
+      },
+      "renormalized to om_gfs (shipped signal)": {
+        "ece_used": 0.0376,
+        "shrink_factor_1_minus_lam": 0.9812,
+        "cal_0.90->": 0.8925,
+        "brier_sole": 0.123,
+        "mean_p": 0.701
+      },
+      "renormalized to fused": {
+        "ece_used": 0.0868,
+        "shrink_factor_1_minus_lam": 0.9566,
+        "cal_0.90->": 0.8826,
+        "brier_sole": 0.1227,
+        "mean_p": 0.701
+      }
+    }
+  },
+  "ceiling_audit": {
+    "n_stations_with_custom_ceiling": 20,
+    "min": 0.7682,
+    "max": 0.9031,
+    "mean": 0.8253,
+    "n_distinct": 19,
+    "pooled_constant_in_code": 0.84,
+    "within_075_090": false,
+    "provenance": "per-station values ARE distinct and looked up by station; they are NOT a single reused constant. But the refit formula is 0.75 + 0.24*min(1, resolution/0.05) where `resolution` is rate_1h's \u2014 a signal with no skill.",
+    "ceiling_vs_source_resolution": {
+      "KATL": {
+        "ceiling": 0.7836,
+        "rate1h_resolution": 0.007,
+        "rate1h_ece": 0.5061
+      },
+      "KAUS": {
+        "ceiling": 0.799,
+        "rate1h_resolution": 0.0102,
+        "rate1h_ece": 0.5475
+      },
+      "KBOS": {
+        "ceiling": 0.7894,
+        "rate1h_resolution": 0.0082,
+        "rate1h_ece": 0.2618
+      },
+      "KDCA": {
+        "ceiling": 0.8062,
+        "rate1h_resolution": 0.0117,
+        "rate1h_ece": 0.42
+      },
+      "KDEN": {
+        "ceiling": 0.8148,
+        "rate1h_resolution": 0.0135,
+        "rate1h_ece": 0.421
+      },
+      "KDFW": {
+        "ceiling": 0.8018,
+        "rate1h_resolution": 0.0108,
+        "rate1h_ece": 0.5309
+      },
+      "KHOU": {
+        "ceiling": 0.8402,
+        "rate1h_resolution": 0.0188,
+        "rate1h_ece": 0.3775
+      },
+      "KLAS": {
+        "ceiling": 0.7735,
+        "rate1h_resolution": 0.0049,
+        "rate1h_ece": 0.4864
+      },
+      "KLAX": {
+        "ceiling": 0.8671,
+        "rate1h_resolution": 0.0244,
+        "rate1h_ece": 0.1176
+      },
+      "KMDW": {
+        "ceiling": 0.8441,
+        "rate1h_resolution": 0.0196,
+        "rate1h_ece": 0.3306
+      },
+      "KMIA": {
+        "ceiling": 0.8738,
+        "rate1h_resolution": 0.0258,
+        "rate1h_ece": 0.1707
+      },
+      "KMSP": {
+        "ceiling": 0.8618,
+        "rate1h_resolution": 0.0233,
+        "rate1h_ece": 0.46
+      },
+      "KMSY": {
+        "ceiling": 0.9031,
+        "rate1h_resolution": 0.0319,
+        "rate1h_ece": 0.2942
+      },
+      "KNYC": {
+        "ceiling": 0.8321,
+        "rate1h_resolution": 0.0171,
+        "rate1h_ece": 0.2588
+      },
+      "KOKC": {
+        "ceiling": 0.8143,
+        "rate1h_resolution": 0.0134,
+        "rate1h_ece": 0.513
+      },
+      "KPHL": {
+        "ceiling": 0.847,
+        "rate1h_resolution": 0.0202,
+        "rate1h_ece": 0.4068
+      },
+      "KPHX": {
+        "ceiling": 0.7735,
+        "rate1h_resolution": 0.0049,
+        "rate1h_ece": 0.5889
+      },
+      "KSAT": {
+        "ceiling": 0.7682,
+        "rate1h_resolution": 0.0038,
+        "rate1h_ece": 0.5825
+      },
+      "KSEA": {
+        "ceiling": 0.8599,
+        "rate1h_resolution": 0.0229,
+        "rate1h_ece": 0.414
+      },
+      "KSFO": {
+        "ceiling": 0.8518,
+        "rate1h_resolution": 0.0212,
+        "rate1h_ece": 0.3055
+      }
+    },
+    "pooled_from_refit": 0.8268,
+    "sole_rows_clamped_by_ceiling": 1555,
+    "sole_rows_total": 2927,
+    "sole_clamp_rate": 0.5313
+  },
+  "per_station_crossval": {
+    "stations": {
+      "KATL": {
+        "n": 149,
+        "brier_raw": 0.0547,
+        "brier_calibrated": 0.0883,
+        "delta": 0.0335,
+        "calibrated_better": false,
+        "ceiling": 0.7836
+      },
+      "KAUS": {
+        "n": 139,
+        "brier_raw": 0.019,
+        "brier_calibrated": 0.0555,
+        "delta": 0.0364,
+        "calibrated_better": false,
+        "ceiling": 0.799
+      },
+      "KBOS": {
+        "n": 153,
+        "brier_raw": 0.1691,
+        "brier_calibrated": 0.1704,
+        "delta": 0.0013,
+        "calibrated_better": false,
+        "ceiling": 0.7894
+      },
+      "KDCA": {
+        "n": 104,
+        "brier_raw": 0.0826,
+        "brier_calibrated": 0.1038,
+        "delta": 0.0212,
+        "calibrated_better": false,
+        "ceiling": 0.8062
+      },
+      "KDEN": {
+        "n": 153,
+        "brier_raw": 0.0692,
+        "brier_calibrated": 0.0877,
+        "delta": 0.0185,
+        "calibrated_better": false,
+        "ceiling": 0.8148
+      },
+      "KDFW": {
+        "n": 152,
+        "brier_raw": 0.0479,
+        "brier_calibrated": 0.075,
+        "delta": 0.0271,
+        "calibrated_better": false,
+        "ceiling": 0.8018
+      },
+      "KHOU": {
+        "n": 152,
+        "brier_raw": 0.1865,
+        "brier_calibrated": 0.1814,
+        "delta": -0.005,
+        "calibrated_better": true,
+        "ceiling": 0.8402
+      },
+      "KLAS": {
+        "n": 148,
+        "brier_raw": 0.0419,
+        "brier_calibrated": 0.0789,
+        "delta": 0.0369,
+        "calibrated_better": false,
+        "ceiling": 0.7735
+      },
+      "KLAX": {
+        "n": 134,
+        "brier_raw": 0.2048,
+        "brier_calibrated": 0.1972,
+        "delta": -0.0076,
+        "calibrated_better": true,
+        "ceiling": 0.8671
+      },
+      "KMDW": {
+        "n": 152,
+        "brier_raw": 0.1539,
+        "brier_calibrated": 0.1544,
+        "delta": 0.0005,
+        "calibrated_better": false,
+        "ceiling": 0.8441
+      },
+      "KMIA": {
+        "n": 145,
+        "brier_raw": 0.2222,
+        "brier_calibrated": 0.2102,
+        "delta": -0.012,
+        "calibrated_better": true,
+        "ceiling": 0.8738
+      },
+      "KMSP": {
+        "n": 156,
+        "brier_raw": 0.053,
+        "brier_calibrated": 0.0677,
+        "delta": 0.0147,
+        "calibrated_better": false,
+        "ceiling": 0.8618
+      },
+      "KMSY": {
+        "n": 150,
+        "brier_raw": 0.179,
+        "brier_calibrated": 0.1754,
+        "delta": -0.0036,
+        "calibrated_better": true,
+        "ceiling": 0.9031
+      },
+      "KNYC": {
+        "n": 150,
+        "brier_raw": 0.1776,
+        "brier_calibrated": 0.1733,
+        "delta": -0.0043,
+        "calibrated_better": true,
+        "ceiling": 0.8321
+      },
+      "KOKC": {
+        "n": 151,
+        "brier_raw": 0.052,
+        "brier_calibrated": 0.0757,
+        "delta": 0.0237,
+        "calibrated_better": false,
+        "ceiling": 0.8143
+      },
+      "KPHL": {
+        "n": 150,
+        "brier_raw": 0.0973,
+        "brier_calibrated": 0.1079,
+        "delta": 0.0106,
+        "calibrated_better": false,
+        "ceiling": 0.847
+      },
+      "KPHX": {
+        "n": 140,
+        "brier_raw": 0.0346,
+        "brier_calibrated": 0.0731,
+        "delta": 0.0385,
+        "calibrated_better": false,
+        "ceiling": 0.7735
+      },
+      "KSAT": {
+        "n": 148,
+        "brier_raw": 0.0309,
+        "brier_calibrated": 0.076,
+        "delta": 0.0451,
+        "calibrated_better": false,
+        "ceiling": 0.7682
+      },
+      "KSEA": {
+        "n": 153,
+        "brier_raw": 0.044,
+        "brier_calibrated": 0.0567,
+        "delta": 0.0128,
+        "calibrated_better": false,
+        "ceiling": 0.8599
+      },
+      "KSFO": {
+        "n": 148,
+        "brier_raw": 0.2112,
+        "brier_calibrated": 0.2047,
+        "delta": -0.0065,
+        "calibrated_better": true,
+        "ceiling": 0.8518
+      }
+    },
+    "summary": {
+      "n_stations": 20,
+      "calibrated_beats_raw": 6,
+      "calibrated_loses_to_raw": 14,
+      "beats_every_station": false
+    }
+  },
+  "alternatives": {
+    "identity_raw": {
+      "n": 2927,
+      "brier": 0.1067,
+      "reliability": 0.0047,
+      "resolution": 0.0494,
+      "uncertainty": 0.1524,
+      "ece": 0.0376,
+      "mce": 0.2547,
+      "base_rate": 0.8124,
+      "mean_p": 0.8019,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 77,
+          "mean_p": 0.044,
+          "emp_rate": 0.2987,
+          "gap": -0.2547
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 88,
+          "mean_p": 0.1488,
+          "emp_rate": 0.3977,
+          "gap": -0.249
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 93,
+          "mean_p": 0.2491,
+          "emp_rate": 0.3011,
+          "gap": -0.0519
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 109,
+          "mean_p": 0.3541,
+          "emp_rate": 0.422,
+          "gap": -0.0679
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 129,
+          "mean_p": 0.4509,
+          "emp_rate": 0.5426,
+          "gap": -0.0917
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 123,
+          "mean_p": 0.5526,
+          "emp_rate": 0.5366,
+          "gap": 0.016
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 166,
+          "mean_p": 0.6514,
+          "emp_rate": 0.6807,
+          "gap": -0.0293
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 181,
+          "mean_p": 0.7555,
+          "emp_rate": 0.7293,
+          "gap": 0.0262
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 240,
+          "mean_p": 0.8522,
+          "emp_rate": 0.7833,
+          "gap": 0.0689
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 1721,
+          "mean_p": 0.9839,
+          "emp_rate": 0.9744,
+          "gap": 0.0094
+        }
+      ]
+    },
+    "shipped_shrink_shipped_ece": {
+      "n": 2927,
+      "brier": 0.1206,
+      "reliability": 0.0151,
+      "resolution": 0.0463,
+      "uncertainty": 0.1524,
+      "ece": 0.1147,
+      "mce": 0.1464,
+      "base_rate": 0.8124,
+      "mean_p": 0.6977,
+      "calibration_table": [
+        {
+          "bin": "0.0-0.1",
+          "n": 0,
+          "mean_p": null,
+          "emp_rate": null,
+          "gap": null
+        },
+        {
+          "bin": "0.1-0.2",
+          "n": 88,
+          "mean_p": 0.1569,
+          "emp_rate": 0.2841,
+          "gap": -0.1271
+        },
+        {
+          "bin": "0.2-0.3",
+          "n": 117,
+          "mean_p": 0.253,
+          "emp_rate": 0.3675,
+          "gap": -0.1145
+        },
+        {
+          "bin": "0.3-0.4",
+          "n": 121,
+          "mean_p": 0.3529,
+          "emp_rate": 0.3967,
+          "gap": -0.0438
+        },
+        {
+          "bin": "0.4-0.5",
+          "n": 169,
+          "mean_p": 0.4499,
+          "emp_rate": 0.503,
+          "gap": -0.0531
+        },
+        {
+          "bin": "0.5-0.6",
+          "n": 171,
+          "mean_p": 0.5533,
+          "emp_rate": 0.5673,
+          "gap": -0.0139
+        },
+        {
+          "bin": "0.6-0.7",
+          "n": 218,
+          "mean_p": 0.6498,
+          "emp_rate": 0.6881,
+          "gap": -0.0383
+        },
+        {
+          "bin": "0.7-0.8",
+          "n": 952,
+          "mean_p": 0.7717,
+          "emp_rate": 0.9181,
+          "gap": -0.1464
+        },
+        {
+          "bin": "0.8-0.9",
+          "n": 1091,
+          "mean_p": 0.8334,
+          "emp_rate": 0.9679,
+          "gap": -0.1345
+        },
+        {
+          "bin": "0.9-1.0",
+          "n": 0,
+          "mean_p": null,
+          "emp_rate": null,
+          "gap": null
+        }
+      ]
+    },
+    "shrink_renormalized_ece_004": {
+      "brier": 0.123,
+      "note": "shrink factor ~0.981 -> near identity"
+    }
+  }
+}

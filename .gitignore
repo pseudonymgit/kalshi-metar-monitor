@@ -99,3 +99,12 @@ data/gefs_work/
 !artifacts/brier-datefix-impact-2026-10-15.json
 !artifacts/ghcn-alignment-audit-2026-10-15.json
 !artifacts/high-bridge-arm-2026-10-15.json
+
+# Honest-calibration red-team audit (committed analysis artifact, 2026-10-15)
+!data/honest_calibration_audit_2026-10-15.json
+
+# HIGH re-sweep under Kalshi truth (committed analysis artifact, 2026-10-15)
+!data/high_kalshi_resweep_2026-10-15.json
+
+# GEFSv12 per-member skill (committed analysis artifact, 2026-10-15)
+!data/gefsv12_member_skill_2026-10-15.json
