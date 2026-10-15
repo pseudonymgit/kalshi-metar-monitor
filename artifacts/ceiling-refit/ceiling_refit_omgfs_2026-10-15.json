@@ -1,0 +1,110 @@
+{
+  "generated_by": "scripts/refit_ceiling_shipped_2026-10-15.py",
+  "signal": "om_gfs_bc_ps (shipped HIGH sole forecast, 13:30 pin)",
+  "cohort_n": 2927,
+  "method": "per-station cap = min(0.99, top-decile(p>=0.9) empirical crossing rate + 2*SE); near-identity for the shipped signal",
+  "pooled_ceiling": 0.982,
+  "A2_omgfs_topbin_capped_per_station": {
+    "KATL": {
+      "ceiling": 0.99,
+      "n": 149,
+      "top_decile_n": 106
+    },
+    "KAUS": {
+      "ceiling": 0.99,
+      "n": 139,
+      "top_decile_n": 126
+    },
+    "KBOS": {
+      "ceiling": 0.989,
+      "n": 153,
+      "top_decile_n": 64
+    },
+    "KDCA": {
+      "ceiling": 0.99,
+      "n": 104,
+      "top_decile_n": 56
+    },
+    "KDEN": {
+      "ceiling": 0.99,
+      "n": 153,
+      "top_decile_n": 117
+    },
+    "KDFW": {
+      "ceiling": 0.99,
+      "n": 152,
+      "top_decile_n": 123
+    },
+    "KHOU": {
+      "ceiling": 0.99,
+      "n": 152,
+      "top_decile_n": 49
+    },
+    "KLAS": {
+      "ceiling": 0.99,
+      "n": 148,
+      "top_decile_n": 105
+    },
+    "KLAX": {
+      "ceiling": 0.9604,
+      "n": 134,
+      "top_decile_n": 38
+    },
+    "KMDW": {
+      "ceiling": 0.99,
+      "n": 152,
+      "top_decile_n": 64
+    },
+    "KMIA": {
+      "ceiling": 0.99,
+      "n": 145,
+      "top_decile_n": 31
+    },
+    "KMSP": {
+      "ceiling": 0.99,
+      "n": 156,
+      "top_decile_n": 114
+    },
+    "KMSY": {
+      "ceiling": 0.99,
+      "n": 150,
+      "top_decile_n": 47
+    },
+    "KNYC": {
+      "ceiling": 0.9878,
+      "n": 150,
+      "top_decile_n": 59
+    },
+    "KOKC": {
+      "ceiling": 0.99,
+      "n": 151,
+      "top_decile_n": 116
+    },
+    "KPHL": {
+      "ceiling": 0.99,
+      "n": 150,
+      "top_decile_n": 87
+    },
+    "KPHX": {
+      "ceiling": 0.99,
+      "n": 140,
+      "top_decile_n": 126
+    },
+    "KSAT": {
+      "ceiling": 0.99,
+      "n": 148,
+      "top_decile_n": 122
+    },
+    "KSEA": {
+      "ceiling": 0.99,
+      "n": 153,
+      "top_decile_n": 129
+    },
+    "KSFO": {
+      "ceiling": 0.99,
+      "n": 148,
+      "top_decile_n": 42
+    }
+  },
+  "legacy_artifact": "ceiling_refit_2026-10-13.json (rate_1h-derived; provenance only)"
+}

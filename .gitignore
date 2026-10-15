@@ -108,3 +108,9 @@ data/gefs_work/
 
 # GEFSv12 per-member skill (committed analysis artifact, 2026-10-15)
 !data/gefsv12_member_skill_2026-10-15.json
+
+# Honest-calibration repair (2026-10-15): independent verification artifact + the
+# shipped-cohort fixture the no-harm regression test reads.
+!artifacts/calibration-fix/
+!artifacts/calibration-fix/*.json
+!tests/fixtures/honest_cohort_2026-10-15.json

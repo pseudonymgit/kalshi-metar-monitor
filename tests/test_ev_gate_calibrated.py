@@ -19,8 +19,8 @@ sys.path.insert(0, _REPO)
 sys.path.insert(0, os.path.join(_REPO, "scripts"))
 
 from core.intraday.honest_calibration import (  # noqa: E402
-    honest_calibrated_p, station_ceiling, composite_conf_from_p,
-    ECE, BASE_RATE, POOLED_CEILING,
+    honest_calibrated_p, station_ceiling, station_ceilings,
+    composite_conf_from_p, ECE, BASE_RATE, POOLED_CEILING,
 )
 
 
@@ -47,14 +47,20 @@ def test_coin_flip_stays_a_coin_flip():
 
 
 def test_ceiling_clamps_overconfident_signal():
-    assert honest_calibrated_p(0.99, 0.7519) == 0.7519
-    assert honest_calibrated_p(0.99, 0.79) == 0.79
+    # The cap is a real clamp: a p whose SHRUNK value exceeds the ceiling is
+    # pulled DOWN to it (shrink is near-identity under the 2026-10-15 ECE).
+    assert honest_calibrated_p(0.9999, 0.989) == 0.989
+    assert honest_calibrated_p(0.9999, 0.96) == 0.96
+    # ...and a value already below the cap is left alone (by the cap).
+    assert honest_calibrated_p(0.99, 0.96) < 0.989
 
 
 def test_unknown_station_falls_back_to_pooled():
     assert station_ceiling("ZZZZ") == POOLED_CEILING
-    # KBOS has a measured per-station ceiling in the refit artifact.
-    assert station_ceiling("KBOS") < POOLED_CEILING
+    # Every shipped station cap is present and near-identity (2026-10-15 refit).
+    ce = station_ceilings()
+    assert len(ce) == 20
+    assert all(0.90 <= v <= 0.99 for v in ce.values())
 
 
 def test_nan_is_rejected():
@@ -63,6 +69,44 @@ def test_nan_is_rejected():
     except ValueError:
         return
     raise AssertionError("NaN raw probability must raise (fail closed)")
+
+
+def test_none_and_nonfinite_fail_closed():
+    # ITEM 2 (2026-10-15): None raised TypeError; a NaN ceiling silently clamped
+    # to the max (fail-OPEN). Both must now raise ValueError.
+    for bad_p in (None, float("inf"), "x"):
+        try:
+            honest_calibrated_p(bad_p, 0.9)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"p={bad_p!r} must raise ValueError")
+    for bad_ce in (None, float("nan"), float("inf")):
+        try:
+            honest_calibrated_p(0.7, bad_ce)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"ceiling={bad_ce!r} must raise ValueError")
+
+
+def test_calibration_does_not_harm_the_honest_cohort():
+    """ITEM 1 invariant: brier(calibrated) <= brier(raw) on the shipped cohort.
+
+    Fixture = the honest sole-om_gfs cohort (p_raw, per-station ceiling, y),
+    n=2927. The pre-repair transform scored 0.1206 vs raw 0.1067 (worse at
+    14/20 stations); the repair must not degrade the shipped signal.
+    """
+    import json
+    fx = json.load(open(os.path.join(
+        _REPO, "tests", "fixtures", "honest_cohort_2026-10-15.json")))
+    rows = fx["rows"]
+    assert len(rows) > 2000
+    raw = sum((p - y) ** 2 for p, _, y in rows) / len(rows)
+    cal = [honest_calibrated_p(p, c) for p, c, y in rows]
+    cal_b = sum((p - y) ** 2 for p, (_, _, y) in zip(cal, rows)) / len(rows)
+    assert cal_b <= raw + 1e-9, (
+        f"calibration degraded the shipped signal: cal {cal_b:.4f} > raw {raw:.4f}")
 
 
 def test_composite_conf_from_p():
