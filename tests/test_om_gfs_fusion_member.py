@@ -1,21 +1,29 @@
 #!/usr/bin/env python3
-"""om_gfs as the FIFTH fusion member (2026-10-13 WIRE FLIP, ADDITIVE).
+"""om_gfs fusion member is RETIRED — the SOLE-FORECAST contract
+(Workstream AF, 2026-10-14; re-stated 2026-10-15).
 
-The honest re-run (`27463df0d`) found om_gfs(bc) Brier 0.123 beats honest
-rate_1h 0.362, flipping the prior DO_NOT_WIRE verdict to WIRE as a SECOND,
-ADDITIVE fusion member. This is separate from the lever-axis NWP substitution
-(`USE_OM_GFS_NWP`), which is unchanged and still in `.env`.
+HISTORICAL: the honest re-run (`27463df0d`) once wired om_gfs(bc) as a FIFTH,
+additive fusion member behind `USE_OM_GFS_FUSION` (Brier 0.123 vs honest
+rate_1h 0.362).
 
-These tests pin the wiring guarantee:
+CURRENT: behind `USE_OM_GFS_NWP` om_gfs IS the forecast — the NWP component
+uses the bias-corrected om_gfs value instead of the raw local GFS-seeded WS-P
+distribution. There is no fusion for it to join, so `om_gfs_fusion_enabled()`
+is a permanent `return False` no-op and `USE_OM_GFS_FUSION` can no longer
+enable a vote. `select_om_gfs_fusion_member` therefore ALWAYS returns None.
 
-  * the fusion flag (`USE_OM_GFS_FUSION`) is OFF by default and the four-member
-    fusion is byte-identical when it is off (legacy callers unaffected);
-  * when on, om_gfs joins the CORE blend and the COMPOSITE confidence as a fifth
-    component, at its own `weight_om_gfs` (default 0.15), REPLACING nothing;
-  * the per-station weight store carries `weight_om_gfs` (default 0.15);
-  * the NWP member is NOT double-counted (suppressed when the NWP slot is
-    already om_gfs via `USE_OM_GFS_NWP`);
-  * a fetch failure leaves the fifth member out (never raises).
+These tests pin the CURRENT contract:
+
+  * `om_gfs_fusion_enabled()` is False for EVERY value, including "1" — the
+    flag is inert (no-op);
+  * the flag has NO effect on member selection: set == unset -> None, and the
+    member fetch is never reached;
+  * the NWP slot is not double-counted: nwp_src == "om_gfs" -> None;
+  * the legacy fusion MATH (`multi_forecaster_fusion`) is intact as the
+    ROLLBACK path (reached only when the NWP flag is off) and stays covered;
+  * the defensive error-recording branch is LATENT — reachable only if the
+    retired lever were force-re-enabled; a fetch failure then still records
+    `om_gfs_member_error` and returns None (never raises).
 
 Run: python3 -m pytest tests/test_om_gfs_fusion_member.py -v
 """
@@ -57,11 +65,10 @@ def test_fusion_flag_default_off(monkeypatch):
     assert _load_omgfs().om_gfs_fusion_enabled() is False
 
 
-def test_fusion_flag_on_and_other_values_off(monkeypatch):
+def test_fusion_flag_is_retired_noop_for_every_value(monkeypatch):
+    """The retired lever is permanently False — even "1" can no longer turn it on."""
     m = _load_omgfs()
-    monkeypatch.setenv("USE_OM_GFS_FUSION", "1")
-    assert m.om_gfs_fusion_enabled() is True
-    for v in ("0", "", "yes", "true"):
+    for v in ("1", "0", "", "yes", "true"):
         monkeypatch.setenv("USE_OM_GFS_FUSION", v)
         assert m.om_gfs_fusion_enabled() is False, v
 
@@ -126,10 +133,7 @@ def test_station_weights_has_om_gfs_column_and_default():
     conn.close()
 
 
-# ── bridge seam: fifth member selection ──────────────────────────────────────
-_OM_SENTINEL = DistributionState("KNYC", "2026-10-13", 55.0, 3.0)
-
-
+# ── bridge seam: the retired fifth-member selection ──────────────────────────
 def test_fusion_member_off_by_default(monkeypatch):
     b = _load_bridge()
     monkeypatch.delenv("USE_OM_GFS_FUSION", raising=False)
@@ -141,30 +145,49 @@ def test_fusion_member_off_by_default(monkeypatch):
     assert b.select_om_gfs_fusion_member("gfs_local", "KNYC", "2026-10-13", 64.0) is None
 
 
-def test_fusion_member_on_returns_state(monkeypatch):
+def test_fusion_flag_has_no_effect_on_member_selection(monkeypatch):
+    """Flag set -> same behaviour as unset: no member, fetch never reached.
+
+    `USE_OM_GFS_FUSION` is retired (a permanent no-op), so member selection is
+    identical whether it is set or not — and it never re-votes when the NWP
+    slot is already om_gfs.
+    """
     b = _load_bridge()
+
+    def _boom(*a, **k):
+        raise AssertionError("retired flag must not trigger a member fetch")
+
+    monkeypatch.setattr(b, "om_gfs_state_for_day", _boom)
+    monkeypatch.delenv("USE_OM_GFS_FUSION", raising=False)
+    assert b.select_om_gfs_fusion_member("gfs_local", "KNYC", "2026-10-13", 64.0) is None
     monkeypatch.setenv("USE_OM_GFS_FUSION", "1")
-    monkeypatch.setattr(b, "om_gfs_state_for_day",
-                        lambda st, d, live=True, high_so_far=None: _OM_SENTINEL)
-    st = b.select_om_gfs_fusion_member("gfs_local", "KNYC", "2026-10-13", 64.0)
-    assert st is _OM_SENTINEL
+    assert b.select_om_gfs_fusion_member("gfs_local", "KNYC", "2026-10-13", 64.0) is None
 
 
-def test_fusion_member_suppressed_when_nwp_is_already_om_gfs(monkeypatch):
+def test_fusion_member_no_dup_vote_when_nwp_is_om_gfs(monkeypatch):
+    """No double-count: nwp_src == "om_gfs" -> None, even if the lever came back."""
     b = _load_bridge()
-    monkeypatch.setenv("USE_OM_GFS_FUSION", "1")
+    # Force the retired lever ON to prove the suppression is the NWP-slot rule,
+    # not merely the (always-False) flag guard.
+    monkeypatch.setattr(b, "om_gfs_fusion_enabled", lambda: True)
 
     def _boom(*a, **k):
         raise AssertionError("double-count: NWP slot already om_gfs")
 
     monkeypatch.setattr(b, "om_gfs_state_for_day", _boom)
-    # USE_OM_GFS_NWP on -> NWP slot is om_gfs, so the member must not re-vote.
     assert b.select_om_gfs_fusion_member("om_gfs", "KNYC", "2026-10-13", 64.0) is None
 
 
-def test_fusion_member_fetch_error_is_swallowed(monkeypatch):
+def test_member_fetch_error_records_diag_when_lever_forced(monkeypatch):
+    """Latent defensive branch: IF the retired lever were re-enabled, a fetch
+    failure records `om_gfs_member_error` and returns None (never raises).
+
+    Under current reality the flag guard returns None before any fetch, so the
+    branch is unreachable on the default path; forcing the lever here keeps the
+    defensive behaviour covered without pretending the lever is live.
+    """
     b = _load_bridge()
-    monkeypatch.setenv("USE_OM_GFS_FUSION", "1")
+    monkeypatch.setattr(b, "om_gfs_fusion_enabled", lambda: True)
 
     def _raise(*a, **k):
         raise RuntimeError("network down")
