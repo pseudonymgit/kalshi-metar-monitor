@@ -93,3 +93,7 @@ data/gefs_work/
 
 # LOW/HIGH end-to-end side-by-side (committed analysis artifact, 2026-10-14)
 !data/low_high_sidebyside_2026-10-14.json
+
+# Kalshi date-offset repair + Brier impact (committed analysis artifact, 2026-10-15)
+!attention/kalshi_datefix_2026-10-15.json
+!artifacts/brier-datefix-impact-2026-10-15.json

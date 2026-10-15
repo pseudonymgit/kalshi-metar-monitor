@@ -1,0 +1,26 @@
+{
+  "generated_by": "scripts/fix_kalshi_settlement_dates_2026-10-15.py",
+  "applied": false,
+  "db": "data/kalshi_settlements.db",
+  "md5_before": "722730470730ef2d3dc00e7982ddf7c8",
+  "md5_after": "722730470730ef2d3dc00e7982ddf7c8",
+  "backup": null,
+  "rows_total": 11690,
+  "rows_fixed": 0,
+  "rows_that_would_change": 0,
+  "fixed_by_source_type": {},
+  "rows_still_mismatched": 0,
+  "index_before": null,
+  "index_after": [
+    "idx_ks_source_type",
+    "idx_ks_station",
+    "idx_ks_station_date",
+    "idx_ks_target_date",
+    "sqlite_autoindex_kalshi_settlements_1",
+    "uq_kalshi_settlements_station_series_date"
+  ],
+  "unique_key_duplicates": 0,
+  "integrity_check": "ok",
+  "foreign_key_check_errors": 0,
+  "sample_remaining": []
+}

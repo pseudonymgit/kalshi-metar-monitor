@@ -1,0 +1,21 @@
+{
+  "generated_by": "scripts/brier_datefix_impact_2026-10-15.py",
+  "axis": "om_gfs bc_ps (P(settled_high > T) at 13:30 pin), naive (station,target_date) join",
+  "pre_db": "data/_backup_pre_datefix_20261015T012634Z.db",
+  "post_db": "data/kalshi_settlements.db",
+  "pre_fix_naive_join": {
+    "n": 2700,
+    "brier": 0.1215,
+    "dir_acc": 0.8326,
+    "base_rate": 0.7663,
+    "rows": 2700
+  },
+  "post_fix_naive_join": {
+    "n": 2695,
+    "brier": 0.1031,
+    "dir_acc": 0.8545,
+    "base_rate": 0.7788,
+    "rows": 2695
+  },
+  "brier_improvement_post_minus_pre": -0.0184
+}
