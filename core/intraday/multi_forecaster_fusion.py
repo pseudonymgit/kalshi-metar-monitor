@@ -611,13 +611,22 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
             UNIQUE(trade_uuid)
         )
     """)
-    # Additive calibration columns on the companion table (may pre-exist).
+    # Additive calibration/grade columns on the companion table (may pre-exist).
+    # This single list is the source of truth for the companion schema and must
+    # match the LIVE book (28 columns): the 2026-10-14 honest calibration
+    # (calibrated_p/ceiling/composite_conf/calibrated_at), the F7 grade columns
+    # (grade_entered/grade_cap_usd), and the fusion metadata (p_market,
+    # grade, weights_applied). CREATE TABLE IF NOT EXISTS never adds a column to
+    # an already-created table, so every column is re-checked here and ALTERed in
+    # when absent — a pre-existing table gains the column without data loss.
     tfp_cols = {d[1] for d in conn.execute("PRAGMA table_info(trade_forecaster_probs)")}
-    for name in ("calibrated_p", "p_market", "composite_conf", "grade",
-                 "ceiling", "weights_applied"):
+    for name, decl in (("calibrated_p", "REAL"), ("p_market", "REAL"),
+                       ("composite_conf", "REAL"), ("grade", "REAL"),
+                       ("ceiling", "REAL"), ("weights_applied", "TEXT"),
+                       ("grade_entered", "TEXT"), ("grade_cap_usd", "REAL"),
+                       ("calibrated_at", "TEXT")):
         if name not in tfp_cols:
-            conn.execute(f"ALTER TABLE trade_forecaster_probs ADD COLUMN {name} "
-                         + ("TEXT" if name == "weights_applied" else "REAL"))
+            conn.execute(f"ALTER TABLE trade_forecaster_probs ADD COLUMN {name} {decl}")
     # Per-station weight store (WEIGHTED-FUSION-SPEC-2026-10-13 §4).
     conn.execute("""
         CREATE TABLE IF NOT EXISTS station_weights (

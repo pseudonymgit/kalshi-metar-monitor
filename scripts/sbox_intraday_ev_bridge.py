@@ -657,7 +657,13 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
     _ensure_price_source_column(conn)
     _ensure_lane_column(conn)  # AF: HIGH/LOW co-existence
     _ensure_trade_uniqueness(conn)
-    _ensure_grade_columns(conn)  # F7: companion-table grade columns
+    # Canonical additive companion schema: calibrated_p/p_market/composite_conf/
+    # grade/ceiling/weights_applied/grade_entered/grade_cap_usd/calibrated_at.
+    # The booking path writes those columns (see _upsert_forecast), so the schema
+    # path MUST create them too — otherwise a pre-existing companion table without
+    # them (or a fresh one) rejects the INSERT. Idempotent + additive.
+    ensure_schema(conn)
+    _ensure_grade_columns(conn)  # F7: companion-table grade columns (idempotent)
     existing = conn.execute(
         "SELECT trade_uuid FROM trades WHERE station=? AND trade_date_utc=? "
         "AND functionality=?",
