@@ -34,8 +34,16 @@ def _load_low():
 
 
 class _State:
-    def __init__(self, mu=54.0, sigma=3.0, low_so_far=None):
+    # Mirrors the real DistributionState contract (core.intraday.distribution_adapter):
+    # the run() path now applies update_from_intraday_low(), which reads
+    # station/date/high_so_far/base_sigma as well as mu/sigma/low_so_far.
+    def __init__(self, mu=54.0, sigma=3.0, low_so_far=None, station="KATL",
+                 date="2026-09-07", high_so_far=None):
+        self.station = station
+        self.date = date
         self.mu, self.sigma, self.low_so_far = mu, sigma, low_so_far
+        self.high_so_far = high_so_far
+        self.base_sigma = sigma
 
     def p_ge(self, x):
         import math

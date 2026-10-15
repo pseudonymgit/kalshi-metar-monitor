@@ -60,6 +60,7 @@ except Exception:  # pragma: no cover - substrate missing => gate off
     record_custody = None
     _ADMISSION_IMPORTED = False
 from core.strike_selection_ev import select_strike, make_truncated_p_fn  # noqa: E402
+from core.intraday.distribution_adapter import update_from_intraday_low  # noqa: E402
 from core.station_params import get_station_params  # noqa: E402
 from core.station_time import is_within_entry_window, station_timezone_name  # noqa: E402
 
@@ -282,6 +283,26 @@ def _market_cap(station: str) -> float:
 
 
 # ── entry pass ───────────────────────────────────────────────────────────────
+def _pin_day_fraction(station: str, day_str: str,
+                      pin_local_hhmm: str = DECISION_PIN_LOCAL_HHMM) -> float:
+    """Fraction of the station-local weather day elapsed at the decision pin.
+
+    PWW-2026-10-15 (ITEM2): the LOW mirror of HIGH's `frac` computed in run()
+    from the real now_utc vs local day bounds. The LOW lane evaluates historical
+    station-days from the backfill panel, so the elapsed fraction is the fixed
+    13:30 pin position in the local day. Computed in station-local wall time so
+    it is DST-safe (13:30 EDT -> 0.5625, not an instant-based 0.5292). Degenerate
+    tz/day -> 0.5 (a benign midpoint) rather than raising.
+    """
+    try:
+        d = date.fromisoformat(day_str)
+        pin_h, pin_m, pin_s = (int(x) for x in pin_local_hhmm.split(":"))
+    except (ValueError, AttributeError):
+        return 0.5
+    pin_seconds = pin_h * 3600 + pin_m * 60 + pin_s
+    return max(0.0, min(1.0, pin_seconds / 86400.0))
+
+
 def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True,
         allow_book=False):
     """Evaluate the LOW lane for each station-day in the LOW backfill panel.
@@ -335,6 +356,14 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True,
                 # Fall back to the backfill series' own pin reading (auditable).
                 rlow = running_low_at_pin(ladder)
             state.low_so_far = rlow
+            # PWW-2026-10-15 (ITEM2): apply the intraday sigma shrink, the LOW
+            # mirror of HIGH's `state = update_from_intraday(state, hsf, frac)`.
+            # Before this the LOW lane priced every strike off the FULL-day
+            # sigma (3.0 F) all day, so a strike far below the running low was
+            # mispriced as uncertain instead of near-certain. Shrink on the same
+            # running low that p_ge() truncates on, at the 13:30 pin fraction.
+            state = update_from_intraday_low(
+                state, rlow, _pin_day_fraction(st, day_str))
             p_fn, meta_fn = sole_tmin_p_fn(state, station=st, low_so_far=rlow)
             # NO mirror: the KXLOWT-X YES mid already IS the market's P(min<=X),
             # exactly the surface `p_fn` returns. The EV picker therefore prices

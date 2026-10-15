@@ -97,6 +97,41 @@ def update_from_intraday(state: DistributionState, high_so_far: float,
                              high_so_far=hsf, base_sigma=base)
 
 
+def update_from_intraday_low(state: DistributionState, low_so_far: Optional[float],
+                             day_fraction_elapsed: float) -> DistributionState:
+    """
+    LOW-axis mirror of `update_from_intraday`: shrink the daily-min sigma by the
+    fraction of the day remaining, on the observed running-low bound.
+
+    PWW-2026-10-15 (ITEM2): the LOW bridge built its Tmin p_fn from the FULL-day
+    sigma (3.0 F) all day, while HIGH shrinks sigma as observations accrue. This
+    reuses the exact E2E/F15 mechanics (recompute from `base_sigma`, never
+    compound) so the LOW sigma shrinks once the running low is observed. The mu
+    is pinned to the OBSERVED running low (the daily min cannot exceed it — the
+    running low is the best point estimate for the realized min so far), i.e. the
+    `min` mirror of HIGH's `mu = max(state.mu, hsf)`. The `low_so_far` bound
+    itself is preserved for p_ge()'s truncation.
+    """
+    df = max(0.0, min(1.0, day_fraction_elapsed))
+    remaining = max(0.05, 1.0 - df)
+    # Preserve the running observed min across successive calls (min, not max).
+    # `low_so_far` is Optional: without an observed bound the sigma still shrinks
+    # by the remaining-day fraction, but mu is left at the forecast value.
+    lsf: Optional[float] = None
+    if low_so_far is not None and state.low_so_far is not None:
+        lsf = min(low_so_far, state.low_so_far)
+    elif low_so_far is not None:
+        lsf = low_so_far
+    elif state.low_so_far is not None:
+        lsf = state.low_so_far
+    base = (getattr(state, "base_sigma", None) or state.sigma)
+    mu = min(state.mu, lsf) if lsf is not None else state.mu
+    sigma = base * math.sqrt(remaining)
+    return DistributionState(state.station, state.date, mu, sigma,
+                             high_so_far=state.high_so_far, low_so_far=lsf,
+                             base_sigma=base)
+
+
 def select(state: DistributionState, strikes: List[Dict], min_edge: float = 0.0) -> Optional[Dict]:
     """Pick the best-EV strike against live prices.
 
