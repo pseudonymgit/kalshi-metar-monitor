@@ -191,11 +191,14 @@ def process_settlements_for_date(self, settlement_date):
             continue
         qty = quantity or 0
 
-        # P&L BASIS (2026-10-14): constant-1-contract — see
-        # docs/plans/TRADES-TABLE-INTEGRITY-2026-10-14.md. `realized_pnl` is per
-        # ONE contract and is size-independent: it must NOT be multiplied by
-        # `quantity` (the book's `quantity`/`position_size_usd` are size metadata,
-        # and the whole constant-1-contract re-settle matches (S-price)*1).
+        # P&L BASIS (2026-10-14, Dan ruling): CONTRACT-NOTIONAL dollars — see
+        # docs/plans/WE-COMPLETE-REGISTER-2026-10-13.md §AG-0. `realized_pnl` is
+        # scored as (payout - price) * quantity, size-scaled; the shipped SBOX
+        # book matches this basis (43/43) and 0 rows match constant-1 (F7). The
+        # earlier "constant-1-contract" label (commit 690db06da) is RETIRED and
+        # superseded by this line; constant-1 is not what the code produces.
+        # NOTE: the engine settle writer below still multiplies by 1 (legacy
+        # per-contract form) and is slated to be brought to the qty-scaled basis.
         if trade_type == TradeType.BUY_YES:
             payout_per_contract = settlement_contract_value
             cost_per_contract = filled_price

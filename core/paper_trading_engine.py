@@ -554,16 +554,16 @@ class PaperTrader:
                 -- Enhanced for settlement
                 settled_value REAL,  -- Settlement TEMPERATURE (°F) when closed (NOT a 0/1 binary)
                 settlement_date_utc TEXT,  -- Date paid out
-                -- P&L BASIS (2026-10-14, constant-1-contract — see
-                -- docs/plans/TRADES-TABLE-INTEGRITY-2026-10-14.md): realized_pnl
-                -- is per ONE contract, size-independent:
-                --   buy_yes: (S - trade_price) * 1 ; buy_no: (trade_price - S) * 1
-                -- where S in {0,1} is the market's OWN settled binary. It is NOT
-                -- scaled by `quantity` (the old qty-basis P&L is preserved in
-                -- realized_pnl_old_2026). `quantity`/`position_size_usd` are
-                -- size metadata only and must not be multiplied into P&L.
-                realized_pnl REAL,  -- Realized profit/loss per 1 contract (see basis above)
-                settlement_return_amount REAL,  -- Dollar amount from settlement event (per contract)
+                -- P&L BASIS (2026-10-14, Dan ruling — see
+                -- docs/plans/WE-COMPLETE-REGISTER-2026-10-13.md §AG-0):
+                -- realized_pnl is CONTRACT-NOTIONAL dollars, size-scaled:
+                --   buy_yes: (S - trade_price) * quantity ; buy_no: (trade_price - S) * quantity
+                -- where S in {0,1} is the market's OWN settled binary. This
+                -- SUPERSEDES the earlier "constant-1-contract" label (commit
+                -- 690db06da), which the shipped SBOX book never matched (F7).
+                -- The legacy per-contract value is preserved in realized_pnl_old_2026.
+                realized_pnl REAL,  -- Realized P&L (contract-notional; see basis above)
+                settlement_return_amount REAL,  -- Dollar amount from settlement event (contract-notional, qty-scaled)
                 status TEXT DEFAULT 'open',  -- open, closed
                 notes TEXT,
 
