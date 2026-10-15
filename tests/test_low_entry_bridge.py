@@ -83,6 +83,26 @@ def test_low_ladder_reads_the_backfill_csv():
 
 
 @pytest.mark.unit
+def test_low_ladder_drops_stale_pin_snapshots():
+    """ITEM6 (2026-10-15): a snapshot > MAX_DIST_PIN_MINUTES from the 13:30 pin
+    is dropped, not used as the entry price.
+
+    Observed artifact: KATL 2026-09-18 had only 480/600-min snapshots for strikes
+    72.5/73.0, so the unbounded picker priced them 8h/10h off the pin. The bound
+    mirrors HIGH's newest-snapshot-at-or-before-pin rule.
+    """
+    lb = _load_low()
+    assert lb.MAX_DIST_PIN_MINUTES > 0
+    ladder = lb.low_ladder_from_csv("KATL", "2026-09-18")
+    # The two 480/600-min strikes are gone; the 0-min strikes remain.
+    dists = [r["dist_pin_minutes"] for r in ladder]
+    assert all(d is None or d <= lb.MAX_DIST_PIN_MINUTES for d in dists), dists
+    strikes = {r["strike"] for r in ladder}
+    assert 72.5 not in strikes and 73.0 not in strikes, strikes
+    assert 68.5 in strikes and 70.5 in strikes, strikes
+
+
+@pytest.mark.unit
 def test_run_is_prepare_only_and_lane_tagged():
     """Source contract: run() books lane=LOW, is never cron-wired."""
     lb = _load_low()

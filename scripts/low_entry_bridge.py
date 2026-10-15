@@ -83,6 +83,19 @@ FUSION_RULE_ID = SOLE_FORECAST_RULE_ID
 # is the TRUE source, so a booked row can never claim om_gfs when it is not.
 FORECAST_SRC = "om_gfs_tmin"
 
+# ITEM6 (2026-10-15): max distance from the 13:30 decision pin for a snapshot to
+# be usable as a LOW entry price. `low_ladder_from_csv` previously took the
+# nearest available snapshot per strike with NO bound, so when the pin snapshot
+# was filtered (thin/wide book) it silently priced a strike off a snapshot up to
+# 780 min away — the KATL 2026-09-18 480/600-min artifact, the same stale-price
+# class the 2026-10-05 KOKC fix closed for HIGH. HIGH's live `strike_ladder`
+# bounds on `snapshot_time < before_iso` (the decision instant) and takes the
+# newest per strike; at the hourly collector cadence (snapshots at :30) the
+# newest snapshot at/before a 13:30 pin is 13:30 itself, else 12:30 — i.e. at
+# most one cycle (60 min) stale. The backfill CSV stores only the UNSIGNED
+# distance, so the bound is applied symmetrically at one collector cycle.
+MAX_DIST_PIN_MINUTES = 60
+
 
 def _ro(p):
     return sqlite3.connect(f"file:{p}?mode=ro", uri=True)
@@ -178,7 +191,10 @@ def low_ladder_from_csv(station: str, day_str: str) -> List[Dict]:
     market_type='binary' under the KXLOWT* prefix — see
     scripts/low_market_price_backfill_2026-10-13.py). 'B' (both-side) rows carry
     a mid; 'T' (threshold) rows are the strike axis. One mid per strike (nearest
-    the 13:30 pin wins).
+    the 13:30 pin wins) — but ONLY within `MAX_DIST_PIN_MINUTES` of the pin
+    (ITEM6, 2026-10-15): a snapshot further than that is dropped, not used, so a
+    strike is never priced off a stale quote. `running_low_at_pin` is read from
+    the retained (near-pin) row.
     """
     ladder: Dict[float, Dict] = {}
     try:
@@ -195,6 +211,11 @@ def low_ladder_from_csv(station: str, day_str: str) -> List[Dict]:
                     continue
                 prev = ladder.get(strike)
                 d = float(r.get("dist_pin_minutes") or 9e9)
+                # ITEM6: reject a snapshot too far from the 13:30 pin instead of
+                # silently falling back to a stale price (mirrors HIGH's
+                # newest-snapshot-at-or-before-pin bound).
+                if d > MAX_DIST_PIN_MINUTES:
+                    continue
                 if prev is None or d < prev["_d"]:
                     ladder[strike] = {
                         "strike": strike, "yes_price": mid,
