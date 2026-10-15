@@ -114,3 +114,7 @@ data/gefs_work/
 !artifacts/calibration-fix/
 !artifacts/calibration-fix/*.json
 !tests/fixtures/honest_cohort_2026-10-15.json
+
+# Custody/gate-ledger vs blank-slate book reconciliation (2026-10-15)
+!artifacts/custody-integrity/
+!artifacts/custody-integrity/*.json

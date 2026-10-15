@@ -1,0 +1,60 @@
+{
+  "generated_by": "scripts/reconcile_custody_book_2026-10-15.py",
+  "finding": "PWW v3 #4 \u2014 custody/ledger outlive the blank-slate book",
+  "surfaces": {
+    "sbox_embedded": {
+      "trades": 0,
+      "trade_custody": 91,
+      "gate_ledger": 100
+    },
+    "standalone_custody_db": {
+      "trade_custody": 95
+    },
+    "standalone_gate_ledger_db": {
+      "gate_ledger": 97
+    }
+  },
+  "write_path": {
+    "live_bridge": "data/paper_trading_sbox.db (embedded trade_custody/gate_ledger)",
+    "standalone": "data/trade_custody.db + data/gate_ledger.db \u2014 written by the settled-admission boundary (booking_admission.record_custody_for_trade / admit_settled_trades) and the 2026-10-10 reconcile driver; NOT by the live booking path",
+    "evidence": "sbox_intraday_ev_bridge.run -> record_custody(conn, ...) with conn = data/paper_trading_sbox.db; embedded tables."
+  },
+  "embedded_custody": {
+    "rows": 91,
+    "created_range": [
+      "2026-10-10T14:15:43.303572+00:00",
+      "2026-10-14T18:15:40.793543+00:00"
+    ],
+    "rows_joining_trades": 0,
+    "rows_after_blank_slate": 7,
+    "disposition_distribution": [
+      [
+        null,
+        91
+      ]
+    ],
+    "interpretation": "append-only archive from the pre-blank-slate book; the purge deliberately preserved it (0/91 join the now-empty trades)"
+  },
+  "disposition": {
+    "custody_column_exists": true,
+    "gate_ledger_column_exists": false,
+    "writer": "disposition is set ONLY by scripts/reconcile_stale_open_trades_2026-10-13.py (a governance annotation), NEVER by the booking writer record_from_trade; gate_ledger has no disposition column",
+    "verdict": "NULL is EXPECTED for booking-time rows, not a wiring gap"
+  },
+  "immutability": {
+    "triggers": [
+      "trg_gate_ledger_no_delete",
+      "trg_gate_ledger_no_update",
+      "trg_trade_custody_no_delete",
+      "trg_trade_custody_no_update"
+    ],
+    "delete_refused": "trade_custody/gate_ledger BEFORE DELETE/UPDATE RAISE(ABORT)"
+  },
+  "custody_chain_ok": true,
+  "custody_chain_problems": 0,
+  "remedy": {
+    "action": "KEEP (no delete)",
+    "why": "the 91 rows are the intended append-only archive, immutable by design; clearing them would require disabling the immutability triggers and would destroy the audit chain. The divergence is by design (blank-slate purge preserved the archive), not a defect. This artifact makes it legible so future hunts do not re-flag it.",
+    "if_a_clear_is_ever_wanted": "it must be an explicit archive-out (copy to a dated backup, drop triggers in that copy), signed off by Dan \u2014 never in place"
+  }
+}
