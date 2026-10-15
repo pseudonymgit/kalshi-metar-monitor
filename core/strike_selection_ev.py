@@ -135,12 +135,18 @@ def _entry_exec_cost(strike_row: Dict, cost_model, fail_closed: bool) -> float:
     """F1: per-contract execution cost (fraction of $1) to add to the mid.
 
     Live path: ``cost_model.get_dynamic_spread(ticker)`` -> half-spread.
-    Fallback:  the measured/execution cost (``EXECUTION_COST_RATE`` ~0.0205).
-    Fail-closed: with no live spread AND no fallback, raise instead of silently
-    pricing off the mid (entry_cost == mid).
 
-    ``cost_model`` is any object exposing ``get_dynamic_spread(ticker) -> spread``;
-    its own internal fallback (measured mean spread) always yields a usable value.
+    ``fail_closed`` (ITEM 4, 2026-10-15): when True the cost MUST come from a
+    resolvable live spread. A hard-coded fallback is an ASSUMPTION, not a
+    measurement, so it must not silently satisfy a fail-closed call — before
+    this fix ``_FALLBACK_EXEC_COST`` (== EXECUTION_COST_RATE) always short-
+    circuited the ``raise``, making ``fail_closed`` inert. Now:
+      * fail_closed=True + no cost_model            -> raise
+      * fail_closed=True + cost_model, no live spread -> raise
+      * fail_closed=False -> the measured/execution-cost constant (an explicit
+        assumption) is returned; behaviour of the fail-open path is unchanged.
+
+    ``cost_model`` is any object exposing ``get_dynamic_spread(ticker) -> spread``.
     """
     if cost_model is not None:
         ticker = strike_row.get("ticker")
@@ -156,13 +162,18 @@ def _entry_exec_cost(strike_row: Dict, cost_model, fail_closed: bool) -> float:
             # DEFAULT_SLIPPAGE) so live and fallback costs are interchangeable.
             slippage = float(getattr(cost_model, "slippage", 0.0) or 0.0)
             return float(live_spread) / 2.0 + slippage
+    if fail_closed:
+        # No resolvable live spread (or no cost model at all). Fail closed
+        # instead of substituting the constant assumption below.
+        raise ValueError(
+            "F1: fail_closed requires a resolvable execution spread; no live "
+            f"spread for strike {strike_row.get('strike')!r} "
+            f"(cost_model={'present' if cost_model is not None else 'None'})"
+        )
+    # Fail-OPEN path: return the measured/execution-cost constant (an explicit
+    # assumption, acceptable only when the caller did not ask to fail closed).
     if _FALLBACK_EXEC_COST is not None:
         return float(_FALLBACK_EXEC_COST)
-    if fail_closed:
-        raise ValueError(
-            "F1: execution spread unknown for strike "
-            f"{strike_row.get('strike')!r} and no fallback available (fail-closed)"
-        )
     return 0.0
 
 
@@ -180,8 +191,10 @@ def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float 
           EV is net of the modeled execution cost (mid + half-spread at entry,
           half that at exit) rather than priced off the bare mid. When omitted,
           behaviour is unchanged (legacy mid + taker-fee pricing).
-    fail_closed: when True and a strike has no resolvable spread and no fallback,
-          raise instead of silently pricing off the mid.
+    fail_closed: when True, a strike whose execution spread cannot be resolved
+          from a live cost model raises instead of being priced off a hard-coded
+          constant or the bare mid (ITEM 4, 2026-10-15: the constant no longer
+          silently satisfies it).
     min_edge_scaler: F6 (2026-10-13) optional callable x -> multiplier applied to
           `min_edge` for the strike at price-level x. The scaled edge floor is
           tested for EVERY candidate BEFORE ranking, so when the top-EV strike
@@ -198,6 +211,14 @@ def select_strike(mu: float, sigma: float, strikes: List[Dict], min_edge: float 
         required = min_edge * (float(min_edge_scaler(x)) if min_edge_scaler else 1.0)
         yes_px = float(s.get("yes_price", 0.5))
         no_px = float(s.get("no_price", 1.0 - yes_px))
+        if fail_closed and cost_model is None:
+            # ITEM 4 (2026-10-15): fail-closed demands a modelled spread. Without
+            # a cost model there is nothing to resolve, so the constant fallback
+            # below must not be substituted silently.
+            raise ValueError(
+                "F1: fail_closed=True requires a cost_model; got None for strike "
+                f"{x!r}"
+            )
         if cost_model is not None:
             # F1 (2026-10-13): round-trip execution model. The leg is bought at its
             # own mid + half-spread, and (for the intraday book, which exits before

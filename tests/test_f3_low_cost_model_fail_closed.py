@@ -47,7 +47,12 @@ class _FakeTminState:
 
 @pytest.mark.unit
 def test_run_builds_and_passes_the_cost_model_and_fails_closed():
-    """Source contract: LOW resolves a station spread model and threads it in."""
+    """Wiring contract: LOW resolves a station spread model and threads it in.
+
+    The behavioural guarantee of fail-closed is asserted in
+    test_fail_closed_raises_even_when_the_constant_fallback_exists (the source-
+    string check alone was the ITEM 4 gap: it could not see the dead raise).
+    """
     lb = _load_low()
     src = inspect.getsource(lb.run)
     assert "_station_spread_model(" in src, "run must build the station spread model"
@@ -97,10 +102,12 @@ def test_low_cost_model_flips_a_mid_positive_ev_trade(monkeypatch):
         def get_dynamic_spread(self, ticker):
             return 0.10  # 5c half-spread per leg
 
-    # A LOW YES leg (min <= 56) underpriced vs the calibrated p_fn by a few cents:
-    # +EV on the bare mid, negative once the half-spread is crossed twice.
-    ladder = [{"strike": 56.0, "yes_price": 0.10, "no_price": 0.90,
-               "ticker": "KXLOWTATL-26SEP07-T56"}]
+    # A LOW YES leg (min <= 61.5, calibrated p_fn ~= 0.688) underpriced ~5c vs the
+    # calibrated p_fn: +EV on the bare mid, negative once the half-spread is
+    # crossed twice. (Fixture re-tuned 2026-10-15: the calibration repair changed
+    # the LOW p_fn, so the old strike/price no longer straddled zero.)
+    ladder = [{"strike": 61.5, "yes_price": 0.638, "no_price": 0.362,
+               "ticker": "KXLOWTATL-26SEP07-T615"}]
     on_mid = select_strike(st.mu, st.sigma, ladder, min_edge=-1.0, p_fn=p_fn)
     assert on_mid["ev"] > 0.0, "fixture must be +EV on the bare mid"
     with_cost = select_strike(st.mu, st.sigma, ladder, min_edge=-1.0, p_fn=p_fn,
@@ -127,3 +134,59 @@ def test_fail_closed_raises_when_no_spread_and_no_fallback(monkeypatch):
     with pytest.raises(ValueError):
         select_strike(60.0, 3.0, ladder, min_edge=-1.0, cost_model=_NoSpread(),
                       fail_closed=True)
+
+
+@pytest.mark.unit
+def test_fail_closed_raises_without_a_cost_model():
+    """ITEM 4: fail_closed=True and cost_model=None must raise, not price off mid.
+
+    The old code only called `_entry_exec_cost` when a cost model was supplied,
+    so the flag alone was silently ignored.
+    """
+    ladder = [{"strike": 56.0, "yes_price": 0.10, "no_price": 0.90,
+               "ticker": "KXLOWTATL-26SEP07-T56"}]
+    with pytest.raises(ValueError):
+        select_strike(60.0, 3.0, ladder, min_edge=-1.0, cost_model=None,
+                      fail_closed=True)
+
+
+@pytest.mark.unit
+def test_fail_closed_not_satisfied_by_the_constant_fallback():
+    """ITEM 4: the hard-coded constant must NOT satisfy fail_closed.
+
+    The dead-code case: `_FALLBACK_EXEC_COST` (== EXECUTION_COST_RATE, set at
+    import) short-circuited the `raise` at the old :161, so `if fail_closed:
+    raise` never ran. Assert the raise fires while the constant is still present.
+    """
+    import core.strike_selection_ev as ev
+    assert ev._FALLBACK_EXEC_COST is not None, "fixture assumes the constant exists"
+
+    class _NoSpread:
+        slippage = 0.005
+
+        def get_dynamic_spread(self, ticker):
+            return None  # probe failed / empty book
+
+    ladder = [{"strike": 56.0, "yes_price": 0.10, "no_price": 0.90,
+               "ticker": "KXLOWTATL-26SEP07-T56"}]
+    with pytest.raises(ValueError):
+        select_strike(60.0, 3.0, ladder, min_edge=-1.0, cost_model=_NoSpread(),
+                      fail_closed=True)
+
+
+@pytest.mark.unit
+def test_fail_open_still_uses_the_constant(monkeypatch):
+    """fail_closed=False keeps the documented fail-open behaviour (assumption)."""
+    import core.strike_selection_ev as ev
+    from core.market_cost_model import EXECUTION_COST_RATE
+
+    class _NoSpread:
+        slippage = 0.005
+
+        def get_dynamic_spread(self, ticker):
+            return None
+
+    ladder = [{"strike": 56.0, "yes_price": 0.10, "no_price": 0.90,
+               "ticker": "KXLOWTATL-26SEP07-T56"}]
+    got = ev._entry_exec_cost(ladder[0], _NoSpread(), fail_closed=False)
+    assert abs(got - EXECUTION_COST_RATE) < 1e-12
