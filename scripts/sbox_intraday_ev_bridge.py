@@ -1004,6 +1004,21 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # climatology build). The legacy fusion stays available when the flag is
         # off, so rollback is a flag flip.
         sole = sole_forecast_enabled()
+        # PWW-2026-10-15 (ITEM1, BLOCKER): the sole path must be gated on the
+        # DATA, not just on the flag. `select_nwp_state` falls through to the raw
+        # local GFS-seeded WS-P (nwp_src == "gfs_local") whenever om_gfs is
+        # unavailable or its fetch fails; the sole branch below would then run
+        # `build_om_gfs_sole_p_fn` on that GFS-local state and hard-code om_gfs
+        # provenance onto a non-om_gfs forecast (a silent fallback that books a
+        # mislabelled trade). Fail closed exactly as the LOW lane's F5 fix does:
+        # skip loudly, never book. (If gfs_local is ever intended as an allowed
+        # fallback it must be booked as `gfs_local`, never `om_gfs`.)
+        if sole and nwp_src != "om_gfs":
+            skipped.append((st, "sole_no_om_gfs"))
+            diag.append({"station": st, "day": day_str,
+                         "skip": "sole_no_om_gfs", "nwp_src": nwp_src,
+                         "forecast_src": None})
+            continue
         cdf = None
         traj = None
         if not sole:
