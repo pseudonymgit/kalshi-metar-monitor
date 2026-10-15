@@ -1,0 +1,31 @@
+{
+  "generated_by": "verify_high_bridge_arm_2026-10-15.py",
+  "env": {
+    "USE_OM_GFS_NWP": "1",
+    "LOW_BRIDGE_ENABLED": "0"
+  },
+  "sole_forecast_enabled": true,
+  "position_size_fn": "_position_size_usd",
+  "kelly_is_active_path": true,
+  "kelly_zero_edge_returns_zero": true,
+  "booking_gate_enabled": true,
+  "sbox_db": "data/paper_trading_sbox.db",
+  "settle_writer_contract_notional": true,
+  "book": {
+    "exists": true,
+    "trades_rows": 0,
+    "has_quantity": true,
+    "has_position_size_usd": true,
+    "has_lane": true
+  },
+  "dry_run": {
+    "date_utc": "2026-10-15",
+    "n_executed": 0,
+    "n_skipped": 20,
+    "skip_reasons": {
+      "no_strike_ladder": 20
+    },
+    "would_execute": []
+  },
+  "ARMED": true
+}
