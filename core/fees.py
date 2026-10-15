@@ -3,14 +3,19 @@ core/fees.py — Kalshi fee model (canonical).
 
 Single source of truth for Kalshi taker fees used across the weather engine.
 
-Kalshi's official taker fee schedule (per contract, in cents):
+Kalshi's official taker fee schedule. The coefficient **0.07 is a RATE**
+(7%), not a dollar amount — it is multiplied by P x (1-P), whose maximum
+is 0.25, so the raw product never exceeds 0.0175:
 
-    fee_per_contract_cents = ceil(0.07 x P x (1 - P) x 100)
+    raw_per_contract_dollars = 0.07 x P x (1 - P)      # 7% rate x P x (1-P)
+    fee_per_contract_cents   = ceil(raw_per_contract_dollars x 100)
     fee = fee_per_contract_cents / 100 x C
 
 where C = contracts in the order and P = fill price as a probability.
-This module returns fees in DOLLARS. No trading logic lives here — this is
-a pure cost model that other modules import.
+Because 0.07 x P x (1-P) <= 0.0175, ceil to whole cents gives a **maximum
+fee of $0.02 per contract**, never $0.07. This module returns fees in
+DOLLARS. No trading logic lives here — this is a pure cost model that
+other modules import.
 
 H1 (Sprint H, 2026-10-07): the ceil() is applied PER CONTRACT, matching the
 pre-existing `core/market_cost_model.py` implementation and avoiding the
@@ -37,7 +42,10 @@ _LOGGER = logging.getLogger(__name__)
 def fee_per_contract(price: float) -> float:
     '''Canonical Kalshi taker fee for ONE contract, in dollars.
 
-    fee = ceil(0.07 × P × (1-P) × 100) / 100
+    fee = ceil(0.07 × P × (1-P) × 100) / 100      # 0.07 is a 7% RATE
+
+    Note 0.07 is the fee RATE (7%), not $0.07: 0.07 × P × (1-P) peaks at
+    0.0175 at P=0.5, so the ceil'd per-contract fee peaks at $0.02.
 
     This is the primitive every other fee helper is built from. Degenerate
     prices (<=0 or >=1) short-circuit to 0.0.
@@ -99,9 +107,11 @@ def execution_cost_rate() -> float:
 def kalshi_fee(contracts: int, price: float) -> float:
     '''Kalshi taker fee per side (canonical), in dollars.
 
-    fee = ceil(0.07 × P × (1-P) × 100) / 100 × contracts
+    fee = ceil(0.07 × P × (1-P) × 100) / 100 × contracts      # 0.07 is a RATE
 
-    Ceil is per contract (see module docstring). Degenerate inputs
+    The 0.07 here is the 7% fee rate, not $0.07; the maximum per-contract
+    fee is $0.02 (at P=0.5). Ceil is per contract (see module docstring).
+    Degenerate inputs
     (non-positive contracts, price at or outside (0, 1)) short-circuit to 0.0.
 
     Args:
