@@ -73,6 +73,9 @@ data/gefs_work/
 !artifacts/fusion-weight-sweep/*.json
 !data/fusion_weight_sweep_2026-10-14.json
 
+# LOW pin corrected-target-model sweep (committed analysis artifact, 2026-10-15)
+!data/low_pin_corrected_2026-10-15.json
+
 # LOW market lane design + trajectory pin sweep (committed analysis artifact, 2026-10-14)
 !artifacts/low-market-lane/
 !artifacts/low-market-lane/*.json
