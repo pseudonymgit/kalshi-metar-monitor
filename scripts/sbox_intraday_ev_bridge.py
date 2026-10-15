@@ -2,10 +2,17 @@
 """
 SBOX Multi-Forecaster Intraday EV Bridge (2026-09-30)
 =====================================================
-Extends the Item-1 bridge (scripts/sbox_intraday_ev_bridge.py) to run THREE
-independent forecasters and score trading AND analytics together.
+Extends the Item-1 bridge (scripts/sbox_intraday_ev_bridge.py).
 
-Pipeline:
+DEFAULT (Workstream AF, 2026-10-14) — SOLE om_gfs:
+Behind USE_OM_GFS_NWP the forecast is the SINGLE bias-corrected om_gfs
+DistributionState `build_om_gfs_sole_p_fn`; the analog CDF and trajectory gate
+are NOT run. The sole path additionally FAILS CLOSED when the NWP data source is
+not om_gfs (PWW-2026-10-15): if `select_nwp_state` fell through to the raw local
+GFS (`nwp_src == "gfs_local"`) the station-day is skipped with
+`sole_no_om_gfs` rather than booked under om_gfs provenance.
+
+ROLLBACK PATH (flag OFF) — three-forecaster fusion:
 
     WS-P calibrated GEFS/emOS distribution        (p_gefs,  intraday-truncated)
   + GHCN analog empirical CDF                     (p_analog, independent)
@@ -18,9 +25,10 @@ Pipeline:
   AND a pure weather-analytics evaluation (CRPS vs settlement, resolution)
       reported TOGETHER with the trade results.
 
-Deterministic, no AI/ML. SBOX only — refuses to touch DEV/PROD.
+Both paths are deterministic, no AI/ML. SBOX only — refuses to touch DEV/PROD.
 
-Fusion rule (see docs/plans/SBOX-MULTI-FORECASTER-BRIDGE-2026-09-30.md):
+Fusion rule (rollback path only — see
+docs/plans/SBOX-MULTI-FORECASTER-BRIDGE-2026-09-30.md):
   core  = 0.55*p_gefs + 0.45*p_analog          when |gap| <= 0.10  (agree, x1.0)
         = 0.50/0.50                             when 0.10 < gap <= 0.20 (split, x1.25)
         = shrink(0.50/0.50, x0.5)               when gap > 0.20        (disagree, x1.50)

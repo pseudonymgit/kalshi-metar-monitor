@@ -12,14 +12,18 @@ GFS on BOTH axes over 2026-04-21..2026-10-09:
   * level MAE        0.680 F (bias-corrected) vs 2.095 F raw local GFS  (-1.415 F)
   * strike-crossing  Brier 0.1079 vs 0.1597
 
-Independence correction (2026-10-14, docs/plans/RTMA-INDEPENDENCE-HONEST-2026-10-14.md):
-the earlier "COLLINEAR, fcerr 0.99" claim was LEVEL correlation (0.9924), which is
+Independence + role (corrected 2026-10-14, re-stated 2026-10-15): the earlier
+"COLLINEAR, fcerr 0.99" claim was LEVEL correlation (0.9924), which is
 meaningless between two temperature views — all temps correlate. On the ERROR
-domain the honest re-run gets fcerr 0.21 (< 0.85) => om_gfs is NOT collinear and is
-WIRED as a fusion member (USE_OM_GFS_FUSION). Separately, this module still exists
-for the LEVER/level-axis substitution (USE_OM_GFS_NWP): when enabled, the SBOX
-bridge's NWP component uses om_gfs (bias-corrected) instead of the raw local
-GFS-seeded WS-P distribution.
+domain the honest re-run gets fcerr 0.21 (< 0.85), so om_gfs is NOT collinear.
+
+Role (SOLE FORECAST, Workstream AF 2026-10-14): behind USE_OM_GFS_NWP om_gfs IS
+the forecast — the SBOX bridge's NWP component uses the bias-corrected om_gfs
+value INSTEAD of the raw local GFS-seeded WS-P distribution. There is NO fusion
+member: `om_gfs_fusion_enabled()` is a permanent `return False` no-op and the
+USE_OM_GFS_FUSION flag is retired (it can no longer enable a vote). The legacy
+multi-forecaster fusion still exists on the bridge as the ROLLBACK path, reached
+only when the flag is off — om_gfs never votes inside it.
 
 Source: Open-Meteo, free + keyless.
   * backfill : https://historical-forecast-api.open-meteo.com/v1/forecast
@@ -59,11 +63,10 @@ CACHE_PATH = REPO / "data" / "_omgfs_nwp_cache.json"
 
 # ── flag ─────────────────────────────────────────────────────────────────────
 OM_GFS_FLAG_ENV = "USE_OM_GFS_NWP"
-# 2026-10-13 WIRE FLIP: a SECOND, additive flag lets om_gfs ALSO vote as a
-# fifth fusion member (core blend + composite confidence). The honest re-run
-# (`27463df0d`) found om_gfs(bc) Brier 0.123 beats honest rate_1h 0.362, so the
-# prior DO_NOT_WIRE verdict flips to WIRE. This is separate from the lever-axis
-# NWP substitution (USE_OM_GFS_NWP), which is unchanged and stays additive.
+# RETIRED (Workstream AF, 2026-10-14): USE_OM_GFS_FUSION once let om_gfs ALSO
+# vote as a fifth fusion member. om_gfs is now the SOLE forecast behind
+# USE_OM_GFS_NWP, so there is no fusion for it to join; `om_gfs_fusion_enabled()`
+# is a permanent False. The env var name is kept only for historical reference.
 OM_GFS_FUSION_FLAG_ENV = "USE_OM_GFS_FUSION"
 
 
@@ -345,7 +348,6 @@ def rolling_bias_f(station: str, as_of_date: str, *,
     # of the correct -1.17F. Silent (no error, plausible number).
     _bvar = _daily_var(market_type)
     _bhist = "hist" if _bvar == VAR_TMAX else f"hist|{_bvar}"
-    _blive = "live" if _bvar == VAR_TMAX else f"live|{_bvar}"
 
     truth: Dict[str, float] = {}
     try:
@@ -379,9 +381,13 @@ def rolling_bias_f(station: str, as_of_date: str, *,
 
     resid = []
     for ds, settled in truth.items():
+        # PWW-2026-10-15 (ITEM3.3): the bias window is HISTORICAL — it must read
+        # only historical keys. The previous `live|<var>` fallback could pull a
+        # live-fetched value (potentially the decision day's own forecast) into a
+        # residual measured against settled truth, a latent hindsight seam. A
+        # window day missing its hist key is simply dropped (min_obs gates the
+        # window); never substitute a live key here.
         v = cmap.get(_cache_key(station, ds, _bhist))
-        if v is None:  # tolerate a live-keyed value if that is all we have
-            v = cmap.get(_cache_key(station, ds, _blive))
         if v is not None:
             resid.append(v - settled)
 
