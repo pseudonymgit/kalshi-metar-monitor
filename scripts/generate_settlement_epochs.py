@@ -102,17 +102,31 @@ def generate_epochs_for_station(
         obs_count = row[7]
         ingestion_ts = row[8]
         
-        # Determine bucket based on market type. Guard: a corrupt daily_stats
-        # temp (out of the sane band) must NOT become a settlement bucket —
-        # skip the epoch instead of writing garbage (the 292-row defect).
+        # Determine bucket based on market type.
+        # PWW Loop-C (2026-10-16): prefer CANONICAL truth when available.
+        # The METAR-derived bucket can differ from the canonical Kalshi/GHCN
+        # value by 1-2°F, which causes the regeneration-invariant guard to
+        # fail closed. Check settlement_truth first; if it has a canonical
+        # value for this station-day, use it. Falls back to the raw METAR
+        # bucket when no canonical truth exists (e.g. recent dates the failed
+        # cron never backfilled).
         try:
             if market_type == "HIGH":
-                current_bucket = get_temp_bucket(max_temp_f, "HIGH")
+                metar_bucket = get_temp_bucket(max_temp_f, "HIGH")
             else:
-                current_bucket = get_temp_bucket(min_temp_f, "LOW")
+                metar_bucket = get_temp_bucket(min_temp_f, "LOW")
         except ValueError as exc:
             print(f"  SKIP {station} {date_local} {market_type}: {exc}")
             continue
+        # Consult canonical truth (if available) to override the METAR bucket.
+        _truth_row = conn.execute(
+            "SELECT settlement_temp_f FROM settlement_truth "
+            "WHERE station=? AND market_type=? AND local_trading_date=?",
+            (station, market_type, date_local)).fetchone()
+        if _truth_row is not None and _truth_row[0] is not None:
+            current_bucket = int(round(_truth_row[0]))
+        else:
+            current_bucket = metar_bucket
         
         # Get prior bucket (previous day's max for HIGH, min for LOW)
         prior_bucket = None
