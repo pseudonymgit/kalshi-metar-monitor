@@ -467,19 +467,37 @@ def exposure_skip_reason(conn, station: str, day_str: str) -> Optional[str]:
 
 
 def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs):
-    """Insert-or-replace the companion per-trade forecaster row (idempotent)."""
+    """Insert-or-replace the companion per-trade forecaster row (idempotent).
+
+    ITEM4.2 (2026-10-16): the companion row in ``trade_forecaster_probs`` IS the
+    live calibration record — the booking path writes the calibrated_p/ceiling/
+    composite_conf/grade here at booking time. ``trade_calibration`` is a RETIRED
+    one-off table populated only by ``migrate_fusion_calibration_2026-10-13.py``;
+    the bridge never writes it and it is left in place (a drop is destructive and
+    record-integrity discipline forbids rewriting history). ``calibrated_at`` is
+    now stamped whenever a calibrated_p is written, so new bookings are never
+    NULL.
+    """
     now = datetime.now(timezone.utc).isoformat()
     wa = probs.get("weights_applied")
     if not isinstance(wa, str):
         wa = json.dumps(wa) if wa is not None else None
+    calibrated_at = now if probs.get("calibrated_p") is not None else None
+    # ITEM4.1 (2026-10-16): the companion `grade` MUST be the GATE-TIME grade.
+    # `grade_entered` is that grade (the edge-ladder letter that gated entry);
+    # the fusion meta `grade` is a DIFFERENT ladder (grade_from_confidence on the
+    # composite confidence) and produced grade='F' on 5 entered rows. Coerce at
+    # the writer so the booked row and its companion can never disagree.
+    grade = probs.get("grade_entered") or probs.get("grade")
     conn.execute(
         """INSERT INTO trade_forecaster_probs
            (trade_uuid, station, trade_date_utc, strike, side, ticker,
             p_gefs, p_analog, p_trajectory, p_fused, n_analog, n_traj,
             agreement, edge_mult, traj_verdict, traj_mult, fusion_rule, created_at_utc,
             grade_entered, grade_cap_usd,
-            calibrated_p, p_market, composite_conf, grade, ceiling, weights_applied)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            calibrated_p, p_market, composite_conf, grade, ceiling, weights_applied,
+            calibrated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
            ON CONFLICT(trade_uuid) DO UPDATE SET
              p_gefs=excluded.p_gefs, p_analog=excluded.p_analog,
              p_trajectory=excluded.p_trajectory, p_fused=excluded.p_fused,
@@ -490,7 +508,8 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
              grade_entered=excluded.grade_entered, grade_cap_usd=excluded.grade_cap_usd,
              calibrated_p=excluded.calibrated_p, p_market=excluded.p_market,
              composite_conf=excluded.composite_conf, grade=excluded.grade,
-             ceiling=excluded.ceiling, weights_applied=excluded.weights_applied""",
+             ceiling=excluded.ceiling, weights_applied=excluded.weights_applied,
+             calibrated_at=COALESCE(excluded.calibrated_at, calibrated_at)""",
         (tuuid, station, day_str, strike, side, ticker,
          probs.get("p_gefs"), probs.get("p_analog"),
          probs.get("p_trajectory"), probs.get("p_fused"),
@@ -500,8 +519,8 @@ def _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
          (probs.get("fusion_rule") or FUSION_RULE_ID), now,
          probs.get("grade_entered"), probs.get("grade_cap_usd"),
          probs.get("calibrated_p"), probs.get("p_market"),
-         probs.get("composite_conf"), probs.get("grade"),
-         probs.get("ceiling"), wa))
+         probs.get("composite_conf"), grade,
+         probs.get("ceiling"), wa, calibrated_at))
 
 
 # ── Kelly sizing (Workstream AF, 2026-10-14) ────────────────────────────────
@@ -1320,7 +1339,17 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                         "p_market": both.get("p_market"),
                         "p_om_gfs": both.get("p_om_gfs"),
                         "composite_conf": both.get("composite_conf"),
-                        "grade": both.get("grade"),
+                        # ITEM4 (2026-10-16): the companion `grade` MUST be the
+                        # GATE-TIME grade (the edge-ladder grade that actually
+                        # gated entry), not the fusion meta's
+                        # `grade_from_confidence` re-score. They are different
+                        # ladders: the meta grade is a composite-confidence
+                        # letter (F for a coin-flip-ish conf) while the gate
+                        # grade is the edge letter. On the live book the two
+                        # disagreed on 5 entered rows (grade='F' while
+                        # grade_entered gated entry). Store the gate grade so
+                        # the booked row and its companion agree.
+                        "grade": grade,
                         "ceiling": both.get("ceiling"),
                         "weights_applied": both.get("weights_applied")}
 
@@ -1344,6 +1373,16 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             # A rejected candidate is not booked. Fail-open (never break the
             # booking path on a gate error) but loud.
             if ENABLE_BOOKING_GATE:
+                # ITEM4.3 (2026-10-16): the ledger's `trade_uuid` is the
+                # DETERMINISTIC DECISION-INTENT key `SBOX-{station}-{day}`, not
+                # the booked row's random uuid4. This is BY DESIGN: the ledger
+                # key must be reproducible across a cron re-run so the append is
+                # idempotent (verdict_idempotency_key is a hash of the key — a
+                # per-run uuid4 would enqueue a duplicate verdict on every
+                # re-invoke). The intent key maps 1:1 to the booked row via
+                # (station, trade_date_utc), which is exactly how the book is
+                # keyed; the join is `gate_ledger.station/day` <-> `trades`.
+                # See docs/plans/GATE-LEDGER-INTENT-KEY-2026-10-16.md.
                 try:
                     gv, _g_admitted = admit_decision_candidate(
                         trade_uuid=f"{INSTANCE}-{st}-{day_str}",
