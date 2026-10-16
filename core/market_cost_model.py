@@ -180,9 +180,11 @@ class MarketCostModel:
                 spread = float(depth.spread)
             except (TypeError, ValueError):
                 spread = None
-            # A zero / negative / NaN spread is NOT a usable measurement.
+            # A zero / negative / NaN / infinite spread is NOT a usable
+            # measurement. (PWW Loop-2, 2026-10-16: inf was previously unguarded.)
             if spread is not None and spread > 0 and spread == spread:
-                return spread
+                if spread != float("inf"):
+                    return spread
         if unresolved_on_failure:
             return None
         return self.spread
