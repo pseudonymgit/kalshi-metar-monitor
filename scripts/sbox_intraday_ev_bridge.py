@@ -282,10 +282,14 @@ def market_mid_prob(ticker: str, pin_iso: Optional[str]) -> Optional[float]:
         return None
     c = _ro(SNAPS)
     try:
+        # PWW Loop-2 (MAJOR, 2026-10-16): bound to pre-pin snapshots only.
+        # The old ABS(nearest) ordering could pick a snapshot AFTER the pin,
+        # leaking post-decision market information into the decision.
         row = c.execute(
             "SELECT mid_price FROM market_snapshots WHERE market_ticker=? "
             "AND mid_price IS NOT NULL "
-            "ORDER BY ABS(julianday(snapshot_time)-julianday(?)) ASC LIMIT 1",
+            "AND snapshot_time <= ? "
+            "ORDER BY snapshot_time DESC LIMIT 1",
             (ticker, pin_iso)).fetchone()
     finally:
         c.close()
@@ -1186,7 +1190,12 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
             continue
         state = update_from_intraday(state, hsf, frac)
 
-        ladder = strike_ladder(st, date_yy, before_iso=now_iso)
+        # PWW Loop-2 (BLOCKER, 2026-10-16): bound the ladder by the canonical
+        # decision pin, NOT now. Bounding by now let the selected market price
+        # be hours newer than the 13:30 pin, making EV/side/size/price
+        # non-reproducible and leaking post-decision market data.
+        _pin_iso = pinned_decision_utc(st, day_str)
+        ladder = strike_ladder(st, date_yy, before_iso=_pin_iso or now_iso)
         if not ladder:
             skipped.append((st, "no_strike_ladder"))
             continue
