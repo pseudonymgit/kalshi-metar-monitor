@@ -27,7 +27,7 @@ TRADER = PaperTrader(paper_db=SBOX_DB, initial_balance=200.0, fee_rate=0.0205)
 
 today = datetime.now(timezone.utc).date()
 # Settle recent trading dates
-for days_ago in range(1, 12):
+for days_ago in range(0, 12):
     d = today - timedelta(days=days_ago)
     date_str = d.isoformat()
     try:

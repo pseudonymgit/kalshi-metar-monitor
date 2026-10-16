@@ -129,6 +129,7 @@ from core.station_time import (  # noqa: E402
 )
 from core.station_params import get_station_params  # noqa: E402  (F4)
 from core.market_cost_model import MARKET_COST_MODEL  # noqa: E402
+from core.fees import execution_cost_rate as _exec_cost_rate  # noqa: E402  (B&B-K)
 
 # ── GR5 §2/§6 live-path wiring (2026-10-10) ──────────────────────────────────
 # The measurement substrate (pre-ingest gate G0–G5 + TradeCustodyRecord) is
@@ -1420,7 +1421,11 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # probability of the BOOKED side vs the price paid. Replaces the retired
         # confidence ladder that produced 19:1 win/loss asymmetry on cheap entries.
         confidence = abs(our_prob - 0.5) * 2.0
-        size_usd = _position_size_usd(our_prob, mkt)
+        # B&B-K (2026-10-16): size net of the per-contract execution cost so the
+        # Kelly edge matches the honest gate (execution_cost_rate = ~0.0205). The
+        # prior call defaulted fee_rate=0.0, admitting marginal trades that fail
+        # the honest-EV gate by anything up to the fee.
+        size_usd = _position_size_usd(our_prob, mkt, fee_rate=_exec_cost_rate())
         # A $0 Kelly size means no edge at this price -> NO trade. Without this
         # guard a $0 size still records a phantom row (qty floored to 1).
         if size_usd <= 0:

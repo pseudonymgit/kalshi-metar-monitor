@@ -1,12 +1,12 @@
 {
-  "generated_at_utc": "2026-10-16T01:04:24.441495+00:00",
+  "generated_at_utc": "2026-10-16T19:35:40.302485+00:00",
   "source_db": "data/paper_trading_sbox.db",
   "paradigm": "sole om_gfs + honest calibration + Kelly edge sizing",
   "bankroll_usd": 200.0,
-  "total_trades": 10,
+  "total_trades": 13,
   "flagged_trades": 2,
-  "clean_trades": 8,
-  "flagged_pct": 20.0,
+  "clean_trades": 11,
+  "flagged_pct": 15.4,
   "flags_per_rule": {
     "bankroll/position mismatch": 0,
     "over max position": 0,
@@ -16,7 +16,7 @@
   },
   "rule_definitions": {
     "bankroll/position mismatch": "realized_pnl > 200.0 x 10.0 = 2000",
-    "over max position": "position_size_usd > 25.0",
+    "over max position": "position_size_usd > 10.0",
     "negative edge entered": "position_size_usd > 0 and forecast_prob - market_price < 0 (Kelly trades on edge; low absolute p is not a flag)",
     "saturated flat signal": "sole raw YES-side p >= per-station honest ceiling (the calibration clamp engaged)",
     "calibration bound violated": "YES-side calibrated_p outside [0,1] or above its ceiling (replaces the retired raw-%-edge rule)"
@@ -31,8 +31,8 @@
       "trade_uuid": "a4e49e12-ca26-4a74-9cb3-898b727f6d90",
       "station": "KSEA",
       "trade_date_utc": "2026-10-15",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "saturated flat signal"
       ],
@@ -47,8 +47,8 @@
       "trade_uuid": "7006ada5-8388-4de8-a4b6-c61d79253033",
       "station": "KNYC",
       "trade_date_utc": "2026-10-15",
-      "status": "open",
-      "settlement_outcome": null,
+      "status": "closed",
+      "settlement_outcome": "incorrect",
       "rules": [
         "saturated flat signal"
       ],

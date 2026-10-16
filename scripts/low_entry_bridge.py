@@ -63,6 +63,7 @@ from core.strike_selection_ev import select_strike, make_truncated_p_fn  # noqa:
 from core.intraday.distribution_adapter import update_from_intraday_low  # noqa: E402
 from core.station_params import get_station_params  # noqa: E402
 from core.station_time import is_within_entry_window, station_timezone_name  # noqa: E402
+from core.fees import execution_cost_rate as _exec_cost_rate  # noqa: E402  (B&B-K)
 
 DATA = REPO / "data"
 SBOX_DB = DATA / "paper_trading_sbox.db"
@@ -479,7 +480,9 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True,
                 continue
             mkt = row["yes_price"] if picked["side"] == "yes" else row["no_price"]
             confidence = abs(our_prob - 0.5) * 2.0
-            size_usd = kelly_position_size(our_prob, mkt)
+            # B&B-K (2026-10-16): size net of execution cost, matching HIGH and
+            # the honest gate. Prior call defaulted fee_rate=0.0.
+            size_usd = kelly_position_size(our_prob, mkt, fee_rate=_exec_cost_rate())
             if size_usd <= 0:
                 skipped.append((st, day_str, "kelly_zero_edge"))
                 continue
