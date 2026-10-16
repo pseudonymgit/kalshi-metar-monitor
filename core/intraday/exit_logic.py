@@ -46,25 +46,25 @@ def _estimate_pnl(
     """Estimate PnL for a position given current market price.
 
     The entry-side EV model assumes execution cost (half-spread) is paid on
-    BOTH entry and exit. The entry cost was paid at booking (reflected in the
-    fill price). For an early exit, the EXIT half-spread must also be deducted
-    so the realized P&L matches the EV model's assumption.
-    (Loop-A, 2026-10-16: Dan confirmed "exit fees should be the clashing
-    calculation" — the entry EV deducts both halves, the exit writer was
-    deducting neither.)
+    BOTH entry and exit. The entry cost was reflected at booking in the fill
+    price (mid + half-spread). For an early exit, only the EXIT half-spread
+    plus the Kalshi taker fee on the close need to be deducted from the gross
+    price movement.
+    (Loops A+B, 2026-10-16: Dan confirmed exit fees should match the EV model.
+    The prior fix used `2 * fee_per_contract` — wrong magnitude and label. The
+    correct per-contract exit cost is `execution_cost_rate() + fee_per_contract()`
+    — one tick of half-spread to cross the book at close, plus one Kalshi fee.
+    The settlement path (pnl_tracking.py) is contract-notional (zero deduction)
+    by Dan's design — no change needed there.)
     """
-    fee = fee_per_contract(entry_price)
+    from core.fees import execution_cost_rate, fee_per_contract
     direction_u = direction.upper()
     if direction_u in ("UP", "BUY", "YES"):
         gross = position_size * (current_price - entry_price)
     else:
         gross = position_size * (entry_price - current_price)
-    # Deduct exit half-spread (matches the entry EV model's `exit_cost`).
-    # The spread is the difference between mid and the fill price; at exit,
-    # the fill price to close is mid + half the bid-ask spread. Model it as
-    # 2 × fee_per_contract (one tick of spread + one tick of Kalshi fee).
-    # Both are per-contract costs billed at the exit price.
-    exit_cost = 2 * fee_per_contract(current_price)
+    # Exit-side cost: half-spread to close the position + Kalshi fee on exit.
+    exit_cost = execution_cost_rate() + fee_per_contract(current_price)
     return round(gross - position_size * exit_cost, 4)
 
 
