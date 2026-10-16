@@ -43,12 +43,29 @@ def _estimate_pnl(
     current_price: float,
     position_size: float,
 ) -> float:
-    """Estimate PnL for a position given current market price."""
+    """Estimate PnL for a position given current market price.
+
+    The entry-side EV model assumes execution cost (half-spread) is paid on
+    BOTH entry and exit. The entry cost was paid at booking (reflected in the
+    fill price). For an early exit, the EXIT half-spread must also be deducted
+    so the realized P&L matches the EV model's assumption.
+    (Loop-A, 2026-10-16: Dan confirmed "exit fees should be the clashing
+    calculation" — the entry EV deducts both halves, the exit writer was
+    deducting neither.)
+    """
+    fee = fee_per_contract(entry_price)
     direction_u = direction.upper()
     if direction_u in ("UP", "BUY", "YES"):
-        return position_size * (current_price - entry_price)
+        gross = position_size * (current_price - entry_price)
     else:
-        return position_size * (entry_price - current_price)
+        gross = position_size * (entry_price - current_price)
+    # Deduct exit half-spread (matches the entry EV model's `exit_cost`).
+    # The spread is the difference between mid and the fill price; at exit,
+    # the fill price to close is mid + half the bid-ask spread. Model it as
+    # 2 × fee_per_contract (one tick of spread + one tick of Kalshi fee).
+    # Both are per-contract costs billed at the exit price.
+    exit_cost = 2 * fee_per_contract(current_price)
+    return round(gross - position_size * exit_cost, 4)
 
 
 def _is_direction_up(direction: str) -> bool:
