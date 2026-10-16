@@ -172,8 +172,11 @@ def build_station_tickers(db_stations: set[str]) -> dict[str, dict[str, list[str
         return {}
     for s in series:
         tk = s.get("ticker") or s.get("series_ticker") or ""
-        station = _ksm.resolve_ticker(tk)
-        if station is None or station not in db_stations:
+        try:
+            station = _ksm.resolve_ticker(tk)
+        except KeyError:
+            continue  # non-canonical ticker (e.g. retired/experimental series)
+        if station not in db_stations:
             continue
         direction = "HIGH" if tk.startswith("KXHIGH") else "LOW"
         if tk not in result[station][direction]:
