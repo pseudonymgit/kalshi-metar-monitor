@@ -677,36 +677,83 @@ def _fetch_trade_dict(conn, tuuid):
     return dict(zip(cols, row)) if row else None
 
 
-def _sync_booked_prob(conn, tuuid, our_prob):
-    """ITEM2 (2026-10-16): re-sync the BOOKED probability columns to a re-stamp.
+def _booked_side_prob(calibrated_p, leg):
+    """ITEM2' (2026-10-16): booked-side probability from the YES-side calibrated
+    value. YES leg: ``calibrated_p``; NO leg: ``1 - calibrated_p``. None/NaN in
+    => None out, so the caller leaves the columns untouched.
+    """
+    if calibrated_p is None or calibrated_p != calibrated_p:
+        return None
+    return float(calibrated_p) if leg == "yes" else 1.0 - float(calibrated_p)
 
-    The fast-path enrich refreshed `p_*` + the companion row but NEVER re-wrote
-    the booked ``forecast_prob``/``analytical_prob``. Observed on ids 285/287/288:
-    the companion was re-stamped at 15:15 while the trade row kept the 14:15
-    values, so the scoring/calibrating paths read a stale probability (booked
-    prob != companion calibrated_p).
 
-    ``our_prob`` is the CALIBRATED probability of the booked side — the SAME
-    source the companion's ``calibrated_p`` is derived from (companion side=BUY
-    carries calibrated_p, and the booked leg is ``calibrated_p`` for YES /
-    ``1-calibrated_p`` for NO). Writing it here keeps both sides of a re-stamp
-    consistent: the caller updates the companion via ``_upsert_forecast`` and
-    calls this in the SAME transaction, so a re-stamp is atomic.
+def _booked_leg_from_trade_type(trade_type):
+    """Map a booked ``trade_type`` ('buy_yes'/'buy_no'/...) to its leg."""
+    t = (trade_type or "").lower()
+    if "yes" in t:
+        return "yes"
+    if "no" in t:
+        return "no"
+    return None
+
+
+def _canonical_booked_prob(conn, tuuid):
+    """The SINGLE source of truth for the booked probability: the companion's
+    YES-side ``calibrated_p`` transformed by the row's OWN booked leg. None when
+    either the companion row or its ``calibrated_p`` is absent.
+    """
+    row = conn.execute(
+        "SELECT t.trade_type, f.calibrated_p FROM trades t "
+        "LEFT JOIN trade_forecaster_probs f ON f.trade_uuid = t.trade_uuid "
+        "WHERE t.trade_uuid = ?", (tuuid,)).fetchone()
+    if not row:
+        return None
+    return _booked_side_prob(row[1], _booked_leg_from_trade_type(row[0]))
+
+
+def _write_booked_prob(conn, tuuid, prob):
+    """The single writer of ``trades.forecast_prob``/``analytical_prob``.
 
     ``calibration_error`` is recomputed against the row's OWN booked price
-    (never a re-fetched market mid) so the error stays tied to the fill.
+    (never a re-fetched market mid) so the error stays tied to the fill;
+    ``implied_prob`` is back-filled once (COALESCE).
     """
-    if our_prob is None or our_prob != our_prob:
+    if prob is None or prob != prob:
         return
     row = conn.execute(
         "SELECT market_price FROM trades WHERE trade_uuid=?", (tuuid,)).fetchone()
     mkt = row[0] if row and row[0] is not None else None
-    err = abs(float(our_prob) - float(mkt)) if mkt is not None else None
+    err = abs(float(prob) - float(mkt)) if mkt is not None else None
     conn.execute(
         "UPDATE trades SET forecast_prob=?, analytical_prob=?, "
         "implied_prob=COALESCE(implied_prob, ?), calibration_error=? "
         "WHERE trade_uuid=?",
-        (float(our_prob), float(our_prob), mkt, err, tuuid))
+        (float(prob), float(prob), mkt, err, tuuid))
+
+
+def _sync_booked_prob(conn, tuuid, our_prob=None):
+    """ITEM2' (2026-10-16): canonicalise the BOOKED probability on a re-stamp.
+
+    The booked ``forecast_prob``/``analytical_prob`` are a DERIVED quantity: the
+    companion's YES-side ``calibrated_p`` transformed by the row's OWN booked leg
+    (YES: ``calibrated_p``; NO: ``1 - calibrated_p``). Writing a caller-supplied
+    value directly let the two sides drift (ids 285/287/288): a 15:15 companion
+    re-stamp moved ``calibrated_p`` while the booked column stayed at the stale
+    14:15 value, so booked != companion and the scoring/calibrating paths read a
+    stale probability.
+
+    The companion is now the SINGLE source of truth — this writer DERIVES the
+    booked prob from it, so no caller can inject a raw or stale value. ``our_prob``
+    is only a fallback for rows/callers that carry no companion ``calibrated_p``
+    (legacy books). The caller invokes this in the SAME transaction as
+    ``_upsert_forecast``, so a re-stamp stays atomic on both sides.
+
+    Invariant (both sides): ``abs(booked - (cal if YES else 1-cal)) < 1e-6``.
+    """
+    prob = _canonical_booked_prob(conn, tuuid)
+    if prob is None:
+        prob = our_prob
+    _write_booked_prob(conn, tuuid, prob)
 
 
 def record_trade(conn, station, market_type, side, our_prob, market_price,
@@ -824,6 +871,12 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
                 "p_gefs": probs.get("p_gefs"), "p_analog": probs.get("p_analog"),
                 "p_trajectory": probs.get("p_trajectory"), "p_fused": probs.get("p_fused")}
     _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
+    # ITEM2': the insert wrote `our_prob` into the booked columns BEFORE the
+    # companion existed. Now that the companion row is in, reconcile the booked
+    # prob to the companion's own calibrated_p (the single source) — so a caller
+    # that passed a value inconsistent with the side transform cannot persist a
+    # divergent row. No-op when there is no companion calibrated_p (legacy).
+    _sync_booked_prob(conn, tuuid, our_prob)
     conn.commit()
     return {"status": "executed", "station": station, "signal_direction": direction,
             "trade_uuid": tuuid,
