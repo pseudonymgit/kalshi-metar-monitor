@@ -216,20 +216,58 @@ def low_ladder_from_csv(station: str, day_str: str) -> List[Dict]:
                 # newest-snapshot-at-or-before-pin bound).
                 if d > MAX_DIST_PIN_MINUTES:
                     continue
-                if prev is None or d < prev["_d"]:
-                    ladder[strike] = {
-                        "strike": strike, "yes_price": mid,
-                        "no_price": round(1 - mid, 4), "ticker": r["ticker"],
-                        "volume_24h": None, "snapshot_time": None,
-                        "dist_pin_minutes": d if d < 9e9 else None,
-                        "running_low_at_pin": _parse_running_low(r.get("running_low_at_pin")),
-                        "_d": d,
-                    }
+                # PWW Loop-H (2026-10-16): the CSV's `dist_pin_minutes` is
+                # UNSIGNED, so a post-pin quote (look-ahead) used to be as
+                # eligible as a pre-pin one. If the series carries the signed
+                # distance, rank pre-pin (<=0) quotes ahead of post-pin ones and
+                # prefer the newest pre-pin quote per strike; a post-pin quote
+                # is only kept when no pre-pin quote exists for that strike.
+                _sp_raw = r.get("signed_pin_minutes")
+                if _sp_raw in (None, ""):
+                    signed = None  # legacy CSV: no causality info
+                else:
+                    try:
+                        signed = float(_sp_raw)
+                    except (TypeError, ValueError):
+                        signed = None
+                _prev_sp = prev.get("_sp") if prev else None
+                if prev is not None and not _prefer_pin_quote(signed, d, _prev_sp, prev["_d"]):
+                    continue
+                ladder[strike] = {
+                    "strike": strike, "yes_price": mid,
+                    "no_price": round(1 - mid, 4), "ticker": r["ticker"],
+                    "volume_24h": None, "snapshot_time": None,
+                    "dist_pin_minutes": d if d < 9e9 else None,
+                    "signed_pin_minutes": signed,
+                    "running_low_at_pin": _parse_running_low(r.get("running_low_at_pin")),
+                    "_d": d, "_sp": signed,
+                }
     except OSError:
         return []
     for v in ladder.values():
         v.pop("_d", None)
+        v.pop("_sp", None)
     return sorted(ladder.values(), key=lambda d: d["strike"])
+
+
+def _prefer_pin_quote(cand_signed, cand_d, prev_signed, prev_d) -> bool:
+    """True when the candidate quote should beat the existing one for a strike.
+
+    PWW Loop-H (2026-10-16): causality first. When both quotes carry a signed
+    distance, a pre-pin quote (<=0) beats a post-pin quote (>0), and among
+    pre-pin the nearest-to-pin (largest signed, i.e. closest from below) wins.
+    When the signed distance is absent (legacy CSV), fall back to the old
+    'smallest unsigned distance' rule.
+    """
+    if cand_signed is None or prev_signed is None:
+        return cand_d < prev_d  # legacy: nearest by unsigned distance
+    cand_pre = cand_signed <= 0
+    prev_pre = prev_signed <= 0
+    if cand_pre != prev_pre:
+        return cand_pre
+    if cand_pre:
+        return cand_signed > prev_signed
+    return cand_signed < prev_signed
 
 
 def _parse_running_low(raw) -> Optional[float]:

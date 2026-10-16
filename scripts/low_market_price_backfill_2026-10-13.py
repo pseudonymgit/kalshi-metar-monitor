@@ -123,11 +123,42 @@ def load_low_series():
             continue
         mod = loc.hour * 60 + loc.minute
         key = (st, tgt, tk)
+        # PWW Loop-H (2026-10-16): keep the SIGNED pin distance. The previous
+        # `abs(mod - PIN)` made a 14:00 post-pin quote indistinguishable from a
+        # 13:00 pre-pin quote — both `dist_pin == 30` — so a post-pin snapshot
+        # could be selected as the entry price (look-ahead). We now prefer the
+        # newest snapshot AT OR BEFORE the pin (signed distance <= 0, i.e. the
+        # same discipline the HIGH live ladder uses) and only fall back to a
+        # post-pin quote if no pre-pin quote exists, recording the sign so the
+        # consumer can reject it.
+        signed = mod - PIN
         prev = out.get(key)
-        if prev is None or abs(mod - PIN) < abs(prev["snap_local_mod"] - PIN):
+        if prev is None or _better_pin_quote(signed, prev["signed_pin"]):
             out[key] = {"strike": float(sv), "kind": kind, "mid": float(mid),
-                        "snap_local_mod": mod, "dist_pin": abs(mod - PIN)}
+                        "snap_local_mod": mod, "signed_pin": signed,
+                        "dist_pin": abs(signed)}
     return out
+
+
+def _better_pin_quote(cand_signed: int, prev_signed: Optional[int]) -> bool:
+    """True when `cand_signed` is the better entry quote than `prev_signed`.
+
+    Preference order (PWW Loop-H, 2026-10-16):
+      1. pre-pin quotes (signed <= 0) beat post-pin quotes (signed > 0);
+      2. among pre-pin, the CLOSEST to the pin (largest signed, i.e. nearest 0
+         from below) wins — the HIGH ladder's 'newest at/before the pin';
+      3. only when no pre-pin quote exists does a post-pin quote win, and then
+         the EARLIEST after the pin (smallest signed) is preferred.
+    """
+    if prev_signed is None:
+        return True
+    cand_pre = cand_signed <= 0
+    prev_pre = prev_signed <= 0
+    if cand_pre != prev_pre:
+        return cand_pre  # a pre-pin quote beats any post-pin quote
+    if cand_pre:
+        return cand_signed > prev_signed  # both pre-pin: nearest below the pin
+    return cand_signed < prev_signed      # both post-pin: earliest after the pin
 
 
 def load_low_labels():
@@ -232,7 +263,10 @@ def main():
     # ---- AFTER: group cells by (station, ds) ------------------------------
     by_sd = defaultdict(list)
     for (st, ds, tk), v in series.items():
-        by_sd[(st, ds)].append((v["strike"], v["mid"], v["kind"], tk, v["dist_pin"]))
+        # PWW Loop-H (2026-10-16): carry the SIGNED pin distance through so the
+        # consumer can reject post-pin quotes (look-ahead guard).
+        by_sd[(st, ds)].append((v["strike"], v["mid"], v["kind"], tk,
+                                v["dist_pin"], v.get("signed_pin")))
 
     priced_sd = set(by_sd)
     priced_with_label = {k for k in priced_sd if k in labels}
@@ -285,14 +319,17 @@ def main():
     # ---- write the entry-price series CSV ---------------------------------
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     lines = ["station,target_date,ticker,strike,kind,mid,dist_pin_minutes,"
-             "has_low_label,has_low_truth,running_low_at_pin"]
+             "signed_pin_minutes,has_low_label,has_low_truth,running_low_at_pin"]
     for (st, ds), cells in sorted(by_sd.items()):
         rl = runlow.get((st, ds))
         haslab = 1 if (st, ds) in labels else 0
         hastr = 1 if (st, ds) in truth else 0
-        for s, m, kind, tk, dp in sorted(cells):
-            lines.append(f"{st},{ds},{tk},{s},{kind},{m},{dp},{haslab},{hastr},"
-                         f"{'' if rl is None else round(rl,2)}")
+        for c in sorted(cells):
+            # cells: (strike, mid, kind, ticker, dist_pin, signed_pin)
+            s, m, kind, tk, dp, sp = c
+            sp_out = "" if sp is None else sp
+            lines.append(f"{st},{ds},{tk},{s},{kind},{m},{dp},{sp_out},{haslab},"
+                         f"{hastr},{'' if rl is None else round(rl,2)}")
     OUT_CSV.write_text("\n".join(lines) + "\n")
 
     # ---- coverage artifact ------------------------------------------------

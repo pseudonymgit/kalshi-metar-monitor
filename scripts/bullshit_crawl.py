@@ -125,7 +125,7 @@ def main() -> None:
             values["realized_pnl"] = pnl
             values["bankroll_x10"] = round(BANKROLL * BANKROLL_MULT, 2)
 
-        # R2 — position over the $25 cap
+        # R2 — position over the $10 cap (single source: sbox_intraday_ev_bridge)
         if pos > MAX_POSITION_USD:
             reasons.append("over max position")
             values["position_size_usd"] = pos
