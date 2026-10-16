@@ -367,10 +367,22 @@ def _station_spread_model(ladder: List[Dict]):
     whole ladder (spread is a station-day-level market property).
 
     Returns an object exposing ``get_dynamic_spread(ticker)`` for
-    ``core.strike_selection_ev.select_strike``. When the live probe is unavailable
-    (or ``WE_LIVE_SPREAD_EV=0``), it returns the model's measured-mean spread, so
-    the per-contract entry cost collapses to ``EXECUTION_COST_RATE``
-    (measured half-spread + slippage) — the same fallback F1 specifies.
+    ``core.strike_selection_ev.select_strike``.
+
+    ITEM 2 (2026-10-16): the returned model no longer MASKES a probe failure with
+    an untagged fallback. It exposes:
+      * ``resolution``       — ``'measured'`` | ``'unresolved'`` |
+                               ``'policy_fallback_we_live_spread_ev_0'``;
+      * ``fallback_used``    — True whenever the value is an ASSUMPTION, not a
+                               measurement;
+      * ``policy_selected``  — True only when the operator EXPLICITLY chose the
+                               fallback via ``WE_LIVE_SPREAD_EV=0``.
+
+    A fail-closed caller (``select_strike(..., fail_closed=True)``) rejects any
+    returned value that is ``fallback_used`` and not ``policy_selected`` — so a
+    failed/absent live probe SKIPS the station instead of silently pricing off
+    the measured-mean assumption. The fail-open path (``fail_closed=False``)
+    keeps the documented measured-mean fallback (=> ``EXECUTION_COST_RATE``).
     """
     slippage = float(getattr(MARKET_COST_MODEL, "slippage", 0.005) or 0.005)
     slip_rate = slippage
@@ -381,7 +393,10 @@ def _station_spread_model(ladder: List[Dict]):
         ticker = best.get("ticker")
         if ticker:
             try:
-                probe = MARKET_COST_MODEL.get_dynamic_spread(ticker)
+                # unresolved_on_failure=True -> an explicit None on API/probe
+                # failure (instead of the masked measured-mean fallback).
+                probe = MARKET_COST_MODEL.get_dynamic_spread(
+                    ticker, unresolved_on_failure=True)
             except Exception as e:  # never break the pass on a live-data error
                 print(f"[warn] live spread probe {ticker} failed: {type(e).__name__}: {e}",
                       file=sys.stderr)
@@ -390,11 +405,29 @@ def _station_spread_model(ladder: List[Dict]):
     class _StationSpreadModel:
         slippage = slip_rate
 
-        def get_dynamic_spread(self, ticker: str) -> float:
-            if probe is not None and probe > 0:
-                return float(probe)
-            # Documented fallback: measured mean spread (=> EXECUTION_COST_RATE).
-            return float(MARKET_COST_MODEL.spread)
+        def __init__(self):
+            # The probe is resolved ONCE per station, so the resolution state is
+            # fixed at construction — `get_dynamic_spread` just replays it.
+            if probe is not None and float(probe) > 0:
+                self._spread = float(probe)
+                self.resolution = "measured"
+                self.fallback_used = False
+                self.policy_selected = False
+            else:
+                self._spread = float(MARKET_COST_MODEL.spread)
+                self.fallback_used = True
+                if not live_enabled:
+                    # The operator EXPLICITLY disabled the live probe: an
+                    # allowed, SELECTED-AND-RECORDED fallback policy.
+                    self.resolution = "policy_fallback_we_live_spread_ev_0"
+                    self.policy_selected = True
+                else:
+                    # The live probe FAILED/unresolved under a fail-closed ask.
+                    self.resolution = "unresolved"
+                    self.policy_selected = False
+
+        def get_dynamic_spread(self, ticker: str) -> Optional[float]:
+            return self._spread
 
     return _StationSpreadModel()
 
@@ -1251,9 +1284,20 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # a top-EV strike that fails its widened floor falls through to the
         # next-best candidate that clears its own floor, instead of skipping the
         # station outright. min_edge is the per-strike floor (base * edge_mult).
-        picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
-                               p_fn=p_fn, cost_model=cost_model, fail_closed=True,
-                               min_edge_scaler=lambda x: meta_fn(x)["edge_mult"])
+        # ITEM 2: a genuinely fail-closed selection (unresolved live spread under
+        # fail_closed=True) raises; that is a SKIP for THIS station, not a crash
+        # of the pass — record it loudly and move on.
+        try:
+            picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
+                                   p_fn=p_fn, cost_model=cost_model, fail_closed=True,
+                                   min_edge_scaler=lambda x: meta_fn(x)["edge_mult"])
+        except ValueError as e:
+            skipped.append((st, "no_resolvable_exec_spread_fail_closed"))
+            diag.append({"station": st, "day": day_str,
+                         "skip": "no_resolvable_exec_spread_fail_closed",
+                         "resolution": getattr(cost_model, "resolution", None),
+                         "error": str(e)})
+            continue
         if not picked or picked.get("ev", 0) <= 0:
             skipped.append((st, "no_positive_ev_strike"))
             continue

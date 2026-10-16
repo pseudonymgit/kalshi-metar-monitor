@@ -398,8 +398,20 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True,
             # lane previously priced off the bare mid with no fail-closed guard,
             # a systematic over-entry bias vs HIGH).
             cost_model = _station_spread_model(ladder)
-            picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
-                                   p_fn=p_fn, cost_model=cost_model, fail_closed=True)
+            # ITEM 2: a genuinely fail-closed selection (unresolved live spread
+            # under fail_closed=True) raises; that SKIPS this station-day loudly
+            # rather than crashing the whole pass.
+            try:
+                picked = select_strike(state.mu, state.sigma, ladder, min_edge=min_edge,
+                                       p_fn=p_fn, cost_model=cost_model,
+                                       fail_closed=True)
+            except ValueError as e:
+                skipped.append((st, day_str, "no_resolvable_exec_spread_fail_closed"))
+                diag.append({"station": st, "day": day_str,
+                             "skip": "no_resolvable_exec_spread_fail_closed",
+                             "resolution": getattr(cost_model, "resolution", None),
+                             "error": str(e)})
+                continue
             if not picked or picked.get("ev", 0) <= 0:
                 skipped.append((st, day_str, "no_positive_ev_strike"))
                 continue

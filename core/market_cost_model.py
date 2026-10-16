@@ -155,21 +155,36 @@ class MarketCostModel:
         self,
         ticker: str,
         force_refresh: bool = False,
-    ) -> float:
+        unresolved_on_failure: bool = False,
+    ) -> Optional[float]:
         """
         Fetch the live bid-ask spread for a ticker from the Kalshi API.
 
         Args:
             ticker: Full market ticker (e.g. 'KXHIGHKDEN-260722-85')
             force_refresh: If True, bypass cache
+            unresolved_on_failure (ITEM 2, 2026-10-16): when True, an API/depth
+                failure returns an explicit ``None`` (UNRESOLVED) instead of the
+                measured-mean fallback. A fail-closed caller MUST be able to
+                tell a MEASURED spread from an ASSUMPTION; the default (False)
+                preserves the historical fail-open fallback for legacy callers.
 
         Returns:
-            Spread as fraction of $1 (e.g. 0.031 for 3.1¢).
-            Falls back to self.spread if API unavailable.
+            Spread as fraction of $1 (e.g. 0.031 for 3.1¢), or ``None`` when
+            ``unresolved_on_failure`` and no usable live spread could be
+            measured. Falls back to self.spread otherwise.
         """
         depth = self._fetch_market_depth(ticker, force_refresh)
         if depth is not None:
-            return depth.spread
+            try:
+                spread = float(depth.spread)
+            except (TypeError, ValueError):
+                spread = None
+            # A zero / negative / NaN spread is NOT a usable measurement.
+            if spread is not None and spread > 0 and spread == spread:
+                return spread
+        if unresolved_on_failure:
+            return None
         return self.spread
 
     def get_bid_ask(
@@ -461,9 +476,16 @@ class MarketCostModel:
 
 # ─── Helper functions for backward-compatible single-call usage ──────────
 
-def get_dynamic_spread(ticker: str) -> float:
-    """Convenience: get live spread for a ticker using the default model."""
-    return MARKET_COST_MODEL.get_dynamic_spread(ticker)
+def get_dynamic_spread(ticker: str, *,
+                       unresolved_on_failure: bool = False) -> Optional[float]:
+    """Convenience: get live spread for a ticker using the default model.
+
+    ``unresolved_on_failure=True`` returns ``None`` (unresolved) rather than the
+    measured-mean fallback when no live spread can be measured — ITEM 2, so a
+    fail-closed caller can distinguish a measurement from an assumption.
+    """
+    return MARKET_COST_MODEL.get_dynamic_spread(
+        ticker, unresolved_on_failure=unresolved_on_failure)
 
 
 def estimate_slippage(ticker: str, contracts: float = 1.0, is_buy: bool = True) -> SlippageEstimate:

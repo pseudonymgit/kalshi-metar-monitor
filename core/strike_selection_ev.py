@@ -146,6 +146,12 @@ def _entry_exec_cost(strike_row: Dict, cost_model, fail_closed: bool) -> float:
       * fail_closed=False -> the measured/execution-cost constant (an explicit
         assumption) is returned; behaviour of the fail-open path is unchanged.
 
+    ITEM 2 (2026-10-16): a fail-closed caller must be able to tell a MEASURED
+    spread from an ASSUMPTION. The cost model therefore returns an explicit
+    ``None`` (UNRESOLVED) on API/probe failure (or reports ``fallback_used``), and
+    both are rejected here when ``fail_closed`` — an API exception, ``None``, a
+    zero/negative/NaN spread, and a model-reported fallback all raise.
+
     ``cost_model`` is any object exposing ``get_dynamic_spread(ticker) -> spread``.
     """
     if cost_model is not None:
@@ -153,10 +159,28 @@ def _entry_exec_cost(strike_row: Dict, cost_model, fail_closed: bool) -> float:
         live_spread = None
         if ticker:
             try:
-                live_spread = cost_model.get_dynamic_spread(ticker)
+                raw = cost_model.get_dynamic_spread(ticker)
+                live_spread = float(raw) if raw is not None else None
             except Exception:
                 live_spread = None
-        if live_spread is not None and live_spread > 0:
+            # Zero / negative / NaN is not a usable measured spread.
+            if live_spread is not None and (live_spread != live_spread
+                                            or live_spread <= 0):
+                live_spread = None
+        if live_spread is not None:
+            # The model may report that the value it just returned is an
+            # ASSUMPTION (its measured probe failed and it fell back). A
+            # fail-closed caller rejects that UNLESS the fallback was an EXPLICIT,
+            # SELECTED-AND-RECORDED policy (``policy_selected``) — e.g. the
+            # operator disabled the live probe with ``WE_LIVE_SPREAD_EV=0``.
+            if (fail_closed and getattr(cost_model, "fallback_used", False)
+                    and not getattr(cost_model, "policy_selected", False)):
+                raise ValueError(
+                    "ITEM2: fail_closed requires a MEASURED execution spread; the "
+                    "cost model reported an untagged fallback ASSUMPTION "
+                    f"(resolution={getattr(cost_model, 'resolution', None)!r}) for "
+                    f"strike {strike_row.get('strike')!r}"
+                )
             # One-way execution cost = half-spread + slippage, matching the
             # composition of EXECUTION_COST_RATE (MEASURED_MEAN_SPREAD/2 +
             # DEFAULT_SLIPPAGE) so live and fallback costs are interchangeable.
