@@ -1777,7 +1777,11 @@ def run_exit_pass(dry_run: bool = False, stations=None) -> Dict:
     rules = _enabled_exit_rules()
     conn = sqlite3.connect(SBOX_DB)
     try:
-        conn.execute("PRAGMA journal_mode=WAL;")
+        # PWW Loop-2 (MINOR, 2026-10-16): a dry run must not mutate the DB.
+        # The WAL journal-mode switch writes to the file, so only apply it when
+        # we actually intend to write.
+        if not dry_run:
+            conn.execute("PRAGMA journal_mode=WAL;")
         positions = open_exit_positions(conn)
         if stations:
             positions = [p for p in positions if p["station"] in stations]
