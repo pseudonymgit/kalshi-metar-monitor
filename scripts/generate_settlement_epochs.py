@@ -64,6 +64,31 @@ def get_temp_bucket(temp_f: float, market_type: str) -> int:
         return rounded
 
 
+def _frozen_bucket_or(conn: sqlite3.Connection, station: str, market_type: str,
+                      local_trading_date: str, fallback: Optional[int]) -> Optional[int]:
+    """Return the FROZEN canonical bucket for a station-day, else `fallback`.
+
+    PWW Loop-C/D (2026-10-16): the regeneration-invariant guard compares a
+    regenerated value against the frozen snapshot in `settlement_snapshot`.
+    Reading the SAME frozen table here guarantees agreement for frozen rows;
+    unfrozen rows (no snapshot) use the METAR-derived `fallback`. Note this is
+    deliberately NOT `settlement_truth` — that table is GHCN/weatherapi-
+    dominated and disagrees with the frozen Kalshi canonical values on ~38
+    station-days, which would introduce NEW invariant violations.
+    Returns None when neither a frozen value nor a fallback exists.
+    """
+    try:
+        row = conn.execute(
+            "SELECT settlement_temp_f FROM settlement_snapshot "
+            "WHERE station=? AND market_type=? AND local_trading_date=?",
+            (station, market_type, local_trading_date)).fetchone()
+    except sqlite3.OperationalError:
+        row = None  # snapshot table absent (older DB) -> use fallback
+    if row is not None and row[0] is not None:
+        return int(round(float(row[0])))
+    return fallback
+
+
 def generate_epochs_for_station(
     conn: sqlite3.Connection, 
     station: str,
@@ -103,13 +128,16 @@ def generate_epochs_for_station(
         ingestion_ts = row[8]
         
         # Determine bucket based on market type.
-        # PWW Loop-C (2026-10-16): prefer CANONICAL truth when available.
-        # The METAR-derived bucket can differ from the canonical Kalshi/GHCN
-        # value by 1-2°F, which causes the regeneration-invariant guard to
-        # fail closed. Check settlement_truth first; if it has a canonical
-        # value for this station-day, use it. Falls back to the raw METAR
-        # bucket when no canonical truth exists (e.g. recent dates the failed
-        # cron never backfilled).
+        #
+        # PWW Loop-C/D (2026-10-16): the regeneration-invariant guard compares
+        # a regenerated bucket against the FROZEN canonical snapshot in
+        # `settlement_snapshot`. To make regeneration succeed for frozen rows,
+        # the generator must read that SAME table — not `settlement_truth`
+        # (a different, GHCN-dominated table that disagrees with the frozen
+        # values on ~38 station-days and would introduce NEW violations).
+        # Frozen rows use the frozen value (agreement by construction);
+        # unfrozen rows fall back to the METAR bucket (the invariant skips
+        # them — nothing frozen to protect).
         try:
             if market_type == "HIGH":
                 metar_bucket = get_temp_bucket(max_temp_f, "HIGH")
@@ -118,39 +146,30 @@ def generate_epochs_for_station(
         except ValueError as exc:
             print(f"  SKIP {station} {date_local} {market_type}: {exc}")
             continue
-        # Consult canonical truth (if available) to override the METAR bucket.
-        _truth_row = conn.execute(
-            "SELECT settlement_temp_f FROM settlement_truth "
-            "WHERE station=? AND market_type=? AND local_trading_date=?",
-            (station, market_type, date_local)).fetchone()
-        if _truth_row is not None and _truth_row[0] is not None:
-            current_bucket = int(round(_truth_row[0]))
-        else:
-            current_bucket = metar_bucket
-        
+        # Frozen canonical snapshot wins when present (agrees with the guard).
+        current_bucket = _frozen_bucket_or(
+            conn, station, market_type, date_local, metar_bucket)
+
         # Get prior bucket (previous day's max for HIGH, min for LOW)
-        # PWW Loop-D (2026-10-16): use canonical truth for prior too, so
-        # reversion_occurred is computed from a CONSISTENT basis.
-        # Before the current-bucket fix, prior came from METAR and current
-        # from canonical — a 1-2°F difference could produce a false reversion.
+        # PWW Loop-D (2026-10-16): prior uses the SAME source discipline so
+        # reversion_occurred is computed on one consistent basis.
         prior_bucket = None
         if i > 0:
-            prior_date = daily_rows[i - 1][2]  # date_local from prior row
-            _prior_truth = conn.execute(
-                "SELECT settlement_temp_f FROM settlement_truth "
-                "WHERE station=? AND market_type=? AND local_trading_date=?",
-                (station, market_type, prior_date)).fetchone()
-            if _prior_truth is not None and _prior_truth[0] is not None:
-                prior_bucket = int(round(_prior_truth[0]))
+            prior_row = daily_rows[i - 1]
+            prior_date = prior_row[2]
+            try:
+                if market_type == "HIGH":
+                    _prior_fallback = get_temp_bucket(prior_row[4], "HIGH")
+                else:
+                    _prior_fallback = get_temp_bucket(prior_row[5], "LOW")
+            except ValueError:
+                _prior_fallback = None
+            if _prior_fallback is not None:
+                prior_bucket = _frozen_bucket_or(
+                    conn, station, market_type, prior_date, _prior_fallback)
             else:
-                prior_row = daily_rows[i - 1]
-                try:
-                    if market_type == "HIGH":
-                        prior_bucket = get_temp_bucket(prior_row[4], "HIGH")
-                    else:
-                        prior_bucket = get_temp_bucket(prior_row[5], "LOW")
-                except ValueError:
-                    prior_bucket = None
+                prior_bucket = _frozen_bucket_or(
+                    conn, station, market_type, prior_date, None)
         
         # Determine reversion: 1 if current > prior, 0 otherwise
         reversion_occurred = 1 if (prior_bucket is not None and current_bucket > prior_bucket) else 0
