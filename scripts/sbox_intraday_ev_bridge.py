@@ -246,6 +246,30 @@ def pinned_decision_utc(station: str, day_str: str) -> Optional[str]:
         return None
 
 
+def sole_pin_reached(station: str, day_str: str,
+                     now_utc: datetime) -> Optional[bool]:
+    """ITEM1 (2026-10-16, H3): has the 13:30 station-local decision pin passed?
+
+    Returns True when `now_utc` is at/after the station-day's pin, False when the
+    pin is still in the future, and None when the pin cannot be resolved (missing
+    tz data / bad zone). The sole (om_gfs) path must NOT enter a station-day
+    before its pin: the caller SKIPS on False and FAILS CLOSED (skip) on None, so
+    a missing measurement can never silently default the decision instant to
+    `now`. The pin encodes "when the day's trajectory has developed enough to
+    decide" — it is the minimum-information instant, not a diagnostic.
+    """
+    pin_iso = pinned_decision_utc(station, day_str)
+    if pin_iso is None:
+        return None
+    try:
+        pin = datetime.fromisoformat(pin_iso)
+    except Exception:
+        return None
+    if pin.tzinfo is None:
+        pin = pin.replace(tzinfo=timezone.utc)
+    return now_utc >= pin
+
+
 def market_mid_prob(ticker: str, pin_iso: Optional[str]) -> Optional[float]:
     """Market mid as an implied P(YES) at the snapshot nearest the decision pin.
 
@@ -941,11 +965,14 @@ def select_nwp_state(st, day_str, hsf, dist, month, diag=None):
 
 
 def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
-        report=False, max_stations=None):
+        report=False, max_stations=None, now_utc=None):
     stations = stations or STATIONS
     if max_stations:
         stations = stations[:max_stations]
-    now_utc = datetime.now(timezone.utc)
+    # ITEM1 (2026-10-16): `now_utc` is injectable so the 13:30 pin gate is
+    # DETERMINISTIC under test (default: wall clock). The pin enforcement is the
+    # only consumer that depends on it beyond the existing window/hour math.
+    now_utc = now_utc or datetime.now(timezone.utc)
     now_iso = now_utc.isoformat()
 
     try:
@@ -1042,6 +1069,29 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
                          "skip": "sole_no_om_gfs", "nwp_src": nwp_src,
                          "forecast_src": None})
             continue
+        # ITEM1 (2026-10-16, H3): enforce the canonical 13:30 station-local
+        # decision pin on the SOLE path. `build_om_gfs_sole_p_fn` has no pin
+        # argument, so the sole branch previously consumed the pin only as a
+        # diagnostic and could book a station-day the moment the F4 window
+        # opened (observed: all 10 day-1 fills stamped 14:15Z, ~3.5h before the
+        # 17:30Z pin). A station-day must NOT be entered until
+        # `now >= pinned_decision_utc(station, day)`: a pin still in the FUTURE
+        # is SKIPPED (do not book early); an UNRESOLVABLE pin FAILS CLOSED
+        # (skip), never defaulting the decision instant to `now`.
+        if sole:
+            pin_ok = sole_pin_reached(st, day_str, now_utc)
+            if pin_ok is None:
+                skipped.append((st, "sole_pin_unresolved"))
+                diag.append({"station": st, "day": day_str,
+                             "skip": "sole_pin_unresolved",
+                             "pin_iso": None, "now_utc": now_iso})
+                continue
+            if not pin_ok:
+                skipped.append((st, "sole_before_pin"))
+                diag.append({"station": st, "day": day_str,
+                             "skip": "sole_before_pin", "now_utc": now_iso,
+                             "pin_iso": pinned_decision_utc(st, day_str)})
+                continue
         cdf = None
         traj = None
         if not sole:

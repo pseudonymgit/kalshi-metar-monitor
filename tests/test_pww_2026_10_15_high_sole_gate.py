@@ -18,6 +18,7 @@ import inspect
 import math
 import os
 import sys
+from datetime import datetime, timezone
 
 import pytest
 
@@ -87,6 +88,10 @@ def high_harness(monkeypatch):
         return (lambda x: 0.0), (lambda x: {"calibrated_p": 0.0, "edge_mult": 1.0})
 
     monkeypatch.setattr(b, "build_om_gfs_sole_p_fn", _sole)
+    # ITEM1 (2026-10-16): the sole path now enforces the 13:30 station-local
+    # pin. Pin a deterministic decision instant AT/AFTER the pin (KATL
+    # 2026-10-15 pin = 17:30Z) so these gate tests are not wall-clock flaky.
+    b._now = datetime(2026, 10, 15, 18, 0, tzinfo=timezone.utc)
     b._calls = calls
     return b
 
@@ -98,7 +103,8 @@ def test_sole_path_skips_when_om_gfs_unavailable(high_harness, monkeypatch):
     b = high_harness
     monkeypatch.setattr(b, "om_gfs_state_for_day", lambda *a, **k: None)
 
-    out = b.run(dry_run=True, ignore_window=True, stations=["KATL"], report=True)
+    out = b.run(dry_run=True, ignore_window=True, stations=["KATL"], report=True,
+                now_utc=b._now)
 
     assert out["executed"] == [], "a gfs_local sole pass must not produce a trade"
     assert any("sole_no_om_gfs" in s for s in out["skipped"]), out["skipped"]
@@ -118,7 +124,8 @@ def test_sole_path_skips_on_om_gfs_fetch_error(high_harness, monkeypatch):
         raise RuntimeError("network down")
 
     monkeypatch.setattr(b, "om_gfs_state_for_day", _raise)
-    out = b.run(dry_run=True, ignore_window=True, stations=["KATL"])
+    out = b.run(dry_run=True, ignore_window=True, stations=["KATL"],
+                now_utc=b._now)
     assert out["executed"] == []
     assert any("sole_no_om_gfs" in s for s in out["skipped"])
     assert b._calls["sole_p_fn"] == 0
@@ -130,7 +137,8 @@ def test_sole_path_proceeds_when_om_gfs_present(high_harness, monkeypatch):
     b = high_harness
     monkeypatch.setattr(b, "om_gfs_state_for_day",
                         lambda *a, **k: _FakeState(mu=76.0, sigma=2.0))
-    out = b.run(dry_run=True, ignore_window=True, stations=["KATL"], report=True)
+    out = b.run(dry_run=True, ignore_window=True, stations=["KATL"], report=True,
+                now_utc=b._now)
     assert not any("sole_no_om_gfs" in s for s in out["skipped"]), out["skipped"]
     # The gate opened, so the sole p_fn WAS built on the real om_gfs state.
     assert b._calls["sole_p_fn"] >= 1
