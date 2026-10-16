@@ -328,16 +328,26 @@ def run(dry_run=False, stations=None, min_edge=0.03, ignore_window=True,
         allow_book=False):
     """Evaluate the LOW lane for each station-day in the LOW backfill panel.
 
-    F4 (2026-10-14): the ``LOW_BRIDGE_ENABLED`` flag now GATES booking. A
-    non-dry-run pass refuses to book unless the flag is set (or the explicit
-    ``allow_book`` override is passed) — the "prepare-only, safe by default"
-    claim is enforced, not decorative. Dry runs always compute but never book.
+    F4 (2026-10-14): the ``LOW_BRIDGE_ENABLED`` flag GATES booking. A non-dry-run
+    pass refuses to book unless the flag is set — the "prepare-only, safe by
+    default" claim is enforced, not decorative. Dry runs always compute but never
+    book.
+
+    ITEM 4 (2026-10-16): the env flag is now the SOLE AUTHORITY. The previous
+    ``allow_book`` override could arm the lane on its own, so a stray programmatic
+    caller (or a test harness) could bypass the operator gate — the module's own
+    "booking refuses unless LOW_BRIDGE_ENABLED=1" claim was false. DECISION:
+    ``allow_book`` is retained for signature compatibility but is NO LONGER an
+    arming authority; it can only be an ADDITIONAL explicit acknowledgement that
+    is still subject to the env flag. Booking requires ``LOW_BRIDGE_ENABLED``;
+    ``allow_book=True`` alone is refused.
     """
-    if not dry_run and not (LOW_BRIDGE_ENABLED or allow_book):
+    if not dry_run and not LOW_BRIDGE_ENABLED:
         raise RuntimeError(
-            "LOW bridge is not armed: set LOW_BRIDGE_ENABLED=1 (or pass "
-            "allow_book=True) to book LOW trades; use --dry-run to evaluate "
-            "without booking. The LOW lane stays dormant until explicitly armed."
+            "LOW bridge is not armed: set LOW_BRIDGE_ENABLED=1 to book LOW "
+            "trades; use --dry-run to evaluate without booking. The allow_book "
+            "override cannot arm the lane on its own (ITEM 4): the environment "
+            "flag is the authority, so a stray caller cannot book LOW trades."
         )
     stations = stations or STATIONS
     now_utc = datetime.now(timezone.utc)

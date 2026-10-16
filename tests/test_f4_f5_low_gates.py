@@ -147,11 +147,24 @@ def test_flag_on_books(harness, monkeypatch):
 
 
 @pytest.mark.unit
-def test_allow_book_override_books_without_the_flag(harness, monkeypatch):
+def test_allow_book_override_cannot_arm_the_lane(harness, monkeypatch):
+    """ITEM 4 (2026-10-16): the env flag is the authority. `allow_book=True` with
+    LOW_BRIDGE_ENABLED unset must STILL refuse to book — the old override let a
+    stray caller arm the lane and made the module's arming claim false."""
     lb = harness
     monkeypatch.setattr(lb, "LOW_BRIDGE_ENABLED", False)
-    out = lb.run(dry_run=False, allow_book=True)
-    assert out["n_executed"] >= 1
+    with pytest.raises(RuntimeError):
+        lb.run(dry_run=False, allow_book=True)
+    assert lb._calls["record"] == [], "allow_book must not bypass the env gate"
+
+
+@pytest.mark.unit
+def test_flag_on_books_with_or_without_the_override(harness, monkeypatch):
+    """The env flag alone authorises booking; the override is inert."""
+    lb = harness
+    monkeypatch.setattr(lb, "LOW_BRIDGE_ENABLED", True)
+    assert lb.run(dry_run=False)["n_executed"] >= 1
+    assert lb.run(dry_run=False, allow_book=True)["n_executed"] >= 1
 
 
 # ── F5: exposure + booking gates ─────────────────────────────────────────────
