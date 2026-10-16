@@ -109,7 +109,11 @@ def test_regeneration_moving_frozen_value_is_violation():
     v = verify_regeneration_invariants(conn, [
         {"station": "KBOS", "market_type": "HIGH",
          "local_trading_date": "2026-10-04", "settlement_bucket": 57}])
-    assert len(v) == 1 and "move frozen 63.0 -> 57" in v[0]
+    # Loop D (2026-10-16): violation message now includes bucket resolution.
+    # Keep the load-bearing check: the frozen move IS detected.
+    assert len(v) == 1
+    assert "63.0" in v[0] and "57" in v[0]
+    assert "move frozen" in v[0]
 
 
 def test_regeneration_ignores_unfrozen_rows():

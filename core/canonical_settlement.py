@@ -427,8 +427,17 @@ def verify_regeneration_invariants(conn: sqlite3.Connection,
                                r["local_trading_date"])
         if frozen is None:
             continue  # nothing frozen -> nothing to protect
-        if float(frozen["settlement_temp_f"]) != float(val):
+        # Compare at bucket (integer-degree) resolution, not raw float.
+        # The frozen snapshot stores the canonical float (e.g. 74.48) while the
+        # epoch generator produces int(round(...)) = 74 — comparing raw floats
+        # would always flag a false violation. Round both so a 0.01° drift from
+        # float arithmetic doesn't block regeneration.
+        # (Loop D, 2026-10-16: the previous float-float comparison was the bug.)
+        _frozen_bucket = int(round(float(frozen["settlement_temp_f"])))
+        _candidate_bucket = int(round(float(val)))
+        if _frozen_bucket != _candidate_bucket:
             violations.append(
                 f"{r['station']}/{r['market_type']}/{r['local_trading_date']}: "
-                f"regeneration would move frozen {frozen['settlement_temp_f']} -> {val}")
+                f"regeneration would move frozen {frozen['settlement_temp_f']} "
+                f"(bucket {_frozen_bucket}) -> {val} (bucket {_candidate_bucket})")
     return violations

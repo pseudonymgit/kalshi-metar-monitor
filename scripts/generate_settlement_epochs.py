@@ -129,16 +129,28 @@ def generate_epochs_for_station(
             current_bucket = metar_bucket
         
         # Get prior bucket (previous day's max for HIGH, min for LOW)
+        # PWW Loop-D (2026-10-16): use canonical truth for prior too, so
+        # reversion_occurred is computed from a CONSISTENT basis.
+        # Before the current-bucket fix, prior came from METAR and current
+        # from canonical — a 1-2°F difference could produce a false reversion.
         prior_bucket = None
         if i > 0:
-            prior_row = daily_rows[i - 1]
-            try:
-                if market_type == "HIGH":
-                    prior_bucket = get_temp_bucket(prior_row[4], "HIGH")
-                else:
-                    prior_bucket = get_temp_bucket(prior_row[5], "LOW")
-            except ValueError:
-                prior_bucket = None  # prior day unusable -> no direction
+            prior_date = daily_rows[i - 1][2]  # date_local from prior row
+            _prior_truth = conn.execute(
+                "SELECT settlement_temp_f FROM settlement_truth "
+                "WHERE station=? AND market_type=? AND local_trading_date=?",
+                (station, market_type, prior_date)).fetchone()
+            if _prior_truth is not None and _prior_truth[0] is not None:
+                prior_bucket = int(round(_prior_truth[0]))
+            else:
+                prior_row = daily_rows[i - 1]
+                try:
+                    if market_type == "HIGH":
+                        prior_bucket = get_temp_bucket(prior_row[4], "HIGH")
+                    else:
+                        prior_bucket = get_temp_bucket(prior_row[5], "LOW")
+                except ValueError:
+                    prior_bucket = None
         
         # Determine reversion: 1 if current > prior, 0 otherwise
         reversion_occurred = 1 if (prior_bucket is not None and current_bucket > prior_bucket) else 0
