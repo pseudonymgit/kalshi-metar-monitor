@@ -125,6 +125,15 @@ def _strike_from_notes(monkeypatch):
     """Strike resolution reads the trade's own `notes` (no network)."""
     monkeypatch.setattr(pnl_tracking, "_get_strike_price",
                         lambda station, market_type, date, paper_db, metar_db: _STRIKE)
+    # ITEM 3 (2026-10-16): settlement now REQUIRES a resolved strike axis; an
+    # unresolved axis leaves the trade open. These fixtures predate the axis
+    # discipline (their `-T##` tickers are not in the ladder), so provide the
+    # market's own `greater` axis explicitly — the production condition these
+    # canonical-truth tests intend to exercise.
+    monkeypatch.setattr(pnl_tracking, "_resolve_strike_axis_row",
+                        lambda ticker, **k: {"strike_type": "greater",
+                                             "floor_strike": _STRIKE,
+                                             "cap_strike": None})
 
 
 def _trade(paper_db, uuid="t-1"):

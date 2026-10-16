@@ -177,6 +177,14 @@ def _trader(paper_db, metar_db):
 def _strike(monkeypatch):
     monkeypatch.setattr(pnl_tracking, "_get_strike_price",
                         lambda *a, **k: _STRIKE)
+    # ITEM 3 (2026-10-16): settlement now REQUIRES a resolved strike axis; an
+    # unresolved axis leaves the trade open. These fixtures predate the axis
+    # discipline, so provide the market's own `greater` axis explicitly — the
+    # production condition this canonical-truth test intends to exercise.
+    monkeypatch.setattr(pnl_tracking, "_resolve_strike_axis_row",
+                        lambda ticker, **k: {"strike_type": "greater",
+                                             "floor_strike": _STRIKE,
+                                             "cap_strike": None})
 
 
 def test_settle_books_finalized_not_frozen_proxy(tmp_path, monkeypatch):

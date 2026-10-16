@@ -143,35 +143,34 @@ def process_settlements_for_date(self, settlement_date):
         _strike_type = strike_axis.get("strike_type") if strike_axis else None
         _floor = strike_axis.get("floor_strike") if strike_axis else None
         _cap = strike_axis.get("cap_strike") if strike_axis else None
+
+        # ITEM 3 (2026-10-16): an unresolved strike axis must LEAVE THE TRADE OPEN.
+        # The ticker suffix `-T##` is ambiguous between the "or above" and "or
+        # below" tails, so guessing the operator from `market_type` (HIGH -> '>',
+        # LOW -> '<') can INVERT the payout: a HIGH "or below" market settled with
+        # '>' pays the losing side on every body. The previous code did exactly that
+        # fallback and then SETTLED. Now: no axis -> loud skip, no settlement.
         if _strike_type is None:
             _LOGGER.warning(
-                "Trade %s: strike axis unresolved for ticker=%s; falling back to "
-                "market_type=%s legacy operator (greater-tail only).",
-                trade_uuid, _axis_ticker, market_type)
+                "Cannot settle trade %s: strike axis unresolved for ticker=%s "
+                "(station=%s market_type=%s date=%s). The `-T##` ticker cannot "
+                "disambiguate the greater/less tails and guessing from market_type "
+                "can invert the payout. Trade left open.",
+                trade_uuid, _axis_ticker, station, market_type, settlement_date)
+            continue
 
         # Calculate settlement payout based on CANONICAL temperature vs the
         # market's OWN strike operator (strict on both tails).
         settlement_temp = canonical_temp  # canonical truth (Kalshi/GHCN), not the epoch bucket
         settlement_value = canonical_temp  # booked value going forward = canonical truth
         if strike_price is not None:
-            if _strike_type is not None:
-                try:
-                    _yes = strike_crossing_yes(
-                        settlement_temp, strike_price, market_type,
-                        strike_type=_strike_type, floor_strike=_floor, cap_strike=_cap)
-                except ValueError:
-                    _yes = None
-                settlement_contract_value = (1.0 if _yes else 0.0) if _yes is not None else None
-            elif market_type == "HIGH":
-                settlement_contract_value = 1.0 if settlement_temp > strike_price else 0.0
-            elif market_type == "LOW":
-                settlement_contract_value = 1.0 if settlement_temp < strike_price else 0.0
-            else:
-                _LOGGER.warning(
-                    "Cannot settle trade %s: unknown market_type=%s",
-                    trade_uuid, market_type
-                )
-                continue
+            try:
+                _yes = strike_crossing_yes(
+                    settlement_temp, strike_price, market_type,
+                    strike_type=_strike_type, floor_strike=_floor, cap_strike=_cap)
+            except ValueError:
+                _yes = None
+            settlement_contract_value = (1.0 if _yes else 0.0) if _yes is not None else None
         else:
             # No strike price available — cannot determine strike-based settlement.
             # Skipping is safer than falling back to direction-based or 50°F,
