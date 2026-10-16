@@ -189,7 +189,15 @@ def test_unresolvable_pin_fails_closed(harness, monkeypatch):
     out = b.run(dry_run=False, ignore_window=True, stations=["KATL"], report=True,
                 now_utc=now)
     assert b._booked == [], "an unresolved pin must not book"
-    assert any("sole_pin_unresolved" in s for s in out["skipped"]), out["skipped"]
+    # Loop-3 (2026-10-16): the pin gate now fails closed on ALL entry paths,
+    # not only the sole-forecast branch, so the skip reason may be the general
+    # `pin_unresolved` (emitted earlier) or the sole-specific
+    # `sole_pin_unresolved`. Both are fail-closed pin reasons; the load-bearing
+    # assertion is that nothing was booked.
+    assert any(
+        ("sole_pin_unresolved" in s) or ("pin_unresolved" in s)
+        for s in out["skipped"]
+    ), out["skipped"]
 
 
 @pytest.mark.unit

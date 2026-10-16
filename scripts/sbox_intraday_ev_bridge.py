@@ -589,6 +589,13 @@ def kelly_fraction(our_prob: float, market_price: float, *,
     """
     p = float(our_prob)
     m = float(market_price)
+    # PWW Loop-3 (MAJOR, 2026-10-16): reject non-finite inputs. NaN produced
+    # NaN and +inf produced inf, and the downstream `size_usd <= 0` guard does
+    # not reject NaN — so a non-finite probability could pass sizing and create
+    # malformed/over-sized trade state.
+    import math as _math
+    if not _math.isfinite(p) or not _math.isfinite(m) or not _math.isfinite(float(fee_rate)):
+        return 0.0
     if not (0.0 < m < 1.0):
         return 0.0
     edge = p - m - float(fee_rate)
@@ -1194,8 +1201,16 @@ def run(dry_run=False, ignore_window=False, stations=None, min_edge=0.03,
         # decision pin, NOT now. Bounding by now let the selected market price
         # be hours newer than the 13:30 pin, making EV/side/size/price
         # non-reproducible and leaking post-decision market data.
+        # PWW Loop-3 (BLOCKER, 2026-10-16): an UNRESOLVED pin must FAIL CLOSED.
+        # The prior `_pin_iso or now_iso` silently substituted wall-clock time,
+        # reintroducing the exact post-pin leak. Skip with an explicit reason.
         _pin_iso = pinned_decision_utc(st, day_str)
-        ladder = strike_ladder(st, date_yy, before_iso=_pin_iso or now_iso)
+        if _pin_iso is None:
+            skipped.append((st, "pin_unresolved"))
+            diag.append({"station": st, "day": day_str,
+                         "skip": "pin_unresolved", "now_utc": now_iso})
+            continue
+        ladder = strike_ladder(st, date_yy, before_iso=_pin_iso)
         if not ladder:
             skipped.append((st, "no_strike_ladder"))
             continue
