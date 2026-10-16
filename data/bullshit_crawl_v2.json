@@ -1,28 +1,11 @@
 {
-  "generated_at_utc": null,
-  "n_trades": 50,
-  "n_with_calibrated_p": 156,
-  "flips": 1,
-  "flip_pct": 2.0,
-  "flip_detail": [
-    {
-      "id": 246,
-      "uuid": "aff13489-b2cd-4c3c-8bab-1bda0fc845f8",
-      "station": "KMDW",
-      "date": "2026-09-15",
-      "outcome": "correct",
-      "pnl": 0.0,
-      "p_fused": 0.202,
-      "calibrated_p": 0.1315,
-      "ceiling": 0.8441,
-      "market_price": 0.94,
-      "honest_ev": -0.829,
-      "old_flags": [
-        "low_conf_entered"
-      ],
-      "honest_flags": [
-        "honest_ev_too_low"
-      ]
-    }
-  ]
+  "generated_at_utc": "2026-10-16T01:04:31.267808+00:00",
+  "paradigm": "sole om_gfs + honest calibration + Kelly edge sizing",
+  "n_trades": 10,
+  "n_with_calibrated_p": 10,
+  "honest_negative_edge": 0,
+  "flips": 0,
+  "flip_pct": 0.0,
+  "note": "`old_flags` are the RETIRED absolute-p rule set and are paradigm mismatches under Kelly \u2014 reported for provenance only. The only honest selection defect is `honest_negative_edge`.",
+  "flip_detail": []
 }
