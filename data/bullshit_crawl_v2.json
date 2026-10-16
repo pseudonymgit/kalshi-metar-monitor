@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-10-16T19:40:53.859741+00:00",
+  "generated_at_utc": "2026-10-16T21:53:09.756833+00:00",
   "paradigm": "sole om_gfs + honest calibration + Kelly edge sizing",
-  "n_trades": 13,
-  "n_with_calibrated_p": 13,
+  "n_trades": 14,
+  "n_with_calibrated_p": 14,
   "honest_negative_edge": 0,
   "flips": 0,
   "flip_pct": 0.0,
