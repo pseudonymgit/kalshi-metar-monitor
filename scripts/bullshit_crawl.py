@@ -49,7 +49,7 @@ OUT = REPO / "data" / "bullshit_crawl.json"
 
 BANKROLL = 200.0            # the $200 book
 BANKROLL_MULT = 10.0        # R1: pnl > bankroll * mult
-MAX_POSITION_USD = 25.0     # R2
+MAX_POSITION_USD = 10.0     # R2 (single source: sbox_intraday_ev_bridge MAX_POSITION_USD; Dan 2026-10-13: max $10)
 CEILING_EPS = 1e-6          # R4: pinned-at-ceiling tolerance
 POOLED_CEILING = 0.982      # honest pooled ceiling fallback
 
