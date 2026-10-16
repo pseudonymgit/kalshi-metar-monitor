@@ -658,6 +658,38 @@ def _fetch_trade_dict(conn, tuuid):
     return dict(zip(cols, row)) if row else None
 
 
+def _sync_booked_prob(conn, tuuid, our_prob):
+    """ITEM2 (2026-10-16): re-sync the BOOKED probability columns to a re-stamp.
+
+    The fast-path enrich refreshed `p_*` + the companion row but NEVER re-wrote
+    the booked ``forecast_prob``/``analytical_prob``. Observed on ids 285/287/288:
+    the companion was re-stamped at 15:15 while the trade row kept the 14:15
+    values, so the scoring/calibrating paths read a stale probability (booked
+    prob != companion calibrated_p).
+
+    ``our_prob`` is the CALIBRATED probability of the booked side — the SAME
+    source the companion's ``calibrated_p`` is derived from (companion side=BUY
+    carries calibrated_p, and the booked leg is ``calibrated_p`` for YES /
+    ``1-calibrated_p`` for NO). Writing it here keeps both sides of a re-stamp
+    consistent: the caller updates the companion via ``_upsert_forecast`` and
+    calls this in the SAME transaction, so a re-stamp is atomic.
+
+    ``calibration_error`` is recomputed against the row's OWN booked price
+    (never a re-fetched market mid) so the error stays tied to the fill.
+    """
+    if our_prob is None or our_prob != our_prob:
+        return
+    row = conn.execute(
+        "SELECT market_price FROM trades WHERE trade_uuid=?", (tuuid,)).fetchone()
+    mkt = row[0] if row and row[0] is not None else None
+    err = abs(float(our_prob) - float(mkt)) if mkt is not None else None
+    conn.execute(
+        "UPDATE trades SET forecast_prob=?, analytical_prob=?, "
+        "implied_prob=COALESCE(implied_prob, ?), calibration_error=? "
+        "WHERE trade_uuid=?",
+        (float(our_prob), float(our_prob), mkt, err, tuuid))
+
+
 def record_trade(conn, station, market_type, side, our_prob, market_price,
                  confidence, strike, ticker, size_usd, functionality, day_str,
                  probs: Optional[Dict] = None, price_source: Optional[str] = None,
@@ -708,6 +740,10 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
                 "UPDATE trades SET price_source=COALESCE(price_source, ?) "
                 "WHERE trade_uuid=?", (price_source, tuuid))
         _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
+        # ITEM2: a re-stamp must update BOTH sides atomically — the companion
+        # (above) AND the booked probability columns (here), from the SAME
+        # calibrated value, so the scoring path never reads a stale prob.
+        _sync_booked_prob(conn, tuuid, our_prob)
         conn.commit()
         return {"status": "enriched", "station": station,
                 "trade_uuid": tuuid, "picked_strike": strike,
@@ -760,6 +796,8 @@ def record_trade(conn, station, market_type, side, our_prob, market_price,
             (probs.get("p_gefs"), probs.get("p_analog"),
              probs.get("p_trajectory"), probs.get("p_fused"), tuuid))
         _upsert_forecast(conn, tuuid, station, day_str, strike, side, ticker, probs)
+        # ITEM2: keep the booked prob consistent with the companion re-stamp.
+        _sync_booked_prob(conn, tuuid, our_prob)
         conn.commit()
         return {"status": "duplicate_intent_noop", "station": station,
                 "trade_uuid": tuuid, "picked_strike": strike,
