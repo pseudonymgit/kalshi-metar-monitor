@@ -205,19 +205,26 @@ def process_settlements_for_date(self, settlement_date):
             profit = (settlement_contract_value - filled_price) * qty
             return_amount = settlement_contract_value * qty
         elif trade_type == TradeType.BUY_NO:
+            # `filled_price`/`trade_price` is the LEG price actually paid — for a
+            # NO buy that IS the NO price, corroborated by trade_cost == leg_price
+            # * qty and by price_source storing the YES mid (no_px = 1 - yes_mid).
+            # The prior form complemented BOTH sides (`cost = 1 - filled_price`),
+            # which double-counted the complement and booked a loss LARGER than
+            # the premium paid (impossible for a long). Fixed 2026-10-17.
             payout_per_contract = 1.0 - settlement_contract_value
-            cost_per_contract = 1.0 - filled_price
-            profit = (payout_per_contract - cost_per_contract) * qty
+            profit = (payout_per_contract - filled_price) * qty
             return_amount = payout_per_contract * qty
         elif trade_type == TradeType.SELL_YES:
             # Short YES: collect filled_price, owe event payout.
             profit = (filled_price - settlement_contract_value) * qty
             return_amount = profit
         elif trade_type == TradeType.SELL_NO:
-            # Short NO: collect NO price, owe non-event payout.
-            no_price = 1.0 - filled_price
+            # Short NO: collect the NO leg price (filled_price), owe the NO payout.
+            # Same leg-price convention as BUY_YES/SELL_YES; do NOT complement
+            # filled_price (that was the BUY_NO double-complement bug, fixed
+            # 2026-10-17 — kept symmetric here so no new landmine is left).
             no_payout = 1.0 - settlement_contract_value
-            profit = (no_price - no_payout) * qty
+            profit = (filled_price - no_payout) * qty
             return_amount = profit
         else:
             continue

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-16T21:53:09.734783+00:00",
+  "generated_at_utc": "2026-10-17T15:12:35.279710+00:00",
   "source_db": "data/paper_trading_sbox.db",
   "paradigm": "sole om_gfs + honest calibration + Kelly edge sizing",
   "bankroll_usd": 200.0,
